@@ -1,0 +1,31 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/plantillas/template.xhtml">
+
+    <ui:define name="title">Uniformes</ui:define>
+
+    <ui:define name="head">
+        <h:outputStylesheet name="css/estilos.css" library="recursos"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="formActividadesUniformes">
+            <p:growl id="messages" showDetail="true" life="2500"/>
+            <p:tabView id="tabView" cache="false" widgetVar="tvUniformes" dynamic="true">
+                <p:tab title="Solicitar Uniforme">
+                    <ui:include src="/protected/seccionesUniformes/solicitudUniformes.xhtml" />
+                    
+
+                </p:tab>
+
+                <p:tab title="Solicitudes de Uniformes Realizadas">
+                    <ui:include src="/protected/seccionesUniformes/solicitudesRealizadasUniformes.xhtml" />
+                </p:tab>
+
+            </p:tabView>              
+        </h:form>
+    </ui:define>
+</ui:composition>

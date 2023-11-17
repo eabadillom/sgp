@@ -1,0 +1,35 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/plantillas/template.xhtml">
+
+    <ui:define name="title">Asistencia</ui:define>
+
+    <ui:define name="head">
+        <h:outputScript library="recursos" name="js/primefaces_locale.js" />
+        <h:outputStylesheet name="css/estilos.css" library="recursos"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="formActividades">
+            <div class="grid table-demo">
+                <div class="col-12">
+                    <div class="card p-4">
+                        <p:growl id="messages" showDetail="true" life="2500"/>
+                        <p:tabView id="tabView" cache="false" widgetVar="tvAsistencia" dynamic="true">
+                            <p:tab title="Asistencia">
+                                <ui:include src="/protected/seccionesAsistencia/calendario.xhtml" />
+                            </p:tab>
+                            <p:tab title="Vacaciones/Permisos">
+                                <ui:include src="/protected/seccionesAsistencia/vacaciones.xhtml" />
+                            </p:tab>
+                        </p:tabView>                        
+                    </div>
+                </div>
+            </div>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

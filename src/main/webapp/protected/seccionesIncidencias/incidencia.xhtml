@@ -1,0 +1,130 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:ui="http://java.sun.com/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+    <p:toolbar styleClass="mb-4">
+        <p:toolbarGroup align="right">
+            <p:commandButton value="Descargar" icon="pi pi-download" styleClass="ui-button-secondary" ajax="false">
+                <p:dataExporter type="pdf" target="dtIncidencias" fileName="incidencias"/>
+            </p:commandButton>
+        </p:toolbarGroup>
+    </p:toolbar>
+
+    <p:dataTable id="dtIncidencias" widgetVar="dtIncidencias" lazy="false" value="#{incidenciaBean.listaPermisos}" 
+                 var="incidencia" rowKey="#{incidencia.idIncidencia}">
+        <p:column headerText="# Empleado">
+            <p:outputLabel value="#{incidencia.detEmpleadoDTO.numEmpleado}"/>
+        </p:column>
+        <p:column headerText="Nombre">
+            <p:outputLabel value="#{incidencia.detEmpleadoDTO.nombre} #{incidencia.detEmpleadoDTO.primerAp} #{incidencia.detEmpleadoDTO.segundoAp}"/>
+        </p:column>
+        <p:column headerText="Tipo Incidencia">
+            <p:outputLabel value="#{incidencia.catTipoIncidenciaDTO.idTipo eq 1 ? incidencia.detSolicitudPermisoDTO.catTipoSolicitud.descripcion :''}"/>
+        </p:column>
+        <p:column headerText="Fecha Inicio">
+            <p:outputLabel value="#{incidencia.catTipoIncidenciaDTO.idTipo eq 1 ? incidencia.detSolicitudPermisoDTO.fechaInicio :''}">
+                <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+            </p:outputLabel>
+        </p:column>
+        <p:column headerText="Fecha Fin">
+            <p:outputLabel value="#{incidencia.catTipoIncidenciaDTO.idTipo eq 1 ? incidencia.detSolicitudPermisoDTO.fechaFin :''}">
+                <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+            </p:outputLabel>
+        </p:column>
+        <p:column headerText="Fecha Captura">
+            <p:outputLabel value="#{incidencia.catTipoIncidenciaDTO.idTipo eq 1 ? incidencia.fechaCap :''}">
+                <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+            </p:outputLabel>
+        </p:column>
+        <p:column headerText="Estatus">
+            <p:outputLabel class="customer-badge status-#{incidencia.catEstatusIncidenciaDTO.idEstatus eq 1 ? 'proposal' : incidencia.catEstatusIncidenciaDTO.idEstatus eq  2 ? 'qualified' : 'unqualified'}"
+                           value="#{incidencia.catEstatusIncidenciaDTO.descripcion}" style="display: block; width: 7rem"/>
+        </p:column>
+        <!-- 
+        <p:column exportable="false">
+            <p:button icon="pi pi-check" styleClass="rounded-button ui-button-success mr-2 mb-2" />
+            <p:button icon="pi pi-times" styleClass="rounded-button ui-button-danger mr-2 mb-2" />
+        </p:column> 
+        -->
+        <p:column exportable="false" style="text-align: center" width="20px">
+            <p:commandButton icon="pi pi-search" styleClass="rounded-button ui-button-secondary mr-2 mb-2"  process="@this"
+                             action="#{incidenciaBean.visualizaDialog()}" update="formIncidencias:tabViewI:dialogPermisos">
+                <f:setPropertyActionListener value="#{incidencia}" target="#{incidenciaBean.incidenciaSelected}" for="@previous"/>
+            </p:commandButton>
+        </p:column>
+
+    </p:dataTable>
+
+    <p:dialog id="dialogPermisos" widgetVar="dialogPermisos" header="Detalle solicitud permiso" showEffect="fade" responsive="true" modal="true" 
+              styleClass="ferbo-dialog" dynamic="true" cache="false" >
+        <p:outputPanel id="pnlDetalleSolicitudPermiso" styleClass="ui-fluid pb-3">
+
+            <div class="formgrid grid">
+                <div class="field col">
+                    <p:outputLabel for="soTipoPermiso" value="Tipo"/>
+                    <p:selectOneMenu id="soTipoPermiso" autoWidth="false" value="#{incidenciaBean.incidenciaSelected.detSolicitudPermisoDTO.catTipoSolicitud.idTipoSolicitud}" 
+                                     disabled="true">
+                        <f:selectItems value="#{incidenciaBean.lstTipoSol}" var="tipoV" itemLabel="#{tipoV.descripcion}" itemValue="#{tipoV.idTipoSolicitud}"/>
+                    </p:selectOneMenu>
+                </div>
+            </div>
+            <div class="formgrid grid">
+                <div class="field col">
+                    <p:outputLabel for="soEstatusView" value="Estatus"/>
+                    <p:selectOneMenu id="soEstatusView" autoWidth="false" value="#{incidenciaBean.incidenciaSelected.detSolicitudPermisoDTO.aprobada}" 
+                                     disabled="true">
+                        <f:selectItem itemLabel="ENVIADA"/>
+                        <f:selectItem itemLabel="APROBADA" itemValue="1"/>
+                        <f:selectItem itemLabel="CANCELADA" itemValue="0"/>
+                    </p:selectOneMenu>
+                </div>
+            </div>
+            <p:datePicker id="dpRangoView" rendered="#{incidenciaBean.incidenciaSelected.detSolicitudPermisoDTO.catTipoSolicitud.idTipoSolicitud ne null 
+                                                       and (incidenciaBean.incidenciaSelected.detSolicitudPermisoDTO.catTipoSolicitud.idTipoSolicitud eq 2 
+                                                       or incidenciaBean.incidenciaSelected.detSolicitudPermisoDTO.catTipoSolicitud.idTipoSolicitud eq 4)}" 
+                          styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" disabled="true"
+                          showIcon="true" readonlyInput="true" timeZone="Mexico/General" value="#{incidenciaBean.lstRangoRegistro}"
+                          inline="true" selectionMode="range" disabledDays="#{incidenciaBean.invalidDays}"/>
+            <p:datePicker id="dpSimpleView" rendered="#{incidenciaBean.incidenciaSelected.detSolicitudPermisoDTO.catTipoSolicitud.idTipoSolicitud ne null 
+                                                        and (incidenciaBean.incidenciaSelected.detSolicitudPermisoDTO.catTipoSolicitud.idTipoSolicitud eq 1 
+                                                        or incidenciaBean.incidenciaSelected.detSolicitudPermisoDTO.catTipoSolicitud.idTipoSolicitud eq 3)}" 
+                          styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" disabled="true"
+                          pattern="dd-MM-yyyy" showIcon="true" readonlyInput="true" timeZone="Mexico/General" value="#{incidenciaBean.fechaSeleccionada}"
+                          inline="true" disabledDays="#{incidenciaBean.invalidDays}"/>
+
+        </p:outputPanel>
+        <f:facet name="footer">
+            <p:commandButton value="Aprobar" icon="pi pi-check" class="ui-button-success" process="pnlDetalleSolicitudPermiso @this"
+                             actionListener="#{incidenciaBean.guardarEstatusIncidencia(true)}" 
+                             disabled="#{incidenciaBean.incidenciaSelected.detSolicitudPermisoDTO.aprobada ne null}"/>
+            <p:commandButton value="Rechazar" icon="pi pi-times" class="ui-button-danger" process="pnlDetalleSolicitudPermiso @this" 
+                             disabled="#{incidenciaBean.incidenciaSelected.detSolicitudPermisoDTO.aprobada ne null}"
+                             oncomplete="PF('dialogRechazar').show()"/>
+        </f:facet>
+    </p:dialog>
+    <p:dialog widgetVar="dialogRechazar" header="Detalle rechazo" showEffect="fade" responsive="true" modal="true" 
+              styleClass="ferbo-dialog" dynamic="true" cache="false" >
+        <p:outputPanel id="pnlDetalleRechazo" styleClass="ui-fluid pb-3">
+            <div class="formgrid grid">
+                <div class="field col">
+                    <p:outputLabel for="txtRechazo" value="Descripción de rechazo"/>
+                    <p:inputTextarea id="txtRechazo" value="#{incidenciaBean.incidenciaSelected.detSolicitudPermisoDTO.descripcionRechazo}"/>
+                </div>
+            </div>
+        </p:outputPanel>
+        <f:facet name="footer">
+            <p:commandButton value="Aceptar" icon="pi pi-check" class="ui-button-success" process="pnlDetalleRechazo @this"
+                             actionListener="#{incidenciaBean.guardarEstatusIncidencia(false)}" oncomplete="PF('dialogRechazar').hide()"/>
+            <p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-secondary" process="@this" 
+                             oncomplete="PF('dialogRechazar').hide()"/>
+        </f:facet>
+    </p:dialog>
+    <style>
+        .ferbo-datePicker .ui-datepicker-calendar td a.ui-state-active{
+            background: #77ff00 !important;
+        }
+    </style>
+</ui:composition>

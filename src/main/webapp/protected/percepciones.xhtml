@@ -1,0 +1,97 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/plantillas/template.xhtml">
+
+    <ui:define name="title">Valores para Percepciones</ui:define>
+
+    <ui:define name="content">
+        <h:form id="form">
+            <div class="grid crud-demo">
+                <div class="col-12">
+                    <div class="card">
+                        <p:growl id="messages" showDetail="true" />
+                        <p:toolbar styleClass="mb-4">
+                            <p:toolbarGroup>
+                                <p:commandButton value="Nuevo" icon="pi pi-plus" actionListener="#{percepcionesBean.crearPercepcionNueva}" update="manage-nomina-content" oncomplete="PF('manageNominaDialog').show()" 
+                                                 styleClass="ui-button-success" style="margin-right: .5rem" />
+                                
+                            </p:toolbarGroup>
+                        </p:toolbar>
+                        <p:dataTable id="dt-percepcion" widgetVar="dtPercepcion" var="percepcion" value="#{percepcionesBean.percepcionActual}" reflow="true" styleClass="products-table"
+                                     rowKey="#{percepcion.idPercepciones}" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
+                            <p:column headerText="Días de Aguinaldo" sortBy="#{percepcion.diasAguinaldo}" filterBy="#{percepcion.diasAguinaldo}" style="width:10px;">
+                                <h:outputText value="#{percepcion.diasAguinaldo}" />
+                            </p:column>
+                            <p:column headerText="Días de Vacaciones" sortBy="#{percepcion.diasVacaciones}" filterBy="#{percepcion.diasVacaciones}" style="width:10px;">
+                                <h:outputText value="#{percepcion.diasVacaciones}" />
+                            </p:column>
+                            <p:column headerText="Prima Vacacional" sortBy="#{percepcion.primaVacacional}" filterBy="#{percepcion.primaVacacional}" style="width:10px;">
+                                <h:outputText value="#{percepcion.primaVacacional}" />
+                            </p:column>
+                            <p:column headerText="Bonos de Puntualidad" sortBy="#{percepcion.bonoPuntualidad}" filterBy="#{percepcion.bonoPuntualidad}" style="width:10px;">
+                                <h:outputText value="#{percepcion.bonoPuntualidad}" />
+                            </p:column>
+                            <p:column headerText="Vales de Despensa" sortBy="#{percepcion.valeDespensa}" filterBy="#{percepcion.valeDespensa}" style="width:10px;">
+                                <h:outputText value="#{percepcion.valeDespensa}" />
+                            </p:column>
+                            <p:column headerText="UMA" sortBy="#{percepcion.uma}" filterBy="#{percepcion.uma}" style="width:10px;">
+                                <h:outputText value="#{percepcion.uma}" />
+                            </p:column>
+                            <p:column headerText="Fecha" sortBy="#{percepcion.fechaCap}" filterBy="#{percepcion.fechaCap}" style="width:10px;">
+                                <h:outputText value="#{percepcion.fechaCap}" >
+                                    <f:convertDateTime pattern="yyyy-MM-dd hh:mm a" timeZone="Mexico/General"/>
+                                </h:outputText>
+                            </p:column>
+                        </p:dataTable>
+                        
+                        <p:dialog header="Percepciones" showEffect="fade" modal="true" widgetVar="manageNominaDialog" responsive="true">
+                            <p:outputPanel id="manage-nomina-content" class="ui-fluid">
+                                <p:outputPanel rendered="#{not empty percepcionesBean.percepcionNueva}">
+                                    <div class="field">
+                                        <p:outputLabel for="diasAguinaldo">Días de Aguinaldo</p:outputLabel>
+                                        <p:inputNumber id="diasAguinaldo" value="#{percepcionesBean.percepcionNueva.diasAguinaldo}" required="true"/>
+                                    </div>
+                                    <div class="field">
+                                        <p:outputLabel for="diasVacaciones">Días de Vacaciones</p:outputLabel>
+                                        <p:inputNumber id="diasVacaciones" value="#{percepcionesBean.percepcionNueva.diasVacaciones}" required="true"/>
+                                    </div>
+                                    <div class="field">
+                                        <p:outputLabel for="primaVacaciones">Prima Vacacional</p:outputLabel>
+                                        <p:inputNumber id="primaVacaciones" value="#{percepcionesBean.percepcionNueva.primaVacacional}" required="true"/>
+                                    </div>
+                                    <div class="field">
+                                        <p:outputLabel for="bonosPuntualidad">Bonos de Puntualidad</p:outputLabel>  
+                                        <p:inputNumber id="bonosPuntualidad" value="#{percepcionesBean.percepcionNueva.bonoPuntualidad}" required="true" decimalPlaces="6"/>
+                                    </div>
+                                    <div class="field">
+                                        <p:outputLabel for="valesDespensa">Vales de Despensa</p:outputLabel>   
+                                        <p:inputNumber id="valesDespensa" value="#{percepcionesBean.percepcionNueva.valeDespensa}" required="true" decimalPlaces="6"/>
+                                    </div>
+                                    <div class="field">
+                                        <p:outputLabel for="uma">UMA</p:outputLabel>   
+                                        <p:inputNumber id="uma" value="#{percepcionesBean.percepcionNueva.uma}" required="true" decimalPlaces="6"/>
+                                    </div>
+                                    <div class="field">
+                                        <p:outputLabel for="fechaCaptura">Fecha Captura</p:outputLabel> 
+                                        <p:calendar id="fechaCaptura" value="#{percepcionesBean.percepcionNueva.fechaCap}" required="true"/>
+                                    </div>
+                                </p:outputPanel>
+                            </p:outputPanel>
+
+                            <f:facet name="footer">
+                                <p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{percepcionesBean.crearPercepcionNueva}" update="manage-nomina-content" process="manage-nomina-content @this" />
+                                <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('manageNominaDialog').hide()" class="ui-button-secondary" />
+                            </f:facet>
+                        </p:dialog>
+                        
+                    </div>
+                </div>
+            </div>
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,38 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:ui="http://java.sun.com/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+    <p:dataTable id="dt-uniformes-sol" widgetVar="dtUniformes"
+                 var="uniforme" value="#{uniformesBean.lstSolicitudPrendasRealizadas}"
+                 reflow="true" styleClass="products-table" rowKey="uniforme.idSolicitud" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
+        <p:column headerText="Prenda" sortBy="#{uniforme.getPrenda().idPrenda}" width="100px">
+            <h:outputText value="#{uniforme.getPrenda().descripcion}" />
+        </p:column>
+        <p:column headerText="Imagen" width="100px">
+            <h:graphicImage name="images/prendas/#{uniforme.getPrenda().descripcion}.jpg" library="recursos" width="57" />
+        </p:column>
+        <p:column headerText="Precio" sortBy="#{uniforme.cantidad}" width="100px">
+            <h:outputText value="Precio Individual: $#{uniforme.getPrenda().precio} / Precio Total: $#{uniforme.getPrenda().precio * uniforme.cantidad}" />
+        </p:column>
+        <p:column headerText="Cantidad" sortBy="#{uniforme.cantidad}" width="100px">
+            <h:outputText value="#{uniforme.cantidad}" />
+        </p:column>
+        <p:column headerText="Talla" sortBy="#{uniforme.getTalla().idTalla}" width="100px">
+            <h:outputText value="#{uniforme.getTalla().descripcion}" />
+        </p:column>
+        <p:column headerText="Fecha" sortBy="#{uniforme.getFechaCap()}" sortOrder="descending" width="100px">
+            <h:outputText value="#{uniforme.getFechaCap()}" >
+                <f:convertDateTime pattern="yyyy-MM-dd hh:mm a" timeZone="Mexico/General"/>
+            </h:outputText>
+        </p:column>
+        <p:column headerText="Estatus" sortBy="#{uniforme.getAprobada()}" width="100px">
+            <span class="customer-badge status-#{uniforme.aprobada eq null ? 'proposal' : uniforme.aprobada eq  1 ? 'qualified' : 'unqualified'}" style="display: block; width: 7rem">
+                #{solicitud.aprobada eq null ? 'ENVIADA' : uniforme.aprobada eq  1 ? 'APROBADA' : 'RECHAZADA'}</span>
+        </p:column>
+    </p:dataTable>
+
+
+</ui:composition>

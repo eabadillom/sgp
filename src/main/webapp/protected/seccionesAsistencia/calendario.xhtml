@@ -1,0 +1,129 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:ui="http://java.sun.com/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:schedule value="#{asistenciaBean.calendario}" draggable="false" resizable="false" widgetVar="actividades" timeZone="Mexico/General" 
+                styleClass="ferbo-schedule" view="agendaWeek" showWeekNumbers="true">
+        <p:ajax event="eventSelect" listener="#{asistenciaBean.eventoSeleccionado}" update="eventDialog"
+                oncomplete="PF('eventDialog').show();"/>
+        <p:ajax event="viewChange" oncomplete="actualizaCampos();"/>
+    </p:schedule>
+
+    <p:dialog id="eventDialog" widgetVar="eventDialog" header="Detalle del registro" showEffect="fade" width="350" responsive="true" modal="true">
+        <p:outputPanel id="pnlDetalleRegistro" styleClass="ui-fluid p-0" rendered="#{asistenciaBean.evento.dynamicProperties.get('estatus') ne null}">
+            <p:panel id="pnlEntrada" rendered="#{asistenciaBean.evento.description eq null}" styleClass="ferbo-panel-no-border">
+                <div class="field">
+                    <p:outputLabel for="hEntrada" value="Hora de entrada" />
+                    <p:calendar id="hEntrada" value="#{asistenciaBean.evento.startDate}" pattern="hh:mm:ss a" disabled="true"
+                                timeZone="Mexico/General"/>
+                </div>
+            </p:panel>
+            <p:panel id="pnlSalida" rendered="#{asistenciaBean.evento.description ne null}" styleClass="ferbo-panel-no-border">
+                <div class="field">
+                    <p:outputLabel for="hSalida" value="Hora de salida" />
+                    <p:calendar id="hSalida" value="#{asistenciaBean.evento.endDate}" 
+                                pattern="hh:mm:ss a" disabled="true" timeZone="Mexico/General"/>
+                    <p:inputText id="registro" rendered="#{asistenciaBean.evento.description eq null}" value="Sin registro" disabled="true"/>
+                </div>
+            </p:panel>
+            <p:panel id="pnlEstatus" rendered="#{asistenciaBean.evento.description eq null}" styleClass="ferbo-panel-no-border">
+                <div class="field">
+                    <p:outputLabel for="estatus" value="Estatus" />
+                    <p:inputText id="estatus" value="#{asistenciaBean.evento.dynamicProperties.get('estatus')}" disabled="true"/>
+                </div>
+            </p:panel>
+        </p:outputPanel>
+        <p:outputPanel id="pnlDetallePermiso" styleClass="ui-fluid p-0" rendered="#{asistenciaBean.evento.dynamicProperties.get('estatus') eq null}">
+            <div class="field">
+                <p:outputLabel for="tipoSol" value="Tipo" />
+                <p:inputText id="tipoSol" value="#{asistenciaBean.evento.dynamicProperties.get('tipoSolicitud')}" disabled="true"/>
+            </div>
+            <p:panel id="pnlFechas" styleClass="ferbo-panel-no-border">
+                <div class="field">
+                    <p:outputLabel for="fDesde" value="Desde" rendered="#{asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') eq 2}"/>
+                    <p:outputLabel for="fDesde" value="Fecha" rendered="#{asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') ne 2 
+                                                                          and asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') ne 3}"/>
+                    <p:calendar id="fDesde" value="#{asistenciaBean.evento.startDate}" pattern="dd/MM/yyyy" disabled="true"
+                                timeZone="Mexico/General" rendered="#{asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') ne 3}"/>
+                    
+                    <p:outputLabel for="fDesdeHr" value="Hora inicial" rendered="#{asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') eq 3}"/>
+                    <p:calendar id="fDesdeHr" value="#{asistenciaBean.evento.startDate}" pattern="hh:mm:ss a" disabled="true"
+                                timeZone="Mexico/General" rendered="#{asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') eq 3}"/>
+                </div>
+                <div class="field">
+                    <p:outputLabel for="fHasta" value="Hasta" rendered="#{asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') eq 2}"/>
+                    <p:calendar id="fHasta" value="#{asistenciaBean.evento.endDate}" pattern="dd/MM/yyyy" disabled="true"
+                                timeZone="Mexico/General" rendered="#{asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') eq 2}"/>
+                    <p:outputLabel for="fHastaHr" value="Hora final" rendered="#{asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') eq 3}"/>
+                    <p:calendar id="fHastaHr" value="#{asistenciaBean.evento.endDate}" pattern="hh:mm:ss a" disabled="true"
+                                timeZone="Mexico/General" rendered="#{asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') eq 3}"/>
+                </div>
+            </p:panel>
+        </p:outputPanel>
+    </p:dialog>        
+    <style>
+        .ferbo-panel-no-border .ui-panel-content{
+            padding: 0 !important;
+            border: none !important;
+        }
+
+        .ferbo-schedule .fc-daygrid-day-frame {
+            /*max-height: 6rem;*/
+            max-height: 16rem;
+        }
+        .ferbo-schedule .fc-h-event .fc-event-main-frame {
+            display: flex;
+            text-align: center;
+        }
+        .ferbo-schedule .fc-daygrid-body-unbalanced .fc-daygrid-day-events {
+            /*text-align: center;*/
+        }
+        
+        .ferbo-schedule .fc-event .fc-event-main{
+            background: none !important;
+        }
+        
+        .ferbo-evento-comida{
+            background-color: #f39c12 !important;
+        }
+        .ferbo-evento-permiso{
+            background-color: #425691 !important;
+        }
+        .ferbo-evento-vacaciones{
+            /*background-color: #6cccdc !important;*/
+            background-color: #689f38 !important;
+        }
+        .ferbo-evento-incapacidad-c{
+            background-color: #ae1c89 !important;
+        }
+        .ferbo-evento-incapacidad-l{
+            background-color: #6e1271 !important;
+        }
+    </style>
+    <script  type="text/javascript">
+        function actualizaCampos() {
+            Array.from(document.getElementsByClassName('fc-daygrid-event-harness')).forEach(function (dia) {
+                Array.from(dia.getElementsByClassName('fc-daygrid-event')).forEach(function (evento) {
+                    tipo = evento.querySelector('.fc-event-title');
+                    switch (tipo.innerHTML.at(0)) {
+                        case 'E':
+                            tipo.innerHTML = 'Entrada<br/>'.concat(tipo.innerHTML.replace('Entrada', ''));
+                            break;
+                        case 'S':
+                            tipo.innerHTML = 'Salida<br/>'.concat(tipo.innerHTML.replace('Salida', ''));
+                            tipo.setAttribute('style', 'padding: 0 8px;');
+                            if (evento.querySelector('.fc-daygrid-event-dot') !== null) {
+                                evento.querySelector('.fc-daygrid-event-dot').setAttribute('style', 'display:none!important');
+                            }
+                            break;
+                        case 'C':
+                            tipo.innerHTML = 'Comida<br/>'.concat(tipo.innerHTML.replace('Comida', ''));
+                            tipo.setAttribute('style', 'padding: 0 8px;');
+                            evento.querySelector('.fc-daygrid-event-dot').setAttribute('style', 'display:none!important');
+                            break;
+                    }
+                });
+            });
+        };
+    </script>
+</ui:composition>

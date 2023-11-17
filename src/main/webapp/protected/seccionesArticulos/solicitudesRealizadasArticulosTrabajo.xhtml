@@ -1,0 +1,38 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:ui="http://java.sun.com/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+    <p:dataTable id="dt-articuloOficinas-sol" widgetVar="dtArticuloOficinasSol"
+                 var="articuloOficina" value="#{articuloOficinasBean.lstSolicitudArticulosRealizadas}"
+                 reflow="true" styleClass="products-table"
+                 rowKey="articuloOficina.idSolicitud">
+        <p:column headerText="Articulo"
+                  sortBy="#{articuloOficina.getArticulo().idArticulo}" width="100px">
+            <h:outputText value="#{articuloOficina.getArticulo().descripcion}" />
+        </p:column>
+        <p:column headerText="Imagen" width="100px">
+            <h:graphicImage name="images/articulos/#{articuloOficina.getArticulo().descripcion}.jpg" library="recursos" width="57" />
+        </p:column>
+        <p:column headerText="Cantidad" sortBy="#{articuloOficina.cantidad}"
+                  width="100px">
+            <h:outputText value="#{articuloOficina.cantidad}" />
+        </p:column>
+        <p:column headerText="Unidad" sortBy="#{articuloOficina.getArticulo().unidad}"
+                  width="100px">
+            <h:outputText value="#{articuloOficina.getArticulo().unidad}" />
+        </p:column>
+        <p:column headerText="Fecha" sortBy="#{articuloOficina.getFechaCap()}" sortOrder="descending" width="100px">
+            <h:outputText value="#{articuloOficina.getFechaCap()}" >
+                 <f:convertDateTime pattern="yyyy-MM-dd hh:mm a" timeZone="Mexico/General"/>
+            </h:outputText>
+        </p:column>
+        <p:column headerText="Estatus" sortBy="#{articuloOficina.aprobada}" width="100px">
+            <span class="customer-badge status-#{articuloOficina.aprobada eq null ? 'proposal' : articuloOficina.aprobada eq  1 ? 'qualified' : 'unqualified'}" style="display: block; width: 7rem">
+                #{articuloOficina.aprobada eq null ? 'ENVIADA' : articuloOficina.aprobada eq  1 ? 'APROBADA' : 'RECHAZADA'}</span>
+        </p:column>
+    </p:dataTable>
+
+</ui:composition>

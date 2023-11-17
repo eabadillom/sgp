@@ -1,0 +1,197 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:ui="http://java.sun.com/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+    <p:toolbar styleClass="mb-4">
+        <p:toolbarGroup>
+            <p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-success" style="margin-right: .5rem" process="@this"
+                             onstart="PF('uniformeDialog').show();" actionListener="#{uniformesBean.inicializaPrenda()}"/>
+        </p:toolbarGroup>
+    </p:toolbar>
+
+    <p:dataTable id="dt-uniformes" widgetVar="dtUniformes"
+                 var="uniforme" value="#{uniformesBean.lstSolicitudPrendas}"
+                 reflow="true" styleClass="products-table" rowKey="uniforme.idSolicitud">
+        <p:column headerText="Prenda" sortBy="#{uniforme.getPrenda().idPrenda}" width="22%">
+            <h:outputText value="#{uniforme.getPrenda().descripcion}" />
+        </p:column>
+        <p:column headerText="Imagen" width="18%">
+            <p:graphicImage name="images/prendas/#{uniforme.getPrenda().descripcion}.jpg" library="recursos" width="57" />
+        </p:column>
+        <p:column headerText="Precio" sortBy="#{uniforme.cantidad}" width="18%">
+            <h:outputText value="$#{uniforme.getPrenda().precio * uniforme.cantidad}" />
+        </p:column>
+        <p:column headerText="Cantidad" sortBy="#{uniforme.cantidad}" width="18%">
+            <h:outputText value="#{uniforme.cantidad}" />
+        </p:column>
+        <p:column headerText="Talla" sortBy="#{uniforme.getTalla().idTalla}" width="18%">
+            <h:outputText value="#{uniforme.getTalla().descripcion}" />
+        </p:column>
+        <p:column width="6%">
+            <p:commandButton class="ui-button-danger rounded-button m-1" icon="pi pi-trash" process="@this" title="Eliminar"
+                             oncomplete="PF('dialogEliminarPrenda').show()" >
+                <f:setPropertyActionListener value="#{uniforme}" target="#{uniformesBean.solicitud}" />
+            </p:commandButton>
+        </p:column>
+    </p:dataTable>
+    <div class="pt-4">
+        <p:commandButton id="btnRegistro" value="Registrar Solicitud" 
+                         disabled="#{empty uniformesBean.lstSolicitudPrendas}" actionListener="#{uniformesBean.registro()}" />
+    </div>
+    <div class="pt-4">
+        <p:fieldset legend="DATOS PARA PAGO DEL UNIFORME" toggleable="true" toggleSpeed="500" collapsed="true">
+            <div class="col-12">
+                <div class="ui-fluid formgrid grid">
+                    <div class="field col-12 md:col-12">
+                        <p:outputLabel for="razonSocial" value="RAZÓN SOCIAL" />
+                        <p:inputText id="razonSocial" />
+                    </div>
+                    <div class="field col-4 md:col-4">
+                        <p:outputLabel for="rfc" value="RFC" />
+                        <p:inputText id="rfc" value="123456789123456789" />
+                    </div>
+                    <div class="field col-12">
+                        <p:outputLabel for="referenciaPago" value="REFERENCIA DE PAGO" />
+                        <p:inputText id="referenciaPago" />
+                    </div>
+                    <div class="field col-12 md:col-6">
+                        <p:outputLabel for="banco" value="BANCO" />
+                        <p:inputText id="banco" />
+                    </div>
+                    <div class="field col-12 md:col-6">
+                        <p:outputLabel for="cuenta" value="CUENTA" />
+                        <p:inputText id="cuenta" />
+                    </div>
+                    <div class="field col-4 md:col-4">
+                        <p:outputLabel for="clabeBancaria" value="CLABE INTERBANCARIA" />
+                        <p:inputText id="clabeBancaria" value="123456789123456789" />
+                    </div>
+                </div>
+            </div>
+
+        </p:fieldset>
+    </div>
+
+    <p:dialog id="uniformeDialog" header="Uniformes" showEffect="fade" modal="true" styleClass="ferbo-dialog-prenda"
+              widgetVar="uniformeDialog" responsive="true" blockScroll="false" cache="false" closeOnEscape="true" closable="true" dynamic="true" >
+        <p:dataScroller value="#{uniformesBean.lstPrendasActivas}" var="prenda" mode="inline"
+                        styleClass="ferbo-data-scroller">
+
+            <div style="height: 300px">
+                <div class="ferbo-list-item-prenda pl-5 pr-5 pt-0 pb-0">
+                    <p:outputLabel value="#{prenda.descripcion}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
+                    <h:graphicImage name="images/prendas/#{prenda.descripcion}.jpg" library="recursos" styleClass="ferbo-prenda-imagen" alt="Sin imágen" />                    
+                </div>
+                <div class="ferbo-list-item-descripcion p-0">
+                    <div class="product-list-action">
+                        <div class="product-list-detail">
+                            <div>#{prenda.detalle}</div>
+                        </div>
+                        <p:panelGrid columns="2" columnClasses="ui-grid-col-4 p-0 m-auto, ui-grid-col-8 p-0" layout="grid" styleClass="pt-2">
+                            <h:outputText value="#{prenda.precio}" styleClass="product-price">
+                                <f:convertNumber currencySymbol="$" type="currency"/>
+                            </h:outputText>
+
+                            <p:commandButton value="Seleccionar" icon="pi pi-check" actionListener="#{uniformesBean.seleccionarItem(prenda)}" process="@this"/>
+                        </p:panelGrid>
+                        <!--<span class="product-badge status-instock">DISPONIBLE</span>-->
+                    </div>
+                </div>
+            </div>
+
+        </p:dataScroller>
+    </p:dialog>
+    <p:dialog id="dialogComplementoPrenda" showEffect="fade" modal="true" draggable="false" resizable="false"
+              widgetVar="dialogComplementoPrenda" responsive="true" dynamic="true" cache="false" closable="false" closeOnEscape="false" styleClass="ferbo-dialog-complemento-prenda">
+        <p:outputPanel id="manage-prendas-content" class="ui-fluid">
+            <p:outputPanel id="pnlPrendas" rendered="#{not empty uniformesBean.prendaSelected}">
+                <div class="field" style="text-align: center">
+                    <p:outputLabel value="#{uniformesBean.prendaSelected.descripcion}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
+                </div>
+                <div class="product-item-content" style="text-align: center">
+                    <h:graphicImage id="precioPrenda2" name="images/prendas/#{uniformesBean.prendaSelected.descripcion}.jpg" library="recursos" width="113" rendered="#{uniformesBean.prendaSelected.descripcion ne null}" styleClass="product-image"/>
+                </div>
+                <div class="field">
+                    <p:outputLabel for="@next" value="Cantidad" />
+                    <p:spinner id="spCantidad" value="#{uniformesBean.solicitud.cantidad}" min="0" max="#{uniformesBean.prendaSelected.cantidadMax}" size="1" buttons="horizontal">
+                        <p:ajax update="formActividadesUniformes:tabView:totalPrenda" process="@this"/>
+                    </p:spinner>
+                    <p:message for="@previous" styleClass="mt-1"/>
+                </div>
+
+                <div class="field">
+                    <p:outputLabel for="@next" value="Talla" />
+                    <p:selectOneMenu id="soTalla" value="#{uniformesBean.solicitud.talla}" converter="entityConverter">
+                        <f:selectItem itemLabel="--Seleccione--" />
+                        <f:selectItems value="#{uniformesBean.lstTallasActivas}" var="talla" itemValue="#{talla}" itemLabel="#{talla.descripcion}" />
+                        <p:ajax event="itemSelect" process="@this formActividadesUniformes:tabView:soTalla"/>
+                    </p:selectOneMenu>
+                    <p:message for="@previous" styleClass="mt-1"/>
+                </div>
+
+                <div class="field">
+                    <h:outputText value="Total: "/>
+                    <h:outputText id="totalPrenda" value="$#{uniformesBean.prendaSelected.precio*uniformesBean.solicitud.cantidad}"/>
+                </div>
+            </p:outputPanel>
+        </p:outputPanel>
+        <f:facet name="footer">
+            <p:commandButton value="Agregar" icon="pi pi-shopping-cart"
+                             actionListener="#{uniformesBean.preRegistro()}" />
+            <p:commandButton value="Cancelar" icon="pi pi-times"
+                             onclick="PF('dialogComplementoPrenda').hide()"
+                             class="ui-button-secondary" process="@this formActividadesUniformes:tabView:pnlPrendas"/>
+        </f:facet>
+    </p:dialog>
+
+    <p:confirmDialog widgetVar="dialogEliminarPrenda" showEffect="fade" width="300" message="Eliminar prenda?" header="Confirmar" severity="warn">
+        <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{uniformesBean.eliminaSolicitud()}" process="@this" 
+                         oncomplete="PF('dialogEliminarPrenda').hide()" update="formActividadesUniformes:tabView:dt-uniformes formActividadesUniformes:tabView:btnRegistro"/>
+        <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('dialogEliminarPrenda').hide()" />
+    </p:confirmDialog>
+
+    <style>
+        .ferbo-data-scroller{
+
+        }
+        .ferbo-data-scroller .ui-datascroller-content{
+            height: 70vh;
+        }
+        .ferbo-data-scroller .ui-datascroller-list {
+            display: grid;
+            grid-template-columns: 33% 33% 33%;
+            text-align: center;
+        }
+        .ferbo-data-scroller .ui-datascroller-item{
+            border: 1px grey solid;
+            margin: 4px;
+            border-radius: 10px;
+        }
+        .ferbo-dialog-prenda{
+            width: 70vw !important;
+            height: 80vh !important;
+        }
+        .ferbo-dialog-prenda .ui-dialog-content{
+            height: 80vh !important;
+        }
+        .ferbo-list-item-prenda{
+            height: 70%;
+            display: grid;
+        }
+        .ferbo-list-item-descripcion{
+            height: 30%;
+            display: grid;
+            align-content: space-around;
+        }
+        .ferbo-prenda-imagen{
+            height: 160px !important;
+            margin: auto;
+        }
+        .ferbo-dialog-complemento-prenda{
+            width: 480px !important;
+        }
+    </style>
+</ui:composition>

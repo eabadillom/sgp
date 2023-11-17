@@ -1,0 +1,97 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:ui="http://java.sun.com/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+    <p:toolbar styleClass="mb-4">
+        <p:toolbarGroup align="right">
+            <p:commandButton value="Descargar" icon="pi pi-download" styleClass="ui-button-secondary" ajax="false">
+                <p:dataExporter type="pdf" target="dtArticulosSolicitados" fileName="articulos"/>
+            </p:commandButton>
+        </p:toolbarGroup>
+    </p:toolbar>
+
+    <p:dataTable id="dtArticulosSolicitados" widgetVar="dtArticulosSolicitados" lazy="false" value="#{incidenciaBean.listaArticulos}" 
+                 var="articulos" rowKey="#{articulos.idIncidencia}">
+        <p:column headerText="# Empleado">
+            <p:outputLabel value="#{articulos.detEmpleadoDTO.numEmpleado}"/>
+        </p:column>
+        <p:column headerText="Nombre">
+            <p:outputLabel value="#{articulos.detEmpleadoDTO.nombre} #{articulos.detEmpleadoDTO.primerAp} #{articulos.detEmpleadoDTO.segundoAp}"/>
+        </p:column>
+        <p:column headerText="Articulos">
+            <p:outputLabel value="#{articulos.catTipoIncidenciaDTO.idTipo eq 4 ? articulos.detSolicitudArticuloDTO.articulo.descripcion :''}"/>
+        </p:column>
+        <p:column headerText="Imagen">
+            <h:graphicImage name="images/articulos/#{articulos.detSolicitudArticuloDTO.articulo.descripcion}.jpg" library="recursos" width="57" />
+        </p:column>
+        <p:column headerText="Cantidad / Unidad">
+            <p:outputLabel value="#{articulos.catTipoIncidenciaDTO.idTipo eq 4 ? articulos.detSolicitudArticuloDTO.cantidad :''} #{articulos.catTipoIncidenciaDTO.idTipo eq 4 ? articulos.detSolicitudArticuloDTO.articulo.unidad :''}"/>
+        </p:column>
+        <p:column headerText="Fecha Captura">
+            <p:outputLabel value="#{articulos.catTipoIncidenciaDTO.idTipo eq 4 ? articulos.fechaCap :''}">
+                <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+            </p:outputLabel>
+        </p:column>
+        <p:column headerText="Estatus">
+            <p:outputLabel class="customer-badge status-#{articulos.catEstatusIncidenciaDTO.idEstatus eq 1 ? 'proposal' : articulos.catEstatusIncidenciaDTO.idEstatus eq  2 ? 'qualified' : 'unqualified'}"
+                           value="#{articulos.catEstatusIncidenciaDTO.descripcion}" style="display: block; width: 7rem"/>
+        </p:column>
+        <p:column exportable="false" style="text-align: center" width="20px">
+            <p:commandButton icon="pi pi-search" styleClass="rounded-button ui-button-secondary mr-2 mb-2"  process="@this"
+                             action="#{incidenciaBean.visualizaDialog()}" update="formIncidencias:tabViewI:dialogArticulos">
+                <f:setPropertyActionListener value="#{articulos}" target="#{incidenciaBean.incidenciaSelected}" for="@previous"/>
+            </p:commandButton>
+        </p:column>
+    </p:dataTable>
+
+    <p:dialog id="dialogArticulos" showEffect="fade" modal="true" 
+              widgetVar="dialogArticulos" responsive="true" dynamic="true" cache="false" styleClass="ferbo-dialog-complemento-articulo">
+        <p:outputPanel id="pnlArticulos" rendered="#{not empty incidenciaBean.incidenciaSelected}">
+            <div class="formgrid grid">
+                <div class="field col">
+                    <p:outputLabel value="#{incidenciaBean.incidenciaSelected.detSolicitudArticuloDTO.articulo.descripcion}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
+                </div>
+            </div>
+            <div class="formgrid grid">
+                <div class="field col">
+                    <h:graphicImage id="imgArticulo" name="images/articulos/#{incidenciaBean.incidenciaSelected.detSolicitudArticuloDTO.articulo.descripcion}.jpg" library="recursos" width="113" rendered="#{incidenciaBean.incidenciaSelected.detSolicitudArticuloDTO.articulo.descripcion ne null}" styleClass="product-image"/>
+                </div>
+            </div>
+            <div class="formgrid grid">
+                <div class="field col">
+                    <p:outputLabel value="Cantidad: #{incidenciaBean.incidenciaSelected.detSolicitudArticuloDTO.cantidad} #{incidenciaBean.incidenciaSelected.detSolicitudArticuloDTO.articulo.unidad}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
+                </div>
+            </div>
+        </p:outputPanel>
+        <f:facet name="footer">
+            <p:commandButton value="Aprobar" icon="pi pi-check" class="ui-button-success" process="pnlArticulos @this"
+                             actionListener="#{incidenciaBean.guardarEstatusArticulo(true)}" 
+                             disabled="#{incidenciaBean.incidenciaSelected.detSolicitudArticuloDTO.aprobada ne null}"/>
+            <p:commandButton value="Rechazar" icon="pi pi-times" class="ui-button-danger" process="pnlArticulos @this"
+                             onclick="PF('dialogArticulos').hide()"
+                             disabled="#{incidenciaBean.incidenciaSelected.detSolicitudArticuloDTO.aprobada ne null}"
+                             oncomplete="PF('dialogRechazarArticulo').show()"/>
+        </f:facet>
+    </p:dialog>
+
+    <p:dialog widgetVar="dialogRechazarArticulo" header="Detalle rechazo" showEffect="fade" responsive="true" modal="true" 
+              styleClass="ferbo-dialog" dynamic="true" cache="false" >
+        <p:outputPanel id="pnlDetalleRechazoArticulo" styleClass="ui-fluid pb-3">
+            <div class="formgrid grid">
+                <div class="field col">
+                    <p:outputLabel for="txtRechazoArticulo" value="Descripción de rechazo"/>
+                    <p:inputTextarea id="txtRechazoArticulo" value="#{incidenciaBean.incidenciaSelected.detSolicitudArticuloDTO.descripcionRechazo}"/>
+                </div>
+            </div>
+        </p:outputPanel>
+        <f:facet name="footer">
+            <p:commandButton value="Aceptar" icon="pi pi-check" class="ui-button-success" process="pnlDetalleRechazoArticulo @this"
+                             actionListener="#{incidenciaBean.guardarEstatusIncidencia(false)}" oncomplete="PF('dialogRechazarArticulo').hide()" update="formIncidencias:tabViewI:dtArticulosSolicitados"/>
+            <p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-secondary" process="@this" 
+                             oncomplete="PF('dialogRechazarArticulo').hide()"/>
+        </f:facet>
+    </p:dialog>
+</ui:composition>

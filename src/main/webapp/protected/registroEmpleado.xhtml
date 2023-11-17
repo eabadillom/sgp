@@ -1,0 +1,347 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/plantillas/template.xhtml">
+
+    <ui:define name="title">Registro de empleados</ui:define>
+
+    <ui:define name="head">
+        <h:outputScript library="recursos" name="js/primefaces_locale.js" />
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="formRegistroEmpleado">
+            <div class="grid table-demo">
+                <div class="col-12">
+                    <div class="card p-4">
+
+                        <p:growl id="messages" showDetail="true" life="2500"/>
+                         <p:blockUI block="formRegistroEmpleado:dialogBiometrico" widgetVar="bui"/>
+                         <p:remoteCommand name="verificaEstado" onstart="PF('bui').hide();" actionListener="#{registroEmpleadosBean.validaHuella()}"/>
+
+                        <p:toolbar styleClass="mb-4">
+                            <p:toolbarGroup>
+                                <p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{registroEmpleadosBean.agregarEmpleado()}" update="panelDialogEmpleado" oncomplete="PF('dialogEmpleado').show()" 
+                                                 styleClass="ui-button-success" style="margin-right: .5rem" process="@this"/>
+                                <p:commandButton id="btnEliminarEmp" value="#{registroEmpleadosBean.mensajeBotonEliminar}" icon="pi pi-trash" actionListener="#{registroEmpleadosBean.eliminaEmpleadosSeleccionados()}" 
+                                                 styleClass="ui-button-danger" disabled="#{!registroEmpleadosBean.empleadoSeleccionado}" update="@this">
+                                    <p:confirm header="Confimación" message="Está seguro que desea eliminar los registros seleccionados?" icon="pi pi-exclamation-triangle" />
+                                </p:commandButton>
+                            </p:toolbarGroup>
+                            <p:toolbarGroup align="right">
+                                <p:commandButton value="Descargar" icon="pi pi-download" styleClass="ui-button-secondary" ajax="false">
+                                    <p:dataExporter type="pdf" target="dtEmpleados" fileName="empleados"/>
+                                </p:commandButton>
+                            </p:toolbarGroup>
+                        </p:toolbar>
+
+                        <p:dataTable id="dtEmpleados" widgetVar="dtEmpleados" var="empleado" value="#{registroEmpleadosBean.lstEmpleados}" reflow="true" styleClass="products-table"
+                                     selection="#{registroEmpleadosBean.lstEmpleadosSelected}" rowKey="#{empleado.idEmpleado}" paginator="true" rows="10" rowSelectMode="add" 
+                                     paginatorPosition="bottom">
+                            <f:facet name="header">
+                                <div class="customers-table-header">
+                                    <span style="font-weight: bold">Empleados</span>
+
+                                    <span class="ui-input-icon-left filter-container">
+                                        <i class="pi pi-search"/>
+                                        <p:inputText id="globalFilter" onkeyup="PF('dtEmpleados').filter()" placeholder="Buscar"/>
+                                    </span>
+                                </div>
+                            </f:facet>
+
+                            <p:ajax event="rowSelect" update=":formRegistroEmpleado:btnEliminarEmp"/>
+                            <p:ajax event="rowUnselect" update=":formRegistroEmpleado:btnEliminarEmp" />
+                            <p:ajax event="rowSelectCheckbox" update=":formRegistroEmpleado:btnEliminarEmp"/>
+                            <p:ajax event="rowUnselectCheckbox" update=":formRegistroEmpleado:btnEliminarEmp" />
+                            <p:ajax event="toggleSelect" update=":formRegistroEmpleado:btnEliminarEmp" />
+
+                            <p:column selectionMode="multiple" exportable="false"></p:column>
+
+                            <p:column headerText="# Empleado" sortBy="#{empleado.numEmpleado}" filterBy="#{empleado.numEmpleado}">
+                                <h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{empleado.numEmpleado}" />
+                            </p:column>
+                            <p:column headerText="Nombre" sortBy="#{empleado.nombre}" filterBy="#{empleado.nombre}">
+                                <h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{empleado.nombre}" />
+                            </p:column>
+                            <p:column headerText="Puesto" sortBy="#{empleado.catPuestoDTO.descripcion}" filterBy="#{empleado.catPuestoDTO.descripcion}">
+                                <h:outputText value="#{empleado.catPuestoDTO.descripcion}" />
+                            </p:column>
+                            <p:column headerText="Planta" sortBy="#{empleado.catPlantaDTO.descripcion}" filterBy="#{empleado.catPlantaDTO.descripcion}">
+                                <h:outputText value="#{empleado.catPlantaDTO.descripcion}" />
+                            </p:column>
+                            <p:column headerText="Perfil" sortBy="#{empleado.catPerfilDTO.descripcion}" filterBy="#{empleado.activo}">
+                                <h:outputText value="#{empleado.catPerfilDTO.descripcion}" />
+                            </p:column>
+                            <p:column exportable="false">
+                                <p:commandButton icon="pi pi-pencil" update=":formRegistroEmpleado:panelDialogEmpleado" oncomplete="PF('dialogEmpleado').show()" 
+                                                 styleClass="edit-button rounded-button ui-button-warning m-1" process="@this">
+                                    <f:setPropertyActionListener value="#{empleado}" target="#{registroEmpleadosBean.empleadoSelected}" />
+                                </p:commandButton>
+                                <p:commandButton class="ui-button-danger rounded-button m-1" icon="pi pi-trash" process="@this" oncomplete="PF('dialogEliminarEmpleado').show()" >
+                                    <f:setPropertyActionListener value="#{empleado}" target="#{registroEmpleadosBean.empleadoSelected}" />
+                                </p:commandButton>
+                                <p:commandButton class="ui-button-success rounded-button m-1" icon="pi pi-search" process="@this" action="#{registroEmpleadosBean.redirectKardex()}">
+                                    <f:setPropertyActionListener value="#{empleado}" target="#{registroEmpleadosBean.empleadoSelected}" />
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+
+                        <p:dialog header="Empleado" showEffect="fade" modal="true" widgetVar="dialogEmpleado" responsive="true" draggable="false">
+                            <p:outputPanel id="panelDialogEmpleado" class="ui-fluid">
+                                <p:outputPanel>
+                                    <p:fieldset legend="Datos personales">
+                                        <div class="formgrid grid">
+                                            <div class="field col-4">
+                                                <p:outputLabel for="@next" value="Número de empleado"/>
+                                                <p:inputText id="numEmp" value="#{registroEmpleadosBean.empleadoSelected.numEmpleado}" disabled="true"/>  
+                                            </div>
+                                        </div>
+                                        <div class="formgrid grid">
+                                            <div class="field col">
+                                                <p:outputLabel for="@next" value="Nombre"/>
+                                                <p:inputText id="nombreEmp" value="#{registroEmpleadosBean.empleadoSelected.nombre}"/>  
+                                            </div>
+                                            <div class="field col">
+                                                <p:outputLabel for="@next" value="Primer Apellido"/>
+                                                <p:inputText id="primerAp" value="#{registroEmpleadosBean.empleadoSelected.primerAp}"/>  
+                                            </div>
+                                            <div class="field col">
+                                                <p:outputLabel for="@next" value="Segundo Apellido"/>
+                                                <p:inputText id="segundoAp" value="#{registroEmpleadosBean.empleadoSelected.segundoAp}"/>  
+                                            </div>
+                                        </div>
+                                        <div class="formgrid grid">
+                                            <div class="field col">
+                                                <p:outputLabel for="@next" value="CURP"/>
+                                                <p:inputText id="curp" value="#{registroEmpleadosBean.empleadoSelected.curp}" maxlength="18" class="uppercase" onblur="value.toUpperCase()"/>  
+                                            </div>
+                                            <div class="field col">
+                                                <p:outputLabel for="@next" value="Fecha de nacimiento" />
+                                                <p:datePicker id="fNac" value="#{registroEmpleadosBean.empleadoSelected.fechaNacimiento}" monthNavigator="true" yearNavigator="true"
+                                                              yearRange="1940:2015" pattern="dd-MM-yyyy" showIcon="true" readonlyInput="true"/>
+                                            </div>
+                                            <div class="field col">
+                                                <p:outputLabel for="@next" value="Correo"/>
+                                                <p:inputText id="correo" value="#{registroEmpleadosBean.empleadoSelected.correo}"/>  
+                                            </div>
+                                        </div>
+                                    </p:fieldset>
+                                    <p:fieldset legend="Datos de empresa" styleClass="mt-4">
+                                        <div class="formgrid grid">
+                                            <!--                                            <div class="field col">
+                                                                                            <p:outputLabel for="@next" value="# Empleado"/>
+                                                                                            <p:inputText id="nEmpleado" value="#{registroEmpleadosBean.empleadoSelected.numEmpleado}" disabled="true"/>
+                                                                                        </div>-->
+                                            <div class="field col">
+                                                <p:outputLabel for="@next" value="RFC" />
+                                                <p:inputText id="nss" value="#{registroEmpleadosBean.empleadoSelected.rfc}"/>
+                                            </div>
+                                            <div class="field col">
+                                                <p:outputLabel for="@next" value="NSS" />
+                                                <p:inputText id="rfc" value="#{registroEmpleadosBean.empleadoSelected.nss}"/>
+                                            </div>
+                                            <div class="field col">
+                                                <p:outputLabel for="@next" value="Salario Diario" />
+                                                <p:inputText id="salario" value="#{registroEmpleadosBean.empleadoSelected.sueldoDiario}"/>
+                                            </div>
+                                            <div class="field col">
+                                                <p:outputLabel for="@next" value="Fecha de ingreso" />
+                                                <p:datePicker id="fIngreso" value="#{registroEmpleadosBean.empleadoSelected.fechaIngreso}" monthNavigator="true" yearNavigator="true"
+                                                              yearRange="1940:2030" pattern="dd-MM-yyyy" showIcon="true" readonlyInput="true"/>
+                                            </div>
+                                        </div>
+                                        <div class="formgrid grid">
+                                            <div class="field col">
+                                                <p:outputLabel for="@next" value="Perfil" />
+                                                <p:selectOneMenu id="soPerfil" value="#{registroEmpleadosBean.empleadoSelected.catPerfilDTO.idPerfil}" autoWidth="false">
+                                                    <f:selectItem itemLabel="--Seleccione--"/>
+                                                    <f:selectItems value="#{registroEmpleadosBean.lstCatPerfil}" var="perfil" itemValue="#{perfil.idPerfil}" itemLabel="#{perfil.descripcion}"/>
+                                                </p:selectOneMenu>
+                                            </div>
+                                            <div class="field col">
+                                                <p:outputLabel for="@next" value="Empresa" />
+                                                <p:selectOneMenu id="soEmpresa" value="#{registroEmpleadosBean.empleadoSelected.catEmpresaDTO.idEmpresa}" autoWidth="false">
+                                                    <f:selectItem itemLabel="--Seleccione--"/>
+                                                    <f:selectItems value="#{registroEmpleadosBean.lstCatEmpresa}" var="empresa" itemValue="#{empresa.idEmpresa}" itemLabel="#{empresa.descripcion}"/>
+                                                </p:selectOneMenu>
+                                            </div>
+                                            <div class="field col">
+                                                <p:outputLabel for="@next" value="Puesto" />
+                                                <p:selectOneMenu id="soPuesto" value="#{registroEmpleadosBean.empleadoSelected.catPuestoDTO.idPuesto}" autoWidth="false">
+                                                    <f:selectItem itemLabel="--Seleccione--"/>
+                                                    <f:selectItems value="#{registroEmpleadosBean.lstCatPuesto}" var="puesto" itemValue="#{puesto.idPuesto}" itemLabel="#{puesto.descripcion}"/>
+                                                </p:selectOneMenu>
+                                            </div>
+
+                                        </div>
+                                        <div class="formgrid grid">
+                                            <div class="field col-4">
+                                                <p:outputLabel for="@next" value="Área" />
+                                                <p:selectOneMenu id="soArea" value="#{registroEmpleadosBean.empleadoSelected.catAreaDTO.idArea}" autoWidth="false">
+                                                    <f:selectItem itemLabel="--Seleccione--"/>
+                                                    <f:selectItems value="#{registroEmpleadosBean.lstCatArea}" var="area" itemValue="#{area.idArea}" itemLabel="#{area.descripcion}"/>
+                                                </p:selectOneMenu>
+                                            </div>
+                                            <div class="field col-4">
+                                                <p:outputLabel for="@next" value="Ubicación" />
+                                                <p:selectOneMenu id="soUbica" value="#{registroEmpleadosBean.empleadoSelected.catPlantaDTO.idPlanta}" autoWidth="false">
+                                                    <f:selectItem itemLabel="--Seleccione--"/>
+                                                    <f:selectItems value="#{registroEmpleadosBean.lstCatPlanta}" var="planta" itemValue="#{planta.idPlanta}" itemLabel="#{planta.descripcion}"/>
+                                                </p:selectOneMenu>
+                                            </div>
+                                            <div class="formgrid grid align-self-end col-4">
+                                                <div class="field col-6">
+                                                    <p:commandButton value="Biométrico" icon="pi pi-sync" iconPos="right" process="@this" actionListener="#{registroEmpleadosBean.consultaBiometrico()}" immediate="true"/>
+                                                </div>
+                                                <div class="field col-6">
+                                                    <p:commandButton value="Fotografía" icon="pi pi-camera" iconPos="right" process="@this" immediate="true"
+                                                                     onclick="PF('dialogFotografia').show();"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </p:fieldset>
+
+                                </p:outputPanel>
+                            </p:outputPanel>
+
+                            <f:facet name="footer">
+                                <p:commandButton value="Guardar" icon="pi pi-save" actionListener="#{registroEmpleadosBean.guardarEmpleado()}" process="panelDialogEmpleado @this" />
+                                <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogEmpleado').hide()" class="ui-button-secondary" resetValues="true"/>
+                            </f:facet>
+                        </p:dialog> 
+
+                        <p:dialog header="Captura de fotografía" widgetVar="dialogFotografia" modal="true" draggable="false" cache="false" dynamic="true" closable="false">
+                            <p:outputPanel id="panelDialogFoto" class="ui-fluid">
+                                <h:panelGrid columns="2" cellpadding="5">
+                                    <p:photoCam id="foto" widgetVar="pc" listener="#{registroEmpleadosBean.oncapture}"/>
+                                    <p:outputPanel id="photo">
+                                        <img src="#{registroEmpleadosBean.empleadoSelected.fotografia}" />
+                                    </p:outputPanel>
+                                </h:panelGrid>
+                            </p:outputPanel>
+                            <f:facet name="footer">
+                                <p:commandButton  value="Capture" icon="pi pi-camera" onclick="PF('pc').capture()" process="@this" 
+                                                  update="formRegistroEmpleado:photo formRegistroEmpleado:btnAceptarFoto"/>
+                                <p:commandButton id="btnAceptarFoto" value="Aceptar" disabled="#{registroEmpleadosBean.empleadoSelected.fotografia eq null}" 
+                                                 oncomplete="PF('pc').detach();" class="ui-button-success" icon="pi pi-check" onclick="PF('dialogFotografia').hide()" process="@this"/>
+                                <p:commandButton value="Cancelar" icon="pi pi-times" actionListener="#{registroEmpleadosBean.empleadoSelected.setFotografia(null)}" onclick="PF('dialogFotografia').hide(); PF('pc').detach();" class="ui-button-secondary" />
+                            </f:facet>
+                        </p:dialog> 
+
+                         <p:dialog id="dialogBiometrico" header="Biométrico" widgetVar="dialogBiometrico" modal="true" draggable="false" cache="false" dynamic="true" closable="false">
+                            <p:outputPanel id="panelDialogBiometrico" class="ui-fluid">
+                                <h:panelGrid columns="2" cellpadding="5" columnClasses="ui-g-6, ui-g-6">
+                                    <p:commandLink oncomplete="InvokeFingerScan('GetHuella'); PF('bui').show()" actionListener="#{registroEmpleadosBean.setNumBiometrico(1)}">
+                                        <p:graphicImage rendered="#{registroEmpleadosBean.detBiometrico.huella eq null}" name="images/huella/finger_print_01.png" library="recursos" style="max-width: 100px;"/>
+                                        <p:graphicImage rendered="#{registroEmpleadosBean.detBiometrico.huella ne null}" name="images/huella/finger_print_02.png" library="recursos" style="max-width: 100px;"/>
+                                    </p:commandLink>
+                                    <p:commandLink oncomplete="InvokeFingerScan('GetHuella'); PF('bui').show()" actionListener="#{registroEmpleadosBean.setNumBiometrico(2)}">
+                                        <p:graphicImage rendered="#{registroEmpleadosBean.detBiometrico.huella2 eq null}" name="images/huella/finger_print_01.png" library="recursos" style="max-width: 100px;"/>
+                                        <p:graphicImage rendered="#{registroEmpleadosBean.detBiometrico.huella2 ne null}" name="images/huella/finger_print_02.png" library="recursos" style="max-width: 100px;"/>
+                                    </p:commandLink>
+                                </h:panelGrid>
+                                <p:inputText id="biometrico" style="display: none;" value="#{registroEmpleadosBean.biometrico}"/>
+
+                                <div class="alert alert-primary respresultado successfull text-break" role="alert"/>                        
+                                <div class="alert alert-success respresultado verifyfingerprintOk" role="alert"/>
+                                <div class="alert alert-danger respresultado badrequest" role="alert"/>
+
+                            </p:outputPanel>
+                            <f:facet name="footer">
+                                <p:commandButton value="Aceptar" class="ui-button-success" icon="pi pi-check" oncomplete="PF('dialogBiometrico').hide()" process="@this"/>
+                                <p:commandButton value="Cancelar" class="ui-button-secondary" icon="pi pi-times" oncomplete="PF('dialogBiometrico').hide();" process="@this"/>
+                            </f:facet>
+                        </p:dialog> 
+
+
+
+
+
+                        <p:confirmDialog widgetVar="dialogEliminarEmpleado" showEffect="fade" width="300" message="Eliminar el empleado?" header="Confirmar" severity="warn">
+                            <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{registroEmpleadosBean.eliminaEmpleado()}" process="@this" oncomplete="PF('dialogEliminarEmpleado').hide()"/>
+                            <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('dialogEliminarEmpleado').hide()" />
+                        </p:confirmDialog>
+
+                        <p:confirmDialog global="true" showEffect="fade" width="300">
+                            <p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                            <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary" icon="pi pi-times" />
+                        </p:confirmDialog>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                $('.respresultado').hide();
+                $(".clean").click(function () {
+                    $('.respresultado').hide();
+                });
+               
+                function createCORSRequest(method, url) {
+                    var xhr = new XMLHttpRequest();
+                    if ("withCredentials" in xhr) {
+                        xhr.open(method, url, true);
+                    } else if (typeof XDomainRequest != "undefined") {
+                        xhr = new XDomainRequest();
+                        xhr.open(method, url, true);
+                    } else {
+                        xhr = null;
+                    }
+                    return xhr;
+                }
+
+                function InvokeFingerScan(TpAccion, payload, signature) {
+                    var url = "http://127.0.0.1:23106";
+                    var request = createCORSRequest('POST', url);
+                    if (!request) {
+                        throw new Error('CORS not supported');
+                    }
+                    request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                    request.onreadystatechange = function () {
+                        if (this.readyState == 4) {
+                            if (this.status == 200) {
+                                var dataValue = {"cipherText": request.responseText};
+                                var response = JSON.parse(request.responseText);
+                                console.log(response);
+                                if (response != null) {
+                                    //En la respuesta 
+                                    if (response.BiometricData1 != null) {
+                                        document.getElementById('formRegistroEmpleado:biometrico').value = response.BiometricData1;
+                                        $(".successfull").show(300);
+                                        verificaEstado();
+                                    } else {
+                                        if (response.VerifyBiometricData == true) {
+                                            $(".verifyfingerprintOk").html("!!! Fingerprint Match !!!");
+                                            $(".verifyfingerprintOk").show(300);
+                                        } else {
+                                            $(".badrequest").html("!!! Fingerprint Not Match !!!");
+                                            $(".badrequest").show(300);
+                                        }
+                                    }
+                                }
+                            } else {
+                            }
+                        }
+                    };
+                    request.onerror = function () {
+                        console.error('Ocurrió un error al hacer una solicitud de adquisición de datos.');
+                    };
+                    request.ontimeout = function () {
+                        console.error("La solicitud de adquisición de datos ha expirado.");
+                    };
+                                        
+                    var obj = new Object();
+                    obj.TpAccion = TpAccion;
+                    obj.FingerPrinToVerify = [];
+                    var jsonString = JSON.stringify(obj);
+                    request.send(jsonString);
+                }
+
+
+            </script>      
+
+        </h:form>
+    </ui:define>
+
+</ui:composition>

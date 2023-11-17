@@ -1,0 +1,196 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/plantillas/template.xhtml">
+
+    <ui:define name="title">Raya</ui:define>
+
+    <ui:define name="content">
+        <h:form id="form">
+            <div class="grid crud-demo">
+                <div class="col-12">
+                    <div class="card">
+                        <p:growl id="messages" showDetail="true" />
+                        <p:toolbar styleClass="mb-4">
+                            <p:toolbarGroup>
+                                <p:button outcome="/protected/nomina" value="Regresar" ></p:button>
+                            </p:toolbarGroup>
+                            <p:toolbarGroup align="right">
+                                <p:commandButton value="Exportar" icon="pi pi-upload" styleClass="ui-button-help" ajax="false">
+                                    <p:dataExporter type="csv" target="dtNomina" fileName="raya" preProcessor="#{nominaBean.exportNomina}"/>
+                                </p:commandButton>
+                            </p:toolbarGroup>
+                        </p:toolbar>
+
+                        <p:dataTable id="dtNomina" widgetVar="dt-Nomina" var="nomina" value="#{nominaBean.lstNominaByFecha}" reflow="true" styleClass="products-table"
+                                     rowKey="#{nomina.idNomina}" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom" scrollable="true" 
+                                     scrollWidth="1200" frozenColumns="2">
+                            <f:facet name="header">
+                                <div class="customers-table-header">
+                                    <span style="font-weight: bold">Raya</span>
+
+                                    <span class="ui-input-icon-left filter-container">
+                                        <i class="pi pi-search"/>
+                                        <p:inputText id="globalFilter" onkeyup="PF('dt-Nomina').filter()" placeholder="Buscar"/>
+                                    </span>
+                                </div>
+                            </f:facet>
+                            <p:column headerText="NumEmpl" width="75px">
+                                <h:outputText value="#{nomina.idEmpleado.numEmpleado}" />
+                            </p:column>
+                            <p:column headerText="Empleado" width="110px" >
+                                <h:outputText value="#{nomina.idEmpleado.primerAp} #{nomina.idEmpleado.segundoAp} #{nomina.idEmpleado.nombre} " />
+                            </p:column>
+                            <p:column headerText="Sueldo" width="50px">
+                                <h:outputText value="#{nomina.sueldo}" />
+                            </p:column>
+                            <p:column headerText="Septimo Día" width="75px">
+                                <h:outputText value="#{nomina.septimoDia}" />
+                            </p:column>
+                            <p:column headerText="Hora Extras" width="75px">
+                                <h:outputText value="#{nomina.horasExtras}" />
+                            </p:column>
+                            <p:column headerText="Destajos" width="75px">
+                                <h:outputText value="#{nomina.destajos}" />
+                            </p:column>
+                            <p:column headerText="PremiosEficiencia" width="75px">
+                                <h:outputText value="#{nomina.premiosEficiencia}" />
+                            </p:column>
+                            <p:column headerText="BonoPuntualidad" width="75px">
+                                <h:outputText value="#{nomina.bonoPuntualidad}" />
+                            </p:column>
+                            <p:column headerText="Despensa" width="75px" >
+                                <h:outputText value="#{nomina.despensa}" />
+                            </p:column>
+                            <p:column headerText="Otras Percepsiones" width="75px">
+                                <h:outputText value="#{nomina.otrasPercepciones}" />
+                            </p:column>
+                            <p:column headerText="TOTAL PERCEPCIONES" width="75px">
+                                <h:outputText value="#{nomina.totalPercepciones}" />
+                            </p:column>
+                            <p:column headerText="Ret. Inv. y Vida" width="75px">
+                                <h:outputText value="#{nomina.retInvYVida}" />
+                            </p:column>
+                            <p:column headerText="Ret. Cesantía" width="75px">
+                                <h:outputText value="#{nomina.retCesantia}" />
+                            </p:column>
+                            <p:column headerText="Ret. Enf. y Mat. obrero" width="75px">
+                                <h:outputText value="#{nomina.retEnfYMatObrero}" />
+                            </p:column>
+                            <p:column headerText="Préstamo infonavit (FD)" width="75px">
+                                <h:outputText value="#{nomina.prestamoInfonavitFd}" />
+                            </p:column>
+                            <p:column headerText="Préstamo infonavit (CF)" width="75px">
+                                <h:outputText value="#{nomina.prestamoInfonavitCf}" />
+                            </p:column>
+                            <p:column headerText="Subs al Empleo acreditado" width="75px">
+                                <h:outputText value="#{nomina.subsAlEmpleoAcreditado}" />
+                            </p:column>
+                            <p:column headerText="Subs al Empleo (mes)" width="75px">
+                                <h:outputText value="#{nomina.subsAlEmpleoAcreditado}" />
+                            </p:column>
+                            <p:column headerText="I.S.R. antes de Subs al Empleo" width="75px">
+                                <h:outputText value="#{nomina.isrAntesDeSubsAlEmpleo}" />
+                            </p:column>
+                            <p:column headerText="I.S.R. (mes)" width="75px">
+                                <h:outputText value="#{nomina.isrMes}" />
+                            </p:column>
+                            <p:column headerText="I.M.S.S." width="75px">
+                                <h:outputText value="#{nomina.imss}" />
+                            </p:column>
+                            <p:column headerText="Préstamo FONACOT" width="75px">
+                                <h:outputText value="#{nomina.prestamoFonacot}" />
+                            </p:column>
+                            <p:column headerText="Ajuste en Subsidio para el empleo" width="75px">
+                                <h:outputText value="#{nomina.ajusteEnSubsidioParaElEmpleo}" />
+                            </p:column>
+                            <p:column headerText="Subs entregado que no correspondía" width="75px">
+                                <h:outputText value="#{nomina.subsEntregadoQueNoCorrespondia}" />
+                            </p:column>
+                            <p:column headerText="Ajuste al neto" width="75px">
+                                <h:outputText value="#{nomina.ajusteAlNeto}" />
+                            </p:column>
+                            <p:column headerText="ISR de ajuste mensual" width="75px">
+                                <h:outputText value="#{nomina.isrDeAjusteMensual}" />
+                            </p:column>
+                            <p:column headerText="ISR ajustado por subsidio" width="75px">
+                                <h:outputText value="#{nomina.isrAjustadoPorSubsidio}" />
+                            </p:column>
+                            <p:column headerText="Ajuste al Subsidio Causado" width="75px">
+                                <h:outputText value="#{nomina.ajusteAlSubsidioCausado}" />
+                            </p:column>
+                            <p:column headerText="Pension Alimienticia" width="75px">
+                                <h:outputText value="#{nomina.pensionAlimienticia}" />
+                            </p:column>
+                            <p:column headerText="Otras Deducciones" width="75px">
+                                <h:outputText value="#{nomina.otrasDeducciones}" />
+                            </p:column>
+                            <p:column headerText="TOTAL DEDUCCIONES" width="75px">
+                                <h:outputText value="#{nomina.otrasDeducciones}" />
+                            </p:column>
+                            <p:column headerText="NETO" width="75px">
+                                <h:outputText value="#{nomina.neto}" />
+                            </p:column>
+                            <p:column headerText="Invalidez y Vida" width="75px">
+                                <h:outputText value="#{nomina.invalidezYVida}" />
+                            </p:column>
+                            <p:column headerText="Cesantia y Vejez" width="75px">
+                                <h:outputText value="#{nomina.cesantiaYVejez}" />
+                            </p:column>
+                            <p:column headerText="Enf. y Mat. Patron" width="75px">
+                                <h:outputText value="#{nomina.enfYMatPatron}" />
+                            </p:column>
+                            <p:column headerText="2% Fondo retiro SAR (8)" width="75px">
+                                <h:outputText value="#{nomina.fondoRetiroSar}" />
+                            </p:column>
+                            <p:column headerText="2% Impuesto estatal" width="75px">
+                                <h:outputText value="#{nomina.impuestoEstatal}" />
+                            </p:column>
+                            <p:column headerText="Riesgo de trabajo (9)" width="75px">
+                                <h:outputText value="#{nomina.riesgoDeTrabajo9}" />
+                            </p:column>
+                            <p:column headerText="I.M.S.S. empresa" width="75px">
+                                <h:outputText value="#{nomina.imssEmpresa}" />
+                            </p:column>
+                            <p:column headerText="Infonavit Empresa" width="75px">
+                                <h:outputText value="#{nomina.infonavitEmpresa}" />
+                            </p:column>
+                            <p:column headerText="Guarderia I.M.S.S. (7)" width="75px">
+                                <h:outputText value="#{nomina.guarderiaImss7}" />
+                            </p:column>
+                            <p:column headerText="Otras Obligaciones" width="75px">
+                                <h:outputText value="#{nomina.otrasObligaciones}" />
+                            </p:column>
+                            <p:column headerText="TOTAL OBLIGACIONES" width="75px">
+                                <h:outputText value="#{nomina.totalObligaciones}" />
+                            </p:column>
+                        </p:dataTable>
+
+                    </div>
+                </div>
+            </div>
+        </h:form>
+
+    </ui:define>
+    <script type="text/javascript">
+        // Get the table element by its ID
+        var table = document.getElementById("form:dtNomina");
+
+        // Get the header row (first row) of the table
+        var headerRow = table.querySelector("thead tr");
+
+        // Get the first two cells in the header row (corresponding to the first two columns)
+        var firstColumnHeader = headerRow.cells[0];
+        var secondColumnHeader = headerRow.cells[1];
+
+        // Set the CSS property 'position' to 'sticky' for the first two column headers
+        firstColumnHeader.style.position = "sticky";
+        secondColumnHeader.style.position = "sticky";
+
+        // Set the CSS property 'left' to '0' for the first two column headers (to stick to the left side)
+        firstColumnHeader.style.left = "0";
+        secondColumnHeader.style.left = "0";
+    </script>
+</ui:composition>

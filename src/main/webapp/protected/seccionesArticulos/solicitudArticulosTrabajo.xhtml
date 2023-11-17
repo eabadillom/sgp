@@ -1,0 +1,148 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:ui="http://java.sun.com/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+    <p:toolbar styleClass="mb-4">
+        <p:toolbarGroup>
+            <p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-success" style="margin-right: .5rem" process="@this"
+                             onstart="PF('articuloOficinaDialog').show();" actionListener="#{articuloOficinasBean.inicializaArticulo()}"/>
+        </p:toolbarGroup>
+    </p:toolbar>
+
+    <p:dataTable id="dt-articuloOficinas" widgetVar="dtArticuloOficinas"
+                 var="articuloOficina" value="#{articuloOficinasBean.lstSolicitudArticulos}"
+                 reflow="true" styleClass="products-table"
+                 rowKey="articuloOficina.idSolicitud">
+        <p:column headerText="Articulo" sortBy="#{articuloOficina.getArticulo().idArticulo}" width="22%">
+            <h:outputText value="#{articuloOficina.getArticulo().descripcion}" />
+        </p:column>
+        <p:column headerText="Imagen" width="18%">
+            <h:graphicImage name="images/articulos/#{articuloOficina.getArticulo().descripcion}.jpg" library="recursos" width="57" />
+        </p:column>
+        <p:column headerText="Cantidad" sortBy="#{articuloOficina.cantidad}" width="18%">
+            <h:outputText value="#{articuloOficina.cantidad}" />
+        </p:column>
+        <p:column headerText="Unidad" sortBy="#{articuloOficina.getArticulo().unidad}"
+                  width="100px">
+            <h:outputText value="#{articuloOficina.getArticulo().unidad}" />
+        </p:column>
+        <p:column width="6%">
+            <p:commandButton class="ui-button-danger rounded-button m-1" icon="pi pi-trash" process="@this" title="Eliminar"
+                             oncomplete="PF('dialogEliminarArticulo').show()" >
+                <f:setPropertyActionListener value="#{articuloOficina}" target="#{articuloOficinasBean.solicitud}" />
+            </p:commandButton>
+        </p:column>
+    </p:dataTable>
+
+    <div class="pt-4">
+        <p:commandButton id="btnRegistro" value="Registrar Solicitud" 
+                         disabled="#{empty articuloOficinasBean.lstSolicitudArticulos}" actionListener="#{articuloOficinasBean.registro()}" />
+    </div>
+
+    <p:dialog id="articuloOficinaDialog" header="Articulos de Oficina" showEffect="fade" modal="true" styleClass="ferbo-dialog-prenda"
+              widgetVar="articuloOficinaDialog" responsive="true" blockScroll="false" cache="false" closeOnEscape="true" closable="true" dynamic="true">
+        <p:dataScroller value="#{articuloOficinasBean.lstArticulosActivas}" var="articulo" mode="inline"
+                        styleClass="ferbo-data-scroller">
+            <div style="height: 300px">
+                <div class="ferbo-list-item-prenda pl-5 pr-5 pt-0 pb-0">
+                    <p:outputLabel value="#{articulo.descripcion}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
+                    <h:graphicImage id="Articulo2" name="images/articulos/#{articulo.descripcion}.jpg" library="recursos" styleClass="ferbo-prenda-imagen" alt="Sin imágen" />
+                </div>
+                <div class="ferbo-list-item-descripcion p-0">
+                    <div class="product-list-action">
+                        <div class="product-list-detail">
+                            <div>#{articulo.detalle}</div>
+                        </div>
+                        <p:panelGrid columns="2" columnClasses="ui-grid-col-4 p-0 m-auto, ui-grid-col-8 p-0" layout="grid" styleClass="pt-2">
+                            <p:commandButton value="Seleccionar" icon="pi pi-check" actionListener="#{articuloOficinasBean.seleccionarItem(articulo)}" process="@this"/>
+                        </p:panelGrid>
+                    </div>
+                </div>
+            </div>
+        </p:dataScroller>
+    </p:dialog>
+
+    <p:dialog id="dialogComplementoArtiulo" showEffect="fade" modal="true" draggable="false" resizable="false"
+              widgetVar="dialogComplementoArtiulo" responsive="true" dynamic="true" cache="false" closable="false" closeOnEscape="false" styleClass="ferbo-dialog-complemento-articulo">
+        <p:outputPanel id="manage-prendas-content" class="ui-fluid">
+            <p:outputPanel id="pnlArticulos" rendered="#{not empty articuloOficinasBean.articuloSelected}">
+                <div class="field" style="text-align: center">
+                    <p:outputLabel value="#{articuloOficinasBean.articuloSelected.descripcion}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
+                </div>
+                <div class="product-item-content" style="text-align: center">
+                    <h:graphicImage id="precioPrenda2" name="images/articulos/#{articuloOficinasBean.articuloSelected.descripcion}.jpg" library="recursos" width="113" rendered="#{articuloOficinasBean.articuloSelected.descripcion ne null}" styleClass="product-image"/>
+                </div>
+                <div class="field">
+                    <p:outputLabel for="@next" value="Cantidad" />
+                    <p:spinner id="spCantidad" value="#{articuloOficinasBean.solicitud.cantidad}" min="0" max="#{articuloOficinasBean.articuloSelected.cantidadMax}" size="1" buttons="horizontal" />
+                </div>
+                <div class="field" style="text-align: center">
+                    <p:outputLabel for="@next" value="Unidad" />
+                    <p:outputLabel value="#{articuloOficinasBean.articuloSelected.unidad}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
+                </div>
+
+            </p:outputPanel>
+        </p:outputPanel>
+        <f:facet name="footer">
+            <p:commandButton value="Agregar" icon="pi pi-shopping-cart"
+                             actionListener="#{articuloOficinasBean.preRegistro()}" />
+            <p:commandButton value="Cancelar" icon="pi pi-times"
+                             onclick="PF('dialogComplementoArtiulo').hide()"
+                             class="ui-button-secondary" process="@this formActividadesArticulos:tabViewA:pnlArticulos"/>
+        </f:facet>
+    </p:dialog>
+
+    <p:confirmDialog widgetVar="dialogEliminarArticulo" showEffect="fade" width="300" message="Eliminar articulo?" header="Confirmar" severity="warn">
+        <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{articuloOficinasBean.eliminaSolicitud()}" process="@this" 
+                         oncomplete="PF('dialogEliminarArticulo').hide()" update="formActividadesArticulos:tabViewA:dt-articuloOficinas formActividadesArticulos:tabViewA:btnRegistro"/>
+        <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('dialogEliminarArticulo').hide()" />
+    </p:confirmDialog>
+
+    <style>
+        .ferbo-data-scroller{
+
+        }
+        .ferbo-data-scroller .ui-datascroller-content{
+            height: 70vh;
+        }
+        .ferbo-data-scroller .ui-datascroller-list {
+            display: grid;
+            grid-template-columns: 33% 33% 33%;
+            text-align: center;
+        }
+        .ferbo-data-scroller .ui-datascroller-item{
+            border: 1px grey solid;
+            margin: 4px;
+            border-radius: 10px;
+        }
+        .ferbo-dialog-prenda{
+            width: 70vw !important;
+            height: 80vh !important;
+        }
+        .ferbo-dialog-prenda .ui-dialog-content{
+            height: 80vh !important;
+        }
+        .ferbo-list-item-prenda{
+            height: 70%;
+            display: grid;
+        }
+        .ferbo-list-item-descripcion{
+            height: 30%;
+            display: grid;
+            align-content: space-around;
+        }
+        .ferbo-prenda-imagen{
+            height: 160px !important;
+            margin: auto;
+        }
+        .ferbo-dialog-complemento-prenda{
+            width: 480px !important;
+        }
+    </style>
+
+
+
+</ui:composition>

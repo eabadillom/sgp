@@ -1,0 +1,522 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/plantillas/template.xhtml">
+
+    <ui:define name="title">Nómina</ui:define>
+
+    <ui:define name="content">
+        <h:form id="formNomina">
+            <div class="grid table-demo">
+                <div class="col-12">
+                    <div class="card p-4">
+                        <p:messages id="messages" globalOnly="true" closable="true"/>
+                        <p:growl id="mssgs" showDetail="true" life="5000"/>
+                        <p:remoteCommand name="rcUpdate" update="dtNomina"/>
+                        <p:toolbar styleClass="mb-4">
+                            <p:toolbarGroup>
+                                <p:commandButton value="Exportar" icon="pi pi-upload" styleClass="ui-button-help" ajax="false">
+                                    <p:dataExporter type="csv" target="dtNomina" fileName="raya" preProcessor="#{nominaBean.exportNomina}"/>
+                                </p:commandButton>
+                            </p:toolbarGroup>
+                            <p:toolbarGroup align="right">
+                                <p:commandButton styleClass="ui-button-success" style="margin-right: .5rem" process="@this" value="Cálcular por Empleados" 
+                                                 onstart="PF('empleadoDialog').show();" update="panelDialogEmpleados"/>
+                                <p:commandButton styleClass="ui-button-success" style="margin-right: .5rem" process="@this" value="Cálcular por Empresa" 
+                                                 onstart="PF('empresaDialog').show();" update="panelDialogEmpresa"/>
+
+                            </p:toolbarGroup>
+                        </p:toolbar>
+                        <div>
+                            <p:dataTable id="dtNomina" widgetVar="dt-Nomina" var="nomina" value="#{nominaBean.listaNomina}" reflow="true" styleClass="products-table"
+                                         rowKey="#{nomina.idEmpleado.idEmpleado}" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom" scrollable="true" 
+                                         scrollWidth="1200" frozenColumns="2" editable="true" editMode="cell" editInitEvent="dblclick">
+                                <p:ajax event="cellEdit" listener="#{nominaBean.onCellEdit}" update=":formNomina:mssgs"/>
+                                <f:facet name="header">
+                                    <div class="customers-table-header">
+                                        <span style="font-weight: bold">Raya</span>
+
+                                        <span class="ui-input-icon-left filter-container">
+                                            <i class="pi pi-search"/>
+                                            <p:inputText id="globalFilter" onkeyup="PF('dt-Nomina').filter()" placeholder="Buscar"/>
+                                        </span>
+                                    </div>
+                                </f:facet>
+                                <p:column headerText="NumEmpl" width="75px">
+                                    <h:outputText value="#{nomina.idEmpleado.numEmpleado}" />
+                                </p:column>
+                                <p:column headerText="Empleado" width="110px" >
+                                    <h:outputText value="#{nomina.idEmpleado.primerAp} #{nomina.idEmpleado.segundoAp} #{nomina.idEmpleado.nombre} " />
+                                </p:column>
+                                <p:column headerText="Sueldo" width="50px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.sueldo}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.sueldo}" style="width:100%"/>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Septimo Día" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.septimoDia}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.septimoDia}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Hora Extras" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.horasExtras}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.horasExtras}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Destajos" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.destajos}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.destajos}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="PremiosEficiencia" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.premiosEficiencia}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.premiosEficiencia}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="BonoPuntualidad" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.bonoPuntualidad}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.bonoPuntualidad}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Despensa" width="75px" >
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.despensa}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.despensa}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Otras Percepsiones" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.otrasPercepciones}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.otrasPercepciones}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="TOTAL PERCEPCIONES" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.totalPercepciones}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.totalPercepciones}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Ret. Inv. y Vida" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.retInvYVida}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.retInvYVida}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Ret. Cesantía" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.retCesantia}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.retCesantia}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Ret. Enf. y Mat. obrero" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.retEnfYMatObrero}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.retEnfYMatObrero}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Préstamo infonavit (FD)" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.prestamoInfonavitFd}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.prestamoInfonavitFd}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Préstamo infonavit (CF)" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.prestamoInfonavitCf}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.prestamoInfonavitCf}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Subs al Empleo acreditado" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.subsAlEmpleoAcreditado}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.subsAlEmpleoAcreditado}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Subs al Empleo (mes)" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.subsAlEmpleoAcreditado}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.subsAlEmpleoAcreditado}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="I.S.R. antes de Subs al Empleo" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.isrAntesDeSubsAlEmpleo}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.isrAntesDeSubsAlEmpleo}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="I.S.R. (mes)" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.isrMes}" />
+
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.isrMes}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="I.M.S.S." width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.imss}" />
+
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.imss}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Préstamo FONACOT" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.prestamoFonacot}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.prestamoFonacot}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Ajuste en Subsidio para el empleo" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.ajusteEnSubsidioParaElEmpleo}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.ajusteEnSubsidioParaElEmpleo}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Subs entregado que no correspondía" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.subsEntregadoQueNoCorrespondia}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.subsEntregadoQueNoCorrespondia}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Ajuste al neto" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.ajusteAlNeto}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.ajusteAlNeto}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="ISR de ajuste mensual" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.isrDeAjusteMensual}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.isrDeAjusteMensual}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="ISR ajustado por subsidio" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.isrAjustadoPorSubsidio}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.isrAjustadoPorSubsidio}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Ajuste al Subsidio Causado" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.ajusteAlSubsidioCausado}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.ajusteAlSubsidioCausado}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Pension Alimienticia" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.pensionAlimienticia}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.pensionAlimienticia}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Otras Deducciones" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.otrasDeducciones}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.otrasDeducciones}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="TOTAL DEDUCCIONES" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.totalDeducciones}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.totalDeducciones}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="NETO" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.neto}" />
+
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.neto}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Invalidez y Vida" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.invalidezYVida}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.invalidezYVida}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Cesantia y Vejez" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.cesantiaYVejez}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.cesantiaYVejez}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Enf. y Mat. Patron" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.enfYMatPatron}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.enfYMatPatron}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="2% Fondo retiro SAR (8)" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.fondoRetiroSar}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.fondoRetiroSar}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="2% Impuesto estatal" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.impuestoEstatal}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.impuestoEstatal}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Riesgo de trabajo (9)" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.riesgoDeTrabajo9}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.riesgoDeTrabajo9}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="I.M.S.S. empresa" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.imssEmpresa}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.imssEmpresa}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Infonavit Empresa" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.infonavitEmpresa}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.infonavitEmpresa}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Guarderia I.M.S.S. (7)" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.guarderiaImss7}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.guarderiaImss7}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Otras Obligaciones" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.otrasObligaciones}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.otrasObligaciones}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="TOTAL OBLIGACIONES" width="75px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.totalObligaciones}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.totalObligaciones}" />
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <f:facet name="footer" >
+                                    <p:commandButton value="Guardar" icon="pi pi-pencil" actionListener="#{nominaBean.guardarNominaEmpleado()}" disabled="#{nominaBean.listaNomina.size() eq 0}"
+                                                     oncomplete="rcUpdate()"/>
+                                </f:facet>
+                            </p:dataTable>
+                        </div>
+                        <p:dialog header="Seleccionar Empresa" showEffect="fade" modal="true" widgetVar="empresaDialog" responsive="true" draggable="false">
+                            <p:outputPanel id="panelDialogEmpresa" class="ui-fluid">
+                                <div class="card">
+                                    <p:selectOneMenu id="soEmpresa" value="#{nominaBean.empresaSelected.idEmpresa}" autoWidth="false" >
+                                        <f:selectItem itemLabel="--Seleccione--"/>
+                                        <f:selectItems value="#{nominaBean.lstEmpresas}" var="empresa" itemValue="#{empresa.idEmpresa}" itemLabel="#{empresa.descripcion}"/>
+                                    </p:selectOneMenu>
+                                </div>
+                                <div class="card">
+                                    <p:commandButton value="Cálcular" icon="pi pi-pencil" actionListener="#{nominaBean.calculandoNomina()}" />
+                                </div>
+                            </p:outputPanel>
+                        </p:dialog>
+                        <p:dialog header="Seleccionar Empleado" showEffect="fade" modal="true" widgetVar="empleadoDialog" responsive="true" draggable="false">
+                            <p:outputPanel id="panelDialogEmpleados" class="ui-fluid">
+                                <div class="card">
+                                    <p:selectOneMenu id="soEmpleados" value="#{nominaBean.empleadoSelected.idEmpleado}" autoWidth="false" >
+                                        <f:selectItem itemLabel="--Seleccione--"/>
+                                        <f:selectItems value="#{nominaBean.lstEmpleados}" var="empleado" itemValue="#{empleado.idEmpleado}" itemLabel="#{empleado.primerAp} #{empleado.segundoAp} #{empleado.nombre}"/>
+                                    </p:selectOneMenu>
+                                </div>
+                                <div class="card">
+                                    <p:commandButton value="Cálcular" icon="pi pi-pencil" actionListener="#{nominaBean.searchIdEmpleado()}" />
+                                </div>
+                            </p:outputPanel>
+                        </p:dialog>
+                    </div>
+                </div>
+            </div>
+        </h:form>
+    </ui:define>
+    <script type="text/javascript">
+        // Get the table element by its ID
+        var table = document.getElementById("form:dtNomina");
+
+        // Get the header row (first row) of the table
+        var headerRow = table.querySelector("thead tr");
+
+        // Get the first two cells in the header row (corresponding to the first two columns)
+        var firstColumnHeader = headerRow.cells[0];
+        var secondColumnHeader = headerRow.cells[1];
+
+        // Set the CSS property 'position' to 'sticky' for the first two column headers
+        firstColumnHeader.style.position = "sticky";
+        secondColumnHeader.style.position = "sticky";
+
+        // Set the CSS property 'left' to '0' for the first two column headers (to stick to the left side)
+        firstColumnHeader.style.left = "0";
+        secondColumnHeader.style.left = "0";
+    </script>
+</ui:composition>

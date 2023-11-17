@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+    <persistence-unit name="sgpPU" transaction-type="RESOURCE_LOCAL">
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <class>mx.com.ferbo.model.BitacoraCatPerfil</class>
+        <class>mx.com.ferbo.model.BitacoraInventario</class>
+        <class>mx.com.ferbo.model.CatArea</class>
+        <class>mx.com.ferbo.model.CatArticulo</class>
+        <class>mx.com.ferbo.model.CatEmpresa</class>
+        <class>mx.com.ferbo.model.CatEstatusIncidencia</class>
+        <class>mx.com.ferbo.model.CatEstatusRegistro</class>
+        <class>mx.com.ferbo.model.CatImssCuotas</class>
+        <class>mx.com.ferbo.model.CatPercepciones</class>
+        <class>mx.com.ferbo.model.CatPerfil</class>
+        <class>mx.com.ferbo.model.CatPlanta</class>
+        <class>mx.com.ferbo.model.CatPrenda</class>
+        <class>mx.com.ferbo.model.CatPuesto</class>
+        <class>mx.com.ferbo.model.CatRazonSocial</class>
+        <class>mx.com.ferbo.model.CatSubsidio</class>
+        <class>mx.com.ferbo.model.CatTalla</class>
+        <class>mx.com.ferbo.model.CatTarifaIsr</class>
+        <class>mx.com.ferbo.model.CatTipoBitacora</class>
+        <class>mx.com.ferbo.model.CatTipoIncidencia</class>
+        <class>mx.com.ferbo.model.CatTipoSolicitud</class>
+        <class>mx.com.ferbo.model.DetBiometrico</class>
+        <class>mx.com.ferbo.model.DetEmpleado</class>
+        <class>mx.com.ferbo.model.DetIncidencia</class>
+        <class>mx.com.ferbo.model.DetInventario</class>
+        <class>mx.com.ferbo.model.DetNomina</class>
+        <class>mx.com.ferbo.model.DetRegistro</class>
+        <class>mx.com.ferbo.model.DetSolicitudArticulo</class>
+        <class>mx.com.ferbo.model.DetSolicitudPermiso</class>
+        <class>mx.com.ferbo.model.DetSolicitudPrenda</class>
+        <class>mx.com.ferbo.model.CatImssCuotas</class>
+        <exclude-unlisted-classes>false</exclude-unlisted-classes>
+        <properties>
+            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://ferbo-prd.mysql.database.azure.com:3306/sgp?useSSL=true&amp;useTimezone=true&amp;serverTimezone=GMT-6&amp;allowPublicKeyRetrieval=true"/>
+            <property name="javax.persistence.jdbc.user" value="ferbodba"/>
+            <property name="javax.persistence.jdbc.password" value="f3RB0d8prD8xI1k"/>
+            <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
+            <property name="hibernate.show_sql" value="false"/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
+        </properties>
+    </persistence-unit>
+</persistence> 

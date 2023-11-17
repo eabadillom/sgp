@@ -1,0 +1,79 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <a tabindex="0" id="layout-config-button" class="layout-config-button">
+        <i class="pi pi-cog"/>
+    </a>
+
+    <div id="layout-config" class="layout-config">
+        <h:form id="config-form">
+            <h5>Menu Mode</h5>
+            <p:selectOneRadio value="#{guestPreferences.menuMode}" layout="pageDirection"
+                              onchange="PrimeFaces.OmegaConfigurator.changeMenuMode(event.target.value)">
+                <f:selectItem itemLabel="Static" itemValue="menu-layout-static"/>
+                <f:selectItem itemLabel="Overlay" itemValue="menu-layout-overlay"/>
+                <p:ajax update="config-form menuform"/>
+            </p:selectOneRadio>
+
+            <hr/>
+
+            <h5>Menu Color</h5>
+            <p:selectOneRadio value="#{guestPreferences.menuColor}" layout="pageDirection" onchange="PrimeFaces.OmegaConfigurator.changeMenuColor(event.target.value)" >
+                <f:selectItem itemLabel="Light" itemValue="light"/>
+                <f:selectItem itemLabel="Dark" itemValue="dark"/>
+                <p:ajax update="config-form menuform" />
+            </p:selectOneRadio>
+
+            <hr/>
+
+            <h5>Input Style</h5>
+            <p:selectOneRadio value="#{guestPreferences.inputStyle}" layout="pageDirection"
+                              onchange="PrimeFaces.OmegaConfigurator.updateInputStyle(event.target.value)">
+                <f:selectItem itemLabel="Outlined" itemValue="outlined"/>
+                <f:selectItem itemLabel="Filled" itemValue="filled"/>
+                <p:ajax/>
+            </p:selectOneRadio>
+
+            <hr/>
+
+            <h5>Topbar</h5>
+            <div class="layout-themes">
+                <ui:repeat value="#{guestPreferences.layouts}" var="layout">
+                    <div>
+                        <p:commandLink actionListener="#{guestPreferences.setLayout(layout.file)}"
+                                       style="background-color: #{layout.color}" title="#{layout.name}" process="@this"
+                                       onstart="PrimeFaces.OmegaConfigurator.beforeResourceChange()"
+                                       update="config-form"
+                                       oncomplete="PrimeFaces.OmegaConfigurator.changeLayout('#{layout.file}')">
+                            <ui:fragment rendered="#{layout.file eq guestPreferences.layout}">
+                                <i class="pi pi-check"/>
+                            </ui:fragment>
+                        </p:commandLink>
+                    </div>
+                </ui:repeat>
+            </div>
+
+            <hr/>
+
+            <h5>Themes</h5>
+            <div class="layout-themes">
+                <ui:repeat value="#{guestPreferences.themes}" var="theme">
+                    <div>
+                        <p:commandLink actionListener="#{guestPreferences.setTheme(theme.file)}"
+                                       style="background-color: #{theme.color}" title="#{theme.name}" process="@this"
+                                       onstart="PrimeFaces.OmegaConfigurator.beforeResourceChange()"
+                                       update="config-form"
+                                       oncomplete="PrimeFaces.OmegaConfigurator.changeScheme('#{theme.file}')">
+                            <ui:fragment rendered="#{theme.file eq guestPreferences.theme}">
+                                <i class="pi pi-check" style="color: #ffffff"/>
+                            </ui:fragment>
+                        </p:commandLink>
+                    </div>
+                </ui:repeat>
+            </div>
+        </h:form>
+    </div>
+</ui:composition>

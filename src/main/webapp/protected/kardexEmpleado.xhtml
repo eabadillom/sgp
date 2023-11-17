@@ -1,0 +1,120 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pe="http://primefaces.org/ui/extensions"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+                template="/WEB-INF/plantillas/template.xhtml">
+
+    <ui:define name="title">Kardex</ui:define>
+
+    <ui:define name="head">
+        <h:outputScript library="recursos" name="js/primefaces_locale.js" />
+    </ui:define>
+
+    <ui:insert name="css_styles">
+        <!-- 					<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;300;400;500;700&amp;display=swap" rel="stylesheet" /> -->
+        <!--<h:outputStylesheet name="css/oficina.css" />-->
+    </ui:insert>
+    <ui:define name="content">
+        <h:form id="kardexEmpleado">
+            <div class="grid">
+                <div class="col-12 card">
+                    <div class="pl-2 pr-2 pt-0 pb-0">
+                        <p:divider id="dvd" align="center" class="mb-0">
+                            <h:graphicImage id="imgEmpleado" value="#{kardexBean.empleadoSelected.fotografia}" 
+                                            width="100" style="vertical-align: middle;width: 8rem; height: 8rem; border-radius: 60px;"
+                                            pt:data-zoom-src="#{kardexBean.empleadoSelected.fotografia}"/>
+                            <pe:imageZoom for="imgEmpleado"/>
+                        </p:divider>
+                    </div>
+                    <div class="pl-2 pr-2 pt-0 pb-2">
+                        <p:fieldset legend="Datos personales" toggleable="true" toggleSpeed="500">
+                            <div class="ui-fluid formgrid grid">
+                                <div class="field col-12 md:col-4">
+                                    <p:outputLabel for="@next" value="Nombre"/>
+                                    <p:inputText id="nombre" value="#{kardexBean.empleadoSelected.nombre}" readonly="true"/>
+                                </div>
+                                <div class="field col-12 md:col-4">
+                                    <p:outputLabel for="@next" value="Primer Apellido" />
+                                    <p:inputText id="pAp" value="#{kardexBean.empleadoSelected.primerAp}" readonly="true"/>
+                                </div>
+                                <div class="field col-12 md:col-4">
+                                    <p:outputLabel for="@next" value="Segundo Apellido" />
+                                    <p:inputText id="sAp" value="#{kardexBean.empleadoSelected.segundoAp}" readonly="true"/>
+                                </div>
+                                <div class="field col-12 md:col-4">
+                                    <p:outputLabel for="@next" value="CURP" />
+                                    <p:inputText id="curp" value="#{kardexBean.empleadoSelected.curp}" readonly="true"/>
+                                </div>
+                                <div class="field col-12 md:col-4">
+                                    <p:outputLabel for="@next" value="Fecha de nacimiento" />
+                                    <p:calendar id="fNac" value="#{kardexBean.empleadoSelected.fechaNacimiento}" readonly="true"/>
+                                </div>
+                                <div class="field col-12 md:col-4">
+                                    <p:outputLabel for="@next" value="Correo" />
+                                    <p:inputText id="sCorreo" value="#{kardexBean.empleadoSelected.correo}" readonly="true"/>
+                                </div>
+                            </div>
+                        </p:fieldset>
+                    </div>
+                    <div class="p-2">
+                        <p:fieldset legend="Datos de empresa" toggleable="true" toggleSpeed="500">
+                            <div class="ui-fluid formgrid grid">
+                                <div class="field col-12 md:col-4">
+                                    <p:outputLabel for="@next" value="# Empleado"/>
+                                    <p:inputText id="nEmpleado" value="#{kardexBean.empleadoSelected.numEmpleado}" readonly="true"/>
+                                </div>
+                                <div class="field col-12 md:col-4">
+                                    <p:outputLabel for="@next" value="NSS" />
+                                    <p:inputText id="nss" value="#{kardexBean.empleadoSelected.nss}" readonly="true"/>
+                                </div>
+                                <div class="field col-12 md:col-4">
+                                    <p:outputLabel for="@next" value="Fecha de ingreso" />
+                                    <p:calendar id="fIngreso" value="#{kardexBean.empleadoSelected.fechaIngreso}" readonly="true"/>
+                                </div>
+                                <div class="field col-12 md:col-4">
+                                    <p:outputLabel for="@next" value="Empresa" />
+                                    <p:selectOneMenu id="soEmpresa" value="#{kardexBean.empleadoSelected.catEmpresaDTO.idEmpresa}" converter="entityConverter" autoWidth="false" disabled="true">
+                                        <f:selectItem itemLabel="--Seleccione--"/>
+                                        <f:selectItems value="#{kardexBean.lstCatEmpresa}" var="empresa" itemValue="#{empresa.idEmpresa}" itemLabel="#{empresa.descripcion}"/>
+                                    </p:selectOneMenu>
+                                </div>
+                                <div class="field col-12 md:col-4">
+                                    <p:outputLabel for="@next" value="Puesto" />
+                                    <p:selectOneMenu id="soPuesto" value="#{kardexBean.empleadoSelected.catPuestoDTO.idPuesto}" converter="entityConverter" autoWidth="false" disabled="true">
+                                        <f:selectItem itemLabel="--Seleccione--"/>
+                                        <f:selectItems value="#{kardexBean.lstCatPuesto}" var="puesto" itemValue="#{puesto.idPuesto}" itemLabel="#{puesto.descripcion}"/>
+                                    </p:selectOneMenu>
+                                </div>
+                                <div class="field col-12 md:col-4">
+                                    <p:outputLabel for="@next" value="Área" />
+                                    <p:selectOneMenu id="soArea" value="#{kardexBean.empleadoSelected.catAreaDTO.idArea}" converter="entityConverter" autoWidth="false" disabled="true">
+                                        <f:selectItem itemLabel="--Seleccione--"/>
+                                        <f:selectItems value="#{kardexBean.lstCatArea}" var="area" itemValue="#{area.idArea}" itemLabel="#{area.descripcion}"/>
+                                    </p:selectOneMenu>
+                                </div>
+                                <div class="field col-12 md:col-4">
+                                    <p:outputLabel for="@next" value="Ubicación" />
+                                    <p:selectOneMenu id="soUbica" value="#{kardexBean.empleadoSelected.catPlantaDTO.idPlanta}" converter="entityConverter" autoWidth="false" disabled="true">
+                                        <f:selectItem itemLabel="--Seleccione--"/>
+                                        <f:selectItems value="#{kardexBean.lstCatPlanta}" var="planta" itemValue="#{planta.idPlanta}" itemLabel="#{planta.descripcion}"/>
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                        </p:fieldset>
+
+                    </div>
+
+                    <!--                    <div class="p-2">
+                                            <p:fieldset legend="Biométicos" toggleable="true" toggleSpeed="500">
+                    
+                                            </p:fieldset>
+                                        </div>-->
+                </div>
+            </div>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

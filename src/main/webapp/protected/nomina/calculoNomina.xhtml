@@ -1,0 +1,231 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/plantillas/template.xhtml">
+
+    <ui:define name="title">Nómina</ui:define>
+
+    <ui:define name="head">
+
+    </ui:define>
+
+    <ui:define name="content">
+
+        <h:form id="mainform">
+            <div class="col-12">
+                <div class="card">
+                    <p:growl id="messages" showDetail="true" life="2500"/>
+
+                    <div class="pl-2 pr-2 pt-0 pb-2">
+                        <p:toolbar styleClass="mb-4">
+                            <p:toolbarGroup align="right">
+                                <p:button outcome="/protected/nomina" value="Regresar" ></p:button>
+                            </p:toolbarGroup>
+                        </p:toolbar>
+                        <p:fieldset id="datPers" widgetVar="datPers" legend="Datos personales del Empleado" toggleable="true" toggleSpeed="500" >
+                            <div class="card">
+                                <div class="ui-fluid formgrid grid">
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="@next" value="Nombre"/>
+                                        <p:inputText id="nombre" value="#{nominaBean.empleadoSelected.nombre} #{nominaBean.empleadoSelected.primerAp} #{nominaBean.empleadoSelected.segundoAp}" readonly="true"/>
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="@next" value="Num. Empl."/>
+                                        <p:inputText id="numEmpl" value="#{nominaBean.empleadoSelected.numEmpleado}" readonly="true"/>
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="@next" value="CURP" />
+                                        <p:inputText id="curp" value="#{nominaBean.empleadoSelected.curp}" readonly="true"/>
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="@next" value="Fecha de nacimiento" />
+                                        <p:calendar id="fNac" value="#{nominaBean.empleadoSelected.fechaNacimiento}" readonly="true"/>
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="@next" value="Correo" />
+                                        <p:inputText id="sCorreo" value="#{nominaBean.empleadoSelected.correo}" readonly="true"/>
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="@next" value="RFC" />
+                                        <p:inputText id="rfc" value="#{nominaBean.empleadoSelected.rfc}" readonly="true"/>
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="periodoPago">Periodo de Pago</p:outputLabel>
+                                        <p:inputText id="periodoPago" type="text" value="Semanal" disabled="True"/>
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="diasAguinaldo">Días de Aguinaldo</p:outputLabel>
+                                        <ui:repeat id="diasAguinaldo" value="#{nominaBean.lstPercepcionActual}" var="percepcion">
+                                            <p:inputText value="#{percepcion.diasAguinaldo}" disabled="True"/>
+                                        </ui:repeat> 
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="primaVacacional">Prima Vacacional %</p:outputLabel>
+                                        <ui:repeat id="primaVacacional" value="#{nominaBean.lstPercepcionActual}" var="percepcion">
+                                            <p:inputText value="#{percepcion.primaVacacional * 100}" disabled="True"/>
+                                        </ui:repeat> 
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="diasVacaciones">Días Vacaciones</p:outputLabel>
+                                        <ui:repeat id="diasVacaciones" value="#{nominaBean.lstPercepcionActual}" var="percepcion">
+                                            <p:inputText value="#{percepcion.diasVacaciones}" disabled="True"/>
+                                        </ui:repeat>
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="salarioEmpleado">Salario Diario</p:outputLabel>
+                                        <p:inputText id="salarioEmpleado" value="#{nominaBean.empleadoSelected.sueldoDiario}" disabled="True"/>
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="faltas">Faltas</p:outputLabel>
+                                        <p:inputText id="faltas" value="#{nominaBean.faltas}" disabled="True"/>
+                                    </div>
+                                </div>
+                                <div align="right">
+                                    <p:commandButton value="Cálcular" icon="pi pi-pencil" styleClass="mr-2 mb-2" actionListener="#{nominaBean.calculoNomina()}" update="mainform" />
+                                </div>
+                            </div>
+                        </p:fieldset>
+                    </div>
+
+                    <div class="p-2">
+                        <p:fieldset id="preNom" widgetVar="preNom" legend="Precálculo Nómina" toggleable="true" toggleSpeed="500" rendered="#{nominaBean.divVisibleCalculoNomina}">
+                            <div class="card">
+                                <div class="ui-fluid formgrid grid">
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="sdi">Salario Diario Integrado</p:outputLabel>
+                                        <p:inputText id="sdi" value="#{nominaBean.sdi()}" />
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="diasTrabajados">Días Trabajados</p:outputLabel>
+                                        <p:inputText id="diasTrabajados" value="#{nominaBean.getDIAS_TRABAJADOS()}" />
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="septimoDia">Septimo Día</p:outputLabel>
+                                        <p:inputText id="septimoDia" value="#{nominaBean.getSEPTIMO_DIA()}" />
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="salarioSeptimo">Salario Septimo</p:outputLabel>
+                                        <p:inputText id="salarioSeptimo" value="#{nominaBean.empleadoSelected.sueldoDiario}" />
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="salarioSemanal">Salario Semanal</p:outputLabel>
+                                        <p:inputText id="salarioSemanal" value="#{nominaBean.salarioSemanal()}" />
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="bonoPuntualidad">Bono Puntualidad</p:outputLabel>
+                                        <p:inputText id="bonoPuntualidad" value="#{nominaBean.bonoPuntualidad()}" />
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="valesDespensa">Vales de Despensa</p:outputLabel>
+                                        <p:inputText id="valesDespensa" value="#{nominaBean.valesDespensa()}" />
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="totalPercepciones">Total de Percepciones</p:outputLabel>
+                                        <p:inputText id="totalPercepciones" value="#{nominaBean.totalPercepciones()}" />
+                                    </div>
+                                </div>
+                                <div align="right">
+                                    <p:commandButton value="Actúalizar Nómina" icon="pi pi-pencil" styleClass="mr-2 mb-2" actionListener="#{nominaBean.recalcularPercepciones()}" process="@this" update="mainform" />
+                                </div>
+                            </div>
+                        </p:fieldset>
+                    </div>
+
+                    <div class="p-2">
+                        <p:fieldset id="isr" widgetVar="isr" legend="Cálculo ISR" toggleable="true" toggleSpeed="500" rendered="#{nominaBean.divVisibleCalculoNomina}">
+                            <div class="card">
+                                <div class="ui-fluid formgrid grid">
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="baseIsr">Base para ISR</p:outputLabel>
+                                        <p:inputText id="baseIsr" value="#{nominaBean.baseIsr()}" />
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="liminf">Limite Inferior</p:outputLabel>
+                                        <p:inputText id="liminf" value="#{nominaBean.isr.limiteInferior}" />
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="excedente">Excedente</p:outputLabel>
+                                        <p:inputText id="excedente" value="#{nominaBean.excedente}" />
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="porcexcedente">Porc. aplicable sobre excedente</p:outputLabel>
+                                        <p:inputText id="porcexcedente" value="#{nominaBean.isr.porcAplExceLimInf}" />
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="impuestoPrevio">Impuesto Previo</p:outputLabel>
+                                        <p:inputText id="impuestoPrevio" value="#{nominaBean.impuestoPrevio}" />
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="cuotaFija">Cuota Fija</p:outputLabel>
+                                        <p:inputText id="cuotaFija" value="#{nominaBean.isr.cuotaFija}" />
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="subsidio">Impuesto antes de Subsidio</p:outputLabel>
+                                        <p:inputText id="subsidio" value="#{nominaBean.impuestoAntesDeSubsidio}" />
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="subsidioAcre">Subsidio Acreditado</p:outputLabel>
+                                        <p:inputText id="subsidioAcre" value="#{nominaBean.subsidio.cantidadSubsidio}" />
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="isrRetener">ISR a Retener</p:outputLabel>
+                                        <p:inputText id="isrRetener" value="#{nominaBean.isrRetener()}" />
+                                    </div>
+                                </div>
+                                <div align="right">
+                                    <p:commandButton value="Actúalizar ISR" icon="pi pi-pencil" styleClass="mr-2 mb-2" actionListener="#{nominaBean.recalcularNomina()}" process="@this" update="mainform" />
+                                </div>
+                            </div>
+                        </p:fieldset>
+                    </div>
+
+                    <div class="p-2">
+                        <p:fieldset id="imssT" widgetVar="imssT" legend="Cálculo IMSS Obrero" toggleable="true" toggleSpeed="500" rendered="#{nominaBean.divVisibleCalculoNomina}">
+                            <div class="card">
+                                <div class="ui-fluid formgrid grid">
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="enfMatEnEsp">Enf. y Mat. En Esp.</p:outputLabel>
+                                        <p:inputText id="enfMatEnEsp" value="#{nominaBean.enfMatEsp()}" />
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="enfMatGM">Enf. y Mat. GM</p:outputLabel>
+                                        <p:inputText id="enfMatGM" value="#{nominaBean.enfMatGM()}" />
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="enfMatEnDinero">Enf. y Mat. En Dinero</p:outputLabel>
+                                        <p:inputText id="enfMatEnDinero" value="#{nominaBean.enfMatDinero()}" />
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="enfMatTotal">Total Enf. y Mat.</p:outputLabel>
+                                        <p:inputText id="enfMatTotal" value="#{nominaBean.totalEnfMat()}" />
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="invVida">Inv. y Vida</p:outputLabel>
+                                        <p:inputText id="invVida" value="#{nominaBean.invVida()}" />
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="cesVejez">Cesant. y Vejez</p:outputLabel>
+                                        <p:inputText id="cesVejez" value="#{nominaBean.cesantiaVejez()}" />
+                                    </div>
+                                    <div class="field col-3 md:col-3">
+                                        <p:outputLabel for="totalImss">IMSS a Retener</p:outputLabel>
+                                        <p:inputText id="totalImss" value="#{nominaBean.totalImssRetener()}" />
+                                    </div>
+                                </div>
+                                <div align="right">
+                                    <p:commandButton value="Actúalizar IMSS Obrero" icon="pi pi-pencil" styleClass="mr-2 mb-2" actionListener="#{nominaBean.recalcularImssRetener()}" process="@this"  update="mainform" />
+                                </div>
+                            </div>
+                        </p:fieldset>
+                    </div>
+                    <div align="right">
+                        <p:commandButton value="Guardar" icon="pi pi-save" styleClass="mr-2 mb-2" actionListener="#{nominaBean.guardarNominaEmpleado()}" process="@this"  update="mainform" 
+                                         disabled="false" rendered="#{nominaBean.divVisibleCalculoNomina}"/>
+                    </div>
+                </div>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

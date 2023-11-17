@@ -1,0 +1,61 @@
+/* 
+    Created on : 19/01/2023, 07:41:51 AM
+    Author     : Gabo
+*/
+
+.ferbo-keyboard-class.ui-inputfield{
+    width: 180px !important;
+}
+.ferbo-keyboard-class.keypad-popup{
+    width: 180px !important;
+}
+.ferbo-keyboard-class .keypad-key{
+    width: 4em;
+    height: 4em;
+}
+.ferbo-keyboard-class .keypad-space{
+    width: 4em;
+    height: 2em;
+}
+
+.ferbo-schedule{
+}
+
+.ferbo-schedule .fc-event-time{
+    display: none;
+}
+
+.ferbo-schedule .fc-toolbar-title:first-letter{
+    text-transform: uppercase;
+}
+
+.ferbo-schedule .fc-daygrid-event {
+    font-size: 1.2em;
+    white-space: normal;
+    margin-top: 4px !important;
+}
+.ferbo-schedule .fc-daygrid-event-dot {
+    margin: 6px 6px;
+    width: 0px;
+    height: 0px;
+    border: calc(16px / 2) solid #3788d8;
+    border-radius: calc(14px / 0);
+}
+
+.ferbo-datePicker .ui-datepicker-group{
+    padding: 0px !important;
+}
+
+.ferbo-datePicker td span{
+    padding: 0 !important;
+}
+
+.ferbo-datePicker-panel{
+    display: contents !important;
+    width: 300px !important;
+    height: 300px !important;
+}
+
+.ferbo-dialog .ui-dialog-content{
+    padding-bottom: 0.5rem !important;
+}

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+      xmlns:jsf="http://xmlns.jcp.org/jsf"
+      >
+
+    <h:head>
+        <f:facet name="first">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+            <meta name="viewport"
+                  content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+            <meta name="apple-mobile-web-app-capable" content="yes" />
+        </f:facet>
+        <h:outputStylesheet name="css/estilos.css" library="recursos" />
+        <title>Sistema de Gestión de Personal</title>
+    </h:head>
+    <h:body styleClass="login-body" style="padding: 0;">
+
+        <h:form id="login_form">
+            
+            
+            <p:growl id="messages" showDetail="true" sticky="true"/>
+
+            <p:idleMonitor timeout="120000">
+                <p:ajax event="active" listener="#{loginBean.logProvisional(true)}" update=":login_form"/>
+                <p:ajax event="idle" listener="#{loginBean.logProvisional(false)}"/>
+            </p:idleMonitor>
+
+            <p:remoteCommand name="rcRefresh" update="login_form:listBiometrico" oncomplete="InvokeFingerScan('VerifyFingerprint')"/>
+            <p:remoteCommand name="unblock" onstart="PF('block').unblock()"/>
+            <p:remoteCommand name="rcMatch" actionListener="#{loginBean.login(loginBean.navegacion)}" process="@this"/>
+            <p:remoteCommand name="rcNoMatch" onstart="PF('dialogNoMatch').show()"/>
+            <p:remoteCommand autoRun="true" actionListener="#{loginBean.setNumEmpleado(null)}" update="login_form:keypad" immediate="true"/>
+            <p:growl id="growl" showDetail="true" life="2500" />
+            <div id="login-wrapper" style="padding-top:3%; position: relative;">
+                <p:graphicImage name="images/login.png" library="recursos"
+                                width="100%" />
+                <div class="card">
+                    <h5>Bienvenido</h5>
+                    <div class="field col-12 md:col-12 mb-0">
+                        <p:outputLabel for="keypad" value="Ingrese su Número de Empleado: " />
+                        <p:inputText id="keypad" value="#{loginBean.numEmpleado}" autocomplete="false" readonly="true"/>
+                    </div>
+                    <div class="field col-12 md:col-12">
+                        <div class="ferbo-keyboard-class ui-widget ui-widget-content ui-corner-all ui-shadow keypad-popup ui-input-overlay" style="display: contents;">
+                            <div class="keypad-row">
+                                <p:commandButton value="1" actionListener="#{loginBean.setNumEmpleado(loginBean.numEmpleado eq null ? '1' : loginBean.numEmpleado.concat('1'))}" update="keypad back"/>
+                                <p:commandButton value="2" actionListener="#{loginBean.setNumEmpleado(loginBean.numEmpleado eq null ? '2' : loginBean.numEmpleado.concat('2'))}" update="keypad back"/>
+                                <p:commandButton value="3" actionListener="#{loginBean.setNumEmpleado(loginBean.numEmpleado eq null ? '3' : loginBean.numEmpleado.concat('3'))}" update="keypad back"/>
+                            </div>
+                            <div class="keypad-row">
+                                <p:commandButton value="4" actionListener="#{loginBean.setNumEmpleado(loginBean.numEmpleado eq null ? '4' : loginBean.numEmpleado.concat('4'))}" update="keypad back"/>
+                                <p:commandButton value="5" actionListener="#{loginBean.setNumEmpleado(loginBean.numEmpleado eq null ? '5' : loginBean.numEmpleado.concat('5'))}" update="keypad back"/>
+                                <p:commandButton value="6" actionListener="#{loginBean.setNumEmpleado(loginBean.numEmpleado eq null ? '6' : loginBean.numEmpleado.concat('6'))}" update="keypad back"/>
+                            </div>
+                            <div class="keypad-row">
+                                <p:commandButton value="7" actionListener="#{loginBean.setNumEmpleado(loginBean.numEmpleado eq null ? '7' : loginBean.numEmpleado.concat('7'))}" update="keypad back"/>
+                                <p:commandButton value="8" actionListener="#{loginBean.setNumEmpleado(loginBean.numEmpleado eq null ? '8' : loginBean.numEmpleado.concat('8'))}" update="keypad back"/>
+                                <p:commandButton value="9" actionListener="#{loginBean.setNumEmpleado(loginBean.numEmpleado eq null ? '9' : loginBean.numEmpleado.concat('9'))}" update="keypad back"/>
+                            </div>
+                            <div class="keypad-row">
+                                <p:commandButton id="back" value="&lt;" actionListener="#{loginBean.setNumEmpleado(loginBean.numEmpleado.substring(0,loginBean.numEmpleado.length()-1))}" update="keypad back" disabled="#{loginBean.numEmpleado eq null or loginBean.numEmpleado.isEmpty()}"/>
+                                <p:commandButton value="0" actionListener="#{loginBean.setNumEmpleado(loginBean.numEmpleado eq null ? '0' : loginBean.numEmpleado.concat('0'))}" update="keypad back"/>
+                                <p:commandButton id="btnReset" value="X" actionListener="#{loginBean.setNumEmpleado(null)}" update="keypad back"/>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- PARA PROD -->
+                    <div jsf:rendered="true">
+                        <p:commandButton actionListener="#{loginBean.consultaBiometrico(loginBean.numEmpleado, false)}" value="Entrada/Salida" update="growl" styleClass="m-2"
+                                         onclick="PF('block').block()" oncomplete="rcRefresh()"/>
+                        <p:commandButton actionListener="#{loginBean.consultaBiometrico(loginBean.numEmpleado, true)}" value="Mi perfil" update="growl" styleClass="m-2"
+                                         onclick="PF('block').block()" oncomplete="rcRefresh()"/>
+                    </div>
+                    <!-- PARA DESARROLLO -->
+                    <div jsf:rendered="false">
+                        <p:commandButton actionListener="#{loginBean.login(false)}" value="Entrada/Salida" update="growl" styleClass="m-2"/>
+                        <p:commandButton actionListener="#{loginBean.login(true)}" value="Mi perfil" update="growl" styleClass="m-2"/>
+                    </div>
+                </div>
+                <div class="login-footer">Ferbo</div>
+            </div>
+            <p:dialog widgetVar="dialogNoMatch" header="Error" modal="true" closable="false">
+                <p:panelGrid columns="1">
+                    <p:outputLabel value="El dato biométrico no coincide, intenta nuevamente"/>
+                </p:panelGrid>
+                <f:facet name="footer">
+                    <p:commandButton value="Aceptar" icon="pi pi-check" onclick="PF('dialogNoMatch').hide()"/>
+                    <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogNoMatch').hide()" class="ui-button-secondary" resetValues="true" 
+                                     process="@this" actionListener="#{loginBean.setNumEmpleado(null)}" update="login_form:keypad"/>
+                </f:facet>
+            </p:dialog>
+
+
+            <p:orderList style="display: none;" id="listBiometrico" value="#{loginBean.listadoBiometricos}" controlsLocation="none" var="biometrico" itemLabel="#{biometrico}" itemValue="#{biometrico}"/>
+
+            <p:dialog widgetVar="dialogLogin" modal="true">
+                <div>
+                        <p:commandButton actionListener="#{loginBean.login(false)}" value="Entrada/Salida" update="growl" styleClass="m-2"/>
+                        <p:commandButton actionListener="#{loginBean.login(true)}" value="Mi perfil" update="growl" styleClass="m-2"/>
+                </div>
+            </p:dialog>
+            <pe:blockUI widgetVar="block" cssOverlay="{opacity:0.5}">
+                <h:panelGrid columns="1">
+                    <h:graphicImage library="recursos" name="images/loading.gif"
+                                    style="vertical-align: middle;display: block; margin: auto;width: 60px"/>
+                    <h:outputText value="Please wait..." style="white-space: nowrap;"/>
+                </h:panelGrid>
+            </pe:blockUI>
+
+            <script>
+
+                function createCORSRequest(method, url) {
+                    var xhr = new XMLHttpRequest();
+                    if ("withCredentials" in xhr) {
+                        xhr.open(method, url, true);
+                    } else if (typeof XDomainRequest != "undefined") {
+                        xhr = new XDomainRequest();
+                        xhr.open(method, url, true);
+                    } else {
+                        xhr = null;
+                    }
+                    return xhr;
+                }
+
+                function InvokeFingerScan(TpAccion, payload, signature) {
+                    var url = "http://127.0.0.1:23106";
+                    var request = createCORSRequest('POST', url);
+                    if (!request) {
+                        throw new Error('CORS not supported');
+                    }
+                    request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                    request.onreadystatechange = function () {
+                        if (this.readyState == 4) {
+                            if (this.status == 200) {
+                                var dataValue = {"cipherText": request.responseText};
+                                var response = JSON.parse(request.responseText);
+                                console.log(response);
+                                if (response != null) {
+                                    //En la respuesta 
+                                    if (response.BiometricData1 != null) {
+                                        $(".successfull").html(response.BiometricData1);
+                                        $(".successfull").show(300);
+                                    } else {
+                                        if (response.VerifyBiometricData == true) {
+                                            $(".verifyfingerprintOk").html("!!! Fingerprint Match !!!");
+                                            $(".verifyfingerprintOk").show(300);
+                                            rcMatch();
+                                        } else {
+                                            $(".badrequest").html("!!! Fingerprint Not Match !!!");
+                                            $(".badrequest").show(300);
+                                            rcNoMatch();
+                                        }
+                                        unblock();
+                                    }
+                                }
+                            } else {
+                            }
+                        }
+                    };
+                    request.onerror = function () {
+                        console.error('Ocurrió un error al hacer una solicitud de adquisición de datos.');
+                    };
+                    request.ontimeout = function () {
+                        console.error("La solicitud de adquisición de datos ha expirado.");
+                    };
+
+                    var obj = new Object();
+                    obj.TpAccion = TpAccion;
+                    obj.FingerPrinToVerify = listado();
+                    var jsonString = JSON.stringify(obj);
+                    console.log(jsonString);
+                    try {
+                        request.send(jsonString);
+                    } catch (err) {
+                        console.error("Error de comunicaciones.");
+
+                    } finally {
+                    }
+                }
+
+                function listado() {
+                    const arreglo = [];
+                    for (const li of document.querySelectorAll('ul>li')) {
+                        arreglo.push(li.textContent);
+                    }
+                    return arreglo;
+                };
+
+            </script>            
+
+        </h:form>
+        <h:outputStylesheet name="css/primeicons.css" library="omega-layout" />
+        <h:outputStylesheet name="css/primeflex.min.css" library="omega-layout" />
+        <h:outputStylesheet name="css/layout-#{guestPreferences.layout}.css"
+                            library="omega-layout" />
+
+        <style>
+            .pe-blockui {
+                left: 47% !important;
+            }
+        </style>
+    </h:body>
+</html>
