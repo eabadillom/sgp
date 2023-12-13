@@ -71,9 +71,9 @@
                     </div>
                     <!-- PARA PROD -->
                     <div jsf:rendered="true">
-                        <p:commandButton actionListener="#{loginBean.consultaBiometrico(loginBean.numEmpleado, false)}" value="Entrada/Salida" update="growl" styleClass="m-2"
+                        <p:commandButton actionListener="#{loginBean.consultaBiometrico(loginBean.numEmpleado, false)}" value="Entrada/Salida..." update="growl" styleClass="m-2"
                                          onclick="PF('block').block()" oncomplete="rcRefresh()"/>
-                        <p:commandButton actionListener="#{loginBean.consultaBiometrico(loginBean.numEmpleado, true)}" value="Mi perfil" update="growl" styleClass="m-2"
+                        <p:commandButton actionListener="#{loginBean.consultaBiometrico(loginBean.numEmpleado, true)}" value="Mi perfil..." update="growl" styleClass="m-2"
                                          onclick="PF('block').block()" oncomplete="rcRefresh()"/>
                     </div>
                     <!-- PARA DESARROLLO -->

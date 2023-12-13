@@ -1,13 +1,10 @@
 package mx.com.ferbo.controller;
 
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -16,11 +13,16 @@ import java.util.TimeZone;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.inject.Named;
-import mx.com.ferbo.dao.DetBiometricoDAO;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.primefaces.PrimeFaces;
 
+import mx.com.ferbo.dao.DetBiometricoDAO;
 import mx.com.ferbo.dao.EmpleadoDAO;
 import mx.com.ferbo.dao.RegistroDAO;
 import mx.com.ferbo.dto.CatEstatusRegistroDTO;
@@ -28,11 +30,6 @@ import mx.com.ferbo.dto.DetBiometricoDTO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.dto.DetRegistroDTO;
 import mx.com.ferbo.util.SGPException;
-import org.primefaces.PrimeFaces;
-
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.util.logging.Level;
 
 @Named(value = "loginBean")
 @SessionScoped
@@ -110,7 +107,7 @@ public class LoginBean implements Serializable {
      * @throws IOException
      */
     public void login(boolean navegacion) throws IOException {
-
+    	log.info(String.format("Validando acceso (navegacion =  %s)", navegacion));
         empleadoSelected = empleadoDAO.buscarPorNumEmpl(numEmpleado);
 
         if (contador <= 3) {
@@ -196,6 +193,7 @@ public class LoginBean implements Serializable {
     }
 
     public void consultaBiometrico(String numEmpleado, boolean byNavegacion) {
+    	log.info("Solicitando biometricos...");
         listadoBiometricos.clear();
         DetBiometricoDTO biometrico = biometricoDAO.consultaBiometricoByNumEmpleado(numEmpleado);
         listadoBiometricos.add(biometrico != null ? biometrico.getHuella() : "");
