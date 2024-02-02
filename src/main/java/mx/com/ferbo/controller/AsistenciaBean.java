@@ -4,7 +4,13 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
+
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -12,13 +18,26 @@ import javax.faces.model.SelectItem;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
-import mx.com.ferbo.dao.*;
-import mx.com.ferbo.dto.*;
-import mx.com.ferbo.util.SGPException;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.SelectEvent;
-import org.primefaces.model.*;
-import org.apache.log4j.Logger;
+import org.primefaces.model.DefaultScheduleEvent;
+import org.primefaces.model.DefaultScheduleModel;
+import org.primefaces.model.ScheduleEvent;
+import org.primefaces.model.ScheduleModel;
+
+import mx.com.ferbo.dao.CatTipoSolicitudDAO;
+import mx.com.ferbo.dao.IncidenciaDAO;
+import mx.com.ferbo.dao.RegistroDAO;
+import mx.com.ferbo.dao.SolicitudPermisoDAO;
+import mx.com.ferbo.dto.CatTipoSolicitudDTO;
+import mx.com.ferbo.dto.DetEmpleadoDTO;
+import mx.com.ferbo.dto.DetIncidenciaDTO;
+import mx.com.ferbo.dto.DetRegistroDTO;
+import mx.com.ferbo.dto.DetSolicitudPermisoDTO;
+import mx.com.ferbo.util.SGPException;
 
 /**
  *
@@ -30,7 +49,7 @@ public class AsistenciaBean implements Serializable {
     
     private static final long serialVersionUID = 1L;
 
-    private static final Logger log = Logger.getLogger(AsistenciaBean.class);
+    private static final Logger log = LogManager.getLogger(AsistenciaBean.class);
 
     private ScheduleModel calendario;
     private ScheduleEvent evento;

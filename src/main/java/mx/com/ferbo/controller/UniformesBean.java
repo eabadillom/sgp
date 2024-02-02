@@ -13,7 +13,10 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
+import org.primefaces.model.ResponsiveOption;
 
 import mx.com.ferbo.dao.CatPrendaDAO;
 import mx.com.ferbo.dao.CatTallaDAO;
@@ -28,8 +31,6 @@ import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.dto.DetIncidenciaDTO;
 import mx.com.ferbo.dto.DetSolicitudPrendaDTO;
 import mx.com.ferbo.util.SGPException;
-import org.primefaces.model.ResponsiveOption;
-import org.apache.log4j.Logger;
 
 @Named(value = "uniformesBean")
 @ViewScoped
@@ -37,7 +38,7 @@ public class UniformesBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
     
-    private static final Logger log = Logger.getLogger(UniformesBean.class);
+    private static final Logger log = LogManager.getLogger(UniformesBean.class);
 
     private String numeroEmpl;
 

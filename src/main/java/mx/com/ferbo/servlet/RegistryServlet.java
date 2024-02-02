@@ -7,7 +7,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 //import com.digitalpersona.uareu.Reader;
 //import com.digitalpersona.uareu.ReaderCollection;
@@ -22,7 +23,7 @@ import mx.com.ferbo.dto.DetBiometricoDTO;
  */
 public class RegistryServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static Logger log = Logger.getLogger(RegistryServlet.class);
+	private static Logger log = LogManager.getLogger(RegistryServlet.class);
        
     /**
      * @see HttpServlet#HttpServlet()

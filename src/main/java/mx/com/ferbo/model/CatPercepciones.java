@@ -1,7 +1,9 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -47,7 +49,21 @@ import javax.validation.constraints.NotNull;
                                                   + " cp.activo"
                                                   + ")"
                                                   + " FROM CatPercepciones cp"
-                                                  + " WHERE cp.fechaCap LIKE :fechaCap AND cp.activo = 1")
+                                                  + " WHERE cp.fechaCap LIKE :fechaCap AND cp.activo = 1"),
+    @NamedQuery(name = "CatPercepciones.findLastActive", query =
+    		  "SELECT NEW mx.com.ferbo.dto.CatPercepcionesDTO("
+            + " cp.idPercepciones,"
+            + " cp.diasAguinaldo,"
+            + " cp.diasVacaciones,"
+            + " cp.primaVacacional,"
+            + " cp.bonoPuntualidad,"
+            + " cp.valeDespensa,"
+            + " cp.uma,"
+            + " cp.fechaCap,"
+            + " cp.activo"
+            + ")"
+            + " FROM CatPercepciones cp"
+            + " WHERE cp.fechaCap = (SELECT MAX(p.fechaCap) FROM CatPercepciones p WHERE p.activo = 1 and p.fechaCap <= :fechaCorte )")
 })
 public class CatPercepciones implements Serializable {
     
@@ -57,26 +73,34 @@ public class CatPercepciones implements Serializable {
     @Basic(optional = false)
     @Column(name = "id_percepciones")
     private Integer idPercepciones;
+    
     @NotNull
     @Column(name = "dias_aguinaldo")
     private Integer diasAguinaldo;
+    
     @NotNull
     @Column(name = "dias_vacaciones")
     private Integer diasVacaciones;
+    
     @NotNull
     @Column(name = "prima_vacacional")
-    private Float primaVacacional;
+    private BigDecimal primaVacacional;
+    
     @NotNull
     @Column(name = "bono_puntualidad")
-    private Float bonoPuntualidad;
+    private BigDecimal bonoPuntualidad;
+    
     @NotNull
     @Column(name = "vale_despensa")
-    private Float valeDespensa;
+    private BigDecimal valeDespensa;
+    
     @NotNull
     @Column(name = "uma")
-    private Float uma;
+    private BigDecimal uma;
+    
     @Column(name = "fecha_cap")
     private Date fechaCap;
+    
     @NotNull
     @Column(name = "activo")
     private short activo;
@@ -88,7 +112,7 @@ public class CatPercepciones implements Serializable {
         this.idPercepciones = idPercepciones;
     }
 
-    public CatPercepciones(Integer idPercepciones, Integer diasAguinaldo, Integer diasVacaciones, Float primaVacacional, Float bonoPuntualidad, Float valeDespensa, Float uma, Date fechaCap, short activo) {
+    public CatPercepciones(Integer idPercepciones, Integer diasAguinaldo, Integer diasVacaciones, BigDecimal primaVacacional, BigDecimal bonoPuntualidad, BigDecimal valeDespensa, BigDecimal uma, Date fechaCap, short activo) {
         this.idPercepciones = idPercepciones;
         this.diasAguinaldo = diasAguinaldo;
         this.diasVacaciones = diasVacaciones;
@@ -124,35 +148,35 @@ public class CatPercepciones implements Serializable {
         this.diasVacaciones = diasVacaciones;
     }
 
-    public Float getPrimaVacacional() {
+    public BigDecimal getPrimaVacacional() {
         return primaVacacional;
     }
 
-    public void setPrimaVacacional(Float primaVacacional) {
+    public void setPrimaVacacional(BigDecimal primaVacacional) {
         this.primaVacacional = primaVacacional;
     }
 
-    public Float getBonoPuntualidad() {
+    public BigDecimal getBonoPuntualidad() {
         return bonoPuntualidad;
     }
 
-    public void setBonoPuntualidad(Float bonoPuntualidad) {
+    public void setBonoPuntualidad(BigDecimal bonoPuntualidad) {
         this.bonoPuntualidad = bonoPuntualidad;
     }
 
-    public Float getValeDespensa() {
+    public BigDecimal getValeDespensa() {
         return valeDespensa;
     }
 
-    public void setValeDespensa(Float valeDespensa) {
+    public void setValeDespensa(BigDecimal valeDespensa) {
         this.valeDespensa = valeDespensa;
     }
 
-    public Float getUma() {
+    public BigDecimal getUma() {
         return uma;
     }
 
-    public void setUma(Float uma) {
+    public void setUma(BigDecimal uma) {
         this.uma = uma;
     }
 
@@ -171,6 +195,4 @@ public class CatPercepciones implements Serializable {
     public void setActivo(short activo) {
         this.activo = activo;
     }
-    
-    
 }

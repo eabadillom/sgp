@@ -3,8 +3,13 @@ package mx.com.ferbo.dao;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.model.CatArea;
@@ -14,7 +19,6 @@ import mx.com.ferbo.model.CatPlanta;
 import mx.com.ferbo.model.CatPuesto;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.util.SGPException;
-import org.apache.log4j.Logger;
 
 /**
  *
@@ -26,7 +30,7 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     
     private static final long serialVersionUID = 1L;
     
-    private final Logger log = Logger.getLogger(EmpleadoDAO.class);
+    private final Logger log = LogManager.getLogger(EmpleadoDAO.class);
     
     @Override
     public DetEmpleadoDTO buscarPorId(Integer id) {
@@ -151,5 +155,11 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     
     public List<DetEmpleadoDTO> buscarActivoConSDI() {
         return emSGP.createNamedQuery("DetEmpleado.findByActiveSDI", DetEmpleadoDTO.class).getResultList();
+    }
+    
+    public List<DetEmpleadoDTO> buscarActivoAndEmpresa(Integer idEmpresa) {
+    	return emSGP.createNamedQuery("DetEmpleado.findByActiveAndIdEmpresa", DetEmpleadoDTO.class)
+    			.setParameter("idEmpresa", idEmpresa)
+    			.getResultList();
     }
 }

@@ -19,7 +19,8 @@ import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.DetBiometricoDAO;
@@ -37,7 +38,7 @@ public class LoginBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger log = Logger.getLogger(LoginBean.class);
+    private static final Logger log = LogManager.getLogger(LoginBean.class);
 
     private DetEmpleadoDTO empleadoSelected;
     private DetEmpleadoDTO detEmpleadoDTO;

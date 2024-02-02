@@ -3,16 +3,20 @@ package mx.com.ferbo.dao;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
 import javax.persistence.TemporalType;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.dto.DetRegistroDTO;
 import mx.com.ferbo.model.CatEstatusRegistro;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetRegistro;
 import mx.com.ferbo.util.SGPException;
-import org.apache.log4j.Logger;
 
 /**
  *
@@ -24,7 +28,7 @@ public class RegistroDAO extends IBaseDAO<DetRegistroDTO, Integer> implements Se
     
     private static final long serialVersionUID = 1L;
 
-    private static final Logger log = Logger.getLogger(RegistroDAO.class);
+    private static final Logger log = LogManager.getLogger(RegistroDAO.class);
 
     @Override
     public DetRegistroDTO buscarPorId(Integer id) {
@@ -83,6 +87,18 @@ public class RegistroDAO extends IBaseDAO<DetRegistroDTO, Integer> implements Se
             emSGP.getTransaction().rollback();
             log.warn("EX-0003: " + ex.getMessage() + ". Error al guardar el registro del empleado: " + e.getDetEmpleadoDTO().getNumEmpleado() != null ? e.getDetEmpleadoDTO().getNumEmpleado() : null);
         }
+    }
+    
+    public List<DetRegistroDTO> buscar(Integer idEmpleado, Date fechaEntrada, Date fechaSalida) {
+    	List<DetRegistroDTO> lista = null;
+    	lista = emSGP.createNamedQuery("DetRegistro.findByIdEmpleadoPeriodo", DetRegistroDTO.class)
+    			.setParameter("idEmpleado", idEmpleado)
+    			.setParameter("fechaEntrada", fechaEntrada)
+    			.setParameter("fechaSalida", fechaSalida)
+    			.getResultList()
+    			;
+    	
+    	return lista;
     }
 
     public List<DetRegistroDTO> consultaRegistrosPorIdEmp(Integer idEmpleado) {

@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.primefaces</groupId>
+    <groupId>com.ferbo</groupId>
     <artifactId>sgp</artifactId>
     <version>1.0</version>
     <packaging>${packaging.type}</packaging>
@@ -130,11 +130,12 @@
             <artifactId>openpdf</artifactId>
             <version>${open-pdf.version}</version>
         </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.16</version>
-        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.20.0</version>
+		</dependency>
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>org.eclipse.persistence.core</artifactId>
@@ -241,6 +242,12 @@
             <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
+        
+        <dependency>
+			<groupId>com.ferbo</groupId>
+			<artifactId>gestion-tools</artifactId>
+			<version>0.0.2-SNAPSHOT</version>
+		</dependency>
     </dependencies>
 
     <repositories>
@@ -249,6 +256,11 @@
             <name>PrimeFaces Maven Repository</name>
             <url>http://repository.primefaces.org</url>
         </repository>
+        <repository>
+			<id>github</id>
+			<name>github</name>
+			<url>https://maven.pkg.github.com/eabadillom/*</url>
+		</repository>
     </repositories>
 
     <build>

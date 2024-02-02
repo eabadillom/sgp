@@ -15,13 +15,21 @@
                         <p:messages id="messages" globalOnly="true" closable="true"/>
                         <p:growl id="mssgs" showDetail="true" life="5000"/>
                         <p:remoteCommand name="rcUpdate" update="dtNomina"/>
-                        <p:toolbar styleClass="mb-4">
+                        <p:toolbar>
                             <p:toolbarGroup>
                                 <p:commandButton value="Exportar" icon="pi pi-upload" styleClass="ui-button-help" ajax="false">
                                     <p:dataExporter type="csv" target="dtNomina" fileName="raya" preProcessor="#{nominaBean.exportNomina}"/>
                                 </p:commandButton>
                             </p:toolbarGroup>
-                            <p:toolbarGroup align="right">
+                            <p:toolbarGroup>
+                            	<p:datePicker value="#{nominaBean.periodoInicio}" placeholder="Periodo Inicio" showIcon="true">
+                            		<p:ajax process="@this"></p:ajax>
+                            	</p:datePicker>
+                            	<p:datePicker value="#{nominaBean.periodoFin}" placeholder="Periodo Fin" showIcon="true">
+                            		<p:ajax process="@this"></p:ajax>
+                            	</p:datePicker>
+                            </p:toolbarGroup>
+                            <p:toolbarGroup>
                                 <p:commandButton styleClass="ui-button-success" style="margin-right: .5rem" process="@this" value="Cálcular por Empleados" 
                                                  onstart="PF('empleadoDialog').show();" update="panelDialogEmpleados"/>
                                 <p:commandButton styleClass="ui-button-success" style="margin-right: .5rem" process="@this" value="Cálcular por Empresa" 
@@ -49,6 +57,36 @@
                                 </p:column>
                                 <p:column headerText="Empleado" width="110px" >
                                     <h:outputText value="#{nomina.idEmpleado.primerAp} #{nomina.idEmpleado.segundoAp} #{nomina.idEmpleado.nombre} " />
+                                </p:column>
+                                <p:column headerText="SD" width="50px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.salarioDiario}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.salarioDiario}" style="width:100%"/>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="SDI" width="50px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.salarioDiarioIntegrado}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.salarioDiarioIntegrado}" style="width:100%"/>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Días trabajados" width="50px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.asistencia}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.asistencia}" style="width:100%"/>
+                                        </f:facet>
+                                    </p:cellEditor>
                                 </p:column>
                                 <p:column headerText="Sueldo" width="50px">
                                     <p:cellEditor>

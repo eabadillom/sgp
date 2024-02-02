@@ -1,43 +1,50 @@
 package mx.com.ferbo.controller;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.PostConstruct;
-import javax.faces.context.FacesContext;
-import javax.inject.Named;
-import javax.faces.view.ViewScoped;
-import javax.servlet.http.HttpServletRequest;
-import mx.com.ferbo.dao.CatPercepcionesDAO;
-import mx.com.ferbo.dao.CatTarifaIsrDAO;
-import mx.com.ferbo.dao.EmpleadoDAO;
-import mx.com.ferbo.dto.CatPercepcionesDTO;
-import mx.com.ferbo.dto.CatTarifaIsrDTO;
-import mx.com.ferbo.dto.DetEmpleadoDTO;
-import java.util.Calendar;
-import java.util.Comparator;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
-import mx.com.ferbo.dao.CatEmpresaDAO;
-import mx.com.ferbo.dao.CatImssCuotasDAO;
-import mx.com.ferbo.dao.CatSubsidioDAO;
-import mx.com.ferbo.dao.DetNominaDAO;
-import mx.com.ferbo.dao.RegistroDAO;
-import mx.com.ferbo.dto.CatEmpresaDTO;
-import mx.com.ferbo.dto.CatImssCuotasDTO;
-import mx.com.ferbo.dto.CatSubsidioDTO;
-import mx.com.ferbo.dto.DetNominaDTO;
-import mx.com.ferbo.dto.DetRegistroDTO;
-import mx.com.ferbo.util.SGPException;
+import javax.faces.context.FacesContext;
+import javax.faces.view.ViewScoped;
+import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.CellEditEvent;
 
-import org.apache.log4j.Logger;
+import mx.com.ferbo.business.NominaSemanalBL;
+import mx.com.ferbo.dao.CatEmpresaDAO;
+import mx.com.ferbo.dao.CatImssCuotasDAO;
+import mx.com.ferbo.dao.CatPercepcionesDAO;
+import mx.com.ferbo.dao.CatSubsidioDAO;
+import mx.com.ferbo.dao.CatTarifaIsrDAO;
+import mx.com.ferbo.dao.DetNominaDAO;
+import mx.com.ferbo.dao.EmpleadoDAO;
+import mx.com.ferbo.dao.RegistroDAO;
+import mx.com.ferbo.dto.CatEmpresaDTO;
+import mx.com.ferbo.dto.CatImssCuotasDTO;
+import mx.com.ferbo.dto.CatPercepcionesDTO;
+import mx.com.ferbo.dto.CatSubsidioDTO;
+import mx.com.ferbo.dto.CatTarifaIsrDTO;
+import mx.com.ferbo.dto.DetEmpleadoDTO;
+import mx.com.ferbo.dto.DetNominaDTO;
+import mx.com.ferbo.dto.DetRegistroDTO;
+import mx.com.ferbo.util.SGPException;
+
+
 
 /**
  *
@@ -49,12 +56,11 @@ public class NominaBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
     
-    private static final Logger log = Logger.getLogger(NominaBean.class);
+    private static final Logger log = LogManager.getLogger(NominaBean.class);
 
     //<editor-fold defaultstate="collapsed" desc="Constantes">
     private static final int DIAS_TRABAJADOS = 6;
     private static final int SEPTIMO_DIA = 1;
-    private static final int DIAS_ANIO = 365;
     //</editor-fold> 
     //<editor-fold defaultstate="collapsed" desc="DAOs">
     private RegistroDAO registroDAO;
@@ -121,7 +127,8 @@ public class NominaBean implements Serializable {
     private Date fecha;
     private int year;
 
-    private Date juevesPasado, miercolesPasado;
+    private Date periodoInicio;
+    private Date periodoFin;
 
     private HttpServletRequest httpServletRequest;
 
@@ -194,8 +201,12 @@ public class NominaBean implements Serializable {
             empresaSelected = empresaDAO.buscarPorId(idEmpresa);
             // divDataTableEmpresas = !divDataTableEmpresas;
         }
-
-        fecha = new Date();
+        log.info("====================== salida constructor nominaBean ======================");
+        log.info("Largo de Lista constructor {}", listaNomina.size());
+    }
+    
+    public void configuraPeriodo() {
+    	fecha = new Date();
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Mexico_City"));
         cal.setTime(fecha);
         year = cal.get(Calendar.YEAR);
@@ -205,28 +216,31 @@ public class NominaBean implements Serializable {
         cal.set(Calendar.MINUTE, 59);
         cal.set(Calendar.SECOND, 59);
         cal.set(Calendar.MILLISECOND, 999);
-        miercolesPasado = cal.getTime();
+        periodoFin = cal.getTime();
+        
+        
         cal.add(Calendar.DATE, -6);
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
-        juevesPasado = cal.getTime();
+        periodoInicio = cal.getTime();
 
         dateFormatYYYYMMDD = new SimpleDateFormat("yyyy-MM-dd");
         strDate = dateFormatYYYYMMDD.format(fecha) + "%";
-        log.info("====================== salida constructor nominaBean ======================");
-        log.info("Largo de Lista constructor" + listaNomina.size());
     }
 
     @PostConstruct
     public void init() {
         log.info("====================== entrada init nominaBean ======================");
+        this.configuraPeriodo();
+        
+        
         lstEmpresas = empresaDAO.buscarActivo();
         // Utilizado en obteniendoListaEmpleadosDeEmpresaSeleccionada();
-        lstEmpleados = empleadoDAO.buscarActivoConSDI();
+//        lstEmpleados = empleadoDAO.buscarActivoConSDI();//EABM REMOVED
 
-        lstRegistrosEmpleadoSemanaAnterior = registroDAO.buscarRegistroNomina(juevesPasado, miercolesPasado);
+        lstRegistrosEmpleadoSemanaAnterior = registroDAO.buscarRegistroNomina(periodoInicio, periodoFin);
 
         lstPercepcionActual = catPercepcionesDAO.buscarActivo();
         percepcion = (CatPercepcionesDTO) lstPercepcionActual.get(0);
@@ -237,23 +251,28 @@ public class NominaBean implements Serializable {
         isr = new CatTarifaIsrDTO();
         subsidio = new CatSubsidioDTO();
         imss = new CatImssCuotasDTO();
+        
+        log.info("Miercoles pasado: {}", periodoFin);
+        log.info("Jueves pasado: {}", periodoInicio);
       
     }
 
     public void calculandoNomina() {
         listaNomina.clear();
-        listaEmpleadosDeEmpresaSeleccionada = obteniendoListaEmpleadosDeEmpresaSeleccionada(empresaSelected.getIdEmpresa());
-        listaRegistrosEmpleadosDeEmpresaSeleccionadaSemanaAnterior = obteniendoListaRegistrosEmpleadosDeEmpresaSeleccionada();
+//        listaEmpleadosDeEmpresaSeleccionada = getEmpleados(empresaSelected.getIdEmpresa());
+        
+        //¿¿ES LISTA DE ASISTENCIAS??
+//        listaRegistrosEmpleadosDeEmpresaSeleccionadaSemanaAnterior = obteniendoListaRegistrosEmpleadosDeEmpresaSeleccionada();
       
-        rellenandoRegistrosConFaltasActual();
+        procesaListaEmpleados(empleadoDAO.buscarActivoAndEmpresa(empresaSelected.getIdEmpresa()));
 
         PrimeFaces.current().ajax().update("formNomina:dtNomina");
         PrimeFaces.current().executeScript("PF('empresaDialog').hide()");
     }
 
-    private List<DetEmpleadoDTO> obteniendoListaEmpleadosDeEmpresaSeleccionada(Integer idEmpresa) {
-        lstEmpleadosTmp = lstEmpleados.stream().filter(i -> i.getCatEmpresaDTO().getIdEmpresa().equals(idEmpresa)).sorted(Comparator.comparingInt(DetEmpleadoDTO::getIdEmpleado)).collect(Collectors.toList());
-        return lstEmpleadosTmp;
+    private List<DetEmpleadoDTO> getEmpleados(Integer idEmpresa) {
+    	lstEmpleadosTmp = empleadoDAO.buscarActivoAndEmpresa(idEmpresa);
+    	return lstEmpleadosTmp;
     }
 
     private List<DetRegistroDTO> obteniendoListaRegistrosEmpleadosDeEmpresaSeleccionada() {
@@ -262,141 +281,100 @@ public class NominaBean implements Serializable {
         return lstRegistrosPorEmpresaSemanaAnterior;
     }
 
-    private void rellenandoRegistrosConFaltasActual() { // Mandar llamar la sublista de empleados de lstRegistrosEmpleadoSemanaAnterior
-        for (DetEmpleadoDTO detEmpleadoDTO : lstEmpleadosTmp) {
-            lstRegistrosPorEmpresaSemanaAnteriorTmp = lstRegistrosPorEmpresaSemanaAnterior.stream().filter(i -> i.getDetEmpleadoDTO().getIdEmpleado().equals(detEmpleadoDTO.getIdEmpleado())).collect(Collectors.toList());
-            DetRegistroDTO registroNuevo = new DetRegistroDTO(0, detEmpleadoDTO.getIdEmpleado(), new Date(), new Date(), 3, "Falta");
-            for (int i = 0; i <= lstRegistrosPorEmpresaSemanaAnteriorTmp.size(); i++) {
-                if (lstRegistrosPorEmpresaSemanaAnteriorTmp.size() < 6) {
-                    lstRegistrosPorEmpresaSemanaAnteriorTmp.add(registroNuevo);
-                }
-            }
-            for (DetRegistroDTO registro : lstRegistrosPorEmpresaSemanaAnteriorTmp) {
-                if (registro.getCatEstatusRegistroDTO().getIdEstatus() == 2 || registro.getCatEstatusRegistroDTO().getIdEstatus() == 3) {
-                    lstRegistrosEmpleadoIncidencias.add(registro);
-                }
-            }
-            sdi(detEmpleadoDTO);
-            salarioSemanal(detEmpleadoDTO);
-            bonoPuntualidad();
-            valesDespensa();
-            totalPercepciones(detEmpleadoDTO);
-
-            baseIsr();
-            isrRetener();
-
-            enfMatEsp();
-            enfMatGM();
-            enfMatDinero();
-            totalEnfMat();
-            invVida();
-            cesantiaVejez();
-            totalImssRetener();
-
-            nomina = new DetNominaDTO();
-            nomina.setIdEmpleado(detEmpleadoDTO);
-            nomina.setSueldo(salSem);
-            nomina.setSeptimoDia((float)detEmpleadoDTO.getSueldoDiario());
-            nomina.setHorasExtras((float) 0);
-            nomina.setDestajos((float) 0);
-            nomina.setPremiosEficiencia((float) 0);
-            nomina.setBonoPuntualidad(bono);
-            nomina.setDespensa(vales);
-            nomina.setOtrasPercepciones((float) 0);
-            nomina.setTotalPercepciones(total);
-            nomina.setRetInvYVida(invVida);
-            nomina.setRetCesantia(cesVejez);
-            nomina.setRetEnfYMatObrero(totalEnfMat);
-            nomina.setPrestamoInfonavitFd((float) 0);
-            nomina.setPrestamoInfonavitCf((float) 0);
-            nomina.setSubsAlEmpleoAcreditado(subsidio.getCantidadSubsidio());
-            nomina.setSubsAlEmpleoMes((float) 0);
-            nomina.setIsrAntesDeSubsAlEmpleo(impuestoAntesDeSubsidio);
-            nomina.setIsrMes(impuestoAntesDeSubsidio - subsidio.getCantidadSubsidio());
-            nomina.setImss(imssARetener);
-            nomina.setPrestamoFonacot((float) 0);
-            nomina.setAjusteEnSubsidioParaElEmpleo((float) 0);
-            nomina.setSubsEntregadoQueNoCorrespondia((float) 0);
-            nomina.setAjusteAlNeto((float) 0);
-            nomina.setIsrDeAjusteMensual((float) 0);
-            nomina.setIsrAjustadoPorSubsidio((float) 0);
-            nomina.setAjusteAlSubsidioCausado((float) 0);
-            nomina.setPensionAlimienticia((float) 0);
-            nomina.setOtrasDeducciones((float) 0);
-            nomina.setTotalDeducciones((float) 0 + (float) 0 + (impuestoAntesDeSubsidio - subsidio.getCantidadSubsidio()) + imssARetener + (float) 0 + (float) 0 + (float) 0 + (float) 0 + (float) 0);
-            nomina.setNeto(total - ((float) 0 + (float) 0 + (impuestoAntesDeSubsidio - subsidio.getCantidadSubsidio()) + imssARetener + (float) 0 + (float) 0 + (float) 0 + (float) 0 + (float) 0));
-            nomina.setInvalidezYVida((float) 0);
-            nomina.setCesantiaYVejez((float) 0);
-            nomina.setEnfYMatPatron((float) 0);
-            nomina.setFondoRetiroSar((float) 0);
-            nomina.setImpuestoEstatal((float) 0);
-            nomina.setRiesgoDeTrabajo9((float) 0);
-            nomina.setImssEmpresa((float) 0);
-            nomina.setInfonavitEmpresa((float) 0);
-            nomina.setGuarderiaImss7((float) 0);
-            nomina.setOtrasObligaciones((float) 0);
-            nomina.setTotalObligaciones((float) 0);
-            nomina.setFechaCreacion(fecha);
-            nomina.setIdEmpleadoCreador(empleadoLogin);
-
-            listaNomina.add(nomina);
-
-            lstRegistrosEmpleadoIncidencias.clear();
-        }
+    private void procesaListaEmpleados(List<DetEmpleadoDTO> listaEmpleados) {
+    	try {
+    		for (DetEmpleadoDTO detEmpleadoDTO : listaEmpleados) {
+    			this.nomina = this.procesaEmpleado(detEmpleadoDTO);
+    			
+    			listaNomina.add(nomina);
+    			
+    			lstRegistrosEmpleadoIncidencias.clear();
+    		}
+    		
+    	} catch(Exception ex) {
+    		log.error("Problema para procesar la nómina", ex);
+    	}
     }
-
-    //<editor-fold defaultstate="collapsed" desc="Cálculo de Nómina">
-    private float sdi(DetEmpleadoDTO empleado) {
-        sdi = ((DIAS_ANIO + percepcion.getDiasAguinaldo() + (percepcion.getDiasVacaciones() * percepcion.getPrimaVacacional())) / DIAS_ANIO) * empleado.getSueldoDiario();
-        sdi = (float) (Math.round(sdi * 100d) / 100d);
-        return sdi;
+    
+    public DetNominaDTO procesaEmpleado(DetEmpleadoDTO detEmpleadoDTO) {
+    	DetNominaDTO nomina = null;
+    	NominaSemanalBL nominaSemanalBO = null;
+    	log.info("Empleado: {} {} {}, Salario diario: {}", detEmpleadoDTO.getNombre(), detEmpleadoDTO.getPrimerAp(), detEmpleadoDTO.getSegundoAp(), detEmpleadoDTO.getSueldoDiario());
+		
+//		lstRegistrosPorEmpresaSemanaAnteriorTmp = 
+//				lstRegistrosPorEmpresaSemanaAnterior.stream()
+//				.filter(i -> i.getDetEmpleadoDTO().getIdEmpleado().equals(detEmpleadoDTO.getIdEmpleado()))
+//				.collect(Collectors.toList());
+		
+//		DetRegistroDTO registroNuevo = new DetRegistroDTO(0, detEmpleadoDTO.getIdEmpleado(), new Date(), new Date(), 3, "Falta");
+//		
+//		for (int i = 0; i <= lstRegistrosPorEmpresaSemanaAnteriorTmp.size(); i++) {
+//			if (lstRegistrosPorEmpresaSemanaAnteriorTmp.size() < 6) {
+//				lstRegistrosPorEmpresaSemanaAnteriorTmp.add(registroNuevo);
+//			}
+//		}
+//		
+//		for (DetRegistroDTO registro : lstRegistrosPorEmpresaSemanaAnteriorTmp) {
+//			if (registro.getCatEstatusRegistroDTO().getIdEstatus() == 2 || registro.getCatEstatusRegistroDTO().getIdEstatus() == 3) {
+//				lstRegistrosEmpleadoIncidencias.add(registro);
+//			}
+//		}
+		
+		nominaSemanalBO = new NominaSemanalBL(detEmpleadoDTO, periodoInicio, periodoFin);
+		
+		nomina = nominaSemanalBO.calculoNomina();
+		
+		
+		
+		baseIsr(); baseIsr = 0f;
+//		isrRetener();
+		
+//		enfMatEsp();
+//		enfMatGM();
+//		enfMatDinero();
+//		totalEnfMat();
+//		invVida();
+//		cesantiaVejez();
+//		totalImssRetener();
+		
+		
+//		nomina.setRetInvYVida(invVida);
+//		nomina.setRetCesantia(cesVejez);
+//		nomina.setRetEnfYMatObrero(totalEnfMat);
+//		nomina.setPrestamoInfonavitFd((float) 0);
+//		nomina.setPrestamoInfonavitCf((float) 0);
+//		nomina.setSubsAlEmpleoAcreditado(subsidio.getCantidadSubsidio());
+//		nomina.setSubsAlEmpleoMes((float) 0);
+//		nomina.setIsrAntesDeSubsAlEmpleo(impuestoAntesDeSubsidio);
+//		nomina.setIsrMes(impuestoAntesDeSubsidio - subsidio.getCantidadSubsidio());
+//		nomina.setImss(imssARetener);
+//		nomina.setPrestamoFonacot((float) 0);
+//		nomina.setAjusteEnSubsidioParaElEmpleo((float) 0);
+//		nomina.setSubsEntregadoQueNoCorrespondia((float) 0);
+//		nomina.setAjusteAlNeto((float) 0);
+//		nomina.setIsrDeAjusteMensual((float) 0);
+//		nomina.setIsrAjustadoPorSubsidio((float) 0);
+//		nomina.setAjusteAlSubsidioCausado((float) 0);
+//		nomina.setPensionAlimienticia((float) 0);
+//		nomina.setOtrasDeducciones((float) 0);
+//		nomina.setTotalDeducciones((float) 0 + (float) 0 + (impuestoAntesDeSubsidio - subsidio.getCantidadSubsidio()) + imssARetener + (float) 0 + (float) 0 + (float) 0 + (float) 0 + (float) 0);
+//		nomina.setNeto(total - ((float) 0 + (float) 0 + (impuestoAntesDeSubsidio - subsidio.getCantidadSubsidio()) + imssARetener + (float) 0 + (float) 0 + (float) 0 + (float) 0 + (float) 0));
+//		nomina.setInvalidezYVida((float) 0);
+//		nomina.setCesantiaYVejez((float) 0);
+//		nomina.setEnfYMatPatron((float) 0);
+//		nomina.setFondoRetiroSar((float) 0);
+//		nomina.setImpuestoEstatal((float) 0);
+//		nomina.setRiesgoDeTrabajo9((float) 0);
+//		nomina.setImssEmpresa((float) 0);
+//		nomina.setInfonavitEmpresa((float) 0);
+//		nomina.setGuarderiaImss7((float) 0);
+//		nomina.setOtrasObligaciones((float) 0);
+//		nomina.setTotalObligaciones((float) 0);
+//		nomina.setFechaCreacion(fecha);
+//		nomina.setIdEmpleadoCreador(empleadoLogin);
+		
+		return nomina;
     }
-
-    private float salarioSemanal(DetEmpleadoDTO empleado) {
-        if (lstRegistrosEmpleadoIncidencias.isEmpty()) {
-            salSem = empleado.getSueldoDiario() * DIAS_TRABAJADOS + SEPTIMO_DIA;
-            salSem = (float) (Math.round(salSem * 100d) / 100d);
-            return salSem;
-        } else {
-            parteProporcionalDiaDescanso = (1 * ((float) DIAS_TRABAJADOS - (float) lstRegistrosEmpleadoIncidencias.size()) / (float) DIAS_TRABAJADOS);
-            parteProporcionalDiaDescanso = (float) (Math.round(parteProporcionalDiaDescanso * 100d) / 100d);
-            salSem = empleadoSelected.getSueldoDiario() * ((DIAS_TRABAJADOS - lstRegistrosEmpleadoIncidencias.size()) + parteProporcionalDiaDescanso);
-            salSem = (float) (Math.round(salSem * 100d) / 100d);
-            return salSem;
-        }
-    }
-
-    private float bonoPuntualidad() {
-        if (lstRegistrosEmpleadoIncidencias.isEmpty()) {
-            // bono = (sdi() * percepcion.getBonoPuntualidad()) * (DIAS_TRABAJADOS + SEPTIMO_DIA);
-            bono = (sdi * percepcion.getBonoPuntualidad()) * (DIAS_TRABAJADOS + SEPTIMO_DIA);
-            bono = (float) (Math.round(bono * 100d) / 100d);
-            /*return bono;
-        } else {
-            return bono;*/
-        }
-        return bono;
-    }
-
-    private float valesDespensa() {
-        vales = (percepcion.getUma() * percepcion.getValeDespensa()) * (DIAS_TRABAJADOS + SEPTIMO_DIA);
-        vales = (float) (Math.round(vales * 100d) / 100d);
-        return vales;
-    }
-
-    private float totalPercepciones(DetEmpleadoDTO empleado) {
-        if (lstRegistrosEmpleadoIncidencias.isEmpty()) {
-            total = (DIAS_TRABAJADOS + SEPTIMO_DIA) * empleado.getSueldoDiario() + bonoPuntualidad() + valesDespensa();
-            total = (float) (Math.round(total * 100d) / 100d);
-            return total;
-        } else {
-            total = (DIAS_TRABAJADOS - lstRegistrosEmpleadoIncidencias.size()) * empleado.getSueldoDiario() + valesDespensa();
-            total = (float) (Math.round(total * 100d) / 100d);
-            return total;
-        }
-    }
-
-//</editor-fold> 
     
     //<editor-fold defaultstate="collapsed" desc="Cálculo de ISR">
     public float baseIsr() {
@@ -420,12 +398,11 @@ public class NominaBean implements Serializable {
         isrARetener = (float) (Math.round(isrARetener * 100d) / 100d);
         return isrARetener; //isrRetener = baseIsr 
     }
-    //</editor-fold> 
 
     //<editor-fold defaultstate="collapsed" desc="Cálculo de IMSS">
     public float enfMatEsp() {
         imss = lstCuotaImssActual.stream().filter(s -> s.getCuota().equals("T")).findFirst().get();
-        enfMatEsp = percepcion.getUma() * 3;
+        enfMatEsp = percepcion.getUma().multiply(new BigDecimal(3).setScale(2, BigDecimal.ROUND_HALF_UP)).floatValue();
         if (sdi > enfMatEsp) {
             enfMatEsp = ((sdi - enfMatEsp) * imss.getEnfMatEspCtAd()) * (DIAS_TRABAJADOS + SEPTIMO_DIA);
             enfMatEsp = (float) (Math.round(enfMatEsp * 100d) / 100d);
@@ -977,20 +954,20 @@ public class NominaBean implements Serializable {
         this.year = year;
     }
 
-    public Date getJuevesPasado() {
-        return juevesPasado;
+    public Date getPeriodoInicio() {
+        return periodoInicio;
     }
 
-    public void setJuevesPasado(Date juevesPasado) {
-        this.juevesPasado = juevesPasado;
+    public void setPeriodoInicio(Date juevesPasado) {
+        this.periodoInicio = juevesPasado;
     }
 
-    public Date getMiercolesPasado() {
-        return miercolesPasado;
+    public Date getPeriodoFin() {
+        return periodoFin;
     }
 
-    public void setMiercolesPasado(Date miercolesPasado) {
-        this.miercolesPasado = miercolesPasado;
+    public void setPeriodoFin(Date periodoFin) {
+        this.periodoFin = periodoFin;
     }
 
     public HttpServletRequest getHttpServletRequest() {

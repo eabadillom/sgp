@@ -1,6 +1,7 @@
 package mx.com.ferbo.dto;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -30,7 +31,7 @@ public class DetEmpleadoDTO implements Serializable {
     private CatPerfilDTO catPerfilDTO;
     private CatPlantaDTO catPlantaDTO;
     private CatPuestoDTO catPuestoDTO;
-    private Float sueldoDiario;
+    private BigDecimal sueldoDiario;
     private DetBiometricoDTO detBiometricoDTO;
 
     public DetEmpleadoDTO() {
@@ -115,7 +116,7 @@ public class DetEmpleadoDTO implements Serializable {
                           Date fechaNacimiento, Date fechaRegistro, Date fechaModificacion, String curp, String rfc, String correo,
                           Date fechaIngreso, String nss, short activo, String fotografia, Integer idArea, String descripcionArea, Integer idEmpresa,
                           String descripcionEmpresa, Integer idPerfil, String descripcionPerfil, Integer idPlanta,
-                          String descripcionPlanta, Integer idPuesto, String descripcionPuesto, Float sueldoDiario) {
+                          String descripcionPlanta, Integer idPuesto, String descripcionPuesto, BigDecimal sueldoDiario) {
         this.idEmpleado = idEmpleado;
         this.numEmpleado = numEmpleado;
         this.nombre = nombre;
@@ -299,11 +300,11 @@ public class DetEmpleadoDTO implements Serializable {
         this.fotografia = fotografia;
     }
 
-    public Float getSueldoDiario() {
+    public BigDecimal getSueldoDiario() {
         return sueldoDiario;
     }
 
-    public void setSueldoDiario(Float sueldoDiario) {
+    public void setSueldoDiario(BigDecimal sueldoDiario) {
         this.sueldoDiario = sueldoDiario;
     }
 

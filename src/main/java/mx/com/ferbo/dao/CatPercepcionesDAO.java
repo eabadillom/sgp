@@ -1,26 +1,27 @@
 package mx.com.ferbo.dao;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
+
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.dto.CatPercepcionesDTO;
 import mx.com.ferbo.model.CatPercepciones;
-import mx.com.ferbo.util.SGPException;
-import org.apache.log4j.Logger; 
+import mx.com.ferbo.util.SGPException; 
 
-/**
- *
- * @author erale
- */
 @Stateless
 @LocalBean
 public class CatPercepcionesDAO extends IBaseDAO<CatPercepcionesDTO, Integer> implements Serializable {
     
     private static final long serialVersionUID = 1L; 
  
-    private static final Logger log = Logger.getLogger(CatPercepcionesDAO.class); 
+    private static final Logger log = LogManager.getLogger(CatPercepcionesDAO.class); 
 
     @Override
     public CatPercepcionesDTO buscarPorId(Integer id) {
@@ -37,8 +38,17 @@ public class CatPercepcionesDAO extends IBaseDAO<CatPercepcionesDTO, Integer> im
     public List<CatPercepcionesDTO> buscarActivo() {
         return emSGP.createNamedQuery("CatPercepciones.findByActive", CatPercepcionesDTO.class).getResultList();
     }
+    
+    public CatPercepcionesDTO buscarActual(Date fechaCorte) {
+    	CatPercepcionesDTO percepcion = null;
+    	percepcion = emSGP.createNamedQuery("CatPercepciones.findLastActive", CatPercepcionesDTO.class)
+    			.setParameter("fechaCorte", fechaCorte)
+    			.getSingleResult();
+    	return percepcion;
+    }
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public List<CatPercepcionesDTO> buscarPorCriterios(CatPercepcionesDTO e) {
         return (List<CatPercepcionesDTO>) emSGP.createNamedQuery("CatPercepciones.findByFecha", CatPercepcionesDTO.class).setParameter("fechaCap", e.getFechaCap()).getSingleResult();
     }

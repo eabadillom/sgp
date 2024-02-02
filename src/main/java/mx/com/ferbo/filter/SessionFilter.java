@@ -17,7 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.dto.DetEmpleadoDTO;
 
@@ -29,7 +30,7 @@ public class SessionFilter implements Filter {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger log = Logger.getLogger(SessionFilter.class);
+    private static final Logger log = LogManager.getLogger(SessionFilter.class);
 
     private FilterConfig filterConfig = null;
     private List<String> exceptionPages = null;

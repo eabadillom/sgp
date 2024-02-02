@@ -3,13 +3,17 @@ package mx.com.ferbo.dao;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.dto.CatImssCuotasDTO;
 import mx.com.ferbo.model.CatImssCuotas;
-import mx.com.ferbo.util.SGPException;
-import org.apache.log4j.Logger; 
+import mx.com.ferbo.util.SGPException; 
 
 /**
  *
@@ -21,7 +25,7 @@ public class CatImssCuotasDAO extends IBaseDAO<CatImssCuotasDTO, Integer> implem
     
     private static final long serialVersionUID = 1L; 
  
-    private static final Logger log = Logger.getLogger(CatImssCuotasDAO.class);
+    private static final Logger log = LogManager.getLogger(CatImssCuotasDAO.class);
 
     @Override
     public CatImssCuotasDTO buscarPorId(Integer id) {

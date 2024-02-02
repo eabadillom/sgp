@@ -5,14 +5,18 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import javax.annotation.PostConstruct;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import mx.com.ferbo.dao.CatPercepcionesDAO;
 import mx.com.ferbo.dto.CatPercepcionesDTO;
-import mx.com.ferbo.util.SGPException;
-import org.apache.log4j.Logger; 
+import mx.com.ferbo.util.SGPException; 
 
 /**
  *
@@ -24,7 +28,7 @@ public class PercepcionesBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
     
-    private static final Logger log = Logger.getLogger(PercepcionesBean.class); 
+    private static final Logger log = LogManager.getLogger(PercepcionesBean.class); 
     
     private Date fechaCap;
     private CatPercepcionesDTO percepcionSeleccionada;

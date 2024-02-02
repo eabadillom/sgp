@@ -23,16 +23,15 @@
                         <p:menuitem id="incidencia" value="Incidencias" icon="pi pi-fw pi-check-circle" outcome="/protected/incidencias" rendered="#{loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 1 
                                                                                                                                                              or loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 2 
                                                                                                                                                              or loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 3}"/>
-                        <p:menuitem id="uniformes" value="Uniforme" icon="pi pi-fw pi-compass" outcome="/protected/uniformes" rendered="#{(loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 1 and loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 2) and loginBean.diaHoy.date eq 25 
-                                                                                                                                          or loginBean.diaHoy.date eq 26 
-                                                                                                                                          or loginBean.diaHoy.date eq 27}"/>
-                        <p:menuitem id="articulos" value="Articulos" icon="pi pi-pencil" outcome="/protected/articulosTrabajo" rendered="#{(loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 1 and loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 2) and loginBean.diaHoy.date eq 25 
-                                                                                                                                          or loginBean.diaHoy.date eq 26 
-                                                                                                                                          or loginBean.diaHoy.date eq 27}"/>
+                        <!-- <p:menuitem id="uniformes" value="Uniforme" icon="pi pi-fw pi-compass" outcome="/protected/uniformes" rendered="#{(loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 1 and loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 2)}"/>
+                        <p:menuitem id="articulos" value="Articulos" icon="pi pi-pencil" outcome="/protected/articulosTrabajo" rendered="#{(loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 1 and loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 2)}"/> -->
+                        <p:menuitem id="uniformes" value="Uniforme" icon="pi pi-fw pi-compass" outcome="/protected/uniformes" />
+                        <p:menuitem id="articulos" value="Articulos" icon="pi pi-pencil" outcome="/protected/articulosTrabajo"/>
                         
                         <p:menuitem id="percepciones" value="Valores para Percepciones" icon="pi pi-book" outcome="/protected/percepciones" rendered="#{loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 1}"/>
                         <p:menuitem id="cuotasImss" value="Cuotas del IMSS" icon="pi pi-book" outcome="/protected/cuotasImss" rendered="#{loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 1}"/>
-                        <p:menuitem id="nomina" value="Nómina" icon="pi pi-money-bill" outcome="/protected/nomina" rendered="#{loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 1 and (loginBean.diaSemana.value eq 3 || loginBean.diaSemana.value eq 4)}"/> 
+                        <!-- <p:menuitem id="nomina" value="Nómina" icon="pi pi-money-bill" outcome="/protected/nomina" rendered="#{loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 1 and (loginBean.diaSemana.value eq 3 || loginBean.diaSemana.value eq 4)}"/> -->
+                        <p:menuitem id="nomina" value="Nómina" icon="pi pi-money-bill" outcome="/protected/nomina" rendered="#{loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 1}"/> 
                         <p:menuitem value="Salir" icon="pi pi-fw pi-sign-out" outcome="/login" actionListener="#{loginBean.killSesion()}" process="@this" immediate="true" />
                     </po:menu>
                 </div>

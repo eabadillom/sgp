@@ -6,11 +6,12 @@ import java.util.List;
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.dto.CatArticuloDTO;
 import mx.com.ferbo.util.SGPException;
-
-import org.apache.log4j.Logger;
 
 @Stateless
 @LocalBean
@@ -18,7 +19,7 @@ public class CatArticulosDAO extends IBaseDAO<CatArticuloDTO, Integer> implement
     
     private static final long serialVersionUID = 1L;
 
-    private static final Logger log = Logger.getLogger(CatArticulosDAO.class);
+    private static final Logger log = LogManager.getLogger(CatArticulosDAO.class);
 
     @Override
     public CatArticuloDTO buscarPorId(Integer id) {
