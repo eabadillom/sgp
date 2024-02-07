@@ -209,8 +209,8 @@ public class RegistroEmpleadosBean implements Serializable {
         }
         PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:dtEmpleados");
     }
-
-    /*
+ 
+    /* 
      * Método para redirigir al kárdex
      */
     public String redirectKardex() {
