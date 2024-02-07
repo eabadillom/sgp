@@ -1,7 +1,20 @@
+<%@page import="mx.com.ferbo.dto.DetEmpleadoDTO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%><%
+    pageEncoding="UTF-8"%>
+<%@ page import="mx.com.ferbo.controller.LoginBean" %>
+<%@ page import="mx.com.ferbo.dto.DetEmpleadoDTO" %>
+<%@ page import="javax.faces.context.FacesContext" %>    
+<%DetEmpleadoDTO empleado = (DetEmpleadoDTO) session.getAttribute("empleado"); %>
+<%
 String path = request.getContextPath();
 String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + path;
+
+if(empleado != null){
+	request.getSession().invalidate();
+}
+
+String numEmpleado = "";
+
 %>
 <!DOCTYPE html>
 <html>
@@ -9,6 +22,7 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title></title>
+		<link rel="shortcut icon" href="#">
 		<script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.js"></script>
 		<script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.0/jquery-ui.min.js"></script>
@@ -25,6 +39,7 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 				});
 
 				const input_value = $("#numero");
+				const accion = $("#accion");
 				
 				//disable input from typing
 				$("#numero").keypress(function () {
@@ -48,6 +63,15 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 				$("#enter").click(function () {
 				  myAlert("Your password " + input_value.val() + " added");
 				});
+				
+				$("#inoutES").click(function() {
+					accion.val("registro"); 
+				});
+				
+				$("#inoutP").click(function() {
+					accion.val("perfil"); 
+				});
+				
 			});
 			
 			function myAlert(mensaje) {
@@ -56,62 +80,105 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 				$( "#dialog-message" ).dialog( "open" );
 			}
 			
-			
-			function registry() {
+			function lectura(){
+				console.log("Entrando a funcion lectura..................")
 				var num = $("#numero").val();
-				var parametros = {
-						numero: num
-				};
-				var path = "<%=basePath%>/registry?" + $.param(parametros);
-				$.ajax({
-					type: "GET",
-					dataType: "json",
-					url: path,
-					success:  function (jsonObj) {
-						var respuesta = jsonObj;
-						console.log("Solicitando peticion al agente FP...");
-						invokeScan(respuesta.f1, respuesta.f2);
-					},
-					error: function (jsonObj) {
-						var respuesta = JSON.parse(jsonObj.responseText);
-						myAlert(respuesta);
-					}
-				});
-				
-			}
-			
-			function invokeScan(f1, f2) {
-				var parametros = {
-						"TpAccion": "VerifyFingerprint",
-					    "FingerPrinToVerify": [f1, f2]
-				}
 				
 				var obj = new Object();
-                obj.TpAccion = "VerifyFingerprint";
-                obj.FingerPrinToVerify = listado(f1, f2);
-                var jsonString = JSON.stringify(obj);
+				obj.tpAccion = "Capture";
+				var jsonString = JSON.stringify(obj);
 				
 				$.ajax({
-					type: "POST",
-					dataType: 'json',
-					data:  jsonString,
-					url : "http://localhost:23106",
-					success:  function (jsonObj) {
-						myAlert("Respuesta del lector de huella: " + jsonObj.Message);
-						myAlert("Respuesta del lector de huella: " + jsonObj.VerifyBiometricData);
+					type : "POST",
+					dataType : 'json',
+					data : jsonString,
+					contentType :"application/json;charset=utf-8",
+					url : "http://localhost:8090/finger",
+					timeout: 60000,
+					success : function(jsonObj) {
+						jsonObj.biometricData1;
+						console.log("Entrando a fuincion validar.....")
+						validar(jsonObj.biometricData1);
+
+						console.log("Saliendo de funcion lectura...................")
+						
 					},
-			    	error: function(jsonObj) {
-			    		myAlert("No hay respuesta del lector de huella.");
+					error : function(jsonObj) {
+						myAlert("No hay respuesta del lector de huella.");
 					}
 				});
 			}
 			
-			function listado(f1, f2) {
-                const arreglo = [];
-                arreglo.push(f1);
-                arreglo.push(f2);
-                return arreglo;
-            };
+			function validar(captura){
+				console.log("Entrando a funcion validar..........")
+				var numeroEmp = $("#numero").val();
+				var obj =  new Object();
+				obj.tpAccion = "Validate";
+				obj.captura = captura; 
+				obj.numeroEmpleado = numeroEmp;
+				
+				var jsonString = JSON.stringify(obj);
+				
+				$.ajax({
+					type : "POST",
+					dataType : 'json',
+					data : jsonString,
+					contentType :"application/json;charset=utf-8",
+					url : "http://localhost:8090/finger",
+					timeout: 60000,
+					success : function(jsonObj) {
+						console.log("function jsonObj..........")
+						//myAlert("Respuesta del lector de huella: " + jsonObj.token);
+						var token = jsonObj.token; 
+						var verificacion = jsonObj.verifyBiometricData;
+						if(verificacion){
+							registryServlet(token);
+						}else{
+							location.href = "<%=basePath%>/" + "login.jsp";
+						}
+						
+					},
+					error : function(jsonObj) {
+						myAlert("No hay respuesta del lector de huella.");
+					}
+				});
+				console.log("Saliendo de funcion validar.............")
+			}
+			
+			
+			function registryServlet(objeto1){
+				console.log("Entrando a registryServlet");
+				var accion = $("#accion").val();
+				var numEmpleado = $("#numero").val();
+				var parametros = {
+						numero: numEmpleado,
+						token: objeto1,
+						accion: accion
+				};
+				
+				var path = "<%=basePath%>/registry?" + $.param(parametros);
+				$.ajax({
+					type : "GET",
+					dataType : 'json',
+					contentType :"application/json;charset=utf-8",
+					url : path,
+					timeout: 60000,
+					success : function(jsonObj) {
+						var url = jsonObj.url;
+						var myUrl = "<%=basePath%>/" + url;
+						
+						console.log("function jsonObj..........")
+						console.log("Registo exitoso");
+						location.href = myUrl;
+
+					},
+					error : function(jsonObj) {
+						myAlert("No hay respuesta del lector de huella.");
+					}
+				});
+			}
+			
+			
 		</script>
 		<style type="text/css">
 			form {
@@ -186,7 +253,8 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 			}
 		</style>
 	</head>
-	<body>
+	<body >
+	
 		<div id="dialog-message" class="dialog-box" style="background-color: #3366CC; color: white; display: none;"></div>
 		<div id="pinpad">
 	  		<form >
@@ -206,7 +274,9 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 			</form>
 		</div>
 		<div align="center">
-			<input type="button" id="inout" value="Entrada / Salida" onclick="registry();"/>
+			<input type="button" id="accion" value=""  style="display:none">
+			<input type="button" id="inoutES" value="Entrada/Salida" name="" onclick="lectura();" />
+			<input type="button" id="inoutP" value="Mi Perfil" onclick="lectura();" />
 		</div>
 	</body>
 </html>

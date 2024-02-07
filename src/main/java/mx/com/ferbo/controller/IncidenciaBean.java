@@ -19,7 +19,8 @@ import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.dto.DetIncidenciaDTO;
 import mx.com.ferbo.util.SGPException;
 import org.primefaces.PrimeFaces;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -31,7 +32,7 @@ public class IncidenciaBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
     
-    private static final Logger log = Logger.getLogger(IncidenciaBean.class);
+    private static Logger log = LogManager.getLogger(IncidenciaBean.class);
 
     private final IncidenciaDAO incidenciaDAO;
     private DetIncidenciaDTO incidenciaSelected;

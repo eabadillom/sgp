@@ -15,7 +15,8 @@ import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetSolicitudPrenda;
 import mx.com.ferbo.util.SGPException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @Stateless
 @LocalBean
@@ -23,7 +24,7 @@ public class DetSolicitudPrendaDAO extends IBaseDAO<DetSolicitudPrendaDTO, Integ
     
     private static final long serialVersionUID = 1L;
 
-    private static final Logger log = Logger.getLogger(DetSolicitudPrendaDAO.class);
+    private static final Logger log = LogManager.getLogger(DetSolicitudPrendaDAO.class);
 
     @Override
     public DetSolicitudPrendaDTO buscarPorId(Integer id) {

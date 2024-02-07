@@ -24,10 +24,12 @@ import mx.com.ferbo.dto.CatPuestoDTO;
 import mx.com.ferbo.dto.DetBiometricoDTO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.util.SGPException;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.CaptureEvent;
 
-import org.apache.log4j.Logger;
 
 /**
  *
@@ -39,7 +41,7 @@ public class RegistroEmpleadosBean implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
-    private static final Logger log = Logger.getLogger(RegistroEmpleadosBean.class);
+    private static final Logger log = LogManager.getLogger(RegistroEmpleadosBean.class);
 
     private DetEmpleadoDTO empleadoSelected;
 

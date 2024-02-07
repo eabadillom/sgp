@@ -13,7 +13,8 @@ import mx.com.ferbo.dao.CatImssCuotasDAO;
 import mx.com.ferbo.dto.CatImssCuotasDTO;
 import mx.com.ferbo.util.SGPException;
 
-import org.apache.log4j.Logger; 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger; 
 /**
  *
  * @author erale
@@ -24,7 +25,7 @@ public class CuotasImssBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
     
-    private static final Logger log = Logger.getLogger(CuotasImssBean.class); 
+    private static Logger log = LogManager.getLogger(CuotasImssBean.class); 
     
     private Date fechaCap;
     private CatImssCuotasDTO cuotaImssNueva;

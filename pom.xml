@@ -6,8 +6,8 @@
     <artifactId>sgp</artifactId>
     <version>1.0</version>
     <packaging>${packaging.type}</packaging>
-
     <name>sgp</name>
+        
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -17,8 +17,23 @@
         <poi.version>5.0.0</poi.version>
         <packaging.type>war</packaging.type>
     </properties>
+    
+    
 
     <dependencies>
+		<!-- https://mvnrepository.com/artifact/xerces/xercesImpl -->
+		<dependency>
+		    <groupId>xerces</groupId>
+		    <artifactId>xercesImpl</artifactId>
+		    <version>2.9.1</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.passay</groupId>
+			<artifactId>passay</artifactId>
+			<version>1.6.1</version>
+		</dependency>
+		
         <dependency>
             <groupId>org.primefaces</groupId>
             <artifactId>primefaces</artifactId>
@@ -88,6 +103,11 @@
             <version>${owb.version}</version>
         </dependency>
 
+			<dependency>
+			    <groupId>com.google.code.gson</groupId>
+			    <artifactId>gson</artifactId>
+			    <version>2.10.1</version>
+			</dependency>
         <!-- Export Demo Impl -->
         <dependency>
             <groupId>org.apache.poi</groupId>
@@ -131,10 +151,10 @@
             <version>${open-pdf.version}</version>
         </dependency>
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.16</version>
-        </dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.19.0</version>
+		</dependency>
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>org.eclipse.persistence.core</artifactId>
@@ -241,6 +261,13 @@
             <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
+        
+         <dependency>
+			<groupId>com.ferbo.fp</groupId>
+			<artifactId>gestion-fp</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency> 
+        
     </dependencies>
 
     <repositories>
@@ -249,6 +276,13 @@
             <name>PrimeFaces Maven Repository</name>
             <url>http://repository.primefaces.org</url>
         </repository>
+        
+        <repository>
+			<id>github</id>
+			<name>github</name>
+			<url>https://maven.pkg.github.com/eabadillom/*</url>
+		</repository>        
+        
     </repositories>
 
     <build>
