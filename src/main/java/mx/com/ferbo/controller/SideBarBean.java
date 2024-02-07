@@ -21,7 +21,7 @@ import mx.com.ferbo.dto.DetEmpleadoDTO;
 @Named(value = "SideBarBean")
 @ViewScoped
 public class SideBarBean implements Serializable  {
-	
+	 
 	
 	 private static final long serialVersionUID = 1L;
 	 private DetEmpleadoDTO empleadoSelected;
