@@ -134,7 +134,8 @@ String numEmpleado = "";
 						if(verificacion){
 							registryServlet(token);
 						}else{
-							location.href = "<%=basePath%>/" + "login.jsp";
+							myAlert("Las huellas no coinciden");
+							
 						}
 						
 					},
@@ -183,12 +184,40 @@ String numEmpleado = "";
 		<style type="text/css">
 			form {
 			  width: 390px;
-			  margin: 50px auto;
+			  margin: 0px auto;
 			  background: #fff;
 			  padding: 35px 25px;
 			  text-align: center;
 			  box-shadow: 0px 5px 5px -0px rgba(0, 0, 0, 0.3);
 			  border-radius: 5px;
+			}
+		
+			.login-body {
+				height: 100vh;
+				font-family: "latoregular", "Trebuchet MS", Arial, Helvetica, sans-serif;
+				font-size: 16px;
+				margin: 0;
+				padding: 40px 0 0 0;
+				background-image: linear-gradient(to top, #6b77a1, #737ea5 3%, #9599b3 15%, #b1b0bf 28%,
+					#c7c1c8 41%, #d6cdcf 57%, #dfd5d3 74%, #e2d7d4);
+				background-image: -ms-linear-gradient(bottom, #6B77A1 0%, #737EA5 3%, #9599B3 15%, #B1B0BF
+					28%, #C7C1C8 41%, #D6CDCF 57%, #DFD5D3 74%, #E2D7D4 100%);
+				background-image: -moz-linear-gradient(bottom, #6B77A1 0%, #737EA5 3%, #9599B3 15%,
+					#B1B0BF 28%, #C7C1C8 41%, #D6CDCF 57%, #DFD5D3 74%, #E2D7D4 100%);
+				background-image: -o-linear-gradient(bottom, #6B77A1 0%, #737EA5 3%, #9599B3 15%, #B1B0BF
+					28%, #C7C1C8 41%, #D6CDCF 57%, #DFD5D3 74%, #E2D7D4 100%);
+				background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #6B77A1),
+					color-stop(3, #737EA5), color-stop(15, #9599B3),
+					color-stop(28, #B1B0BF), color-stop(41, #C7C1C8),
+					color-stop(57, #D6CDCF), color-stop(74, #DFD5D3),
+					color-stop(100, #E2D7D4));
+				background-image: -webkit-linear-gradient(bottom, #6B77A1 0%, #737EA5 3%, #9599B3 15%,
+					#B1B0BF 28%, #C7C1C8 41%, #D6CDCF 57%, #DFD5D3 74%, #E2D7D4 100%);
+				filter: progid:DXImageTransform.Microsoft.gradient( startColorstr="#E2D7D4",
+					endColorstr="#6B77A1", GradientType=0);
+				box-sizing: border-box;
+				background-repeat: no-repeat;
+				background-attachment: fixed;
 			}
 		
 			input[type="password"] {
@@ -251,13 +280,54 @@ String numEmpleado = "";
 			  background: #47cf73;
 			  color: #fff;
 			}
+			
+			.btnfos {
+			 background: #2196f3;			 
+			  color: white;
+			  border-radius: 10px;
+			  cursor: pointer;
+			  font-size: 12px;
+			  font-weight: 400;
+			  line-height: 25px;
+			  max-width: 140px;
+			  margin: 15px;
+			  text-transform: uppercase;
+			  width: 100%;
+			}
+			
+			.btnfos-5 {
+			  border: 0 solid;
+			  box-shadow: inset 0 0 20px rgba(255, 255, 255, 0);
+			  outline: 1px solid;
+			  outline-color: rgba(255, 255, 255, 0);
+			  outline-offset: 0px;
+			  text-shadow: none;
+			  -webkit-transition: all 1250ms cubic-bezier(0.19, 1, 0.22, 1);
+			          transition: all 1250ms cubic-bezier(0.19, 1, 0.22, 1);
+			  outline-color: rgba(255, 255, 255, 0.5);
+			  outline-offset: 0px;
+			}
+
+			.btnfos-5:hover {
+			  box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.2);
+			  outline-offset: 15px;
+			  outline-color: rgba(255, 255, 255, 0);
+			  text-shadow: 1px 1px 2px #427388;
+			}
+			
+		
 		</style>
 	</head>
-	<body >
+	<body class="login-body" >
 	
 		<div id="dialog-message" class="dialog-box" style="background-color: #3366CC; color: white; display: none;"></div>
-		<div id="pinpad">
-	  		<form >
+		
+		<div align="center">
+			<img src="resources/recursos/images/login.png" width="400" height="170" >
+		</div>
+		
+		<div id="pinpad" align="center">
+	  		<form>
 			    <input type="password" id="numero" name="numero" /><br>
 			    <input type="button" value="1" id="1" class="pinButton calc"/>
 			    <input type="button" value="2" id="2" class="pinButton calc"/>
@@ -271,12 +341,13 @@ String numEmpleado = "";
 			    <input type="button" value="clear" id="clear" class="pinButton clear"/>
 			    <input type="button" value="0" id="0 " class="pinButton calc"/>
 			    <input type="button" value="enter" id="enter" class="pinButton enter"/>
+			    
+				<div align="center">
+					<input type="button" id="accion" value=""  style="display:none">
+					<input type="button" id="inoutES" value="Entrada/Salida" name="" onclick="lectura();" class=" btnfos btnfos-5" />
+					<input type="button" id="inoutP" value="Mi Perfil" onclick="lectura();" class=" btnfos btnfos-5"  />
+				</div>
 			</form>
-		</div>
-		<div align="center">
-			<input type="button" id="accion" value=""  style="display:none">
-			<input type="button" id="inoutES" value="Entrada/Salida" name="" onclick="lectura();" />
-			<input type="button" id="inoutP" value="Mi Perfil" onclick="lectura();" />
 		</div>
 	</body>
 </html>
