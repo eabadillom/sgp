@@ -143,12 +143,12 @@ public Fmd decodificar(String huella){
 			fpClient = detFpClientDAO.buscarPorId(Integer.parseInt(idFpClient));
 			
 			//Recuperamos huellas del empleado
-			if(numeroEmpleado != null) {
+			if(!("".equals(numeroEmpleado))) {
 				biometricos = biometricoDAO.consultaBiometricoByNumEmpleado(numeroEmpleado);
 				log.info(biometricos.getHuella() + biometricos.getHuella2());
 			}
 			
-			if(fpClient != null) {
+			if(fpClient != null && biometricos != null) {
 				//Generamos su token, falta validar ?
 				token = su.getRandomString();			
 				fechaTemp = DateUtil.addMinute(fechaTemp, 5);
@@ -181,7 +181,7 @@ public Fmd decodificar(String huella){
 			}
 				
 		} catch(SGPException ex) {
-            log.error("Problema al registrar el emisor...", ex);
+            log.error("Problema con el challenge...", ex);
             /*Prepara respuesta de error personalizado.*/
             mensaje = ex.getMessage();
             respuesta = new RespuestaSistema();
@@ -193,9 +193,9 @@ public Fmd decodificar(String huella){
             prettyGson = new GsonBuilder().setPrettyPrinting().create();
             jsonResponse = prettyGson.toJson(respuesta);
         } catch(Exception ex) {
-            log.error("Problema al registrar consultar un emisor...", ex);
+            log.error("Problema al intentar ingresar al challenge...", ex);
             /*Prepara respuesta de error del sistema.*/
-            mensaje = "Se ha presentado un problema con la consulta de los emisores.\n"
+            mensaje = "Se ha presentado un problema con el challenge.\n"
                     + "Por favor contacte a su administrador de sistemas.";
             respuesta = new RespuestaSistema();
             respuesta.setCodigo(2);
