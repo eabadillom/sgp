@@ -37,7 +37,8 @@ import mx.com.ferbo.util.SGPException;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.CellEditEvent;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -49,7 +50,7 @@ public class NominaBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
     
-    private static final Logger log = Logger.getLogger(NominaBean.class);
+    private static Logger log = LogManager.getLogger(NominaBean.class);
 
     //<editor-fold defaultstate="collapsed" desc="Constantes">
     private static final int DIAS_TRABAJADOS = 6;

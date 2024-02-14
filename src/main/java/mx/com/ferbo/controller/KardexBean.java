@@ -20,19 +20,17 @@ import mx.com.ferbo.dto.CatPerfilDTO;
 import mx.com.ferbo.dto.CatPlantaDTO;
 import mx.com.ferbo.dto.CatPuestoDTO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-/**
- *
- * @author Gabo
- */
+
 @Named(value = "kardexBean")
 @ViewScoped
 public class KardexBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
     
-    private static final Logger log = Logger.getLogger(KardexBean.class);
+    private static Logger log = LogManager.getLogger(KardexBean.class);
 
     private List<CatEmpresaDTO> lstCatEmpresa;
     private List<CatPerfilDTO> lstCatPerfil;

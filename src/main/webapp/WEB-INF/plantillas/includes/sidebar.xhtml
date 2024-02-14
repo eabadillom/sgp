@@ -7,36 +7,29 @@
     xmlns:po="http://primefaces.org/omega">
     <h:form id="menuform">
         <div class="sidebar">
-            <div class="sidebar-scroll-content">
-                <div class="logo">
-                    <p:graphicImage name="images/login.png" library="recursos" width="113" />
-                </div>
-                <div class="profile">
-                    <h:graphicImage value="#{loginBean.empleadoSelected.fotografia}" style="border-radius: 50%;width: 7em;height: 7rem;"/>
-                </div>
-                <div class="menu">
-                    <po:menu widgetVar="OmegaMenuWidget">
-
-                        <p:menuitem id="registroEmp" value="Registro de Empleados" icon="pi pi-fw pi-list" outcome="/protected/registroEmpleado" rendered="#{loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 1 
-                                                                                                                                                             or loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 2}"/>
-                        <p:menuitem id="asistencia" value="Asistencia" icon="pi pi-fw pi-calendar" outcome="/protected/asistencia"/>
-                        <p:menuitem id="incidencia" value="Incidencias" icon="pi pi-fw pi-check-circle" outcome="/protected/incidencias" rendered="#{loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 1 
-                                                                                                                                                             or loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 2 
-                                                                                                                                                             or loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 3}"/>
-                        <p:menuitem id="uniformes" value="Uniforme" icon="pi pi-fw pi-compass" outcome="/protected/uniformes" rendered="#{(loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 1 and loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 2) and loginBean.diaHoy.date eq 25 
-                                                                                                                                          or loginBean.diaHoy.date eq 26 
-                                                                                                                                          or loginBean.diaHoy.date eq 27}"/>
-                        <p:menuitem id="articulos" value="Articulos" icon="pi pi-pencil" outcome="/protected/articulosTrabajo" rendered="#{(loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 1 and loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 2) and loginBean.diaHoy.date eq 25 
-                                                                                                                                          or loginBean.diaHoy.date eq 26 
-                                                                                                                                          or loginBean.diaHoy.date eq 27}"/>
-                        
-                        <p:menuitem id="percepciones" value="Valores para Percepciones" icon="pi pi-book" outcome="/protected/percepciones" rendered="#{loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 1}"/>
-                        <p:menuitem id="cuotasImss" value="Cuotas del IMSS" icon="pi pi-book" outcome="/protected/cuotasImss" rendered="#{loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 1}"/>
-                        <p:menuitem id="nomina" value="Nómina" icon="pi pi-money-bill" outcome="/protected/nomina" rendered="#{loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 1 and (loginBean.diaSemana.value eq 3 || loginBean.diaSemana.value eq 4)}"/> 
-                        <p:menuitem value="Salir" icon="pi pi-fw pi-sign-out" outcome="/login" actionListener="#{loginBean.killSesion()}" process="@this" immediate="true" />
-                    </po:menu>
-                </div>
+        <div class="sidebar-scroll-content">
+            <div class="logo">
+                <p:graphicImage name="images/login.png" library="recursos" width="113" />
             </div>
+            <div class="profile">
+                <h:graphicImage value="#{sideBarBean.empleadoSelected.fotografia}" style="border-radius: 50%;width: 7em;height: 7rem;"/>
+            </div>
+            <div class="menu">
+                <po:menu widgetVar="OmegaMenuWidget">
+
+                    <p:menuitem id="registroEmp" value="Registro de Empleados" icon="pi pi-fw pi-list" outcome="/protected/registroEmpleado" />
+                    <p:menuitem id="asistencia" value="Asistencia" icon="pi pi-fw pi-calendar" outcome="/protected/asistencia"/>
+                    <p:menuitem id="incidencia" value="Incidencias" icon="pi pi-fw pi-check-circle" outcome="/protected/incidencias" rendered="#{SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 1 or SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 2 or SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 3}"/>
+                    <p:menuitem id="uniformes" value="Uniforme" icon="pi pi-fw pi-compass" outcome="/protected/uniformes" rendered="#{(SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 1 or SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 4) }"/>
+                    <p:menuitem id="articulos" value="Articulos" icon="pi pi-pencil" outcome="/protected/articulosTrabajo" rendered="#{(SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 2 or SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 4)}"/>
+                    
+                    <p:menuitem id="percepciones" value="Valores para Percepciones" icon="pi pi-book" outcome="/protected/percepciones" rendered="#{SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 1}"/>
+                    <p:menuitem id="cuotasImss" value="Cuotas del IMSS" icon="pi pi-book" outcome="/protected/cuotasImss" rendered="#{sideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 1}"/>
+                    <p:menuitem id="nomina" value="Nómina" icon="pi pi-money-bill" outcome="/protected/nomina" rendered="#{SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 1 }"/> 
+                    <p:menuitem value="Salir" icon="pi pi-fw pi-sign-out" action="#{SideBarBean.killSesion()}"  process="@this" url="/sgp/login.jsp"/>
+                </po:menu>
+            </div>
+        </div>
         </div>
     </h:form>
 </ui:composition>
