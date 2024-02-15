@@ -19,9 +19,8 @@ import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
-import org.primefaces.PrimeFaces;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import mx.com.ferbo.dao.DetBiometricoDAO;
 import mx.com.ferbo.dao.EmpleadoDAO;
 import mx.com.ferbo.dao.RegistroDAO;
@@ -37,7 +36,7 @@ public class LoginBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger log = Logger.getLogger(LoginBean.class);
+    private static Logger log = LogManager.getLogger(LoginBean.class);
 
     private DetEmpleadoDTO empleadoSelected;
     private DetEmpleadoDTO detEmpleadoDTO;
@@ -92,6 +91,7 @@ public class LoginBean implements Serializable {
 
         hoy = LocalDate.now();
         diaSemana = hoy.getDayOfWeek();
+        contador = 0;
         setNumEmpleado(null);
     }
 
@@ -106,8 +106,8 @@ public class LoginBean implements Serializable {
      * @param navegacion
      * @throws IOException
      */
-    public void login(boolean navegacion) throws IOException {
-    	log.info(String.format("Validando acceso (navegacion =  %s)", navegacion));
+    public void login(String numEmpleado) throws IOException {
+    	log.info("Entrando a login");
         empleadoSelected = empleadoDAO.buscarPorNumEmpl(numEmpleado);
 
         if (contador <= 3) {
@@ -208,7 +208,7 @@ public class LoginBean implements Serializable {
         if(isActive){
             log.info("Modo activo");
             try {
-                FacesContext.getCurrentInstance().getExternalContext().redirect("login.xhtml?faces-redirect=true");
+                FacesContext.getCurrentInstance().getExternalContext().redirect("login.jsp?faces-redirect=true");
             } catch (IOException ex) {
                 log.info("Error al redireccionar");
             }
@@ -219,6 +219,7 @@ public class LoginBean implements Serializable {
     }
 
     public void killSesion() throws IOException {
+    	log.info("Entrada al killSesion");
         HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(false);
 
         if(session.getAttribute("empleado") != null){

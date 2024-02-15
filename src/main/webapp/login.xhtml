@@ -37,7 +37,7 @@
             <p:remoteCommand autoRun="true" actionListener="#{loginBean.setNumEmpleado(null)}" update="login_form:keypad" immediate="true"/>
             <p:growl id="growl" showDetail="true" life="2500" />
             <div id="login-wrapper" style="padding-top:3%; position: relative;">
-                <p:graphicImage name="images/login.png" library="recursos"
+                <p:graphicImage name="images/login.png" library="recursos" 
                                 width="100%" />
                 <div class="card">
                     <h5>Bienvenido</h5>
@@ -70,14 +70,14 @@
                         </div>
                     </div>
                     <!-- PARA PROD -->
-                    <div jsf:rendered="true">
-                        <p:commandButton actionListener="#{loginBean.consultaBiometrico(loginBean.numEmpleado, false)}" value="Entrada/Salida..." update="growl" styleClass="m-2"
+                    <div jsf:rendered="false">
+                        <p:commandButton actionListener="#{loginBean.consultaBiometrico(loginBean.numEmpleado, false)}" value="Entrada/Salida" update="growl" styleClass="m-2"
                                          onclick="PF('block').block()" oncomplete="rcRefresh()"/>
                         <p:commandButton actionListener="#{loginBean.consultaBiometrico(loginBean.numEmpleado, true)}" value="Mi perfil..." update="growl" styleClass="m-2"
                                          onclick="PF('block').block()" oncomplete="rcRefresh()"/>
                     </div>
                     <!-- PARA DESARROLLO -->
-                    <div jsf:rendered="false">
+                    <div jsf:rendered="true">
                         <p:commandButton actionListener="#{loginBean.login(false)}" value="Entrada/Salida" update="growl" styleClass="m-2"/>
                         <p:commandButton actionListener="#{loginBean.login(true)}" value="Mi perfil" update="growl" styleClass="m-2"/>
                     </div>
@@ -154,7 +154,6 @@
                                             $(".badrequest").html("!!! Fingerprint Not Match !!!");
                                             $(".badrequest").show(300);
                                             rcNoMatch();
-                                        }
                                         unblock();
                                     }
                                 }

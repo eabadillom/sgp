@@ -18,7 +18,8 @@ import mx.com.ferbo.util.SGPException;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.*;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -30,7 +31,7 @@ public class AsistenciaBean implements Serializable {
     
     private static final long serialVersionUID = 1L;
 
-    private static final Logger log = Logger.getLogger(AsistenciaBean.class);
+    private static Logger log = LogManager.getLogger(AsistenciaBean.class);
 
     private ScheduleModel calendario;
     private ScheduleEvent evento;

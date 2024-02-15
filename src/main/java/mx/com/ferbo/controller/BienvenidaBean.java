@@ -25,7 +25,9 @@ import mx.com.ferbo.dto.DetRegistroDTO;
 @Named(value = "bienvenidaBean")
 @ViewScoped
 public class BienvenidaBean implements Serializable {
-    private DetEmpleadoDTO empleadoSelected;
+    private static final long serialVersionUID = 1L;
+    
+	private DetEmpleadoDTO empleadoSelected;
     private final EmpleadoDAO empleadoDAO;
     private String numeroEmpl;
     private String strCumpleanios;

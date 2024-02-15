@@ -17,7 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.dto.DetEmpleadoDTO;
 
@@ -29,7 +30,7 @@ public class SessionFilter implements Filter {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger log = Logger.getLogger(SessionFilter.class);
+    private static final Logger log = LogManager.getLogger(SessionFilter.class);
 
     private FilterConfig filterConfig = null;
     private List<String> exceptionPages = null;
@@ -39,8 +40,8 @@ public class SessionFilter implements Filter {
     private static final String INIT_PARAM_LOGIN_PAGE = "login-page";
     private static final String INIT_PARAM_EXCEPTION_PAGES = "exception-pages";
     private static final String INIT_PARAM_ENABLED = "enabled";
-    private static final String DEFAULT_LOGIN_PAGE = "/login.xhtml";
-    private static final String NO_SESSION_PAGE = "/login.xhtml";
+    private static final String DEFAULT_LOGIN_PAGE = "/login.jsp";
+    private static final String NO_SESSION_PAGE = "/login.jsp";
 
     /**
      * Default constructor.

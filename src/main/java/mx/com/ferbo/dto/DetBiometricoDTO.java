@@ -3,12 +3,17 @@ package mx.com.ferbo.dto;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import mx.com.ferbo.dao.DetBiometricoDAO;
+
 /**
  *
  * @author Gabriel
  */
 public class DetBiometricoDTO implements Serializable {
-
+	
     private static final long serialVersionUID = 1L;
 
     private Integer idBiometrico;

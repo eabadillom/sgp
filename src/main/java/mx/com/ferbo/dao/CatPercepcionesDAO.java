@@ -8,7 +8,8 @@ import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.dto.CatPercepcionesDTO;
 import mx.com.ferbo.model.CatPercepciones;
 import mx.com.ferbo.util.SGPException;
-import org.apache.log4j.Logger; 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger; 
 
 /**
  *
@@ -20,7 +21,7 @@ public class CatPercepcionesDAO extends IBaseDAO<CatPercepcionesDTO, Integer> im
     
     private static final long serialVersionUID = 1L; 
  
-    private static final Logger log = Logger.getLogger(CatPercepcionesDAO.class); 
+    private static final Logger log = LogManager.getLogger(CatPercepcionesDAO.class); 
 
     @Override
     public CatPercepcionesDTO buscarPorId(Integer id) {
