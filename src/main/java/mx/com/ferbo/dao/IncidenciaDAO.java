@@ -5,6 +5,10 @@ import java.util.Date;
 import java.util.List;
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.dto.DetIncidenciaDTO;
@@ -16,7 +20,6 @@ import mx.com.ferbo.model.DetSolicitudArticulo;
 import mx.com.ferbo.model.DetSolicitudPermiso;
 import mx.com.ferbo.model.DetSolicitudPrenda;
 import mx.com.ferbo.util.SGPException;
-import org.apache.log4j.Logger;
 
 /**
  *
@@ -28,7 +31,7 @@ public class IncidenciaDAO extends IBaseDAO<DetIncidenciaDTO, Integer>  implemen
     
     private static final long serialVersionUID = 1L;
 
-    private static final Logger log = Logger.getLogger(IncidenciaDAO.class);
+    private static final Logger log = LogManager.getLogger(IncidenciaDAO.class);
     
     @Override
     public DetIncidenciaDTO buscarPorId(Integer id) {

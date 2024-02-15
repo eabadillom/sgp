@@ -14,7 +14,8 @@ import mx.com.ferbo.model.CatPlanta;
 import mx.com.ferbo.model.CatPuesto;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.util.SGPException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -26,7 +27,7 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     
     private static final long serialVersionUID = 1L;
     
-    private final Logger log = Logger.getLogger(EmpleadoDAO.class);
+    private final Logger log = LogManager.getLogger(EmpleadoDAO.class);
     
     @Override
     public DetEmpleadoDTO buscarPorId(Integer id) {
@@ -135,6 +136,11 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     }
     
     public DetEmpleadoDTO buscarPorNumEmpl(String numEmpl) {
+    	List<DetEmpleadoDTO> empleado = emSGP.createNamedQuery("DetEmpleado.findByNumEmpl", DetEmpleadoDTO.class).setParameter("numEmpl", numEmpl).getResultList();
+    	return !empleado.isEmpty() ? empleado.get(0) : null;
+    }
+    
+    public DetEmpleadoDTO buscarPorNumEmplAndBiometricos(String numEmpl) {
     	List<DetEmpleadoDTO> empleado = emSGP.createNamedQuery("DetEmpleado.findByNumEmpl", DetEmpleadoDTO.class).setParameter("numEmpl", numEmpl).getResultList();
     	return !empleado.isEmpty() ? empleado.get(0) : null;
     }

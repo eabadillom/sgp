@@ -7,7 +7,8 @@ import javax.ejb.Stateless;
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.dto.CatSubsidioDTO;
 import mx.com.ferbo.util.SGPException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -19,7 +20,7 @@ public class CatSubsidioDAO extends IBaseDAO<CatSubsidioDTO, Integer> implements
     
     private static final long serialVersionUID = 1L; 
  
-    private static final Logger log = Logger.getLogger(CatSubsidioDAO.class);
+    private static final Logger log = LogManager.getLogger(CatSubsidioDAO.class);
 
     @Override
     public CatSubsidioDTO buscarPorId(Integer id) {

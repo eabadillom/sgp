@@ -80,6 +80,7 @@ import javax.validation.constraints.Size;
                         + " LEFT JOIN e.idPlanta pl"
                         + " LEFT JOIN e.idPuesto pu"
     		+ " WHERE e.activo = 1 AND e.idEmpleado = :idEmp"),
+    
     @NamedQuery(name = "DetEmpleado.findByActiveSDI",
                 query = "SELECT NEW mx.com.ferbo.dto.DetEmpleadoDTO("
                         + " e.idEmpleado, e.numEmpleado, e.nombre, e.primerAp, e.segundoAp, e.fechaNacimiento,"
@@ -177,6 +178,8 @@ public class DetEmpleado implements Serializable {
     private List<DetSolicitudArticulo> detSolicitudArticuloList;
     @OneToMany(mappedBy = "idEmpleadoRev")
     private List<DetSolicitudPrenda> detSolicitudPrendaList;
+    @OneToMany( cascade = CascadeType.ALL, mappedBy = "idEmpleado")
+    private List<DetToken> detTokenLIst;
     @JoinColumn(name = "id_area", referencedColumnName = "id_area")
     @ManyToOne
     private CatArea idArea;

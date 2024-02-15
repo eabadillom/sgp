@@ -5,6 +5,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.PersistenceContext;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import mx.com.ferbo.dao.DetBiometricoDAO;
+import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.SGPException;
 
 /**
@@ -12,6 +18,8 @@ import mx.com.ferbo.util.SGPException;
  * @author Gabo
  */
 public abstract class IBaseDAO<E, ID> {
+
+	private static Logger log = LogManager.getLogger(IBaseDAO.class);
 
     private static EntityManagerFactory emf = Persistence.createEntityManagerFactory("sgpPU");
 

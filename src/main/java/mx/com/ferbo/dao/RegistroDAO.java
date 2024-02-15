@@ -12,7 +12,8 @@ import mx.com.ferbo.model.CatEstatusRegistro;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetRegistro;
 import mx.com.ferbo.util.SGPException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -24,7 +25,7 @@ public class RegistroDAO extends IBaseDAO<DetRegistroDTO, Integer> implements Se
     
     private static final long serialVersionUID = 1L;
 
-    private static final Logger log = Logger.getLogger(RegistroDAO.class);
+    private static final Logger log = LogManager.getLogger(RegistroDAO.class);
 
     @Override
     public DetRegistroDTO buscarPorId(Integer id) {

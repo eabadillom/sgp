@@ -12,7 +12,8 @@ import javax.inject.Named;
 import mx.com.ferbo.dao.CatPercepcionesDAO;
 import mx.com.ferbo.dto.CatPercepcionesDTO;
 import mx.com.ferbo.util.SGPException;
-import org.apache.log4j.Logger; 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger; 
 
 /**
  *
@@ -24,7 +25,7 @@ public class PercepcionesBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
     
-    private static final Logger log = Logger.getLogger(PercepcionesBean.class); 
+    private static Logger log = LogManager.getLogger(PercepcionesBean.class); 
     
     private Date fechaCap;
     private CatPercepcionesDTO percepcionSeleccionada;
