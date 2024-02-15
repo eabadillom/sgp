@@ -33,7 +33,6 @@ import org.primefaces.PrimeFaces;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.logging.Level;
 
 @Named(value = "loginBean")
 @SessionScoped
