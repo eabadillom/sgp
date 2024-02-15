@@ -13,9 +13,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.digitalpersona.uareu.Fmd;
-import com.digitalpersona.uareu.UareUException;
-import com.digitalpersona.uareu.UareUGlobal;
+// import com.digitalpersona.uareu.Fmd;
+// import com.digitalpersona.uareu.UareUException;
+// import com.digitalpersona.uareu.UareUGlobal;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -39,35 +39,35 @@ public class ChallengeServlet extends HttpServlet{
 	private static final long serialVersionUID = 1L;
 	Date fechaCaducidad;
 	
-public Fmd decodificar(String huella){
+// public Fmd decodificar(String huella){
 		
-		Fmd fmd = null;
-		byte[] byteHuella = null;
-		log.info("entre al metodo decodificador");
+// 		Fmd fmd = null;
+// 		byte[] byteHuella = null;
+// 		log.info("entre al metodo decodificador");
 		
-		//Creamos el fmd en base a los bytes del string
+// 		//Creamos el fmd en base a los bytes del string
 		
-		try {
+// 		try {
 
-			log.info("descodificare {}" + huella);
-			byteHuella = Base64.getDecoder().decode(new String(huella).getBytes("UTF-8"));
-			log.info("descodificada la huellla");			
-			fmd = UareUGlobal.GetImporter().ImportFmd(byteHuella, Fmd.Format.ANSI_378_2004, Fmd.Format.ANSI_378_2004);
+// 			log.info("descodificare {}" + huella);
+// 			byteHuella = Base64.getDecoder().decode(new String(huella).getBytes("UTF-8"));
+// 			log.info("descodificada la huellla");			
+// 			fmd = UareUGlobal.GetImporter().ImportFmd(byteHuella, Fmd.Format.ANSI_378_2004, Fmd.Format.ANSI_378_2004);
 
-		} catch (UareUException e) {			
-			e.printStackTrace();
-			log.info("error al convertir en fmd");
-		} catch (UnsupportedEncodingException e) {
-			log.info("Error al convertir en base 64");			
-			e.printStackTrace();
-		}
+// 		} catch (UareUException e) {			
+// 			e.printStackTrace();
+// 			log.info("error al convertir en fmd");
+// 		} catch (UnsupportedEncodingException e) {
+// 			log.info("Error al convertir en base 64");			
+// 			e.printStackTrace();
+// 		}
 		
 
-		log.info("converti los bytes de huella a fmd ");
-		log.info("Fmd convertido {}"+ fmd);				
+// 		log.info("converti los bytes de huella a fmd ");
+// 		log.info("Fmd convertido {}"+ fmd);				
 		
-		return fmd;
-	}
+// 		return fmd;
+// 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException  {
 		response.getOutputStream().print("Hola Mundo");
