@@ -52,6 +52,7 @@ public class DiasNoLaboralesBean implements Serializable {
 		try {
 			anioActual = DateUtils.getAnio(fechaActual);
 			this.aniosList = new ArrayList<Integer>();
+			this.aniosList.add((anioActual - 1));
 			this.aniosList.add(anioActual);
 			this.aniosList.add((anioActual + 1));
 			
@@ -118,6 +119,8 @@ public class DiasNoLaboralesBean implements Serializable {
 			this.muestraDiasNoLaborales();
 			
 			log.info("El dia no laboral se registro correctamente.");
+			this.muestraDiasNoLaborales();
+			
 			PrimeFaces.current().executeScript("PF('dlgDiaNL').hide()");
 			severity = FacesMessage.SEVERITY_INFO;
 			mensaje = "La fecha se registró correctamente.";
@@ -126,7 +129,36 @@ public class DiasNoLaboralesBean implements Serializable {
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, titulo, mensaje));
-			PrimeFaces.current().ajax().update("form:messages");
+			PrimeFaces.current().ajax().update("messages");
+		}
+	}
+	
+	public void editaDiaNoLaboral() {
+		log.info("Cargando dia no laboral seleccionado: {}", this.diaNLSelected);
+	}
+	
+	public void eliminaDiaNoLaboral() {
+		
+		String mensaje = null;
+		Severity severity = null;	
+		String titulo = "Eliminar día no laboral";
+		
+		try {
+			log.info("Eliminando dia no laboral seleccionado: {}", this.diaNLSelected);
+			diaNLDAO.eliminar(this.diaNLSelected);
+			
+			log.info("El dia no laboral se eliminó correctamente.");
+			this.muestraDiasNoLaborales();
+			
+			PrimeFaces.current().executeScript("PF('dlgDiaNL').hide()");
+			severity = FacesMessage.SEVERITY_INFO;
+			mensaje = "La fecha se eliminó correctamente.";
+		} catch(Exception ex) {
+			mensaje = "Ocurrió un problema al eliminar el día no laboral.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, titulo, mensaje));
+			PrimeFaces.current().ajax().update("messages");
 		}
 	}
 	

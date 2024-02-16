@@ -80,13 +80,37 @@ public class DiaNoLaboralDAO extends IBaseDAO<DiaNoLaboralDTO, Integer> {
 
 	@Override
 	public void actualizar(DiaNoLaboralDTO e) throws SGPException {
-		// TODO Auto-generated method stub
+		CatDiaNoLaboral dia = null;
+		
+		try {
+			dia = new CatDiaNoLaboral(e.getId(), e.getFecha(), e.getDescripcion(), e.getPais().getClavePais(), e.getPais().getNombrePais());
+			emSGP.getTransaction().begin();
+			dia = emSGP.merge(dia);
+			emSGP.getTransaction().commit();
+			e.setId(dia.getId());
+		} catch(Exception ex) {
+			log.error("Ocurrió un problema al actualizar el día no laboral...", ex);
+			throw new SGPException("Problema para actualizar el día no laboral...");
+		} finally {
+			
+		}
 		
 	}
 
 	@Override
 	public void eliminar(DiaNoLaboralDTO e) throws SGPException {
-		// TODO Auto-generated method stub
+		CatDiaNoLaboral dia = null;
+		try {
+			emSGP.getTransaction().begin();
+			dia = emSGP.find(CatDiaNoLaboral.class, e.getId());
+			emSGP.remove(dia);
+			emSGP.getTransaction().commit();
+		} catch(Exception ex) {
+			log.error("Ocurrió un problema al eliminar el día no laboral...", ex);
+			throw new SGPException("Problema para eliminar el día no laboral...");
+		} finally {
+			
+		}
 		
 	}
 
