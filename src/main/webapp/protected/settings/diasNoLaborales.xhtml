@@ -1,0 +1,69 @@
+<ui:composition
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/plantillas/template.xhtml">
+	<ui:define name="title">Ajustes</ui:define>
+	<ui:define name="content">
+		<h:form id="form">
+			<p:growl id="messages" showDetail="true" />
+			<div class="ui-fluid">
+				<p:panelGrid columns="4" layout="grid">
+					<div class="p-field">
+						<p:outputLabel value="Año" />
+						<p:selectOneMenu id="sel-anio" value="#{diasNLBean.anioSelected}">
+							<f:selectItem itemLabel="Seleccione el año" noSelectionOption="true" />
+							<f:selectItems value="#{diasNLBean.aniosList}" var="anio" itemLabel="#{anio}" itemValue="#{anio}" />
+							<p:ajax listener="#{diasNLBean.muestraDiasNoLaborales()}" update="form:dt-diasNL"/>
+						</p:selectOneMenu>
+					</div>
+					<div class="p-field">
+						<p:outputLabel value="País"/>
+						<p:selectOneMenu id="sel-pais" value="#{diasNLBean.paisSelected}" converter="entityConverter" >
+							<f:selectItem itemLabel="Seleccione un país" noSelectionOption="true" />
+							<f:selectItems value="#{diasNLBean.paisesList}" var="pais" itemLabel="#{pais.nombrePais}" itemValue="#{pais}" />
+							<p:ajax listener="#{diasNLBean.muestraDiasNoLaborales()}" update="dt-diasNL"/>
+						</p:selectOneMenu>
+					</div>
+					<div class="field">
+						<p:commandButton value="Agregar" oncomplete="PF('dlgDiaNL').show();" update="pnl-dia-nl" action="#{diasNLBean.nuevoDiaNoLaboral}" process="sel-anio sel-pais @this"/>
+					</div>
+				</p:panelGrid>
+			</div>
+			<p:dialog id="dlg-dia-nl" widgetVar="dlgDiaNL" header="Día no laboral" showEffect="fade" modal="true" responsive="true">
+				<p:outputPanel id="pnl-dia-nl" class="ui-fluid">
+					<div class="p-field">
+						<p:outputLabel value="País" for="@next" />
+						<p:inputText value="#{diasNLBean.diaNLSelected.pais.nombrePais}" placeholder="País"/>
+					</div>
+					<div class="p-field">
+						<p:outputLabel value="Fecha" for="@next" />
+						<p:datePicker value="#{diasNLBean.diaNLSelected.fecha}" monthNavigator="true" yearNavigator="true" pattern="dd/MM/yyyy">
+							<p:ajax process="@this"/>
+							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+						</p:datePicker>
+					</div>
+					<div class="p-field">
+						<p:outputLabel value="Descripción" for="@next" />
+						<p:inputText value="#{diasNLBean.diaNLSelected.descripcion}" placeholder="Descripción"/>
+					</div>
+				</p:outputPanel>
+				<f:facet name="footer">
+					<p:commandButton value="Guardar" icon="pi pi-save" actionListener="#{diasNLBean.guardarDiaNoLaboral}"></p:commandButton>
+				</f:facet>
+			</p:dialog>
+			<p:dataTable id="dt-diasNL" value="#{listaDiasNL.listaDiasNL}" var="dia">
+				<p:column headerText="Fecha">
+					<p:outputLabel value="#{dia.fecha}">
+						<f:convertDateTime pattern="dd/MMM/yyyy" />
+					</p:outputLabel>
+				</p:column>
+				<p:column headerText="Descripción">
+					<p:outputLabel value="#{dia.descripcion}"/>
+				</p:column>
+			</p:dataTable>
+		</h:form>
+	</ui:define>
+</ui:composition>

@@ -9,6 +9,9 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**Esta clase agrupa varios metodos para la operacion con fechas.
  * Los dos métodos principales son getFechaLiquidacion y esDiaAsueto,
  * ambos consultan a un archivo DateUtils.properties o directamente
@@ -18,6 +21,8 @@ import java.util.TimeZone;
  * @version 1.0
  */
 public class DateUtils {
+	
+	private static Logger log = LogManager.getLogger(DateUtils.class);
 
 	public static String PREF_FECHA        = "fecha"; //Para lectura del .properties
 	public static String PREF_ASUETO       = "asueto"; //Para lectura del .properties
@@ -438,6 +443,7 @@ public class DateUtils {
 	public static Date getDate(int year, int month, int date){
 		Date     fecha = null;
 		Calendar cal = null;
+		log.debug("Default Time Zone: {}", TimeZone.getDefault());
 		
 		cal = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
 		cal.set(year, month, date);
@@ -472,9 +478,9 @@ public class DateUtils {
 	public static void setTime(Date fecha, int hour, int minute, int second, int millisecond){
 		Calendar cal = null;
 		
-		cal = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
+		cal = Calendar.getInstance(TimeZone.getTimeZone("-06:00"), Locale.getDefault());
 		cal.setTime(fecha);
-		cal.set(Calendar.HOUR, hour);
+		cal.set(Calendar.HOUR_OF_DAY, hour);
 		cal.set(Calendar.MINUTE, minute);
 		cal.set(Calendar.SECOND, second);
 		cal.set(Calendar.MILLISECOND, millisecond);

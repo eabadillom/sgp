@@ -31,7 +31,9 @@
                         <p:menuitem id="percepciones" value="Valores para Percepciones" icon="pi pi-book" outcome="/protected/percepciones" rendered="#{loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 1}"/>
                         <p:menuitem id="cuotasImss" value="Cuotas del IMSS" icon="pi pi-book" outcome="/protected/cuotasImss" rendered="#{loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 1}"/>
                         <!-- <p:menuitem id="nomina" value="Nómina" icon="pi pi-money-bill" outcome="/protected/nomina" rendered="#{loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 1 and (loginBean.diaSemana.value eq 3 || loginBean.diaSemana.value eq 4)}"/> -->
-                        <p:menuitem id="nomina" value="Nómina" icon="pi pi-money-bill" outcome="/protected/nomina" rendered="#{loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 1}"/> 
+                        <p:menuitem id="nomina" value="Nómina" icon="pi pi-money-bill" outcome="/protected/nomina" rendered="#{loginBean.empleadoSelected.catPerfilDTO.idPerfil eq 1}"/>
+                        <p:menuitem id="ajustes" value="Ajustes" icon="pi pi-cog" outcome="/protected/settings/ajustes"></p:menuitem>
+                        <!-- <p:menuitem id="diasNoLaborales" value="Dias no laborales" icon="pi pi-calendar" outcome="/protected/settings/diasNoLaborales"/> --> 
                         <p:menuitem value="Salir" icon="pi pi-fw pi-sign-out" outcome="/login" actionListener="#{loginBean.killSesion()}" process="@this" immediate="true" />
                     </po:menu>
                 </div>

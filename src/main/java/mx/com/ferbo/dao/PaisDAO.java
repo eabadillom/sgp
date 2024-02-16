@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.dto.PaisDTO;
+import mx.com.ferbo.model.Pais;
 import mx.com.ferbo.util.SGPException;
 
 public class PaisDAO extends IBaseDAO<PaisDTO, String>{
@@ -16,17 +17,19 @@ public class PaisDAO extends IBaseDAO<PaisDTO, String>{
 
 	@Override
 	public PaisDTO buscarPorId(String id) {
-		PaisDTO p = null;
+		PaisDTO pais = null;
+		Pais p = null;
 		
 		try {
-			p = emSGP.find(PaisDTO.class, id);
+			p = emSGP.find(Pais.class, id);
+			pais = new PaisDTO(p.getClavePais(), p.getNombrePais());
 		} catch(NoResultException ex) {
 			log.warn("No se encontró el pais con id {}", id);
 		} catch(Exception ex) {
 			log.error("Problema para obtener el pais con id " + id, ex);
 		}
 		
-		return p;
+		return pais;
 	}
 
 	@Override
