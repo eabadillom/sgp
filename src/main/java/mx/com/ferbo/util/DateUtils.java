@@ -76,6 +76,14 @@ public class DateUtils {
 	
 	public static final String KEY_SEPARADOR_DIA = " ";//Para lectura del .properties
 	
+	public static Date now() {
+		Date resultado = null;
+		Calendar c = Calendar.getInstance(TimeZone.getTimeZone("GMT-06:00"), Locale.getDefault());
+		c.setTimeZone(TimeZone.getTimeZone("GMT-06:00"));
+		resultado = new Date(c.getTimeInMillis());
+		return resultado;
+	}
+	
 	/**Metodo para agregar dias a una fecha dada.
 	 * @param fecha Fecha de referencia a la que se desea agregar dias.
 	 * @param dias Numero de dias a agregar.
@@ -84,7 +92,7 @@ public class DateUtils {
 	public static Date addDay(Date fecha, int dias){
 		Date resultado = null;
 		
-		Calendar c = Calendar.getInstance();
+		Calendar c = Calendar.getInstance(TimeZone.getTimeZone("GMT-06:00"), Locale.getDefault());
 		c.setTime(fecha);
 		c.add(Calendar.DATE, dias);
 		
@@ -478,7 +486,7 @@ public class DateUtils {
 	public static void setTime(Date fecha, int hour, int minute, int second, int millisecond){
 		Calendar cal = null;
 		
-		cal = Calendar.getInstance(TimeZone.getTimeZone("-06:00"), Locale.getDefault());
+		cal = Calendar.getInstance(TimeZone.getTimeZone("GMT-06:00"), Locale.getDefault());
 		cal.setTime(fecha);
 		cal.set(Calendar.HOUR_OF_DAY, hour);
 		cal.set(Calendar.MINUTE, minute);

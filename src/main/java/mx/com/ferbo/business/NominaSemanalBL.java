@@ -1,7 +1,6 @@
 package mx.com.ferbo.business;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -12,11 +11,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.dao.CatPercepcionesDAO;
+import mx.com.ferbo.dao.DiaNoLaboralDAO;
 import mx.com.ferbo.dao.RegistroDAO;
 import mx.com.ferbo.dto.CatPercepcionesDTO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.dto.DetNominaDTO;
 import mx.com.ferbo.dto.DetRegistroDTO;
+import mx.com.ferbo.dto.DiaNoLaboralDTO;
 import mx.com.ferbo.util.DateUtils;
 import mx.com.ferbo.util.SGPException;
 
@@ -30,6 +31,7 @@ public class NominaSemanalBL {
 	//PERCEPCIONES
 	private BigDecimal salarioDiario = null;
 	private BigDecimal salarioDiarioIntegrado = null;
+	private BigDecimal proporcionalSeptimoDia = null;
 	private BigDecimal septimoDia = null;
 	private BigDecimal salarioSemanal = null;
 	private BigDecimal bonoPuntualidad = null;
@@ -43,6 +45,8 @@ public class NominaSemanalBL {
 	private BigDecimal diasTrabajados = null;
 	private BigDecimal diasAsueto = null;
 	private BigDecimal diasAusencia = null;
+	
+	private Map<String, DetRegistroDTO> mapAsistencias = null;
 	
     private static final int SEPTIMO_DIA = 1;
     private static final int DIAS_ANIO = 365;
@@ -63,9 +67,9 @@ public class NominaSemanalBL {
 	
 	public DetNominaDTO calculoNomina() {
 		DetNominaDTO nomina = null;
-		Map<String, DetRegistroDTO> mapAsistencias = null;
+		
 		BigDecimal diasTrabajados = null;
-		BigDecimal proporcionalSeptimoDia = null;
+		
 		BigDecimal diasPeriodo = null;
 		
 		
@@ -165,7 +169,7 @@ public class NominaSemanalBL {
 		return diasTrabajados;
 	}
 	
-	private BigDecimal getProporcionalSeptimoDia(DetEmpleadoDTO empleado, BigDecimal diasTrabajados, int diasPorPeriodo) {
+	private BigDecimal calculaProporcionalSeptimoDia(DetEmpleadoDTO empleado, BigDecimal diasTrabajados, int diasPorPeriodo) {
 		BigDecimal proporcionalSeptimoDia = null;
 		BigDecimal bdDiasPorPeriodo = null;
 		
@@ -181,8 +185,12 @@ public class NominaSemanalBL {
 	private Map<String, DetRegistroDTO> getAsistencias(DetEmpleadoDTO empleado, Date periodoInicio, Date periodoFin) {
 		Map<String, DetRegistroDTO> mapAsistencias = null;
 		List<DetRegistroDTO> listaAsistencias = null;
+		List<DiaNoLaboralDTO> listaDiasDescanso = null;
 		RegistroDAO registroDAO = null;
 		String diaSemana = null;
+		DiaNoLaboralDAO diaNLDAO = null;
+		Date diaNLEntrada = null;
+		Date diaNLSalida = null;
 		
 		mapAsistencias = new HashMap<String, DetRegistroDTO>();
 		registroDAO = new RegistroDAO();
@@ -193,6 +201,26 @@ public class NominaSemanalBL {
 				continue;
 			mapAsistencias.put(diaSemana, registro);
 		}
+		
+		diaNLDAO = new DiaNoLaboralDAO();
+		listaDiasDescanso = diaNLDAO.buscarPorPeriodo("MX", periodoInicio, periodoFin);
+		
+		for(DiaNoLaboralDTO dia : listaDiasDescanso) {
+			diaSemana = DateUtils.getDiaSemana(dia.getFecha());
+			if(mapAsistencias.containsKey(diaSemana))
+				continue;
+			
+			diaNLEntrada = new Date(dia.getFecha().getTime());
+			diaNLSalida = new Date(dia.getFecha().getTime());
+			
+			mapAsistencias.put(diaSemana, new DetRegistroDTO(null, diaNLEntrada, diaNLSalida, -1, "DIA NO LABORAL"));
+		}
+		
+		this.proporcionalSeptimoDia = new BigDecimal(mapAsistencias.size())
+				.setScale(2, BigDecimal.ROUND_HALF_UP)
+				.divide(new BigDecimal( DIAS_POR_PERIODO ).setScale(2, BigDecimal.ROUND_HALF_UP), BigDecimal.ROUND_HALF_UP)
+				.setScale(2, BigDecimal.ROUND_HALF_UP)
+				;
 		
 		return mapAsistencias;
 	}
@@ -277,6 +305,11 @@ public class NominaSemanalBL {
     		if(this.diasTrabajados.intValue() < diasPorPeriodo)
     			return BigDecimal.ZERO;
     		
+    		for(Map.Entry<String, DetRegistroDTO> entry :  this.mapAsistencias.entrySet()) {
+    			String codigo = entry.getValue().getCatEstatusRegistroDTO().getCodigo();
+    			if("R".equalsIgnoreCase(codigo) || "F".equalsIgnoreCase(codigo))
+    				return BigDecimal.ZERO;
+    		}
     		
     		tasaBonoPuntualidad = new BigDecimal(this.percepcion.getBonoPuntualidad().floatValue());
     		diasPeriodo = this.diasTrabajados.add(proporcionalSeptimoDia).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -299,10 +332,10 @@ public class NominaSemanalBL {
     		if(this.diasTrabajados.compareTo(BigDecimal.ZERO) == 0)
     			throw new SGPException("No es posible asignar bono de puntualidad.");
     		
-    		this.uma = new BigDecimal(percepcion.getUma().floatValue());
-    		this.tasaValesDespensa = new BigDecimal(percepcion.getValeDespensa().floatValue());
+    		this.uma = percepcion.getUma();
+    		this.tasaValesDespensa = percepcion.getValeDespensa();
     		
-    		vales = uma.multiply(tasaValesDespensa).setScale(2, BigDecimal.ROUND_HALF_UP);
+    		vales = uma.multiply(tasaValesDespensa).setScale(4, BigDecimal.ROUND_HALF_UP);
     		vales = vales.multiply(diasPeriodo).setScale(2, BigDecimal.ROUND_HALF_UP);
     		
     	} catch(Exception ex) {
@@ -425,6 +458,22 @@ public class NominaSemanalBL {
 
 	public void setPeriodoFin(Date periodoFin) {
 		this.periodoFin = periodoFin;
+	}
+
+	public BigDecimal getProporcionalSeptimoDia() {
+		return proporcionalSeptimoDia;
+	}
+
+	public void setProporcionalSeptimoDia(BigDecimal proporcionalSeptimoDia) {
+		this.proporcionalSeptimoDia = proporcionalSeptimoDia;
+	}
+
+	public Map<String, DetRegistroDTO> getMapAsistencias() {
+		return mapAsistencias;
+	}
+
+	public void setMapAsistencias(Map<String, DetRegistroDTO> mapAsistencias) {
+		this.mapAsistencias = mapAsistencias;
 	}
 	
 	

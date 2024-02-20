@@ -42,6 +42,7 @@ import mx.com.ferbo.dto.CatTarifaIsrDTO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.dto.DetNominaDTO;
 import mx.com.ferbo.dto.DetRegistroDTO;
+import mx.com.ferbo.util.DateUtils;
 import mx.com.ferbo.util.SGPException;
 
 
@@ -206,8 +207,9 @@ public class NominaBean implements Serializable {
     }
     
     public void configuraPeriodo() {
-    	fecha = new Date();
-        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Mexico_City"));
+    	fecha = DateUtils.now();
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT-06:00"));
+        cal.setTimeZone(TimeZone.getTimeZone("GMT-06:00"));
         cal.setTime(fecha);
         year = cal.get(Calendar.YEAR);
 
@@ -256,6 +258,26 @@ public class NominaBean implements Serializable {
         log.info("Jueves pasado: {}", periodoInicio);
       
     }
+    
+    public void calculaFechaFin() {
+    	log.info("Fecha Inicio: {}", this.periodoInicio);
+    	log.info("Fecha Fin: {}", this.periodoFin);
+    	this.periodoFin = new Date(this.periodoInicio.getTime());
+    	this.periodoFin = DateUtils.addDay(this.periodoFin, 6);
+    	DateUtils.setTime(this.periodoFin, 23, 59, 59, 999);
+    	log.info("Fecha Inicio: {}", this.periodoInicio);
+    	log.info("Fecha Fin: {}", this.periodoFin);
+    }
+    
+    public void calculaFechaInicio() {
+    	log.info("Fecha Inicio: {}", this.periodoInicio);
+    	log.info("Fecha Fin: {}", this.periodoFin);
+    	this.periodoInicio = new Date(this.periodoFin.getTime());
+    	this.periodoInicio = DateUtils.addDay(this.periodoInicio, -6);
+    	DateUtils.setTime(this.periodoInicio, 0, 0, 0, 0);
+    	log.info("Fecha Inicio: {}", this.periodoInicio);
+    	log.info("Fecha Fin: {}", this.periodoFin);
+    }
 
     public void calculandoNomina() {
         listaNomina.clear();
@@ -263,8 +285,10 @@ public class NominaBean implements Serializable {
         
         //¿¿ES LISTA DE ASISTENCIAS??
 //        listaRegistrosEmpleadosDeEmpresaSeleccionadaSemanaAnterior = obteniendoListaRegistrosEmpleadosDeEmpresaSeleccionada();
+        
+        List<DetEmpleadoDTO> listaEmpleados = empleadoDAO.buscarActivoAndEmpresa(empresaSelected.getIdEmpresa());
       
-        procesaListaEmpleados(empleadoDAO.buscarActivoAndEmpresa(empresaSelected.getIdEmpresa()));
+        procesaListaEmpleados(listaEmpleados);
 
         PrimeFaces.current().ajax().update("formNomina:dtNomina");
         PrimeFaces.current().executeScript("PF('empresaDialog').hide()");

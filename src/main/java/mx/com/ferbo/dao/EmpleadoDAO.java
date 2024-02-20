@@ -158,8 +158,11 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     }
     
     public List<DetEmpleadoDTO> buscarActivoAndEmpresa(Integer idEmpresa) {
-    	return emSGP.createNamedQuery("DetEmpleado.findByActiveAndIdEmpresa", DetEmpleadoDTO.class)
+    	List<DetEmpleadoDTO> lista = null;
+    	lista = emSGP.createNamedQuery("DetEmpleado.findByActiveAndIdEmpresa", DetEmpleadoDTO.class)
     			.setParameter("idEmpresa", idEmpresa)
     			.getResultList();
+    	
+    	return lista;
     }
 }

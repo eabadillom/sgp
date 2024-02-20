@@ -22,11 +22,13 @@
                                 </p:commandButton>
                             </p:toolbarGroup>
                             <p:toolbarGroup>
-                            	<p:datePicker value="#{nominaBean.periodoInicio}" placeholder="Periodo Inicio" showIcon="true">
-                            		<p:ajax process="@this"></p:ajax>
+                            	<p:datePicker id="dp-periodo-inicio" value="#{nominaBean.periodoInicio}" placeholder="Periodo Inicio" showIcon="true" >
+                            		<p:ajax process="@this" listener="#{nominaBean.calculaFechaFin}" update="dp-periodo-fin" />
+                            		<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
                             	</p:datePicker>
-                            	<p:datePicker value="#{nominaBean.periodoFin}" placeholder="Periodo Fin" showIcon="true">
-                            		<p:ajax process="@this"></p:ajax>
+                            	<p:datePicker id="dp-periodo-fin" value="#{nominaBean.periodoFin}" placeholder="Periodo Fin" showIcon="true">
+                            		<p:ajax process="@this" listener="#{nominaBean.calculaFechaInicio}" update="dp-periodo-inicio" />
+                            		<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
                             	</p:datePicker>
                             </p:toolbarGroup>
                             <p:toolbarGroup>
