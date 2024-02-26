@@ -1,6 +1,8 @@
 package mx.com.ferbo.dao;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 import javax.ejb.LocalBean;
@@ -62,5 +64,18 @@ public class CatSubsidioDAO extends IBaseDAO<CatSubsidioDTO, Integer> implements
     
     public List<CatSubsidioDTO> buscarActuales(Integer fecha){
         return emSGP.createNamedQuery("CatSubsidio.findActual", CatSubsidioDTO.class).setParameter("fecha", fecha + "%").getResultList();
+    }
+    
+    public CatSubsidioDTO buscar(Date fechaInicio, Date fechaFin, String periodo, BigDecimal ingreso) {
+    	CatSubsidioDTO subsidio = null;
+    	subsidio = emSGP.createNamedQuery("CatSubsidio.findByPeriodoTipoIngreso", CatSubsidioDTO.class)
+    			.setParameter("fechaInicio", fechaInicio)
+    			.setParameter("fechaFin", fechaFin)
+    			.setParameter("periodo", periodo)
+    			.setParameter("ingreso", ingreso)
+    			.getSingleResult()
+    			;
+    	
+    	return subsidio;
     }
 }

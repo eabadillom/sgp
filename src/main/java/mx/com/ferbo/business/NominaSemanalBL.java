@@ -11,9 +11,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.dao.CatPercepcionesDAO;
+import mx.com.ferbo.dao.CatSubsidioDAO;
+import mx.com.ferbo.dao.CatTarifaIsrDAO;
+import mx.com.ferbo.dao.CuotaIMSSDAO;
 import mx.com.ferbo.dao.DiaNoLaboralDAO;
 import mx.com.ferbo.dao.RegistroDAO;
 import mx.com.ferbo.dto.CatPercepcionesDTO;
+import mx.com.ferbo.dto.CatSubsidioDTO;
+import mx.com.ferbo.dto.CatTarifaIsrDTO;
+import mx.com.ferbo.dto.CuotaIMSSDTO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.dto.DetNominaDTO;
 import mx.com.ferbo.dto.DetRegistroDTO;
@@ -27,6 +33,14 @@ public class NominaSemanalBL {
 	private DetEmpleadoDTO empleado = null;
 	private Date periodoInicio = null;
 	private Date periodoFin = null;
+	private Date fechaInicioAnio = null;
+	private Date fechafinAnio = null;
+	
+	private BigDecimal diasPeriodo = null;
+	private BigDecimal diasTrabajados = null;
+	private BigDecimal diasAsueto = null;
+	private BigDecimal diasAusencia = null;
+	private Map<String, DetRegistroDTO> mapAsistencias = null;
 	
 	//PERCEPCIONES
 	private BigDecimal salarioDiario = null;
@@ -38,15 +52,21 @@ public class NominaSemanalBL {
 	private BigDecimal valesDespensa = null;
 	private BigDecimal totalPercepciones = null;
 	
-	//DEDUCCIONES
+	//DEDUCCIONES ISR
 	private BigDecimal baseISR = null;
+	private BigDecimal excedente = null;
+	private BigDecimal isrPrevio = null;
+	private BigDecimal impuestoAntesSubsidio = null;
+	private BigDecimal subsidioEmpleo = null;
+	private BigDecimal isr = null;
 	
-	private BigDecimal diasPeriodo = null;
-	private BigDecimal diasTrabajados = null;
-	private BigDecimal diasAsueto = null;
-	private BigDecimal diasAusencia = null;
-	
-	private Map<String, DetRegistroDTO> mapAsistencias = null;
+	//CUOTAS DEL IMSS
+	private BigDecimal enfermedadYmaternidad = null;
+	private BigDecimal gastosMedicosPensionadosBeneficiarios = null;
+	private BigDecimal enDinero = null;
+	private BigDecimal invalidezVida = null;
+	private BigDecimal cesantiaEdadAvanzadaVejez = null;
+	private BigDecimal imss = null;
 	
     private static final int SEPTIMO_DIA = 1;
     private static final int DIAS_ANIO = 365;
@@ -57,20 +77,36 @@ public class NominaSemanalBL {
     private BigDecimal tasaValesDespensa = null;
 	private BigDecimal uma = null;
 	
+	private CatTarifaIsrDAO tarifaISRDAO = null;
+	private CatSubsidioDAO subsidioDAO = null;
+	private CuotaIMSSDAO tarifaIMSSDAO = null;
+	
 	
 	public NominaSemanalBL(DetEmpleadoDTO empleado, Date periodoInicio, Date periodoFin) {
+		Integer anioActual = null;
+		
 		this.empleado = empleado;
 		this.periodoInicio = periodoInicio;
 		this.periodoFin = periodoFin;
 		this.catPercepcionesDAO = new CatPercepcionesDAO();
+		this.tarifaISRDAO = new CatTarifaIsrDAO();
+		this.subsidioDAO = new CatSubsidioDAO();
+		this.tarifaIMSSDAO = new CuotaIMSSDAO();
+		
+		anioActual = DateUtils.getAnio(periodoInicio);
+		this.fechaInicioAnio = DateUtils.getDate(anioActual, DateUtils.ENERO, 1);
+		DateUtils.setTime(this.fechaInicioAnio, 0, 0, 0, 0);
+		
+		this.fechafinAnio = DateUtils.getDate(anioActual, DateUtils.DICIEMBRE, 31);
+		DateUtils.setTime(this.fechafinAnio, 23, 59, 59, 000);
 	}
 	
 	public DetNominaDTO calculoNomina() {
 		DetNominaDTO nomina = null;
-		
 		BigDecimal diasTrabajados = null;
-		
 		BigDecimal diasPeriodo = null;
+		CatTarifaIsrDTO tarifaISR = null;
+		CatSubsidioDTO tarifaSubsidio = null;
 		
 		
 		try {
@@ -102,11 +138,6 @@ public class NominaSemanalBL {
 					.add(this.valesDespensa)
 					.setScale(2, BigDecimal.ROUND_HALF_UP);
 			
-			
-			
-			this.baseISR = new BigDecimal(totalPercepciones.toString()).setScale(2, BigDecimal.ROUND_HALF_UP);
-			
-			
 			//percepciones
 			nomina = new DetNominaDTO();
 			nomina.setIdEmpleado(empleado);
@@ -124,9 +155,41 @@ public class NominaSemanalBL {
 			nomina.setTotalPercepciones(this.totalPercepciones);
 			
 			//deducciones
+			//Para el cálculo del ISR a retener al empleado se deben sumar las percepciones 
+			//que gravan para ISR, en este caso son:
+			this.baseISR = this.salarioSemanal
+					.add(this.septimoDia)
+					.add(this.bonoPuntualidad)
+					.setScale(2, BigDecimal.ROUND_HALF_UP);
+			
+			tarifaISR      = tarifaISRDAO.buscar(fechaInicioAnio, fechafinAnio, "s", this.baseISR);
+			tarifaSubsidio = subsidioDAO.buscar(fechaInicioAnio, fechafinAnio, "s", this.baseISR);
+			
+			this.excedente = calculoExcedente(tarifaISR);
+			this.isrPrevio = calculoISRPrevio(tarifaISR);
+			this.impuestoAntesSubsidio = calculoImpuestoAntesSubsidio(tarifaISR);
+			this.subsidioEmpleo = calculoSubsidioEmpleo(tarifaSubsidio);
+			this.isr = impuestoAntesSubsidio.subtract(subsidioEmpleo);
 			
 			
+			nomina.setSubsAlEmpleoAcreditado(this.subsidioEmpleo);
+			nomina.setIsrAntesDeSubsAlEmpleo(impuestoAntesSubsidio);
+			nomina.setIsr(this.isr);
 			
+			//Cálculo del IMSS
+			this.enfermedadYmaternidad = this.calculoEnfermedadMaternidad();
+			this.gastosMedicosPensionadosBeneficiarios = this.calculoGastosMedicosPensionadosBeneficiarios();
+			this.enDinero = this.calculoEnDinero();
+			this.invalidezVida = this.calculoInvalidezVida();
+			this.cesantiaEdadAvanzadaVejez = this.calculoCesantiaEdadAvanzadaVejez();
+			this.imss = enfermedadYmaternidad
+					.add(this.gastosMedicosPensionadosBeneficiarios)
+					.add(this.enDinero)
+					.add(this.invalidezVida)
+					.add(this.cesantiaEdadAvanzadaVejez)
+					;
+			
+			nomina.setImss(this.imss);
 			//otros
 			
 		} catch(Exception ex) {
@@ -160,28 +223,12 @@ public class NominaSemanalBL {
 		for(String key : keySet) {
 			registro = mapAsistencias.get(key);
 			log.info("Buscando día de la semana Key en el catálogo de días no laborales: {}, {}...", key, registro.getFechaEntrada());
-			
-			//TODO falta implementar el catálogo de días festivos o no laborales.
 		}
-		//TODO falta agregar algún día no laboral.
 		diasTrabajados = new BigDecimal(mapAsistencias.size());
 		
 		return diasTrabajados;
 	}
 	
-	private BigDecimal calculaProporcionalSeptimoDia(DetEmpleadoDTO empleado, BigDecimal diasTrabajados, int diasPorPeriodo) {
-		BigDecimal proporcionalSeptimoDia = null;
-		BigDecimal bdDiasPorPeriodo = null;
-		
-		if(diasTrabajados == null)
-			return new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
-		
-		bdDiasPorPeriodo = new BigDecimal(diasPorPeriodo).setScale(2, BigDecimal.ROUND_HALF_UP);
-		proporcionalSeptimoDia = diasTrabajados.divide(bdDiasPorPeriodo, 2, BigDecimal.ROUND_HALF_UP);
-		
-		return proporcionalSeptimoDia;
-	}
-
 	private Map<String, DetRegistroDTO> getAsistencias(DetEmpleadoDTO empleado, Date periodoInicio, Date periodoFin) {
 		Map<String, DetRegistroDTO> mapAsistencias = null;
 		List<DetRegistroDTO> listaAsistencias = null;
@@ -254,7 +301,7 @@ public class NominaSemanalBL {
     				.divide(diasAnio, 4, BigDecimal.ROUND_HALF_UP)
     				;
     		
-    		sdi = sueldoDiario.multiply(factorSDI).setScale(6, BigDecimal.ROUND_HALF_UP);
+    		sdi = sueldoDiario.multiply(factorSDI).setScale(2, BigDecimal.ROUND_HALF_UP);
     	} catch(Exception ex) {
     		sdi = BigDecimal.ZERO;
     	}
@@ -271,27 +318,11 @@ public class NominaSemanalBL {
 					.multiply(this.diasTrabajados).setScale(2, BigDecimal.ROUND_HALF_UP)
 					;
 			
-//			septimoDia = empleado.getSueldoDiario().multiply(proporcionalSeptimoDia).setScale(2, BigDecimal.ROUND_HALF_UP);
 		} catch(Exception ex) {
 			log.error("Problema para obtener el cálculo del septimo día.",  ex);
 			septimoDia = BigDecimal.ZERO;
 		}
 		return septimoDia;
-	}
-	
-	private BigDecimal calculoSalarioSemanal() {
-		BigDecimal salarioSemanal = null;
-    	
-    	try {
-			salarioSemanal = this.salarioDiario.multiply(this.diasTrabajados).setScale(2, BigDecimal.ROUND_HALF_UP);
-			salarioSemanal = salarioSemanal.add(this.septimoDia).setScale(2, BigDecimal.ROUND_HALF_UP);
-            
-    	} catch(Exception ex) {
-    		log.error("Problema para procesar el salario semanal...", ex);
-    		salarioSemanal = BigDecimal.ZERO;
-    	}
-    	
-    	return salarioSemanal;
 	}
 	
 	private BigDecimal calculoBonoPuntualidad(int diasPorPeriodo, DetEmpleadoDTO empleado, Map mapAsistencia, BigDecimal salarioDiarioIntegrado, BigDecimal proporcionalSeptimoDia) {
@@ -344,9 +375,176 @@ public class NominaSemanalBL {
     	
     	return vales;
 	}
+	/********************TERMINAN PERCEPCIONES****************/
 	
 	
+	/********************EMPIEZAN DEDUCCIONES****************/
 	
+	private BigDecimal calculoExcedente(CatTarifaIsrDTO tarifaISR) {
+		BigDecimal excedente = null;
+		excedente = baseISR.subtract(tarifaISR.getLimiteInferior()) ;
+		return excedente;
+	}
+	
+	private BigDecimal calculoISRPrevio(CatTarifaIsrDTO tarifaISR) {
+		BigDecimal isrPrevio = null;
+		BigDecimal porcentajeExcedente = null;
+		BigDecimal cien = null;
+		BigDecimal porcentaje = null;
+		
+		try {
+			porcentajeExcedente = tarifaISR.getPorcAplExceLimInf();
+			
+			cien = new BigDecimal("100.00").setScale(2, BigDecimal.ROUND_HALF_UP);
+			if(porcentajeExcedente.compareTo(cien) >= 0)
+				porcentaje = porcentajeExcedente;
+			else
+				porcentaje = porcentajeExcedente.divide(cien, 4, BigDecimal.ROUND_HALF_UP);
+			
+			isrPrevio = this.excedente.multiply(porcentaje).setScale(2, BigDecimal.ROUND_HALF_UP);
+		} catch(Exception ex) {
+			log.error("Problema para obtener el ISR previo");
+			isrPrevio = BigDecimal.ZERO;
+		}
+		
+		return isrPrevio;
+	}
+	
+	private BigDecimal calculoImpuestoAntesSubsidio(CatTarifaIsrDTO tarifaISR) {
+		BigDecimal impuesto = null;
+		impuesto = this.isrPrevio.add(tarifaISR.getCuotaFija());
+		return impuesto;
+	}
+	
+	private BigDecimal calculoSubsidioEmpleo(CatSubsidioDTO tarifaSubsidio) {
+		BigDecimal subsidioEmpleo = null;
+		subsidioEmpleo = tarifaSubsidio.getCantidadSubsidio();
+		return subsidioEmpleo;
+	}
+	
+	//IMSS
+	private BigDecimal calculoEnfermedadMaternidad() {
+		BigDecimal cuota = null;
+		BigDecimal cero = null;
+		BigDecimal tres = null;
+		BigDecimal limiteUMAs = null;
+		BigDecimal excedente = null;
+		BigDecimal tarifa = null;
+		BigDecimal totalDiasPeriodo = null;
+		CuotaIMSSDTO tarifaIMSS = null;
+		
+		try {
+			//Constantes necesarias para el cálculo de Enfermedad y Maternidad.
+			cero = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
+			tres = new BigDecimal("3.00").setScale(2, BigDecimal.ROUND_HALF_UP);
+			
+			totalDiasPeriodo = new BigDecimal(DIAS_POR_PERIODO + SEPTIMO_DIA).setScale(2, BigDecimal.ROUND_HALF_UP);
+			cuota = cero;
+			
+			limiteUMAs = this.uma.multiply(tres).setScale(2, BigDecimal.ROUND_HALF_UP);
+			excedente = this.salarioDiarioIntegrado.subtract(limiteUMAs);
+			
+			if(salarioDiarioIntegrado.compareTo(limiteUMAs) >= 0) {
+				
+				tarifaIMSS = tarifaIMSSDAO.buscar("O", "EM1", this.fechaInicioAnio, this.fechafinAnio, tres);
+				tarifa = tarifaIMSS.getCuota();
+				cuota = excedente
+						.multiply(tarifa).setScale(2, BigDecimal.ROUND_HALF_UP)
+						.multiply(totalDiasPeriodo).setScale(2, BigDecimal.ROUND_HALF_UP);
+			}
+		} catch(Exception ex) {
+			log.warn("No fue posible calcular el excedente por Enfermedad y Maternidad.", ex);
+			cuota = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
+		}
+		
+		return cuota;
+	}
+	
+	//IMSS
+	private BigDecimal calculoGastosMedicosPensionadosBeneficiarios() {
+		BigDecimal cuota = null;
+		BigDecimal totalDiasPeriodo = null;
+		CuotaIMSSDTO tarifaIMSS = null;
+		
+		try {
+			totalDiasPeriodo = new BigDecimal(DIAS_POR_PERIODO + SEPTIMO_DIA).setScale(2, BigDecimal.ROUND_HALF_UP);
+			tarifaIMSS = tarifaIMSSDAO.buscar("O", "EM2", this.fechaInicioAnio, this.fechafinAnio, this.salarioDiarioIntegrado);
+			cuota = this.salarioDiarioIntegrado
+					.multiply(tarifaIMSS.getCuota()).setScale(2, BigDecimal.ROUND_HALF_UP)
+					.multiply(totalDiasPeriodo).setScale(2, BigDecimal.ROUND_HALF_UP);
+			
+		} catch(Exception ex) {
+			log.warn("No fue posible calcular el excedente por Gastos Médicos para pensionados y beneficiarios...", ex);
+			cuota = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
+		}
+		
+		return cuota;
+	}
+	
+	//IMSS
+	private BigDecimal calculoEnDinero() {
+		BigDecimal cuota = null;
+		BigDecimal totalDiasPeriodo = null;
+		CuotaIMSSDTO tarifaIMSS = null;
+		
+		try {
+			totalDiasPeriodo = new BigDecimal(DIAS_POR_PERIODO + SEPTIMO_DIA).setScale(2, BigDecimal.ROUND_HALF_UP);
+			tarifaIMSS = tarifaIMSSDAO.buscar("O", "EM3", this.fechaInicioAnio, this.fechafinAnio, this.salarioDiarioIntegrado);
+			cuota = this.salarioDiarioIntegrado
+					.multiply(tarifaIMSS.getCuota()).setScale(2, BigDecimal.ROUND_HALF_UP)
+					.multiply(totalDiasPeriodo).setScale(2, BigDecimal.ROUND_HALF_UP);
+			
+		} catch(Exception ex) {
+			log.warn("No fue posible calcular el excedente por Gastos Médicos para pensionados y beneficiarios...", ex);
+			cuota = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
+		}
+		
+		return cuota;
+	}
+	
+	//IMSS
+	private BigDecimal calculoInvalidezVida() {
+		BigDecimal cuota = null;
+		BigDecimal totalDiasPeriodo = null;
+		CuotaIMSSDTO tarifaIMSS = null;
+		
+		try {
+			totalDiasPeriodo = new BigDecimal(DIAS_POR_PERIODO + SEPTIMO_DIA).setScale(2, BigDecimal.ROUND_HALF_UP);
+			tarifaIMSS = tarifaIMSSDAO.buscar("O", "IV", this.fechaInicioAnio, this.fechafinAnio, this.salarioDiarioIntegrado);
+			cuota = this.salarioDiarioIntegrado
+					.multiply(tarifaIMSS.getCuota()).setScale(2, BigDecimal.ROUND_HALF_UP)
+					.multiply(totalDiasPeriodo).setScale(2, BigDecimal.ROUND_HALF_UP);
+			
+		} catch(Exception ex) {
+			log.warn("No fue posible calcular el excedente por Gastos Médicos para pensionados y beneficiarios...", ex);
+			cuota = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
+		}
+		
+		return cuota;
+	}
+	
+	//IMSS
+	private BigDecimal calculoCesantiaEdadAvanzadaVejez() {
+		BigDecimal cuota = null;
+		BigDecimal totalDiasPeriodo = null;
+		CuotaIMSSDTO tarifaIMSS = null;
+		
+		try {
+			totalDiasPeriodo = new BigDecimal(DIAS_POR_PERIODO + SEPTIMO_DIA).setScale(2, BigDecimal.ROUND_HALF_UP);
+			tarifaIMSS = tarifaIMSSDAO.buscar("O", "CEAV", this.fechaInicioAnio, this.fechafinAnio, this.salarioDiarioIntegrado);
+			cuota = this.salarioDiarioIntegrado
+					.multiply(tarifaIMSS.getCuota()).setScale(2, BigDecimal.ROUND_HALF_UP)
+					.multiply(totalDiasPeriodo).setScale(2, BigDecimal.ROUND_HALF_UP);
+			
+		} catch(Exception ex) {
+			log.warn("No fue posible calcular el excedente por Gastos Médicos para pensionados y beneficiarios...", ex);
+			cuota = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
+		}
+		
+		return cuota;
+	}
+	
+	/********************TERMINAN DEDUCCIONES****************/
 
 	public DetEmpleadoDTO getEmpleado() {
 		return empleado;

@@ -24,8 +24,7 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name = "det_nomina")
 @NamedQueries({
-    @NamedQuery(name = "DetNomina.findAll", query = "SELECT n FROM DetNomina n"),
-    @NamedQuery(name = "DetNomina.findByFecha", query = "SELECT NEW mx.com.ferbo.dto.DetNominaDTO(n.idNomina, n.idEmpleado, n.sueldo, n.septimoDia, n.horasExtras, n.destajos, n.premiosEficiencia, n.bonoPuntualidad, n.despensa, n.otrasPercepciones, n.totalPercepciones, n.retInvYVida, n.retCesantia, n.retEnfYMatObrero, n.prestamoInfonavitFd, n.prestamoInfonavitCf, n.subsAlEmpleoAcreditado, n.subsAlEmpleoMes, n.isrAntesDeSubsAlEmpleo, n.isrMes, n.imss, n.prestamoFonacot, n.ajusteEnSubsidioParaElEmpleo, n.subsEntregadoQueNoCorrespondia, n.ajusteAlNeto, n.isrDeAjusteMensual, n.isrAjustadoPorSubsidio, n.ajusteAlSubsidioCausado, n.pensionAlimienticia, n.otrasDeducciones, n.totalDeducciones, n.neto, n.invalidezYVida, n.cesantiaYVejez, n.enfYMatPatron, n.fondoRetiroSar, n.impuestoEstatal, n.riesgoDeTrabajo9, n.imssEmpresa, n.infonavitEmpresa, n.guarderiaImss7, n.otrasObligaciones, n.totalObligaciones, n.fechaCreacion, n.idEmpleadoCreador) FROM DetNomina n WHERE n.fechaCreacion LIKE :fechaCreacion")
+    @NamedQuery(name = "DetNomina.findAll", query = "SELECT n FROM DetNomina n")
 })
 public class DetNomina implements Serializable {
 
@@ -94,16 +93,16 @@ public class DetNomina implements Serializable {
     private Float prestamoInfonavitCf;
     @NotNull
     @Column(name = "subs_al_empleo_acreditado")
-    private Float subsAlEmpleoAcreditado;
+    private BigDecimal subsAlEmpleoAcreditado;
     @NotNull
     @Column(name = "subs_al_empleo_mes")
-    private Float subsAlEmpleoMes;
+    private BigDecimal subsAlEmpleoMes;
     @NotNull
     @Column(name = "isr_antes_de_subs_al_empleo")
-    private Float isrAntesDeSubsAlEmpleo;
+    private BigDecimal isrAntesDeSubsAlEmpleo;
     @NotNull
     @Column(name = "isr_mes")
-    private Float isrMes;
+    private BigDecimal isrMes;
     @NotNull
     @Column(name = "imss")
     private Float imss;
@@ -187,7 +186,7 @@ public class DetNomina implements Serializable {
         this.idNomina = idNomina;
     }
 
-    public DetNomina(Integer idNomina, DetEmpleado idEmpleado, BigDecimal sueldo, BigDecimal septimoDia, BigDecimal horasExtras, BigDecimal destajos, BigDecimal premiosEficiencia, BigDecimal bonoPuntualidad, BigDecimal despensa, BigDecimal otrasPercepciones, BigDecimal totalPercepciones, Float retInvYVida, Float retCesantia, Float retEnfYMatObrero, Float prestamoInfonavitFd, Float prestamoInfonavitCf, Float subsAlEmpleoAcreditado, Float subsAlEmpleoMes, Float isrAntesDeSubsAlEmpleo, Float isrMes, Float imss, Float prestamoFonacot, Float ajusteEnSubsidioParaElEmpleo, Float subsEntregadoQueNoCorrespondia, Float ajusteAlNeto, Float isrDeAjusteMensual, Float isrAjustadoPorSubsidio, Float ajusteAlSubsidioCausado, Float pensionAlimienticia, Float otrasDeducciones, Float totalDeducciones, Float neto, Float invalidezYVvida, Float cesantiaYVejez, Float enfYMatPatron, Float fondoRetiroSar, Float impuestoEstatal, Float riesgoDeTrabajo9, Float imssEmpresa, Float infonavitEmpresa, Float guarderiaImss7, Float otrasObligaciones, Float totalObligaciones, Date fechaCreacion, DetEmpleado idEmpleadoCreador) {
+    public DetNomina(Integer idNomina, DetEmpleado idEmpleado, BigDecimal sueldo, BigDecimal septimoDia, BigDecimal horasExtras, BigDecimal destajos, BigDecimal premiosEficiencia, BigDecimal bonoPuntualidad, BigDecimal despensa, BigDecimal otrasPercepciones, BigDecimal totalPercepciones, Float retInvYVida, Float retCesantia, Float retEnfYMatObrero, Float prestamoInfonavitFd, Float prestamoInfonavitCf, BigDecimal subsAlEmpleoAcreditado, BigDecimal subsAlEmpleoMes, BigDecimal isrAntesDeSubsAlEmpleo, BigDecimal isrMes, Float imss, Float prestamoFonacot, Float ajusteEnSubsidioParaElEmpleo, Float subsEntregadoQueNoCorrespondia, Float ajusteAlNeto, Float isrDeAjusteMensual, Float isrAjustadoPorSubsidio, Float ajusteAlSubsidioCausado, Float pensionAlimienticia, Float otrasDeducciones, Float totalDeducciones, Float neto, Float invalidezYVvida, Float cesantiaYVejez, Float enfYMatPatron, Float fondoRetiroSar, Float impuestoEstatal, Float riesgoDeTrabajo9, Float imssEmpresa, Float infonavitEmpresa, Float guarderiaImss7, Float otrasObligaciones, Float totalObligaciones, Date fechaCreacion, DetEmpleado idEmpleadoCreador) {
         this.idNomina = idNomina;
         this.idEmpleado = idEmpleado;
         this.sueldo = sueldo;
@@ -363,35 +362,35 @@ public class DetNomina implements Serializable {
         this.prestamoInfonavitCf = prestamoInfonavitCf;
     }
 
-    public Float getSubsAlEmpleoAcreditado() {
+    public BigDecimal getSubsAlEmpleoAcreditado() {
         return subsAlEmpleoAcreditado;
     }
 
-    public void setSubsAlEmpleoAcreditado(Float subsAlEmpleoAcreditado) {
+    public void setSubsAlEmpleoAcreditado(BigDecimal subsAlEmpleoAcreditado) {
         this.subsAlEmpleoAcreditado = subsAlEmpleoAcreditado;
     }
 
-    public Float getSubsAlEmpleoMes() {
+    public BigDecimal getSubsAlEmpleoMes() {
         return subsAlEmpleoMes;
     }
 
-    public void setSubsAlEmpleoMes(Float subsAlEmpleoMes) {
+    public void setSubsAlEmpleoMes(BigDecimal subsAlEmpleoMes) {
         this.subsAlEmpleoMes = subsAlEmpleoMes;
     }
 
-    public Float getIsrAntesDeSubsAlEmpleo() {
+    public BigDecimal getIsrAntesDeSubsAlEmpleo() {
         return isrAntesDeSubsAlEmpleo;
     }
 
-    public void setIsrAntesDeSubsAlEmpleo(Float isrAntesDeSubsAlEmpleo) {
+    public void setIsrAntesDeSubsAlEmpleo(BigDecimal isrAntesDeSubsAlEmpleo) {
         this.isrAntesDeSubsAlEmpleo = isrAntesDeSubsAlEmpleo;
     }
 
-    public Float getIsrMes() {
+    public BigDecimal getIsrMes() {
         return isrMes;
     }
 
-    public void setIsrMes(Float isrMes) {
+    public void setIsrMes(BigDecimal isrMes) {
         this.isrMes = isrMes;
     }
 

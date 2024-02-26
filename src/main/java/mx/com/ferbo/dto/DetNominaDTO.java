@@ -35,11 +35,11 @@ public class DetNominaDTO implements Serializable {
     private Float retEnfYMatObrero;
     private Float prestamoInfonavitFd;
     private Float prestamoInfonavitCf;
-    private Float subsAlEmpleoAcreditado;
-    private Float subsAlEmpleoMes;
-    private Float isrAntesDeSubsAlEmpleo;
-    private Float isrMes;
-    private Float imss;
+    private BigDecimal subsAlEmpleoAcreditado;
+    private BigDecimal subsAlEmpleoMes;
+    private BigDecimal isrAntesDeSubsAlEmpleo;
+    private BigDecimal isr;
+    private BigDecimal imss;
     private Float prestamoFonacot;
     private Float ajusteEnSubsidioParaElEmpleo;
     private Float subsEntregadoQueNoCorrespondia;
@@ -73,7 +73,7 @@ public class DetNominaDTO implements Serializable {
     	
     }
 
-    public DetNominaDTO(Integer idNomina, DetEmpleadoDTO idEmpleado, BigDecimal sueldo, BigDecimal septimoDia, BigDecimal horasExtras, BigDecimal destajos, BigDecimal premiosEficiencia, BigDecimal bonoPuntualidad, BigDecimal despensa, BigDecimal otrasPercepciones, BigDecimal totalPercepciones, Float retInvYVida, Float retCesantia, Float retEnfYMatObrero, Float prestamoInfonavitFd, Float prestamoInfonavitCf, Float subsAlEmpleoAcreditado, Float subsAlEmpleoMes, Float isrAntesDeSubsAlEmpleo, Float isrMes, Float imss, Float prestamoFonacot, Float ajusteEnSubsidioParaElEmpleo, Float subsEntregadoQueNoCorrespondia, Float ajusteAlNeto, Float isrDeAjusteMensual, Float isrAjustadoPorSubsidio, Float ajusteAlSubsidioCausado, Float pensionAlimienticia, Float otrasDeducciones, Float totalDeducciones, Float neto, Float invalidezYVida, Float cesantiaYVejez, Float enfYMatPatron, Float fondoRetiroSar, Float impuestoEstatal, Float riesgoDeTrabajo9, Float imssEmpresa, Float infonavitEmpresa, Float guarderiaImss7, Float otrasObligaciones, Float totalObligaciones, Date fechaCreacion, DetEmpleadoDTO idEmpleadoCreador) {
+    public DetNominaDTO(Integer idNomina, DetEmpleadoDTO idEmpleado, BigDecimal sueldo, BigDecimal septimoDia, BigDecimal horasExtras, BigDecimal destajos, BigDecimal premiosEficiencia, BigDecimal bonoPuntualidad, BigDecimal despensa, BigDecimal otrasPercepciones, BigDecimal totalPercepciones, Float retInvYVida, Float retCesantia, Float retEnfYMatObrero, Float prestamoInfonavitFd, Float prestamoInfonavitCf, BigDecimal subsAlEmpleoAcreditado, BigDecimal subsAlEmpleoMes, BigDecimal isrAntesDeSubsAlEmpleo, BigDecimal isrMes, BigDecimal imss, Float prestamoFonacot, Float ajusteEnSubsidioParaElEmpleo, Float subsEntregadoQueNoCorrespondia, Float ajusteAlNeto, Float isrDeAjusteMensual, Float isrAjustadoPorSubsidio, Float ajusteAlSubsidioCausado, Float pensionAlimienticia, Float otrasDeducciones, Float totalDeducciones, Float neto, Float invalidezYVida, Float cesantiaYVejez, Float enfYMatPatron, Float fondoRetiroSar, Float impuestoEstatal, Float riesgoDeTrabajo9, Float imssEmpresa, Float infonavitEmpresa, Float guarderiaImss7, Float otrasObligaciones, Float totalObligaciones, Date fechaCreacion, DetEmpleadoDTO idEmpleadoCreador) {
         this.idNomina = idNomina;
         this.idEmpleado = idEmpleado;
         this.sueldo = sueldo;
@@ -93,7 +93,7 @@ public class DetNominaDTO implements Serializable {
         this.subsAlEmpleoAcreditado = subsAlEmpleoAcreditado;
         this.subsAlEmpleoMes = subsAlEmpleoMes;
         this.isrAntesDeSubsAlEmpleo = isrAntesDeSubsAlEmpleo;
-        this.isrMes = isrMes;
+        this.isr = isrMes;
         this.imss = imss;
         this.prestamoFonacot = prestamoFonacot;
         this.ajusteEnSubsidioParaElEmpleo = ajusteEnSubsidioParaElEmpleo;
@@ -125,7 +125,7 @@ public class DetNominaDTO implements Serializable {
                         String segundoAp, BigDecimal sueldo, BigDecimal septimoDia, BigDecimal horasExtras, BigDecimal destajos, 
                         BigDecimal premiosEficiencia, BigDecimal bonoPuntualidad, BigDecimal despensa, BigDecimal otrasPercepciones, BigDecimal totalPercepciones, 
                         Float retInvYVida, Float retCesantia, Float retEnfYMatObrero, Float prestamoInfonavitFd, Float prestamoInfonavitCf, 
-                        Float subsAlEmpleoAcreditado, Float subsAlEmpleoMes, Float isrAntesDeSubsAlEmpleo, Float isrMes, Float imss, 
+                        BigDecimal subsAlEmpleoAcreditado, BigDecimal subsAlEmpleoMes, BigDecimal isrAntesDeSubsAlEmpleo, BigDecimal isrMes, BigDecimal imss, 
                         Float prestamoFonacot, Float ajusteEnSubsidioParaElEmpleo, Float subsEntregadoQueNoCorrespondia, Float ajusteAlNeto, Float isrDeAjusteMensual, 
                         Float isrAjustadoPorSubsidio, Float ajusteAlSubsidioCausado, Float pensionAlimienticia, Float otrasDeducciones, Float totalDeducciones, 
                         Float neto, Float invalidezYVida, Float cesantiaYVejez, Float enfYMatPatron, Float fondoRetiroSar, 
@@ -155,7 +155,7 @@ public class DetNominaDTO implements Serializable {
         this.subsAlEmpleoAcreditado = subsAlEmpleoAcreditado;
         this.subsAlEmpleoMes = subsAlEmpleoMes;
         this.isrAntesDeSubsAlEmpleo = isrAntesDeSubsAlEmpleo;
-        this.isrMes = isrMes;
+        this.isr = isrMes;
         this.imss = imss;
         this.prestamoFonacot = prestamoFonacot;
         this.ajusteEnSubsidioParaElEmpleo = ajusteEnSubsidioParaElEmpleo;
@@ -339,43 +339,43 @@ public class DetNominaDTO implements Serializable {
         this.prestamoInfonavitCf = prestamoInfonavitCf;
     }
 
-    public Float getSubsAlEmpleoAcreditado() {
+    public BigDecimal getSubsAlEmpleoAcreditado() {
         return subsAlEmpleoAcreditado;
     }
 
-    public void setSubsAlEmpleoAcreditado(Float subsAlEmpleoAcreditado) {
+    public void setSubsAlEmpleoAcreditado(BigDecimal subsAlEmpleoAcreditado) {
         this.subsAlEmpleoAcreditado = subsAlEmpleoAcreditado;
     }
 
-    public Float getSubsAlEmpleoMes() {
+    public BigDecimal getSubsAlEmpleoMes() {
         return subsAlEmpleoMes;
     }
 
-    public void setSubsAlEmpleoMes(Float subsAlEmpleoMes) {
+    public void setSubsAlEmpleoMes(BigDecimal subsAlEmpleoMes) {
         this.subsAlEmpleoMes = subsAlEmpleoMes;
     }
 
-    public Float getIsrAntesDeSubsAlEmpleo() {
+    public BigDecimal getIsrAntesDeSubsAlEmpleo() {
         return isrAntesDeSubsAlEmpleo;
     }
 
-    public void setIsrAntesDeSubsAlEmpleo(Float isrAntesDeSubsAlEmpleo) {
+    public void setIsrAntesDeSubsAlEmpleo(BigDecimal isrAntesDeSubsAlEmpleo) {
         this.isrAntesDeSubsAlEmpleo = isrAntesDeSubsAlEmpleo;
     }
 
-    public Float getIsrMes() {
-        return isrMes;
+    public BigDecimal getIsr() {
+        return isr;
     }
 
-    public void setIsrMes(Float isrMes) {
-        this.isrMes = isrMes;
+    public void setIsr(BigDecimal isr) {
+        this.isr = isr;
     }
 
-    public Float getImss() {
+    public BigDecimal getImss() {
         return imss;
     }
 
-    public void setImss(Float imss) {
+    public void setImss(BigDecimal imss) {
         this.imss = imss;
     }
 

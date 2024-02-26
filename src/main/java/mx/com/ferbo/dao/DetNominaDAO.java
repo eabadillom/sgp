@@ -80,7 +80,7 @@ public class DetNominaDAO extends IBaseDAO<DetNominaDTO, Integer> implements Ser
             nomina.setSubsAlEmpleoAcreditado(e.getSubsAlEmpleoAcreditado());
             nomina.setSubsAlEmpleoMes(e.getSubsAlEmpleoMes());
             nomina.setIsrAntesDeSubsAlEmpleo(e.getIsrAntesDeSubsAlEmpleo());
-            nomina.setIsrMes(e.getIsrMes());
+            nomina.setIsrMes(e.getIsr());
             nomina.setImss(e.getImss());
             nomina.setPrestamoFonacot(e.getPrestamoFonacot());
             nomina.setAjusteEnSubsidioParaElEmpleo(e.getAjusteEnSubsidioParaElEmpleo());
@@ -114,7 +114,7 @@ public class DetNominaDAO extends IBaseDAO<DetNominaDTO, Integer> implements Ser
         }
     }
     
-    public List<DetNominaDTO> buscarNominaPorFecha(String fechaCreacion) throws SGPException {
-        return emSGP.createNamedQuery("DetNomina.findByFecha", DetNominaDTO.class).setParameter(fechaCreacion, "fechaCreacion").getResultList();
-    }
+//    public List<DetNominaDTO> buscarNominaPorFecha(String fechaCreacion) throws SGPException {
+//        return emSGP.createNamedQuery("DetNomina.findByFecha", DetNominaDTO.class).setParameter(fechaCreacion, "fechaCreacion").getResultList();
+//    }
 }

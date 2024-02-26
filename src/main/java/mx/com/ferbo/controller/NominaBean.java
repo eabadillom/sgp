@@ -350,7 +350,7 @@ public class NominaBean implements Serializable {
 		
 		
 		
-		baseIsr(); baseIsr = 0f;
+//		baseIsr(); baseIsr = 0f;
 //		isrRetener();
 		
 //		enfMatEsp();
@@ -400,28 +400,28 @@ public class NominaBean implements Serializable {
 		return nomina;
     }
     
-    //<editor-fold defaultstate="collapsed" desc="Cálculo de ISR">
-    public float baseIsr() {
-        // baseIsr = salSem + empleadoSelected.getSueldoDiario() + bono + vales;
-        baseIsr = total;
-        // baseIsr = (float) (Math.round(total * 100d) / 100d);
-        return baseIsr;
-    }
+//    //<editor-fold defaultstate="collapsed" desc="Cálculo de ISR">
+//    public float baseIsr() {
+//        // baseIsr = salSem + empleadoSelected.getSueldoDiario() + bono + vales;
+//        baseIsr = total;
+//        // baseIsr = (float) (Math.round(total * 100d) / 100d);
+//        return baseIsr;
+//    }
 
-    public float isrRetener() {
-        isr = lstIsrActualSemanal.stream().filter(i -> i.getLimiteSuperior() >= baseIsr).findFirst().get();
-        subsidio = lstSubsidioActual.stream().filter(s -> s.getHastaIngresosDe() >= baseIsr).findFirst().get();
-
-        excedente = baseIsr - isr.getLimiteInferior();
-        excedente = (float) (Math.round(excedente * 100d) / 100d);
-        impuestoPrevio = (float) (excedente * (isr.getPorcAplExceLimInf() / 100));
-        impuestoPrevio = (float) (Math.round(impuestoPrevio * 100d) / 100d);
-        impuestoAntesDeSubsidio = impuestoPrevio + isr.getCuotaFija();
-        impuestoAntesDeSubsidio = (float) (Math.round(impuestoAntesDeSubsidio * 100d) / 100d);
-        isrARetener = impuestoAntesDeSubsidio - subsidio.getCantidadSubsidio();
-        isrARetener = (float) (Math.round(isrARetener * 100d) / 100d);
-        return isrARetener; //isrRetener = baseIsr 
-    }
+//    public float isrRetener() {
+//        isr = lstIsrActualSemanal.stream().filter(i -> i.getLimiteSuperior() >= baseIsr).findFirst().get();
+//        subsidio = lstSubsidioActual.stream().filter(s -> s.getHastaIngresosDe() >= baseIsr).findFirst().get();
+//
+//        excedente = baseIsr - isr.getLimiteInferior();
+//        excedente = (float) (Math.round(excedente * 100d) / 100d);
+//        impuestoPrevio = (float) (excedente * (isr.getPorcAplExceLimInf() / 100));
+//        impuestoPrevio = (float) (Math.round(impuestoPrevio * 100d) / 100d);
+//        impuestoAntesDeSubsidio = impuestoPrevio + isr.getCuotaFija();
+//        impuestoAntesDeSubsidio = (float) (Math.round(impuestoAntesDeSubsidio * 100d) / 100d);
+//        isrARetener = impuestoAntesDeSubsidio - subsidio.getCantidadSubsidio();
+//        isrARetener = (float) (Math.round(isrARetener * 100d) / 100d);
+//        return isrARetener; //isrRetener = baseIsr 
+//    }
 
     //<editor-fold defaultstate="collapsed" desc="Cálculo de IMSS">
     public float enfMatEsp() {
