@@ -31,6 +31,7 @@ String numEmpleado = "";
 			$(document).ready(function (){
 				jQuery("#dialog-message" ).dialog({
 					autoOpen: false,
+					modal: true,
 					buttons: {
 						Aceptar: function() {
 							$( this ).dialog( "close" );
@@ -60,10 +61,6 @@ String numEmpleado = "";
 				  input_value.val("");
 				});
 				
-				$("#enter").click(function () {
-				  myAlert("Your password " + input_value.val() + " added");
-				});
-				
 				$("#inoutES").click(function() {
 					accion.val("registro"); 
 				});
@@ -80,15 +77,27 @@ String numEmpleado = "";
 				$( "#dialog-message" ).dialog( "open" );
 			}
 			
-			function lectura(){
+			function lectura(accion){
 				console.log("Entrando a funcion lectura..................")
+				$("#inoutES").prop("disabled", true);
+				$("#inoutP").prop("disabled", true);
 				var num = $("#numero").val();
+				
+				if(num.length == 0) {
+					myAlert("Debe indicar un número de empleado.");
+					$("#inoutES").prop("disabled", false);
+					$("#inoutP").prop("disabled", false);
+					return;
+				}
+				
+				$("#accion").val(accion);
 				
 				var obj = new Object();
 				obj.tpAccion = "Capture";
 				var jsonString = JSON.stringify(obj);
-				
+				var botonES = $("#inoutES").prop("disabled", true)
 				$.ajax({
+					async: false,
 					type : "POST",
 					dataType : 'json',
 					data : jsonString,
@@ -97,14 +106,16 @@ String numEmpleado = "";
 					timeout: 60000,
 					success : function(jsonObj) {
 						jsonObj.biometricData1;
-						console.log("Entrando a fuincion validar.....")
+						console.log("Entrando a funcion validar.....")
 						validar(jsonObj.biometricData1);
-
 						console.log("Saliendo de funcion lectura...................")
-						
+						$("#inoutES").prop("disabled", false);
+						$("#inoutP").prop("disabled", false);
 					},
 					error : function(jsonObj) {
 						myAlert("No hay respuesta del lector de huella.");
+						$("#inoutES").prop("disabled", false);
+						$("#inoutP").prop("disabled", false);
 					}
 				});
 			}
@@ -120,6 +131,7 @@ String numEmpleado = "";
 				var jsonString = JSON.stringify(obj);
 				
 				$.ajax({
+					async: false,
 					type : "POST",
 					dataType : 'json',
 					data : jsonString,
@@ -128,7 +140,6 @@ String numEmpleado = "";
 					timeout: 60000,
 					success : function(jsonObj) {
 						console.log("function jsonObj..........")
-						//myAlert("Respuesta del lector de huella: " + jsonObj.token);
 						var token = jsonObj.token; 
 						var verificacion = jsonObj.verifyBiometricData;
 						if(verificacion){
@@ -140,7 +151,15 @@ String numEmpleado = "";
 						
 					},
 					error : function(jsonObj) {
-						myAlert("No hay respuesta del lector de huella.");
+						var jsonText = jsonText = jsonObj.responseText;
+						var respuesta = null;
+						if(jsonText == undefined || jsonText == null) {
+							respuesta = {"lastMessageError" : "No hay respuesta de Facturama."};
+						} else {
+							respuesta = JSON.parse(jsonText);
+						}
+						
+						myAlert(respuesta.lastMessageError);
 					}
 				});
 				console.log("Saliendo de funcion validar.............")
@@ -159,6 +178,7 @@ String numEmpleado = "";
 				
 				var path = "<%=basePath%>/registry?" + $.param(parametros);
 				$.ajax({
+					async: false,
 					type : "GET",
 					dataType : 'json',
 					contentType :"application/json;charset=utf-8",
@@ -183,7 +203,7 @@ String numEmpleado = "";
 		</script>
 		<style type="text/css">
 			form {
-			  width: 390px;
+			  width: 30rem;
 			  margin: 0px auto;
 			  background: #fff;
 			  padding: 35px 25px;
@@ -197,7 +217,7 @@ String numEmpleado = "";
 				font-family: "latoregular", "Trebuchet MS", Arial, Helvetica, sans-serif;
 				font-size: 16px;
 				margin: 0;
-				padding: 40px 0 0 0;
+				padding: 0 0 0 0;
 				background-image: linear-gradient(to top, #6b77a1, #737ea5 3%, #9599b3 15%, #b1b0bf 28%,
 					#c7c1c8 41%, #d6cdcf 57%, #dfd5d3 74%, #e2d7d4);
 				background-image: -ms-linear-gradient(bottom, #6B77A1 0%, #737EA5 3%, #9599B3 15%, #B1B0BF
@@ -286,11 +306,12 @@ String numEmpleado = "";
 			  color: white;
 			  border-radius: 10px;
 			  cursor: pointer;
-			  font-size: 12px;
+			  font-size: 1rem;
 			  font-weight: 400;
 			  line-height: 25px;
-			  max-width: 140px;
-			  margin: 15px;
+			  max-width: 11rem;
+			  margin: 1rem;
+			  padding: 0.5rem;
 			  text-transform: uppercase;
 			  width: 100%;
 			}
@@ -320,7 +341,7 @@ String numEmpleado = "";
 	</head>
 	<body class="login-body" >
 	
-		<div id="dialog-message" class="dialog-box" style="background-color: #3366CC; color: white; display: none;"></div>
+		<div id="dialog-message" class="dialog-box" style="background-color: #FFFFFF; color: #000000; display: none;"></div>
 		
 		<div align="center">
 			<img src="resources/recursos/images/login.png" width="400" height="170" >
@@ -338,14 +359,14 @@ String numEmpleado = "";
 			    <input type="button" value="7" id="7" class="pinButton calc"/>
 			    <input type="button" value="8" id="8" class="pinButton calc"/>
 			    <input type="button" value="9" id="9" class="pinButton calc"/><br>
-			    <input type="button" value="clear" id="clear" class="pinButton clear"/>
+			    <input type="button" value="&#10006;" id="clear" class="pinButton clear"/>
 			    <input type="button" value="0" id="0 " class="pinButton calc"/>
-			    <input type="button" value="enter" id="enter" class="pinButton enter"/>
+			    <input type="button" value="" id="enter" class="pinButton enter"/>
 			    
 				<div align="center">
-					<input type="button" id="accion" value=""  style="display:none">
-					<input type="button" id="inoutES" value="Entrada/Salida" name="" onclick="lectura();" class=" btnfos btnfos-5" />
-					<input type="button" id="inoutP" value="Mi Perfil" onclick="lectura();" class=" btnfos btnfos-5"  />
+					<input type="hidden" id="accion" value=""  style="display:none">
+					<input type="button" id="inoutES" value="Entrada / Salida" name="" onclick="lectura('registro');" class=" btnfos btnfos-5" />
+					<input type="button" id="inoutP" value="Mi Perfil" onclick="lectura('perfil');" class=" btnfos btnfos-5"  />
 				</div>
 			</form>
 		</div>
