@@ -10,12 +10,13 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import javax.annotation.PostConstruct;
-
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
+
+import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.EmpleadoDAO;
 import mx.com.ferbo.dao.RegistroDAO;
@@ -61,6 +62,9 @@ public class BienvenidaBean implements Serializable {
         this.empleadoSelected = (DetEmpleadoDTO) httpServletRequest.getSession(true).getAttribute("empleado");
         empleadoLogeado();
         consultaRegistro();
+        
+        PrimeFaces.current().executeScript("PF('bar').show()");
+        
     }
 
     public String pasoDeEmpleado(DetEmpleadoDTO detEmpleadoDTO) {
