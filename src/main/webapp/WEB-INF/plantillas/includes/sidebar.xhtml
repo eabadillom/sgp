@@ -12,7 +12,7 @@
                 <p:graphicImage name="images/login.png" library="recursos" width="113" />
             </div>
             <div class="profile">
-                <h:graphicImage value="#{sideBarBean.empleadoSelected.fotografia}" style="border-radius: 50%;width: 7em;height: 7rem;"/>
+                <h:graphicImage value="#{sideBarBean.empleadoSelected.fotografia}" style="border-radius: 30%;width: auto; height: 7rem;"/>
             </div>
             <div class="menu">
                 <po:menu widgetVar="OmegaMenuWidget">
@@ -20,9 +20,8 @@
                     <p:menuitem id="registroEmp" value="Registro de Empleados" icon="pi pi-fw pi-list" outcome="/protected/registroEmpleado" />
                     <p:menuitem id="asistencia" value="Asistencia" icon="pi pi-fw pi-calendar" outcome="/protected/asistencia"/>
                     <p:menuitem id="incidencia" value="Incidencias" icon="pi pi-fw pi-check-circle" outcome="/protected/incidencias" rendered="#{SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 1 or SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 2 or SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 3}"/>
-                    <p:menuitem id="uniformes" value="Uniforme" icon="pi pi-fw pi-compass" outcome="/protected/uniformes" rendered="#{(SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 1 or SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 4) }"/>
-                    <p:menuitem id="articulos" value="Articulos" icon="pi pi-pencil" outcome="/protected/articulosTrabajo" rendered="#{(SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 2 or SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 4)}"/>
-                    
+                    <p:menuitem id="uniformes" value="Uniforme" icon="pi pi-fw pi-compass" outcome="/protected/uniformes" rendered="#{(SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 1 or SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 4) and SideBarBean.showUniformes}"/>
+                    <p:menuitem id="articulos" value="Articulos" icon="pi pi-pencil" outcome="/protected/articulosTrabajo" rendered="#{(SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 1 or SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 2 or SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 4) and SideBarBean.showArticulos}"/>
                     <p:menuitem id="percepciones" value="Valores para Percepciones" icon="pi pi-book" outcome="/protected/percepciones" rendered="#{SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 1}"/>
                     <p:menuitem id="cuotasImss" value="Cuotas del IMSS" icon="pi pi-book" outcome="/protected/cuotasImss" rendered="#{sideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 1}"/>
                     <p:menuitem id="nomina" value="Nómina" icon="pi pi-money-bill" outcome="/protected/nomina" rendered="#{SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 1 }"/> 

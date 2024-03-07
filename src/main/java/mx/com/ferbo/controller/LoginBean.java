@@ -30,6 +30,11 @@ import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.dto.DetRegistroDTO;
 import mx.com.ferbo.util.SGPException;
 
+import org.primefaces.PrimeFaces;
+
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+
 @Named(value = "loginBean")
 @SessionScoped
 public class LoginBean implements Serializable {
