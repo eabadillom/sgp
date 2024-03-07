@@ -27,6 +27,27 @@ String numEmpleado = "";
 		<script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.0/jquery-ui.min.js"></script>
 		<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.0/jquery-ui.css">
+		<style type="text/css">
+			.overlay{
+			    display: none;
+			    position: fixed;
+			    width: 100%;
+			    height: 100%;
+			    top: 0;
+			    left: 0;
+			    z-index: 999;
+			    background: rgba(120, 120, 120,0.8);
+			}
+			
+			/* Turn off scrollbar when body element has the loading class */
+			body.loading{
+			    overflow: hidden;   
+			}
+			/* Make spinner image visible when body element has the loading class */
+			body.loading .overlay{
+			    display: block;
+			}
+		</style>
 		<script type="text/javascript">
 			$(document).ready(function (){
 				jQuery("#dialog-message" ).dialog({
@@ -37,6 +58,18 @@ String numEmpleado = "";
 							$( this ).dialog( "close" );
 						}
 					}
+				});
+				
+				$(document).on({
+				    ajaxStart: function(){
+				        $("body").addClass("loading"); 
+				    },
+				    ajaxStop: function(){ 
+				        $("body").removeClass("loading"); 
+				    },
+				    ajaxError: function() {
+				    	$("body").removeClass("loading");
+				    }
 				});
 
 				const input_value = $("#numero");
