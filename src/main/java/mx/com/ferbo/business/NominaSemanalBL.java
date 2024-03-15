@@ -35,6 +35,7 @@ public class NominaSemanalBL {
 	private Date periodoFin = null;
 	private Date fechaInicioAnio = null;
 	private Date fechafinAnio = null;
+	private Integer semanaAnio = null;
 	
 	private BigDecimal diasPeriodo = null;
 	private BigDecimal diasTrabajados = null;
@@ -59,7 +60,6 @@ public class NominaSemanalBL {
 	private BigDecimal impuestoAntesSubsidio = null;
 	private BigDecimal subsidioEmpleo = null;
 	private BigDecimal isr = null;
-	
 	//CUOTAS DEL IMSS
 	private BigDecimal enfermedadYmaternidad = null;
 	private BigDecimal gastosMedicosPensionadosBeneficiarios = null;
@@ -67,6 +67,11 @@ public class NominaSemanalBL {
 	private BigDecimal invalidezVida = null;
 	private BigDecimal cesantiaEdadAvanzadaVejez = null;
 	private BigDecimal imss = null;
+	//TOTAL DEDUCCIONES
+	private BigDecimal totalDeducciones;
+	
+	//NETO A PAGAR
+	private BigDecimal neto;
 	
     private static final int SEPTIMO_DIA = 1;
     private static final int DIAS_ANIO = 365;
@@ -99,6 +104,8 @@ public class NominaSemanalBL {
 		
 		this.fechafinAnio = DateUtils.getDate(anioActual, DateUtils.DICIEMBRE, 31);
 		DateUtils.setTime(this.fechafinAnio, 23, 59, 59, 000);
+		
+		this.semanaAnio = DateUtils.getSemanaAnio(this.periodoInicio);
 	}
 	
 	public DetNominaDTO calculoNomina() {
@@ -110,6 +117,8 @@ public class NominaSemanalBL {
 		
 		
 		try {
+			log.info("Ejecutando la nomina de la semana {} del año en curso...", this.semanaAnio);
+			
 			this.percepcion = catPercepcionesDAO.buscarActual(this.periodoInicio);
 			mapAsistencias = this.getAsistencias(this.empleado, this.periodoInicio, this.periodoFin);
 			diasPeriodo = new BigDecimal(DateUtils.daysDiff(periodoInicio, periodoFin)).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -119,7 +128,6 @@ public class NominaSemanalBL {
 			diasTrabajados = this.getDiasTrabajados(mapAsistencias, DIAS_POR_PERIODO); //EL SEGUNDO PARAMETRO (6) CORRESPONDE A LOS DÍAS QUE DEBE LABORAR UN TRABAJADOR POR SEMANA.
 			this.diasTrabajados = diasTrabajados;
 			this.diasPeriodo = new BigDecimal(DIAS_POR_PERIODO).setScale(2, BigDecimal.ROUND_HALF_UP);
-//			proporcionalSeptimoDia = this.getProporcionalSeptimoDia(this.empleado, this.diasTrabajados, DIAS_POR_PERIODO);
 			
 			//Para el séptimo día, se considera el salario diario (sin SDI), dividiendolo entre los días de la semana que se deben laborar,
     		//multiplicado por los días que si laboró el trabajador (parte proporcional de los días trabajados).
@@ -190,7 +198,12 @@ public class NominaSemanalBL {
 					;
 			
 			nomina.setImss(this.imss);
-			//otros
+			
+			this.totalDeducciones = this.isr.add(this.imss);
+			nomina.setTotalDeducciones(this.totalDeducciones);
+			
+			this.neto = totalPercepciones.subtract(totalDeducciones);
+			nomina.setNeto(neto);
 			
 		} catch(Exception ex) {
 			log.error("Problema para obtener el cálculo de la nómina del empleado {} {} {}", empleado.getNombre(), empleado.getPrimerAp(), empleado.getSegundoAp() );
@@ -277,7 +290,6 @@ public class NominaSemanalBL {
     	BigDecimal diasAguinaldo = null;
     	BigDecimal diasVacaciones = null;
     	BigDecimal primaVacacional = null;
-    	BigDecimal propAntiguedad = null;
     	BigDecimal diasAnio = null;
     	BigDecimal sueldoDiario = null;
     	
@@ -291,7 +303,6 @@ public class NominaSemanalBL {
     		diasVacaciones = new BigDecimal(percepcion.getDiasVacaciones().intValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
     		
     		primaVacacional = new BigDecimal(percepcion.getPrimaVacacional().floatValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
-    		propAntiguedad = diasVacaciones.multiply(primaVacacional).setScale(4, BigDecimal.ROUND_HALF_UP);
     		sueldoDiario = empleado.getSueldoDiario();
     		
     		factorSDI = primaVacacional
@@ -325,7 +336,7 @@ public class NominaSemanalBL {
 		return septimoDia;
 	}
 	
-	private BigDecimal calculoBonoPuntualidad(int diasPorPeriodo, DetEmpleadoDTO empleado, Map mapAsistencia, BigDecimal salarioDiarioIntegrado, BigDecimal proporcionalSeptimoDia) {
+	private BigDecimal calculoBonoPuntualidad(int diasPorPeriodo, DetEmpleadoDTO empleado, Map<String, DetRegistroDTO> mapAsistencia, BigDecimal salarioDiarioIntegrado, BigDecimal proporcionalSeptimoDia) {
 		BigDecimal bono = null;
     	BigDecimal tasaBonoPuntualidad = null;
     	BigDecimal diasPeriodo = null;

@@ -38,5 +38,27 @@ public class AjustesBean implements Serializable {
 			log.error("Problema para redirigir al catalogo de dias no laborales...", ex);
 		}
 	}
+	
+	public void prestamosInfonavit() {
+		String path = null;
+		try {
+			log.info("Redirigiendo a préstamos INFONAVIT...");
+			path = this.contextPath + "/protected/settings/prestamosInfonavit.xhtml";
+			FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+		} catch (IOException ex) {
+			log.error("Problema para redirigir al catalogo de dias no laborales...", ex);
+		}
+	}
+	
+	public void periodicidadPago() {
+		String path = null;
+		try {
+			log.info("Redirigiendo a periodicidad de pago...");
+			path = this.contextPath + "/protected/settings/periodicidadPago.xhtml";
+			FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+		} catch (IOException ex) {
+			log.error("Problema para redirigir al catalogo de dias no laborales...", ex);
+		}
+	}
 
 }

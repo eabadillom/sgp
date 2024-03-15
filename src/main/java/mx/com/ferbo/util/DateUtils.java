@@ -341,6 +341,17 @@ public class DateUtils {
 		return milisegundo;
 	}
 	
+	public static int getSemanaAnio(Date fecha) {
+		int semana = -1;
+		Calendar cal = null;
+		
+		cal = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
+		cal.setTime(fecha);
+		semana = cal.get(Calendar.WEEK_OF_YEAR);
+		
+		return semana;
+	}
+	
 	/**Establece valor del año para el objeto {@link Date} dado.
 	 * @param fecha Objeto {@link Date} al cual se desea establecer el nuevo valor para el año.
 	 * @param anio El nuevo valor para el Año que se establecerá en el parametro {@link Date}.

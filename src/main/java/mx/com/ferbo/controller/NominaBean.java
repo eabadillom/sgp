@@ -130,6 +130,7 @@ public class NominaBean implements Serializable {
 
     private Date periodoInicio;
     private Date periodoFin;
+    private Integer semana;
 
     private HttpServletRequest httpServletRequest;
 
@@ -265,6 +266,7 @@ public class NominaBean implements Serializable {
     	this.periodoFin = new Date(this.periodoInicio.getTime());
     	this.periodoFin = DateUtils.addDay(this.periodoFin, 6);
     	DateUtils.setTime(this.periodoFin, 23, 59, 59, 999);
+    	this.semana = DateUtils.getSemanaAnio(this.periodoInicio);
     	log.info("Fecha Inicio: {}", this.periodoInicio);
     	log.info("Fecha Fin: {}", this.periodoFin);
     }
@@ -275,6 +277,7 @@ public class NominaBean implements Serializable {
     	this.periodoInicio = new Date(this.periodoFin.getTime());
     	this.periodoInicio = DateUtils.addDay(this.periodoInicio, -6);
     	DateUtils.setTime(this.periodoInicio, 0, 0, 0, 0);
+    	this.semana = DateUtils.getSemanaAnio(this.periodoInicio);
     	log.info("Fecha Inicio: {}", this.periodoInicio);
     	log.info("Fecha Fin: {}", this.periodoFin);
     }
@@ -1155,5 +1158,13 @@ public class NominaBean implements Serializable {
         return columnNames;
     }
     //</editor-fold> 
+
+	public Integer getSemana() {
+		return semana;
+	}
+
+	public void setSemana(Integer semana) {
+		this.semana = semana;
+	}
 
 }

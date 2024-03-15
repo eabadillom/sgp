@@ -23,13 +23,14 @@
                             </p:toolbarGroup>
                             <p:toolbarGroup>
                             	<p:datePicker id="dp-periodo-inicio" value="#{nominaBean.periodoInicio}" placeholder="Periodo Inicio" showIcon="true" >
-                            		<p:ajax process="@this" listener="#{nominaBean.calculaFechaFin}" update="dp-periodo-fin" />
+                            		<p:ajax process="@this" listener="#{nominaBean.calculaFechaFin}" update="dp-periodo-fin semana" />
                             		<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
                             	</p:datePicker>
                             	<p:datePicker id="dp-periodo-fin" value="#{nominaBean.periodoFin}" placeholder="Periodo Fin" showIcon="true">
-                            		<p:ajax process="@this" listener="#{nominaBean.calculaFechaInicio}" update="dp-periodo-inicio" />
+                            		<p:ajax process="@this" listener="#{nominaBean.calculaFechaInicio}" update="dp-periodo-inicio semana" />
                             		<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
                             	</p:datePicker>
+                            	<p:inputText id="semana" value="Semana: #{nominaBean.semana}" readonly="true"></p:inputText>
                             </p:toolbarGroup>
                             <p:toolbarGroup>
                                 <p:commandButton styleClass="ui-button-success" style="margin-right: .5rem" process="@this" value="Cálcular por Empleados" 
@@ -41,7 +42,7 @@
                         </p:toolbar>
                         <div>
                             <p:dataTable id="dtNomina" widgetVar="dt-Nomina" var="nomina" value="#{nominaBean.listaNomina}" reflow="true" styleClass="products-table"
-                                         rowKey="#{nomina.idEmpleado.idEmpleado}" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom" scrollable="true" 
+                                         rowKey="#{nomina.idEmpleado.idEmpleado}" paginator="true" rowSelectMode="add" paginatorPosition="bottom" scrollable="true" 
                                          scrollWidth="1200" frozenColumns="2" editable="true" editMode="cell" editInitEvent="dblclick">
                                 <p:ajax event="cellEdit" listener="#{nominaBean.onCellEdit}" update=":formNomina:mssgs"/>
                                 <f:facet name="header">

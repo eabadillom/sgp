@@ -1,0 +1,78 @@
+<ui:composition
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/plantillas/template.xhtml">
+	<ui:define name="title">Periodicidad de pago</ui:define>
+	<ui:define name="content">
+		<h:form id="form">
+			<p:growl id="messages" showDetail="true" life="4000"/>
+			<p:dialog modal="true" widgetVar="statusDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
+		    </p:dialog>
+		    <p:toolbar>
+		    	<p:toolbarGroup>
+		    		<p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{perPagoBean.nuevo()}" oncomplete="PF('dgPeriodicidad').show();" process="@this" update="form:dg-periodicidad"/>
+		    	</p:toolbarGroup>
+		    </p:toolbar>
+			<div style="padding-top: 1rem">
+				<p:dataTable id="dt-periodicidad" widgetVar="dtPeriodicidad" value="#{perPagoBean.periodicidades}" var="periodo" allowUnsorting="true" sortMode="single">
+					<p:column headerText="Periodicidad" sortBy="#{periodo.periodicidad}" sortOrder="asc">
+						<p:outputLabel value="#{periodo.periodicidad}" />
+					</p:column>
+					<p:column headerText="Descripcion" sortBy="#{periodo.descripcion}">
+						<p:outputLabel value="#{periodo.descripcion}" />
+					</p:column>
+					<p:column headerText="Inicio vigencia" sortBy="#{periodo.vigenciaInicio}">
+						<p:outputLabel value="#{periodo.vigenciaInicio}">
+							<f:convertDateTime pattern="dd/MMM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+					<p:column headerText="Fin vigencia" sortBy="#{periodo.vigenciaFin}">
+						<p:outputLabel value="#{periodo.vigenciaFin}" >
+							<f:convertDateTime pattern="dd/MMM/yyyy" />
+						</p:outputLabel>
+					</p:column>
+					<p:column width="3rem">
+						<p:commandButton icon="pi pi-bars" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dgPeriodicidad').show();" actionListener="#{perPagoBean.editar}" process="@this" update="form:dg-periodicidad">
+							<f:setPropertyActionListener value="#{periodo}" target="#{perPagoBean.periodo}" />
+						</p:commandButton>
+					</p:column>
+				</p:dataTable>
+			</div>
+			
+			<p:dialog id="dg-periodicidad" widgetVar="dgPeriodicidad" header="Periodicidad de pago" showEffect="hide" modal="true">
+				<p:outputPanel class="ui-fluid">
+					<div class="p-field">
+						<p:outputLabel value="Periodicidad"></p:outputLabel>
+						<p:inputText value="#{perPagoBean.periodo.periodicidad}" readonly="#{perPagoBean.accion ne 'N'}" maxlength="3"></p:inputText>
+					</div>
+					<div class="p-field">
+						<p:outputLabel value="Descripción"></p:outputLabel>
+						<p:inputText value="#{perPagoBean.periodo.descripcion}" maxlength="30"></p:inputText>
+					</div>
+					<div class="p-field">
+						<p:outputLabel value="Inicio vigencia"></p:outputLabel>
+						<p:datePicker value="#{perPagoBean.periodo.vigenciaInicio}" showIcon="true">
+							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+						</p:datePicker>
+					</div>
+					<div class="p-field">
+						<p:outputLabel value="Fin vigencia"></p:outputLabel>
+						<p:datePicker value="#{perPagoBean.periodo.vigenciaFin}" showIcon="true">
+							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+						</p:datePicker>
+					</div>
+				</p:outputPanel>
+				<f:facet name="footer">
+					<p:commandButton value="Guardar" actionListener="#{perPagoBean.guardar}" icon="pi pi-check"></p:commandButton>
+					<p:commandButton value="Cancelar" onclick="PF('dgPeriodicidad').hide();" class="ui-button-danger" icon="pi pi-times"></p:commandButton>
+				</f:facet>
+			</p:dialog>
+		</h:form>
+	</ui:define>
+</ui:composition>

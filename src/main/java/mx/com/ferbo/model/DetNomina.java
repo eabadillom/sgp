@@ -105,7 +105,7 @@ public class DetNomina implements Serializable {
     private BigDecimal isrMes;
     @NotNull
     @Column(name = "imss")
-    private Float imss;
+    private BigDecimal imss;
     @NotNull
     @Column(name = "prestamo_fonacot")
     private Float prestamoFonacot;
@@ -135,10 +135,10 @@ public class DetNomina implements Serializable {
     private Float otrasDeducciones;
     @NotNull
     @Column(name = "total_deducciones")
-    private Float totalDeducciones;
+    private BigDecimal totalDeducciones;
     @NotNull
     @Column(name = "neto")
-    private Float neto;
+    private BigDecimal neto;
     @NotNull
     @Column(name = "invalidez_y_vida")
     private Float invalidezYVida;
@@ -186,7 +186,7 @@ public class DetNomina implements Serializable {
         this.idNomina = idNomina;
     }
 
-    public DetNomina(Integer idNomina, DetEmpleado idEmpleado, BigDecimal sueldo, BigDecimal septimoDia, BigDecimal horasExtras, BigDecimal destajos, BigDecimal premiosEficiencia, BigDecimal bonoPuntualidad, BigDecimal despensa, BigDecimal otrasPercepciones, BigDecimal totalPercepciones, Float retInvYVida, Float retCesantia, Float retEnfYMatObrero, Float prestamoInfonavitFd, Float prestamoInfonavitCf, BigDecimal subsAlEmpleoAcreditado, BigDecimal subsAlEmpleoMes, BigDecimal isrAntesDeSubsAlEmpleo, BigDecimal isrMes, Float imss, Float prestamoFonacot, Float ajusteEnSubsidioParaElEmpleo, Float subsEntregadoQueNoCorrespondia, Float ajusteAlNeto, Float isrDeAjusteMensual, Float isrAjustadoPorSubsidio, Float ajusteAlSubsidioCausado, Float pensionAlimienticia, Float otrasDeducciones, Float totalDeducciones, Float neto, Float invalidezYVvida, Float cesantiaYVejez, Float enfYMatPatron, Float fondoRetiroSar, Float impuestoEstatal, Float riesgoDeTrabajo9, Float imssEmpresa, Float infonavitEmpresa, Float guarderiaImss7, Float otrasObligaciones, Float totalObligaciones, Date fechaCreacion, DetEmpleado idEmpleadoCreador) {
+    public DetNomina(Integer idNomina, DetEmpleado idEmpleado, BigDecimal sueldo, BigDecimal septimoDia, BigDecimal horasExtras, BigDecimal destajos, BigDecimal premiosEficiencia, BigDecimal bonoPuntualidad, BigDecimal despensa, BigDecimal otrasPercepciones, BigDecimal totalPercepciones, Float retInvYVida, Float retCesantia, Float retEnfYMatObrero, Float prestamoInfonavitFd, Float prestamoInfonavitCf, BigDecimal subsAlEmpleoAcreditado, BigDecimal subsAlEmpleoMes, BigDecimal isrAntesDeSubsAlEmpleo, BigDecimal isrMes, BigDecimal imss, Float prestamoFonacot, Float ajusteEnSubsidioParaElEmpleo, Float subsEntregadoQueNoCorrespondia, Float ajusteAlNeto, Float isrDeAjusteMensual, Float isrAjustadoPorSubsidio, Float ajusteAlSubsidioCausado, Float pensionAlimienticia, Float otrasDeducciones, BigDecimal totalDeducciones, BigDecimal neto, Float invalidezYVvida, Float cesantiaYVejez, Float enfYMatPatron, Float fondoRetiroSar, Float impuestoEstatal, Float riesgoDeTrabajo9, Float imssEmpresa, Float infonavitEmpresa, Float guarderiaImss7, Float otrasObligaciones, Float totalObligaciones, Date fechaCreacion, DetEmpleado idEmpleadoCreador) {
         this.idNomina = idNomina;
         this.idEmpleado = idEmpleado;
         this.sueldo = sueldo;
@@ -394,11 +394,11 @@ public class DetNomina implements Serializable {
         this.isrMes = isrMes;
     }
 
-    public Float getImss() {
+    public BigDecimal getImss() {
         return imss;
     }
 
-    public void setImss(Float imss) {
+    public void setImss(BigDecimal imss) {
         this.imss = imss;
     }
 
@@ -474,19 +474,19 @@ public class DetNomina implements Serializable {
         this.otrasDeducciones = otrasDeducciones;
     }
 
-    public Float getTotalDeducciones() {
+    public BigDecimal getTotalDeducciones() {
         return totalDeducciones;
     }
 
-    public void setTotalDeducciones(Float totalDeducciones) {
+    public void setTotalDeducciones(BigDecimal totalDeducciones) {
         this.totalDeducciones = totalDeducciones;
     }
 
-    public Float getNeto() {
+    public BigDecimal getNeto() {
         return neto;
     }
 
-    public void setNeto(Float neto) {
+    public void setNeto(BigDecimal neto) {
         this.neto = neto;
     }
 
