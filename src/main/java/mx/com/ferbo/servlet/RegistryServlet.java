@@ -124,10 +124,6 @@ public class RegistryServlet extends HttpServlet {
 				throw new SGPException("El token ha expirado.");
 			}
 			
-			// Invalidar el token y redirigir al jsp
-			log.info("La fecha recuperada no es valida");
-			// Actualizamos campo valido ?? a 0 ??
-			
 			prettyGson = new GsonBuilder().setPrettyPrinting().create();
 			
 			detTokenDTO.setValido(false);
@@ -159,7 +155,7 @@ public class RegistryServlet extends HttpServlet {
 				switch (registro) {
 				
 				case "Entrada":
-					
+					log.info("Registrando entrada...");
 					registroDTO.setFechaEntrada(fechaActual);
 					registroDTO.setFechaSalida(null);
 					registroDTO.setDetEmpleadoDTO(detEmpleadoDTO);
@@ -170,20 +166,23 @@ public class RegistryServlet extends HttpServlet {
 					}
 					registroDTO.setCatEstatusRegistroDTO(status);
 					registroDAO.guardar(registroDTO);
+					log.info("Entrada registrada correctamente");
 					break;
-					
 				case "Salida":
+					log.info("Registrando salida...");
 					registroDTO = listadetRegistro.get(listadetRegistro.size() - 1);
 					listadetRegistro.get(listadetRegistro.size() - 1);
 					registroDTO.setFechaSalida(fechaActual);
 					registroDAO.actualizar(registroDTO);
+					log.info("Entrada registrada correctamente");
 					break;
 					
 				}
 			} else if ("perfil".equalsIgnoreCase(accion)) {
+				log.info("Entrando a mi perfil...");
 				respuesta.setUrl("protected/kardexEmpleado.xhtml");
 			}
-
+			log.info("Registro completo.");
 			jsonResponse = prettyGson.toJson(respuesta);
 			httpStatus = HttpServletResponse.SC_OK;
 		} catch (Exception ex) {
