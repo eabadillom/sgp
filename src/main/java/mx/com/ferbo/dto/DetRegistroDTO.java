@@ -75,4 +75,10 @@ public class DetRegistroDTO implements Serializable {
         this.catEstatusRegistroDTO = catEstatusRegistroDTO;
     }
 
+	@Override
+	public String toString() {
+		return "{\"idRegistro\":\"" + idRegistro + "\", \"detEmpleadoDTO\":\"" + detEmpleadoDTO
+				+ "\", \"fechaEntrada\":\"" + fechaEntrada + "\", \"fechaSalida\":\"" + fechaSalida
+				+ "\", \"catEstatusRegistroDTO\":\"" + catEstatusRegistroDTO + "\"}";
+	}
 }

@@ -96,7 +96,7 @@ public class ChallengeServlet extends HttpServlet{
 			}
 			log.info(biometricos.getHuella() + biometricos.getHuella2());
 			//Generamos su token, falta validar ?
-			token = su.getRandomString();			
+			token = su.getRandomString();
 			fechaTemp = DateUtil.addMinute(fechaTemp, 5);
 			log.info(fechaTemp);				
 			

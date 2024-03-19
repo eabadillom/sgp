@@ -1,16 +1,13 @@
 package mx.com.ferbo.dao;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
-import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.dto.DetTokenDTO;
-import mx.com.ferbo.model.DetBiometrico;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetToken;
 import mx.com.ferbo.util.SGPException;
@@ -74,6 +71,7 @@ public class DetTokenDAO extends IBaseDAO<DetTokenDTO, Integer> implements Seria
 		} catch (Exception ex) {
 			emSGP.getTransaction().rollback();
             log.warn("EX-0014: " + ex.getMessage() + ". Error al actualizar el token " );
+            throw new SGPException("Problema para el registro del token.");
 		}
 		
 	}
