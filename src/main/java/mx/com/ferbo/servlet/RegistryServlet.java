@@ -174,7 +174,7 @@ public class RegistryServlet extends HttpServlet {
 					listadetRegistro.get(listadetRegistro.size() - 1);
 					registroDTO.setFechaSalida(fechaActual);
 					registroDAO.actualizar(registroDTO);
-					log.info("Entrada registrada correctamente");
+					log.info("Salida registrada correctamente");
 					break;
 					
 				}
