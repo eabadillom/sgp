@@ -54,6 +54,7 @@ public class RegistroDAO extends IBaseDAO<DetRegistroDTO, Integer> implements Se
             emSGP.getTransaction().begin();
             registro = emSGP.getReference(DetRegistro.class, e.getIdRegistro());
             registro.setFechaSalida(e.getFechaSalida());
+            log.info("Empleado: {}", e);
             emSGP.merge(registro);
             emSGP.getTransaction().commit();
             emSGP.detach(registro);
@@ -77,12 +78,15 @@ public class RegistroDAO extends IBaseDAO<DetRegistroDTO, Integer> implements Se
             registro.setFechaEntrada(e.getFechaEntrada());
             registro.setFechaSalida(e.getFechaSalida());
             registro.setIdEstatus(e.getDetEmpleadoDTO() != null ? emSGP.getReference(CatEstatusRegistro.class, e.getCatEstatusRegistroDTO().getIdEstatus()) : null);
+            
+            log.info("Empleado: {}", e);
             emSGP.persist(registro);
             emSGP.getTransaction().commit();
             emSGP.detach(registro);
         } catch (Exception ex) {
             emSGP.getTransaction().rollback();
             log.warn("EX-0003: " + ex.getMessage() + ". Error al guardar el registro del empleado: " + e.getDetEmpleadoDTO().getNumEmpleado() != null ? e.getDetEmpleadoDTO().getNumEmpleado() : null);
+            throw new SGPException("Problema para guardar el registro de asistencia.");
         }
     }
 
