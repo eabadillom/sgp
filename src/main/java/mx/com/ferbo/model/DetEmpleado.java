@@ -178,8 +178,6 @@ public class DetEmpleado implements Serializable {
     private List<DetSolicitudArticulo> detSolicitudArticuloList;
     @OneToMany(mappedBy = "idEmpleadoRev")
     private List<DetSolicitudPrenda> detSolicitudPrendaList;
-    @OneToMany( cascade = CascadeType.ALL, mappedBy = "idEmpleado")
-    private List<DetToken> detTokenLIst;
     @JoinColumn(name = "id_area", referencedColumnName = "id_area")
     @ManyToOne
     private CatArea idArea;

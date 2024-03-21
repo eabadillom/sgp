@@ -1,13 +1,7 @@
 package mx.com.ferbo.servlet;
 
 import java.io.IOException;
-import java.io.Reader;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -16,7 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.loader.plan.exec.process.spi.ReaderCollector;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -29,6 +22,7 @@ import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.dto.DetRegistroDTO;
 import mx.com.ferbo.dto.DetTokenDTO;
 import mx.com.ferbo.response.RegistryResponse;
+import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.SGPException;
 
 /**
@@ -38,34 +32,13 @@ public class RegistryServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static Logger log = LogManager.getLogger(RegistryServlet.class);
 
-	ReaderCollector m_Collection;
-	Reader reader;
-	boolean fingerM;
-	private Calendar calendarHoy;
-	private Calendar calendarDiaSistema;
-	private final Date diaSistema;
-	private Date diaActual;
-	private final SimpleDateFormat sdFormat;
-	private final SimpleDateFormat sdFormatHMS;
-	private final String strFechaActual;
-
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
 	public RegistryServlet() {
-		diaActual = new Date();
-		calendarHoy = Calendar.getInstance(TimeZone.getTimeZone("America/Mexico_City"));
-		calendarDiaSistema = Calendar.getInstance(TimeZone.getTimeZone("America/Mexico_City"));
-		sdFormat = new SimpleDateFormat("yyyy-MM-dd");
-		sdFormatHMS = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		strFechaActual = sdFormat.format(diaActual) + "%";
-		diaSistema = new Date();
 
 	}
 
-	public boolean isFinger_M() {
-		return fingerM;
-	}
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
@@ -73,15 +46,20 @@ public class RegistryServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		
+		Date horaSistema;
+		Date horaLimiteEntrada = null;
 
 		EmpleadoDAO empleadoDAO = null;
 		DetEmpleadoDTO detEmpleadoDTO = null;
 		DetTokenDAO detTokenDAO = null;
 		DetTokenDTO detTokenDTO = null;
 		DetRegistroDTO registroDTO = null;
-		List<DetRegistroDTO> listadetRegistro = null;
+		String registro = null;
 		RegistroDAO registroDAO = null;
 		Date fechaActual = null;
+		Date fechaEntradaInicio = null;
+		Date fechaEntradaFin = null;
 		String numeroEmpleado = null;
 		String jsonResponse = null;
 		int httpStatus = -1;
@@ -92,18 +70,22 @@ public class RegistryServlet extends HttpServlet {
 		Gson prettyGson = null;
 		CatEstatusRegistroDTO status = null;
 		try {
+			horaSistema = new Date();
+			fechaEntradaInicio = new Date();
+			fechaEntradaFin = new Date();
+			DateUtil.setTime(fechaEntradaInicio, 0, 0, 0, 0);
+			DateUtil.setTime(fechaEntradaFin, 23, 59, 59, 999);
+			
 			status = new CatEstatusRegistroDTO();
 			registroDTO = new DetRegistroDTO();
-			listadetRegistro = new ArrayList<>();
 			registroDAO = new RegistroDAO();
 			numeroEmpleado = request.getParameter("numero");
 			token = request.getParameter("token");
 			accion = request.getParameter("accion");// registro, Entrada/Salida
-			// accion2 = request.getParameter("perfil");// perfil Mi Perfil
 			fechaActual = new Date();
 			log.info("Buscando biometricos para el empleado numero: " + numeroEmpleado);
 			log.info("Buscando token........: " + token);
-
+			
 			if (numeroEmpleado == null) {
 				throw new Exception("El Numero de Empleado esta vacio");
 			}
@@ -116,12 +98,17 @@ public class RegistryServlet extends HttpServlet {
 
 			detTokenDAO = new DetTokenDAO();
 			detTokenDTO = detTokenDAO.buscarPorIdEmpleadoAndFecha(detEmpleadoDTO.getIdEmpleado());
-			log.info("Caducidad token: {}", detTokenDTO.getCaducidad());
+			log.info("Token: {}, Caducidad: {}", detTokenDTO.getNbToken(), detTokenDTO.getCaducidad());
 			log.info("Fecha hora actual: {}", fechaActual);
-
+			
 			if (detTokenDTO.getCaducidad().before(fechaActual)) {
 				log.info("La fecha recuperada es valida: {}", detTokenDTO.getCaducidad());
 				throw new SGPException("El token ha expirado.");
+			}
+			
+			if(detTokenDTO.isValido() == false) {
+				log.info("El token no es válido: {}", detTokenDTO.isValido());
+				throw new SGPException("El token no es válido.");
 			}
 			
 			prettyGson = new GsonBuilder().setPrettyPrinting().create();
@@ -136,30 +123,32 @@ public class RegistryServlet extends HttpServlet {
 			if ("registro".equalsIgnoreCase(accion)) {
 				// opcion 1: replicar metodo login debajo, opcion 2: hacer instancia de
 				// loginBean y llamar a su metodo login si es posible
-				respuesta.setUrl("protected/registroAsistencia.xhtml");
-				listadetRegistro = registroDAO.buscarPorIdFechaEntrada(detEmpleadoDTO.getIdEmpleado(), strFechaActual);
-				String registro = (listadetRegistro.isEmpty()) ? "Entrada" : "Salida";
-				calendarHoy.setTime(diaActual);
-				diaActual = calendarHoy.getTime();
+				respuesta.setUrl("/protected/registroAsistencia.xhtml");
 				
-				calendarDiaSistema.setTime(diaSistema);
-				String sDiaSistema = sdFormatHMS.format(diaActual);
-				calendarHoy.setTime(diaSistema);
+				log.info("Buscando entrada del empleado {} entre las {} y las {}", 
+						detEmpleadoDTO.getNumEmpleado(),
+						DateUtil.getString(fechaEntradaInicio, DateUtil.FORMATO_YYYY_MM_DD_HH_MM_SS),
+						DateUtil.getString(fechaEntradaFin, DateUtil.FORMATO_YYYY_MM_DD_HH_MM_SS));
+				registroDTO = registroDAO.buscarPorEmpleadoFechaEntrada(detEmpleadoDTO.getIdEmpleado(), fechaEntradaInicio, fechaEntradaFin);
+				if(registroDTO == null || registroDTO.getIdRegistro() == null)
+					registro = "Entrada";
+				else
+					registro = "Salida";
 				
-				calendarHoy.set(Calendar.HOUR_OF_DAY, 7);
-				calendarHoy.set(Calendar.MINUTE, 10);
-				Date hoy = calendarHoy.getTime();
-				String strActual = sdFormatHMS.format(hoy);
-				int result = sDiaSistema.compareTo(strActual);
+				horaLimiteEntrada = new Date();
+				DateUtil.setTime(horaLimiteEntrada, 7, 10, 0, 0);
 				
 				switch (registro) {
 				
 				case "Entrada":
+				case "ENTRADA":
+				case "entrada":
 					log.info("Registrando entrada...");
+					registroDTO = new DetRegistroDTO();
 					registroDTO.setFechaEntrada(fechaActual);
 					registroDTO.setFechaSalida(null);
 					registroDTO.setDetEmpleadoDTO(detEmpleadoDTO);
-					if (result > 0) {
+					if (horaSistema.after(horaLimiteEntrada)) {
 						status.setIdEstatus(2);
 					} else {
 						status.setIdEstatus(1);
@@ -169,9 +158,9 @@ public class RegistryServlet extends HttpServlet {
 					log.info("Entrada registrada correctamente");
 					break;
 				case "Salida":
+				case "SALIDA":
+				case "salida":
 					log.info("Registrando salida...");
-					registroDTO = listadetRegistro.get(listadetRegistro.size() - 1);
-					listadetRegistro.get(listadetRegistro.size() - 1);
 					registroDTO.setFechaSalida(fechaActual);
 					registroDAO.actualizar(registroDTO);
 					log.info("Salida registrada correctamente");
@@ -180,7 +169,7 @@ public class RegistryServlet extends HttpServlet {
 				}
 			} else if ("perfil".equalsIgnoreCase(accion)) {
 				log.info("Entrando a mi perfil...");
-				respuesta.setUrl("protected/kardexEmpleado.xhtml");
+				respuesta.setUrl("/protected/kardexEmpleado.xhtml");
 			}
 			log.info("Registro completo.");
 			jsonResponse = prettyGson.toJson(respuesta);

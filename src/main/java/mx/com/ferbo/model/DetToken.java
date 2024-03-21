@@ -19,14 +19,12 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.Size;
 
-import org.eclipse.persistence.jpa.jpql.parser.DateTime;
-
 @Entity
 @Table(name = "det_token_empleado")
 @NamedQueries({
-@NamedQuery(name = "DetToken.findAll", query = "SELECT DT FROM DetToken DT"),
-@NamedQuery(name = "DetToken.findIdEmpleado", query= "SELECT NEW mx.com.ferbo.dto.DetTokenDTO( DT.idToken, em.idEmpleado, DT.nbToken, DT.Caducidad, DT.valido) FROM DetToken DT INNER JOIN DT.idEmpleado em WHERE em.numEmpleado = :numEmpleado"),
-@NamedQuery(name = "DetToken.findByIdEmpAndFecha", query = "SELECT NEW mx.com.ferbo.dto.DetTokenDTO( MAX(DT.idToken) , em.idEmpleado, MAX(DT.nbToken), MAX(DT.Caducidad) , MAX(DT.valido) ) FROM DetToken Dt INNER JOIN Dt.idEmpleado em WHERE em.idEmpleado = :idEmpleado GROUP BY em.idEmpleado " )
+	@NamedQuery(name = "DetToken.findAll", query = "SELECT DT FROM DetToken DT"),
+	@NamedQuery(name = "DetToken.findIdEmpleado", query= "SELECT NEW mx.com.ferbo.dto.DetTokenDTO( DT.idToken, em.idEmpleado, DT.nbToken, DT.caducidad, DT.valido) FROM DetToken DT INNER JOIN DT.empleado em WHERE em.numEmpleado = :numEmpleado"),
+	@NamedQuery(name = "DetToken.findByEmpleadoAndFecha", query = "SELECT te FROM DetToken te WHERE te.empleado.idEmpleado = :idEmpleado AND te.caducidad = (SELECT MAX(d.caducidad) FROM DetToken d WHERE d.empleado.idEmpleado = :idEmpleado)")
 })
 public class DetToken implements Serializable {
 
@@ -40,7 +38,7 @@ public class DetToken implements Serializable {
 	
 	@JoinColumn(name = "id_empleado", referencedColumnName = "id_empleado")
     @ManyToOne
-    private DetEmpleado idEmpleado;
+    private DetEmpleado empleado;
     
     @Basic(optional = false)
     @Size(min = 1, max = 30)
@@ -51,14 +49,14 @@ public class DetToken implements Serializable {
     @Size(min = 1, max = 30)
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "caducidad")
-    private Date Caducidad;
+    private Date caducidad;
     
     @Column(name = "valido")
     private boolean valido;
     
 	@Override
 	public int hashCode() {
-		return Objects.hash(Caducidad, idEmpleado, idToken, nbToken);
+		return Objects.hash(caducidad, empleado, idToken, nbToken);
 	}
 
 	@Override
@@ -70,7 +68,7 @@ public class DetToken implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		DetToken other = (DetToken) obj;
-		return Objects.equals(Caducidad, other.Caducidad) && Objects.equals(idEmpleado, other.idEmpleado)
+		return Objects.equals(caducidad, other.caducidad) && Objects.equals(empleado, other.empleado)
 				&& Objects.equals(idToken, other.idToken) && Objects.equals(nbToken, other.nbToken);
 	}
 
@@ -82,12 +80,12 @@ public class DetToken implements Serializable {
 		this.idToken = idToken;
 	}
 	
-	public DetEmpleado getIdEmpleado() {
-		return idEmpleado;
+	public DetEmpleado getEmpleado() {
+		return empleado;
 	}
 
-	public void setIdEmpleado(DetEmpleado idEmpleado) {
-		this.idEmpleado = idEmpleado;
+	public void setEmpleado(DetEmpleado empleado) {
+		this.empleado = empleado;
 	}
 
 	public String getNbToken() {
@@ -99,11 +97,11 @@ public class DetToken implements Serializable {
 	}	
 
 	public Date getCaducidad() {
-		return Caducidad;
+		return this.caducidad;
 	}
 
 	public void setCaducidad(Date caducidad) {
-		Caducidad = caducidad;
+		this.caducidad = caducidad;
 	}	
 
 	public boolean isValido() {
