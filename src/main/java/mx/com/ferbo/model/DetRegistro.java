@@ -72,6 +72,7 @@ import javax.persistence.TemporalType;
                                                   + " INNER JOIN d.idEmpleado e"
                                                   + " INNER JOIN d.idEstatus ce"
                                                   + " WHERE e.idEmpleado = :idEmp AND e.activo = 1 AND d.fechaEntrada LIKE :fechaEntrada"),
+    @NamedQuery(name = "DetRegistro.findByIdEmpleadoAndFecha", query = "SELECT r FROM DetRegistro r WHERE r.idEmpleado.idEmpleado = :idEmpleado AND (r.fechaEntrada BETWEEN :fechaEntradaInicio AND :fechaEntradaFin)"),
     @NamedQuery(name = "DetRegistro.findToday", query = "SELECT NEW mx.com.ferbo.dto.DetRegistroDTO("
                                                   + " d.idRegistro,"
                                                   + " e.idEmpleado,"

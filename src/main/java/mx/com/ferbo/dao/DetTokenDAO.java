@@ -17,6 +17,36 @@ public class DetTokenDAO extends IBaseDAO<DetTokenDTO, Integer> implements Seria
 	private static final long serialVersionUID = 1L;
 	private Logger log = LogManager.getLogger(DetTokenDAO.class);
 	
+	public static synchronized DetTokenDTO getDTO(DetToken model) {
+		DetTokenDTO dto = null;
+		try {
+			dto = new DetTokenDTO();
+			dto.setIdToken(model.getIdToken());
+			dto.setDetEmpleadoDTO(EmpleadoDAO.getDTO(model.getEmpleado()));
+			dto.setNbToken(model.getNbToken());
+			dto.setCaducidad(model.getCaducidad());
+			dto.setValido(model.isValido());
+		} catch(Exception ex) {
+			dto = null;
+		}
+		return dto;
+	}
+	
+	public static synchronized DetToken getModel(DetTokenDTO dto) {
+		DetToken model = null;
+		try {
+			model = new DetToken();
+			model.setIdToken(dto.getIdToken());
+			model.setEmpleado(EmpleadoDAO.getModel(dto.getDetEmpleadoDTO()));
+			model.setNbToken(dto.getNbToken());
+			model.setCaducidad(dto.getCaducidad());
+			model.setValido(dto.isValido());
+		} catch(Exception ex) {
+			model = null;
+		}
+		return model;
+	}
+	
 	@Override
 	public DetTokenDTO buscarPorId(Integer id) {
 		return null;
@@ -29,8 +59,16 @@ public class DetTokenDAO extends IBaseDAO<DetTokenDTO, Integer> implements Seria
 	}
 	
 	public DetTokenDTO buscarPorIdEmpleadoAndFecha(Integer idEmpleado) {
-		List<DetTokenDTO> token = emSGP.createNamedQuery("DetToken.findByIdEmpAndFecha", DetTokenDTO.class).setParameter("idEmpleado", idEmpleado).getResultList();		
-		return token.isEmpty() ? new DetTokenDTO(): token.get(0);
+		DetToken model = null;
+		DetTokenDTO token = null;
+		
+		model = emSGP.createNamedQuery("DetToken.findByEmpleadoAndFecha", DetToken.class)
+				.setParameter("idEmpleado", idEmpleado)
+				.getSingleResult()
+				;
+		
+		token = getDTO(model);
+		return token;
 	}
 
 	@Override
@@ -60,7 +98,7 @@ public class DetTokenDAO extends IBaseDAO<DetTokenDTO, Integer> implements Seria
 			
 			emSGP.getTransaction().begin();
 			detToken.setIdToken(e.getIdToken());
-			detToken.setIdEmpleado(emSGP.getReference(DetEmpleado.class, e.getDetEmpleadoDTO().getIdEmpleado()));
+			detToken.setEmpleado(emSGP.getReference(DetEmpleado.class, e.getDetEmpleadoDTO().getIdEmpleado()));
 			detToken.setCaducidad(e.getCaducidad());
 			detToken.setNbToken(e.getNbToken());
 			detToken.setValido(e.isValido());
@@ -87,7 +125,7 @@ public class DetTokenDAO extends IBaseDAO<DetTokenDTO, Integer> implements Seria
 	    final DetToken token = new DetToken();
         try {
             emSGP.getTransaction().begin();
-            token.setIdEmpleado(emSGP.getReference(DetEmpleado.class,e.getDetEmpleadoDTO().getIdEmpleado()));
+            token.setEmpleado(emSGP.getReference(DetEmpleado.class,e.getDetEmpleadoDTO().getIdEmpleado()));
             token.setNbToken(e.getNbToken());
             token.setCaducidad(e.getCaducidad());
             token.setValido(e.isValido());

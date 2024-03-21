@@ -26,6 +26,36 @@ public class RegistroDAO extends IBaseDAO<DetRegistroDTO, Integer> implements Se
     private static final long serialVersionUID = 1L;
 
     private static final Logger log = LogManager.getLogger(RegistroDAO.class);
+    
+    public static synchronized DetRegistroDTO getDTO(DetRegistro model) {
+    	DetRegistroDTO dto = null;
+    	try {
+    		dto = new DetRegistroDTO();
+    		dto.setIdRegistro(model.getIdRegistro());
+    		dto.setDetEmpleadoDTO(EmpleadoDAO.getDTO(model.getIdEmpleado()));
+    		dto.setFechaEntrada(model.getFechaEntrada());
+    		dto.setFechaSalida(model.getFechaSalida());
+    		dto.setCatEstatusRegistroDTO(EstatusRegistroDAO.getDTO(model.getIdEstatus()));
+    	} catch(Exception ex) {
+    		log.warn("No es posible convertir Model a DTO: {}", ex.getMessage());
+    	}
+    	return dto;
+    }
+    
+    public static synchronized DetRegistro getModel(DetRegistroDTO dto) {
+    	DetRegistro model = null;
+    	try {
+    		model = new DetRegistro();
+    		model.setIdRegistro(dto.getIdRegistro());
+    		model.setIdEmpleado(EmpleadoDAO.getModel(dto.getDetEmpleadoDTO()));
+    		model.setFechaEntrada(dto.getFechaEntrada());
+    		model.setFechaSalida(dto.getFechaSalida());
+    		model.setIdEstatus(EstatusRegistroDAO.getModel(dto.getCatEstatusRegistroDTO()));
+    	} catch(Exception ex) {
+    		log.warn("No es posible convertir DTO a Model: {}", ex.getMessage());
+    	}
+    	return model;
+    }
 
     @Override
     public DetRegistroDTO buscarPorId(Integer id) {
@@ -99,6 +129,26 @@ public class RegistroDAO extends IBaseDAO<DetRegistroDTO, Integer> implements Se
     public List<DetRegistroDTO> buscarPorIdFechaEntrada(Integer id, String fechaEntrada) {
         List<DetRegistroDTO> registros = emSGP.createNamedQuery("DetRegistro.findByIdEmplActivo", DetRegistroDTO.class).setParameter("idEmp", id).setParameter("fechaEntrada", fechaEntrada).getResultList();
         return registros;
+    }
+    
+    public DetRegistroDTO buscarPorEmpleadoFechaEntrada(Integer idEmpleado, Date fechaEntradaInicio, Date fechaEntradaFin) {
+    	DetRegistroDTO dto = null;
+    	DetRegistro model = null;
+    	try {
+    		model = emSGP.createNamedQuery("DetRegistro.findByIdEmpleadoAndFecha", DetRegistro.class)
+    				.setParameter("idEmpleado", idEmpleado)
+    				.setParameter("fechaEntradaInicio", fechaEntradaInicio)
+    				.setParameter("fechaEntradaFin", fechaEntradaFin)
+    				.getSingleResult()
+    				;
+    		log.debug("IdEmpleado: {}", model.getIdEmpleado().getIdEmpleado());
+    		log.debug("Estatus: {}", model.getIdEstatus().getIdEstatus());
+    		dto = getDTO(model);
+    	} catch(Exception ex) {
+    		dto = null;
+    	}
+    	
+    	return dto;
     }
     
     public List<DetRegistroDTO> buscarRegistroPorAnio(String year) {

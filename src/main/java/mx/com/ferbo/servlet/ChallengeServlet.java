@@ -38,7 +38,6 @@ public class ChallengeServlet extends HttpServlet{
 		log.info("entrado al challenge servlet");
 	}
 	
-	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		DetBiometricoDAO biometricoDAO = null;
@@ -94,11 +93,15 @@ public class ChallengeServlet extends HttpServlet{
 			if(biometricos == null) {
 				throw new SGPException("No hay información del empleado solicitado.");
 			}
+			
+			if(biometricos.getIdBiometrico() == null)
+				throw new SGPException("No hay información del empleado solicitado.");
+			
 			log.info(biometricos.getHuella() + biometricos.getHuella2());
 			//Generamos su token, falta validar ?
 			token = su.getRandomString();
-			fechaTemp = DateUtil.addMinute(fechaTemp, 5);
-			log.info(fechaTemp);				
+			fechaTemp = DateUtil.addMinute(fechaTemp, 1);
+			log.info(fechaTemp);
 			
 			tokenDAO = new DetTokenDAO();
 			tokenDTO = tokenDAO.buscarPorNumEmpleado(numeroEmpleado);
