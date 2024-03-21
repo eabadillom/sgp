@@ -165,7 +165,6 @@ public class RegistryServlet extends HttpServlet {
 					registroDAO.actualizar(registroDTO);
 					log.info("Salida registrada correctamente");
 					break;
-					
 				}
 			} else if ("perfil".equalsIgnoreCase(accion)) {
 				log.info("Entrando a mi perfil...");
