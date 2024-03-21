@@ -16,8 +16,7 @@
             </div>
             <div class="menu">
                 <po:menu widgetVar="OmegaMenuWidget">
-
-                    <p:menuitem id="registroEmp" value="Registro de Empleados" icon="pi pi-fw pi-list" outcome="/protected/registroEmpleado" />
+                    <p:menuitem id="registroEmp" value="Registro de Empleados" icon="pi pi-fw pi-list" outcome="/protected/registroEmpleado" rendered="#{SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 1 or SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 2}"/>
                     <p:menuitem id="asistencia" value="Asistencia" icon="pi pi-fw pi-calendar" outcome="/protected/asistencia"/>
                     <p:menuitem id="incidencia" value="Incidencias" icon="pi pi-fw pi-check-circle" outcome="/protected/incidencias" rendered="#{SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 1 or SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 2 or SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 3}"/>
                     <p:menuitem id="uniformes" value="Uniforme" icon="pi pi-fw pi-compass" outcome="/protected/uniformes" rendered="#{(SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 1 or SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 4) and SideBarBean.showUniformes}"/>
