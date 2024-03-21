@@ -16,10 +16,8 @@ import org.passay.Rule;
 import org.passay.RuleResult;
 import org.passay.WhitespaceRule;
 
-import mx.com.ferbo.dao.DetBiometricoDAO;
-
 public class SecurityUtil {
-	
+	private static Logger log = LogManager.getLogger(SecurityUtil.class);
 	
 	public String getRandomString() {
 		String randomString = null;
@@ -33,6 +31,7 @@ public class SecurityUtil {
 		pwdGen    = new PasswordGenerator();
 		
 		randomString = pwdGen.generatePassword(20, alphabets, digits);
+		log.info("Random String: {}", randomString);
 		
 		return randomString;
 	}
