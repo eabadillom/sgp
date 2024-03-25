@@ -10,7 +10,7 @@ public class DetSolicitudPrendaDTO implements Serializable {
 
     private Integer idSolicitud;
     private CatPrendaDTO prenda;
-    private int cantidad;
+    private Integer cantidad;
     private Short aprobada;
     private Date fechaCap;
     private Date fechaMod;
@@ -39,7 +39,7 @@ public class DetSolicitudPrendaDTO implements Serializable {
      * @param talla
      * @param descripcionT 
      */
-    public DetSolicitudPrendaDTO(Integer idSolicitud, Integer prenda, String descripcionP, int cantidad, Short aprobada, Date fechaCap,
+    public DetSolicitudPrendaDTO(Integer idSolicitud, Integer prenda, String descripcionP, Integer cantidad, Short aprobada, Date fechaCap,
             Date fechaMod, Integer idEmpleadoSol, Integer talla, String descripcionT) {
         super();
         this.idSolicitud = idSolicitud;
@@ -52,7 +52,7 @@ public class DetSolicitudPrendaDTO implements Serializable {
         this.talla = new CatTallaDTO(talla, descripcionT, (short)1);
     }
     
-    public DetSolicitudPrendaDTO(Integer idSolicitud, Integer prenda, String descripcionP, int cantidad, Short aprobada, Date fechaCap,
+    public DetSolicitudPrendaDTO(Integer idSolicitud, Integer prenda, String descripcionP, Integer cantidad, Short aprobada, Date fechaCap,
             Date fechaMod, Integer idEmpleadoSol, Integer talla, String descripcionT, String descripcionRechazo) {
         super();
         this.idSolicitud = idSolicitud;
@@ -66,7 +66,7 @@ public class DetSolicitudPrendaDTO implements Serializable {
         this.descripcionRechazo = descripcionRechazo;
     }
     
-    public DetSolicitudPrendaDTO(Integer idSolicitud, Integer prenda, String descripcionP, BigDecimal precio, int cantidad, Short aprobada, Date fechaCap,
+    public DetSolicitudPrendaDTO(Integer idSolicitud, Integer prenda, String descripcionP, BigDecimal precio, Integer cantidad, Short aprobada, Date fechaCap,
             Date fechaMod, Integer idEmpleadoSol, Integer talla, String descripcionT) {
         super();
         this.idSolicitud = idSolicitud;
@@ -79,7 +79,7 @@ public class DetSolicitudPrendaDTO implements Serializable {
         this.talla = new CatTallaDTO(talla, descripcionT, (short)1);
     }
 
-    public DetSolicitudPrendaDTO(Integer idSolicitud, Integer prenda, String descripcionP, BigDecimal precio, Integer cantidadMax, int cantidad, Short aprobada, Date fechaCap,
+    public DetSolicitudPrendaDTO(Integer idSolicitud, Integer prenda, String descripcionP, BigDecimal precio, Integer cantidadMax, Integer cantidad, Short aprobada, Date fechaCap,
             Date fechaMod, Integer idEmpleadoSol, Integer talla, String descripcionT) {
         super();
         this.idSolicitud = idSolicitud;
@@ -108,11 +108,11 @@ public class DetSolicitudPrendaDTO implements Serializable {
         this.prenda = prenda;
     }
 
-    public int getCantidad() {
+    public Integer getCantidad() {
         return cantidad;
     }
 
-    public void setCantidad(int cantidad) {
+    public void setCantidad(Integer cantidad) {
         this.cantidad = cantidad;
     }
 

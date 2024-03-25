@@ -1,19 +1,23 @@
 package mx.com.ferbo.dao;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
 import javax.persistence.TemporalType;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.dto.DetRegistroDTO;
 import mx.com.ferbo.model.CatEstatusRegistro;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetRegistro;
 import mx.com.ferbo.util.SGPException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -167,4 +171,28 @@ public class RegistroDAO extends IBaseDAO<DetRegistroDTO, Integer> implements Se
                 .setParameter("today", today, TemporalType.TIMESTAMP).getResultList();
         return registros.isEmpty() ? null : registros.get(0);
     }
+
+	public List<DetRegistroDTO> buscar(Integer idPlanta, Date fechaInicio, Date fechaFin) {
+		List<DetRegistroDTO> registros = null;
+		List<DetRegistro> list = null;
+		try {
+			list = emSGP.createNamedQuery("DetRegistro.findByPlantaPeriodo", DetRegistro.class)
+			.setParameter("idPlanta", idPlanta)
+			.setParameter("fechaInicio", fechaInicio)
+			.setParameter("fechaFin", fechaFin)
+			.getResultList()
+			;
+			registros = new ArrayList<DetRegistroDTO>();
+			for(DetRegistro model : list) {
+				log.debug("IdEmpleado: {}", model.getIdEmpleado().getIdEmpleado());
+				log.debug("Id Planta: {}", model.getIdEmpleado().getIdPlanta().getIdPlanta());
+				DetRegistroDTO dto = getDTO(model);
+				registros.add(dto);
+			}
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de registros...", ex);
+			registros = new ArrayList<DetRegistroDTO>();
+		}
+		return registros;
+	}
 }

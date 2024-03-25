@@ -401,9 +401,9 @@ public class DateUtil {
 	public static void setTime(Date fecha, int hour, int minute, int second){
 		Calendar cal = null;
 		
-		cal = GregorianCalendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
+		cal = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT-06:00"), Locale.getDefault());
 		cal.setTime(fecha);
-		cal.set(Calendar.HOUR, hour);
+		cal.set(Calendar.HOUR_OF_DAY, hour);
 		cal.set(Calendar.MINUTE, minute);
 		cal.set(Calendar.SECOND, second);
 		
@@ -412,8 +412,9 @@ public class DateUtil {
 	
 	public static void setTime(Date fecha, int hour, int minute, int second, int millisecond){
 		Calendar cal = null;
-		
-		cal = GregorianCalendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
+		TimeZone tz = TimeZone.getTimeZone("GMT-06:00");
+		cal = GregorianCalendar.getInstance(tz, Locale.getDefault());
+		log.info("Timezone: {}", TimeZone.getDefault());
 		cal.setTime(fecha);
 		cal.set(Calendar.HOUR_OF_DAY, hour);
 		cal.set(Calendar.MINUTE, minute);
@@ -426,7 +427,7 @@ public class DateUtil {
 	public static void setTime(Date fecha, int hour, int AM_PM, int minute, int second, int millisecond) {
 		Calendar cal = null;
 		
-		cal = GregorianCalendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
+		cal = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT-06:00"), Locale.getDefault());
 		cal.setTime(fecha);
 		cal.set(Calendar.HOUR, hour);
 		cal.set(Calendar.AM_PM, AM_PM);
