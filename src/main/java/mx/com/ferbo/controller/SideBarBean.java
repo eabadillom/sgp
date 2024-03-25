@@ -31,12 +31,15 @@ public class SideBarBean implements Serializable {
 	private Boolean showArticulos;
 	
 	public SideBarBean() {
-		httpServletRequest = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-		empleadoSelected = (DetEmpleadoDTO) httpServletRequest.getSession(true).getAttribute("empleado");
 		fechaActual = new Date();
 		diaActual = DateUtil.getDia(fechaActual);
 		log.info("Dia actual: {}", diaActual);
-		
+	}
+	
+	@PostConstruct
+	public void init() {
+		httpServletRequest = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+		empleadoSelected = (DetEmpleadoDTO) httpServletRequest.getSession(true).getAttribute("empleado");
 		showUniformes = validarUniformes();
 		showArticulos = validarArticulos();
 	}
@@ -73,10 +76,6 @@ public class SideBarBean implements Serializable {
 			isValid = new Boolean(false);
 		}
 		return isValid;
-	}
-
-	@PostConstruct
-	public void init() {
 	}
 
 	public void killSesion() throws IOException {
