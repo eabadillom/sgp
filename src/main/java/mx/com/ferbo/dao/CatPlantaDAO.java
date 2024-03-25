@@ -1,6 +1,7 @@
 package mx.com.ferbo.dao;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ejb.LocalBean;
@@ -58,7 +59,18 @@ public class CatPlantaDAO extends IBaseDAO<CatPlantaDTO, Integer> implements Ser
 
     @Override
     public List<CatPlantaDTO> buscarTodos() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    	List<CatPlantaDTO> result = null;
+    	try {
+    		result = emSGP.createNamedQuery("CatPlanta.findAll", CatPlantaDTO.class)
+    				.getResultList()
+    				;
+    		
+    	} catch(Exception ex) {
+    		log.error("Problema para obtener el listado de todas las plantas...", ex);
+    		result = new ArrayList<CatPlantaDTO>();
+    	}
+    	
+        return result;
     }
 
     @Override
