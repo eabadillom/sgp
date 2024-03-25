@@ -113,7 +113,7 @@ public class DetNominaDAO extends IBaseDAO<DetNominaDTO, Integer> implements Ser
         }
     }
     
-    public List<DetNominaDTO> buscarNominaPorFecha(String fechaCreacion) throws SGPException {
-        return emSGP.createNamedQuery("DetNomina.findByFecha", DetNominaDTO.class).setParameter(fechaCreacion, "fechaCreacion").getResultList();
-    }
+//    public List<DetNominaDTO> buscarNominaPorFecha(String fechaCreacion) throws SGPException {
+//        return emSGP.createNamedQuery("DetNomina.findByFecha", DetNominaDTO.class).setParameter(fechaCreacion, "fechaCreacion").getResultList();
+//    }
 }

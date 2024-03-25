@@ -2,14 +2,15 @@
 <faces-config version="2.0" xmlns="http://java.sun.com/xml/ns/javaee"
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd">
-    
     <name>primefaces_omega</name>
-    
     <component>
         <component-type>org.primefaces.component.OmegaMenu</component-type>
         <component-class>org.primefaces.omega.component.OmegaMenu</component-class>
     </component>
-    
+    <converter>
+    	<converter-id>javax.faces.DateTime</converter-id>
+    	<converter-class>mx.com.ferbo.util.MxDateTimeConverter</converter-class>
+    </converter>
     <render-kit>
         <renderer>
             <component-family>org.primefaces.component</component-family>
@@ -17,5 +18,4 @@
             <renderer-class>org.primefaces.omega.component.OmegaMenuRenderer</renderer-class>
         </renderer>
     </render-kit>
-    
 </faces-config>

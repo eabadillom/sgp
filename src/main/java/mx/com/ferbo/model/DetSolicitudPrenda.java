@@ -44,7 +44,7 @@ public class DetSolicitudPrenda implements Serializable {
     private Integer idSolicitud;
     @Basic(optional = false)
     @Column(name = "cantidad")
-    private int cantidad;
+    private Integer cantidad;
     @Column(name = "aprobada")
     private Short aprobada;
     @Basic(optional = false)
@@ -78,7 +78,7 @@ public class DetSolicitudPrenda implements Serializable {
         this.idSolicitud = idSolicitud;
     }
 
-    public DetSolicitudPrenda(Integer idSolicitud, int cantidad, Date fechaCap) {
+    public DetSolicitudPrenda(Integer idSolicitud, Integer cantidad, Date fechaCap) {
         this.idSolicitud = idSolicitud;
         this.cantidad = cantidad;
         this.fechaCap = fechaCap;
@@ -92,11 +92,11 @@ public class DetSolicitudPrenda implements Serializable {
         this.idSolicitud = idSolicitud;
     }
 
-    public int getCantidad() {
+    public Integer getCantidad() {
         return cantidad;
     }
 
-    public void setCantidad(int cantidad) {
+    public void setCantidad(Integer cantidad) {
         this.cantidad = cantidad;
     }
 
