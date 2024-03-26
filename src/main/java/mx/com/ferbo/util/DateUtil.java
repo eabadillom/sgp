@@ -334,7 +334,7 @@ public class DateUtil {
 	}
 	
 	public static Date addMinute(Date fecha, int min) {
-	      Calendar calendar = Calendar.getInstance();
+	      Calendar calendar = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
 	      	calendar.setTime(fecha); // Configuramos la fecha que se recibe
 	      	calendar.add(Calendar.MINUTE, min);  // numero de horas a añadir, o restar en caso de horas<0  TimeZone =  "GMT-6:00"
 	      	fecha = calendar.getTime();

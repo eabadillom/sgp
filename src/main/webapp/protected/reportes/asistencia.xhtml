@@ -21,11 +21,9 @@
 						<f:selectItems value="#{repAsistenciaBean.plantas}" var="planta" itemLabel="#{planta.descripcion}" itemValue="#{planta}"></f:selectItems>
 					</p:selectOneMenu>
 					<p:datePicker showIcon="true" placeholder="Del: dd/mm/aaaa" value="#{repAsistenciaBean.fechaInicio}">
-						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 						<p:ajax event="dateSelect" listener="#{repAsistenciaBean.ajustaHoras}" process="@this"></p:ajax>
 					</p:datePicker>
 					<p:datePicker showIcon="true" placeholder="Del: dd/mm/aaaa" value="#{repAsistenciaBean.fechaFin}">
-						<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
 						<p:ajax event="dateSelect" listener="#{repAsistenciaBean.ajustaHoras}" process="@this"></p:ajax>
 					</p:datePicker>
 					<p:commandButton value="Buscar" icon="pi pi-search" process="pnl-buscar @this" update="dt-registros :form:cmd-exportar-pdf" actionListener="#{repAsistenciaBean.cargaInfo}" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
@@ -33,17 +31,17 @@
 			</div>
 			<div style="padding-top: 1rem;">
 				<p:dataTable id="dt-registros" value="#{repAsistenciaBean.registros}" var="registro">
-					<p:column headerText="Empleado">
+					<p:column headerText="Empleado" sortBy="#{registro.detEmpleadoDTO.nombre}">
 						<p:outputLabel value="#{registro.detEmpleadoDTO.nombre} #{registro.detEmpleadoDTO.primerAp} #{registro.detEmpleadoDTO.segundoAp}"></p:outputLabel>
 					</p:column>
-					<p:column headerText="Entrada" style="width: 10rem; text-align: center;">
+					<p:column headerText="Entrada" style="width: 10rem; text-align: center;" sortBy="#{registro.fechaEntrada}">
 						<p:outputLabel value="#{registro.fechaEntrada}">
-							<f:convertDateTime pattern="dd/MM/yyyy hh:mm:ss" />
+							<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" />
 						</p:outputLabel>
 					</p:column>
-					<p:column headerText="Salida" style="width: 10rem; text-align: center;">
+					<p:column headerText="Salida" style="width: 10rem; text-align: center;" sortBy="#{registro.fechaSalida}">
 						<p:outputLabel value="#{registro.fechaSalida}">
-							<f:convertDateTime pattern="dd/MM/yyyy hh:mm:ss" />
+							<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" />
 						</p:outputLabel>
 					</p:column>
 				</p:dataTable>
