@@ -101,7 +101,7 @@ public class ChallengeServlet extends HttpServlet{
 			//Generamos su token, falta validar ?
 			token = su.getRandomString();
 			fechaTemp = DateUtil.addMinute(fechaTemp, 1);
-			log.info(fechaTemp);
+			log.info("Fecha de expiración generada: {}", fechaTemp);
 			
 			tokenDAO = new DetTokenDAO();
 			tokenDTO = tokenDAO.buscarPorNumEmpleado(numeroEmpleado);

@@ -117,6 +117,8 @@ public class RepAsistenciabean implements Serializable {
 		JasperReportUtil jasperReportUtil = null;
 		Map<String, Object> parameters = null;
 		Connection conn = null;
+		
+		Date fechaFinT = null;
 		try {
 			jasperPath = "/jasper/ReporteAsistencia.jrxml";
 			filename = String.format("ReporteAsistencia_%s_%s.pdf", DateUtil.getString(this.fechaInicio, DateUtil.FORMATO_YYYY_MM_DD), DateUtil.getString(this.fechaFin, DateUtil.FORMATO_YYYY_MM_DD));
@@ -138,12 +140,15 @@ public class RepAsistenciabean implements Serializable {
 			log.info("Inicio del periodo de búsqueda: {}", this.fechaInicio);
 			log.info("Fin del periodo de búsqueda: {}", this.fechaFin);
 			
+			fechaFinT = new Date(this.fechaFin.getTime());
+			fechaFinT = DateUtil.addDay(fechaFinT, 1);
+			
 			parameters.put("REPORT_CONNECTION", conn);
 			parameters.put("idPlanta", this.planta == null ? null : this.planta.getIdPlanta());
 			parameters.put("REPORT_TIME_ZONE", TimeZone.getTimeZone("GMT-06:00"));
 			parameters.put("REPORT_LOCALE", new Locale("es", "MX"));
 			parameters.put("fechaInicio", this.fechaInicio);
-			parameters.put("fechaFin", this.fechaFin);
+			parameters.put("fechaFin", fechaFinT);
 			parameters.put("imagen", imgFile.getPath());
 			pdfFile = jasperReportUtil.getPdf(filename, parameters, reportFile.getPath());
 			log.info("Exportación completa.");
