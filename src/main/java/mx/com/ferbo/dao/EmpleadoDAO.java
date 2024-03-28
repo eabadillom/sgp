@@ -32,6 +32,68 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     
     private final Logger log = LogManager.getLogger(EmpleadoDAO.class);
     
+    public static synchronized DetEmpleadoDTO getDTO(DetEmpleado model) {
+    	DetEmpleadoDTO dto = null;
+    	try {
+    		dto = new DetEmpleadoDTO();
+    		dto.setIdEmpleado(model.getIdEmpleado());
+    		dto.setNumEmpleado(model.getNumEmpleado());
+    		dto.setNombre(model.getNombre());
+    		dto.setPrimerAp(model.getPrimerAp());
+    		dto.setSegundoAp(model.getSegundoAp());
+    		dto.setFechaNacimiento(model.getFechaNacimiento());
+    		dto.setFechaRegistro(model.getFechaRegistro());
+    		dto.setFechaModificacion(model.getFechaModificacion());
+    		dto.setCatPerfilDTO(CatPerfilDAO.getDTO(model.getIdPerfil()));
+    		dto.setCatPuestoDTO(CatPuestoDAO.getDTO(model.getIdPuesto()));
+    		dto.setCurp(model.getCurp());
+    		dto.setRfc(model.getRfc());
+    		dto.setCorreo(model.getCorreo());
+    		dto.setFechaIngreso(model.getFechaIngreso());
+    		dto.setNss(model.getNss());
+    		dto.setCatEmpresaDTO(CatEmpresaDAO.getDTO(model.getIdEmpresa()));
+    		dto.setActivo(model.getActivo());
+    		dto.setCatPlantaDTO(CatPlantaDAO.getDTO(model.getIdPlanta()));
+    		dto.setCatAreaDTO(CatAreaDAO.getDTO(model.getIdArea()));
+    		dto.setFotografia(model.getFotografia());
+    		dto.setSueldoDiario(model.getSueldoDiario());
+    	} catch(Exception ex) {
+    		dto = null;
+    	}
+    	return dto;
+    }
+    
+    public static synchronized DetEmpleado getModel(DetEmpleadoDTO dto) {
+    	DetEmpleado model = null;
+    	try {
+    		model = new DetEmpleado();
+    		model.setIdEmpleado(dto.getIdEmpleado());
+    		model.setNumEmpleado(dto.getNumEmpleado());
+    		model.setNombre(dto.getNombre());
+    		model.setPrimerAp(dto.getPrimerAp());
+    		model.setSegundoAp(dto.getSegundoAp());
+    		model.setFechaNacimiento(dto.getFechaNacimiento());
+    		model.setFechaRegistro(dto.getFechaRegistro());
+    		model.setFechaModificacion(dto.getFechaModificacion());
+    		model.setIdPerfil(CatPerfilDAO.getModel(dto.getCatPerfilDTO()));
+    		model.setIdPuesto(CatPuestoDAO.getModel(dto.getCatPuestoDTO()));
+    		model.setCurp(dto.getCurp());
+    		model.setRfc(dto.getRfc());
+    		model.setCorreo(dto.getCorreo());
+    		model.setFechaIngreso(dto.getFechaIngreso());
+    		model.setNss(dto.getNss());
+    		model.setIdEmpresa(CatEmpresaDAO.getModel(dto.getCatEmpresaDTO()));
+    		model.setActivo(dto.getActivo());
+    		model.setIdPlanta(CatPlantaDAO.getModel(dto.getCatPlantaDTO()));
+    		model.setIdArea(CatAreaDAO.getModel(dto.getCatAreaDTO()));
+    		model.setFotografia(dto.getFotografia());
+    		model.setSueldoDiario(dto.getSueldoDiario());
+    	} catch(Exception ex) {
+    		model = null;
+    	}
+    	return model;
+    }
+    
     @Override
     public DetEmpleadoDTO buscarPorId(Integer id) {
         List<DetEmpleadoDTO> empleado = emSGP.createNamedQuery("DetEmpleado.findByID", DetEmpleadoDTO.class).setParameter("idEmp", id).getResultList();

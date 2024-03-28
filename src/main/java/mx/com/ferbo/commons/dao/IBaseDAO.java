@@ -11,25 +11,25 @@ import mx.com.ferbo.util.SGPException;
  *
  * @author Gabo
  */
-public abstract class IBaseDAO<E, ID> {
+public abstract class IBaseDAO<DTO, ID> {
 
     private static EntityManagerFactory emf = Persistence.createEntityManagerFactory("sgpPU");
 
     @PersistenceContext(unitName = "sgpPU")
     protected EntityManager emSGP = emf.createEntityManager();
 
-    public abstract E buscarPorId(ID id);
+    public abstract DTO buscarPorId(ID id);
 
-    public abstract List<E> buscarTodos();
+    public abstract List<DTO> buscarTodos();
     
-    public abstract List<E> buscarActivo();
+    public abstract List<DTO> buscarActivo();
 
-    public abstract List<E> buscarPorCriterios(E e);
+    public abstract List<DTO> buscarPorCriterios(DTO e);
 
-    public abstract void actualizar(E e)throws SGPException;
+    public abstract void actualizar(DTO e)throws SGPException;
     
-    public abstract void eliminar(E e)throws SGPException;
+    public abstract void eliminar(DTO e)throws SGPException;
 
-    public abstract void guardar(E e) throws SGPException;
+    public abstract void guardar(DTO e) throws SGPException;
     
 }

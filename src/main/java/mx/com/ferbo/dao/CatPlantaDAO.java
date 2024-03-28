@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.dto.CatPlantaDTO;
+import mx.com.ferbo.model.CatPlanta;
 
 /**
  *
@@ -23,6 +24,32 @@ public class CatPlantaDAO extends IBaseDAO<CatPlantaDTO, Integer> implements Ser
     private static final long serialVersionUID = 1L;
 
     private static final Logger log = LogManager.getLogger(CatPlantaDAO.class);
+    
+    public static synchronized CatPlantaDTO getDTO(CatPlanta model) {
+    	CatPlantaDTO dto = null;
+    	try  {
+    		dto = new CatPlantaDTO();
+    		dto.setIdPlanta(model.getIdPlanta());
+    		dto.setDescripcion(model.getDescripcion());
+    		dto.setActivo(model.getActivo());
+    	} catch (Exception ex) {
+    		dto = null;
+		}
+    	return dto;
+    }
+    
+    public static synchronized CatPlanta getModel(CatPlantaDTO dto) {
+    	CatPlanta model = null;
+    	try {
+    		model = new CatPlanta();
+    		model.setIdPlanta(dto.getIdPlanta());
+    		model.setDescripcion(dto.getDescripcion());
+    		model.setActivo(dto.getActivo());
+    	} catch(Exception ex) {
+    		model = null;
+    	}
+    	return model;
+    }
 
     @Override
     public CatPlantaDTO buscarPorId(Integer id) {

@@ -44,7 +44,7 @@ import javax.validation.constraints.Size;
                         + " LEFT JOIN e.idPerfil p"
                         + " LEFT JOIN e.idPlanta pl"
                         + " LEFT JOIN e.idPuesto pu"
-                        + " WHERE e.activo = 1"),
+                        + " WHERE e.activo = 1 ORDER BY e.activo, e.nombre, e.primerAp, e.segundoAp"),
     @NamedQuery(name = "DetEmpleado.findByID",
                 query = "SELECT NEW mx.com.ferbo.dto.DetEmpleadoDTO("
                         + " e.idEmpleado, e.numEmpleado, e.nombre, e.primerAp, e.segundoAp, e.fechaNacimiento,"

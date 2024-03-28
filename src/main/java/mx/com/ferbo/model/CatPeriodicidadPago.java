@@ -7,8 +7,6 @@ import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -16,7 +14,9 @@ import javax.persistence.Table;
 
 
 @NamedQueries({
-	@NamedQuery(name = "CatPeriodicidadPago.buscarActivo", query = "SELECT p FROM CatPeriodicidadPago p WHERE (p.vigenciaInicio IS NOT NULL AND p.vigenciaInicio <= :fecha) AND (p.vigenciaFin IS NULL OR p.vigenciaFin >= :fecha)")
+	@NamedQuery(name = "CatPeriodicidadPago.buscarActivo", query = "SELECT p FROM CatPeriodicidadPago p WHERE (p.vigenciaInicio IS NOT NULL AND p.vigenciaInicio <= :fecha) AND (p.vigenciaFin IS NULL OR p.vigenciaFin >= :fecha)"),
+	@NamedQuery(name = "CatPeriodicidadPago.buscarTodos", query = "SELECT p FROM CatPeriodicidadPago p ORDER BY p.periodicidad"),
+	@NamedQuery(name = "CatPeriodicidadPago.buscarTodosActivos", query = "SELECT p FROM CatPeriodicidadPago p WHERE (p.vigenciaFin IS NULL OR p.vigenciaFin <= :vigenciaFin)")
 })
 @Entity
 @Table(name = "cat_periodicidad_pago")

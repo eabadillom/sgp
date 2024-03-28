@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.dto.CatAreaDTO;
+import mx.com.ferbo.model.CatArea;
 
 /**
  *
@@ -23,6 +24,32 @@ public class CatAreaDAO extends IBaseDAO<CatAreaDTO, Integer> implements Seriali
     private static final long serialVersionUID = 1L;
 
     private static final Logger log = LogManager.getLogger(CatAreaDAO.class);
+    
+    public static synchronized CatAreaDTO getDTO(CatArea model) {
+    	CatAreaDTO dto = null;
+    	try {
+    		dto = new CatAreaDTO();
+    		dto.setIdArea(model.getIdArea());
+    		dto.setDescripcion(model.getDescripcion());
+    		dto.setActivo(model.getActivo());
+    	} catch(Exception ex) {
+    		dto = null;
+    	}
+    	return dto;
+    }
+    
+    public static synchronized CatArea getModel(CatAreaDTO dto) {
+    	CatArea model = null;
+    	try {
+    		model = new CatArea();
+    		model.setIdArea(dto.getIdArea());
+    		model.setDescripcion(dto.getDescripcion());
+    		model.setActivo(dto.getActivo());
+    	} catch(Exception ex) {
+    		model = null;
+    	}
+    	return model;
+    }
 
     @Override
     public CatAreaDTO buscarPorId(Integer id) {

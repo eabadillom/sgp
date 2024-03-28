@@ -39,14 +39,14 @@ public class AjustesBean implements Serializable {
 		}
 	}
 	
-	public void prestamosInfonavit() {
+	public void prestamos() {
 		String path = null;
 		try {
-			log.info("Redirigiendo a préstamos INFONAVIT...");
-			path = this.contextPath + "/protected/settings/prestamosInfonavit.xhtml";
+			log.info("Redirigiendo a préstamos...");
+			path = this.contextPath + "/protected/settings/prestamos.xhtml";
 			FacesContext.getCurrentInstance().getExternalContext().redirect(path);
 		} catch (IOException ex) {
-			log.error("Problema para redirigir al catalogo de dias no laborales...", ex);
+			log.error("Problema para redirigir al registro de préstamos...", ex);
 		}
 	}
 	

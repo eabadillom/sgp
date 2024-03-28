@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.dto.CatEmpresaDTO;
+import mx.com.ferbo.model.CatEmpresa;
 
 /**
  *
@@ -23,6 +24,32 @@ public class CatEmpresaDAO extends IBaseDAO<CatEmpresaDTO, Integer> implements S
     private static final long serialVersionUID = 1L;
 
     private static final Logger log = LogManager.getLogger(CatEmpresaDAO.class);
+    
+    public static synchronized CatEmpresaDTO getDTO(CatEmpresa model) {
+    	CatEmpresaDTO dto = null;
+    	try {
+    		dto = new CatEmpresaDTO();
+    		dto.setIdEmpresa(model.getIdEmpresa());
+    		dto.setDescripcion(model.getDescripcion());
+    		dto.setActivo(model.getActivo());
+    	} catch(Exception ex) {
+    		dto = null;
+    	}
+    	return dto;
+    }
+    
+    public static synchronized CatEmpresa getModel(CatEmpresaDTO dto) {
+    	CatEmpresa model = null;
+    	try {
+    		model = new CatEmpresa();
+    		model.setIdEmpresa(dto.getIdEmpresa());
+    		model.setDescripcion(dto.getDescripcion());
+    		model.setActivo(dto.getActivo());
+    	} catch(Exception ex) {
+    		model = null;
+    	}
+    	return model;
+    }
 
     @Override
     public CatEmpresaDTO buscarPorId(Integer id) {
