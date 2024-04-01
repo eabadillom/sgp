@@ -14,6 +14,8 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.CatArticulosDAO;
@@ -28,16 +30,13 @@ import mx.com.ferbo.dto.DetIncidenciaDTO;
 import mx.com.ferbo.dto.DetSolicitudArticuloDTO;
 import mx.com.ferbo.util.SGPException;
 
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 @Named(value = "articuloOficinasBean")
 @ViewScoped
 public class ArticulosOficinaBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
     
+
     private static Logger log = LogManager.getLogger(ArticulosOficinaBean.class);
 
     private String numeroEmpl;

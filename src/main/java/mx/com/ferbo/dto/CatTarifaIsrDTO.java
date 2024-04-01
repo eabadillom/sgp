@@ -1,6 +1,7 @@
 package mx.com.ferbo.dto;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -12,17 +13,19 @@ public class CatTarifaIsrDTO implements Serializable {
     private static final long serialVersionUID = 1L;
     
     private Integer idIsr;
-    private Float limiteInferior;
-    private Float limiteSuperior;
-    private Float cuotaFija;
-    private Float porcAplExceLimInf;
+    private BigDecimal limiteInferior;
+    private BigDecimal limiteSuperior;
+    private BigDecimal cuotaFija;
+    /**Porcentaje para aplicarse sobre el excedente
+     */
+    private BigDecimal porcAplExceLimInf;
     private String tipo;
     private Date fecha;
 
     public CatTarifaIsrDTO() {
     }
 
-    public CatTarifaIsrDTO(Integer idIsr, Float limiteInferior, Float limiteSuperior, Float cuotaFija, Float porcAplExceLimInf, String tipo, Date fecha) {
+    public CatTarifaIsrDTO(Integer idIsr, BigDecimal limiteInferior, BigDecimal limiteSuperior, BigDecimal cuotaFija, BigDecimal porcAplExceLimInf, String tipo, Date fecha) {
         this.idIsr = idIsr;
         this.limiteInferior = limiteInferior;
         this.limiteSuperior = limiteSuperior;
@@ -40,35 +43,35 @@ public class CatTarifaIsrDTO implements Serializable {
         this.idIsr = idIsr;
     }
 
-    public Float getLimiteInferior() {
+    public BigDecimal getLimiteInferior() {
         return limiteInferior;
     }
 
-    public void setLimiteInferior(Float limiteInferior) {
+    public void setLimiteInferior(BigDecimal limiteInferior) {
         this.limiteInferior = limiteInferior;
     }
 
-    public Float getLimiteSuperior() {
+    public BigDecimal getLimiteSuperior() {
         return limiteSuperior;
     }
 
-    public void setLimiteSuperior(Float limiteSuperior) {
+    public void setLimiteSuperior(BigDecimal limiteSuperior) {
         this.limiteSuperior = limiteSuperior;
     }
 
-    public Float getCuotaFija() {
+    public BigDecimal getCuotaFija() {
         return cuotaFija;
     }
 
-    public void setCuotaFija(Float cuotaFija) {
+    public void setCuotaFija(BigDecimal cuotaFija) {
         this.cuotaFija = cuotaFija;
     }
 
-    public Float getPorcAplExceLimInf() {
+    public BigDecimal getPorcAplExceLimInf() {
         return porcAplExceLimInf;
     }
 
-    public void setPorcAplExceLimInf(Float porcAplExceLimInf) {
+    public void setPorcAplExceLimInf(BigDecimal porcAplExceLimInf) {
         this.porcAplExceLimInf = porcAplExceLimInf;
     }
 

@@ -6,18 +6,18 @@ import java.util.List;
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.dto.CatPrendaDTO;
 import mx.com.ferbo.util.SGPException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @Stateless
 @LocalBean
 public class CatPrendaDAO extends IBaseDAO<CatPrendaDTO, Integer> implements Serializable {
     
     private static final long serialVersionUID = 1L;
-
     private static final Logger log = LogManager.getLogger(CatPrendaDAO.class);
 
     @Override

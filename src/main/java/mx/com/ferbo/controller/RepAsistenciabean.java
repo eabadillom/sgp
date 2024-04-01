@@ -82,7 +82,7 @@ public class RepAsistenciabean implements Serializable {
 			
 			idPlanta = this.planta == null ? null : this.planta.getIdPlanta();
 			
-			registros = registroDAO.buscar(idPlanta, this.fechaInicio, this.fechaFin);
+			registros = registroDAO.buscarPorPlantaPeriodo(idPlanta, this.fechaInicio, this.fechaFin);
 			
 			this.exportarPDF();
 			

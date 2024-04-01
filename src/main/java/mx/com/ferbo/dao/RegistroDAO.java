@@ -61,6 +61,7 @@ public class RegistroDAO extends IBaseDAO<DetRegistroDTO, Integer> implements Se
     	return model;
     }
 
+
     @Override
     public DetRegistroDTO buscarPorId(Integer id) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
@@ -123,7 +124,7 @@ public class RegistroDAO extends IBaseDAO<DetRegistroDTO, Integer> implements Se
             throw new SGPException("Problema para guardar el registro de asistencia.");
         }
     }
-
+    
     public List<DetRegistroDTO> consultaRegistrosPorIdEmp(Integer idEmpleado) {
         List<DetRegistroDTO> registros = emSGP.createNamedQuery("DetRegistro.findByIdEmp", DetRegistroDTO.class).setParameter("idEmp", idEmpleado)
                 .getResultList();
@@ -171,8 +172,20 @@ public class RegistroDAO extends IBaseDAO<DetRegistroDTO, Integer> implements Se
                 .setParameter("today", today, TemporalType.TIMESTAMP).getResultList();
         return registros.isEmpty() ? null : registros.get(0);
     }
+    
+    public List<DetRegistroDTO> buscar(Integer idEmpleado, Date fechaEntrada, Date fechaSalida) {
+    	List<DetRegistroDTO> lista = null;
+    	lista = emSGP.createNamedQuery("DetRegistro.findByIdEmpleadoPeriodo", DetRegistroDTO.class)
+    			.setParameter("idEmpleado", idEmpleado)
+    			.setParameter("fechaEntrada", fechaEntrada)
+    			.setParameter("fechaSalida", fechaSalida)
+    			.getResultList()
+    			;
+    	
+    	return lista;
+    }
 
-	public List<DetRegistroDTO> buscar(Integer idPlanta, Date fechaInicio, Date fechaFin) {
+	public List<DetRegistroDTO> buscarPorPlantaPeriodo(Integer idPlanta, Date fechaInicio, Date fechaFin) {
 		List<DetRegistroDTO> registros = null;
 		List<DetRegistro> list = null;
 		try {

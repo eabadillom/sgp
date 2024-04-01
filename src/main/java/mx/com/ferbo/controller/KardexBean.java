@@ -3,11 +3,16 @@ package mx.com.ferbo.controller;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+
 import javax.annotation.PostConstruct;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import mx.com.ferbo.dao.CatAreaDAO;
 import mx.com.ferbo.dao.CatEmpresaDAO;
 import mx.com.ferbo.dao.CatPerfilDAO;
@@ -20,8 +25,6 @@ import mx.com.ferbo.dto.CatPerfilDTO;
 import mx.com.ferbo.dto.CatPlantaDTO;
 import mx.com.ferbo.dto.CatPuestoDTO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 
 @Named(value = "kardexBean")
@@ -29,7 +32,6 @@ import org.apache.logging.log4j.Logger;
 public class KardexBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
     private static Logger log = LogManager.getLogger(KardexBean.class);
 
     private List<CatEmpresaDTO> lstCatEmpresa;

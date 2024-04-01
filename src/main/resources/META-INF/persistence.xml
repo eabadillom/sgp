@@ -17,7 +17,6 @@
         <class>mx.com.ferbo.model.CatPuesto</class>
         <class>mx.com.ferbo.model.CatSubsidio</class>
         <class>mx.com.ferbo.model.CatTalla</class>
-        <class>mx.com.ferbo.model.CatTarifaIsrSemanal</class>
         <class>mx.com.ferbo.model.CatTipoBitacora</class>
         <class>mx.com.ferbo.model.CatTipoIncidencia</class>
         <class>mx.com.ferbo.model.CatTipoSolicitud</class>
@@ -30,6 +29,7 @@
         <class>mx.com.ferbo.model.DetSolicitudArticulo</class>
         <class>mx.com.ferbo.model.DetSolicitudPermiso</class>
         <class>mx.com.ferbo.model.DetSolicitudPrenda</class>
+        <class>mx.com.ferbo.model.Pais</class>
         <exclude-unlisted-classes>false</exclude-unlisted-classes>
         <properties>
             <!-- <property name="javax.persistence.jdbc.url" value="jdbc:mysql://ferbo-prd.mysql.database.azure.com:3306/sgp?useSSL=true&amp;useTimezone=true&amp;serverTimezone=GMT-6&amp;allowPublicKeyRetrieval=true"/> -->
@@ -39,7 +39,7 @@
             <!-- <property name="javax.persistence.jdbc.password" value="f3RB0d8prD8xI1k"/> -->
             <property name="javax.persistence.jdbc.password" value="pruebas123"/>
             <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
-            <property name="hibernate.show_sql" value="false"/>
+            <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
         </properties>
     </persistence-unit>

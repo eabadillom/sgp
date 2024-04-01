@@ -27,12 +27,12 @@ public class DetRegistroDTO implements Serializable {
         this.catEstatusRegistroDTO = new CatEstatusRegistroDTO(idEstatus, descripcionEstatus);
     }
 
-    public DetRegistroDTO(Integer idRegistro, Integer idEmpleado, Date fechaEntrada, Date fechaSalida, Integer idEstatus, String descripcionEstatus) {
+    public DetRegistroDTO(Integer idRegistro, Integer idEmpleado, Date fechaEntrada, Date fechaSalida, Integer idEstatus, String descripcionEstatus, String codigo) {
         this.idRegistro = idRegistro;
         this.detEmpleadoDTO = new DetEmpleadoDTO(idEmpleado);
         this.fechaEntrada = fechaEntrada;
         this.fechaSalida = fechaSalida;
-        this.catEstatusRegistroDTO = new CatEstatusRegistroDTO(idEstatus, descripcionEstatus);
+        this.catEstatusRegistroDTO = new CatEstatusRegistroDTO(idEstatus, descripcionEstatus, codigo);
     }
 
     public Integer getIdRegistro() {

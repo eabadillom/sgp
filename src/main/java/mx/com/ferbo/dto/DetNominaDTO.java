@@ -1,6 +1,7 @@
 package mx.com.ferbo.dto;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -13,25 +14,32 @@ public class DetNominaDTO implements Serializable {
 
     private Integer idNomina;
     private DetEmpleadoDTO idEmpleado;
-    private Float sueldo;
-    private Float septimoDia;
-    private Float horasExtras;
-    private Float destajos;
-    private Float premiosEficiencia;
-    private Float bonoPuntualidad;
-    private Float despensa;
-    private Float otrasPercepciones;
-    private Float totalPercepciones;
+    
+    //PERCEPCIONES
+    private BigDecimal sueldo;
+    private BigDecimal salarioDiario;
+    private BigDecimal salarioDiarioIntegrado;
+    private BigDecimal asistencia;
+    private BigDecimal septimoDia;
+    private BigDecimal horasExtras;
+    private BigDecimal destajos;
+    private BigDecimal premiosEficiencia;
+    private BigDecimal bonoPuntualidad;
+    private BigDecimal despensa;
+    private BigDecimal otrasPercepciones;
+    private BigDecimal totalPercepciones;
+    
+    //DEDUCCIONES
     private Float retInvYVida;
     private Float retCesantia;
     private Float retEnfYMatObrero;
     private Float prestamoInfonavitFd;
     private Float prestamoInfonavitCf;
-    private Float subsAlEmpleoAcreditado;
-    private Float subsAlEmpleoMes;
-    private Float isrAntesDeSubsAlEmpleo;
-    private Float isrMes;
-    private Float imss;
+    private BigDecimal subsAlEmpleoAcreditado;
+    private BigDecimal subsAlEmpleoMes;
+    private BigDecimal isrAntesDeSubsAlEmpleo;
+    private BigDecimal isr;
+    private BigDecimal imss;
     private Float prestamoFonacot;
     private Float ajusteEnSubsidioParaElEmpleo;
     private Float subsEntregadoQueNoCorrespondia;
@@ -41,8 +49,12 @@ public class DetNominaDTO implements Serializable {
     private Float ajusteAlSubsidioCausado;
     private Float pensionAlimienticia;
     private Float otrasDeducciones;
-    private Float totalDeducciones;
-    private Float neto;
+    private BigDecimal totalDeducciones;
+    
+    //TOTAL PERCEPCIONES - DEDUCCIONES
+    private BigDecimal neto;
+    
+    // ¿¿APORTACIONES PATRONALES??
     private Float invalidezYVida;
     private Float cesantiaYVejez;
     private Float enfYMatPatron;
@@ -58,9 +70,10 @@ public class DetNominaDTO implements Serializable {
     private DetEmpleadoDTO idEmpleadoCreador;
 
     public DetNominaDTO() {
+    	
     }
 
-    public DetNominaDTO(Integer idNomina, DetEmpleadoDTO idEmpleado, Float sueldo, Float septimoDia, Float horasExtras, Float destajos, Float premiosEficiencia, Float bonoPuntualidad, Float despensa, Float otrasPercepciones, Float totalPercepciones, Float retInvYVida, Float retCesantia, Float retEnfYMatObrero, Float prestamoInfonavitFd, Float prestamoInfonavitCf, Float subsAlEmpleoAcreditado, Float subsAlEmpleoMes, Float isrAntesDeSubsAlEmpleo, Float isrMes, Float imss, Float prestamoFonacot, Float ajusteEnSubsidioParaElEmpleo, Float subsEntregadoQueNoCorrespondia, Float ajusteAlNeto, Float isrDeAjusteMensual, Float isrAjustadoPorSubsidio, Float ajusteAlSubsidioCausado, Float pensionAlimienticia, Float otrasDeducciones, Float totalDeducciones, Float neto, Float invalidezYVida, Float cesantiaYVejez, Float enfYMatPatron, Float fondoRetiroSar, Float impuestoEstatal, Float riesgoDeTrabajo9, Float imssEmpresa, Float infonavitEmpresa, Float guarderiaImss7, Float otrasObligaciones, Float totalObligaciones, Date fechaCreacion, DetEmpleadoDTO idEmpleadoCreador) {
+    public DetNominaDTO(Integer idNomina, DetEmpleadoDTO idEmpleado, BigDecimal sueldo, BigDecimal septimoDia, BigDecimal horasExtras, BigDecimal destajos, BigDecimal premiosEficiencia, BigDecimal bonoPuntualidad, BigDecimal despensa, BigDecimal otrasPercepciones, BigDecimal totalPercepciones, Float retInvYVida, Float retCesantia, Float retEnfYMatObrero, Float prestamoInfonavitFd, Float prestamoInfonavitCf, BigDecimal subsAlEmpleoAcreditado, BigDecimal subsAlEmpleoMes, BigDecimal isrAntesDeSubsAlEmpleo, BigDecimal isrMes, BigDecimal imss, Float prestamoFonacot, Float ajusteEnSubsidioParaElEmpleo, Float subsEntregadoQueNoCorrespondia, Float ajusteAlNeto, Float isrDeAjusteMensual, Float isrAjustadoPorSubsidio, Float ajusteAlSubsidioCausado, Float pensionAlimienticia, Float otrasDeducciones, BigDecimal totalDeducciones, BigDecimal neto, Float invalidezYVida, Float cesantiaYVejez, Float enfYMatPatron, Float fondoRetiroSar, Float impuestoEstatal, Float riesgoDeTrabajo9, Float imssEmpresa, Float infonavitEmpresa, Float guarderiaImss7, Float otrasObligaciones, Float totalObligaciones, Date fechaCreacion, DetEmpleadoDTO idEmpleadoCreador) {
         this.idNomina = idNomina;
         this.idEmpleado = idEmpleado;
         this.sueldo = sueldo;
@@ -80,7 +93,7 @@ public class DetNominaDTO implements Serializable {
         this.subsAlEmpleoAcreditado = subsAlEmpleoAcreditado;
         this.subsAlEmpleoMes = subsAlEmpleoMes;
         this.isrAntesDeSubsAlEmpleo = isrAntesDeSubsAlEmpleo;
-        this.isrMes = isrMes;
+        this.isr = isrMes;
         this.imss = imss;
         this.prestamoFonacot = prestamoFonacot;
         this.ajusteEnSubsidioParaElEmpleo = ajusteEnSubsidioParaElEmpleo;
@@ -109,18 +122,20 @@ public class DetNominaDTO implements Serializable {
     }
     
     public DetNominaDTO(Integer idNomina, Integer idEmpleado, String numEmpleado, String nombre, String primerAp, 
-                        String segundoAp, Float sueldo, Float septimoDia, Float horasExtras, Float destajos, 
-                        Float premiosEficiencia, Float bonoPuntualidad, Float despensa, Float otrasPercepciones, Float totalPercepciones, 
+                        String segundoAp, BigDecimal sueldo, BigDecimal septimoDia, BigDecimal horasExtras, BigDecimal destajos, 
+                        BigDecimal premiosEficiencia, BigDecimal bonoPuntualidad, BigDecimal despensa, BigDecimal otrasPercepciones, BigDecimal totalPercepciones, 
                         Float retInvYVida, Float retCesantia, Float retEnfYMatObrero, Float prestamoInfonavitFd, Float prestamoInfonavitCf, 
-                        Float subsAlEmpleoAcreditado, Float subsAlEmpleoMes, Float isrAntesDeSubsAlEmpleo, Float isrMes, Float imss, 
+                        BigDecimal subsAlEmpleoAcreditado, BigDecimal subsAlEmpleoMes, BigDecimal isrAntesDeSubsAlEmpleo, BigDecimal isrMes, BigDecimal imss, 
                         Float prestamoFonacot, Float ajusteEnSubsidioParaElEmpleo, Float subsEntregadoQueNoCorrespondia, Float ajusteAlNeto, Float isrDeAjusteMensual, 
-                        Float isrAjustadoPorSubsidio, Float ajusteAlSubsidioCausado, Float pensionAlimienticia, Float otrasDeducciones, Float totalDeducciones, 
-                        Float neto, Float invalidezYVida, Float cesantiaYVejez, Float enfYMatPatron, Float fondoRetiroSar, 
+                        Float isrAjustadoPorSubsidio, Float ajusteAlSubsidioCausado, Float pensionAlimienticia, Float otrasDeducciones, BigDecimal totalDeducciones, 
+                        BigDecimal neto, Float invalidezYVida, Float cesantiaYVejez, Float enfYMatPatron, Float fondoRetiroSar, 
                         Float impuestoEstatal, Float riesgoDeTrabajo9, Float imssEmpresa, Float infonavitEmpresa, Float guarderiaImss7, 
                         Float otrasObligaciones, Float totalObligaciones, Date fechaCreacion, Integer idEmpleadoC, String numEmpleadoC, 
                         String nombreC, String primerApC, String segundoApC) {
         this.idNomina = idNomina;
         this.idEmpleado = new DetEmpleadoDTO(idEmpleado, numEmpleado, nombre, primerAp, segundoAp);
+        
+        //PERCEPCIONES
         this.sueldo = sueldo;
         this.septimoDia = septimoDia;
         this.horasExtras = horasExtras;
@@ -130,6 +145,8 @@ public class DetNominaDTO implements Serializable {
         this.despensa = despensa;
         this.otrasPercepciones = otrasPercepciones;
         this.totalPercepciones = totalPercepciones;
+        
+        //DEDUCCIONES
         this.retInvYVida = retInvYVida;
         this.retCesantia = retCesantia;
         this.retEnfYMatObrero = retEnfYMatObrero;
@@ -138,7 +155,7 @@ public class DetNominaDTO implements Serializable {
         this.subsAlEmpleoAcreditado = subsAlEmpleoAcreditado;
         this.subsAlEmpleoMes = subsAlEmpleoMes;
         this.isrAntesDeSubsAlEmpleo = isrAntesDeSubsAlEmpleo;
-        this.isrMes = isrMes;
+        this.isr = isrMes;
         this.imss = imss;
         this.prestamoFonacot = prestamoFonacot;
         this.ajusteEnSubsidioParaElEmpleo = ajusteEnSubsidioParaElEmpleo;
@@ -150,7 +167,11 @@ public class DetNominaDTO implements Serializable {
         this.pensionAlimienticia = pensionAlimienticia;
         this.otrasDeducciones = otrasDeducciones;
         this.totalDeducciones = totalDeducciones;
+        
+        //TOTAL PERCEPCIONES - DEDUCCIONES
         this.neto = neto;
+        
+        //¿¿CUOTAS PATRONALES??
         this.invalidezYVida = invalidezYVida;
         this.cesantiaYVejez = cesantiaYVejez;
         this.enfYMatPatron = enfYMatPatron;
@@ -182,75 +203,99 @@ public class DetNominaDTO implements Serializable {
         this.idEmpleado = idEmpleado;
     }
 
-    public Float getSueldo() {
+    public BigDecimal getSueldo() {
         return sueldo;
     }
 
-    public void setSueldo(Float sueldo) {
+    public void setSueldo(BigDecimal sueldo) {
         this.sueldo = sueldo;
     }
+    
+    public BigDecimal getSalarioDiario() {
+		return salarioDiario;
+	}
 
-    public Float getSeptimoDia() {
+	public void setSalarioDiario(BigDecimal salarioDiario) {
+		this.salarioDiario = salarioDiario;
+	}
+	
+	public BigDecimal getAsistencia() {
+		return asistencia;
+	}
+
+	public void setAsistencia(BigDecimal asistencia) {
+		this.asistencia = asistencia;
+	}
+    
+    public BigDecimal getSalarioDiarioIntegrado() {
+		return salarioDiarioIntegrado;
+	}
+
+	public void setSalarioDiarioIntegrado(BigDecimal salarioDiarioIntegrado) {
+		this.salarioDiarioIntegrado = salarioDiarioIntegrado;
+	}
+
+    public BigDecimal getSeptimoDia() {
         return septimoDia;
     }
 
-    public void setSeptimoDia(Float septimoDia) {
+    public void setSeptimoDia(BigDecimal septimoDia) {
         this.septimoDia = septimoDia;
     }
 
-    public Float getHorasExtras() {
+    public BigDecimal getHorasExtras() {
         return horasExtras;
     }
 
-    public void setHorasExtras(Float horasExtras) {
+    public void setHorasExtras(BigDecimal horasExtras) {
         this.horasExtras = horasExtras;
     }
 
-    public Float getDestajos() {
+    public BigDecimal getDestajos() {
         return destajos;
     }
 
-    public void setDestajos(Float destajos) {
+    public void setDestajos(BigDecimal destajos) {
         this.destajos = destajos;
     }
 
-    public Float getPremiosEficiencia() {
+    public BigDecimal getPremiosEficiencia() {
         return premiosEficiencia;
     }
 
-    public void setPremiosEficiencia(Float premiosEficiencia) {
+    public void setPremiosEficiencia(BigDecimal premiosEficiencia) {
         this.premiosEficiencia = premiosEficiencia;
     }
 
-    public Float getBonoPuntualidad() {
+    public BigDecimal getBonoPuntualidad() {
         return bonoPuntualidad;
     }
 
-    public void setBonoPuntualidad(Float bonoPuntualidad) {
+    public void setBonoPuntualidad(BigDecimal bonoPuntualidad) {
         this.bonoPuntualidad = bonoPuntualidad;
     }
 
-    public Float getDespensa() {
+    public BigDecimal getDespensa() {
         return despensa;
     }
 
-    public void setDespensa(Float despensa) {
+    public void setDespensa(BigDecimal despensa) {
         this.despensa = despensa;
     }
 
-    public Float getOtrasPercepciones() {
+    public BigDecimal getOtrasPercepciones() {
         return otrasPercepciones;
     }
 
-    public void setOtrasPercepciones(Float otrasPercepciones) {
+    public void setOtrasPercepciones(BigDecimal otrasPercepciones) {
         this.otrasPercepciones = otrasPercepciones;
     }
 
-    public Float getTotalPercepciones() {
+    public BigDecimal getTotalPercepciones() {
         return totalPercepciones;
     }
 
-    public void setTotalPercepciones(Float totalPercepciones) {
+    public void setTotalPercepciones(BigDecimal totalPercepciones) {
         this.totalPercepciones = totalPercepciones;
     }
 
@@ -294,43 +339,43 @@ public class DetNominaDTO implements Serializable {
         this.prestamoInfonavitCf = prestamoInfonavitCf;
     }
 
-    public Float getSubsAlEmpleoAcreditado() {
+    public BigDecimal getSubsAlEmpleoAcreditado() {
         return subsAlEmpleoAcreditado;
     }
 
-    public void setSubsAlEmpleoAcreditado(Float subsAlEmpleoAcreditado) {
+    public void setSubsAlEmpleoAcreditado(BigDecimal subsAlEmpleoAcreditado) {
         this.subsAlEmpleoAcreditado = subsAlEmpleoAcreditado;
     }
 
-    public Float getSubsAlEmpleoMes() {
+    public BigDecimal getSubsAlEmpleoMes() {
         return subsAlEmpleoMes;
     }
 
-    public void setSubsAlEmpleoMes(Float subsAlEmpleoMes) {
+    public void setSubsAlEmpleoMes(BigDecimal subsAlEmpleoMes) {
         this.subsAlEmpleoMes = subsAlEmpleoMes;
     }
 
-    public Float getIsrAntesDeSubsAlEmpleo() {
+    public BigDecimal getIsrAntesDeSubsAlEmpleo() {
         return isrAntesDeSubsAlEmpleo;
     }
 
-    public void setIsrAntesDeSubsAlEmpleo(Float isrAntesDeSubsAlEmpleo) {
+    public void setIsrAntesDeSubsAlEmpleo(BigDecimal isrAntesDeSubsAlEmpleo) {
         this.isrAntesDeSubsAlEmpleo = isrAntesDeSubsAlEmpleo;
     }
 
-    public Float getIsrMes() {
-        return isrMes;
+    public BigDecimal getIsr() {
+        return isr;
     }
 
-    public void setIsrMes(Float isrMes) {
-        this.isrMes = isrMes;
+    public void setIsr(BigDecimal isr) {
+        this.isr = isr;
     }
 
-    public Float getImss() {
+    public BigDecimal getImss() {
         return imss;
     }
 
-    public void setImss(Float imss) {
+    public void setImss(BigDecimal imss) {
         this.imss = imss;
     }
 
@@ -406,19 +451,19 @@ public class DetNominaDTO implements Serializable {
         this.otrasDeducciones = otrasDeducciones;
     }
 
-    public Float getTotalDeducciones() {
+    public BigDecimal getTotalDeducciones() {
         return totalDeducciones;
     }
 
-    public void setTotalDeducciones(Float totalDeducciones) {
+    public void setTotalDeducciones(BigDecimal totalDeducciones) {
         this.totalDeducciones = totalDeducciones;
     }
 
-    public Float getNeto() {
+    public BigDecimal getNeto() {
         return neto;
     }
 
-    public void setNeto(Float neto) {
+    public void setNeto(BigDecimal neto) {
         this.neto = neto;
     }
 
@@ -525,5 +570,4 @@ public class DetNominaDTO implements Serializable {
     public void setIdEmpleadoCreador(DetEmpleadoDTO idEmpleadoCreador) {
         this.idEmpleadoCreador = idEmpleadoCreador;
     }
-    
 }

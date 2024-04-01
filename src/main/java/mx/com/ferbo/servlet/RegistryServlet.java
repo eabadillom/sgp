@@ -31,14 +31,13 @@ import mx.com.ferbo.util.SGPException;
 public class RegistryServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static Logger log = LogManager.getLogger(RegistryServlet.class);
-
+       
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
 	public RegistryServlet() {
 
 	}
-
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse

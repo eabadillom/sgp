@@ -215,7 +215,7 @@
 			<id>github</id>
 			<name>github</name>
 			<url>https://maven.pkg.github.com/eabadillom/*</url>
-		</repository>        
+		</repository>
     </repositories>
     <build>
         <resources>
