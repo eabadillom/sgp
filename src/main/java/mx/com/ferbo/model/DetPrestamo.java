@@ -11,10 +11,16 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "det_prestamo")
+@NamedQueries({
+		@NamedQuery(name = "DetPrestamo.findByTipoAndEmpleado", query = "SELECT p FROM DetPrestamo p WHERE p.empleado.idEmpleado = :idEmpleado AND p.tipoPrestamo.tipoPrestamo = :tipoPrestamo ORDER BY p.fechaInicio DESC"),
+		@NamedQuery(name = "DetPrestamo.findByEmpleado", query = "SELECT p FROM DetPrestamo p WHERE p.empleado.idEmpleado = :idEmpleado ORDER BY p.fechaInicio DESC")
+})
 public class DetPrestamo implements Serializable{
 	
 	private static final long serialVersionUID = -5791927611476079717L;

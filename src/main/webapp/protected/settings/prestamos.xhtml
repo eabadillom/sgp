@@ -8,7 +8,7 @@
 	<ui:define name="title">Préstamos</ui:define>
 	<ui:define name="content">
 		<h:form id="form">
-			<p:growl id="messages" showDetail="true" life="4000"/>
+			<p:growl id="messages" showDetail="true" life="3000"/>
 			<p:dialog modal="true" widgetVar="statusDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
 				<div align="center">
 		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
@@ -25,15 +25,19 @@
 					<p:outputLabel value="#{empleado.segundoAp}" />
 				</p:column>
 				<p:column width="3rem">
-					<p:commandButton icon="pi pi-bars" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dgPrestamo').show();" actionListener="#{prestamoBean.editarPrestamo(empleado)}" process="@this">
+					<p:commandButton icon="pi pi-bars" onclick="PF('statusDialog').show();" 
+						oncomplete="PF('statusDialog').hide();PF('dgPrestamo').show();"
+						actionListener="#{prestamoBean.editarPrestamo(empleado)}" process="@this"
+						update=":form:dg-prestamo">
 						<f:setPropertyActionListener value="#{empleado}" target="#{prestamoBean.empleado}" />
 					</p:commandButton>
 				</p:column>
 			</p:dataTable>
-			<p:dialog id="dg-prestamo" widgetVar="dgPrestamo" header="Préstamos del empleado" showEffect="hide" modal="true">
+			<p:dialog id="dg-prestamo" widgetVar="dgPrestamo" header="Préstamos del empleado" showEffect="hide" modal="true" resizable="true" responsive="true">
 				<p:outputPanel id="registro-prestamo" class="ui-fluid">
-					<p:tabView>
-						<p:tab title="Agregar">
+					<p:tabView id="tv-prestamos" dynamic="true">
+						<p:ajax event="tabChange" listener="#{prestamoBean.onTabChange}" update=":form:messages dt-prestamos" onstart="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"/>
+						<p:tab id="tab-agregar" title="Agregar">
 							<div class="p-field">
 								<p:outputLabel value="Tipo de préstamo"></p:outputLabel>
 								<p:selectOneMenu id="tipoPrestamo" value="#{prestamoBean.prestamo.tipoPrestamo}" converter="entityConverter">
@@ -67,14 +71,43 @@
 								</p:selectOneMenu>
 							</div>
 						</p:tab>
-						<p:tab title="INFONAVIT">
-							<p:dataTable>
+						<p:tab id="tab-prestamos" title="Prestamos del empleado">
+							<p:dataTable id="dt-prestamos" widgetVar="dtPrestamos" value="#{prestamoBean.prestamos}" var="prestamo" allowUnsorting="true" sortMode="single" reflow="true">
+								<p:column headerText="Fecha inicio" sortBy="#{prestamo.fechaInicio}">
+									<p:datePicker value="#{prestamo.fechaInicio}" monthNavigator="true" yearNavigator="true" showIcon="true">
+										<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+									</p:datePicker>
+								</p:column>
+								<p:column headerText="Fecha fin" sortBy="#{prestamo.fechaFin}">
+									<p:datePicker value="#{prestamo.fechaFin}" monthNavigator="true" yearNavigator="true" showIcon="true">
+										<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+									</p:datePicker>
+								</p:column>
+								<p:column headerText="Periodicidad de pago" width="auto">
+									<p:selectOneMenu value="#{prestamo.periodicidadPago}" converter="entityConverter" autoWidth="false">
+										<f:selectItem itemLabel="Seleccione la periodicidad de pago" noSelectionOption="true" />
+										<f:selectItems value="#{prestamoBean.periodicidadesPago}" var="periodicidad" itemLabel="#{periodicidad.descripcion}"></f:selectItems>
+									</p:selectOneMenu>
+								</p:column>
+								<p:column headerText="Tipo Préstamo">
+									<p:selectOneMenu value="#{prestamo.tipoPrestamo}" converter="entityConverter" autoWidth="false">
+										<f:selectItem itemLabel="Seleccione un tipo de préstamo" noSelectionOption="true" />
+										<f:selectItems value="#{prestamoBean.tiposPrestamo}" var="tipoPrestamo" itemLabel="#{tipoPrestamo.descripcion}" itemValue="#{tipoPrestamo}" />
+									</p:selectOneMenu>
+								</p:column>
+								<p:column headerText="Importe" width="5rem;">
+									<p:column headerText="Importe" width="5rem;">
+										<p:inputNumber value="#{prestamo.importe}" decimalSeparator="2" symbol="$" symbolPosition="p" emptyValue="empty" />
+									</p:column>
+								</p:column>
+								<p:column width="3rem;">
+									<p:commandButton icon="pi pi-save" actionListener="#{prestamoBean.guardaPrestamo}">
+										<f:setPropertyActionListener value="#{prestamo}" target="#{prestamoBean.prestamo}"></f:setPropertyActionListener>
+									</p:commandButton>
+								</p:column>
 							</p:dataTable>
 						</p:tab>
-						<p:tab title="FONACOT">
-							<p:dataTable>
-							</p:dataTable>
-						</p:tab>
+						
 					</p:tabView>
 				</p:outputPanel>
 				<f:facet name="footer">

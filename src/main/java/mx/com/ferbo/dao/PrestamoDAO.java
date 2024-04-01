@@ -1,5 +1,6 @@
 package mx.com.ferbo.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -71,6 +72,53 @@ public class PrestamoDAO extends IBaseDAO<PrestamoDTO, Integer>{
 	public List<PrestamoDTO> buscarPorCriterios(PrestamoDTO e) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public List<PrestamoDTO> buscar(String tipoPrestamo, Integer idEmpleado) {
+		List<PrestamoDTO> list = null;
+		List<DetPrestamo> result = null;
+		try {
+			result = emSGP.createNamedQuery("DetPrestamo.findByTipoAndEmpleado", DetPrestamo.class)
+					.setParameter("idEmpleado", idEmpleado)
+					.setParameter("tipoPrestamo", tipoPrestamo)
+					.getResultList()
+					;
+			list = new ArrayList<PrestamoDTO>();
+			
+			for(DetPrestamo model : result) {
+				log.debug("Tipo prestamo: {}", model.getTipoPrestamo().getTipoPrestamo());
+				log.debug("Periodicidad: {}", model.getPeriodicidadPago().getPeriodicidad());
+				PrestamoDTO dto = getDTO(model);
+				list.add(dto);
+			}
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de préstamos...", ex);
+		}
+		
+		return list;
+	}
+	
+	public List<PrestamoDTO> buscar(Integer idEmpleado) {
+		List<PrestamoDTO> list = null;
+		List<DetPrestamo> result = null;
+		try {
+			result = emSGP.createNamedQuery("DetPrestamo.findByEmpleado", DetPrestamo.class)
+					.setParameter("idEmpleado", idEmpleado)
+					.getResultList()
+					;
+			list = new ArrayList<PrestamoDTO>();
+			
+			for(DetPrestamo model : result) {
+				log.debug("Tipo prestamo: {}", model.getTipoPrestamo().getTipoPrestamo());
+				log.debug("Periodicidad: {}", model.getPeriodicidadPago().getPeriodicidad());
+				PrestamoDTO dto = getDTO(model);
+				list.add(dto);
+			}
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de préstamos...", ex);
+		}
+		
+		return list;
 	}
 
 	@Override

@@ -14,6 +14,7 @@ import javax.inject.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
+import org.primefaces.event.TabChangeEvent;
 
 import mx.com.ferbo.dao.EmpleadoDAO;
 import mx.com.ferbo.dao.PeriodicidadPagoDAO;
@@ -45,6 +46,7 @@ public class PrestamoBean implements Serializable {
 	
 	private PrestamoDTO prestamo = null;
 	private PrestamoDAO prestamoDAO = null;
+	private List<PrestamoDTO> prestamos = null;
 	
 	private String accion = null;
 	
@@ -83,6 +85,9 @@ public class PrestamoBean implements Serializable {
 		this.prestamo.setEmpleado(empleado);
 		log.info("Cargando información de préstamo INFONAVIT del empleado {}, prestamo: {}", this.empleado, this.prestamo);
 		this.accion = "E";
+		
+		this.prestamos = prestamoDAO.buscar(this.empleado.getIdEmpleado());
+		log.info("Registros INFONAVIT: {}", this.prestamos.size());
 	}
 	
 	public void guardaPrestamo() {
@@ -131,20 +136,40 @@ public class PrestamoBean implements Serializable {
 		this.empleado = empleado;
 	}
 	
-//	public void onTabChange(TabChangeEvent event) {
-//		
-//		
-//		
-//		
-//		FacesMessage msg = new FacesMessage("Tab Changed", "Active Tab: " + event.getTab().getId());
-//        FacesContext.getCurrentInstance().addMessage(null, msg);
-//	}
-//	
-//	public void onTabClose(TabChangeEvent event) {
-//		FacesMessage msg = new FacesMessage("Tab Closed", "Closed tab: " + event.getTab().getId());
-//        FacesContext.getCurrentInstance().addMessage(null, msg);
-//	}
-
+	public void onTabChange(TabChangeEvent event) {
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Préstamo";
+		
+		String tabId = null;
+		try {
+			tabId = event.getTab().getId();
+			
+			if("tab-agregar".equalsIgnoreCase(tabId)) {
+				mensaje = "Agregar préstamo";
+				this.accion = "E";
+			} else if("tab-prestamos".equalsIgnoreCase(tabId)) {
+				this.prestamos = prestamoDAO.buscar(this.empleado.getIdEmpleado());
+				log.info("Registros INFONAVIT: {}", this.prestamos.size());
+				
+				mensaje = "Préstamos del empleado";
+			} else {
+				log.info("No hay etiqueta seleccionada.");
+			}
+			
+			severity = FacesMessage.SEVERITY_INFO;
+		} catch(Exception ex) {
+			log.error("Ocurrió un problema con la consulta del préstamo...", ex);
+			mensaje = "Ocurrió un problema con la consulta del préstamo.";
+			severity = FacesMessage.SEVERITY_WARN;
+		} finally {
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update(":form:messages");
+		}
+	}
+	
 	public List<TipoPrestamoDTO> getTiposPrestamo() {
 		return tiposPrestamo;
 	}
@@ -191,6 +216,14 @@ public class PrestamoBean implements Serializable {
 
 	public void setEmpleadosSelection(List<DetEmpleadoDTO> empleadosSelection) {
 		this.empleadosSelection = empleadosSelection;
+	}
+
+	public List<PrestamoDTO> getPrestamos() {
+		return prestamos;
+	}
+
+	public void setPrestamos(List<PrestamoDTO> prestamos) {
+		this.prestamos = prestamos;
 	}
 
 }
