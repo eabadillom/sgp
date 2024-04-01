@@ -48,8 +48,7 @@ import mx.com.ferbo.util.SGPException;
 public class AsistenciaBean implements Serializable {
     
     private static final long serialVersionUID = 1L;
-
-    private static final Logger log = LogManager.getLogger(AsistenciaBean.class);
+    private static Logger log = LogManager.getLogger(AsistenciaBean.class);
 
     private ScheduleModel calendario;
     private ScheduleEvent evento;

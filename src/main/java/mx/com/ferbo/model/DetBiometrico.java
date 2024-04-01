@@ -17,10 +17,12 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-/**
- *
- * @author Gabo
- */
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import mx.com.ferbo.dao.DetBiometricoDAO;
+
+
 @Entity
 @Table(name = "det_biometrico")
 @NamedQueries({

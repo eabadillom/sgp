@@ -34,8 +34,7 @@ import mx.com.ferbo.util.SGPException;
 public class IncidenciaBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
-    private static final Logger log = LogManager.getLogger(IncidenciaBean.class);
+    private static Logger log = LogManager.getLogger(IncidenciaBean.class);
 
     private final IncidenciaDAO incidenciaDAO;
     private DetIncidenciaDTO incidenciaSelected;

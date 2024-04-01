@@ -32,6 +32,7 @@ import mx.com.ferbo.dto.DetBiometricoDTO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.util.SGPException;
 
+
 /**
  *
  * @author Gabo
@@ -41,7 +42,6 @@ import mx.com.ferbo.util.SGPException;
 public class RegistroEmpleadosBean implements Serializable {
     
     private static final long serialVersionUID = 1L;
-    
     private static final Logger log = LogManager.getLogger(RegistroEmpleadosBean.class);
 
     private DetEmpleadoDTO empleadoSelected;
@@ -210,8 +210,8 @@ public class RegistroEmpleadosBean implements Serializable {
         }
         PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:dtEmpleados");
     }
-
-    /*
+ 
+    /* 
      * Método para redirigir al kárdex
      */
     public String redirectKardex() {

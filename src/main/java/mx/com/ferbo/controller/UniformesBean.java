@@ -37,8 +37,7 @@ import mx.com.ferbo.util.SGPException;
 public class UniformesBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
-    private static final Logger log = LogManager.getLogger(UniformesBean.class);
+    private static Logger log = LogManager.getLogger(UniformesBean.class);
 
     private String numeroEmpl;
 

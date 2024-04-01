@@ -205,6 +205,11 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     	return !empleado.isEmpty() ? empleado.get(0) : null;
     }
     
+    public DetEmpleadoDTO buscarPorNumEmplAndBiometricos(String numEmpl) {
+    	List<DetEmpleadoDTO> empleado = emSGP.createNamedQuery("DetEmpleado.findByNumEmpl", DetEmpleadoDTO.class).setParameter("numEmpl", numEmpl).getResultList();
+    	return !empleado.isEmpty() ? empleado.get(0) : null;
+    }
+    
     public DetEmpleadoDTO buscarPorNumEmplFechaRegistro(String numEmpl, String fechaEntrada) {
     	List<DetEmpleadoDTO> empleado = emSGP.createNamedQuery("DetEmpleado.findByNumEmpl", DetEmpleadoDTO.class).setParameter("numEmpl", numEmpl).getResultList();
     	return !empleado.isEmpty() ? empleado.get(0) : null;

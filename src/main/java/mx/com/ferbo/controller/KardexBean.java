@@ -26,17 +26,13 @@ import mx.com.ferbo.dto.CatPlantaDTO;
 import mx.com.ferbo.dto.CatPuestoDTO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
 
-/**
- *
- * @author Gabo
- */
+
 @Named(value = "kardexBean")
 @ViewScoped
 public class KardexBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
-    private static final Logger log = LogManager.getLogger(KardexBean.class);
+    private static Logger log = LogManager.getLogger(KardexBean.class);
 
     private List<CatEmpresaDTO> lstCatEmpresa;
     private List<CatPerfilDTO> lstCatPerfil;

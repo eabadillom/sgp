@@ -20,7 +20,6 @@ import mx.com.ferbo.util.SGPException;
 public class CatPercepcionesDAO extends IBaseDAO<CatPercepcionesDTO, Integer> implements Serializable {
     
     private static final long serialVersionUID = 1L; 
- 
     private static final Logger log = LogManager.getLogger(CatPercepcionesDAO.class); 
 
     @Override

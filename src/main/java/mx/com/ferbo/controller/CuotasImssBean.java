@@ -26,8 +26,7 @@ import mx.com.ferbo.util.SGPException;
 public class CuotasImssBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
-    private static final Logger log = LogManager.getLogger(CuotasImssBean.class); 
+    private static Logger log = LogManager.getLogger(CuotasImssBean.class); 
     
     private Date fechaCap;
     private CatImssCuotasDTO cuotaImssNueva;

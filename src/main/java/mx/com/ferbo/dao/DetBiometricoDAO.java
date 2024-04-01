@@ -24,7 +24,8 @@ import mx.com.ferbo.util.SGPException;
 @LocalBean
 public class DetBiometricoDAO extends IBaseDAO<DetBiometricoDTO, Integer> implements Serializable{
 
-    private static final Logger log = LogManager.getLogger(DetBiometricoDAO.class);
+	private static final long serialVersionUID = 1L;
+	private static Logger log = LogManager.getLogger(DetBiometricoDAO.class);
 
     @Override
     public DetBiometricoDTO buscarPorId(Integer id) {
@@ -40,6 +41,9 @@ public class DetBiometricoDAO extends IBaseDAO<DetBiometricoDTO, Integer> implem
     public List<DetBiometricoDTO> buscarActivo() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
+    
+    
+    
 
     @Override
     public List<DetBiometricoDTO> buscarPorCriterios(DetBiometricoDTO e) {

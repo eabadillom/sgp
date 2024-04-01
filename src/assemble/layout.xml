@@ -19,7 +19,7 @@
             <includes>
                 <include>notfound.xhtml</include>
                 <include>access.xhtml</include>
-                <include>login.xhtml</include>
+                <include>login.jsp</include>
                 <include>empty.xhtml</include>
                 <include>error.xhtml</include>
                 <include>landing.xhtml</include>

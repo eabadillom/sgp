@@ -82,6 +82,7 @@ import javax.validation.constraints.Size;
                         + " LEFT JOIN e.idPlanta pl"
                         + " LEFT JOIN e.idPuesto pu"
     		+ " WHERE e.activo = 1 AND e.idEmpleado = :idEmp"),
+    
     @NamedQuery(name = "DetEmpleado.findByActiveSDI",
                 query = "SELECT NEW mx.com.ferbo.dto.DetEmpleadoDTO("
                         + " e.idEmpleado, e.numEmpleado, e.nombre, e.primerAp, e.segundoAp, e.fechaNacimiento,"

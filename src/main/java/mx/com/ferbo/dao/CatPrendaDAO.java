@@ -18,7 +18,6 @@ import mx.com.ferbo.util.SGPException;
 public class CatPrendaDAO extends IBaseDAO<CatPrendaDTO, Integer> implements Serializable {
     
     private static final long serialVersionUID = 1L;
-
     private static final Logger log = LogManager.getLogger(CatPrendaDAO.class);
 
     @Override

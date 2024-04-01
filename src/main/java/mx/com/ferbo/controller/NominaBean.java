@@ -45,8 +45,6 @@ import mx.com.ferbo.dto.DetRegistroDTO;
 import mx.com.ferbo.util.DateUtils;
 import mx.com.ferbo.util.SGPException;
 
-
-
 /**
  *
  * @author erale
@@ -56,8 +54,7 @@ import mx.com.ferbo.util.SGPException;
 public class NominaBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
-    private static final Logger log = LogManager.getLogger(NominaBean.class);
+    private static Logger log = LogManager.getLogger(NominaBean.class);
 
     //<editor-fold defaultstate="collapsed" desc="Constantes">
     private static final int DIAS_TRABAJADOS = 6;

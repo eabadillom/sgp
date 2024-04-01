@@ -1,0 +1,58 @@
+<ui:composition
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/plantillas/template.xhtml">
+	<ui:define name="title">Asistencia</ui:define>
+	<ui:define name="content">
+		<h:form id="form" enctype="multipart/form-data">
+			<p:growl id="messages" showDetail="true" life="2000"/>
+			<p:dialog modal="true" widgetVar="statusInfoDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
+		    </p:dialog>
+			<div class="ui-fluid">
+				<p:panelGrid id="pnl-buscar" columns="4" layout="grid">
+					<p:selectOneMenu id="sel-planta" value="#{repAsistenciaBean.planta}" converter="entityConverter" autoWidth="true">
+						<f:selectItem itemLabel="Todas las plantas"></f:selectItem>
+						<f:selectItems value="#{repAsistenciaBean.plantas}" var="planta" itemLabel="#{planta.descripcion}" itemValue="#{planta}"></f:selectItems>
+					</p:selectOneMenu>
+					<p:datePicker showIcon="true" placeholder="Del: dd/mm/aaaa" value="#{repAsistenciaBean.fechaInicio}">
+						<p:ajax event="dateSelect" listener="#{repAsistenciaBean.ajustaHoras}" process="@this"></p:ajax>
+					</p:datePicker>
+					<p:datePicker showIcon="true" placeholder="Del: dd/mm/aaaa" value="#{repAsistenciaBean.fechaFin}">
+						<p:ajax event="dateSelect" listener="#{repAsistenciaBean.ajustaHoras}" process="@this"></p:ajax>
+					</p:datePicker>
+					<p:commandButton value="Buscar" icon="pi pi-search" process="pnl-buscar @this" update="dt-registros :form:cmd-exportar-pdf" actionListener="#{repAsistenciaBean.cargaInfo}" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
+				</p:panelGrid>
+			</div>
+			<div style="padding-top: 1rem;">
+				<p:dataTable id="dt-registros" value="#{repAsistenciaBean.registros}" var="registro">
+					<p:column headerText="Empleado" sortBy="#{registro.detEmpleadoDTO.nombre}">
+						<p:outputLabel value="#{registro.detEmpleadoDTO.nombre} #{registro.detEmpleadoDTO.primerAp} #{registro.detEmpleadoDTO.segundoAp}"></p:outputLabel>
+					</p:column>
+					<p:column headerText="Entrada" style="width: 10rem; text-align: center;" sortBy="#{registro.fechaEntrada}">
+						<p:outputLabel value="#{registro.fechaEntrada}">
+							<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" />
+						</p:outputLabel>
+					</p:column>
+					<p:column headerText="Salida" style="width: 10rem; text-align: center;" sortBy="#{registro.fechaSalida}">
+						<p:outputLabel value="#{registro.fechaSalida}">
+							<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" />
+						</p:outputLabel>
+					</p:column>
+				</p:dataTable>
+			</div>
+			<div align="center" style="padding-top: 1rem;">
+				<p:panel id="cmd-exportar-pdf">
+					<p:commandButton value="Exportar a PDF" icon="pi pi-file-pdf" ajax="false" rendered="#{not empty repAsistenciaBean.registros}" actionListener="#{repAsistenciaBean.exportarPDF}">
+						<p:fileDownload value="#{repAsistenciaBean.pdfFile}"/>
+					</p:commandButton>
+				</p:panel>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>

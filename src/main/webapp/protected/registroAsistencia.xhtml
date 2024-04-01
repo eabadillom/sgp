@@ -5,74 +5,81 @@
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/plantillas/templateRegistro.xhtml">
 
-    <ui:define name="title">Registro de Asistencia</ui:define>
-
+    <ui:define name="title"></ui:define>
     <ui:define name="head">
+    	<style>
+    		body {
+    			background-color: #ffffff;
+    		}
+			.ui-panelgrid .ui-panelgrid-cell {
+			    background-color: transparent;
+			}
+			
+			.my-heading-row {
+			    /*background-color: var(--surface-c);*/
+			    font-weight: bold;
+			}
+			.alert-popup{
+				font-weight: bold;
+				font-size: 3rem !important;
+				text-align: right;
+			}
+			
+			.top {
+				filter:alpha(opacity=80);
+				padding:1rem 0 0 1rem;
+				z-index: 1000;
+			}
+			
+			.foto {
+				width: auto;
+				height: 10rem;
+				vertical-align: middle;
+				border-radius: 30%;
+			}
+		</style>
     </ui:define>
 
     <ui:define name="content">
         <h:form id="form">
-            <p:remoteCommand autoRun="true" action="#{loginBean.killSesion()}" process="@this" delay="8000"/>
-            <div class="card">
-                <style>
-                    body .ui-panelgrid .ui-panelgrid-cell {
-                        background-color: transparent;
-                    }
-
-                    .my-heading-row {
-                        /*background-color: var(--surface-c);*/
-                        font-weight: bold;
-                    }
-                </style>
-                <p:panelGrid columns="2" columnClasses="ui-grid-col-6,ui-grid-col-6"
-                             layout="grid" styleClass="ui-panelgrid-blank ui-fluid"
-                             style="border:0px none; background-color:transparent;">
-                    <p:row id="my-row-id-one" styleClass="my-heading-row">
-                        <p:column styleClass="ui-grid-col-6">
-                            <h:graphicImage id="imgEmpleado" value="#{bienvenidaBean.empleadoSelected.fotografia}" 
-                                            width="100" style="vertical-align: middle;width: 11rem; height: 11rem; border-radius: 50%;"/>
-                        </p:column>
-
-                    </p:row>
-                    <p:row id="my-row-id-two" styleClass="my-heading-row">
-                        <p:row id="my-row-id-two-0">
-                            <p:outputLabel value="#{bienvenidaBean.empleadoSelected.nombre} #{bienvenidaBean.empleadoSelected.primerAp} #{bienvenidaBean.empleadoSelected.segundoAp}" style="font-size:24px"/>
-                        </p:row>
-                    </p:row>
-
-                    <p:row id="my-row-id-three" styleClass="my-heading-row">
-                        <p:row id="my-row-id-three-0">
-                            <p:outputLabel value="#{bienvenidaBean.empleadoSelected.catPerfilDTO.descripcion}" style="font-size:24px"/>
-                        </p:row>
-                    </p:row>
-
-                    <p:row id="my-row-id-four" styleClass="my-heading-row">
-                        <p:row id="my-row-id-four-0">
-                            <p:outputLabel value="Entrada: " style="font-size:24px"/>
-                            <p:outputLabel value="#{bienvenidaBean.registro.fechaEntrada}" style="font-size:24px">
-                                <f:convertDateTime pattern="HH:mm:ss aa" timeZone="GMT-6"/>
-                            </p:outputLabel>
-                        </p:row>
-                    </p:row>
-                    <p:row styleClass="my-heading-row" rendered="#{bienvenidaBean.registro.fechaSalida ne null}">
-                        <p:row>
-                            <p:outputLabel value="Salida: " style="font-size:24px"/>
-                            <p:outputLabel value="#{bienvenidaBean.registro.fechaSalida}" style="font-size:24px">
-                                <f:convertDateTime pattern="HH:mm:ss aa" timeZone="GMT-6"/>
-                            </p:outputLabel>
-                        </p:row>
-                    </p:row>
-                </p:panelGrid>
-                <p:panelGrid columns="1" columnClasses="ui-grid-col-12"
-                             layout="grid" styleClass="ui-panelgrid-blank ui-fluid"
-                             style="border:0px none; background-color:transparent; text-align: center">
-                    <p:row id="my-row-id-five" styleClass="my-heading-row">
-                        <p:outputLabel value="#{bienvenidaBean.strCumpleanios}" style="font-size:36px"/>
-                    </p:row>
-                </p:panelGrid>
-            </div>
+            <p:remoteCommand autoRun="true" action="#{loginBean.killSesion()}" process="@this" delay="4000"/>
+            
+            <p:notificationBar position="top" effect="slide" styleClass="top" widgetVar="bar" style="text-align: right;">
+            	<h:outputText value="REGISTRO CORRECTO" style="font-size:3rem; font-weight: bold;"></h:outputText>
+            </p:notificationBar>
+            
             <p:growl id="messages" showDetail="true" life="5000" />
+            
+            <div style="padding-top: 3rem">
+            	<h:outputText value=" " />
+            </div>
+            
+            <h:panelGrid columns="2" cellpadding="10">
+          		<h:graphicImage id="imgEmpleado" value="#{bienvenidaBean.empleadoSelected.fotografia}" class="foto"/>
+          		<h:outputText value="#{bienvenidaBean.empleadoSelected.nombre} #{bienvenidaBean.empleadoSelected.primerAp} #{bienvenidaBean.empleadoSelected.segundoAp}" style="font-size:3rem; "/>
+          		<h:outputText value=" "/>
+          		<h:outputText value="#{bienvenidaBean.empleadoSelected.catPerfilDTO.descripcion}" style="font-size:2rem; width: auto; text-align: center;"/>
+          	</h:panelGrid>
+            
+            <p:panel header="Registro de asistencia" style="margin-bottom: 1rem; text-align: center; font-size: 1.5rem;">
+            	<h:panelGrid columns="7" cellpadding="10">
+            		<i class="pi pi-clock" style="font-size:2rem;"/>
+            		<h:outputText value="Entrada" style="font-size:2rem;"/>
+            		<h:outputText value="#{bienvenidaBean.registro.fechaEntrada}" style="font-size:2rem; font-weight: bold;">
+            			<f:convertDateTime pattern="HH:mm:ss aa" timeZone="GMT-6"/>
+            		</h:outputText>
+            		<p:separator style="width: 5rem; height: 1rem;"/>
+            		<i class="pi pi-clock" style="font-size:2rem;"/>
+            		<h:outputText value="Salida" rendered="#{bienvenidaBean.registro.fechaSalida ne null}" style="font-size:2rem;"/>
+            		<h:outputText value="#{bienvenidaBean.registro.fechaSalida}" style="font-size:2rem; font-weight: bold;" rendered="#{bienvenidaBean.registro.fechaSalida ne null}">
+            			<f:convertDateTime pattern="HH:mm:ss aa" timeZone="GMT-6"/>
+            		</h:outputText>
+            	</h:panelGrid>
+            </p:panel>
+            
+            <div align="center">
+            	<p:outputLabel value="#{bienvenidaBean.strCumpleanios}" style="font-size: 2.5rem;"/>
+            </div>
         </h:form>
     </ui:define>
-
 </ui:composition>

@@ -1,36 +1,37 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>com.ferbo</groupId>
     <artifactId>sgp</artifactId>
-    <version>1.0</version>
+    <version>2.0</version>
     <packaging>${packaging.type}</packaging>
-
     <name>sgp</name>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <owb.version>2.0.20</owb.version>
         <mojarra.version>2.3.14</mojarra.version>
         <open-pdf.version>1.3.24</open-pdf.version>
         <poi.version>5.0.0</poi.version>
+        <hibernate.version>5.6.12.Final</hibernate.version>
         <packaging.type>war</packaging.type>
     </properties>
-
     <dependencies>
+		<!-- https://mvnrepository.com/artifact/xerces/xercesImpl -->
+		<dependency>
+		    <groupId>xerces</groupId>
+		    <artifactId>xercesImpl</artifactId>
+		    <version>2.9.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.passay</groupId>
+			<artifactId>passay</artifactId>
+			<version>1.6.1</version>
+		</dependency>
         <dependency>
             <groupId>org.primefaces</groupId>
             <artifactId>primefaces</artifactId>
             <version>12.0.0</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.primefaces.extensions/primefaces-extensions -->
-        <dependency>
-            <groupId>org.primefaces.extensions</groupId>
-            <artifactId>primefaces-extensions</artifactId>
-            <version>12.0.4</version>
-        </dependency>
-
         <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>jakarta.faces</artifactId>
@@ -48,7 +49,6 @@
             <version>3.1.0</version>
             <scope>provided</scope>
         </dependency>
-
         <!-- CDI required APIs -->
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
@@ -70,7 +70,6 @@
             <artifactId>geronimo-annotation_1.3_spec</artifactId>
             <version>1.0</version>
         </dependency>
-
         <!-- CDI Impl -->
         <dependency>
             <groupId>org.apache.openwebbeans</groupId>
@@ -88,6 +87,11 @@
             <version>${owb.version}</version>
         </dependency>
 
+			<dependency>
+			    <groupId>com.google.code.gson</groupId>
+			    <artifactId>gson</artifactId>
+			    <version>2.10.1</version>
+			</dependency>
         <!-- Export Demo Impl -->
         <dependency>
             <groupId>org.apache.poi</groupId>
@@ -130,53 +134,11 @@
             <artifactId>openpdf</artifactId>
             <version>${open-pdf.version}</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
-		<dependency>
+        <dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
-			<version>2.20.0</version>
+			<version>2.19.0</version>
 		</dependency>
-        <dependency>
-            <groupId>org.eclipse.persistence</groupId>
-            <artifactId>org.eclipse.persistence.core</artifactId>
-            <version>2.7.10</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.persistence</groupId>
-            <artifactId>org.eclipse.persistence.asm</artifactId>
-            <version>9.2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.persistence</groupId>
-            <artifactId>org.eclipse.persistence.antlr</artifactId>
-            <version>2.7.10</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.persistence</groupId>
-            <artifactId>org.eclipse.persistence.jpa</artifactId>
-            <version>2.7.10</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.persistence</groupId>
-            <artifactId>org.eclipse.persistence.jpa.jpql</artifactId>
-            <version>2.7.10</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.persistence</groupId>
-            <artifactId>org.eclipse.persistence.moxy</artifactId>
-            <version>2.7.10</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.persistence</groupId>
-            <artifactId>jakarta.persistence</artifactId>
-            <version>2.2.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.persistence</groupId>
-            <artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
-            <version>2.7.10</version>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
@@ -188,68 +150,61 @@
             <groupId>javax</groupId>
             <artifactId>javaee-api</artifactId>
             <version>8.0.1</version>
-            <!--<scope>provided</scope>-->
         </dependency>
-        
         <!-- https://mvnrepository.com/artifact/javax.inject/javax.inject -->
         <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
             <version>1</version>
         </dependency>
-
-        
         <dependency>
             <groupId>javax.persistence</groupId>
             <artifactId>javax.persistence-api</artifactId>
             <version>2.2</version>
         </dependency>
-    
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core-jakarta</artifactId>
-            <version>5.6.12.Final</version>
-        </dependency>
-        
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.28</version>
+            <version>8.0.33</version>
         </dependency>
-        
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>${hibernate.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-c3p0</artifactId>
-            <version>5.3.6.Final</version>
+            <version>${hibernate.version}</version>
         </dependency>
-        
+        <dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+			<version>${hibernate.version}</version>
+		</dependency>
         <!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api -->
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
             <version>2.3.1</version>
         </dependency>
-
         <dependency>
             <groupId>com.lapis.jsfexporter</groupId>
             <artifactId>export-source-primefaces</artifactId>
             <version>1.0.3.Final</version>
         </dependency>
-        
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
-        
-        <dependency>
-			<groupId>com.ferbo</groupId>
-			<artifactId>gestion-tools</artifactId>
-			<version>0.0.2-SNAPSHOT</version>
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports</artifactId>
+			<version>6.19.0</version>
 		</dependency>
     </dependencies>
-
     <repositories>
         <repository>
             <id>prime-repo</id>
@@ -262,7 +217,6 @@
 			<url>https://maven.pkg.github.com/eabadillom/*</url>
 		</repository>
     </repositories>
-
     <build>
         <resources>
             <resource>
