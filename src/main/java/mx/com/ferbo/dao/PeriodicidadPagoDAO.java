@@ -19,17 +19,17 @@ public class PeriodicidadPagoDAO extends IBaseDAO<PeriodicidadPagoDTO, String> i
 	private static Logger log = LogManager.getLogger(PeriodicidadPagoDAO.class);
 	
 	public static synchronized PeriodicidadPagoDTO getDTO(CatPeriodicidadPago e) {
-		PeriodicidadPagoDTO p = null;
+		PeriodicidadPagoDTO dto = null;
 		try {
-			p = new PeriodicidadPagoDTO();
-			p.setPeriodicidad(e.getPeriodicidad());
-			p.setDescripcion(e.getDescripcion());
-			p.setVigenciaInicio(e.getVigenciaInicio());
-			p.setVigenciaFin(e.getVigenciaFin());
+			dto = new PeriodicidadPagoDTO();
+			dto.setPeriodicidad(e.getPeriodicidad());
+			dto.setDescripcion(e.getDescripcion());
+			dto.setVigenciaInicio(e.getVigenciaInicio());
+			dto.setVigenciaFin(e.getVigenciaFin());
 		} catch(Exception ex) {
-			p = null;
+			dto = null;
 		}
-		return p;
+		return dto;
 	}
 	
 	public static synchronized CatPeriodicidadPago getModel(PeriodicidadPagoDTO dto) {
@@ -142,11 +142,11 @@ public class PeriodicidadPagoDAO extends IBaseDAO<PeriodicidadPagoDTO, String> i
 
 	@Override
 	public void actualizar(PeriodicidadPagoDTO e) throws SGPException {
-		CatPeriodicidadPago p = null;
+		CatPeriodicidadPago model = null;
 		try {
-			p = getModel(e);
+			model = getModel(e);
 			emSGP.getTransaction().begin();
-			emSGP.merge(p);
+			emSGP.merge(model);
 			emSGP.getTransaction().commit();
 		} catch(Exception ex) {
 			emSGP.getTransaction().rollback();
@@ -161,11 +161,11 @@ public class PeriodicidadPagoDAO extends IBaseDAO<PeriodicidadPagoDTO, String> i
 
 	@Override
 	public void guardar(PeriodicidadPagoDTO e) throws SGPException {
-		CatPeriodicidadPago p = null;
+		CatPeriodicidadPago model = null;
 		try {
-			p = getModel(e);
+			model = getModel(e);
 			emSGP.getTransaction().begin();
-			emSGP.persist(p);
+			emSGP.persist(model);
 			emSGP.getTransaction().commit();
 		} catch(Exception ex) {
 			emSGP.getTransaction().rollback();

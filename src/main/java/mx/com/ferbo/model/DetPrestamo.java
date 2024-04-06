@@ -8,6 +8,8 @@ import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -27,6 +29,7 @@ public class DetPrestamo implements Serializable{
 
 	@Id
 	@Basic(optional = false)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id_prestamo")
 	private Integer idPrestamo;
 	

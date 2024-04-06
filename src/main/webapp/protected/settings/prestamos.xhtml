@@ -47,13 +47,13 @@
 							</div>
 							<div class="p-field">
 								<p:outputLabel value="Fecha inicio"></p:outputLabel>
-								<p:datePicker value="#{prestamoBean.prestamo.fechaInicio}" showIcon="true">
+								<p:datePicker value="#{prestamoBean.prestamo.fechaInicio}" showIcon="true" yearNavigator="true" monthNavigator="true" weekCalculator="true">
 									<p:ajax process="@this" listener="#{prestamoBean.mostrarFechas}"></p:ajax>
 								</p:datePicker>
 							</div>
 							<div class="p-field">
 								<p:outputLabel value="Fecha Fin"></p:outputLabel>
-								<p:datePicker value="#{prestamoBean.prestamo.fechaFin}" showIcon="true">
+								<p:datePicker value="#{prestamoBean.prestamo.fechaFin}" showIcon="true" yearNavigator="true" monthNavigator="true" weekCalculator="true">
 									<p:ajax process="@this" listener="#{prestamoBean.mostrarFechas}"></p:ajax>
 								</p:datePicker>
 							</div>

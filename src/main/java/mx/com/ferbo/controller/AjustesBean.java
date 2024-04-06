@@ -60,5 +60,16 @@ public class AjustesBean implements Serializable {
 			log.error("Problema para redirigir al catalogo de dias no laborales...", ex);
 		}
 	}
+	
+	public void regimenFiscal() {
+		String path = null;
+		try {
+			log.info("Redirigiendo a catálogo régimen fiscal...");
+			path = this.contextPath + "/protected/settings/sat/regimenFiscal.xhtml";
+			FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+		} catch (IOException ex) {
+			log.error("Problema para redirigir al catalogo de dias no laborales...", ex);
+		}
+	}
 
 }
