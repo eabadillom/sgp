@@ -29,8 +29,7 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "det_empleado")
 @NamedQueries({
-    @NamedQuery(name = "DetEmpleado.findByActive",
-                query = "SELECT NEW mx.com.ferbo.dto.DetEmpleadoDTO("
+    @NamedQuery(name = "DetEmpleado.findByActive",query = "SELECT NEW mx.com.ferbo.dto.DetEmpleadoDTO("
                         + " e.idEmpleado, e.numEmpleado, e.nombre, e.primerAp, e.segundoAp, e.fechaNacimiento,"
                         + " e.fechaRegistro, e.fechaModificacion, e.curp, e.rfc, e.correo, e.fechaIngreso, e.nss, "
                         + " e.activo, e.fotografia, a.idArea, a.descripcion, em.idEmpresa, em.descripcion, "
@@ -43,8 +42,7 @@ import javax.validation.constraints.Size;
                         + " LEFT JOIN e.idPlanta pl"
                         + " LEFT JOIN e.idPuesto pu"
                         + " WHERE e.activo = 1"),
-    @NamedQuery(name = "DetEmpleado.findByID",
-                query = "SELECT NEW mx.com.ferbo.dto.DetEmpleadoDTO("
+    @NamedQuery(name = "DetEmpleado.findByID",query = "SELECT NEW mx.com.ferbo.dto.DetEmpleadoDTO("
                         + " e.idEmpleado, e.numEmpleado, e.nombre, e.primerAp, e.segundoAp, e.fechaNacimiento,"
                         + " e.fechaRegistro, e.fechaModificacion, e.curp, e.rfc, e.correo, e.fechaIngreso, e.nss, e.activo, e.fotografia, a.idArea, a.descripcion,"
                         + " em.idEmpresa, em.descripcion, p.idPerfil, p.descripcion, pl.idPlanta, pl.descripcion, pu.idPuesto, pu.descripcion"
