@@ -1,0 +1,36 @@
+<ui:composition
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/plantillas/template.xhtml">
+	<ui:define name="title">Empresas</ui:define>
+	<ui:define name="content">
+		<h:form id="form">
+			<p:growl id="messages" showDetail="true" life="4000"/>
+			<p:dialog modal="true" widgetVar="statusDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
+			</p:dialog>
+			<p:toolbar>
+		    	<p:toolbarGroup>
+		    		<p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{empresasBean.nuevo()}" oncomplete="PF('dgEmpresa').show();" process="@this" update="form:dg-empresa"/>
+		    	</p:toolbarGroup>
+		    </p:toolbar>
+		    <div style="padding-top: 1rem">
+		    	<p:dataTable id="dt-empresa" widgetVar="dtEmpresa" value="#{empresasBean.empresas}" var="empresa" allowUnsorting="true" sortMode="single">
+		    		<p:column headerText="Nombre">
+		    			<p:outputLabel value="#{empresa.nombre}"></p:outputLabel>
+		    		</p:column>
+		    		<p:column headerText="Razon Social">
+		    			<p:outputLabel value="#{empresa.razonSocial}"></p:outputLabel>
+		    		</p:column>
+		    	</p:dataTable>
+		    </div>
+		    <p:dialog id="dg-empresa" widgetVar="dgEmpresa">
+		    </p:dialog>
+		</h:form>
+	</ui:define>
+</ui:composition>

@@ -10,6 +10,12 @@
 		<h:form id="form">
 			<div class="ui-fluid">
 				<div class="card">
+					<h5 style="margin-top:0">Sistema</h5>
+					<p:panelGrid columns="4" layout="grid">
+						<p:commandButton value="Empresas" icon="pi pi-building" actionListener="#{ajustesBean.empresas()}"></p:commandButton>
+					</p:panelGrid>
+				</div>
+				<div class="card">
 	    			<h5 style="margin-top:0">Catálogos SAT</h5>
 					<p:panelGrid columns="4" layout="grid">
 						<p:commandButton value="Dias no laborales" icon="pi pi-calendar" actionListener="#{ajustesBean.configNonWorkingDays}"></p:commandButton>

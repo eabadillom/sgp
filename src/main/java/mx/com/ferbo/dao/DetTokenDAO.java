@@ -60,15 +60,21 @@ public class DetTokenDAO extends IBaseDAO<DetTokenDTO, Integer> implements Seria
 	
 	public DetTokenDTO buscarPorIdEmpleadoAndFecha(Integer idEmpleado) {
 		DetToken model = null;
-		DetTokenDTO token = null;
+		DetTokenDTO dto = null;
 		
-		model = emSGP.createNamedQuery("DetToken.findByEmpleadoAndFecha", DetToken.class)
-				.setParameter("idEmpleado", idEmpleado)
-				.getSingleResult()
-				;
+		try {
+			model = emSGP.createNamedQuery("DetToken.findByEmpleadoAndFecha", DetToken.class)
+					.setParameter("idEmpleado", idEmpleado)
+					.getSingleResult()
+					;
+			
+			dto = getDTO(model);
+			
+		} catch(Exception ex) {
+			dto = null;
+		}
 		
-		token = getDTO(model);
-		return token;
+		return dto;
 	}
 
 	@Override
