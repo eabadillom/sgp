@@ -189,13 +189,15 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
             empleado.setFechaRegistro(new Date());
             empleado.setActivo((short) 1);
             empleado.setFotografia(e.getFotografia());
-            empleado.setNumEmpleado(String.format("%0" + 4 + "d", (Long) emSGP.createNamedQuery("DetEmpleado.getNumEmpleado").getSingleResult() + 1));
+            empleado.setNumEmpleado(String.format("%0" + 4 + "d", (Integer) emSGP.createNamedQuery("DetEmpleado.getNumEmpleado").getSingleResult() + 1));
+           
             empleado.setSueldoDiario(e.getSueldoDiario());
             emSGP.persist(empleado);
             emSGP.getTransaction().commit();
             e.setIdEmpleado(empleado.getIdEmpleado());
         } catch (Exception ex) {
             emSGP.getTransaction().rollback();
+            ex.printStackTrace();
             log.warn("EX-0009: " + ex.getMessage() + ". Error al guardar empleado " + e.getNumEmpleado() != null ? e.getNumEmpleado() : null);
         }
     }
