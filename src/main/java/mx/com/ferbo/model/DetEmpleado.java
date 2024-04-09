@@ -31,8 +31,7 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "det_empleado")
 @NamedQueries({
-    @NamedQuery(name = "DetEmpleado.findByActive",
-                query = "SELECT NEW mx.com.ferbo.dto.DetEmpleadoDTO("
+    @NamedQuery(name = "DetEmpleado.findByActive",query = "SELECT NEW mx.com.ferbo.dto.DetEmpleadoDTO("
                         + " e.idEmpleado, e.numEmpleado, e.nombre, e.primerAp, e.segundoAp, e.fechaNacimiento,"
                         + " e.fechaRegistro, e.fechaModificacion, e.curp, e.rfc, e.correo, e.fechaIngreso, e.nss, "
                         + " e.activo, e.fotografia, a.idArea, a.descripcion, em.idEmpresa, em.descripcion, "
