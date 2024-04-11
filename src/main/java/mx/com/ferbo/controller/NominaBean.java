@@ -1,17 +1,14 @@
 package mx.com.ferbo.controller;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -78,10 +75,8 @@ public class NominaBean implements Serializable {
     private List<CatEmpresaDTO> lstEmpresas;
     private List<DetRegistroDTO> lstRegistrosAlAnio;
     private List<CatPercepcionesDTO> lstPercepcionActual;
-    private List<CatTarifaIsrDTO> lstIsrActualSemanal;
     private List<CatTarifaIsrDTO> lstIsrActualMensual;
-    private List<CatSubsidioDTO> lstSubsidioActual;
-    private List<CatImssCuotasDTO> lstCuotaImssActual;
+//    private List<CatImssCuotasDTO> lstCuotaImssActual;
     private List<DetEmpleadoDTO> lstEmpleados;
     private List<DetRegistroDTO> lstRegistrosEmpleadoSemanaAnterior;
     private List<DetRegistroDTO> lstRegistrosPorEmpresaSemanaAnterior;
@@ -244,9 +239,7 @@ public class NominaBean implements Serializable {
 
         lstPercepcionActual = catPercepcionesDAO.buscarActivo();
         percepcion = (CatPercepcionesDTO) lstPercepcionActual.get(0);
-        lstIsrActualSemanal = catTarifaIsrSemanalDAO.buscarActualesSemanal(year);
-        lstSubsidioActual = catSubsidioDAO.buscarActuales(year);
-        lstCuotaImssActual = catImssCuotasDAO.buscarActuales(year);
+//        lstCuotaImssActual = catImssCuotasDAO.buscarActuales(year);
 
         isr = new CatTarifaIsrDTO();
         subsidio = new CatSubsidioDTO();
@@ -294,16 +287,16 @@ public class NominaBean implements Serializable {
         PrimeFaces.current().executeScript("PF('empresaDialog').hide()");
     }
 
-    private List<DetEmpleadoDTO> getEmpleados(Integer idEmpresa) {
-    	lstEmpleadosTmp = empleadoDAO.buscarActivoAndEmpresa(idEmpresa);
-    	return lstEmpleadosTmp;
-    }
+//    private List<DetEmpleadoDTO> getEmpleados(Integer idEmpresa) {
+//    	lstEmpleadosTmp = empleadoDAO.buscarActivoAndEmpresa(idEmpresa);
+//    	return lstEmpleadosTmp;
+//    }
 
-    private List<DetRegistroDTO> obteniendoListaRegistrosEmpleadosDeEmpresaSeleccionada() {
-        lstRegistrosPorEmpresaSemanaAnterior = lstRegistrosEmpleadoSemanaAnterior.stream().filter(rg -> lstEmpleadosTmp.stream().anyMatch(empl -> empl.getIdEmpleado().equals(rg.getDetEmpleadoDTO().getIdEmpleado()))).collect(Collectors.toList());
-        lstRegistrosPorEmpresaSemanaAnterior.sort(Comparator.comparingInt(DetEmpleadoDTO -> DetEmpleadoDTO.getDetEmpleadoDTO().getIdEmpleado()));
-        return lstRegistrosPorEmpresaSemanaAnterior;
-    }
+//    private List<DetRegistroDTO> obteniendoListaRegistrosEmpleadosDeEmpresaSeleccionada() {
+//        lstRegistrosPorEmpresaSemanaAnterior = lstRegistrosEmpleadoSemanaAnterior.stream().filter(rg -> lstEmpleadosTmp.stream().anyMatch(empl -> empl.getIdEmpleado().equals(rg.getDetEmpleadoDTO().getIdEmpleado()))).collect(Collectors.toList());
+//        lstRegistrosPorEmpresaSemanaAnterior.sort(Comparator.comparingInt(DetEmpleadoDTO -> DetEmpleadoDTO.getDetEmpleadoDTO().getIdEmpleado()));
+//        return lstRegistrosPorEmpresaSemanaAnterior;
+//    }
 
     private void procesaListaEmpleados(List<DetEmpleadoDTO> listaEmpleados) {
     	try {
@@ -424,41 +417,41 @@ public class NominaBean implements Serializable {
 //    }
 
     //<editor-fold defaultstate="collapsed" desc="Cálculo de IMSS">
-    public float enfMatEsp() {
-        imss = lstCuotaImssActual.stream().filter(s -> s.getCuota().equals("T")).findFirst().get();
-        enfMatEsp = percepcion.getUma().multiply(new BigDecimal(3).setScale(2, BigDecimal.ROUND_HALF_UP)).floatValue();
-        if (sdi > enfMatEsp) {
-            enfMatEsp = ((sdi - enfMatEsp) * imss.getEnfMatEspCtAd()) * (DIAS_TRABAJADOS + SEPTIMO_DIA);
-            enfMatEsp = (float) (Math.round(enfMatEsp * 100d) / 100d);
-        } else {
-            enfMatEsp = 0;
-        }
-        return enfMatEsp;
-    }
+//    public float enfMatEsp() {
+//        imss = lstCuotaImssActual.stream().filter(s -> s.getCuota().equals("T")).findFirst().get();
+//        enfMatEsp = percepcion.getUma().multiply(new BigDecimal(3).setScale(2, BigDecimal.ROUND_HALF_UP)).floatValue();
+//        if (sdi > enfMatEsp) {
+//            enfMatEsp = ((sdi - enfMatEsp) * imss.getEnfMatEspCtAd()) * (DIAS_TRABAJADOS + SEPTIMO_DIA);
+//            enfMatEsp = (float) (Math.round(enfMatEsp * 100d) / 100d);
+//        } else {
+//            enfMatEsp = 0;
+//        }
+//        return enfMatEsp;
+//    }
 
-    public float enfMatGM() {
-        imss = lstCuotaImssActual.stream().filter(s -> s.getCuota().equals("T")).findFirst().get();
-        return enfMatGM = (float) (Math.round((sdi * imss.getEnfMatGastosMed()) * (DIAS_TRABAJADOS + SEPTIMO_DIA) * 100d) / 100d);
-    }
+//    public float enfMatGM() {
+//        imss = lstCuotaImssActual.stream().filter(s -> s.getCuota().equals("T")).findFirst().get();
+//        return enfMatGM = (float) (Math.round((sdi * imss.getEnfMatGastosMed()) * (DIAS_TRABAJADOS + SEPTIMO_DIA) * 100d) / 100d);
+//    }
 
-    public float enfMatDinero() {
-        imss = lstCuotaImssActual.stream().filter(s -> s.getCuota().equals("T")).findFirst().get();
-        return enfMatDinero = (float) (Math.round((sdi * imss.getEnfMatDinero()) * (DIAS_TRABAJADOS + SEPTIMO_DIA) * 100d) / 100d);
-    }
+//    public float enfMatDinero() {
+//        imss = lstCuotaImssActual.stream().filter(s -> s.getCuota().equals("T")).findFirst().get();
+//        return enfMatDinero = (float) (Math.round((sdi * imss.getEnfMatDinero()) * (DIAS_TRABAJADOS + SEPTIMO_DIA) * 100d) / 100d);
+//    }
 
     public float totalEnfMat() {
         return totalEnfMat = enfMatEsp + enfMatGM + enfMatDinero;
     }
 
-    public float invVida() {
-        imss = lstCuotaImssActual.stream().filter(s -> s.getCuota().equals("T")).findFirst().get();
-        return invVida = (float) (Math.round((sdi * imss.getInvVida()) * (DIAS_TRABAJADOS + SEPTIMO_DIA) * 100d) / 100d);
-    }
+//    public float invVida() {
+//        imss = lstCuotaImssActual.stream().filter(s -> s.getCuota().equals("T")).findFirst().get();
+//        return invVida = (float) (Math.round((sdi * imss.getInvVida()) * (DIAS_TRABAJADOS + SEPTIMO_DIA) * 100d) / 100d);
+//    }
 
-    public float cesantiaVejez() {
-        imss = lstCuotaImssActual.stream().filter(s -> s.getCuota().equals("T")).findFirst().get();
-        return cesVejez = (float) (Math.round((sdi * imss.getRetCesantiaVejezCeav()) * (DIAS_TRABAJADOS + SEPTIMO_DIA) * 100d) / 100d);
-    }
+//    public float cesantiaVejez() {
+//        imss = lstCuotaImssActual.stream().filter(s -> s.getCuota().equals("T")).findFirst().get();
+//        return cesVejez = (float) (Math.round((sdi * imss.getRetCesantiaVejezCeav()) * (DIAS_TRABAJADOS + SEPTIMO_DIA) * 100d) / 100d);
+//    }
 
     public float totalImssRetener() {
         return imssARetener = (float) (Math.round((totalEnfMat + invVida + cesVejez) * 100d) / 100d);
@@ -642,14 +635,6 @@ public class NominaBean implements Serializable {
         this.lstPercepcionActual = lstPercepcionActual;
     }
 
-    public List<CatTarifaIsrDTO> getLstIsrActualSemanal() {
-        return lstIsrActualSemanal;
-    }
-
-    public void setLstIsrActualSemanal(List<CatTarifaIsrDTO> lstIsrActualSemanal) {
-        this.lstIsrActualSemanal = lstIsrActualSemanal;
-    }
-
     public List<CatTarifaIsrDTO> getLstIsrActualMensual() {
         return lstIsrActualMensual;
     }
@@ -658,21 +643,13 @@ public class NominaBean implements Serializable {
         this.lstIsrActualMensual = lstIsrActualMensual;
     }
 
-    public List<CatSubsidioDTO> getLstSubsidioActual() {
-        return lstSubsidioActual;
-    }
-
-    public void setLstSubsidioActual(List<CatSubsidioDTO> lstSubsidioActual) {
-        this.lstSubsidioActual = lstSubsidioActual;
-    }
-
-    public List<CatImssCuotasDTO> getLstCuotaImssActual() {
-        return lstCuotaImssActual;
-    }
-
-    public void setLstCuotaImssActual(List<CatImssCuotasDTO> lstCuotaImssActual) {
-        this.lstCuotaImssActual = lstCuotaImssActual;
-    }
+//    public List<CatImssCuotasDTO> getLstCuotaImssActual() {
+//        return lstCuotaImssActual;
+//    }
+//
+//    public void setLstCuotaImssActual(List<CatImssCuotasDTO> lstCuotaImssActual) {
+//        this.lstCuotaImssActual = lstCuotaImssActual;
+//    }
 
     public List<DetEmpleadoDTO> getLstEmpleados() {
         return lstEmpleados;

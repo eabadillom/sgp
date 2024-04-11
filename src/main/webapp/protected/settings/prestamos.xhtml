@@ -47,19 +47,31 @@
 							</div>
 							<div class="p-field">
 								<p:outputLabel value="Fecha inicio"></p:outputLabel>
-								<p:datePicker value="#{prestamoBean.prestamo.fechaInicio}" showIcon="true">
+								<p:datePicker value="#{prestamoBean.prestamo.fechaInicio}" showIcon="true" yearNavigator="true" monthNavigator="true" weekCalculator="true">
 									<p:ajax process="@this" listener="#{prestamoBean.mostrarFechas}"></p:ajax>
 								</p:datePicker>
 							</div>
 							<div class="p-field">
 								<p:outputLabel value="Fecha Fin"></p:outputLabel>
-								<p:datePicker value="#{prestamoBean.prestamo.fechaFin}" showIcon="true">
+								<p:datePicker value="#{prestamoBean.prestamo.fechaFin}" showIcon="true" yearNavigator="true" monthNavigator="true" weekCalculator="true">
 									<p:ajax process="@this" listener="#{prestamoBean.mostrarFechas}"></p:ajax>
 								</p:datePicker>
 							</div>
 							<div class="p-field">
+								<p:outputLabel value="Acumulado"></p:outputLabel>
+								<p:inputNumber value="#{prestamoBean.prestamo.acumulado}">
+									<f:convertNumber currencySymbol="$" maxFractionDigits="2"></f:convertNumber>
+								</p:inputNumber>
+							</div>
+							<div class="p-field">
 								<p:outputLabel value="Importe"></p:outputLabel>
 								<p:inputNumber value="#{prestamoBean.prestamo.importe}">
+									<f:convertNumber currencySymbol="$" maxFractionDigits="2"></f:convertNumber>
+								</p:inputNumber>
+							</div>
+							<div class="p-field">
+								<p:outputLabel value="Total"></p:outputLabel>
+								<p:inputNumber value="#{prestamoBean.prestamo.total}">
 									<f:convertNumber currencySymbol="$" maxFractionDigits="2"></f:convertNumber>
 								</p:inputNumber>
 							</div>
@@ -95,10 +107,14 @@
 										<f:selectItems value="#{prestamoBean.tiposPrestamo}" var="tipoPrestamo" itemLabel="#{tipoPrestamo.descripcion}" itemValue="#{tipoPrestamo}" />
 									</p:selectOneMenu>
 								</p:column>
+								<p:column headerText="Acumulado" width="5rem">
+									<p:inputNumber value="#{prestamo.acumulado}" decimalSeparator="2" symbol="$" symbolPosition="p" emptyValue="empty" />
+								</p:column>
 								<p:column headerText="Importe" width="5rem;">
-									<p:column headerText="Importe" width="5rem;">
-										<p:inputNumber value="#{prestamo.importe}" decimalSeparator="2" symbol="$" symbolPosition="p" emptyValue="empty" />
-									</p:column>
+									<p:inputNumber value="#{prestamo.importe}" decimalSeparator="2" symbol="$" symbolPosition="p" emptyValue="empty" />
+								</p:column>
+								<p:column headerText="Total" width="5rem">
+									<p:inputNumber value="#{prestamo.total}" decimalSeparator="2" symbol="$" symbolPosition="p" emptyValue="empty" />
 								</p:column>
 								<p:column width="3rem;">
 									<p:commandButton icon="pi pi-save" actionListener="#{prestamoBean.guardaPrestamo}">

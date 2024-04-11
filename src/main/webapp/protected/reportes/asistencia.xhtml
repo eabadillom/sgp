@@ -48,9 +48,16 @@
 			</div>
 			<div align="center" style="padding-top: 1rem;">
 				<p:panel id="cmd-exportar-pdf">
-					<p:commandButton value="Exportar a PDF" icon="pi pi-file-pdf" ajax="false" rendered="#{not empty repAsistenciaBean.registros}" actionListener="#{repAsistenciaBean.exportarPDF}">
-						<p:fileDownload value="#{repAsistenciaBean.pdfFile}"/>
-					</p:commandButton>
+					<div style="padding-left: 1rem; padding-right: 1rem; display: inline-block;">
+						<p:commandButton value="Exportar a PDF" icon="pi pi-file-pdf" ajax="false" rendered="#{not empty repAsistenciaBean.registros}" actionListener="#{repAsistenciaBean.exportarPDF}">
+							<p:fileDownload value="#{repAsistenciaBean.pdfFile}"/>
+						</p:commandButton>
+					</div>
+					<div style="padding-left: 1rem; padding-right: 1rem; display: inline-block;">
+						<p:commandButton value="Exportar a Excel" icon="pi pi-file-excel" ajax="false" rendered="#{not empty repAsistenciaBean.registros}" actionListener="#{repAsistenciaBean.exportarXLS}">
+							<p:fileDownload value="#{repAsistenciaBean.xlsFile}"/>
+						</p:commandButton>
+					</div>
 				</p:panel>
 			</div>
 		</h:form>

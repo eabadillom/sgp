@@ -84,7 +84,7 @@ public class PrestamoBean implements Serializable {
 		this.prestamo = new PrestamoDTO();
 		this.prestamo.setEmpleado(empleado);
 		log.info("Cargando información de préstamo INFONAVIT del empleado {}, prestamo: {}", this.empleado, this.prestamo);
-		this.accion = "E";
+		this.accion = "N";
 		
 		this.prestamos = prestamoDAO.buscar(this.empleado.getIdEmpleado());
 		log.info("Registros INFONAVIT: {}", this.prestamos.size());
@@ -99,7 +99,7 @@ public class PrestamoBean implements Serializable {
 		try {
 			log.info("Guardando préstamo: {}", this.prestamo);
 			
-			if("N".equalsIgnoreCase(this.accion))
+			if("N".equalsIgnoreCase(this.accion) || this.prestamo.getIdPrestamo() == null)
 				this.prestamoDAO.guardar(this.prestamo);
 			else
 				this.prestamoDAO.actualizar(this.prestamo);
@@ -118,22 +118,6 @@ public class PrestamoBean implements Serializable {
 			FacesContext.getCurrentInstance().addMessage(null, message);
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-empleado");
 		}
-	}
-
-	public List<DetEmpleadoDTO> getEmpleados() {
-		return empleados;
-	}
-
-	public void setEmpleados(List<DetEmpleadoDTO> empleados) {
-		this.empleados = empleados;
-	}
-
-	public DetEmpleadoDTO getEmpleado() {
-		return empleado;
-	}
-
-	public void setEmpleado(DetEmpleadoDTO empleado) {
-		this.empleado = empleado;
 	}
 	
 	public void onTabChange(TabChangeEvent event) {
@@ -168,6 +152,22 @@ public class PrestamoBean implements Serializable {
 			FacesContext.getCurrentInstance().addMessage(null, message);
 			PrimeFaces.current().ajax().update(":form:messages");
 		}
+	}
+
+	public List<DetEmpleadoDTO> getEmpleados() {
+		return empleados;
+	}
+
+	public void setEmpleados(List<DetEmpleadoDTO> empleados) {
+		this.empleados = empleados;
+	}
+
+	public DetEmpleadoDTO getEmpleado() {
+		return empleado;
+	}
+
+	public void setEmpleado(DetEmpleadoDTO empleado) {
+		this.empleado = empleado;
 	}
 	
 	public List<TipoPrestamoDTO> getTiposPrestamo() {

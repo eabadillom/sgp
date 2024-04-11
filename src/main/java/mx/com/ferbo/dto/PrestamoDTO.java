@@ -10,7 +10,9 @@ public class PrestamoDTO {
 	private DetEmpleadoDTO empleado;
 	private Date fechaInicio;
 	private Date fechaFin;
+	private BigDecimal acumulado;
 	private BigDecimal importe;
+	private BigDecimal total;
 	private PeriodicidadPagoDTO periodicidadPago;
 	private TipoPrestamoDTO tipoPrestamo;
 	
@@ -76,5 +78,17 @@ public class PrestamoDTO {
 			return false;
 		PrestamoDTO other = (PrestamoDTO) obj;
 		return Objects.equals(idPrestamo, other.idPrestamo);
+	}
+	public BigDecimal getAcumulado() {
+		return acumulado;
+	}
+	public void setAcumulado(BigDecimal acumulado) {
+		this.acumulado = acumulado;
+	}
+	public BigDecimal getTotal() {
+		return total;
+	}
+	public void setTotal(BigDecimal total) {
+		this.total = total;
 	}
 }
