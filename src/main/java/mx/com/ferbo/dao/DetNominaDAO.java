@@ -2,6 +2,7 @@ package mx.com.ferbo.dao;
 
 import java.io.Serializable;
 import java.util.List;
+
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
 
@@ -79,7 +80,7 @@ public class DetNominaDAO extends IBaseDAO<DetNominaDTO, Integer> implements Ser
             nomina.setSubsAlEmpleoAcreditado(e.getSubsAlEmpleoAcreditado());
             nomina.setSubsAlEmpleoMes(e.getSubsAlEmpleoMes());
             nomina.setIsrAntesDeSubsAlEmpleo(e.getIsrAntesDeSubsAlEmpleo());
-            nomina.setIsrMes(e.getIsrMes());
+            nomina.setIsrMes(e.getIsr());
             nomina.setImss(e.getImss());
             nomina.setPrestamoFonacot(e.getPrestamoFonacot());
             nomina.setAjusteEnSubsidioParaElEmpleo(e.getAjusteEnSubsidioParaElEmpleo());

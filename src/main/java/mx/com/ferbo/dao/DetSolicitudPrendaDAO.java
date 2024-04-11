@@ -7,6 +7,9 @@ import java.util.List;
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.dto.DetSolicitudPrendaDTO;
 import mx.com.ferbo.model.CatPrenda;
@@ -14,9 +17,6 @@ import mx.com.ferbo.model.CatTalla;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetSolicitudPrenda;
 import mx.com.ferbo.util.SGPException;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @Stateless
 @LocalBean

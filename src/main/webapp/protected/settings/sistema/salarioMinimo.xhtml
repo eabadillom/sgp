@@ -1,0 +1,77 @@
+<ui:composition
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/plantillas/template.xhtml">
+	<ui:define name="title">Salario mínimo</ui:define>
+	<ui:define name="content">
+		<h:form id="form">
+			<p:growl id="messages" showDetail="true" life="4000"/>
+			<p:dialog modal="true" widgetVar="statusDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
+			</p:dialog>
+			<p:toolbar>
+		    	<p:toolbarGroup>
+		    		<p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{salarioMinBean.nuevo()}" oncomplete="PF('dgSalario').show();" process="@this" update="form:dg-salario"/>
+		    	</p:toolbarGroup>
+		    </p:toolbar>
+		    <div style="padding-top: 1rem">
+		    	<p:dataTable id="dt-salario" widgetVar="dtSalario" value="#{salarioMinBean.salarios}" var="salario" allowUnsorting="true" sortMode="single">
+		    		<p:column headerText="Vigencia" style="text-align: center;">
+		    			<p:outputLabel value="#{salario.vigencia}">
+		    				<f:convertDateTime pattern="dd/MMM/yyyy" locale="es" timeZone="GMT-6:00"/>
+		    			</p:outputLabel>
+		    		</p:column>
+		    		<p:column headerText="Zona General" style="text-align: center;">
+		    			<p:outputLabel value="#{salario.zonaG}">
+		    				<f:convertNumber pattern="$#,##0.00" />
+		    			</p:outputLabel>
+		    		</p:column>
+		    		<p:column headerText="Zona Libre Frontera Norte" style="text-align: center;">
+		    			<p:outputLabel value="#{salario.zonaLFN}">
+		    				<f:convertNumber pattern="$#,##0.00" />
+		    			</p:outputLabel>
+		    		</p:column>
+		    		<p:column style="text-align: center;">
+		    			<p:commandButton icon="pi pi-bars" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dgSalario').show();" actionListener="#{salarioMinBean.editar}" process="@this dt-salario" update="form:dg-salario">
+		    				<f:setPropertyActionListener value="#{salario}" target="#{salarioMinBean.salario}" />
+		    			</p:commandButton>
+		    			<p:commandButton icon="pi pi-times" styleClass="ui-button-danger" process="@this dt-salario" action="#{salarioMinBean.eliminar}">
+		    				<p:confirm header="Confirmación" message="¿Deseas eliminar este registro?" icon="pi pi-info-circle"/>
+		    				<f:setPropertyActionListener value="#{salario}" target="#{salarioMinBean.salario}" />
+		    			</p:commandButton>
+		    		</p:column>
+		    	</p:dataTable>
+		    </div>
+		    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+	            <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-flat"/>
+	            <p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes" />
+	        </p:confirmDialog>
+		    <p:dialog id="dg-salario" widgetVar="dgSalario" header="Salario mínimo" showEffect="hide" modal="true">
+		    	<p:outputPanel class="ui-fluid">
+		    		<div class="p-field">
+		    			<p:outputLabel value="Vigencia"></p:outputLabel>
+		    			<p:datePicker value="#{salarioMinBean.salario.vigencia}" showIcon="true" yearNavigator="true" monthNavigator="true">
+		    			</p:datePicker>
+		    		</div>
+		    		<div class="p-field">
+		    			<p:outputLabel value="Zona General"></p:outputLabel>
+		    			<p:inputNumber value="#{salarioMinBean.salario.zonaG}" decimalPlaces="2" minValue="0.00" symbol="$" symbolPosition="p" ></p:inputNumber>
+		    		</div>
+		    		<div class="p-field">
+		    			<p:outputLabel value="Zona Libre Frontera Norte"></p:outputLabel>
+		    			<p:inputNumber value="#{salarioMinBean.salario.zonaLFN}" decimalPlaces="2" minValue="0.00" symbol="$" symbolPosition="p" ></p:inputNumber>
+		    		</div>
+		    	</p:outputPanel>
+	    		<f:facet name="footer">
+	    			<p:commandButton value="Guardar" actionListener="#{salarioMinBean.guardar}" process="dg-salario @this" update="dt-salario">
+	    			</p:commandButton>
+	    		</f:facet>
+		    </p:dialog>
+		</h:form>
+	</ui:define>
+</ui:composition>

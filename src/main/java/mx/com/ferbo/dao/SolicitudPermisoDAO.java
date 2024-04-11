@@ -3,8 +3,13 @@ package mx.com.ferbo.dao;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.dto.DetIncidenciaDTO;
@@ -13,8 +18,6 @@ import mx.com.ferbo.model.CatTipoSolicitud;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetSolicitudPermiso;
 import mx.com.ferbo.util.SGPException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  *

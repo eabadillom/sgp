@@ -48,6 +48,7 @@ public class RepAsistenciabean implements Serializable {
 	private RegistroDAO registroDAO;
 	
 	private StreamedContent pdfFile;
+	private StreamedContent xlsFile;
 	
 	public RepAsistenciabean() {
 		plantaDAO = new CatPlantaDAO();
@@ -82,9 +83,10 @@ public class RepAsistenciabean implements Serializable {
 			
 			idPlanta = this.planta == null ? null : this.planta.getIdPlanta();
 			
-			registros = registroDAO.buscar(idPlanta, this.fechaInicio, this.fechaFin);
+			registros = registroDAO.buscarPorPlantaPeriodo(idPlanta, this.fechaInicio, this.fechaFin);
 			
 			this.exportarPDF();
+			this.exportarXLS();
 			
 		} catch(SGPException ex) {
 			mensaje = ex.getMessage();
@@ -153,7 +155,64 @@ public class RepAsistenciabean implements Serializable {
 			pdfFile = jasperReportUtil.getPdf(filename, parameters, reportFile.getPath());
 			log.info("Exportación completa.");
 		} catch (Exception e) {
-			log.error("Ocurrió un problema al imprimir el ticket de la constancia de salida...", e);
+			log.error("Ocurrió un problema al imprimir el reporte de asistencia...", e);
+			message = String.format("No es posible exportar el reporte.");
+			severity = FacesMessage.SEVERITY_INFO;
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity,"Error en impresion",message));
+			PrimeFaces.current().ajax().update("form:messages");
+		}finally {
+			EntityManagerUtil.close(conn);
+		}
+	}
+	
+	public void exportarXLS() {
+		String jasperPath = null;
+		String filename = null;
+		String images = null;
+		String message = null;
+		Severity severity = null;
+		File reportFile = null;
+		File imgFile = null;
+		JasperReportUtil jasperReportUtil = null;
+		Map<String, Object> parameters = null;
+		Connection conn = null;
+		
+		Date fechaFinT = null;
+		try {
+			jasperPath = "/jasper/ReporteAsistencia.jrxml";
+			filename = String.format("ReporteAsistencia_%s_%s.xlsx", DateUtil.getString(this.fechaInicio, DateUtil.FORMATO_YYYY_MM_DD), DateUtil.getString(this.fechaFin, DateUtil.FORMATO_YYYY_MM_DD));
+			images = "/images/logo.png";
+			reportFile = new File(jasperPath);
+			jasperReportUtil = new JasperReportUtil();
+			parameters = new HashMap<String, Object>();
+			
+			URL resource = getClass().getResource(jasperPath);//verifica si el recurso esta disponible 
+			URL resourceimg = getClass().getResource(images); 
+			String file = resource.getFile();//retorna la ubicacion del archivo
+			String img = resourceimg.getFile();
+			reportFile = new File(file);//crea un archivo
+			imgFile = new File(img);
+			conn = EntityManagerUtil.getConnection();
+			log.info("Conexion: {}", conn);
+			DateUtil.setTime(fechaInicio, 0, 0, 0, 0);
+			DateUtil.setTime(fechaFin, 23, 59, 59, 0);
+			log.info("Inicio del periodo de búsqueda: {}", this.fechaInicio);
+			log.info("Fin del periodo de búsqueda: {}", this.fechaFin);
+			
+			fechaFinT = new Date(this.fechaFin.getTime());
+			fechaFinT = DateUtil.addDay(fechaFinT, 1);
+			
+			parameters.put("REPORT_CONNECTION", conn);
+			parameters.put("idPlanta", this.planta == null ? null : this.planta.getIdPlanta());
+			parameters.put("REPORT_TIME_ZONE", TimeZone.getTimeZone("GMT-06:00"));
+			parameters.put("REPORT_LOCALE", new Locale("es", "MX"));
+			parameters.put("fechaInicio", this.fechaInicio);
+			parameters.put("fechaFin", fechaFinT);
+			parameters.put("imagen", imgFile.getPath());
+			xlsFile = jasperReportUtil.getXls(filename, parameters, reportFile.getPath());
+			log.info("Exportación completa.");
+		} catch (Exception e) {
+			log.error("Ocurrió un problema al imprimir el reporte de asistencia...", e);
 			message = String.format("No es posible exportar el reporte.");
 			severity = FacesMessage.SEVERITY_INFO;
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity,"Error en impresion",message));
@@ -209,6 +268,14 @@ public class RepAsistenciabean implements Serializable {
 
 	public void setPdfFile(StreamedContent pdfFile) {
 		this.pdfFile = pdfFile;
+	}
+
+	public StreamedContent getXlsFile() {
+		return xlsFile;
+	}
+
+	public void setXlsFile(StreamedContent xlsFile) {
+		this.xlsFile = xlsFile;
 	}
 	
 	
