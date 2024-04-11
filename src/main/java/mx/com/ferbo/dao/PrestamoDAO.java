@@ -23,7 +23,9 @@ public class PrestamoDAO extends IBaseDAO<PrestamoDTO, Integer>{
 			dto.setEmpleado(EmpleadoDAO.getDTO(model.getEmpleado()));
 			dto.setFechaInicio(model.getFechaInicio());
 			dto.setFechaFin(model.getFechaFin());
+			dto.setAcumulado(model.getAcumulado());
 			dto.setImporte(model.getImporte());
+			dto.setTotal(model.getTotal()); 
 			dto.setPeriodicidadPago(PeriodicidadPagoDAO.getDTO(model.getPeriodicidadPago()));
 			dto.setTipoPrestamo(TipoPrestamoDAO.getDTO(model.getTipoPrestamo()));
 		} catch(Exception ex) {
@@ -40,7 +42,9 @@ public class PrestamoDAO extends IBaseDAO<PrestamoDTO, Integer>{
 			model.setEmpleado(EmpleadoDAO.getModel(dto.getEmpleado()));
 			model.setFechaInicio(dto.getFechaInicio());
 			model.setFechaFin(dto.getFechaFin());
+			model.setAcumulado(dto.getAcumulado());
 			model.setImporte(dto.getImporte());
+			model.setTotal(dto.getTotal());
 			model.setPeriodicidadPago(PeriodicidadPagoDAO.getModel(dto.getPeriodicidadPago()));
 			model.setTipoPrestamo(TipoPrestamoDAO.getModel(dto.getTipoPrestamo()));
 			

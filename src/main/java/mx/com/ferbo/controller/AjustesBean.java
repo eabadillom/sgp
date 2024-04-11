@@ -50,6 +50,17 @@ public class AjustesBean implements Serializable {
 		}
 	}
 	
+	public void salarioMinimo() {
+		String path = null;
+		try {
+			log.info("Redirigiendo a catálogo de salarios mínimos...");
+			path = this.contextPath + "/protected/settings/sistema/salarioMinimo.xhtml";
+			FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+		} catch (IOException ex) {
+			log.error("Problema para redirigir al catalogo de dias no laborales...", ex);
+		}
+	}
+	
 	public void prestamos() {
 		String path = null;
 		try {

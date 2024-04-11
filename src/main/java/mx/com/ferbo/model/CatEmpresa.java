@@ -24,10 +24,10 @@ import mx.com.ferbo.model.sat.CatRegimenFiscal;
             + "FROM CatEmpresa c"),
     @NamedQuery(name = "CatEmpresa.findByActive", query = "SELECT c "
             + " FROM CatEmpresa c"
-            + " WHERE c.activo = 1"),
+            + " WHERE c.activo = true"),
     @NamedQuery(name = "CatEmpresa.findById", query = "SELECT c "
             + " FROM CatEmpresa c"
-            + " WHERE c.activo = 1 AND c.idEmpresa = :idEmpresa")})
+            + " WHERE c.activo = true AND c.idEmpresa = :idEmpresa")})
 public class CatEmpresa implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -43,7 +43,7 @@ public class CatEmpresa implements Serializable {
     
     @Basic(optional = false)
     @Column(name = "activo")
-    private short activo;
+    private Boolean activo;
     
     @Basic(optional = false)
     @Column(name = "nb_razon_social")
@@ -74,7 +74,7 @@ public class CatEmpresa implements Serializable {
     private String statusPadron;
     
     @JoinColumn(name = "cd_regimen", referencedColumnName = "cd_regimen")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = true)
     private CatRegimenFiscal regimenFiscal;
 
     public CatEmpresa() {
@@ -84,7 +84,7 @@ public class CatEmpresa implements Serializable {
         this.idEmpresa = idEmpresa;
     }
 
-    public CatEmpresa(Integer idEmpresa, String descripcion, short activo) {
+    public CatEmpresa(Integer idEmpresa, String descripcion, Boolean activo) {
         this.idEmpresa = idEmpresa;
         this.descripcion = descripcion;
         this.activo = activo;
@@ -106,11 +106,11 @@ public class CatEmpresa implements Serializable {
         this.descripcion = descripcion;
     }
 
-    public short getActivo() {
+    public Boolean getActivo() {
         return activo;
     }
 
-    public void setActivo(short activo) {
+    public void setActivo(Boolean activo) {
         this.activo = activo;
     }
 

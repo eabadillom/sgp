@@ -90,7 +90,7 @@ public class DetEmpleadoDTO implements Serializable {
         this.activo = activo;
         this.fotografia = fotografia;
         this.catAreaDTO = new CatAreaDTO(idArea, descripcionArea, (short) 1);
-        this.catEmpresaDTO = new CatEmpresaDTO(idEmpresa, descripcionEmpresa, (short) 1);
+        this.catEmpresaDTO = new CatEmpresaDTO(idEmpresa, descripcionEmpresa, true);
         this.catPerfilDTO = new CatPerfilDTO(idPerfil, descripcionPerfil, (short) 1);
         this.catPlantaDTO = new CatPlantaDTO(idPlanta, descripcionPlanta, (short) 1);
         this.catPuestoDTO = new CatPuestoDTO(idPuesto, descripcionPuesto, (short) 1);
@@ -130,7 +130,7 @@ public class DetEmpleadoDTO implements Serializable {
         this.activo = activo;
         this.fotografia = fotografia;
         this.catAreaDTO = new CatAreaDTO(idArea, descripcionArea, (short) 1);
-        this.catEmpresaDTO = new CatEmpresaDTO(idEmpresa, descripcionEmpresa, (short) 1);
+        this.catEmpresaDTO = new CatEmpresaDTO(idEmpresa, descripcionEmpresa, true);
         this.catPerfilDTO = new CatPerfilDTO(idPerfil, descripcionPerfil, (short) 1);
         this.catPlantaDTO = new CatPlantaDTO(idPlanta, descripcionPlanta, (short) 1);
         this.catPuestoDTO = new CatPuestoDTO(idPuesto, descripcionPuesto, (short) 1);

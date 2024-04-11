@@ -31,6 +31,7 @@ public class CatEmpresaDAO extends IBaseDAO<CatEmpresaDTO, Integer> implements S
     	    dto.setRfc(model.getRfc());
     	    dto.setFechaInicioOperacion(model.getFechaInicioOperacion());
     	    dto.setFechaUltimoCambio(model.getFechaUltimoCambio());
+    	    dto.setStatusPadron(model.getStatusPadron());
     	    dto.setRegimenFiscal(RegimenFiscalDAO.getDTO(model.getRegimenFiscal()));
     		
     	} catch(Exception ex) {
@@ -52,6 +53,7 @@ public class CatEmpresaDAO extends IBaseDAO<CatEmpresaDTO, Integer> implements S
     	    model.setRfc(dto.getRfc());
     	    model.setFechaInicioOperacion(dto.getFechaInicioOperacion());
     	    model.setFechaUltimoCambio(dto.getFechaUltimoCambio());
+    	    model.setStatusPadron(dto.getStatusPadron());
     	    model.setRegimenFiscal(RegimenFiscalDAO.getModel(dto.getRegimenFiscal()));
     	    
     	} catch(Exception ex) {
@@ -102,12 +104,32 @@ public class CatEmpresaDAO extends IBaseDAO<CatEmpresaDTO, Integer> implements S
 
     @Override
     public void actualizar(CatEmpresaDTO e) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        CatEmpresa model = null;
+        
+        try {
+        	model = getModel(e);
+        	emSGP.getTransaction().begin();
+        	emSGP.merge(model);
+        	emSGP.getTransaction().commit();
+        } catch(Exception ex) {
+        	log.error("Problema para guardar la empresa...", ex);
+        	emSGP.getTransaction().rollback();
+        }
     }
 
     @Override
     public void guardar(CatEmpresaDTO e) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    	CatEmpresa model = null;
+        
+        try {
+        	model = getModel(e);
+        	emSGP.getTransaction().begin();
+        	emSGP.persist(model);
+        	emSGP.getTransaction().commit();
+        } catch(Exception ex) {
+        	log.error("Problema para guardar la empresa...", ex);
+        	emSGP.getTransaction().rollback();
+        }
     }
 
     @Override

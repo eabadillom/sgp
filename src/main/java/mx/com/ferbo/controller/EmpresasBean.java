@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
@@ -18,6 +19,7 @@ import mx.com.ferbo.dao.CatEmpresaDAO;
 import mx.com.ferbo.dao.sat.RegimenFiscalDAO;
 import mx.com.ferbo.dto.CatEmpresaDTO;
 import mx.com.ferbo.dto.sat.RegimenFiscalDTO;
+import mx.com.ferbo.util.SGPException;
 
 @Named(value = "empresasBean")
 @ViewScoped
@@ -38,6 +40,7 @@ public class EmpresasBean implements Serializable {
 		regimenDAO = new RegimenFiscalDAO();
 	}
 	
+	@PostConstruct
 	public void init() {
 		contextPath = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
 		empresas = empresaDAO.buscarActivo();
@@ -46,6 +49,10 @@ public class EmpresasBean implements Serializable {
 	
 	public void nuevo() {
 		this.empresa = new CatEmpresaDTO();
+		this.empresa.setActivo(true);
+		this.empresa.setStatusPadron("A");
+		this.empresa.setTipoPersona("M");
+		log.info("Nueva empresa");
 	}
 	
 	public void editar() {
@@ -59,6 +66,12 @@ public class EmpresasBean implements Serializable {
 		String titulo = "Guardar empresa";
 		
 		try {
+			if(this.empresa == null)
+				throw new SGPException("No hay información de la empresa.");
+			
+			if("M".equalsIgnoreCase(this.empresa.getTipoPersona()) && (this.empresa.getRegimenCapital() == null || "".equalsIgnoreCase(this.empresa.getRegimenCapital().trim())))
+				throw new SGPException("Debe indicar un régimen capital.");
+			
 			if(this.empresa.getIdEmpresa() == null)
 				empresaDAO.guardar(empresa);
 			else
@@ -69,9 +82,12 @@ public class EmpresasBean implements Serializable {
 			mensaje = "La empresa se guardó correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
 			PrimeFaces.current().executeScript("PF('dgEmpresa').hide()");
-		} catch(Exception ex) {
+		} catch(SGPException ex) {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
+		} catch(Exception ex) {
+			mensaje = "Existe un problema para guardar la información.";
+			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
@@ -93,6 +109,14 @@ public class EmpresasBean implements Serializable {
 
 	public void setEmpresa(CatEmpresaDTO empresa) {
 		this.empresa = empresa;
+	}
+
+	public List<RegimenFiscalDTO> getRegimenes() {
+		return regimenes;
+	}
+
+	public void setRegimenes(List<RegimenFiscalDTO> regimenes) {
+		this.regimenes = regimenes;
 	}
 
 }

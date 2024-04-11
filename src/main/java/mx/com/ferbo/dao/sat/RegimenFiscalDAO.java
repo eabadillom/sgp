@@ -124,6 +124,7 @@ public class RegimenFiscalDAO extends IBaseDAO<RegimenFiscalDTO, String>{
 			emSGP.merge(model);
 			emSGP.getTransaction().commit();
 		} catch(Exception ex) {
+			log.error("Problema para guardar el régimen fiscal...", ex);
 			emSGP.getTransaction().rollback();
 		}
 	}
@@ -146,5 +147,4 @@ public class RegimenFiscalDAO extends IBaseDAO<RegimenFiscalDTO, String>{
 			emSGP.getTransaction().rollback();
 		}
 	}
-
 }

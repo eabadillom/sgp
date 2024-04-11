@@ -5,7 +5,7 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:p="http://primefaces.org/ui"
 	template="/WEB-INF/plantillas/template.xhtml">
-	<ui:define name="title">Empresas</ui:define>
+	<ui:define name="title">Emisores (Empresas)</ui:define>
 	<ui:define name="content">
 		<h:form id="form">
 			<p:growl id="messages" showDetail="true" life="4000"/>
@@ -22,14 +22,74 @@
 		    <div style="padding-top: 1rem">
 		    	<p:dataTable id="dt-empresa" widgetVar="dtEmpresa" value="#{empresasBean.empresas}" var="empresa" allowUnsorting="true" sortMode="single">
 		    		<p:column headerText="Nombre">
-		    			<p:outputLabel value="#{empresa.nombre}"></p:outputLabel>
+		    			<p:outputLabel value="#{empresa.descripcion}"></p:outputLabel>
 		    		</p:column>
 		    		<p:column headerText="Razon Social">
 		    			<p:outputLabel value="#{empresa.razonSocial}"></p:outputLabel>
 		    		</p:column>
+		    		<p:column>
+		    			<p:commandButton icon="pi pi-bars" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dgEmpresa').show();" actionListener="#{empresasBean.editar}" process="@this dt-empresa" update="form:dg-empresa">
+		    				<f:setPropertyActionListener value="#{empresa}" target="#{empresasBean.empresa}" />
+		    			</p:commandButton>
+		    		</p:column>
 		    	</p:dataTable>
 		    </div>
-		    <p:dialog id="dg-empresa" widgetVar="dgEmpresa">
+		    <p:dialog id="dg-empresa" widgetVar="dgEmpresa" header="Empresa" showEffect="hide" modal="true">
+		    	<p:outputPanel class="ui-fluid">
+		    		<div class="p-field">
+		    			<p:outputLabel value="Nombre"></p:outputLabel>
+		    			<p:inputText value="#{empresasBean.empresa.descripcion}"></p:inputText>
+		    		</div>
+		    		<div class="p-field">
+		    			<div style="padding-top: 0.5rem;">
+			    			<p:selectBooleanCheckbox value="#{empresasBean.empresa.activo}" itemLabel="Activo"></p:selectBooleanCheckbox>
+		    			</div>
+		    		</div>
+		    		<div class="p-field">
+		    			<p:outputLabel value="Razón Social"></p:outputLabel>
+		    			<p:inputText value="#{empresasBean.empresa.razonSocial}"></p:inputText>
+		    		</div>
+		    		<div class="p-field">
+		    			<p:selectOneRadio value="#{empresasBean.empresa.tipoPersona}">
+		    				<f:selectItem itemLabel="Persona Física" itemValue="F"/>
+            				<f:selectItem itemLabel="Persona Moral" itemValue="M"/>
+		    			</p:selectOneRadio>
+		    		</div>
+		    		<div class="p-field">
+		    			<p:outputLabel value="Régimen Capital"></p:outputLabel>
+		    			<p:inputText value="#{empresasBean.empresa.regimenCapital}" />
+		    		</div>
+		    		<div class="p-field">
+		    			<p:outputLabel value="RFC"></p:outputLabel>
+		    			<p:inputText value="#{empresasBean.empresa.rfc}"></p:inputText>
+		    		</div>
+		    		<div class="p-field">
+		    			<p:outputLabel value="Régimen Fiscal"></p:outputLabel>
+		    			<p:selectOneMenu value="#{empresasBean.empresa.regimenFiscal}" converter="entityConverter">
+		    				<f:selectItem itemLabel="Seleccione un régimen fiscal" noSelectionOption="true"></f:selectItem>
+		    				<f:selectItems value="#{empresasBean.regimenes}" var="regimen" itemLabel="#{regimen.nombre}" itemValue="#{regimen}" ></f:selectItems>
+		    			</p:selectOneMenu>
+		    		</div>
+		    		<div class="p-field">
+		    			<p:outputLabel value="Fecha inicio de operaciones"></p:outputLabel>
+		    			<p:datePicker value="#{empresasBean.empresa.fechaInicioOperacion}" showIcon="true" yearNavigator="true" monthNavigator="true"></p:datePicker>
+		    		</div>
+		    		<div class="p-field">
+		    			<p:outputLabel value="Fecha ultimo cambio"></p:outputLabel>
+		    			<p:datePicker value="#{empresasBean.empresa.fechaUltimoCambio}" showIcon="true" yearNavigator="true" monthNavigator="true"></p:datePicker>
+		    		</div>
+		    		<div class="p-field">
+		    			<p:outputLabel value="Status en el padrón"></p:outputLabel>
+		    			<p:selectOneRadio value="#{empresasBean.empresa.statusPadron}">
+		    				<f:selectItem itemLabel="Activo" itemValue="A"></f:selectItem>
+		    				<f:selectItem itemLabel="Baja" itemValue="B"></f:selectItem>
+		    			</p:selectOneRadio>
+		    		</div>
+		    	</p:outputPanel>
+	    		<f:facet name="footer">
+	    			<p:commandButton value="Guardar" actionListener="#{empresasBean.guardar}" process="dg-empresa @this" update="dt-empresa">
+	    			</p:commandButton>
+	    		</f:facet>
 		    </p:dialog>
 		</h:form>
 	</ui:define>

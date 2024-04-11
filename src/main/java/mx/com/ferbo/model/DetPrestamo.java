@@ -46,8 +46,16 @@ public class DetPrestamo implements Serializable{
 	private Date fechaFin;
 	
 	@Basic(optional = false)
+	@Column(name="nu_acumulado")
+	private BigDecimal acumulado;
+	
+	@Basic(optional = false)
 	@Column(name = "nu_importe")
 	private BigDecimal importe;
+	
+	@Basic(optional = false)
+	@Column(name = "nu_total")
+	private BigDecimal total;
 	
 	@ManyToOne
 	@JoinColumn(name = "periodicidad", referencedColumnName = "periodicidad")
@@ -88,6 +96,14 @@ public class DetPrestamo implements Serializable{
 	public void setFechaFin(Date fechaFin) {
 		this.fechaFin = fechaFin;
 	}
+	
+	public BigDecimal getAcumulado() {
+		return acumulado;
+	}
+
+	public void setAcumulado(BigDecimal acumulado) {
+		this.acumulado = acumulado;
+	}
 
 	public BigDecimal getImporte() {
 		return importe;
@@ -95,6 +111,14 @@ public class DetPrestamo implements Serializable{
 
 	public void setImporte(BigDecimal importe) {
 		this.importe = importe;
+	}
+	
+	public BigDecimal getTotal() {
+		return total;
+	}
+
+	public void setTotal(BigDecimal total) {
+		this.total = total;
 	}
 
 	public CatPeriodicidadPago getPeriodicidadPago() {
@@ -136,4 +160,6 @@ public class DetPrestamo implements Serializable{
 		DetPrestamo other = (DetPrestamo) obj;
 		return Objects.equals(idPrestamo, other.idPrestamo);
 	}
+
+	
 }
