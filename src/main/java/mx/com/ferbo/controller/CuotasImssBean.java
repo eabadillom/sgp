@@ -5,16 +5,18 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import javax.annotation.PostConstruct;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import mx.com.ferbo.dao.CatImssCuotasDAO;
-import mx.com.ferbo.dto.CatImssCuotasDTO;
-import mx.com.ferbo.util.SGPException;
 
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger; 
+import org.apache.logging.log4j.Logger;
+
+import mx.com.ferbo.dao.CatImssCuotasDAO;
+import mx.com.ferbo.dto.CatImssCuotasDTO;
+import mx.com.ferbo.util.SGPException; 
 /**
  *
  * @author erale
@@ -24,7 +26,6 @@ import org.apache.logging.log4j.Logger;
 public class CuotasImssBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
     private static Logger log = LogManager.getLogger(CuotasImssBean.class); 
     
     private Date fechaCap;

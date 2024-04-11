@@ -1,6 +1,7 @@
 package mx.com.ferbo.dto;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -14,17 +15,17 @@ public class CatPercepcionesDTO implements Serializable {
     private Integer idPercepciones;
     private Integer diasAguinaldo;
     private Integer diasVacaciones;
-    private Float primaVacacional;
-    private Float bonoPuntualidad;
-    private Float valeDespensa;
-    private Float uma;
+    private BigDecimal primaVacacional;
+    private BigDecimal bonoPuntualidad;
+    private BigDecimal valeDespensa;
+    private BigDecimal uma;
     private Date fechaCap;
     private short activo;
 
     public CatPercepcionesDTO() {
     }
     
-    public CatPercepcionesDTO(Integer idPercepciones, Integer diasAguinaldo, Integer diasVacaciones, Float primaVacacional, Float bonoPuntualidad, Float valeDespensa, Float uma, Date fechaCap, short activo) {
+    public CatPercepcionesDTO(Integer idPercepciones, Integer diasAguinaldo, Integer diasVacaciones, BigDecimal primaVacacional, BigDecimal bonoPuntualidad, BigDecimal valeDespensa, BigDecimal uma, Date fechaCap, short activo) {
         this.idPercepciones = idPercepciones;
         this.diasAguinaldo = diasAguinaldo;
         this.diasVacaciones = diasVacaciones;
@@ -60,35 +61,35 @@ public class CatPercepcionesDTO implements Serializable {
         this.diasVacaciones = diasVacaciones;
     }
 
-    public Float getPrimaVacacional() {
+    public BigDecimal getPrimaVacacional() {
         return primaVacacional;
     }
 
-    public void setPrimaVacacional(Float primaVacacional) {
+    public void setPrimaVacacional(BigDecimal primaVacacional) {
         this.primaVacacional = primaVacacional;
     }
 
-    public Float getBonoPuntualidad() {
+    public BigDecimal getBonoPuntualidad() {
         return bonoPuntualidad;
     }
 
-    public void setBonoPuntualidad(Float bonoPuntualidad) {
+    public void setBonoPuntualidad(BigDecimal bonoPuntualidad) {
         this.bonoPuntualidad = bonoPuntualidad;
     }
 
-    public Float getValeDespensa() {
+    public BigDecimal getValeDespensa() {
         return valeDespensa;
     }
 
-    public void setValeDespensa(Float valeDespensa) {
+    public void setValeDespensa(BigDecimal valeDespensa) {
         this.valeDespensa = valeDespensa;
     }
 
-    public Float getUma() {
+    public BigDecimal getUma() {
         return uma;
     }
 
-    public void setUma(Float uma) {
+    public void setUma(BigDecimal uma) {
         this.uma = uma;
     }
 

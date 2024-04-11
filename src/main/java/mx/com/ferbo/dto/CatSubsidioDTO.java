@@ -1,6 +1,7 @@
 package mx.com.ferbo.dto;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -12,20 +13,20 @@ public class CatSubsidioDTO implements Serializable {
     private static final long serialVersionUID = 1L;
     
     private Integer idSubsidio;
-    private Float paraIngresosDe;
-    private Float hastaIngresosDe;
-    private Float cantidadSubsidio;
-    private Date fechaubsidio;
+    private BigDecimal paraIngresosDe;
+    private BigDecimal hastaIngresosDe;
+    private BigDecimal cantidadSubsidio;
+    private Date fechaSubsidio;
 
     public CatSubsidioDTO() {
     }
 
-    public CatSubsidioDTO(Integer idSubsidio, Float paraIngresosDe, Float hastaIngresosDe, Float cantidadSubsidio, Date fechaubsidio) {
+    public CatSubsidioDTO(Integer idSubsidio, BigDecimal paraIngresosDe, BigDecimal hastaIngresosDe, BigDecimal cantidadSubsidio, Date fechaSubsidio) {
         this.idSubsidio = idSubsidio;
         this.paraIngresosDe = paraIngresosDe;
         this.hastaIngresosDe = hastaIngresosDe;
         this.cantidadSubsidio = cantidadSubsidio;
-        this.fechaubsidio = fechaubsidio;
+        this.fechaSubsidio = fechaSubsidio;
     }
 
     public Integer getIdSubsidio() {
@@ -36,36 +37,36 @@ public class CatSubsidioDTO implements Serializable {
         this.idSubsidio = idSubsidio;
     }
 
-    public Float getParaIngresosDe() {
+    public BigDecimal getParaIngresosDe() {
         return paraIngresosDe;
     }
 
-    public void setParaIngresosDe(Float paraIngresosDe) {
+    public void setParaIngresosDe(BigDecimal paraIngresosDe) {
         this.paraIngresosDe = paraIngresosDe;
     }
 
-    public Float getHastaIngresosDe() {
+    public BigDecimal getHastaIngresosDe() {
         return hastaIngresosDe;
     }
 
-    public void setHastaIngresosDe(Float hastaIngresosDe) {
+    public void setHastaIngresosDe(BigDecimal hastaIngresosDe) {
         this.hastaIngresosDe = hastaIngresosDe;
     }
 
-    public Float getCantidadSubsidio() {
+    public BigDecimal getCantidadSubsidio() {
         return cantidadSubsidio;
     }
 
-    public void setCantidadSubsidio(Float cantidadSubsidio) {
+    public void setCantidadSubsidio(BigDecimal cantidadSubsidio) {
         this.cantidadSubsidio = cantidadSubsidio;
     }
 
-    public Date getFechaubsidio() {
-        return fechaubsidio;
+    public Date getFechaSubsidio() {
+        return fechaSubsidio;
     }
 
-    public void setFechaubsidio(Date fechaubsidio) {
-        this.fechaubsidio = fechaubsidio;
+    public void setFechaSubsidio(Date fechaSubsidio) {
+        this.fechaSubsidio = fechaSubsidio;
     }
     
     

@@ -30,7 +30,7 @@ import javax.persistence.TemporalType;
                                                   + " d.fechaEntrada,"
                                                   + " d.fechaSalida,"
                                                   + " ce.idEstatus,"
-                                                  + " ce.descripcion"
+                                                  + " ce.descripcion, ce.codigo"
                                                   + ")"
                                                   + " FROM DetRegistro d"
                                                   + " INNER JOIN d.idEmpleado e"
@@ -42,31 +42,23 @@ import javax.persistence.TemporalType;
                                                   + " d.fechaEntrada,"
                                                   + " d.fechaSalida,"
                                                   + " ce.idEstatus,"
-                                                  + " ce.descripcion"
+                                                  + " ce.descripcion, ce.codigo"
                                                   + ")"
                                                   + " FROM DetRegistro d"
                                                   + " INNER JOIN d.idEmpleado e"
                                                   + " INNER JOIN d.idEstatus ce"
                                                   + " WHERE d.fechaEntrada LIKE :fechaEntrada"),
-    @NamedQuery(name = "DetRegistro.findByNomina", query = "SELECT NEW mx.com.ferbo.dto.DetRegistroDTO("
-                                                  + " d.idRegistro,"
-                                                  + " e.idEmpleado,"
-                                                  + " d.fechaEntrada,"
-                                                  + " d.fechaSalida,"
-                                                  + " ce.idEstatus,"
-                                                  + " ce.descripcion"
-                                                  + ")"
-                                                  + " FROM DetRegistro d"
-                                                  + " INNER JOIN d.idEmpleado e"
-                                                  + " INNER JOIN d.idEstatus ce"
-                                                  + " WHERE d.fechaEntrada BETWEEN :fechaEntrada AND :fechaSalida"),
+    @NamedQuery(name = "DetRegistro.findByNomina", query = "SELECT NEW mx.com.ferbo.dto.DetRegistroDTO( d.idRegistro, e.idEmpleado, d.fechaEntrada, d.fechaSalida, ce.idEstatus, ce.descripcion, ce.codigo) FROM DetRegistro d INNER JOIN d.idEmpleado e INNER JOIN d.idEstatus ce WHERE d.fechaEntrada BETWEEN :fechaEntrada AND :fechaSalida"),
+    
+    @NamedQuery(name = "DetRegistro.findByIdEmpleadoPeriodo", query = "SELECT NEW mx.com.ferbo.dto.DetRegistroDTO( d.idRegistro, e.idEmpleado, d.fechaEntrada, d.fechaSalida, ce.idEstatus, ce.descripcion, ce.codigo) FROM DetRegistro d INNER JOIN d.idEmpleado e INNER JOIN d.idEstatus ce WHERE d.idEmpleado.idEmpleado = :idEmpleado AND d.fechaEntrada BETWEEN :fechaEntrada AND :fechaSalida"),
+    
     @NamedQuery(name = "DetRegistro.findByIdEmplActivo", query = "SELECT NEW mx.com.ferbo.dto.DetRegistroDTO("
                                                   + " d.idRegistro,"
                                                   + " e.idEmpleado,"
                                                   + " d.fechaEntrada,"
                                                   + " d.fechaSalida,"
                                                   + " ce.idEstatus,"
-                                                  + " ce.descripcion"
+                                                  + " ce.descripcion, ce.codigo"
                                                   + ")"
                                                   + " FROM DetRegistro d"
                                                   + " INNER JOIN d.idEmpleado e"
@@ -79,7 +71,7 @@ import javax.persistence.TemporalType;
                                                   + " d.fechaEntrada,"
                                                   + " d.fechaSalida,"
                                                   + " ce.idEstatus,"
-                                                  + " ce.descripcion"
+                                                  + " ce.descripcion, ce.codigo"
                                                   + ")"
                                                   + " FROM DetRegistro d"
                                                   + " INNER JOIN d.idEmpleado e"
@@ -97,15 +89,19 @@ public class DetRegistro implements Serializable {
     @Basic(optional = false)
     @Column(name = "id_registro")
     private Integer idRegistro;
+    
     @Column(name = "fecha_entrada")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaEntrada;
+    
     @Column(name = "fecha_salida")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaSalida;
+    
     @JoinColumn(name = "id_estatus", referencedColumnName = "id_estatus")
     @ManyToOne
     private CatEstatusRegistro idEstatus;
+    
     @JoinColumn(name = "id_empleado", referencedColumnName = "id_empleado")
     @ManyToOne(optional = false)
     private DetEmpleado idEmpleado;

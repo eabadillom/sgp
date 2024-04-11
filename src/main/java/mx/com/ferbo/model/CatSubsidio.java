@@ -1,7 +1,9 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -21,6 +23,7 @@ import javax.validation.constraints.NotNull;
 @Table(name = "cat_subsidio")
 @NamedQueries({
     @NamedQuery(name = "CatSubsidio.findAll", query = "SELECT s FROM CatSubsidio s"),
+    @NamedQuery(name = "CatSubsidio.findByPeriodoTipoIngreso", query = "SELECT new mx.com.ferbo.dto.CatSubsidioDTO(s.idSubsidio, s.paraIngresosDe, s.hastaIngresosDe, s.cantidadSubsidio, s.fecha) FROM CatSubsidio s WHERE s.fecha BETWEEN :fechaInicio AND :fechaFin AND s.periodo = :periodo AND :ingreso BETWEEN s.paraIngresosDe AND s.hastaIngresosDe"),
     @NamedQuery(name = "CatSubsidio.findActual", query = "SELECT NEW mx.com.ferbo.dto.CatSubsidioDTO(s.idSubsidio, s.paraIngresosDe, s.hastaIngresosDe, s.cantidadSubsidio, s.fecha) FROM CatSubsidio s WHERE s.fecha LIKE :fecha")})
 public class CatSubsidio implements Serializable {
     
@@ -30,15 +33,23 @@ public class CatSubsidio implements Serializable {
     @Basic(optional = false)
     @Column(name = "id_subsidio")
     private Integer idSubsidio;
+    
     @NotNull
     @Column(name = "para_ingresos_de")
-    private Float paraIngresosDe;
+    private BigDecimal paraIngresosDe;
+    
     @NotNull
     @Column(name = "hasta_ingresos_de")
-    private Float hastaIngresosDe;
+    private BigDecimal hastaIngresosDe;
+    
     @NotNull
     @Column(name = "cantidad_subsidio")
-    private Float cantidadSubsidio;
+    private BigDecimal cantidadSubsidio;
+    
+    @NotNull
+    @Column(name = "periodo")
+    private String periodo;
+    
     @NotNull
     @Column(name = "fecha")
     private Date fecha;
@@ -50,7 +61,7 @@ public class CatSubsidio implements Serializable {
         this.idSubsidio = idSubsidio;
     }
 
-    public CatSubsidio(Integer idSubsidio, Float paraIngresosDe, Float hastaIngresosDe, Float cantidadSubsidio, Date fecha) {
+    public CatSubsidio(Integer idSubsidio, BigDecimal paraIngresosDe, BigDecimal hastaIngresosDe, BigDecimal cantidadSubsidio, Date fecha) {
         this.idSubsidio = idSubsidio;
         this.paraIngresosDe = paraIngresosDe;
         this.hastaIngresosDe = hastaIngresosDe;
@@ -66,27 +77,27 @@ public class CatSubsidio implements Serializable {
         this.idSubsidio = idSubsidio;
     }
 
-    public Float getParaIngresosDe() {
+    public BigDecimal getParaIngresosDe() {
         return paraIngresosDe;
     }
 
-    public void setParaIngresosDe(Float paraIngresosDe) {
+    public void setParaIngresosDe(BigDecimal paraIngresosDe) {
         this.paraIngresosDe = paraIngresosDe;
     }
 
-    public Float getHastaIngresosDe() {
+    public BigDecimal getHastaIngresosDe() {
         return hastaIngresosDe;
     }
 
-    public void setHastaIngresosDe(Float hastaIngresosDe) {
+    public void setHastaIngresosDe(BigDecimal hastaIngresosDe) {
         this.hastaIngresosDe = hastaIngresosDe;
     }
 
-    public Float getCantidadSubsidio() {
+    public BigDecimal getCantidadSubsidio() {
         return cantidadSubsidio;
     }
 
-    public void setCantidadSubsidio(Float cantidadSubsidio) {
+    public void setCantidadSubsidio(BigDecimal cantidadSubsidio) {
         this.cantidadSubsidio = cantidadSubsidio;
     }
 
@@ -97,6 +108,14 @@ public class CatSubsidio implements Serializable {
     public void setFecha(Date fecha) {
         this.fecha = fecha;
     }
+
+	public String getPeriodo() {
+		return periodo;
+	}
+
+	public void setPeriodo(String periodo) {
+		this.periodo = periodo;
+	}
     
     
 }

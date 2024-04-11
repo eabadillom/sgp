@@ -1,0 +1,91 @@
+<ui:composition
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/plantillas/template.xhtml">
+	<ui:define name="title">Régimen fiscal</ui:define>
+	<ui:define name="content">
+		<h:form id="form">
+			<p:growl id="messages" showDetail="true" life="4000"/>
+			<p:dialog modal="true" widgetVar="statusDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
+			</p:dialog>
+			<p:toolbar>
+		    	<p:toolbarGroup>
+		    		<p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{regimenFiscalBean.nuevo()}" oncomplete="PF('dgRegimenFiscal').show();" process="@this" update="form:dg-regimenFiscal"/>
+		    	</p:toolbarGroup>
+		    </p:toolbar>
+		    <div style="padding-top: 1rem">
+			    <p:dataTable id="dt-regimenFiscal" widgetVar="dtRegimenFiscal" value="#{regimenFiscalBean.regimenes}" var="regimen" allowUnsorting="true" sortMode="single">
+			    	<p:column headerText="Clave" width="5rem">
+			    		<p:outputLabel value="#{regimen.clave}" />
+			    	</p:column>
+			    	<p:column headerText="Nombre">
+			    		<p:outputLabel value="#{regimen.nombre}" />
+			    	</p:column>
+			    	<p:column headerText="Persona Fisica" width="5rem">
+			    		<p:outputLabel value="#{regimen.personaFisica ? 'SI' : 'NO'}"></p:outputLabel>
+			    	</p:column>
+			    	<p:column headerText="Persona Moral" width="5rem">
+			    		<p:outputLabel value="#{regimen.personaMoral ? 'SI' : 'NO'}"></p:outputLabel>
+			    	</p:column>
+			    	<p:column headerText="Inicio Vigencia" width="7rem">
+			    		<p:outputLabel value="#{regimen.vigenciaInicio}">
+			    			<f:convertDateTime pattern="dd/MMM/yyyy" />
+			    		</p:outputLabel>
+			    	</p:column>
+			    	<p:column headerText="Fin Vigencia" width="7rem">
+			    		<p:outputLabel value="#{regimen.vigenciaFin}">
+			    			<f:convertDateTime pattern="dd/MMM/yyyy" />
+			    		</p:outputLabel>
+			    	</p:column>
+			    	<p:column width="3rem">
+			    		<p:commandButton icon="pi pi-bars" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dgRegimenFiscal').show();" actionListener="#{regimenFiscalBean.editar}" process="@this dt-regimenFiscal" update="form:dg-regimenFiscal">
+			    			<f:setPropertyActionListener value="#{regimen}" target="#{regimenFiscalBean.regimen}" />
+			    		</p:commandButton>
+			    	</p:column>
+			    </p:dataTable>
+		    </div>
+		    <p:dialog id="dg-regimenFiscal" widgetVar="dgRegimenFiscal" header="Regimen Fiscal" showEffect="hide" modal="true">
+		    	<p:outputPanel class="ui-fluid">
+		    		<div class="p-field">
+		    			<p:outputLabel value="Clave SAT"></p:outputLabel>
+		    			<p:inputText value="#{regimenFiscalBean.regimen.clave}"></p:inputText>
+		    		</div>
+		    		<div class="p-field">
+		    			<p:outputLabel value="Nombre"></p:outputLabel>
+		    			<p:inputText value="#{regimenFiscalBean.regimen.nombre}"></p:inputText>
+		    		</div>
+		    		<div class="p-field">
+		    			<p:outputLabel value="Aplica para:"></p:outputLabel>
+		    		</div>
+		    		<div class="p-field">
+		    			<div style="padding-top: 0.5rem;">
+			    			<p:selectBooleanCheckbox value="#{regimenFiscalBean.regimen.personaFisica}" itemLabel="Personas Físicas"></p:selectBooleanCheckbox>
+		    			</div>
+		    		</div>
+		    		<div class="p-field">
+		    			<div style="padding-top: 0.5rem;">
+			    			<p:selectBooleanCheckbox value="#{regimenFiscalBean.regimen.personaMoral}" itemLabel="Personas Morales"></p:selectBooleanCheckbox>
+		    			</div>
+		    		</div>
+		    		<div class="p-field">
+		    			<p:outputLabel value="Inicio vigencia"></p:outputLabel>
+		    			<p:datePicker value="#{regimenFiscalBean.regimen.vigenciaInicio}" showIcon="true"></p:datePicker>
+		    		</div>
+		    		<div class="p-field">
+		    			<p:outputLabel value="Fin Vigencia"></p:outputLabel>
+		    			<p:datePicker value="#{regimenFiscalBean.regimen.vigenciaFin}" showIcon="true"></p:datePicker>
+		    		</div>
+		    	</p:outputPanel>
+		    	<f:facet name="footer">
+		    		<p:commandButton value="Guardar" actionListener="#{regimenFiscalBean.guardar}" process="@this dg-regimenFiscal" update="form:dt-regimenFiscal"></p:commandButton>
+		    	</f:facet>
+		    </p:dialog>
+		</h:form>
+	</ui:define>
+</ui:composition>

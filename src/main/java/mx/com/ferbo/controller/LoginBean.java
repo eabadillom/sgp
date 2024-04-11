@@ -21,6 +21,8 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.primefaces.PrimeFaces;
+
 import mx.com.ferbo.dao.DetBiometricoDAO;
 import mx.com.ferbo.dao.EmpleadoDAO;
 import mx.com.ferbo.dao.RegistroDAO;
@@ -30,17 +32,11 @@ import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.dto.DetRegistroDTO;
 import mx.com.ferbo.util.SGPException;
 
-import org.primefaces.PrimeFaces;
-
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-
 @Named(value = "loginBean")
 @SessionScoped
 public class LoginBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
     private static Logger log = LogManager.getLogger(LoginBean.class);
 
     private DetEmpleadoDTO empleadoSelected;

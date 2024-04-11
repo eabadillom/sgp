@@ -5,12 +5,18 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.primefaces.PrimeFaces;
+
 import mx.com.ferbo.dao.CatTipoSolicitudDAO;
 import mx.com.ferbo.dao.EmpleadoDAO;
 import mx.com.ferbo.dao.IncidenciaDAO;
@@ -18,9 +24,6 @@ import mx.com.ferbo.dto.CatTipoSolicitudDTO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.dto.DetIncidenciaDTO;
 import mx.com.ferbo.util.SGPException;
-import org.primefaces.PrimeFaces;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -31,7 +34,6 @@ import org.apache.logging.log4j.Logger;
 public class IncidenciaBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
     private static Logger log = LogManager.getLogger(IncidenciaBean.class);
 
     private final IncidenciaDAO incidenciaDAO;

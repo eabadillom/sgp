@@ -1,7 +1,9 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,10 +21,11 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "cat_tarifa_isr")
 @NamedQueries({
-    @NamedQuery(name = "CatTarifaIsrSemanal.findAll", query = "SELECT i FROM CatTarifaIsrSemanal i"),
-    @NamedQuery(name = "CatTarifaIsrSemanal.findActualSemanal", query = "SELECT NEW mx.com.ferbo.dto.CatTarifaIsrDTO(i.idIsr, i.limiteInferior, i.limiteSuperior, i.cuotaFija, i.porcAplExceLimInf, i.tipo, i.fecha) FROM CatTarifaIsrSemanal i WHERE i.fecha LIKE :fecha AND i.tipo = :tipo "),
-    @NamedQuery(name = "CatTarifaIsrSemanal.findActualMensual", query = "SELECT NEW mx.com.ferbo.dto.CatTarifaIsrDTO(i.idIsr, i.limiteInferior, i.limiteSuperior, i.cuotaFija, i.porcAplExceLimInf, i.tipo, i.fecha) FROM CatTarifaIsrSemanal i WHERE i.fecha LIKE :fecha AND i.tipo = :tipo")})
-public class CatTarifaIsrSemanal implements Serializable {
+    @NamedQuery(name = "CatTarifaISR.findAll", query = "SELECT i FROM CatTarifaISR i"),
+    @NamedQuery(name = "CatTarifaISR.findActualSemanal", query = "SELECT NEW mx.com.ferbo.dto.CatTarifaIsrDTO(i.idIsr, i.limiteInferior, i.limiteSuperior, i.cuotaFija, i.porcAplExceLimInf, i.tipo, i.fecha) FROM CatTarifaISR i WHERE i.fecha LIKE :fecha AND i.tipo = :tipo "),
+    @NamedQuery(name = "CatTarifaISR.findByTipoAndAnioandBaseISR", query = "SELECT NEW mx.com.ferbo.dto.CatTarifaIsrDTO(i.idIsr, i.limiteInferior, i.limiteSuperior, i.cuotaFija, i.porcAplExceLimInf, i.tipo, i.fecha) FROM CatTarifaISR i WHERE i.tipo = :tipo AND i.fecha BETWEEN :fechaInicio AND :fechaFin AND :baseISR BETWEEN i.limiteInferior AND i.limiteSuperior"),
+    @NamedQuery(name = "CatTarifaISR.findActualMensual", query = "SELECT NEW mx.com.ferbo.dto.CatTarifaIsrDTO(i.idIsr, i.limiteInferior, i.limiteSuperior, i.cuotaFija, i.porcAplExceLimInf, i.tipo, i.fecha) FROM CatTarifaISR i WHERE i.fecha LIKE :fecha AND i.tipo = :tipo")})
+public class CatTarifaISR implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -30,27 +33,35 @@ public class CatTarifaIsrSemanal implements Serializable {
     @Basic(optional = false)
     @Column(name = "id_isr")
     private Integer idIsr;
+    
     @Column(name = "limite_inferior")
-    private Float limiteInferior;
+    private BigDecimal limiteInferior;
+    
     @Column(name = "limite_superior")
-    private Float limiteSuperior;
+    private BigDecimal limiteSuperior;
+    
     @Column(name = "cuota_fija")
-    private Float cuotaFija;
+    private BigDecimal cuotaFija;
+    
+    /**Porcentaje para aplicarse sobre el excedente
+     */
     @Column(name = "porc_apl_exce_lim_inf")
-    private Float porcAplExceLimInf;
+    private BigDecimal porcAplExceLimInf;
+    
     @Column(name = "tipo")
     private String tipo;
+    
     @Column(name = "fecha")
     private Date fecha;
 
-    public CatTarifaIsrSemanal() {
+    public CatTarifaISR() {
     }
 
-    public CatTarifaIsrSemanal(Integer idIsr) {
+    public CatTarifaISR(Integer idIsr) {
         this.idIsr = idIsr;
     }
 
-    public CatTarifaIsrSemanal(Integer idIsr, Float limiteInferior, Float limiteSuperior, Float cuotaFija, Float porcAplExceLimInf, String tipo, Date fecha) {
+    public CatTarifaISR(Integer idIsr, BigDecimal limiteInferior, BigDecimal limiteSuperior, BigDecimal cuotaFija, BigDecimal porcAplExceLimInf, String tipo, Date fecha) {
         this.idIsr = idIsr;
         this.limiteInferior = limiteInferior;
         this.limiteSuperior = limiteSuperior;
@@ -68,35 +79,35 @@ public class CatTarifaIsrSemanal implements Serializable {
         this.idIsr = idIsr;
     }
 
-    public Float getLimiteInferior() {
+    public BigDecimal getLimiteInferior() {
         return limiteInferior;
     }
 
-    public void setLimiteInferior(Float limiteInferior) {
+    public void setLimiteInferior(BigDecimal limiteInferior) {
         this.limiteInferior = limiteInferior;
     }
 
-    public Float getLimiteSuperior() {
+    public BigDecimal getLimiteSuperior() {
         return limiteSuperior;
     }
 
-    public void setLimiteSuperior(Float limiteSuperior) {
+    public void setLimiteSuperior(BigDecimal limiteSuperior) {
         this.limiteSuperior = limiteSuperior;
     }
 
-    public Float getCuotaFija() {
+    public BigDecimal getCuotaFija() {
         return cuotaFija;
     }
 
-    public void setCuotaFija(Float cuotaFija) {
+    public void setCuotaFija(BigDecimal cuotaFija) {
         this.cuotaFija = cuotaFija;
     }
 
-    public Float getPorcAplExceLimInf() {
+    public BigDecimal getPorcAplExceLimInf() {
         return porcAplExceLimInf;
     }
 
-    public void setPorcAplExceLimInf(Float porcAplExceLimInf) {
+    public void setPorcAplExceLimInf(BigDecimal porcAplExceLimInf) {
         this.porcAplExceLimInf = porcAplExceLimInf;
     }
 

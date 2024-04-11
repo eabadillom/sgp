@@ -1,7 +1,7 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
-import java.util.List;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,7 +10,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -29,15 +28,19 @@ public class CatEstatusRegistro implements Serializable {
     @Basic(optional = false)
     @Column(name = "id_estatus")
     private Integer idEstatus;
+    
     @Basic(optional = false)
     @Column(name = "descripcion")
     private String descripcion;
+    
+    @Basic(optional = false)
+    @Column(name = "codigo")
+    private String codigo;
+    
     @Basic(optional = false)
     @Column(name = "activo")
     private short activo;
-    @OneToMany(mappedBy = "idEstatus")
-    private List<DetRegistro> detRegistroList;
-
+    
     public CatEstatusRegistro() {
     }
 
@@ -75,14 +78,6 @@ public class CatEstatusRegistro implements Serializable {
         this.activo = activo;
     }
 
-    public List<DetRegistro> getDetRegistroList() {
-        return detRegistroList;
-    }
-
-    public void setDetRegistroList(List<DetRegistro> detRegistroList) {
-        this.detRegistroList = detRegistroList;
-    }
-
     @Override
     public int hashCode() {
         int hash = 0;
@@ -92,7 +87,6 @@ public class CatEstatusRegistro implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof CatEstatusRegistro)) {
             return false;
         }
@@ -107,5 +101,13 @@ public class CatEstatusRegistro implements Serializable {
     public String toString() {
         return "mx.com.ferbo.model.CatEstatusRegistro[ idEstatus=" + idEstatus + " ]";
     }
+
+	public String getCodigo() {
+		return codigo;
+	}
+
+	public void setCodigo(String codigo) {
+		this.codigo = codigo;
+	}
     
 }

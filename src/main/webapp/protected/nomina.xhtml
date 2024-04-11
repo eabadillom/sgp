@@ -15,13 +15,24 @@
                         <p:messages id="messages" globalOnly="true" closable="true"/>
                         <p:growl id="mssgs" showDetail="true" life="5000"/>
                         <p:remoteCommand name="rcUpdate" update="dtNomina"/>
-                        <p:toolbar styleClass="mb-4">
+                        <p:toolbar>
                             <p:toolbarGroup>
                                 <p:commandButton value="Exportar" icon="pi pi-upload" styleClass="ui-button-help" ajax="false">
                                     <p:dataExporter type="csv" target="dtNomina" fileName="raya" preProcessor="#{nominaBean.exportNomina}"/>
                                 </p:commandButton>
                             </p:toolbarGroup>
-                            <p:toolbarGroup align="right">
+                            <p:toolbarGroup>
+                            	<p:datePicker id="dp-periodo-inicio" value="#{nominaBean.periodoInicio}" placeholder="Periodo Inicio" showIcon="true" >
+                            		<p:ajax process="@this" listener="#{nominaBean.calculaFechaFin}" update="dp-periodo-fin semana" />
+                            		<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+                            	</p:datePicker>
+                            	<p:datePicker id="dp-periodo-fin" value="#{nominaBean.periodoFin}" placeholder="Periodo Fin" showIcon="true">
+                            		<p:ajax process="@this" listener="#{nominaBean.calculaFechaInicio}" update="dp-periodo-inicio semana" />
+                            		<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+                            	</p:datePicker>
+                            	<p:inputText id="semana" value="Semana: #{nominaBean.semana}" readonly="true"></p:inputText>
+                            </p:toolbarGroup>
+                            <p:toolbarGroup>
                                 <p:commandButton styleClass="ui-button-success" style="margin-right: .5rem" process="@this" value="Cálcular por Empleados" 
                                                  onstart="PF('empleadoDialog').show();" update="panelDialogEmpleados"/>
                                 <p:commandButton styleClass="ui-button-success" style="margin-right: .5rem" process="@this" value="Cálcular por Empresa" 
@@ -31,7 +42,7 @@
                         </p:toolbar>
                         <div>
                             <p:dataTable id="dtNomina" widgetVar="dt-Nomina" var="nomina" value="#{nominaBean.listaNomina}" reflow="true" styleClass="products-table"
-                                         rowKey="#{nomina.idEmpleado.idEmpleado}" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom" scrollable="true" 
+                                         rowKey="#{nomina.idEmpleado.idEmpleado}" paginator="true" rowSelectMode="add" paginatorPosition="bottom" scrollable="true" 
                                          scrollWidth="1200" frozenColumns="2" editable="true" editMode="cell" editInitEvent="dblclick">
                                 <p:ajax event="cellEdit" listener="#{nominaBean.onCellEdit}" update=":formNomina:mssgs"/>
                                 <f:facet name="header">
@@ -49,6 +60,36 @@
                                 </p:column>
                                 <p:column headerText="Empleado" width="110px" >
                                     <h:outputText value="#{nomina.idEmpleado.primerAp} #{nomina.idEmpleado.segundoAp} #{nomina.idEmpleado.nombre} " />
+                                </p:column>
+                                <p:column headerText="SD" width="50px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.salarioDiario}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.salarioDiario}" style="width:100%"/>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="SDI" width="50px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.salarioDiarioIntegrado}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.salarioDiarioIntegrado}" style="width:100%"/>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+                                <p:column headerText="Días trabajados" width="50px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{nomina.asistencia}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <p:inputText value="#{nomina.asistencia}" style="width:100%"/>
+                                        </f:facet>
+                                    </p:cellEditor>
                                 </p:column>
                                 <p:column headerText="Sueldo" width="50px">
                                     <p:cellEditor>
@@ -223,11 +264,11 @@
                                 <p:column headerText="I.S.R. (mes)" width="75px">
                                     <p:cellEditor>
                                         <f:facet name="output">
-                                            <h:outputText value="#{nomina.isrMes}" />
+                                            <h:outputText value="#{nomina.isr}" />
 
                                         </f:facet>
                                         <f:facet name="input">
-                                            <p:inputText value="#{nomina.isrMes}" />
+                                            <p:inputText value="#{nomina.isr}" />
                                         </f:facet>
                                     </p:cellEditor>
                                 </p:column>

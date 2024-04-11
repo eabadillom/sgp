@@ -4,11 +4,18 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.primefaces.PrimeFaces;
+import org.primefaces.event.CaptureEvent;
+
 import mx.com.ferbo.dao.CatAreaDAO;
 import mx.com.ferbo.dao.CatEmpresaDAO;
 import mx.com.ferbo.dao.CatPerfilDAO;
@@ -25,11 +32,6 @@ import mx.com.ferbo.dto.DetBiometricoDTO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.util.SGPException;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.primefaces.PrimeFaces;
-import org.primefaces.event.CaptureEvent;
-
 
 /**
  *
@@ -40,7 +42,6 @@ import org.primefaces.event.CaptureEvent;
 public class RegistroEmpleadosBean implements Serializable {
     
     private static final long serialVersionUID = 1L;
-    
     private static final Logger log = LogManager.getLogger(RegistroEmpleadosBean.class);
 
     private DetEmpleadoDTO empleadoSelected;
