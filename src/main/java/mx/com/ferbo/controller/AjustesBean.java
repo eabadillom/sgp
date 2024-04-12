@@ -93,5 +93,16 @@ public class AjustesBean implements Serializable {
 			log.error("Problema para redirigir al catalogo de dias no laborales...", ex);
 		}
 	}
+	
+	public void tipoContrato() {
+		String path = null;
+		try {
+			log.info("Redirigiendo a catálogo tipo de contrato...");
+			path = this.contextPath + "/protected/settings/sat/tipoContrato.xhtml";
+			FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+		} catch (IOException ex) {
+			log.error("Problema para redirigir al catalogo de dias no laborales...", ex);
+		}
+	}
 
 }

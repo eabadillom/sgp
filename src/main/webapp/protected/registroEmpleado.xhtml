@@ -62,17 +62,14 @@
                             <p:column headerText="# Empleado" sortBy="#{empleado.numEmpleado}" filterBy="#{empleado.numEmpleado}">
                                 <h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{empleado.numEmpleado}" />
                             </p:column>
+                            <p:column headerText="Primer Apellido" sortBy="#{empleado.primerAp}" filterBy="#{empleado.primerAp}">
+                            	<h:outputText style="vertical-alin: middle; margin-left: .5rem" value="#{empleado.primerAp}" />
+                            </p:column>
+                            <p:column headerText="Segundo Apellido" sortBy="#{empleado.segundoAp}" filterBy="#{empleado.segundoAp}">
+                            	<h:outputText style="vertical-alin: middle; margin-left: .5rem" value="#{empleado.segundoAp}" />
+                            </p:column>
                             <p:column headerText="Nombre" sortBy="#{empleado.nombre}" filterBy="#{empleado.nombre}">
                                 <h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{empleado.nombre}" />
-                            </p:column>
-                            <p:column headerText="Puesto" sortBy="#{empleado.catPuestoDTO.descripcion}" filterBy="#{empleado.catPuestoDTO.descripcion}">
-                                <h:outputText value="#{empleado.catPuestoDTO.descripcion}" />
-                            </p:column>
-                            <p:column headerText="Planta" sortBy="#{empleado.catPlantaDTO.descripcion}" filterBy="#{empleado.catPlantaDTO.descripcion}">
-                                <h:outputText value="#{empleado.catPlantaDTO.descripcion}" />
-                            </p:column>
-                            <p:column headerText="Perfil" sortBy="#{empleado.catPerfilDTO.descripcion}" filterBy="#{empleado.activo}">
-                                <h:outputText value="#{empleado.catPerfilDTO.descripcion}" />
                             </p:column>
                             <p:column exportable="false">
                                 <p:commandButton icon="pi pi-pencil" update=":formRegistroEmpleado:panelDialogEmpleado" oncomplete="PF('dialogEmpleado').show()" 
@@ -87,7 +84,11 @@
                                 </p:commandButton>
                             </p:column>
                         </p:dataTable>
-
+                        
+                        
+                        
+                        
+                        
                         <p:dialog header="Empleado" showEffect="fade" modal="true" widgetVar="dialogEmpleado" responsive="true" draggable="false">
                             <p:outputPanel id="panelDialogEmpleado" class="ui-fluid">
                                 <p:outputPanel>
@@ -130,10 +131,6 @@
                                     </p:fieldset>
                                     <p:fieldset legend="Datos de empresa" styleClass="mt-4">
                                         <div class="formgrid grid">
-                                            <!--                                            <div class="field col">
-                                                                                            <p:outputLabel for="@next" value="# Empleado"/>
-                                                                                            <p:inputText id="nEmpleado" value="#{registroEmpleadosBean.empleadoSelected.numEmpleado}" disabled="true"/>
-                                                                                        </div>-->
                                             <div class="field col">
                                                 <p:outputLabel for="@next" value="RFC" />
                                                 <p:inputText id="nss" value="#{registroEmpleadosBean.empleadoSelected.rfc}"/>
@@ -174,7 +171,6 @@
                                                     <f:selectItems value="#{registroEmpleadosBean.lstCatPuesto}" var="puesto" itemValue="#{puesto.idPuesto}" itemLabel="#{puesto.descripcion}"/>
                                                 </p:selectOneMenu>
                                             </div>
-
                                         </div>
                                         <div class="formgrid grid">
                                             <div class="field col-4">
@@ -202,10 +198,8 @@
                                             </div>
                                         </div>
                                     </p:fieldset>
-
                                 </p:outputPanel>
                             </p:outputPanel>
-
                             <f:facet name="footer">
                                 <p:commandButton value="Guardar" icon="pi pi-save" actionListener="#{registroEmpleadosBean.guardarEmpleado()}" process="panelDialogEmpleado @this" />
                                 <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogEmpleado').hide()" class="ui-button-secondary" resetValues="true"/>
