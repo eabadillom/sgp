@@ -1,5 +1,6 @@
 package mx.com.ferbo.commons.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -30,6 +31,26 @@ public abstract class DAO<DTO, MODEL, PK> {
 	
 	public abstract DTO getDTO(MODEL model);
 	public abstract MODEL getModel(DTO dto);
+	
+	public List<DTO> toDTOList(List<MODEL> modelList) {
+		List<DTO> dtoList;
+		dtoList = new ArrayList<DTO>();
+		for(MODEL model : modelList) {
+			DTO dto = this.getDTO(model);
+			dtoList.add(dto);
+		}
+		return dtoList;
+	}
+	
+	public List<MODEL> toModelList(List<DTO> dtoList) {
+		List<MODEL> modelList;
+		modelList = new ArrayList<MODEL>();
+		for(DTO dto : dtoList) {
+			MODEL model = this.getModel(dto);
+			modelList.add(model);
+		}
+		return modelList;
+	}
 	    
 	public abstract DTO buscarPorId(PK id);
 	public abstract List<DTO> buscarTodos();
@@ -37,13 +58,16 @@ public abstract class DAO<DTO, MODEL, PK> {
 		EntityManager em = null;
 		MODEL model = null;
 		try {
+			log.info("Guardando objeto: {}", dto);
 			em = getEntityManager();
 			model = this.getModel(dto);
 			em.getTransaction().begin();
 			em.persist(model);
 			em.getTransaction().commit();
+			log.info("Objeto guardado correctamente: {}", dto);
 		} catch(Exception ex) {
 			rollback(em);
+			log.error("Problema para guardar el objeto: " + dto, ex);
 		} finally {
 			close(em);
 		}
@@ -53,29 +77,35 @@ public abstract class DAO<DTO, MODEL, PK> {
 		EntityManager em = null;
 		MODEL model = null;
 		try {
+			log.info("Actualizando objeto: {}", dto);
 			em = getEntityManager();
 			model = this.getModel(dto);
 			em.getTransaction().begin();
 			model = em.merge(model);
 			em.getTransaction().commit();
 			dto = this.getDTO(model);
+			log.info("Objeto actualizado correctamente: {}", dto);
 		} catch(Exception ex) {
 			rollback(em);
+			log.error("Problema para actualizar el objeto: " + dto, ex);
 		} finally {
 			close(em);
 		}
 	}
-	public void eliminar(DTO dto) throws SGPException {
+	public synchronized void eliminar(DTO dto) throws SGPException {
 		EntityManager em = null;
 		MODEL model = null;
 		try {
+			log.info("Eliminando objeto: {}", dto);
 			em = getEntityManager();
 			model = this.getModel(dto);
 			em.getTransaction().begin();
 			em.remove(model);
 			em.getTransaction().commit();
+			log.info("Objeto eliminado correctamente: {}", dto);
 		} catch(Exception ex) {
 			rollback(em);
+			log.error("Probleam para eliminar el objeto: " + dto, ex);
 		} finally {
 			close(em);
 		}

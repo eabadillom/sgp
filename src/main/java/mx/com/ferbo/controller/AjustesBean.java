@@ -31,11 +31,11 @@ public class AjustesBean implements Serializable {
 	public void empresas() {
 		String path = null;
 		try {
-			log.info("Redirigiendo a catálogo de dias no laborales...");
+			log.info("Redirigiendo a catálogo de empresas...");
 			path = this.contextPath + "/protected/settings/sistema/empresas.xhtml";
 			FacesContext.getCurrentInstance().getExternalContext().redirect(path);
 		} catch (IOException ex) {
-			log.error("Problema para redirigir al catalogo de dias no laborales...", ex);
+			log.error("Problema para redirigir al catalogo de empresas...", ex);
 		}
 	}
 	
@@ -57,7 +57,7 @@ public class AjustesBean implements Serializable {
 			path = this.contextPath + "/protected/settings/sistema/salarioMinimo.xhtml";
 			FacesContext.getCurrentInstance().getExternalContext().redirect(path);
 		} catch (IOException ex) {
-			log.error("Problema para redirigir al catalogo de dias no laborales...", ex);
+			log.error("Problema para redirigir al catalogo de salarios minimos...", ex);
 		}
 	}
 	
@@ -79,7 +79,7 @@ public class AjustesBean implements Serializable {
 			path = this.contextPath + "/protected/settings/periodicidadPago.xhtml";
 			FacesContext.getCurrentInstance().getExternalContext().redirect(path);
 		} catch (IOException ex) {
-			log.error("Problema para redirigir al catalogo de dias no laborales...", ex);
+			log.error("Problema para redirigir al catalogo periodicidad de pago...", ex);
 		}
 	}
 	
@@ -90,7 +90,7 @@ public class AjustesBean implements Serializable {
 			path = this.contextPath + "/protected/settings/sat/regimenFiscal.xhtml";
 			FacesContext.getCurrentInstance().getExternalContext().redirect(path);
 		} catch (IOException ex) {
-			log.error("Problema para redirigir al catalogo de dias no laborales...", ex);
+			log.error("Problema para redirigir al catalogo regimen fiscal...", ex);
 		}
 	}
 	
@@ -101,7 +101,18 @@ public class AjustesBean implements Serializable {
 			path = this.contextPath + "/protected/settings/sat/tipoContrato.xhtml";
 			FacesContext.getCurrentInstance().getExternalContext().redirect(path);
 		} catch (IOException ex) {
-			log.error("Problema para redirigir al catalogo de dias no laborales...", ex);
+			log.error("Problema para redirigir al catalogo tipo de contrato...", ex);
+		}
+	}
+	
+	public void tipoRegimen() {
+		String path = null;
+		try {
+			log.info("Redirigiendo a catálogo tipo de régimen...");
+			path = this.contextPath + "/protected/settings/sat/tipoRegimen.xhtml";
+			FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+		} catch (IOException ex) {
+			log.error("Problema para redirigir al catalogo tipos de regimen...", ex);
 		}
 	}
 
