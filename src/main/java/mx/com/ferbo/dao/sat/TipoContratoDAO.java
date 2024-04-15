@@ -11,9 +11,8 @@ import org.apache.logging.log4j.Logger;
 import mx.com.ferbo.commons.dao.DAO;
 import mx.com.ferbo.dto.sat.TipoContratoDTO;
 import mx.com.ferbo.model.sat.CatTipoContrato;
-import mx.com.ferbo.util.SGPException;
 
-public class TipoContratoDAO extends DAO<TipoContratoDTO, CatTipoContrato, Integer> {
+public class TipoContratoDAO extends DAO<TipoContratoDTO, CatTipoContrato, String> {
 	
 	private static Logger log = LogManager.getLogger(TipoContratoDAO.class);
 
@@ -45,7 +44,7 @@ public class TipoContratoDAO extends DAO<TipoContratoDTO, CatTipoContrato, Integ
 	}
 
 	@Override
-	public TipoContratoDTO buscarPorId(Integer id) {
+	public TipoContratoDTO buscarPorId(String id) {
 		TipoContratoDTO dto = null;
 		CatTipoContrato model = null;
 		EntityManager em = null;
@@ -86,12 +85,6 @@ public class TipoContratoDAO extends DAO<TipoContratoDTO, CatTipoContrato, Integ
 		}
 		
 		return list;
-	}
-
-	@Override
-	public void eliminar(TipoContratoDTO e) throws SGPException {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
