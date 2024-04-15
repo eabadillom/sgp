@@ -92,112 +92,124 @@
                         <p:dialog header="Empleado" showEffect="fade" modal="true" widgetVar="dialogEmpleado" responsive="true" draggable="false">
                             <p:outputPanel id="panelDialogEmpleado" class="ui-fluid">
                                 <p:outputPanel>
-                                    <p:fieldset legend="Datos personales">
-                                        <div class="formgrid grid">
-                                            <div class="field col-4">
-                                                <p:outputLabel for="@next" value="Número de empleado"/>
-                                                <p:inputText id="numEmp" value="#{registroEmpleadosBean.empleadoSelected.numEmpleado}" disabled="true"/>  
-                                            </div>
-                                        </div>
-                                        <div class="formgrid grid">
-                                            <div class="field col">
-                                                <p:outputLabel for="@next" value="Nombre"/>
-                                                <p:inputText id="nombreEmp" value="#{registroEmpleadosBean.empleadoSelected.nombre}"/>  
-                                            </div>
-                                            <div class="field col">
-                                                <p:outputLabel for="@next" value="Primer Apellido"/>
-                                                <p:inputText id="primerAp" value="#{registroEmpleadosBean.empleadoSelected.primerAp}"/>  
-                                            </div>
-                                            <div class="field col">
-                                                <p:outputLabel for="@next" value="Segundo Apellido"/>
-                                                <p:inputText id="segundoAp" value="#{registroEmpleadosBean.empleadoSelected.segundoAp}"/>  
-                                            </div>
-                                        </div>
-                                        <div class="formgrid grid">
-                                            <div class="field col">
-                                                <p:outputLabel for="@next" value="CURP"/>
-                                                <p:inputText id="curp" value="#{registroEmpleadosBean.empleadoSelected.curp}" maxlength="18" class="uppercase" onblur="value.toUpperCase()"/>  
-                                            </div>
-                                            <div class="field col">
-                                                <p:outputLabel for="@next" value="Fecha de nacimiento" />
-                                                <p:datePicker id="fNac" value="#{registroEmpleadosBean.empleadoSelected.fechaNacimiento}" monthNavigator="true" yearNavigator="true"
-                                                              yearRange="1940:2015" pattern="dd-MM-yyyy" showIcon="true" readonlyInput="true"/>
-                                            </div>
-                                            <div class="field col">
-                                                <p:outputLabel for="@next" value="Correo"/>
-                                                <p:inputText id="correo" value="#{registroEmpleadosBean.empleadoSelected.correo}"/>  
-                                            </div>
-                                        </div>
-                                    </p:fieldset>
-                                    <p:fieldset legend="Datos de empresa" styleClass="mt-4">
-                                        <div class="formgrid grid">
-                                            <div class="field col">
-                                                <p:outputLabel for="@next" value="RFC" />
-                                                <p:inputText id="nss" value="#{registroEmpleadosBean.empleadoSelected.rfc}"/>
-                                            </div>
-                                            <div class="field col">
-                                                <p:outputLabel for="@next" value="NSS" />
-                                                <p:inputText id="rfc" value="#{registroEmpleadosBean.empleadoSelected.nss}"/>
-                                            </div>
-                                            <div class="field col">
-                                                <p:outputLabel for="@next" value="Salario Diario" />
-                                                <p:inputText id="salario" value="#{registroEmpleadosBean.empleadoSelected.sueldoDiario}"/>
-                                            </div>
-                                            <div class="field col">
-                                                <p:outputLabel for="@next" value="Fecha de ingreso" />
-                                                <p:datePicker id="fIngreso" value="#{registroEmpleadosBean.empleadoSelected.fechaIngreso}" monthNavigator="true" yearNavigator="true"
-                                                              yearRange="1940:2030" pattern="dd-MM-yyyy" showIcon="true" readonlyInput="true"/>
-                                            </div>
-                                        </div>
-                                        <div class="formgrid grid">
-                                            <div class="field col">
-                                                <p:outputLabel for="@next" value="Perfil" />
-                                                <p:selectOneMenu id="soPerfil" value="#{registroEmpleadosBean.empleadoSelected.catPerfilDTO.idPerfil}" autoWidth="false">
-                                                    <f:selectItem itemLabel="--Seleccione--"/>
-                                                    <f:selectItems value="#{registroEmpleadosBean.lstCatPerfil}" var="perfil" itemValue="#{perfil.idPerfil}" itemLabel="#{perfil.descripcion}"/>
-                                                </p:selectOneMenu>
-                                            </div>
-                                            <div class="field col">
-                                                <p:outputLabel for="@next" value="Empresa" />
-                                                <p:selectOneMenu id="soEmpresa" value="#{registroEmpleadosBean.empleadoSelected.catEmpresaDTO.idEmpresa}" autoWidth="false">
-                                                    <f:selectItem itemLabel="--Seleccione--"/>
-                                                    <f:selectItems value="#{registroEmpleadosBean.lstCatEmpresa}" var="empresa" itemValue="#{empresa.idEmpresa}" itemLabel="#{empresa.descripcion}"/>
-                                                </p:selectOneMenu>
-                                            </div>
-                                            <div class="field col">
-                                                <p:outputLabel for="@next" value="Puesto" />
-                                                <p:selectOneMenu id="soPuesto" value="#{registroEmpleadosBean.empleadoSelected.catPuestoDTO.idPuesto}" autoWidth="false">
-                                                    <f:selectItem itemLabel="--Seleccione--"/>
-                                                    <f:selectItems value="#{registroEmpleadosBean.lstCatPuesto}" var="puesto" itemValue="#{puesto.idPuesto}" itemLabel="#{puesto.descripcion}"/>
-                                                </p:selectOneMenu>
-                                            </div>
-                                        </div>
-                                        <div class="formgrid grid">
-                                            <div class="field col-4">
-                                                <p:outputLabel for="@next" value="Área" />
-                                                <p:selectOneMenu id="soArea" value="#{registroEmpleadosBean.empleadoSelected.catAreaDTO.idArea}" autoWidth="false">
-                                                    <f:selectItem itemLabel="--Seleccione--"/>
-                                                    <f:selectItems value="#{registroEmpleadosBean.lstCatArea}" var="area" itemValue="#{area.idArea}" itemLabel="#{area.descripcion}"/>
-                                                </p:selectOneMenu>
-                                            </div>
-                                            <div class="field col-4">
-                                                <p:outputLabel for="@next" value="Ubicación" />
-                                                <p:selectOneMenu id="soUbica" value="#{registroEmpleadosBean.empleadoSelected.catPlantaDTO.idPlanta}" autoWidth="false">
-                                                    <f:selectItem itemLabel="--Seleccione--"/>
-                                                    <f:selectItems value="#{registroEmpleadosBean.lstCatPlanta}" var="planta" itemValue="#{planta.idPlanta}" itemLabel="#{planta.descripcion}"/>
-                                                </p:selectOneMenu>
-                                            </div>
-                                            <div class="formgrid grid align-self-end col-4">
-                                                <div class="field col-6">
-                                                    <p:commandButton value="Biométrico" icon="pi pi-sync" iconPos="right" process="@this" actionListener="#{registroEmpleadosBean.consultaBiometrico()}" immediate="true"/>
-                                                </div>
-                                                <div class="field col-6">
-                                                    <p:commandButton value="Fotografía" icon="pi pi-camera" iconPos="right" process="@this" immediate="true"
-                                                                     onclick="PF('dialogFotografia').show();"/>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </p:fieldset>
+                                	<p:tabView title="Información del empleado">
+                                		<p:tab title="Datos Personales">
+                                			<p:fieldset>
+		                                        <div class="formgrid grid">
+		                                            <div class="field col-4">
+		                                                <p:outputLabel for="@next" value="Número de empleado"/>
+		                                                <p:inputText id="numEmp" value="#{registroEmpleadosBean.empleadoSelected.numEmpleado}" disabled="true"/>  
+		                                            </div>
+		                                        </div>
+		                                        <div class="formgrid grid">
+		                                            <div class="field col">
+		                                                <p:outputLabel for="@next" value="Nombre"/>
+		                                                <p:inputText id="nombreEmp" value="#{registroEmpleadosBean.empleadoSelected.nombre}"/>  
+		                                            </div>
+		                                            <div class="field col">
+		                                                <p:outputLabel for="@next" value="Primer Apellido"/>
+		                                                <p:inputText id="primerAp" value="#{registroEmpleadosBean.empleadoSelected.primerAp}"/>  
+		                                            </div>
+		                                            <div class="field col">
+		                                                <p:outputLabel for="@next" value="Segundo Apellido"/>
+		                                                <p:inputText id="segundoAp" value="#{registroEmpleadosBean.empleadoSelected.segundoAp}"/>  
+		                                            </div>
+		                                        </div>
+		                                        <div class="formgrid grid">
+		                                            <div class="field col">
+		                                                <p:outputLabel for="@next" value="CURP"/>
+		                                                <p:inputText id="curp" value="#{registroEmpleadosBean.empleadoSelected.curp}" maxlength="18" class="uppercase" onblur="value.toUpperCase()"/>  
+		                                            </div>
+		                                            <div class="field col">
+		                                                <p:outputLabel for="@next" value="Fecha de nacimiento" />
+		                                                <p:datePicker id="fNac" value="#{registroEmpleadosBean.empleadoSelected.fechaNacimiento}" monthNavigator="true" yearNavigator="true"
+		                                                              yearRange="1940:2015" pattern="dd-MM-yyyy" showIcon="true" readonlyInput="true"/>
+		                                            </div>
+		                                            <div class="field col">
+		                                                <p:outputLabel for="@next" value="Correo"/>
+		                                                <p:inputText id="correo" value="#{registroEmpleadosBean.empleadoSelected.correo}"/>  
+		                                            </div>
+		                                        </div>
+		                                    </p:fieldset>
+                                		</p:tab>
+                                		<p:tab title="Datos empresariales">
+	                                		<p:fieldset>
+		                                        <div class="formgrid grid">
+		                                            <div class="field col">
+		                                                <p:outputLabel for="@next" value="RFC" />
+		                                                <p:inputText id="nss" value="#{registroEmpleadosBean.empleadoSelected.rfc}"/>
+		                                            </div>
+		                                            <div class="field col">
+		                                                <p:outputLabel for="@next" value="NSS" />
+		                                                <p:inputText id="rfc" value="#{registroEmpleadosBean.empleadoSelected.nss}"/>
+		                                            </div>
+		                                            <div class="field col">
+		                                                <p:outputLabel for="@next" value="Salario Diario" />
+		                                                <p:inputText id="salario" value="#{registroEmpleadosBean.empleadoSelected.sueldoDiario}"/>
+		                                            </div>
+		                                            <div class="field col">
+		                                                <p:outputLabel for="@next" value="Fecha de ingreso" />
+		                                                <p:datePicker id="fIngreso" value="#{registroEmpleadosBean.empleadoSelected.fechaIngreso}" monthNavigator="true" yearNavigator="true"
+		                                                              yearRange="1940:2030" pattern="dd-MM-yyyy" showIcon="true" readonlyInput="true"/>
+		                                            </div>
+		                                        </div>
+		                                        <div class="formgrid grid">
+		                                            <div class="field col">
+		                                                <p:outputLabel for="@next" value="Perfil" />
+		                                                <p:selectOneMenu id="soPerfil" value="#{registroEmpleadosBean.empleadoSelected.catPerfilDTO.idPerfil}" autoWidth="false">
+		                                                    <f:selectItem itemLabel="--Seleccione--"/>
+		                                                    <f:selectItems value="#{registroEmpleadosBean.lstCatPerfil}" var="perfil" itemValue="#{perfil.idPerfil}" itemLabel="#{perfil.descripcion}"/>
+		                                                </p:selectOneMenu>
+		                                            </div>
+		                                            <div class="field col">
+		                                                <p:outputLabel for="@next" value="Empresa" />
+		                                                <p:selectOneMenu id="soEmpresa" value="#{registroEmpleadosBean.empleadoSelected.catEmpresaDTO.idEmpresa}" autoWidth="false">
+		                                                    <f:selectItem itemLabel="--Seleccione--"/>
+		                                                    <f:selectItems value="#{registroEmpleadosBean.lstCatEmpresa}" var="empresa" itemValue="#{empresa.idEmpresa}" itemLabel="#{empresa.descripcion}"/>
+		                                                </p:selectOneMenu>
+		                                            </div>
+		                                            <div class="field col">
+		                                                <p:outputLabel for="@next" value="Puesto" />
+		                                                <p:selectOneMenu id="soPuesto" value="#{registroEmpleadosBean.empleadoSelected.catPuestoDTO.idPuesto}" autoWidth="false">
+		                                                    <f:selectItem itemLabel="--Seleccione--"/>
+		                                                    <f:selectItems value="#{registroEmpleadosBean.lstCatPuesto}" var="puesto" itemValue="#{puesto.idPuesto}" itemLabel="#{puesto.descripcion}"/>
+		                                                </p:selectOneMenu>
+		                                            </div>
+		                                        </div>
+		                                        <div class="formgrid grid">
+		                                            <div class="field col-4">
+		                                                <p:outputLabel for="@next" value="Área" />
+		                                                <p:selectOneMenu id="soArea" value="#{registroEmpleadosBean.empleadoSelected.catAreaDTO.idArea}" autoWidth="false">
+		                                                    <f:selectItem itemLabel="--Seleccione--"/>
+		                                                    <f:selectItems value="#{registroEmpleadosBean.lstCatArea}" var="area" itemValue="#{area.idArea}" itemLabel="#{area.descripcion}"/>
+		                                                </p:selectOneMenu>
+		                                            </div>
+		                                            <div class="field col-4">
+		                                                <p:outputLabel for="@next" value="Ubicación" />
+		                                                <p:selectOneMenu id="soUbica" value="#{registroEmpleadosBean.empleadoSelected.catPlantaDTO.idPlanta}" autoWidth="false">
+		                                                    <f:selectItem itemLabel="--Seleccione--"/>
+		                                                    <f:selectItems value="#{registroEmpleadosBean.lstCatPlanta}" var="planta" itemValue="#{planta.idPlanta}" itemLabel="#{planta.descripcion}"/>
+		                                                </p:selectOneMenu>
+		                                            </div>
+		                                        </div>
+		                                    </p:fieldset>
+                               			</p:tab>
+                               			<p:tab title="Datos Biometricos">
+                               				<p:fieldset>
+                               					<div class="formgrid grid">
+	                                                <div class="field col-6">
+	                                                    <p:commandButton value="Biométrico" icon="pi pi-sync" iconPos="right" process="@this" actionListener="#{registroEmpleadosBean.consultaBiometrico()}" immediate="true"/>
+	                                                </div>
+	                                                <div class="field col-6">
+	                                                    <p:commandButton value="Fotografía" icon="pi pi-camera" iconPos="right" process="@this" immediate="true"
+	                                                                     onclick="PF('dialogFotografia').show();"/>
+	                                                </div>
+                               					</div>
+                               				</p:fieldset>
+                               			</p:tab>
+                               		</p:tabView>
+                                    
+                                    
                                 </p:outputPanel>
                             </p:outputPanel>
                             <f:facet name="footer">
