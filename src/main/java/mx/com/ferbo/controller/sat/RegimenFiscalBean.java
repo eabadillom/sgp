@@ -28,6 +28,7 @@ public class RegimenFiscalBean implements Serializable{
 	private RegimenFiscalDAO regimenDAO;
 	private List<RegimenFiscalDTO> regimenes;
 	private RegimenFiscalDTO regimen;
+	private boolean nuevo = false;
 	
 	public RegimenFiscalBean() {
 		regimenDAO = new RegimenFiscalDAO();
@@ -41,10 +42,12 @@ public class RegimenFiscalBean implements Serializable{
 	
 	public void nuevo() {
 		this.regimen = new RegimenFiscalDTO();
+		this.nuevo = true;
 	}
 	
 	public void editar() {
 		log.info("Editando regimen fiscal: {}", this.regimen);
+		this.nuevo = false;
 	}
 	
 	public void guardar() {
@@ -56,7 +59,7 @@ public class RegimenFiscalBean implements Serializable{
 		try {
 			log.info("Guardando regimen fiscal: {}", this.regimen);
 			
-			if(this.regimen.getClave() == null || "".equalsIgnoreCase(this.regimen.getClave().trim()))
+			if(this.nuevo)
 				regimenDAO.guardar(this.regimen);
 			else
 				regimenDAO.actualizar(this.regimen);

@@ -18,16 +18,16 @@ public class DetEmpleadoDTO implements Serializable {
     private String curp;
     private String rfc;
     private String correo;
-    private Date fechaIngreso;
-    private String nss;
+    private Date fechaIngreso;//TODO SE DEBE CAMBIAR ESTA PROPIEDAD A LA ENTIDAD DET_EMPLEADO_EMPRESA
+    private String nss;//TODO SE DEBE CAMBIAR ESTA PROPIEDAD A LA ENTIDAD DET_EMPLEADO_EMPRESA
     private short activo;
     private String fotografia;
-    private CatAreaDTO catAreaDTO;
-    private CatEmpresaDTO catEmpresaDTO;
-    private CatPerfilDTO catPerfilDTO;
-    private CatPlantaDTO catPlantaDTO;
-    private CatPuestoDTO catPuestoDTO;
-    private BigDecimal sueldoDiario;
+    private CatAreaDTO catAreaDTO; //TODO SE DEBE CAMBIAR ESTA PROPIEDAD A LA ENTIDAD DET_EMPLEADO_EMPRESA
+    private CatEmpresaDTO catEmpresaDTO; //TODO SE DEBE CAMBIAR ESTA PROPIEDAD A LA ENTIDAD DET_EMPLEADO_EMPRESA
+    private CatPerfilDTO catPerfilDTO; //TODO SE DEBE CAMBIAR ESTA PROPIEDAD A LA ENTIDAD DET_EMPLEADO_EMPRESA
+    private CatPlantaDTO catPlantaDTO; //TODO SE DEBE CAMBIAR ESTA PROPIEDAD A LA ENTIDAD DET_EMPLEADO_EMPRESA
+    private CatPuestoDTO catPuestoDTO; //TODO SE DEBE CAMBIAR ESTA PROPIEDAD A LA ENTIDAD DET_EMPLEADO_EMPRESA
+    private BigDecimal sueldoDiario; //TODO SE DEBE CAMBIAR ESTA PROPIEDAD A LA ENTIDAD DET_EMPLEADO_EMPRESA
     private DetBiometricoDTO detBiometricoDTO;
 
     public DetEmpleadoDTO() {

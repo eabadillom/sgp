@@ -1,0 +1,54 @@
+<ui:composition
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/plantillas/template.xhtml">
+	<ui:define name="title">Tipo de contrato</ui:define>
+	<ui:define name="content">
+		<h:form id="form">
+			<p:growl id="messages" showDetail="true" life="4000"/>
+			<p:dialog modal="true" widgetVar="statusDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
+			</p:dialog>
+			<p:toolbar>
+				<p:toolbarGroup>
+					<p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{tipoContratoBean.nuevo()}" oncomplete="PF('dgTipoContrato').show()" process="@this" update="form:dg-tipoContrato" />
+				</p:toolbarGroup>
+			</p:toolbar>
+			<div style="padding-top: 1rem">
+				<p:dataTable id="dt-tipoContrato" widgetVar="dtTipoContrato" value="#{tipoContratoBean.tiposContrato}" var="tipoContrato" allowUnsorting="true" sortMode="single">
+					<p:column headerText="Clave SAT">
+						<p:outputLabel value="#{tipoContrato.clave}"></p:outputLabel>
+					</p:column>
+					<p:column headerText="Nombre">
+						<p:outputLabel value="#{tipoContrato.nombre}"></p:outputLabel>
+					</p:column>
+					<p:column>
+						<p:commandButton icon="pi pi-bars" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dgTipoContrato').show();" actionListener="#{tipoContratoBean.editar}" process="@this dt-tipoContrato" update="form:dg-tipoContrato">
+			    			<f:setPropertyActionListener value="#{tipoContrato}" target="#{tipoContratoBean.tipoContrato}" />
+			    		</p:commandButton>
+					</p:column>
+				</p:dataTable>
+			</div>
+			<p:dialog id="dg-tipoContrato" widgetVar="dgTipoContrato" header="Tipo de contrato" showEffect="hide" modal="true">
+				<p:outputPanel class="ui-fluid">
+		    		<div class="p-field">
+		    			<p:outputLabel value="Clave SAT"></p:outputLabel>
+		    			<p:inputText value="#{tipoContratoBean.tipoContrato.clave}"></p:inputText>
+		    		</div>
+		    		<div class="p-field">
+		    			<p:outputLabel value="Nombre"></p:outputLabel>
+		    			<p:inputText value="#{tipoContratoBean.tipoContrato.nombre}"></p:inputText>
+		    		</div>
+		    	</p:outputPanel>
+		    	<f:facet name="footer">
+		    		<p:commandButton value="Guardar" actionListener="#{tipoContratoBean.guardar}" process="@this dg-tipoContrato" update="form:dt-tipoContrato"></p:commandButton>
+		    	</f:facet>
+			</p:dialog>
+		</h:form>
+	</ui:define>
+</ui:composition>
