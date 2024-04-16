@@ -1,0 +1,72 @@
+<ui:composition
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/plantillas/template.xhtml">
+	<ui:define name="title">Tipo de régimen</ui:define>
+	<ui:define name="content">
+		<h:form id="form">
+			<p:growl id="messages" showDetail="true" life="4000"/>
+			<p:dialog modal="true" widgetVar="statusDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
+			</p:dialog>
+			<p:toolbar>
+				<p:toolbarGroup>
+					<p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{tipoRegimenBean.nuevo()}" oncomplete="PF('dgTipoRegimen').show();" process="@this" update="form:dg-tipoRegimen"/>
+				</p:toolbarGroup>
+			</p:toolbar>
+			<div style="padding-top: 1rem">
+				<p:dataTable id="dt-tipoRegimen" widgetVar="dtTipooRegimen" value="#{tipoRegimenBean.regimenes}" var="regimen" allowUnsorting="true" sortMode="single">
+					<p:column headerText="Clave" width="5rem">
+			    		<p:outputLabel value="#{regimen.clave}" />
+			    	</p:column>
+			    	<p:column headerText="Nombre">
+			    		<p:outputLabel value="#{regimen.nombre}" />
+			    	</p:column>
+			    	<p:column headerText="Inicio Vigencia" width="7rem">
+			    		<p:outputLabel value="#{regimen.vigenciaInicio}">
+			    			<f:convertDateTime pattern="dd/MMM/yyyy" />
+			    		</p:outputLabel>
+			    	</p:column>
+			    	<p:column headerText="Fin Vigencia" width="7rem">
+			    		<p:outputLabel value="#{regimen.vigenciaFin}">
+			    			<f:convertDateTime pattern="dd/MMM/yyyy" />
+			    		</p:outputLabel>
+			    	</p:column>
+			    	<p:column width="3rem">
+			    		<p:commandButton icon="pi pi-bars" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dgTipoRegimen').show();" actionListener="#{tipoRegimenBean.editar}" process="@this dt-tipoRegimen" update="form:dg-tipoRegimen">
+			    			<f:setPropertyActionListener value="#{regimen}" target="#{tipoRegimenBean.regimen}" />
+			    		</p:commandButton>
+			    	</p:column>
+				</p:dataTable>
+			</div>
+			<p:dialog id="dg-tipoRegimen" widgetVar="dgTipoRegimen" header="Tipo de régimen" showEffect="hide" modal="true">
+		    	<p:outputPanel class="ui-fluid">
+		    		<div class="p-field">
+		    			<p:outputLabel value="Clave SAT"></p:outputLabel>
+		    			<p:inputText value="#{tipoRegimenBean.regimen.clave}"></p:inputText>
+		    		</div>
+		    		<div class="p-field">
+		    			<p:outputLabel value="Nombre"></p:outputLabel>
+		    			<p:inputText value="#{tipoRegimenBean.regimen.nombre}"></p:inputText>
+		    		</div>
+		    		<div class="p-field">
+		    			<p:outputLabel value="Inicio vigencia"></p:outputLabel>
+		    			<p:datePicker value="#{tipoRegimenBean.regimen.vigenciaInicio}" showIcon="true" yearNavigator="true" monthNavigator="true"></p:datePicker>
+		    		</div>
+		    		<div class="p-field">
+		    			<p:outputLabel value="Fin Vigencia"></p:outputLabel>
+		    			<p:datePicker value="#{tipoRegimenBean.regimen.vigenciaFin}" showIcon="true" yearNavigator="true" monthNavigator="true"></p:datePicker>
+		    		</div>
+		    	</p:outputPanel>
+		    	<f:facet name="footer">
+		    		<p:commandButton value="Guardar" actionListener="#{tipoRegimenBean.guardar}" process="@this dg-tipoRegimen" update="form:dt-tipoRegimen"></p:commandButton>
+		    	</f:facet>
+		    </p:dialog>
+		</h:form>
+	</ui:define>
+</ui:composition>
