@@ -11,7 +11,6 @@ import mx.com.ferbo.dto.sat.TipoRegimenDTO;
 public class DatoEmpresaDTO {
 	
 	private Integer id;
-	private DetEmpleadoDTO empleado;
 	private CatPerfilDTO perfil;
 	private CatEmpresaDTO empresa;
 	private CatPlantaDTO planta;
@@ -25,19 +24,13 @@ public class DatoEmpresaDTO {
 	private String rfc;
 	private BigDecimal salarioDiario;
 	private Date horaEntrada;
-	private Date tiempoTolerancia;
+	private Integer minutosTolerancia;
 	
 	public Integer getId() {
 		return id;
 	}
 	public void setId(Integer id) {
 		this.id = id;
-	}
-	public DetEmpleadoDTO getEmpleado() {
-		return empleado;
-	}
-	public void setEmpleado(DetEmpleadoDTO empleado) {
-		this.empleado = empleado;
 	}
 	public CatPerfilDTO getPerfil() {
 		return perfil;
@@ -117,20 +110,11 @@ public class DatoEmpresaDTO {
 	public void setHoraEntrada(Date horaEntrada) {
 		this.horaEntrada = horaEntrada;
 	}
-	public Date getTiempoTolerancia() {
-		return tiempoTolerancia;
+	public Integer getMinutosTolerancia() {
+		return minutosTolerancia;
 	}
-	public void setTiempoTolerancia(Date tiempoTolerancia) {
-		this.tiempoTolerancia = tiempoTolerancia;
-	}
-	@Override
-	public String toString() {
-		return "{\"id\":\"" + id + "\", \"empleado\":\"" + empleado + "\", \"perfil\":\"" + perfil
-				+ "\", \"empresa\":\"" + empresa + "\", \"planta\":\"" + planta + "\", \"area\":\"" + area
-				+ "\", \"puesto\":\"" + puesto + "\", \"tipoContrato\":\"" + tipoContrato + "\", \"tipoJornada\":\""
-				+ tipoJornada + "\", \"tipoRegimen\":\"" + tipoRegimen + "\", \"fechaIngreso\":\"" + fechaIngreso
-				+ "\", \"nss\":\"" + nss + "\", \"rfc\":\"" + rfc + "\", \"salarioDiario\":\"" + salarioDiario
-				+ "\", \"horaEntrada\":\"" + horaEntrada + "\", \"tiempoTolerancia\":\"" + tiempoTolerancia + "\"}";
+	public void setMinutosTolerancia(Integer minutosTolerancia) {
+		this.minutosTolerancia = minutosTolerancia;
 	}
 	@Override
 	public int hashCode() {
@@ -147,6 +131,13 @@ public class DatoEmpresaDTO {
 		DatoEmpresaDTO other = (DatoEmpresaDTO) obj;
 		return Objects.equals(id, other.id);
 	}
-	
-
+	@Override
+	public String toString() {
+		return "{\"id\":\"" + id + "\", \"perfil\":\"" + perfil + "\", \"empresa\":\"" + empresa + "\", \"planta\":\""
+				+ planta + "\", \"area\":\"" + area + "\", \"puesto\":\"" + puesto + "\", \"tipoContrato\":\""
+				+ tipoContrato + "\", \"tipoJornada\":\"" + tipoJornada + "\", \"tipoRegimen\":\"" + tipoRegimen
+				+ "\", \"fechaIngreso\":\"" + fechaIngreso + "\", \"nss\":\"" + nss + "\", \"rfc\":\"" + rfc
+				+ "\", \"salarioDiario\":\"" + salarioDiario + "\", \"horaEntrada\":\"" + horaEntrada
+				+ "\", \"minutosTolerancia\":\"" + minutosTolerancia + "\"}";
+	}
 }

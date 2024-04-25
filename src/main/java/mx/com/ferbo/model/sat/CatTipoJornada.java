@@ -8,12 +8,13 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "cat_tipo_jornada")
 @NamedQueries({
-	
+	@NamedQuery(name = "CatTipoJornada.findAll", query = "SELECT t FROM CatTipoJornada t ORDER BY t.clave")
 })
 public class CatTipoJornada implements Serializable {
 

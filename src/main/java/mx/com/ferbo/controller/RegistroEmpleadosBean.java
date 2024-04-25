@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
@@ -21,15 +22,23 @@ import mx.com.ferbo.dao.CatEmpresaDAO;
 import mx.com.ferbo.dao.CatPerfilDAO;
 import mx.com.ferbo.dao.CatPlantaDAO;
 import mx.com.ferbo.dao.CatPuestoDAO;
+import mx.com.ferbo.dao.DatoEmpresaDAO;
 import mx.com.ferbo.dao.DetBiometricoDAO;
 import mx.com.ferbo.dao.EmpleadoDAO;
+import mx.com.ferbo.dao.sat.TipoContratoDAO;
+import mx.com.ferbo.dao.sat.TipoJornadaDAO;
+import mx.com.ferbo.dao.sat.TipoRegimenDAO;
 import mx.com.ferbo.dto.CatAreaDTO;
 import mx.com.ferbo.dto.CatEmpresaDTO;
 import mx.com.ferbo.dto.CatPerfilDTO;
 import mx.com.ferbo.dto.CatPlantaDTO;
 import mx.com.ferbo.dto.CatPuestoDTO;
+import mx.com.ferbo.dto.DatoEmpresaDTO;
 import mx.com.ferbo.dto.DetBiometricoDTO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
+import mx.com.ferbo.dto.sat.TipoContratoDTO;
+import mx.com.ferbo.dto.sat.TipoJornadaDTO;
+import mx.com.ferbo.dto.sat.TipoRegimenDTO;
 import mx.com.ferbo.util.SGPException;
 
 
@@ -60,7 +69,14 @@ public class RegistroEmpleadosBean implements Serializable {
     private final CatPuestoDAO catPuestoDAO;
     private final CatAreaDAO catAreaDAO;
     private final EmpleadoDAO empleadoDAO;
+    private DatoEmpresaDTO datoEmpresa;
     private final DetBiometricoDAO biometricoDAO;
+    private List<TipoContratoDTO> tiposContrato;
+    private TipoContratoDAO tipoContratoDAO;
+    private List<TipoJornadaDTO> tiposJornada;
+    private TipoJornadaDAO tipoJornadaDAO;
+    private List<TipoRegimenDTO> tiposRegimen;
+    private TipoRegimenDAO tipoRegimenDAO;
 
     private DetBiometricoDTO detBiometrico;
     private String biometrico;
@@ -74,6 +90,10 @@ public class RegistroEmpleadosBean implements Serializable {
         biometricoDAO = new DetBiometricoDAO();
         catAreaDAO = new CatAreaDAO();
         empleadoDAO = new EmpleadoDAO();
+        tipoContratoDAO = new TipoContratoDAO();
+        tipoJornadaDAO = new TipoJornadaDAO();
+        tipoRegimenDAO = new TipoRegimenDAO();
+        
         empleadoSelected = new DetEmpleadoDTO();
         lstEmpleados = new ArrayList<>();
         lstEmpleadosSelected = new ArrayList<>();
@@ -87,6 +107,9 @@ public class RegistroEmpleadosBean implements Serializable {
             lstCatPlanta = catPlantaDAO.buscarActivo();
             lstCatPuesto = catPuestoDAO.buscarActivo();
             lstCatArea = catAreaDAO.buscarActivo();
+            tiposContrato = tipoContratoDAO.buscarTodos();
+            tiposJornada = tipoJornadaDAO.buscarTodos();
+            tiposRegimen = tipoRegimenDAO.buscarTodos();
             consultaEmpleados();
         } catch (Exception ex) {
             log.warn("EX-0008: " + ex.getMessage() + ". Error al cargar init()");
@@ -124,53 +147,84 @@ public class RegistroEmpleadosBean implements Serializable {
      */
     public void agregarEmpleado() {
         this.empleadoSelected = new DetEmpleadoDTO();
+        this.datoEmpresa = new DatoEmpresaDTO();
+        this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
+    }
+    
+    public void editar() {
+    	Integer idEmpleado = this.empleadoSelected.getIdEmpleado();
+    	DetEmpleadoDTO e = empleadoDAO.buscarPorId(idEmpleado, true);
+    	DatoEmpresaDTO datoEmpresa = e.getDatoEmpresa();
+    	if(datoEmpresa == null) {
+    		this.datoEmpresa = new DatoEmpresaDTO();
+    		this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
+    	} else {
+    		this.datoEmpresa = datoEmpresa;
+    	}
+    	log.info("Empleado seleccionado: {}", this.empleadoSelected.getIdEmpleado());
     }
 
     /*
      * Método para guardar empleado
      */
     public void guardarEmpleado() {
-        if (this.empleadoSelected.getIdEmpleado() == null) {
-            try {
-                empleadoDAO.guardar(empleadoSelected);
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Empleado agregado"));
-            } catch (SGPException ex) {
-                FacesContext.getCurrentInstance()
-                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Error al guardar empleado"));
-                log.warn("EX-0010: " + ex.getMessage() + ". Error al guardar empleado " + empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
-            }
-        } else {
-            try {
-                empleadoDAO.actualizar(empleadoSelected);
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Empleado editado"));
-            } catch (SGPException ex) {
-                FacesContext.getCurrentInstance()
-                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Error al actualizar empleado"));
-                log.warn("EX-0012: " + ex.getMessage() + ". Error al actualizar el empleado " + empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
-            }
-        }
-
-        if (biometrico != null) {
-            try {
-                detBiometrico.setDetEmpleadoDTO(empleadoSelected);
-                if (detBiometrico.getIdBiometrico() == null) {
-                    biometricoDAO.guardar(detBiometrico);
-                } else {
-                    biometricoDAO.actualizar(detBiometrico);
+    	FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Guardar empleado";
+		
+    	try {
+    		this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
+    		
+    		if (this.empleadoSelected.getIdEmpleado() == null) {
+    			empleadoDAO.guardar(empleadoSelected);
+    		} else {
+    			empleadoDAO.actualizar(empleadoSelected);
+    		}
+    		
+    		if (biometrico != null) {
+                try {
+                    detBiometrico.setDetEmpleadoDTO(empleadoSelected);
+                    if (detBiometrico.getIdBiometrico() == null) {
+                        biometricoDAO.guardar(detBiometrico);
+                    } else {
+                        biometricoDAO.actualizar(detBiometrico);
+                    }
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Biométrico registrado"));
+                } catch (SGPException ex) {
+                    FacesContext.getCurrentInstance()
+                            .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Error al registrar biométrico"));
+                    log.warn("EX-0015: " + ex.getMessage() + ". Error al guardar la huella del empleado " + empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
                 }
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Biométrico registrado"));
-            } catch (SGPException ex) {
-                FacesContext.getCurrentInstance()
-                        .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Error al registrar biométrico"));
-                log.warn("EX-0015: " + ex.getMessage() + ". Error al guardar la huella del empleado " + empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
+                biometrico = null;
             }
-            biometrico = null;
-        }
+    		
+    		detBiometrico = new DetBiometricoDTO();
+	        consultaEmpleados();
+	        PrimeFaces.current().executeScript("PF('dialogEmpleado').hide()");
+    		 
+    		mensaje = "El empleado se guardó correctamente.";
+    		severity = FacesMessage.SEVERITY_INFO;
+    	} catch(SGPException ex) {
+    		mensaje = ex.getMessage();
+    		severity = FacesMessage.SEVERITY_WARN;
+    	} catch(Exception ex) {
+    		mensaje = "Problema para guardar al empleado.";
+    		severity = FacesMessage.SEVERITY_ERROR;
+    	} finally {
+    		message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+	        PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:dtEmpleados");
+			
+    	}
+    	
+    	
+        
 
-        detBiometrico = new DetBiometricoDTO();
-        consultaEmpleados();
-        PrimeFaces.current().executeScript("PF('dialogEmpleado').hide()");
-        PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:dtEmpleados");
+//        detBiometrico = new DetBiometricoDTO();
+//        consultaEmpleados();
+//        PrimeFaces.current().executeScript("PF('dialogEmpleado').hide()");
+//        PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:dtEmpleados");
     }
 
     /*
@@ -333,6 +387,38 @@ public class RegistroEmpleadosBean implements Serializable {
     public void setDetBiometrico(DetBiometricoDTO detBiometrico) {
         this.detBiometrico = detBiometrico;
     }
+
+	public DatoEmpresaDTO getDatoEmpresa() {
+		return datoEmpresa;
+	}
+
+	public void setDatoEmpresa(DatoEmpresaDTO datoEmpresa) {
+		this.datoEmpresa = datoEmpresa;
+	}
+
+	public List<TipoContratoDTO> getTiposContrato() {
+		return tiposContrato;
+	}
+
+	public void setTiposContrato(List<TipoContratoDTO> tiposContrato) {
+		this.tiposContrato = tiposContrato;
+	}
+
+	public List<TipoJornadaDTO> getTiposJornada() {
+		return tiposJornada;
+	}
+
+	public void setTiposJornada(List<TipoJornadaDTO> tiposJornada) {
+		this.tiposJornada = tiposJornada;
+	}
+
+	public List<TipoRegimenDTO> getTiposRegimen() {
+		return tiposRegimen;
+	}
+
+	public void setTiposRegimen(List<TipoRegimenDTO> tiposRegimen) {
+		this.tiposRegimen = tiposRegimen;
+	}
     
 //</editor-fold> 
 }
