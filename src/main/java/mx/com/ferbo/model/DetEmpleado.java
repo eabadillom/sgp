@@ -18,6 +18,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -110,7 +111,9 @@ import javax.validation.constraints.Size;
                         + " LEFT JOIN e.idPlanta pl"
                         + " LEFT JOIN e.idPuesto pu"
                         + " WHERE e.activo = 1 AND e.idEmpresa.idEmpresa = :idEmpresa ORDER BY e.primerAp, e.segundoAp, e.nombre"),
-    @NamedQuery(name = "DetEmpleado.getNumEmpleado", query = "SELECT COALESCE(MAX(e.idEmpleado),0) FROM DetEmpleado e")})
+    @NamedQuery(name = "DetEmpleado.getNumEmpleado", query = "SELECT COALESCE(MAX(e.idEmpleado),0) FROM DetEmpleado e"),
+    @NamedQuery(name = "DetEmpleado.getAll", query = "SELECT e FROM DetEmpleado e")
+})
 public class DetEmpleado implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -234,6 +237,10 @@ public class DetEmpleado implements Serializable {
     @JoinColumn(name = "id_puesto", referencedColumnName = "id_puesto")
     @ManyToOne(optional = false)
     private CatPuesto idPuesto;
+    
+    @OneToOne(cascade = {CascadeType.ALL})
+    @JoinColumn(name = "id_empleado_empresa")
+    private InfDatoEmpresa datoEmpresa;
 
     public DetEmpleado() {
     }
@@ -493,5 +500,13 @@ public class DetEmpleado implements Serializable {
     public void setSueldoDiario(BigDecimal sueldoDiario) {
         this.sueldoDiario = sueldoDiario;
     }
+
+	public InfDatoEmpresa getDatoEmpresa() {
+		return datoEmpresa;
+	}
+
+	public void setDatoEmpresa(InfDatoEmpresa datoEmpresa) {
+		this.datoEmpresa = datoEmpresa;
+	}
 
 }

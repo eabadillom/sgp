@@ -1,6 +1,7 @@
 package mx.com.ferbo.dto;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  *
@@ -50,4 +51,26 @@ public class CatPuestoDTO implements Serializable {
         this.activo = activo;
     }
 
+	@Override
+	public String toString() {
+		return "{\"idPuesto\":\"" + idPuesto + "\", \"descripcion\":\"" + descripcion + "\", \"activo\":\"" + activo
+				+ "\"}";
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(idPuesto);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CatPuestoDTO other = (CatPuestoDTO) obj;
+		return Objects.equals(idPuesto, other.idPuesto);
+	}
 }

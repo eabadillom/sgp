@@ -1,6 +1,7 @@
 package mx.com.ferbo.dao;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -12,11 +13,6 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
-import mx.com.ferbo.model.CatArea;
-import mx.com.ferbo.model.CatEmpresa;
-import mx.com.ferbo.model.CatPerfil;
-import mx.com.ferbo.model.CatPlanta;
-import mx.com.ferbo.model.CatPuesto;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.util.SGPException;
 
@@ -57,6 +53,7 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     		dto.setCatAreaDTO(CatAreaDAO.getDTO(model.getIdArea()));
     		dto.setFotografia(model.getFotografia());
     		dto.setSueldoDiario(model.getSueldoDiario());
+    		dto.setDatoEmpresa(new DatoEmpresaDAO().getDTO(model.getDatoEmpresa()));
     	} catch(Exception ex) {
     		dto = null;
     	}
@@ -88,6 +85,7 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     		model.setIdArea(CatAreaDAO.getModel(dto.getCatAreaDTO()));
     		model.setFotografia(dto.getFotografia());
     		model.setSueldoDiario(dto.getSueldoDiario());
+    		model.setDatoEmpresa(new DatoEmpresaDAO().getModel(dto.getDatoEmpresa()));
     	} catch(Exception ex) {
     		model = null;
     	}
@@ -100,9 +98,78 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
         return empleado.isEmpty() ? new DetEmpleadoDTO() : empleado.get(0);
     }
     
+    public DetEmpleadoDTO buscarPorId(Integer id, boolean isFullInfo) {
+    	DetEmpleadoDTO dto = null;
+    	DetEmpleado model = null;
+    	
+    	try {
+    		model = emSGP.find(DetEmpleado.class, id);
+    		if(isFullInfo) {
+    			log.info("id dato empresa: {}", model.getDatoEmpresa() == null ? null : model.getDatoEmpresa().getId());
+    			log.info("id area: {}", model.getIdArea() == null ? null : model.getIdArea().getIdArea());
+    			log.info("id empresa: {}", model.getIdEmpresa() == null ? null : model.getIdEmpresa().getIdEmpresa());
+    			log.info("id perfil: {}", model.getIdPerfil() == null ? null : model.getIdPerfil().getIdPerfil());
+    			log.info("id planta: {}", model.getIdPlanta() == null ? null : model.getIdPlanta().getIdPlanta());
+    			log.info("id puesto: {}", model.getIdPuesto() == null ? null : model.getIdPuesto().getIdPuesto());
+    		}
+    		dto = getDTO(model);
+    	} catch(Exception ex) {
+    		log.error("Problema para obtener el empleado con id " + id, ex);
+    	}
+    	
+    	return dto;
+    }
+    
     @Override
     public List<DetEmpleadoDTO> buscarTodos() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        List<DetEmpleadoDTO> dtoList = null;
+        List<DetEmpleado> modelList = null;
+        
+        try {
+        	modelList = emSGP.createNamedQuery("DetEmpleado.getAll", DetEmpleado.class)
+        			.getResultList();
+        	
+        	dtoList = new ArrayList<DetEmpleadoDTO>();
+        	for(DetEmpleado model : modelList) {
+        		DetEmpleadoDTO dto = getDTO(model);
+        		dtoList.add(dto);
+        	}
+        } catch(Exception ex) {
+        	log.error("Problema para obtener el listado de empleados...", ex);
+        }
+        
+        return dtoList;
+    }
+    
+    public List<DetEmpleadoDTO> buscarTodos(boolean isFullInfo) {
+        List<DetEmpleadoDTO> dtoList = null;
+        List<DetEmpleado> modelList = null;
+        
+        try {
+        	modelList = emSGP.createNamedQuery("DetEmpleado.getAll", DetEmpleado.class)
+        			.getResultList();
+        	
+        	dtoList = new ArrayList<DetEmpleadoDTO>();
+        	for(DetEmpleado model : modelList) {
+        		DetEmpleadoDTO dto = getDTO(model);
+        		dtoList.add(dto);
+        		
+        		if(isFullInfo == false) {
+        			continue;
+        		}
+        		
+        		log.info("id area: {}", model.getIdArea().getIdArea());
+        		log.info("id empresa: {}", model.getIdEmpresa().getIdEmpresa());
+        		log.info("id perfil: {}", model.getIdPerfil().getIdPerfil());
+        		log.info("id planta: {}", model.getIdPlanta().getIdPlanta());
+        		log.info("id puesto: {}", model.getIdPuesto());
+        		log.info("id dato empresa: {}", model.getDatoEmpresa());
+        	}
+        } catch(Exception ex) {
+        	log.error("Problema para obtener el listado de empleados...", ex);
+        }
+        
+        return dtoList;
     }
     
     @Override
@@ -117,33 +184,13 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     
     @Override
     public void actualizar(DetEmpleadoDTO e)throws SGPException {
-        final DetEmpleado empleado = new DetEmpleado();
+        DetEmpleado model = null;
         try {
+        	model = getModel(e);
             emSGP.getTransaction().begin();
-            empleado.setIdEmpleado(e.getIdEmpleado());
-            empleado.setNombre(e.getNombre());
-            empleado.setPrimerAp(e.getPrimerAp());
-            empleado.setSegundoAp(e.getSegundoAp());
-            empleado.setCurp(e.getCurp());
-            empleado.setFechaNacimiento(e.getFechaNacimiento());
-            empleado.setCorreo(e.getCorreo());
-            empleado.setRfc(e.getRfc());
-            empleado.setNss(e.getNss());
-            empleado.setFechaIngreso(e.getFechaIngreso());
-            empleado.setIdPerfil(e.getCatPerfilDTO() != null ? emSGP.getReference(CatPerfil.class, e.getCatPerfilDTO().getIdPerfil()) : null);
-            empleado.setIdEmpresa(e.getCatEmpresaDTO() != null ? emSGP.getReference(CatEmpresa.class, e.getCatEmpresaDTO().getIdEmpresa()) : null);
-            empleado.setIdPuesto(e.getCatPuestoDTO() != null ? emSGP.getReference(CatPuesto.class, e.getCatPuestoDTO().getIdPuesto()) : null);
-            empleado.setIdArea(e.getCatAreaDTO() != null ? emSGP.getReference(CatArea.class, e.getCatAreaDTO().getIdArea()) : null);
-            empleado.setIdPlanta(e.getCatPlantaDTO() != null ? emSGP.getReference(CatPlanta.class, e.getCatPlantaDTO().getIdPlanta()) : null);
-            empleado.setFechaRegistro(e.getFechaRegistro());
-            empleado.setFechaModificacion(new Date());
-            empleado.setActivo(e.getActivo());
-            empleado.setNumEmpleado(e.getNumEmpleado());
-            empleado.setFotografia(e.getFotografia());
-            empleado.setSueldoDiario(e.getSueldoDiario());
-            emSGP.merge(empleado);
+            emSGP.merge(model);
             emSGP.getTransaction().commit();
-            emSGP.detach(empleado);
+            emSGP.detach(model);
         } catch (Exception ex) {
             emSGP.getTransaction().rollback();
             log.warn("EX-0011: " + ex.getMessage() + ". Error al actualizar el empleado " + e.getNumEmpleado() != null ? e.getNumEmpleado() : null);
@@ -169,32 +216,33 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     
     @Override
     public void guardar(DetEmpleadoDTO e) throws SGPException {
-        final DetEmpleado empleado = new DetEmpleado();
+        DetEmpleado model = null;
         try {
+        	model = getModel(e);
+        	
             emSGP.getTransaction().begin();
-            empleado.setNombre(e.getNombre());
-            empleado.setPrimerAp(e.getPrimerAp());
-            empleado.setSegundoAp(e.getSegundoAp());
-            empleado.setCurp(e.getCurp());
-            empleado.setFechaNacimiento(e.getFechaNacimiento());
-            empleado.setCorreo(e.getCorreo());
-            empleado.setRfc(e.getRfc());
-            empleado.setNss(e.getNss());
-            empleado.setFechaIngreso(e.getFechaIngreso());
-            empleado.setIdPerfil(e.getCatPerfilDTO() != null ? emSGP.getReference(CatPerfil.class, e.getCatPerfilDTO().getIdPerfil()) : null);
-            empleado.setIdEmpresa(e.getCatEmpresaDTO() != null ? emSGP.getReference(CatEmpresa.class, e.getCatEmpresaDTO().getIdEmpresa()) : null);
-            empleado.setIdPuesto(e.getCatPuestoDTO() != null ? emSGP.getReference(CatPuesto.class, e.getCatPuestoDTO().getIdPuesto()) : null);
-            empleado.setIdArea(e.getCatAreaDTO() != null ? emSGP.getReference(CatArea.class, e.getCatAreaDTO().getIdArea()) : null);
-            empleado.setIdPlanta(e.getCatPlantaDTO() != null ? emSGP.getReference(CatPlanta.class, e.getCatPlantaDTO().getIdPlanta()) : null);
-            empleado.setFechaRegistro(new Date());
-            empleado.setActivo((short) 1);
-            empleado.setFotografia(e.getFotografia());
-            empleado.setNumEmpleado(String.format("%0" + 4 + "d", (Integer) emSGP.createNamedQuery("DetEmpleado.getNumEmpleado").getSingleResult() + 1));
-           
-            empleado.setSueldoDiario(e.getSueldoDiario());
-            emSGP.persist(empleado);
+//            model.setNombre(e.getNombre());
+//            model.setPrimerAp(e.getPrimerAp());
+//            model.setSegundoAp(e.getSegundoAp());
+//            model.setCurp(e.getCurp());
+//            model.setFechaNacimiento(e.getFechaNacimiento());
+//            model.setCorreo(e.getCorreo());
+//            model.setRfc(e.getRfc());
+//            model.setNss(e.getNss());
+//            model.setFechaIngreso(e.getFechaIngreso());
+//            model.setIdPerfil(e.getCatPerfilDTO() != null ? emSGP.getReference(CatPerfil.class, e.getCatPerfilDTO().getIdPerfil()) : null);
+//            model.setIdEmpresa(e.getCatEmpresaDTO() != null ? emSGP.getReference(CatEmpresa.class, e.getCatEmpresaDTO().getIdEmpresa()) : null);
+//            model.setIdPuesto(e.getCatPuestoDTO() != null ? emSGP.getReference(CatPuesto.class, e.getCatPuestoDTO().getIdPuesto()) : null);
+//            model.setIdArea(e.getCatAreaDTO() != null ? emSGP.getReference(CatArea.class, e.getCatAreaDTO().getIdArea()) : null);
+//            model.setIdPlanta(e.getCatPlantaDTO() != null ? emSGP.getReference(CatPlanta.class, e.getCatPlantaDTO().getIdPlanta()) : null);
+//            model.setFechaRegistro(new Date());
+//            model.setActivo((short) 1);
+//            model.setFotografia(e.getFotografia());
+//            model.setNumEmpleado(String.format("%0" + 4 + "d", (Integer) emSGP.createNamedQuery("DetEmpleado.getNumEmpleado").getSingleResult() + 1));
+//            model.setSueldoDiario(e.getSueldoDiario());
+            emSGP.persist(model);
             emSGP.getTransaction().commit();
-            e.setIdEmpleado(empleado.getIdEmpleado());
+            e.setIdEmpleado(model.getIdEmpleado());
         } catch (Exception ex) {
             emSGP.getTransaction().rollback();
             ex.printStackTrace();

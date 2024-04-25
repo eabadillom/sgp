@@ -29,6 +29,7 @@ public class DetEmpleadoDTO implements Serializable {
     private CatPuestoDTO catPuestoDTO; //TODO SE DEBE CAMBIAR ESTA PROPIEDAD A LA ENTIDAD DET_EMPLEADO_EMPRESA
     private BigDecimal sueldoDiario; //TODO SE DEBE CAMBIAR ESTA PROPIEDAD A LA ENTIDAD DET_EMPLEADO_EMPRESA
     private DetBiometricoDTO detBiometricoDTO;
+    private DatoEmpresaDTO datoEmpresa;
 
     public DetEmpleadoDTO() {
         catAreaDTO = new CatAreaDTO();
@@ -312,5 +313,13 @@ public class DetEmpleadoDTO implements Serializable {
     public void setDetBiometricoDTO(DetBiometricoDTO detBiometricoDTO) {
         this.detBiometricoDTO = detBiometricoDTO;
     }
+
+	public DatoEmpresaDTO getDatoEmpresa() {
+		return datoEmpresa;
+	}
+
+	public void setDatoEmpresa(DatoEmpresaDTO datoEmpresa) {
+		this.datoEmpresa = datoEmpresa;
+	}
     
 }

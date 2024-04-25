@@ -1,6 +1,5 @@
 package mx.com.ferbo.dao.sat;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -64,33 +63,28 @@ public class TipoJornadaDAO extends DAO<TipoJornadaDTO, CatTipoJornada, String> 
 
 	@Override
 	public List<TipoJornadaDTO> buscarTodos() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<TipoJornadaDTO> buscarActivo() {
-		List<TipoJornadaDTO> list = null;
-		List<CatTipoJornada> result = null;
+		List<TipoJornadaDTO> dtoList = null;
+		List<CatTipoJornada> modelList = null;
 		EntityManager em = null;
 		
 		try {
 			em = getEntityManager();
-			result = em.createNamedQuery("CatTipoJornada.findAll", CatTipoJornada.class)
+			modelList = em.createNamedQuery("CatTipoJornada.findAll", CatTipoJornada.class)
 					.getResultList()
 					;
-			list = new ArrayList<TipoJornadaDTO>();
-			for(CatTipoJornada model : result) {
-				TipoJornadaDTO dto = getDTO(model);
-				list.add(dto);
-			}
+			dtoList = this.toDTOList(modelList);
 		} catch(Exception ex) {
 			log.error("Problema para obtener la lista de tipos de contrato...", ex);
 		} finally {
 			close(em);
 		}
 		
-		return list;
+		return dtoList;
+	}
+
+	@Override
+	public List<TipoJornadaDTO> buscarActivo() {
+		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	@Override
