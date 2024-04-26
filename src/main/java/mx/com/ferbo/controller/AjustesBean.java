@@ -115,6 +115,17 @@ public class AjustesBean implements Serializable {
 			log.error("Problema para redirigir al catalogo tipos de regimen...", ex);
 		}
 	}
+	
+	public void tipoJornada() {
+		String path = null;
+		try {
+			log.info("Redirigiendo a catálogo tipo de jornada...");
+			path = this.contextPath + "/protected/settings/sat/tipoJornada.xhtml";
+			FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+		} catch (IOException ex) {
+			log.error("Problema para redirigir al catalogo tipos de jornada...", ex);
+		}
+	}
 
 	public void banco(){
 		String path = null;
