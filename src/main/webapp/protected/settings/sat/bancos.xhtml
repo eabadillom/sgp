@@ -1,0 +1,92 @@
+
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/plantillas/template.xhtml">
+
+<ui:define name="title" >Bancos</ui:define>
+    <ui:define name="content">
+        <h:form id="form" >
+            <p:growl id="messages" showDetail="true" life="4000" />
+            <p:dialog modal="true" widgetVar="statusDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
+                <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+            </p:dialog>
+
+            <p:toolbar>
+                <p:toolbarGroup>
+                    <p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{bancoBean.nuevo()}" oncomplete="PF('dlgBanco').show();" process="@this" update="form:dlg-Banco"></p:commandButton>
+                </p:toolbarGroup>
+            </p:toolbar>
+
+            <div style="padding-top: 1rem">
+                <p:dataTable id="dt-bancos" widgetVar="dtBancos" value="#{bancoBean.listBancoDTO}" var="banco" rows="10" >
+                    <p:column headerText="Código Banco">
+                        <p:outputLabel value="#{banco.idBanco}" ></p:outputLabel>
+                    </p:column>
+                    <p:column headerText="Descripcion">
+                        <p:outputLabel value="#{banco.descripcion}" ></p:outputLabel>
+                    </p:column>
+                    <p:column headerText="Nombre">
+                        <p:outputLabel value="#{banco.nombre}" ></p:outputLabel>
+                    </p:column>
+                    <p:column headerText="Fecha Inicio">
+                        <p:outputLabel value="#{banco.fechaInicio}" >
+                            <f:convertDateTime pattern="dd/MM/YYYY"/>
+                        </p:outputLabel>
+                    </p:column>
+                    <p:column headerText="Fecha Fin">
+                        <p:outputLabel value="#{banco.fechaFin}" >
+                            <f:convertDateTime pattern="dd/MM/YYYY"/>
+                        </p:outputLabel>
+                    </p:column>
+                    <p:column width="3rem">
+                        <p:commandButton icon="pi pi-bars" onclick="PF('dlgBanco').show();" oncomplete="PF('statusDialog').hide();PF('dlgBanco').show();" actionListener="#{bancoBean.editar()}" process="@this dt-bancos" update="form:dlg-Banco">
+                            <f:setPropertyActionListener value="#{banco}" target="#{bancoBean.bancoDTO}" ></f:setPropertyActionListener>
+                        </p:commandButton>
+                    </p:column>
+
+                </p:dataTable>
+            </div>
+
+            <p:dialog id="dlg-Banco" widgetVar="dlgBanco" modal="true" header="Bancos" showEffect="hide">
+                <p:outputPanel class="ui-fluid">
+
+                    <div class="p-field" >
+                        <p:outputLabel value="Codigo Banco"></p:outputLabel>
+                        <p:inputText value="#{bancoBean.bancoDTO.idBanco}" ></p:inputText>
+                    </div>
+
+                    <div class="p-field" >
+                        <p:outputLabel value="descripcion"></p:outputLabel>
+                        <p:inputText value="#{bancoBean.bancoDTO.descripcion}" ></p:inputText>
+                    </div>
+
+                    <div class="p-field" >
+                        <p:outputLabel value="nombre"></p:outputLabel>
+                        <p:inputText value="#{bancoBean.bancoDTO.nombre}" ></p:inputText>
+                    </div>
+
+                    <div class="p-field" >
+                        <p:outputLabel value="Fecha Inicio"></p:outputLabel>
+                        <p:datePicker value="#{bancoBean.bancoDTO.fechaInicio}" showIcon="true" yearNavigator="true" monthNavigator="true" >                            
+                        </p:datePicker>                        
+                    </div>
+
+                    <div class="p-field" >
+                        <p:outputLabel value="Fecha Fin"></p:outputLabel>
+                        <p:datePicker value="#{bancoBean.bancoDTO.fechaFin}" showIcon="true" yearNavigator="true" monthNavigator="true">                            
+                        </p:datePicker>                        
+                    </div>                    
+
+                </p:outputPanel>
+
+                <f:facet name="footer">
+                    <p:commandButton value="Guardar" actionListener="#{bancoBean.save()}" process="@this dlg-Banco" update="form:dt-bancos" ></p:commandButton>
+                </f:facet>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+</ui:composition>

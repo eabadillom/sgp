@@ -116,4 +116,15 @@ public class AjustesBean implements Serializable {
 		}
 	}
 
+	public void banco(){
+		String path = null;
+		try {
+			log.info("Redirigir a catálogo de bancos");
+			path = this.contextPath + "/protected/settings/sat/bancos.xhtml";
+			FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+		} catch (IOException ex) {
+			log.error("Problemas para redirigir al catalogo de bancos");
+		}
+	}
+
 }
