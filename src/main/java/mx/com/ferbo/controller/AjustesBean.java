@@ -138,4 +138,16 @@ public class AjustesBean implements Serializable {
 		}
 	}
 
+	public void origenRecurso(){
+		String path = null;
+		try {
+			log.info("Redirigir a catálogo de origen Recurso");
+			path = contextPath + "/protected/settings/sat/origRecurso.xhtml" ;
+			FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+		} catch (IOException e) {
+			log.error("Problemas para redirigir al catálogo de origen recursos");
+		}
+
+	}
+
 }
