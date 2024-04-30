@@ -150,4 +150,17 @@ public class AjustesBean implements Serializable {
 
 	}
 
+	public void tipoDeduccion(){
+
+		String path = null;
+
+		try {
+			path = contextPath + "/protected/settings/sat/tipoDeduccion.xhtml";
+			FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
 }
