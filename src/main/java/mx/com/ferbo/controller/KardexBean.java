@@ -2,22 +2,17 @@ package mx.com.ferbo.controller;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.dao.CatAreaDAO;
-import mx.com.ferbo.dao.CatEmpresaDAO;
-import mx.com.ferbo.dao.CatPerfilDAO;
-import mx.com.ferbo.dao.CatPlantaDAO;
-import mx.com.ferbo.dao.CatPuestoDAO;
 import mx.com.ferbo.dao.EmpleadoDAO;
 import mx.com.ferbo.dto.CatAreaDTO;
 import mx.com.ferbo.dto.CatEmpresaDTO;
@@ -25,6 +20,7 @@ import mx.com.ferbo.dto.CatPerfilDTO;
 import mx.com.ferbo.dto.CatPlantaDTO;
 import mx.com.ferbo.dto.CatPuestoDTO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
+import mx.com.ferbo.dto.EmpleadoFotoDTO;
 
 
 @Named(value = "kardexBean")
@@ -40,70 +36,33 @@ public class KardexBean implements Serializable {
     private List<CatPuestoDTO> lstCatPuesto;
     private List<CatAreaDTO> lstCatArea;
 
-    private final CatEmpresaDAO catEmpresaDAO;
-    private final CatPerfilDAO catPerfilDAO;
-    private final CatPlantaDAO catPlantaDAO;
-    private final CatPuestoDAO catPuestoDAO;
-    private final CatAreaDAO catAreaDAO;
-    private final EmpleadoDAO empleadoDAO;
-    
-    // Obteniendo Empleado
+    private EmpleadoDAO empleadoDAO;
     private DetEmpleadoDTO empleadoSelected;
-    private HttpServletRequest httpServletRequest;
+    private EmpleadoFotoDTO empleadoFoto;
+    private HttpServletRequest request;
 
     public KardexBean() {
-        catEmpresaDAO = new CatEmpresaDAO();
-        catPerfilDAO = new CatPerfilDAO();
-        catPlantaDAO = new CatPlantaDAO();
-        catPuestoDAO = new CatPuestoDAO();
-        catAreaDAO = new CatAreaDAO();
         empleadoDAO = new EmpleadoDAO();
-        Integer idEmpleado = searchIdEmpleado();
-        if(idEmpleado == null) {
-            httpServletRequest = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-            empleadoSelected = (DetEmpleadoDTO) httpServletRequest.getSession(true).getAttribute("empleado");
-            empleadoSelected = empleadoDAO.buscarPorIdSDI(empleadoSelected.getIdEmpleado());
-        } else {
-            empleadoSelected = empleadoDAO.buscarPorIdSDI(idEmpleado);
-        }
     }
 
     @PostConstruct
     public void init() {
+    	HttpSession session = null;
+    	
         try {
-            lstCatEmpresa = catEmpresaDAO.buscarActivo();
-            lstCatPerfil = catPerfilDAO.buscarActivo();
-            lstCatPlanta = catPlantaDAO.buscarActivo();
-            lstCatPuesto = catPuestoDAO.buscarActivo();
-            lstCatArea = catAreaDAO.buscarActivo();
+        	request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+        	session = request.getSession(false);
+            empleadoSelected = (DetEmpleadoDTO) session.getAttribute("empleado");
+            empleadoFoto = (EmpleadoFotoDTO) session.getAttribute("fotografia");
+            empleadoSelected = empleadoDAO.buscarPorId(empleadoSelected.getIdEmpleado(), true);
+        	
+            log.info("idEmpleado: {}", empleadoSelected.getIdEmpleado());
+        	
         } catch (Exception ex) {
             log.warn("EX-0007: " + ex.getMessage() + ". Error al cargar init()");
         }
     }
     
-    private Integer searchIdEmpleado(){
-        Map<String, String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
-        String id = params.get("idEmpleado");
-        if (isNumeric(id)) {
-            return Integer.valueOf(id);
-        } else {
-            return null;
-        }
-    }
-    
-    private static boolean isNumeric(final String strNum) {
-	    if (strNum == null) {
-	        return false;
-	    }
-	    try {
-	        Integer.valueOf(strNum);
-	    } catch (NumberFormatException nfe) {
-	        return false;
-	    }
-	    return true;
-	}
-
-//<editor-fold defaultstate="collapsed" desc="Getters&Setters">
     public DetEmpleadoDTO getEmpleadoSelected() {
         return empleadoSelected;
     }
@@ -152,5 +111,13 @@ public class KardexBean implements Serializable {
         this.lstCatArea = lstCatArea;
     }
     //</editor-fold>
+
+	public EmpleadoFotoDTO getEmpleadoFoto() {
+		return empleadoFoto;
+	}
+
+	public void setEmpleadoFoto(EmpleadoFotoDTO empleadoFoto) {
+		this.empleadoFoto = empleadoFoto;
+	}
 
 }

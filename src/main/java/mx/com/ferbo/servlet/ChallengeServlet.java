@@ -100,14 +100,14 @@ public class ChallengeServlet extends HttpServlet{
 			log.info(biometricos.getHuella() + biometricos.getHuella2());
 			//Generamos su token, falta validar ?
 			token = su.getRandomString();
-			fechaTemp = DateUtil.addMinute(fechaTemp, 1);
+			fechaTemp = DateUtil.addMinute(fechaTemp, 5);
 			log.info("Fecha de expiración generada: {}", fechaTemp);
 			
 			tokenDAO = new DetTokenDAO();
 			tokenDTO = tokenDAO.buscarPorNumEmpleado(numeroEmpleado);
 			log.info(tokenDTO);
 			
-			empleadoSelect = empleadoDAO.buscarPorNumEmpl(numeroEmpleado);
+			empleadoSelect = empleadoDAO.buscarPorNumeroEmpleado(numeroEmpleado, false);
 			tokenDTO.setDetEmpleadoDTO(empleadoSelect);
 			tokenDTO.setNbToken(token);
 			tokenDTO.setCaducidad(fechaTemp);

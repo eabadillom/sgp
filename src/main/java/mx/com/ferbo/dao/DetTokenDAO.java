@@ -32,8 +32,26 @@ public class DetTokenDAO extends IBaseDAO<DetTokenDTO, Integer> implements Seria
 		return dto;
 	}
 	
+	public static synchronized DetTokenDTO getDTO(DetToken model, boolean isFullInfo) {
+		DetTokenDTO dto = null;
+		try {
+			dto = new DetTokenDTO();
+			dto.setIdToken(model.getIdToken());
+			dto.setNbToken(model.getNbToken());
+			dto.setCaducidad(model.getCaducidad());
+			dto.setValido(model.isValido());
+			if(isFullInfo == false)
+				return dto;
+			dto.setDetEmpleadoDTO(EmpleadoDAO.getDTO(model.getEmpleado()));
+		} catch(Exception ex) {
+			dto = null;
+		}
+		return dto;
+	}
+	
 	public static synchronized DetToken getModel(DetTokenDTO dto) {
 		DetToken model = null;
+		
 		try {
 			model = new DetToken();
 			model.setIdToken(dto.getIdToken());
@@ -44,6 +62,27 @@ public class DetTokenDAO extends IBaseDAO<DetTokenDTO, Integer> implements Seria
 		} catch(Exception ex) {
 			model = null;
 		}
+		
+		return model;
+	}
+	
+	public static synchronized DetToken getModel(DetTokenDTO dto, boolean isFullInfo) {
+		DetToken model = null;
+		try {
+			model = new DetToken();
+			model.setIdToken(dto.getIdToken());
+			model.setNbToken(dto.getNbToken());
+			model.setCaducidad(dto.getCaducidad());
+			model.setValido(dto.isValido());
+			
+			if(isFullInfo == false)
+				return model;
+			
+			model.setEmpleado(EmpleadoDAO.getModel(dto.getDetEmpleadoDTO()));
+		} catch(Exception ex) {
+			model = null;
+		}
+		
 		return model;
 	}
 	
@@ -74,6 +113,38 @@ public class DetTokenDAO extends IBaseDAO<DetTokenDTO, Integer> implements Seria
 					+ "	GROUP BY t2.id_empleado "
 					+ ") t3 ON t.id_empleado = t3.id_empleado AND t.caducidad = t3.caducidad "
 					+ "WHERE t.id_empleado = :idEmpleado";
+			
+			model = (DetToken) emSGP.createNativeQuery(query, DetToken.class)
+					.setParameter("idEmpleado", idEmpleado)
+					.getSingleResult()
+					;
+			
+			dto = getDTO(model);
+			
+		} catch(Exception ex) {
+			log.error("Problema para obtener el empleado con id: " + idEmpleado, ex);
+			dto = null;
+		}
+		
+		return dto;
+	}
+	
+	public DetTokenDTO buscarPorIdEmpleado(Integer idEmpleado) {
+		DetToken model = null;
+		DetTokenDTO dto = null;
+		String query = null;
+		
+		try {
+			log.info("Consultando empleado con native query...");
+			query = "SELECT t.* FROM det_token_empleado t "
+					+ "INNER JOIN ( "
+					+ "	SELECT "
+					+ "		t2.id_empleado, "
+					+ "		MAX(t2.caducidad) AS caducidad "
+					+ "	FROM det_token_empleado t2 "
+					+ "	GROUP BY t2.id_empleado "
+					+ ") t3 ON t.id_empleado = t3.id_empleado AND t.caducidad = t3.caducidad "
+					+ "WHERE t. = :idEmpleado";
 			
 			model = (DetToken) emSGP.createNativeQuery(query, DetToken.class)
 					.setParameter("idEmpleado", idEmpleado)
