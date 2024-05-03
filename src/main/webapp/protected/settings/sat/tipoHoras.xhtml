@@ -1,0 +1,92 @@
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/plantillas/template.xhtml">
+
+    <ui:define name="title">Tipo Horas</ui:define>
+
+    <ui:define name="content">
+        <h:form id="form">
+            <p:growl id="messages" showDetail="true" showSummary="true" life="4000" />
+
+            <p:dialog widgetVar="statusDialog" header="Cargando informacion..." closable="false" draggable="false" resizable="false" modal="true">
+                <i class="pi pi-spinner pi-spin" style="font-size: 3rem;"></i>
+            </p:dialog>
+
+            <p:toolbar>
+                <p:toolbarGroup>
+                    <p:commandButton value="Agregar" actionListener="#{tipoHorasBean.nuevo()}" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dlgTipoHora').show();" process="@this" update="form:dlg-tipoHora"></p:commandButton>
+                </p:toolbarGroup>
+            </p:toolbar>
+
+            <div style="padding-top: 1rem;">
+
+                <p:dataTable id="dt-tipoHora" widgetVar="dtTipoHora" value="#{tipoHorasBean.listTipoHoras}" var="tipoHora">
+
+                    <p:column headerText="Clave">
+                        <p:outputLabel value="#{tipoHora.clave}" ></p:outputLabel>
+                    </p:column>
+
+                    <p:column headerText="Descripcion">
+                        <p:outputLabel value="#{tipoHora.descripcion}" ></p:outputLabel>
+                    </p:column>
+
+                    <p:column headerText="Fecha Inicio">
+                        <p:outputLabel value="#{tipoHora.vigenciaInicio}" >
+                            <f:convertDateTime pattern="dd-MMM-yyyy"></f:convertDateTime>
+                        </p:outputLabel>
+                    </p:column>
+
+                    <p:column headerText="Fecha Fin">
+                        <p:outputLabel value="#{tipoHora.vigenciaFin}" >
+                            <f:convertDateTime pattern="dd-MMM-yyyy"></f:convertDateTime>
+                        </p:outputLabel>
+                    </p:column>
+
+                    <p:column width="3rem">
+                        <p:commandButton icon="pi pi-bars" actionListener="#{tipoHorasBean.editar()}" onclick="PF('statusDialog').show()" oncomplete="PF('statusDialog').hide();PF('dlgTipoHora').show();" process="@this form:dt-tipoHora" update="form:dlg-tipoHora">
+                            <f:setPropertyActionListener value="#{tipoHora}" target="#{tipoHorasBean.tipoHorasDTO}" ></f:setPropertyActionListener>
+                        </p:commandButton>
+                    </p:column>
+
+                </p:dataTable>
+
+            </div>
+
+            <p:dialog id="dlg-tipoHora" header="Tipo Horas" widgetVar="dlgTipoHora" showEffect="hide">
+                <p:outputPanel styleClass="ui-fluid">
+
+                    <div class="p-field" >
+                        <p:outputLabel value="Codigo" ></p:outputLabel>
+                        <p:inputText value="#{tipoHorasBean.tipoHorasDTO.clave}" readonly="#{tipoHorasBean.primaryEdit}" required="true" requiredMessage="el campo clave es obligatorio"></p:inputText>                        
+                    </div>
+
+                    <div class="p-field">
+                        <p:outputLabel value="Descripcion"></p:outputLabel>
+                        <p:inputText value="#{tipoHorasBean.tipoHorasDTO.descripcion}" required="true" requiredMessage="el campo descripcion es obligatorio"></p:inputText>
+                    </div>
+
+                    <div class="p-field">
+                        <p:outputLabel value="Fecha Inicio" ></p:outputLabel>
+                        <p:datePicker value="#{tipoHorasBean.tipoHorasDTO.vigenciaInicio}" showIcon="true" yearNavigator="true" monthNavigator="true" required="true" requiredMessage="el campo fecha Inicio es obligatorio"></p:datePicker>
+                    </div>
+
+                    <div class="p-field">
+                        <p:outputLabel value="Fecha Fin" ></p:outputLabel>
+                        <p:datePicker value="#{tipoHorasBean.tipoHorasDTO.vigenciaFin}" showIcon="true" yearNavigator="true" monthNavigator="true"></p:datePicker>
+                    </div>                    
+
+                </p:outputPanel>
+
+                <f:facet name="footer">
+                    <p:commandButton value="Guardar" actionListener="#{tipoHorasBean.guardar()}" process="@this form:dlg-tipoHora" update="form:dt-tipoHora form:messages" ></p:commandButton>
+                </f:facet>
+
+            </p:dialog>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

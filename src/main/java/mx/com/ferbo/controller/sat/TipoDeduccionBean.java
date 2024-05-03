@@ -32,7 +32,7 @@ public class TipoDeduccionBean implements Serializable{
     private CatTipoDeduccionDAO catTipoDeduccionDAO;
 
     private boolean guardar;
-    
+    private boolean primaryEdit;
 
     public TipoDeduccionBean(){
 
@@ -51,10 +51,12 @@ public class TipoDeduccionBean implements Serializable{
     public void nuevo(){
         tipoDeduccionDTO = new TipoDeduccionDTO();
         guardar = true;
+        primaryEdit = false;
     }
 
     public void editar(){
         guardar = false;
+        primaryEdit = true;
     }
 
     public void guardar(){
@@ -84,17 +86,24 @@ public class TipoDeduccionBean implements Serializable{
             }
             
             listTipoDeduccion = catTipoDeduccionDAO.buscarTodos();
+            PrimeFaces.current().executeScript("PF('dlgTipoDeduccion').hide();");
 
         } catch (SGPException e) {            
 
-            titulo = "Error en registro";
-            mensaje = e.getMessage();
+            titulo = "Error";
+            mensaje = "Error en el registro consulta al administrador de sistemas";
             severity = FacesMessage.SEVERITY_ERROR;
 
             log.error(e.getMessage());
 
-        }finally{
-            
+        }catch(Exception ex){
+            titulo = "Error";
+            mensaje = "Error en el registro consulta al administrador de sistemas";
+            severity = FacesMessage.SEVERITY_ERROR;
+
+            log.error(ex.getMessage());
+
+        }finally{            
             message = new FacesMessage(severity,titulo,mensaje);
             FacesContext.getCurrentInstance().addMessage(null, message);
 
@@ -119,6 +128,14 @@ public class TipoDeduccionBean implements Serializable{
 
     public void setListTipoDeduccion(List<TipoDeduccionDTO> listTipoDeduccion) {
         this.listTipoDeduccion = listTipoDeduccion;
+    }
+
+    public boolean isPrimaryEdit() {
+        return primaryEdit;
+    }
+
+    public void setPrimaryEdit(boolean primaryEdit) {
+        this.primaryEdit = primaryEdit;
     }
 
 

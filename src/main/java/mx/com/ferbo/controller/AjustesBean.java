@@ -163,4 +163,17 @@ public class AjustesBean implements Serializable {
 
 	}
 
+	public void tipoHora(){
+		String path = null;
+		
+		try {
+			path = contextPath + "/protected/settings/sat/tipoHoras.xhtml";
+			FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+
 }
