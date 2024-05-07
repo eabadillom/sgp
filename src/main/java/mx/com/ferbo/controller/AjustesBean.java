@@ -175,5 +175,14 @@ public class AjustesBean implements Serializable {
 		}
 	}
 
+	public void tipoIncapacidad(){
+		String path = null;
+		try {
+			path = contextPath + "/protected/settings/sat/tipoIncapacidad.xhtml";			
+			FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+		} catch (IOException e) {
+			e.getMessage();
+		}
+	}
 
 }
