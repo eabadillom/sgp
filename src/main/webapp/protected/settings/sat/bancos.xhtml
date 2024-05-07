@@ -22,7 +22,7 @@
             </p:toolbar>
 
             <div style="padding-top: 1rem">
-                <p:dataTable id="dt-bancos" widgetVar="dtBancos" value="#{bancoBean.listBancoDTO}" var="banco" rows="10" >
+                <p:dataTable id="dt-bancos" widgetVar="dtBancos" value="#{bancoBean.listBancoDTO}" var="banco" >
                     <p:column headerText="Código Banco">
                         <p:outputLabel value="#{banco.idBanco}" ></p:outputLabel>
                     </p:column>
@@ -34,12 +34,12 @@
                     </p:column>
                     <p:column headerText="Fecha Inicio">
                         <p:outputLabel value="#{banco.fechaInicio}" >
-                            <f:convertDateTime pattern="dd/MM/YYYY"/>
+                            <f:convertDateTime pattern="dd/MMM/YYYY"/>
                         </p:outputLabel>
                     </p:column>
                     <p:column headerText="Fecha Fin">
                         <p:outputLabel value="#{banco.fechaFin}" >
-                            <f:convertDateTime pattern="dd/MM/YYYY"/>
+                            <f:convertDateTime pattern="dd/MMM/YYYY"/>
                         </p:outputLabel>
                     </p:column>
                     <p:column width="3rem">
@@ -56,22 +56,22 @@
 
                     <div class="p-field" >
                         <p:outputLabel value="Codigo Banco"></p:outputLabel>
-                        <p:inputText value="#{bancoBean.bancoDTO.idBanco}" ></p:inputText>
+                        <p:inputText value="#{bancoBean.bancoDTO.idBanco}" required="true" requiredMessage="El campo codigo banco es obligatorio" readonly="#{bancoBean.primaryKey}" ></p:inputText>
                     </div>
 
                     <div class="p-field" >
                         <p:outputLabel value="descripcion"></p:outputLabel>
-                        <p:inputText value="#{bancoBean.bancoDTO.descripcion}" ></p:inputText>
+                        <p:inputText value="#{bancoBean.bancoDTO.descripcion}" required="true" requiredMessage="El campo descripcion es obligatorio"></p:inputText>
                     </div>
 
                     <div class="p-field" >
                         <p:outputLabel value="nombre"></p:outputLabel>
-                        <p:inputText value="#{bancoBean.bancoDTO.nombre}" ></p:inputText>
+                        <p:inputText value="#{bancoBean.bancoDTO.nombre}" required="true" requiredMessage="El campo nombre es obligatorio" ></p:inputText>
                     </div>
 
                     <div class="p-field" >
                         <p:outputLabel value="Fecha Inicio"></p:outputLabel>
-                        <p:datePicker value="#{bancoBean.bancoDTO.fechaInicio}" showIcon="true" yearNavigator="true" monthNavigator="true" >                            
+                        <p:datePicker value="#{bancoBean.bancoDTO.fechaInicio}" showIcon="true" yearNavigator="true" monthNavigator="true" required="true" requiredMessage="El campo fecha inicio es obligatorio" >                            
                         </p:datePicker>                        
                     </div>
 
@@ -84,7 +84,7 @@
                 </p:outputPanel>
 
                 <f:facet name="footer">
-                    <p:commandButton value="Guardar" actionListener="#{bancoBean.save()}" process="@this dlg-Banco" update="form:dt-bancos" ></p:commandButton>
+                    <p:commandButton value="Guardar" actionListener="#{bancoBean.save()}" process="@this dlg-Banco" update="form:dt-bancos form:messages" ></p:commandButton>
                 </f:facet>
             </p:dialog>
         </h:form>

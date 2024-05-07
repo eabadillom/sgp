@@ -15,6 +15,7 @@ import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.sat.CatOrigRecursoDAO;
 import mx.com.ferbo.dto.sat.OrigRecursoDTO;
+import mx.com.ferbo.util.SGPException;
 
 @Named(value = "origRecursoBean")
 @ViewScoped
@@ -27,6 +28,7 @@ public class OrigRecursoBean implements Serializable{
     CatOrigRecursoDAO catOrigRecursoDAO;
 
     boolean guardar;
+    boolean primaryEdit;
 
     public OrigRecursoBean(){
         catOrigRecursoDAO = new CatOrigRecursoDAO();
@@ -41,10 +43,12 @@ public class OrigRecursoBean implements Serializable{
     public void nuevo(){
         origRecursoDTO = new OrigRecursoDTO();
         guardar = true;
+        primaryEdit = false;
     }
 
     public void editar(){
         guardar = false;
+        primaryEdit = true;
     }
 
     public void guardar(){
@@ -73,10 +77,15 @@ public class OrigRecursoBean implements Serializable{
             }
 
             listOrigRecursos = catOrigRecursoDAO.buscarTodos();
+            PrimeFaces.current().executeScript("PF('dlgOrigenRecursos').hide();");
 
-        } catch (Exception e) {
+        }catch(SGPException e ) {
             titulo = "Error";
-            mensaje = e.getMessage();
+            mensaje = "Error en registro consulta al administrador de sistemas";
+            severity = FacesMessage.SEVERITY_ERROR;            
+        }catch (Exception ex) {
+            titulo = "Error";
+            mensaje = ex.getMessage();
             severity = FacesMessage.SEVERITY_ERROR;            
         }finally{
 
@@ -102,6 +111,14 @@ public class OrigRecursoBean implements Serializable{
 
     public void setListOrigRecursos(List<OrigRecursoDTO> listOrigRecursos) {
         this.listOrigRecursos = listOrigRecursos;
+    }
+
+    public boolean isPrimaryEdit() {
+        return primaryEdit;
+    }
+
+    public void setPrimaryEdit(boolean primaryEdit) {
+        this.primaryEdit = primaryEdit;
     }
 
 
