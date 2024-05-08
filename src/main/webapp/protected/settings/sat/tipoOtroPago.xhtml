@@ -1,0 +1,91 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/plantillas/template.xhtml">
+
+    <ui:define name="title">Tipo Otro Pago</ui:define>
+
+    <ui:define name="content">
+        <h:form id="form">
+            <p:growl id="messages" showDetail="true" life="4000" ></p:growl>
+
+            <p:dialog widgetVar="statusDialog" header="Cargando informacion. . ." resizable="false" draggable="false" closable="false">
+                <i class="pi pi-spin pi-spinner"></i>
+            </p:dialog>
+
+            <p:toolbar>
+                <p:toolbarGroup>
+                    <p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{tipoOtroPagoBean.nuevo}" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dlgTipoOtroPa').show();" process="@this" update="@this form:dlg-tipoOtroPa"></p:commandButton>
+                </p:toolbarGroup>
+            </p:toolbar>
+
+            <div style="padding-top: 3rem;">
+                <p:dataTable id="dt-tipoOtroPa" widgetVar="dtTipoOtroPago" value="#{tipoOtroPagoBean.listDTO}" var="otroPago">
+
+                    <p:column headerText="Clave">
+                        <p:outputLabel value="#{otroPago.clave}"></p:outputLabel>
+                    </p:column>
+
+                    <p:column headerText="Descripcion">
+                        <p:outputLabel value="#{otroPago.descripcion}"></p:outputLabel>
+                    </p:column>
+
+                    <p:column headerText="Fecha Inicio">
+                        <p:outputLabel value="#{otroPago.vigenciaInicio}" >
+                        <f:convertDateTime pattern="dd/MMM/yyyy"></f:convertDateTime>
+                        </p:outputLabel>
+                    </p:column>
+
+                    <p:column headerText="Fecha Fin">
+                        <p:outputLabel value="#{otroPago.vigenciaFin}" >
+                            <f:convertDateTime pattern="dd/MMM/yyyy"></f:convertDateTime>
+                        </p:outputLabel>
+                    </p:column>
+
+                    <p:column>
+                        <p:commandButton icon="pi pi-bars" actionListener="#{tipoOtroPagoBean.editar()}" onclick="PF('statusDialog').show()" oncomplete="PF('statusDialog').hide();PF('dlgTipoOtroPa').show();" process="@this form:dt-tipoOtroPa" update="form:dlg-tipoOtroPa">
+                            <f:setPropertyActionListener value="#{otroPago}" target="#{tipoOtroPagoBean.tipoOtroPagoDTO}"></f:setPropertyActionListener>
+                        </p:commandButton>
+                    </p:column>                
+
+                </p:dataTable>
+            </div>
+            
+            <p:dialog id="dlg-tipoOtroPa" widgetVar="dlgTipoOtroPa" modal="true" showEffect="hide" header="Tipo Otro Pago" >
+                <p:outputPanel class="ui-fluid">
+
+                    <div class="p-field">
+                        <p:outputLabel value="Clave"></p:outputLabel>
+                        <p:inputText value="#{tipoOtroPagoBean.tipoOtroPagoDTO.clave}" readonly="#{tipoOtroPagoBean.primaryEdit}" ></p:inputText>
+                    </div>
+
+                    <div class="p-field" >
+                        <p:outputLabel value="Descripcion"></p:outputLabel>
+                        <p:inputText value="#{tipoOtroPagoBean.tipoOtroPagoDTO.descripcion}"></p:inputText>
+                    </div>
+
+                    <div class="p-field">
+                        <p:outputLabel value="Fecha Inicio"></p:outputLabel>
+                        <p:datePicker value="#{tipoOtroPagoBean.tipoOtroPagoDTO.vigenciaInicio}" showIcon="true" yearNavigator="true" monthNavigator="true"></p:datePicker>
+                    </div>
+
+                    <div class="p-field">
+                        <p:outputLabel value="Fecha Fin" ></p:outputLabel>
+                        <p:datePicker value="#{tipoOtroPagoBean.tipoOtroPagoDTO.vigenciaFin}" showIcon="true" yearNavigator="true" monthNavigator="true" ></p:datePicker>
+                    </div>
+
+                </p:outputPanel>
+
+                <f:facet name="footer">
+                    <p:commandButton value="Guardar" actionListener="#{tipoOtroPagoBean.guardar()}" process="@this form:dlg-tipoOtroPa" update="form:dt-tipoOtroPa"></p:commandButton>
+                </f:facet>
+
+            </p:dialog>
+            
+
+        </h:form>
+    </ui:define>
+</ui:composition>
