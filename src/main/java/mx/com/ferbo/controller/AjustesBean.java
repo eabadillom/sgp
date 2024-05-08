@@ -185,4 +185,14 @@ public class AjustesBean implements Serializable {
 		}
 	}
 
+	public void tipoNomina(){
+		String path = null;
+		try {
+			path = contextPath + "/protected/settings/sat/tipoNomina.xhtml";
+			FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+		} catch (IOException e) {
+			e.getMessage();
+		}
+	}
+
 }

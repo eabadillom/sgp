@@ -15,39 +15,39 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.sat.CatTipoIncapacidadDAO;
-import mx.com.ferbo.dto.sat.TipoIncapacidadDTO;
+import mx.com.ferbo.dao.sat.CatTipoNominaDAO;
+import mx.com.ferbo.dto.sat.TipoNominaDTO;
 import mx.com.ferbo.util.SGPException;
 
-@Named(value = "tipoIncapacidadBean")
+@Named(value = "tipoNominaBean")
 @ViewScoped
-public class TipoIncapacidadBean implements Serializable {
+public class TipoNominaBean implements Serializable{
 
     private static final long serialVersionUID = -3103728579268351267L;
-	private static Logger log = LogManager.getLogger(TipoIncapacidadBean.class);
-    
-    private TipoIncapacidadDTO tipoIncapacidadDTO;
-    private List<TipoIncapacidadDTO> listDTO;
+	private static Logger log = LogManager.getLogger(TipoNominaBean.class);
 
-    private CatTipoIncapacidadDAO catTipoIncapacidadDAO;
+    private TipoNominaDTO tipoNominaDTO;
+    private List<TipoNominaDTO> listDTO;
+
+    private CatTipoNominaDAO catTipoNominaDAO;
 
     private boolean guardar;
     private boolean primaryEdit;
-
-    public TipoIncapacidadBean(){
+    
+    public TipoNominaBean(){
 
         listDTO = new ArrayList<>();
-        catTipoIncapacidadDAO = new CatTipoIncapacidadDAO();
+        catTipoNominaDAO = new CatTipoNominaDAO();
 
     }
 
     @PostConstruct
     public void init(){
-        listDTO = catTipoIncapacidadDAO.buscarTodos();
+        listDTO = catTipoNominaDAO.buscarTodos();
     }
 
     public void nuevo(){
-        tipoIncapacidadDTO = new TipoIncapacidadDTO();
+        tipoNominaDTO = new TipoNominaDTO();
         guardar = true;
         primaryEdit = false;
     }
@@ -55,7 +55,6 @@ public class TipoIncapacidadBean implements Serializable {
     public void editar(){
         guardar = false;
         primaryEdit = true;
-
     }
 
     public void guardar(){
@@ -63,69 +62,68 @@ public class TipoIncapacidadBean implements Serializable {
         FacesMessage message = null;
         Severity severity = null;
         String mensaje = null;
-        String titulo = "Registro guardar";
+        String titulo = "Registro guardado";
 
         try {
-
+            
             if(guardar){
 
-                catTipoIncapacidadDAO.guardar(tipoIncapacidadDTO);
+                catTipoNominaDAO.guardar(tipoNominaDTO);
 
-                mensaje = "Exito al guardar el registro";
+                mensaje = "Exito al guardar registro";
                 severity = FacesMessage.SEVERITY_INFO;
 
             }else{
-                
-                catTipoIncapacidadDAO.actualizar(tipoIncapacidadDTO);
 
-                titulo = "Registro actualizado";
-                mensaje = "Exito al actualizar el registro";
+                catTipoNominaDAO.actualizar(tipoNominaDTO);
+
+                mensaje = "Exito al actualizar registro";
                 severity = FacesMessage.SEVERITY_INFO;
+                titulo = "Registro actualizado";
 
             }
 
-            listDTO = catTipoIncapacidadDAO.buscarTodos();
+            listDTO = catTipoNominaDAO.buscarTodos();
 
-            PrimeFaces.current().executeScript("PF('dlgTipoInca').hide();");
+            PrimeFaces.current().executeScript("PF('dlgTipoNomina').hide();");
 
-        }catch(SGPException ex){
+        } catch (SGPException ex) {
 
             titulo = "Error";
             mensaje = "Consulta al administrador de sistemas";
             severity = FacesMessage.SEVERITY_ERROR;
 
-            log.info("ERROR", ex.getMessage());
-        }catch (Exception e) {
-            
+            log.error("Error: ", ex.getMessage());
+        }catch(Exception e){
+
             titulo = "Error";
             mensaje = "Consulta al administrador de sistemas";
             severity = FacesMessage.SEVERITY_ERROR;
 
-            log.info("ERROR", e.getMessage());
+            log.error("Error: ", e.getMessage());
 
         }finally{
-
             message = new FacesMessage(severity, titulo, mensaje);
             FacesContext.getCurrentInstance().addMessage(null, message);
-            PrimeFaces.current().ajax().update("form:messages","form:dt-tipoIncapacidad");
-
+            PrimeFaces.current().ajax().update("form:messages","form:dt-tipoNomina");
         }
 
+
     }
 
-    public TipoIncapacidadDTO getTipoIncapacidadDTO() {
-        return tipoIncapacidadDTO;
+    public TipoNominaDTO getTipoNominaDTO() {
+        return tipoNominaDTO;
     }
 
-    public void setTipoIncapacidadDTO(TipoIncapacidadDTO tipoIncapacidadDTO) {
-        this.tipoIncapacidadDTO = tipoIncapacidadDTO;
+    public void setTipoNominaDTO(TipoNominaDTO tipoNominaDTO) {
+        this.tipoNominaDTO = tipoNominaDTO;
     }
 
-    public List<TipoIncapacidadDTO> getListDTO() {
+    public List<TipoNominaDTO> getListDTO() {
         return listDTO;
     }
 
-    public void setListDTO(List<TipoIncapacidadDTO> listDTO) {
+    public void setListDTO(List<TipoNominaDTO> listDTO) {
         this.listDTO = listDTO;
     }
 
@@ -137,6 +135,7 @@ public class TipoIncapacidadBean implements Serializable {
         this.primaryEdit = primaryEdit;
     }
 
+    
 
 
 }
