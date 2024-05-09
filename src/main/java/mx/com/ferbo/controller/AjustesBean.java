@@ -215,4 +215,14 @@ public class AjustesBean implements Serializable {
 		}
 	}
 
+	public void riesgoPuesto(){
+		String path = null;
+		try {
+			path = contextPath + "/protected/settings/sat/riesgoPuesto.xhtml";
+			FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+		} catch (Exception e) {
+			e.getMessage();
+		}
+	}
+
 }
