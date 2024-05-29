@@ -1,0 +1,70 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/plantillas/template.xhtml">
+
+    <ui:define name="title">Tipo Nomina</ui:define>
+
+    <ui:define name="content">
+
+        <h:form id="form">
+
+        <p:growl id="messages" showDetail="true" life="4000"></p:growl>
+
+        <p:dialog widgetVar="statusDialog" header="Cargando informacion..." closable="false" resizable="false" draggable="false" >
+            <i class="pi pi-spin pi-spinner" ></i>
+        </p:dialog>
+
+        <p:toolbar>
+            <p:toolbarGroup>
+                <p:commandButton value="Agregar" actionListener="#{tipoNominaBean.nuevo()}" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dlgTipoNomina').show();" process="@this" update="form:dlg-tipoNomina" ></p:commandButton>
+            </p:toolbarGroup>
+        </p:toolbar>
+
+        <div style="padding:1rem">
+            <p:dataTable id="dt-tipoNomina" widgetVar="dtTipoNomina" value="#{tipoNominaBean.listDTO}" var="nomina" >
+
+                <p:column headerText="Clave">
+                    <p:outputLabel value="#{nomina.clave}" ></p:outputLabel>
+                </p:column>
+
+                <p:column headerText="Descripcion">
+                    <p:outputLabel value="#{nomina.descripcion}" ></p:outputLabel>
+                </p:column>
+
+                <p:column>
+                    <p:commandButton icon="pi pi-bars" actionListener="#{tipoNominaBean.editar()}" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dlgTipoNomina').show();" process="@this" update="@this form:dlg-tipoNomina" >
+                        <f:setPropertyActionListener value="#{nomina}" target="#{tipoNominaBean.tipoNominaDTO}" ></f:setPropertyActionListener>
+                    </p:commandButton>
+                </p:column>
+
+            </p:dataTable>
+        </div>
+
+        <p:dialog id="dlg-tipoNomina" widgetVar="dlgTipoNomina" header="Tipo Nomina" showEffect="hide">
+            <p:outputPanel styleClass="ui-fluid" >
+
+                <div class="p-field">
+                    <p:outputLabel value="Clave" ></p:outputLabel>
+                    <p:inputText value="#{tipoNominaBean.tipoNominaDTO.clave}" readonly="#{tipoNominaBean.primaryEdit}" ></p:inputText>
+                </div>
+
+                <div class="p-field">
+                    <p:outputLabel value="Descrpcion"></p:outputLabel>
+                    <p:inputText value="#{tipoNominaBean.tipoNominaDTO.descripcion}" ></p:inputText>
+                </div>
+
+            </p:outputPanel>
+
+            <f:facet name="footer">
+                <p:commandButton value="Guardar" actionListener="#{tipoNominaBean.guardar()}" process="@this form:dlg-tipoNomina" update="form:dt-tipoNomina" ></p:commandButton>
+            </f:facet>
+
+        </p:dialog>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -150,4 +150,79 @@ public class AjustesBean implements Serializable {
 
 	}
 
+	public void tipoDeduccion(){
+
+		String path = null;
+
+		try {
+			path = contextPath + "/protected/settings/sat/tipoDeduccion.xhtml";
+			FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public void tipoHora(){
+		String path = null;
+		
+		try {
+			path = contextPath + "/protected/settings/sat/tipoHoras.xhtml";
+			FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void tipoIncapacidad(){
+		String path = null;
+		try {
+			path = contextPath + "/protected/settings/sat/tipoIncapacidad.xhtml";			
+			FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+		} catch (IOException e) {
+			e.getMessage();
+		}
+	}
+
+	public void tipoNomina(){
+		String path = null;
+		try {
+			path = contextPath + "/protected/settings/sat/tipoNomina.xhtml";
+			FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+		} catch (IOException e) {
+			e.getMessage();
+		}
+	}
+
+	public void tipoOtroPago(){
+		String path = null;
+		try {
+			path = contextPath + "/protected/settings/sat/tipoOtroPago.xhtml";
+			FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+		} catch (IOException e) {
+			e.getMessage();
+		}
+	}
+
+	public void tipoPercepcion(){
+		String path = null;
+		try {
+			path = contextPath + "/protected/settings/sat/tipoPercepcion.xhtml";
+			FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+		} catch (IOException e) {
+			e.getMessage();
+		}
+	}
+
+	public void riesgoPuesto(){
+		String path = null;
+		try {
+			path = contextPath + "/protected/settings/sat/riesgoPuesto.xhtml";
+			FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+		} catch (Exception e) {
+			e.getMessage();
+		}
+	}
+
 }

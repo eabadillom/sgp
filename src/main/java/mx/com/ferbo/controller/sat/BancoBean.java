@@ -31,7 +31,9 @@ public class BancoBean implements Serializable {
     private CatBancoDAO catBancoDAO;
 
     private BancoDTO bancoDTO;
+
     private Boolean nuevo;
+    private Boolean primaryKey;
     
     public BancoBean(){        
 
@@ -47,10 +49,12 @@ public class BancoBean implements Serializable {
     public void nuevo(){
         bancoDTO = new BancoDTO();
         nuevo = true;
+        primaryKey = false;
     }
 
     public void editar(){        
         nuevo = false;
+        primaryKey = true;
     }
 
     public void save(){
@@ -70,16 +74,27 @@ public class BancoBean implements Serializable {
             }else{
                 catBancoDAO.actualizar(bancoDTO);
                 mensaje = "Editado con éxito";
-                severity = FacesMessage.SEVERITY_WARN;            
+                severity = FacesMessage.SEVERITY_INFO;            
             }
 
             listBancoDTO = catBancoDAO.buscarTodos();
+            PrimeFaces.current().executeScript("PF('dlgBanco').hide();");
 
         } catch (SGPException e) {                
-            mensaje = e.getMessage();
+            titulo = "Error Registro";
+            mensaje = "Existe algun error en el registro";
             severity = FacesMessage.SEVERITY_ERROR;
-            log.info("Error" + e.getMessage());
-        }finally{
+            log.error("Error: " + e.getMessage());
+            
+        }catch(Exception ex){
+
+            titulo = "Error Registro";
+            mensaje = "Existe algun error en el registro";
+            severity = FacesMessage.SEVERITY_ERROR;
+            log.error("Error: " + ex.getMessage());
+
+        }
+        finally{
             message = new FacesMessage(severity,titulo, mensaje);
             FacesContext.getCurrentInstance().addMessage(null,message);
             PrimeFaces.current().ajax().update("form:messages","form:dt-bancos");
@@ -102,6 +117,14 @@ public class BancoBean implements Serializable {
 
     public void setListBancoDTO(List<BancoDTO> listBancoDTO) {
         this.listBancoDTO = listBancoDTO;
+    }
+
+    public Boolean getPrimaryKey() {
+        return primaryKey;
+    }
+
+    public void setPrimaryKey(Boolean primaryKey) {
+        this.primaryKey = primaryKey;
     }
 
     
