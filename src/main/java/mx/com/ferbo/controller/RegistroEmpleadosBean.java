@@ -22,7 +22,6 @@ import mx.com.ferbo.dao.CatEmpresaDAO;
 import mx.com.ferbo.dao.CatPerfilDAO;
 import mx.com.ferbo.dao.CatPlantaDAO;
 import mx.com.ferbo.dao.CatPuestoDAO;
-import mx.com.ferbo.dao.DatoEmpresaDAO;
 import mx.com.ferbo.dao.DetBiometricoDAO;
 import mx.com.ferbo.dao.EmpleadoDAO;
 import mx.com.ferbo.dao.sat.TipoContratoDAO;
@@ -81,7 +80,7 @@ public class RegistroEmpleadosBean implements Serializable {
     private DetBiometricoDTO detBiometrico;
     private String biometrico;
     private int numBiometrico;
-
+    
     public RegistroEmpleadosBean() {
         catEmpresaDAO = new CatEmpresaDAO();
         catPerfilDAO = new CatPerfilDAO();
@@ -120,8 +119,9 @@ public class RegistroEmpleadosBean implements Serializable {
      * Método para consultar a los empleados
      */
     private void consultaEmpleados() {
-        lstEmpleados = empleadoDAO.buscarActivoConSDI();
-        biometrico = null;
+    	
+//        lstEmpleados = empleadoDAO.buscarActivoConSDI();
+    	this.lstEmpleados = empleadoDAO.buscarTodos(false);
     }
 
     /*

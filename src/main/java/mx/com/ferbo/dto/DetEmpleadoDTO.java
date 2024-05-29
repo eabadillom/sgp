@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class DetEmpleadoDTO implements Serializable {
+public class DetEmpleadoDTO implements Serializable, Cloneable {
     private static final long serialVersionUID = 1L;
 
     private Integer idEmpleado;

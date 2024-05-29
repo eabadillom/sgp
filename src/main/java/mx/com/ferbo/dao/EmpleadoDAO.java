@@ -16,6 +16,8 @@ import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.util.SGPException;
 
+
+
 /**
  *
  * @author Gabo
@@ -252,6 +254,27 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     @Override
     public List<DetEmpleadoDTO> buscarActivo() {
         return emSGP.createNamedQuery("DetEmpleado.findByActive", DetEmpleadoDTO.class).getResultList();
+    }
+    
+    public List<DetEmpleadoDTO> buscarActivo(boolean isFullInfo) {
+    	List<DetEmpleadoDTO> dtoList = null;
+    	List<DetEmpleado> modelList = null;
+    	
+    	try {
+    		modelList = emSGP.createNamedQuery("DetEmpleado.getAll", DetEmpleado.class)
+    				.getResultList()
+    				;
+    		dtoList = new ArrayList<DetEmpleadoDTO>();
+    		
+    		for(DetEmpleado model : modelList) {
+    			DetEmpleadoDTO dto = getDTO(model, isFullInfo);
+    			dtoList.add(dto);
+    		}
+    	} catch(Exception ex) {
+    		log.error("Problema para obtener el listado de empleados...", ex);
+    	}
+    	
+    	return dtoList;
     }
     
     @Override

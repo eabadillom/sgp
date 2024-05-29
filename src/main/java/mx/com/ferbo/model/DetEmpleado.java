@@ -114,7 +114,8 @@ import javax.validation.constraints.Size;
                         + " LEFT JOIN e.idPuesto pu"
                         + " WHERE e.activo = 1 AND e.idEmpresa.idEmpresa = :idEmpresa ORDER BY e.primerAp, e.segundoAp, e.nombre"),
     @NamedQuery(name = "DetEmpleado.getNumEmpleado", query = "SELECT COALESCE(MAX(e.idEmpleado),0) FROM DetEmpleado e"),
-    @NamedQuery(name = "DetEmpleado.getAll", query = "SELECT e FROM DetEmpleado e")
+    @NamedQuery(name = "DetEmpleado.getAll", query = "SELECT e FROM DetEmpleado e"),
+    @NamedQuery(name = "DetEmpleado.getActive", query = "SELECT e FROM DetEmpleado e WHERE e.activo = :activo")
 })
 public class DetEmpleado implements Serializable {
 
