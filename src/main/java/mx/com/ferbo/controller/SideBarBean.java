@@ -15,6 +15,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.dto.DetEmpleadoDTO;
+import mx.com.ferbo.dto.EmpleadoFotoDTO;
 import mx.com.ferbo.util.DateUtil;
 
 @Named(value = "SideBarBean")
@@ -23,7 +24,8 @@ public class SideBarBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private DetEmpleadoDTO empleadoSelected;
-	private HttpServletRequest httpServletRequest;
+	private EmpleadoFotoDTO empleadoFoto;
+	private HttpServletRequest request;
 	private static Logger log = LogManager.getLogger(SideBarBean.class);
 	private Date fechaActual;
 	private Integer diaActual;
@@ -38,10 +40,19 @@ public class SideBarBean implements Serializable {
 	
 	@PostConstruct
 	public void init() {
-		httpServletRequest = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-		empleadoSelected = (DetEmpleadoDTO) httpServletRequest.getSession(true).getAttribute("empleado");
-		showUniformes = validarUniformes();
-		showArticulos = validarArticulos();
+		HttpSession session = null;
+		
+		try {
+			request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+			session = request.getSession(false);
+			empleadoSelected = (DetEmpleadoDTO) session.getAttribute("empleado");
+			empleadoFoto = (EmpleadoFotoDTO) session.getAttribute("fotografia");
+			showUniformes = validarUniformes();
+			showArticulos = validarArticulos();
+			
+		} catch(Exception ex) {
+			
+		}
 	}
 
 	private Boolean validarUniformes() {
@@ -103,11 +114,11 @@ public class SideBarBean implements Serializable {
 	}
 
 	public HttpServletRequest getHttpServletRequest() {
-		return httpServletRequest;
+		return request;
 	}
 
 	public void setHttpServletRequest(HttpServletRequest httpServletRequest) {
-		this.httpServletRequest = httpServletRequest;
+		this.request = httpServletRequest;
 	}
 
 	public static Logger getLog() {
@@ -140,6 +151,14 @@ public class SideBarBean implements Serializable {
 
 	public void setShowArticulos(Boolean showArticulos) {
 		this.showArticulos = showArticulos;
+	}
+
+	public EmpleadoFotoDTO getEmpleadoFoto() {
+		return empleadoFoto;
+	}
+
+	public void setEmpleadoFoto(EmpleadoFotoDTO empleadoFoto) {
+		this.empleadoFoto = empleadoFoto;
 	}
 
 }

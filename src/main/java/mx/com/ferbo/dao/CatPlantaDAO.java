@@ -34,6 +34,7 @@ public class CatPlantaDAO extends IBaseDAO<CatPlantaDTO, Integer> implements Ser
     		dto.setDescripcion(model.getDescripcion());
     		dto.setActivo(model.getActivo());
     	} catch (Exception ex) {
+    		log.info("Problema para generar el DTO...", ex.getMessage());
     		dto = null;
 		}
     	return dto;
@@ -47,6 +48,7 @@ public class CatPlantaDAO extends IBaseDAO<CatPlantaDTO, Integer> implements Ser
     		model.setDescripcion(dto.getDescripcion());
     		model.setActivo(dto.getActivo());
     	} catch(Exception ex) {
+    		log.warn("Problema para generar el model...", ex.getMessage());
     		model = null;
     	}
     	return model;

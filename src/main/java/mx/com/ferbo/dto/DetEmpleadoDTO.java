@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class DetEmpleadoDTO implements Serializable {
+public class DetEmpleadoDTO implements Serializable, Cloneable {
     private static final long serialVersionUID = 1L;
 
     private Integer idEmpleado;
@@ -30,6 +30,7 @@ public class DetEmpleadoDTO implements Serializable {
     private BigDecimal sueldoDiario; //TODO SE DEBE CAMBIAR ESTA PROPIEDAD A LA ENTIDAD DET_EMPLEADO_EMPRESA
     private DetBiometricoDTO detBiometricoDTO;
     private DatoEmpresaDTO datoEmpresa;
+    private EmpleadoFotoDTO empleadoFoto;
 
     public DetEmpleadoDTO() {
         catAreaDTO = new CatAreaDTO();
@@ -320,6 +321,14 @@ public class DetEmpleadoDTO implements Serializable {
 
 	public void setDatoEmpresa(DatoEmpresaDTO datoEmpresa) {
 		this.datoEmpresa = datoEmpresa;
+	}
+
+	public EmpleadoFotoDTO getEmpleadoFoto() {
+		return empleadoFoto;
+	}
+
+	public void setEmpleadoFoto(EmpleadoFotoDTO empleadoFoto) {
+		this.empleadoFoto = empleadoFoto;
 	}
     
 }

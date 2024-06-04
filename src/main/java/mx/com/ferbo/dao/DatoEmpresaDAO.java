@@ -37,7 +37,6 @@ public class DatoEmpresaDAO extends DAO<DatoEmpresaDTO, InfDatoEmpresa, Integer>
 			dto.setMinutosTolerancia(model.getMinutosTolerancia());
 			
 		} catch(Exception ex) {
-			log.error("Problema para generar el DTO...", ex);
 			dto = null;
 		}
 		

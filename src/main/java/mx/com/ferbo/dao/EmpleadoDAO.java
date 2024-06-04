@@ -14,7 +14,10 @@ import org.apache.logging.log4j.Logger;
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.model.DetEmpleado;
+import mx.com.ferbo.model.DetEmpleadoFoto;
 import mx.com.ferbo.util.SGPException;
+
+
 
 /**
  *
@@ -22,7 +25,7 @@ import mx.com.ferbo.util.SGPException;
  */
 @Stateless
 @LocalBean
-public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Serializable{
+public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
@@ -54,6 +57,44 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     		dto.setFotografia(model.getFotografia());
     		dto.setSueldoDiario(model.getSueldoDiario());
     		dto.setDatoEmpresa(new DatoEmpresaDAO().getDTO(model.getDatoEmpresa()));
+    		dto.setEmpleadoFoto(new EmpleadoFotoDAO().getDTO(model.getEmpleadoFoto()));
+    	} catch(Exception ex) {
+    		dto = null;
+    	}
+    	return dto;
+    }
+    
+    public static synchronized DetEmpleadoDTO getDTO(DetEmpleado model, boolean isFullInfo) {
+    	DetEmpleadoDTO dto = null;
+    	try {
+    		dto = new DetEmpleadoDTO();
+    		dto.setIdEmpleado(model.getIdEmpleado());
+    		dto.setNumEmpleado(model.getNumEmpleado());
+    		dto.setNombre(model.getNombre());
+    		dto.setPrimerAp(model.getPrimerAp());
+    		dto.setSegundoAp(model.getSegundoAp());
+    		dto.setFechaNacimiento(model.getFechaNacimiento());
+    		dto.setFechaRegistro(model.getFechaRegistro());
+    		dto.setFechaModificacion(model.getFechaModificacion());
+    		dto.setCurp(model.getCurp());
+    		dto.setRfc(model.getRfc());
+    		dto.setCorreo(model.getCorreo());
+    		dto.setFechaIngreso(model.getFechaIngreso());
+    		dto.setNss(model.getNss());
+    		dto.setActivo(model.getActivo());
+    		dto.setFotografia(model.getFotografia());
+    		dto.setSueldoDiario(model.getSueldoDiario());
+    		dto.setCatPerfilDTO(CatPerfilDAO.getDTO(model.getIdPerfil()));
+    		
+    		if(isFullInfo == false)
+    			return dto;
+    		
+    		dto.setCatAreaDTO(CatAreaDAO.getDTO(model.getIdArea()));
+    		dto.setCatPlantaDTO(CatPlantaDAO.getDTO(model.getIdPlanta()));
+    		dto.setCatEmpresaDTO(CatEmpresaDAO.getDTO(model.getIdEmpresa()));
+    		dto.setCatPuestoDTO(CatPuestoDAO.getDTO(model.getIdPuesto()));
+    		dto.setDatoEmpresa(new DatoEmpresaDAO().getDTO(model.getDatoEmpresa()));
+    		
     	} catch(Exception ex) {
     		dto = null;
     	}
@@ -86,11 +127,51 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     		model.setFotografia(dto.getFotografia());
     		model.setSueldoDiario(dto.getSueldoDiario());
     		model.setDatoEmpresa(new DatoEmpresaDAO().getModel(dto.getDatoEmpresa()));
+    		model.setEmpleadoFoto(new EmpleadoFotoDAO().getModel(dto.getEmpleadoFoto()));
     	} catch(Exception ex) {
     		model = null;
     	}
     	return model;
     }
+    
+    public static synchronized DetEmpleado getModel(DetEmpleadoDTO dto, boolean isFullInfo) {
+    	DetEmpleado model = null;
+    	try {
+    		model = new DetEmpleado();
+    		model.setIdEmpleado(dto.getIdEmpleado());
+    		model.setNumEmpleado(dto.getNumEmpleado());
+    		model.setNombre(dto.getNombre());
+    		model.setPrimerAp(dto.getPrimerAp());
+    		model.setSegundoAp(dto.getSegundoAp());
+    		model.setFechaNacimiento(dto.getFechaNacimiento());
+    		model.setFechaRegistro(dto.getFechaRegistro());
+    		model.setFechaModificacion(dto.getFechaModificacion());
+    		model.setCurp(dto.getCurp());
+    		model.setRfc(dto.getRfc());
+    		model.setCorreo(dto.getCorreo());
+    		model.setFechaIngreso(dto.getFechaIngreso());
+    		model.setNss(dto.getNss());
+    		model.setActivo(dto.getActivo());
+    		model.setFotografia(dto.getFotografia());
+    		model.setSueldoDiario(dto.getSueldoDiario());
+    		
+    		if(isFullInfo == false)
+    			return model;
+    		
+    		model.setIdPerfil(CatPerfilDAO.getModel(dto.getCatPerfilDTO()));
+    		model.setIdPuesto(CatPuestoDAO.getModel(dto.getCatPuestoDTO()));
+    		model.setIdEmpresa(CatEmpresaDAO.getModel(dto.getCatEmpresaDTO()));
+    		model.setIdPlanta(CatPlantaDAO.getModel(dto.getCatPlantaDTO()));
+    		model.setIdArea(CatAreaDAO.getModel(dto.getCatAreaDTO()));
+    		model.setDatoEmpresa(new DatoEmpresaDAO().getModel(dto.getDatoEmpresa()));
+    		
+    	} catch(Exception ex) {
+    		model = null;
+    	}
+    	return model;
+    }
+    
+    
     
     @Override
     public DetEmpleadoDTO buscarPorId(Integer id) {
@@ -111,6 +192,7 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     			log.info("id perfil: {}", model.getIdPerfil() == null ? null : model.getIdPerfil().getIdPerfil());
     			log.info("id planta: {}", model.getIdPlanta() == null ? null : model.getIdPlanta().getIdPlanta());
     			log.info("id puesto: {}", model.getIdPuesto() == null ? null : model.getIdPuesto().getIdPuesto());
+    			log.info("id foto: {}", model.getEmpleadoFoto() == null ? null : model.getEmpleadoFoto().getId());
     		}
     		dto = getDTO(model);
     	} catch(Exception ex) {
@@ -177,6 +259,27 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
         return emSGP.createNamedQuery("DetEmpleado.findByActive", DetEmpleadoDTO.class).getResultList();
     }
     
+    public List<DetEmpleadoDTO> buscarActivo(boolean isFullInfo) {
+    	List<DetEmpleadoDTO> dtoList = null;
+    	List<DetEmpleado> modelList = null;
+    	
+    	try {
+    		modelList = emSGP.createNamedQuery("DetEmpleado.getAll", DetEmpleado.class)
+    				.getResultList()
+    				;
+    		dtoList = new ArrayList<DetEmpleadoDTO>();
+    		
+    		for(DetEmpleado model : modelList) {
+    			DetEmpleadoDTO dto = getDTO(model, isFullInfo);
+    			dtoList.add(dto);
+    		}
+    	} catch(Exception ex) {
+    		log.error("Problema para obtener el listado de empleados...", ex);
+    	}
+    	
+    	return dtoList;
+    }
+    
     @Override
     public List<DetEmpleadoDTO> buscarPorCriterios(DetEmpleadoDTO e) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
@@ -194,6 +297,7 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
         } catch (Exception ex) {
             emSGP.getTransaction().rollback();
             log.warn("EX-0011: " + ex.getMessage() + ". Error al actualizar el empleado " + e.getNumEmpleado() != null ? e.getNumEmpleado() : null);
+            log.error("Problema al actualizar el empleado...", ex);
         }
     }
     
@@ -221,25 +325,6 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
         	model = getModel(e);
         	
             emSGP.getTransaction().begin();
-//            model.setNombre(e.getNombre());
-//            model.setPrimerAp(e.getPrimerAp());
-//            model.setSegundoAp(e.getSegundoAp());
-//            model.setCurp(e.getCurp());
-//            model.setFechaNacimiento(e.getFechaNacimiento());
-//            model.setCorreo(e.getCorreo());
-//            model.setRfc(e.getRfc());
-//            model.setNss(e.getNss());
-//            model.setFechaIngreso(e.getFechaIngreso());
-//            model.setIdPerfil(e.getCatPerfilDTO() != null ? emSGP.getReference(CatPerfil.class, e.getCatPerfilDTO().getIdPerfil()) : null);
-//            model.setIdEmpresa(e.getCatEmpresaDTO() != null ? emSGP.getReference(CatEmpresa.class, e.getCatEmpresaDTO().getIdEmpresa()) : null);
-//            model.setIdPuesto(e.getCatPuestoDTO() != null ? emSGP.getReference(CatPuesto.class, e.getCatPuestoDTO().getIdPuesto()) : null);
-//            model.setIdArea(e.getCatAreaDTO() != null ? emSGP.getReference(CatArea.class, e.getCatAreaDTO().getIdArea()) : null);
-//            model.setIdPlanta(e.getCatPlantaDTO() != null ? emSGP.getReference(CatPlanta.class, e.getCatPlantaDTO().getIdPlanta()) : null);
-//            model.setFechaRegistro(new Date());
-//            model.setActivo((short) 1);
-//            model.setFotografia(e.getFotografia());
-//            model.setNumEmpleado(String.format("%0" + 4 + "d", (Integer) emSGP.createNamedQuery("DetEmpleado.getNumEmpleado").getSingleResult() + 1));
-//            model.setSueldoDiario(e.getSueldoDiario());
             emSGP.persist(model);
             emSGP.getTransaction().commit();
             e.setIdEmpleado(model.getIdEmpleado());
@@ -255,9 +340,47 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     	return !empleado.isEmpty() ? empleado.get(0) : null;
     }
     
+    public DetEmpleadoDTO buscarPorNumeroEmpleado(String numeroEmpleado, boolean isFullInfo) {
+    	DetEmpleadoDTO dto = null;
+    	DetEmpleado model = null;
+    	try {
+    		model = emSGP.createNamedQuery("DetEmpleado.findByNumero", DetEmpleado.class)
+    				.setParameter("numero",numeroEmpleado)
+    				.getSingleResult()
+    				;
+    		
+    		dto = getDTO(model, isFullInfo);
+    	} catch(Exception ex) {
+    		log.error("Problema para obtener el número de empleado " + numeroEmpleado, ex);
+    		dto = null;
+    	}
+    	
+    	return dto;
+    }
+    
     public DetEmpleadoDTO buscarPorNumEmplAndBiometricos(String numEmpl) {
     	List<DetEmpleadoDTO> empleado = emSGP.createNamedQuery("DetEmpleado.findByNumEmpl", DetEmpleadoDTO.class).setParameter("numEmpl", numEmpl).getResultList();
     	return !empleado.isEmpty() ? empleado.get(0) : null;
+    }
+    
+    public DetEmpleadoDTO buscarConFoto(Integer idEmpleado) {
+    	DetEmpleadoDTO dto = null;
+    	DetEmpleado model = null;
+    	
+    	try {
+    		model = emSGP.find(DetEmpleado.class, idEmpleado);
+    		
+    		if(model.getEmpleadoFoto() != null)
+    			log.info("Id foto empleado: {}",model.getEmpleadoFoto().getId());
+    		
+    		dto = getDTO(model,false);
+    		dto.setEmpleadoFoto(new EmpleadoFotoDAO().getDTO(model.getEmpleadoFoto()));
+    		
+    	} catch(Exception ex) {
+    		log.error("Problema para obtener la foto del empleado...", ex);
+    	}
+    	
+    	return dto;
     }
     
     public DetEmpleadoDTO buscarPorNumEmplFechaRegistro(String numEmpl, String fechaEntrada) {
@@ -282,4 +405,5 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     	
     	return lista;
     }
+
 }

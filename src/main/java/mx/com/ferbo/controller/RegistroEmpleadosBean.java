@@ -22,7 +22,6 @@ import mx.com.ferbo.dao.CatEmpresaDAO;
 import mx.com.ferbo.dao.CatPerfilDAO;
 import mx.com.ferbo.dao.CatPlantaDAO;
 import mx.com.ferbo.dao.CatPuestoDAO;
-import mx.com.ferbo.dao.DatoEmpresaDAO;
 import mx.com.ferbo.dao.DetBiometricoDAO;
 import mx.com.ferbo.dao.EmpleadoDAO;
 import mx.com.ferbo.dao.sat.TipoContratoDAO;
@@ -36,6 +35,7 @@ import mx.com.ferbo.dto.CatPuestoDTO;
 import mx.com.ferbo.dto.DatoEmpresaDTO;
 import mx.com.ferbo.dto.DetBiometricoDTO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
+import mx.com.ferbo.dto.EmpleadoFotoDTO;
 import mx.com.ferbo.dto.sat.TipoContratoDTO;
 import mx.com.ferbo.dto.sat.TipoJornadaDTO;
 import mx.com.ferbo.dto.sat.TipoRegimenDTO;
@@ -81,7 +81,7 @@ public class RegistroEmpleadosBean implements Serializable {
     private DetBiometricoDTO detBiometrico;
     private String biometrico;
     private int numBiometrico;
-
+    
     public RegistroEmpleadosBean() {
         catEmpresaDAO = new CatEmpresaDAO();
         catPerfilDAO = new CatPerfilDAO();
@@ -120,8 +120,9 @@ public class RegistroEmpleadosBean implements Serializable {
      * Método para consultar a los empleados
      */
     private void consultaEmpleados() {
-        lstEmpleados = empleadoDAO.buscarActivoConSDI();
-        biometrico = null;
+    	
+//        lstEmpleados = empleadoDAO.buscarActivoConSDI();
+    	this.lstEmpleados = empleadoDAO.buscarTodos(false);
     }
 
     /*
@@ -152,15 +153,18 @@ public class RegistroEmpleadosBean implements Serializable {
     }
     
     public void editar() {
+    	log.info("Cargando información del empleado: {}", this.empleadoSelected);
     	Integer idEmpleado = this.empleadoSelected.getIdEmpleado();
     	DetEmpleadoDTO e = empleadoDAO.buscarPorId(idEmpleado, true);
     	DatoEmpresaDTO datoEmpresa = e.getDatoEmpresa();
+    	EmpleadoFotoDTO empleadoFoto = e.getEmpleadoFoto();
     	if(datoEmpresa == null) {
     		this.datoEmpresa = new DatoEmpresaDTO();
     		this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
     	} else {
     		this.datoEmpresa = datoEmpresa;
     	}
+    	
     	log.info("Empleado seleccionado: {}", this.empleadoSelected.getIdEmpleado());
     }
 
