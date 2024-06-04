@@ -2,6 +2,7 @@ package mx.com.ferbo.dto;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 import mx.com.ferbo.dto.sat.RegimenFiscalDTO;
 
@@ -118,4 +119,29 @@ public class CatEmpresaDTO implements Serializable {
 		this.statusPadron = statusPadron;
 	}
 
+	@Override
+	public String toString() {
+		return "{\"idEmpresa\":\"" + idEmpresa + "\", \"descripcion\":\"" + descripcion + "\", \"activo\":\"" + activo
+				+ "\", \"razonSocial\":\"" + razonSocial + "\", \"tipoPersona\":\"" + tipoPersona
+				+ "\", \"regimenCapital\":\"" + regimenCapital + "\", \"rfc\":\"" + rfc
+				+ "\", \"fechaInicioOperacion\":\"" + fechaInicioOperacion + "\", \"fechaUltimoCambio\":\""
+				+ fechaUltimoCambio + "\", \"statusPadron\":\"" + statusPadron + "\"}";
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(idEmpresa);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CatEmpresaDTO other = (CatEmpresaDTO) obj;
+		return Objects.equals(idEmpresa, other.idEmpresa);
+	}
 }

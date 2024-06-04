@@ -1,0 +1,91 @@
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/plantillas/template.xhtml">
+
+    <ui:define name="title">Tipo Deducciones</ui:define>
+
+    <ui:define name="content">
+        <h:form id="form">
+            <p:growl id="messages" showDetail="true" life="4000" />
+
+            <p:dialog modal="true" widgetVar="statusDialog" header="Cargando información..." closable="false" draggable="false" resizable="false" >
+                <i class="pi pi-spinner pi-spin" style="font-size: 3rem;" ></i>
+            </p:dialog>
+
+            <p:toolbar>
+                <p:toolbarGroup>
+                    <p:commandButton value="Agregar" actionListener="#{tipoDeduccionBean.nuevo()}" oncomplete="PF('dlgTipoDeduccion').show();" process="@this" update="form:dlg-TipoDeduccion" ></p:commandButton>
+                </p:toolbarGroup>
+            </p:toolbar>
+
+            <div style="padding-top:3rem;" >
+            
+                <p:dataTable id="dt-tipoDeduccion" widgetVar="dtTipoDeduccion" value="#{tipoDeduccionBean.listTipoDeduccion}" var="deduccion">
+
+                    <p:column headerText="Clave" >
+                        <p:outputLabel value="#{deduccion.clave}" ></p:outputLabel>
+                    </p:column>
+
+                    <p:column headerText="Descripcion">
+                        <p:outputLabel value="#{deduccion.descripcion}" ></p:outputLabel>
+                    </p:column>
+
+                    <p:column headerText="Fecha Inicio">
+                        <p:outputLabel value="#{deduccion.vigenciaInicio}" >
+                            <f:convertDateTime pattern="dd/MMM/yyyy"></f:convertDateTime>
+                        </p:outputLabel>
+                    </p:column>
+
+                    <p:column headerText="Fecha Fin">
+                        <p:outputLabel value="#{deduccion.vigenciaFin}" >
+                            <f:convertDateTime pattern="dd/MMM/yyyy"></f:convertDateTime>
+                        </p:outputLabel>
+                    </p:column>
+
+                    <p:column>
+                        <p:commandButton icon="pi pi-bars" actionListener="#{tipoDeduccionBean.editar()}" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dlgTipoDeduccion').show()" process="@this dt-tipoDeduccion" update="form:dlg-TipoDeduccion">
+                            <f:setPropertyActionListener value="#{deduccion}" target="#{tipoDeduccionBean.tipoDeduccionDTO}" ></f:setPropertyActionListener>
+                        </p:commandButton>
+                    </p:column>
+
+                </p:dataTable>
+
+                <p:dialog id="dlg-TipoDeduccion" widgetVar="dlgTipoDeduccion" header="Tipo Deducción" showEffect="hide">
+                    <p:outputPanel class="ui-fluid">
+                        <div class="p-field" >
+                            <p:outputLabel value="Clave" ></p:outputLabel>
+                            <p:inputText value="#{tipoDeduccionBean.tipoDeduccionDTO.clave}" readonly="#{tipoDeduccionBean.primaryEdit}" required="true" requiredMessage="El campo clave es obligatorio" ></p:inputText>
+                        </div>
+
+                        <div class="p-field">
+                            <p:outputLabel value="Descripción" ></p:outputLabel>    
+                            <p:inputText value="#{tipoDeduccionBean.tipoDeduccionDTO.descripcion}" required="true" requiredMessage="El campo descripcion es obligatorio"></p:inputText>
+                        </div>
+
+                        <div class="p-field">
+                            <p:outputLabel value="Fecha Inicio" ></p:outputLabel>
+                            <p:datePicker value="#{tipoDeduccionBean.tipoDeduccionDTO.vigenciaInicio}" showIcon="true" monthNavigator="true" yearNavigator="true" required="true" requiredMessage="El campo fecha inicio es obligatorio"></p:datePicker>
+                        </div>
+
+                        <div class="p-field">
+                            <p:outputLabel value="Fecha Fin" ></p:outputLabel>
+                            <p:datePicker value="#{tipoDeduccionBean.tipoDeduccionDTO.vigenciaFin}" showIcon="true" monthNavigator="true" yearNavigator="true"></p:datePicker>
+                        </div>
+
+                    </p:outputPanel>
+
+                    <f:facet name="footer">
+                        <p:commandButton value="Guardar" actionListener="#{tipoDeduccionBean.guardar()}" process="@this dlg-TipoDeduccion" update="form:dt-tipoDeduccion form:messages" ></p:commandButton>
+                    </f:facet>
+
+                </p:dialog>                
+
+            </div>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

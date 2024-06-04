@@ -35,6 +35,7 @@ public class CatEmpresaDAO extends IBaseDAO<CatEmpresaDTO, Integer> implements S
     	    dto.setRegimenFiscal(RegimenFiscalDAO.getDTO(model.getRegimenFiscal()));
     		
     	} catch(Exception ex) {
+    		log.warn("Problema para generar el DTO...", ex);
     		dto = null;
     	}
     	return dto;
@@ -57,6 +58,7 @@ public class CatEmpresaDAO extends IBaseDAO<CatEmpresaDTO, Integer> implements S
     	    model.setRegimenFiscal(RegimenFiscalDAO.getModel(dto.getRegimenFiscal()));
     	    
     	} catch(Exception ex) {
+    		log.warn("Problema para generar el model...", ex.getMessage());
     		model = null;
     	}
     	return model;
