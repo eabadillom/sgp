@@ -14,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.model.DetEmpleado;
+import mx.com.ferbo.model.DetEmpleadoFoto;
 import mx.com.ferbo.util.SGPException;
 
 
@@ -56,6 +57,7 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     		dto.setFotografia(model.getFotografia());
     		dto.setSueldoDiario(model.getSueldoDiario());
     		dto.setDatoEmpresa(new DatoEmpresaDAO().getDTO(model.getDatoEmpresa()));
+    		dto.setEmpleadoFoto(new EmpleadoFotoDAO().getDTO(model.getEmpleadoFoto()));
     	} catch(Exception ex) {
     		dto = null;
     	}
@@ -190,6 +192,7 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     			log.info("id perfil: {}", model.getIdPerfil() == null ? null : model.getIdPerfil().getIdPerfil());
     			log.info("id planta: {}", model.getIdPlanta() == null ? null : model.getIdPlanta().getIdPlanta());
     			log.info("id puesto: {}", model.getIdPuesto() == null ? null : model.getIdPuesto().getIdPuesto());
+    			log.info("id foto: {}", model.getEmpleadoFoto() == null ? null : model.getEmpleadoFoto().getId());
     		}
     		dto = getDTO(model);
     	} catch(Exception ex) {
@@ -294,6 +297,7 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
         } catch (Exception ex) {
             emSGP.getTransaction().rollback();
             log.warn("EX-0011: " + ex.getMessage() + ". Error al actualizar el empleado " + e.getNumEmpleado() != null ? e.getNumEmpleado() : null);
+            log.error("Problema al actualizar el empleado...", ex);
         }
     }
     

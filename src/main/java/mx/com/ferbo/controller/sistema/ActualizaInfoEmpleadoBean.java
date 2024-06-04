@@ -65,13 +65,15 @@ public class ActualizaInfoEmpleadoBean implements Serializable {
 				this.empleado.setDatoEmpresa(datoEmpresa);
 			}
 				
-			if(this.empleado.getEmpleadoFoto() == null) {
+			if(this.empleado.getEmpleadoFoto() == null && this.empleado.getFotografia() != null) {
 				empleadoFoto = new EmpleadoFotoDTO();
 				empleadoFoto.setFotografia(empleado.getFotografia());
 				this.empleado.setEmpleadoFoto(empleadoFoto);
 			}
 			
 			this.empleadoDAO.actualizar(this.empleado);
+			
+			empleados = empleadoDAO.buscarTodos();
 			
 			mensaje = "La información del empleado se actualizó correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;

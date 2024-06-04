@@ -33,6 +33,7 @@ public class CatAreaDAO extends IBaseDAO<CatAreaDTO, Integer> implements Seriali
     		dto.setDescripcion(model.getDescripcion());
     		dto.setActivo(model.getActivo());
     	} catch(Exception ex) {
+    		log.warn("Problema para generar el DTO...", ex.getMessage());
     		dto = null;
     	}
     	return dto;
@@ -46,6 +47,7 @@ public class CatAreaDAO extends IBaseDAO<CatAreaDTO, Integer> implements Seriali
     		model.setDescripcion(dto.getDescripcion());
     		model.setActivo(dto.getActivo());
     	} catch(Exception ex) {
+    		log.warn("Problema para generar el model...", ex.getMessage());
     		model = null;
     	}
     	return model;

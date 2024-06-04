@@ -28,6 +28,9 @@
 					<p:column headerText="Dato empresa">
 						<p:outputLabel value="#{empleado.datoEmpresa eq null ? '--' : 'SI'}"></p:outputLabel>
 					</p:column>
+					<p:column headerText="Foto">
+						<p:outputLabel value="#{empleado.empleadoFoto eq null ? '--' : 'SI'}"></p:outputLabel>
+					</p:column>
 					<p:column>
 						<p:commandButton icon="pi pi-bars" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();" action="#{updEmpleado.actualizar}" process="@this" update="dt-empleado">
 							<f:setPropertyActionListener value="#{empleado}" target="#{updEmpleado.empleado}"/>

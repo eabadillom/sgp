@@ -35,6 +35,7 @@ import mx.com.ferbo.dto.CatPuestoDTO;
 import mx.com.ferbo.dto.DatoEmpresaDTO;
 import mx.com.ferbo.dto.DetBiometricoDTO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
+import mx.com.ferbo.dto.EmpleadoFotoDTO;
 import mx.com.ferbo.dto.sat.TipoContratoDTO;
 import mx.com.ferbo.dto.sat.TipoJornadaDTO;
 import mx.com.ferbo.dto.sat.TipoRegimenDTO;
@@ -152,15 +153,18 @@ public class RegistroEmpleadosBean implements Serializable {
     }
     
     public void editar() {
+    	log.info("Cargando información del empleado: {}", this.empleadoSelected);
     	Integer idEmpleado = this.empleadoSelected.getIdEmpleado();
     	DetEmpleadoDTO e = empleadoDAO.buscarPorId(idEmpleado, true);
     	DatoEmpresaDTO datoEmpresa = e.getDatoEmpresa();
+    	EmpleadoFotoDTO empleadoFoto = e.getEmpleadoFoto();
     	if(datoEmpresa == null) {
     		this.datoEmpresa = new DatoEmpresaDTO();
     		this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
     	} else {
     		this.datoEmpresa = datoEmpresa;
     	}
+    	
     	log.info("Empleado seleccionado: {}", this.empleadoSelected.getIdEmpleado());
     }
 
