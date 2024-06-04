@@ -9,6 +9,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -18,6 +19,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -69,6 +71,7 @@ import javax.validation.constraints.Size;
                         + " LEFT JOIN e.idPlanta pl"
                         + " LEFT JOIN e.idPuesto pu"
     		+ " WHERE e.activo = 1 AND e.numEmpleado = :numEmpl"),
+    @NamedQuery(name = "DetEmpleado.findByNumero", query = "SELECT e FROM DetEmpleado e WHERE e.numEmpleado = :numero"),
     @NamedQuery(name = "DetEmpleado.findByNumEmplSD", query = "SELECT NEW mx.com.ferbo.dto.DetEmpleadoDTO("
                         + " e.idEmpleado, e.numEmpleado, e.nombre, e.primerAp, e.segundoAp, e.fechaNacimiento,"
                         + " e.fechaRegistro, e.fechaModificacion, e.curp, e.rfc, e.correo, e.fechaIngreso, e.nss, e.activo, e.fotografia, a.idArea, a.descripcion,"
@@ -110,7 +113,10 @@ import javax.validation.constraints.Size;
                         + " LEFT JOIN e.idPlanta pl"
                         + " LEFT JOIN e.idPuesto pu"
                         + " WHERE e.activo = 1 AND e.idEmpresa.idEmpresa = :idEmpresa ORDER BY e.primerAp, e.segundoAp, e.nombre"),
-    @NamedQuery(name = "DetEmpleado.getNumEmpleado", query = "SELECT COALESCE(MAX(e.idEmpleado),0) FROM DetEmpleado e")})
+    @NamedQuery(name = "DetEmpleado.getNumEmpleado", query = "SELECT COALESCE(MAX(e.idEmpleado),0) FROM DetEmpleado e"),
+    @NamedQuery(name = "DetEmpleado.getAll", query = "SELECT e FROM DetEmpleado e"),
+    @NamedQuery(name = "DetEmpleado.getActive", query = "SELECT e FROM DetEmpleado e WHERE e.activo = :activo")
+})
 public class DetEmpleado implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -216,11 +222,11 @@ public class DetEmpleado implements Serializable {
     private List<DetSolicitudPrenda> detSolicitudPrendaList;
     
     @JoinColumn(name = "id_area", referencedColumnName = "id_area")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private CatArea idArea;
     
     @JoinColumn(name = "id_empresa", referencedColumnName = "id_empresa")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private CatEmpresa idEmpresa;
     
     @JoinColumn(name = "id_perfil", referencedColumnName = "id_perfil")
@@ -228,12 +234,20 @@ public class DetEmpleado implements Serializable {
     private CatPerfil idPerfil;
     
     @JoinColumn(name = "id_planta", referencedColumnName = "id_planta")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private CatPlanta idPlanta;
     
     @JoinColumn(name = "id_puesto", referencedColumnName = "id_puesto")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private CatPuesto idPuesto;
+    
+    @OneToOne(cascade = {CascadeType.ALL})
+    @JoinColumn(name = "id_empleado_empresa")
+    private InfDatoEmpresa datoEmpresa;
+    
+    @OneToOne(cascade = {CascadeType.ALL})
+    @JoinColumn(name = "id_empleado_foto")
+    private DetEmpleadoFoto empleadoFoto;
 
     public DetEmpleado() {
     }
@@ -493,5 +507,21 @@ public class DetEmpleado implements Serializable {
     public void setSueldoDiario(BigDecimal sueldoDiario) {
         this.sueldoDiario = sueldoDiario;
     }
+
+	public InfDatoEmpresa getDatoEmpresa() {
+		return datoEmpresa;
+	}
+
+	public void setDatoEmpresa(InfDatoEmpresa datoEmpresa) {
+		this.datoEmpresa = datoEmpresa;
+	}
+
+	public DetEmpleadoFoto getEmpleadoFoto() {
+		return empleadoFoto;
+	}
+
+	public void setEmpleadoFoto(DetEmpleadoFoto empleadoFoto) {
+		this.empleadoFoto = empleadoFoto;
+	}
 
 }

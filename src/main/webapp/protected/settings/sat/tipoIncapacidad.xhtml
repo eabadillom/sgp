@@ -1,0 +1,69 @@
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/plantillas/template.xhtml" >
+
+    <ui:define name="title">Tipo Incapacidad</ui:define>
+
+    <ui:define name="content">
+        <h:form id="form">
+
+            <p:growl id="messages" showDetail="true" life="4000"/>
+            
+            <p:dialog widgetVar="statusDialog" header="Cargando informacion..." showEffect="hide" closable="false" draggable="false" resizable="false" >
+                <i class="pi pi-spin pi-spinner" style="width: 3rem;" ></i>
+            </p:dialog>
+
+            <p:toolbar>
+                <p:toolbarGroup>
+                    <p:commandButton value="Agregar" icon="pi pi-plus" action="#{tipoIncapacidadBean.nuevo()}" oncomplete="PF('dlgTipoInca').show();" process="@this" update="@this form:dlg-tipoInca" ></p:commandButton>
+                </p:toolbarGroup>
+            </p:toolbar>
+
+            <div style="padding: 1rem;">
+                <p:dataTable id="dt-tipoInca" widgetVar="dtTipoInca" value="#{tipoIncapacidadBean.listDTO}" var="tipoIncapacidad" >
+
+                    <p:column headerText="Clave">
+                        <p:outputLabel value="#{tipoIncapacidad.clave}" ></p:outputLabel>
+                    </p:column>
+
+                    <p:column headerText="Descripcion">
+                        <p:outputLabel value="#{tipoIncapacidad.descripcion}" ></p:outputLabel>
+                    </p:column>
+
+                    <p:column>
+                        <p:commandButton icon="pi pi-bars" action="#{tipoIncapacidadBean.editar()}" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dlgTipoInca').show();" process="@this" update="form:dlg-tipoInca" >
+                            <f:setPropertyActionListener value="#{tipoIncapacidad}" target="#{tipoIncapacidadBean.tipoIncapacidadDTO}" ></f:setPropertyActionListener>
+                        </p:commandButton>
+                    </p:column>
+
+                </p:dataTable>
+            </div>
+
+            <p:dialog id="dlg-tipoInca" widgetVar="dlgTipoInca" showEffect="hide" header="Tipo De Incapacidad">
+                <p:outputPanel styleClass="ui-fluid">
+
+                    <div class="p-field">
+                        <p:outputLabel value="Clave" ></p:outputLabel>
+                        <p:inputText value="#{tipoIncapacidadBean.tipoIncapacidadDTO.clave}" readonly="#{tipoIncapacidadBean.primaryEdit}" ></p:inputText>
+                    </div>
+
+                    <div class="p-field" >
+                        <p:outputLabel value="Descripcion" ></p:outputLabel>
+                        <p:inputText value="#{tipoIncapacidadBean.tipoIncapacidadDTO.descripcion}"  ></p:inputText>
+                    </div>
+
+                </p:outputPanel>
+
+                <f:facet name="footer">
+                    <p:commandButton value="Guardar" actionListener="#{tipoIncapacidadBean.guardar()}" process="@this form:dlg-tipoInca" update="form:dt-tipoInca"/>
+                </f:facet>
+
+            </p:dialog>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

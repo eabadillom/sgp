@@ -1,0 +1,91 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/plantillas/template.xhtml">
+
+    <ui:define name="title">Riesgo Puesto</ui:define>
+
+    <ui:define name="content">
+        <h:form id="form">
+            
+            <p:growl id="messages" showDetail="true" life="4000"></p:growl>
+
+            <p:dialog widgetVar="statusDialog" header="Cargando Informacion. . ." resizable="false" closable="false" draggable="false" >
+                <i styleClass="pi pi-spin pi-spinner"></i>
+            </p:dialog>
+
+            <p:toolbar>
+                <p:toolbarGroup>
+                    <p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{riesgoPuestoBean.nuevo()}" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dlgRiesgoPuesto').show();" process="@this" update="@this form:dlg-riesgoPuesto"></p:commandButton>
+                </p:toolbarGroup>
+            </p:toolbar>
+
+            <div style="padding-top: 3rem;" >
+                <p:dataTable id="dt-riesgoPuesto" widgetVar="dtRiesgoPuesto" value="#{riesgoPuestoBean.listDTO}" var="riesgoPuesto">
+
+                    <p:column headerText="Clave">
+                        <p:outputLabel value="#{riesgoPuesto.clave}"></p:outputLabel>
+                    </p:column>
+
+                    <p:column headerText="Descripcion">
+                        <p:outputLabel value="#{riesgoPuesto.descripcion}"></p:outputLabel>
+                    </p:column>
+
+                    <p:column headerText="Fecha Inicio">
+                        <p:outputLabel value="#{riesgoPuesto.vigenciaInicio}">
+                            <f:convertDateTime pattern="dd/MMM/yyyy"></f:convertDateTime>
+                        </p:outputLabel>
+                    </p:column>
+
+                    <p:column headerText="Fecha Fin">
+                        <p:outputLabel value="#{riesgoPuesto.vigenciaFin}">
+                            <f:convertDateTime pattern="dd/MMM/yyyy"></f:convertDateTime>
+                        </p:outputLabel>                    
+                    </p:column>
+
+                    <p:column>
+                        <p:commandButton icon="pi pi-bars" actionListener="#{riesgoPuestoBean.editar()}" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dlgRiesgoPuesto').show();" process="@this form:dt-riesgoPuesto" update="form:dlg-riesgoPuesto">
+                            <f:setPropertyActionListener value="#{riesgoPuesto}" target="#{riesgoPuestoBean.riesgoPuestoDTO}"></f:setPropertyActionListener>
+                        </p:commandButton>
+                    </p:column>
+
+                </p:dataTable>
+            </div>
+
+            <p:dialog id="dlg-riesgoPuesto" widgetVar="dlgRiesgoPuesto">
+                <p:outputPanel styleClass="ui-fluid">
+
+                    <div class="p-field">
+                        <p:outputLabel value="Clave"></p:outputLabel>
+                        <p:inputNumber value="#{riesgoPuestoBean.riesgoPuestoDTO.clave}" readonly="#{riesgoPuestoBean.primaryEdit}" ></p:inputNumber>
+                    </div>
+
+                    <div class="p-field">
+                        <p:outputLabel value="Descripcion"></p:outputLabel>
+                        <p:inputText value="#{riesgoPuestoBean.riesgoPuestoDTO.descripcion}"></p:inputText>
+                    </div>
+
+                    <div class="p-field">
+                        <p:outputLabel value="Fecha Inicio"></p:outputLabel>
+                        <p:datePicker value="#{riesgoPuestoBean.riesgoPuestoDTO.vigenciaInicio}" showIcon="true" yearNavigator="true" monthNavigator="true" ></p:datePicker>
+                    </div>
+
+                    <div class="p-field">
+                        <p:outputLabel value="Fecha Fin"></p:outputLabel>
+                        <p:datePicker value="#{riesgoPuestoBean.riesgoPuestoDTO.vigenciaFin}" showIcon="true" yearNavigator="true" monthNavigator="true"></p:datePicker>
+                    </div>
+
+                </p:outputPanel>
+
+                <f:facet name="footer">
+                    <p:commandButton value="Guardar" actionListener="#{riesgoPuestoBean.guardar()}" process="@this form:dlg-riesgoPuesto" update="form:dt-riesgoPuesto"></p:commandButton>
+                </f:facet>
+
+            </p:dialog>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -7,6 +7,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -45,12 +46,13 @@ public class RegistryServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		
+		HttpSession session = null;
 		Date horaSistema;
 		Date horaLimiteEntrada = null;
 
 		EmpleadoDAO empleadoDAO = null;
 		DetEmpleadoDTO detEmpleadoDTO = null;
+		DetEmpleadoDTO empleadoConFoto = null;
 		DetTokenDAO detTokenDAO = null;
 		DetTokenDTO detTokenDTO = null;
 		DetRegistroDTO registroDTO = null;
@@ -69,6 +71,8 @@ public class RegistryServlet extends HttpServlet {
 		Gson prettyGson = null;
 		CatEstatusRegistroDTO status = null;
 		try {
+			session = request.getSession(true);
+			
 			horaSistema = new Date();
 			fechaEntradaInicio = new Date();
 			fechaEntradaFin = new Date();
@@ -90,9 +94,10 @@ public class RegistryServlet extends HttpServlet {
 			}
 
 			empleadoDAO = new EmpleadoDAO();
-			detEmpleadoDTO = empleadoDAO.buscarPorNumEmpl(numeroEmpleado);
+			detEmpleadoDTO = empleadoDAO.buscarPorNumeroEmpleado(numeroEmpleado, false);
+			empleadoConFoto = empleadoDAO.buscarConFoto(detEmpleadoDTO.getIdEmpleado());
 			
-			if(detEmpleadoDTO == null)
+			if(detEmpleadoDTO == null || detEmpleadoDTO.getIdEmpleado() == null)
 				throw new SGPException("El empleado indicado es incorrecto.");
 
 			detTokenDAO = new DetTokenDAO();
@@ -114,7 +119,8 @@ public class RegistryServlet extends HttpServlet {
 			
 			detTokenDTO.setValido(false);
 			detTokenDAO.actualizar(detTokenDTO);
-			request.getSession(true).setAttribute("empleado", detEmpleadoDTO);
+			session.setAttribute("empleado", detEmpleadoDTO);
+			session.setAttribute("fotografia", empleadoConFoto.getEmpleadoFoto());
 			
 			respuesta = new RegistryResponse();
 			respuesta.setCodigo(0);

@@ -13,10 +13,6 @@ import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.dto.CatPuestoDTO;
 import mx.com.ferbo.model.CatPuesto;
 
-/**
- *
- * @author Gabo
- */
 @Stateless
 @LocalBean
 public class CatPuestoDAO extends IBaseDAO<CatPuestoDTO, Integer>  implements Serializable{
@@ -33,6 +29,7 @@ public class CatPuestoDAO extends IBaseDAO<CatPuestoDTO, Integer>  implements Se
     		dto.setDescripcion(model.getDescripcion());
     		dto.setActivo(model.getActivo());
     	} catch(Exception ex) {
+    		log.warn("Problema para generar el DTO...", ex.getMessage());
     		dto = null;
     	}
     	return dto;
@@ -46,6 +43,7 @@ public class CatPuestoDAO extends IBaseDAO<CatPuestoDTO, Integer>  implements Se
     		model.setDescripcion(dto.getDescripcion());
     		model.setActivo(dto.getActivo());
     	} catch(Exception ex) {
+    		log.warn("Problema para generar el model...", ex.getMessage());
     		model = null;
     	}
     	return model;
