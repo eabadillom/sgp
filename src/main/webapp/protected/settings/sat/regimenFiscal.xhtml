@@ -35,12 +35,12 @@
 			    	</p:column>
 			    	<p:column headerText="Inicio Vigencia" width="7rem">
 			    		<p:outputLabel value="#{regimen.vigenciaInicio}">
-			    			<f:convertDateTime pattern="dd/MMM/yyyy" />
+			    			<f:convertDateTime pattern="dd/MMM/yyyy" locale="es" timeZone="GMT-6" />
 			    		</p:outputLabel>
 			    	</p:column>
 			    	<p:column headerText="Fin Vigencia" width="7rem">
 			    		<p:outputLabel value="#{regimen.vigenciaFin}">
-			    			<f:convertDateTime pattern="dd/MMM/yyyy" />
+			    			<f:convertDateTime pattern="dd/MMM/yyyy" locale="es" timeZone="GMT-6" />
 			    		</p:outputLabel>
 			    	</p:column>
 			    	<p:column width="3rem">
@@ -75,11 +75,11 @@
 		    		</div>
 		    		<div class="p-field">
 		    			<p:outputLabel value="Inicio vigencia"></p:outputLabel>
-		    			<p:datePicker value="#{regimenFiscalBean.regimen.vigenciaInicio}" showIcon="true"></p:datePicker>
+		    			<p:datePicker value="#{regimenFiscalBean.regimen.vigenciaInicio}" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"></p:datePicker>
 		    		</div>
 		    		<div class="p-field">
 		    			<p:outputLabel value="Fin Vigencia"></p:outputLabel>
-		    			<p:datePicker value="#{regimenFiscalBean.regimen.vigenciaFin}" showIcon="true"></p:datePicker>
+		    			<p:datePicker value="#{regimenFiscalBean.regimen.vigenciaFin}" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"></p:datePicker>
 		    		</div>
 		    	</p:outputPanel>
 		    	<f:facet name="footer">

@@ -12,7 +12,9 @@
         <h:form id="form" >
             <p:growl id="messages" showDetail="true" life="4000" />
             <p:dialog modal="true" widgetVar="statusDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
-                <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+                <div align="center">
+		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
             </p:dialog>
 
             <p:toolbar>
@@ -34,12 +36,12 @@
                     </p:column>
                     <p:column headerText="Fecha Inicio">
                         <p:outputLabel value="#{banco.fechaInicio}" >
-                            <f:convertDateTime pattern="dd/MMM/YYYY"/>
+                            <f:convertDateTime pattern="dd/MMM/YYYY" locale="es" timeZone="GMT-6"/>
                         </p:outputLabel>
                     </p:column>
                     <p:column headerText="Fecha Fin">
                         <p:outputLabel value="#{banco.fechaFin}" >
-                            <f:convertDateTime pattern="dd/MMM/YYYY"/>
+                            <f:convertDateTime pattern="dd/MMM/YYYY" locale="es" timeZone="GMT-6"/>
                         </p:outputLabel>
                     </p:column>
                     <p:column width="3rem">
@@ -71,13 +73,13 @@
 
                     <div class="p-field" >
                         <p:outputLabel value="Fecha Inicio"></p:outputLabel>
-                        <p:datePicker value="#{bancoBean.bancoDTO.fechaInicio}" showIcon="true" yearNavigator="true" monthNavigator="true" required="true" requiredMessage="El campo fecha inicio es obligatorio" >                            
+                        <p:datePicker value="#{bancoBean.bancoDTO.fechaInicio}" showIcon="true" yearNavigator="true" monthNavigator="true" required="true" requiredMessage="El campo fecha inicio es obligatorio" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">                            
                         </p:datePicker>                        
                     </div>
 
                     <div class="p-field" >
                         <p:outputLabel value="Fecha Fin"></p:outputLabel>
-                        <p:datePicker value="#{bancoBean.bancoDTO.fechaFin}" showIcon="true" yearNavigator="true" monthNavigator="true">                            
+                        <p:datePicker value="#{bancoBean.bancoDTO.fechaFin}" showIcon="true" yearNavigator="true" monthNavigator="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">                            
                         </p:datePicker>                        
                     </div>                    
 
