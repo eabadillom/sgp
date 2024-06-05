@@ -13,7 +13,9 @@
             <p:growl id="messages" showDetail="true" life="4000" />
 
             <p:dialog modal="true" widgetVar="statusDialog" header="Cargando información..." closable="false" draggable="false" resizable="false" >
-                <i class="pi pi-spinner pi-spin" style="font-size: 3rem;" ></i>
+                <div align="center">
+		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
             </p:dialog>
 
             <p:toolbar>
@@ -36,13 +38,13 @@
 
                     <p:column headerText="Fecha Inicio">
                         <p:outputLabel value="#{deduccion.vigenciaInicio}" >
-                            <f:convertDateTime pattern="dd/MMM/yyyy"></f:convertDateTime>
+                            <f:convertDateTime pattern="dd/MMM/yyyy" locale="es" timeZone="GMT-6"></f:convertDateTime>
                         </p:outputLabel>
                     </p:column>
 
                     <p:column headerText="Fecha Fin">
                         <p:outputLabel value="#{deduccion.vigenciaFin}" >
-                            <f:convertDateTime pattern="dd/MMM/yyyy"></f:convertDateTime>
+                            <f:convertDateTime pattern="dd/MMM/yyyy" locale="es" timeZone="GMT-6"></f:convertDateTime>
                         </p:outputLabel>
                     </p:column>
 
@@ -68,12 +70,12 @@
 
                         <div class="p-field">
                             <p:outputLabel value="Fecha Inicio" ></p:outputLabel>
-                            <p:datePicker value="#{tipoDeduccionBean.tipoDeduccionDTO.vigenciaInicio}" showIcon="true" monthNavigator="true" yearNavigator="true" required="true" requiredMessage="El campo fecha inicio es obligatorio"></p:datePicker>
+                            <p:datePicker value="#{tipoDeduccionBean.tipoDeduccionDTO.vigenciaInicio}" showIcon="true" monthNavigator="true" yearNavigator="true" required="true" requiredMessage="El campo fecha inicio es obligatorio" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"></p:datePicker>
                         </div>
 
                         <div class="p-field">
                             <p:outputLabel value="Fecha Fin" ></p:outputLabel>
-                            <p:datePicker value="#{tipoDeduccionBean.tipoDeduccionDTO.vigenciaFin}" showIcon="true" monthNavigator="true" yearNavigator="true"></p:datePicker>
+                            <p:datePicker value="#{tipoDeduccionBean.tipoDeduccionDTO.vigenciaFin}" showIcon="true" monthNavigator="true" yearNavigator="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"></p:datePicker>
                         </div>
 
                     </p:outputPanel>

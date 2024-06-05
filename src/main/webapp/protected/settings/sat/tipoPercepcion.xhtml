@@ -13,7 +13,9 @@
             <p:growl id="messages" showDetail="true" life="4000"></p:growl>
 
             <p:dialog widgetVar="statusDialog" header="Cargando Informacion. . ." resizable="false" closable="false" draggable="false">
-                <i class="pi pi-spin pi-spinner" ></i>
+                <div align="center">
+		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
             </p:dialog>
 
             <p:toolbar>
@@ -35,13 +37,13 @@
 
                     <p:column headerText="Fecha Inicio">
                         <p:outputLabel value="#{tipoPercepcion.vigenciaInicio}">
-                            <f:convertDateTime pattern="dd/MMM/yyyy"></f:convertDateTime>
+                            <f:convertDateTime pattern="dd/MMM/yyyy" locale="es" timeZone="GMT-6"></f:convertDateTime>
                         </p:outputLabel>
                     </p:column>
 
                     <p:column headerText="Fecha Fin">
                         <p:outputLabel value="#{tipoPercepcion.vigenciaFin}">
-                            <f:convertDateTime pattern="dd/MMM/yyyy"></f:convertDateTime>
+                            <f:convertDateTime pattern="dd/MMM/yyyy" locale="es" timeZone="GMT-6"></f:convertDateTime>
                         </p:outputLabel>
                     </p:column>
 
@@ -68,12 +70,12 @@
 
                     <div class="p-field">
                         <p:outputLabel value="Fecha Inicio" ></p:outputLabel>
-                        <p:datePicker value="#{tipoPercepcionBean.tipoPercepcionDTO.vigenciaInicio}" showIcon="true" yearNavigator="true" monthNavigator="true" ></p:datePicker>                    
+                        <p:datePicker value="#{tipoPercepcionBean.tipoPercepcionDTO.vigenciaInicio}" showIcon="true" yearNavigator="true" monthNavigator="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"></p:datePicker>                    
                     </div>
 
                     <div class="p-field">
                         <p:outputLabel value="Fecha Fin"></p:outputLabel>
-                        <p:datePicker value="#{tipoPercepcionBean.tipoPercepcionDTO.vigenciaFin}" showIcon="true" yearNavigator="true" monthNavigator="true"></p:datePicker>
+                        <p:datePicker value="#{tipoPercepcionBean.tipoPercepcionDTO.vigenciaFin}" showIcon="true" yearNavigator="true" monthNavigator="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"></p:datePicker>
                     </div>
 
                 </p:outputPanel>
