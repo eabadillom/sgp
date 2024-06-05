@@ -29,12 +29,12 @@
 					</p:column>
 					<p:column headerText="Inicio vigencia" sortBy="#{periodo.vigenciaInicio}">
 						<p:outputLabel value="#{periodo.vigenciaInicio}">
-							<f:convertDateTime pattern="dd/MMM/yyyy" />
+							<f:convertDateTime pattern="dd/MMM/yyyy" locale="es" timeZone="GMT-6"/>
 						</p:outputLabel>
 					</p:column>
 					<p:column headerText="Fin vigencia" sortBy="#{periodo.vigenciaFin}">
 						<p:outputLabel value="#{periodo.vigenciaFin}" >
-							<f:convertDateTime pattern="dd/MMM/yyyy" />
+							<f:convertDateTime pattern="dd/MMM/yyyy" locale="es" timeZone="GMT-6"/>
 						</p:outputLabel>
 					</p:column>
 					<p:column width="3rem">
@@ -57,14 +57,12 @@
 					</div>
 					<div class="p-field">
 						<p:outputLabel value="Inicio vigencia"></p:outputLabel>
-						<p:datePicker value="#{perPagoBean.periodo.vigenciaInicio}" showIcon="true">
-							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+						<p:datePicker value="#{perPagoBean.periodo.vigenciaInicio}" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
 						</p:datePicker>
 					</div>
 					<div class="p-field">
 						<p:outputLabel value="Fin vigencia"></p:outputLabel>
-						<p:datePicker value="#{perPagoBean.periodo.vigenciaFin}" showIcon="true">
-							<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
+						<p:datePicker value="#{perPagoBean.periodo.vigenciaFin}" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
 						</p:datePicker>
 					</div>
 				</p:outputPanel>
