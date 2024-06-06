@@ -14,6 +14,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
 
 import mx.com.ferbo.model.sat.CatRegimenFiscal;
 
@@ -76,6 +77,11 @@ public class CatEmpresa implements Serializable {
     @JoinColumn(name = "cd_regimen", referencedColumnName = "cd_regimen")
     @ManyToOne(optional = true)
     private CatRegimenFiscal regimenFiscal;
+    
+    @Column(name = "nu_reg_pat")
+    @Basic(optional = true)
+    @Size(max = 20)
+    private String registroPatronal;
 
     public CatEmpresa() {
     }
@@ -176,5 +182,13 @@ public class CatEmpresa implements Serializable {
 
 	public void setRegimenFiscal(CatRegimenFiscal regimenFiscal) {
 		this.regimenFiscal = regimenFiscal;
+	}
+
+	public String getRegistroPatronal() {
+		return registroPatronal;
+	}
+
+	public void setRegistroPatronal(String registroPatronal) {
+		this.registroPatronal = registroPatronal;
 	}
 }

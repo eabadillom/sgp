@@ -20,6 +20,7 @@ public class CatEmpresaDTO implements Serializable {
     private Date fechaUltimoCambio;
     private String statusPadron;
     private RegimenFiscalDTO regimenFiscal;
+    private String registroPatronal;
 
     public CatEmpresaDTO() {
     	
@@ -143,5 +144,13 @@ public class CatEmpresaDTO implements Serializable {
 			return false;
 		CatEmpresaDTO other = (CatEmpresaDTO) obj;
 		return Objects.equals(idEmpresa, other.idEmpresa);
+	}
+
+	public String getRegistroPatronal() {
+		return registroPatronal;
+	}
+
+	public void setRegistroPatronal(String registroPatronal) {
+		this.registroPatronal = registroPatronal;
 	}
 }

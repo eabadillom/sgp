@@ -33,6 +33,7 @@ public class CatEmpresaDAO extends IBaseDAO<CatEmpresaDTO, Integer> implements S
     	    dto.setFechaUltimoCambio(model.getFechaUltimoCambio());
     	    dto.setStatusPadron(model.getStatusPadron());
     	    dto.setRegimenFiscal(RegimenFiscalDAO.getDTO(model.getRegimenFiscal()));
+    	    dto.setRegistroPatronal(model.getRegistroPatronal());
     		
     	} catch(Exception ex) {
     		log.warn("Problema para generar el DTO...", ex);
@@ -56,6 +57,7 @@ public class CatEmpresaDAO extends IBaseDAO<CatEmpresaDTO, Integer> implements S
     	    model.setFechaUltimoCambio(dto.getFechaUltimoCambio());
     	    model.setStatusPadron(dto.getStatusPadron());
     	    model.setRegimenFiscal(RegimenFiscalDAO.getModel(dto.getRegimenFiscal()));
+    	    model.setRegistroPatronal(dto.getRegistroPatronal());
     	    
     	} catch(Exception ex) {
     		log.warn("Problema para generar el model...", ex.getMessage());

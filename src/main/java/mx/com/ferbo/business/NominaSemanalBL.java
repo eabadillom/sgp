@@ -77,7 +77,7 @@ public class NominaSemanalBL {
     private static final int DIAS_ANIO = 365;
     private static final int DIAS_POR_PERIODO = 6;
     
-    private CatPercepcionesDTO percepcion = null;
+    private CatPercepcionesDTO parametrosPercepciones = null;
     private CatPercepcionesDAO catPercepcionesDAO;
     private BigDecimal tasaValesDespensa = null;
 	private BigDecimal uma = null;
@@ -85,6 +85,9 @@ public class NominaSemanalBL {
 	private CatTarifaIsrDAO tarifaISRDAO = null;
 	private CatSubsidioDAO subsidioDAO = null;
 	private CuotaIMSSDAO tarifaIMSSDAO = null;
+	
+	//OBJETOS RELACIONADOS A LA NOMINA Y CFDI
+	
 	
 	
 	public NominaSemanalBL(DetEmpleadoDTO empleado, Date periodoInicio, Date periodoFin) {
@@ -119,7 +122,7 @@ public class NominaSemanalBL {
 		try {
 			log.info("Ejecutando la nomina de la semana {} del año en curso...", this.semanaAnio);
 			
-			this.percepcion = catPercepcionesDAO.buscarActual(this.periodoInicio);
+			this.parametrosPercepciones = catPercepcionesDAO.buscarActual(this.periodoInicio);
 			mapAsistencias = this.getAsistencias(this.empleado, this.periodoInicio, this.periodoFin);
 			diasPeriodo = new BigDecimal(DateUtils.daysDiff(periodoInicio, periodoFin)).setScale(2, BigDecimal.ROUND_HALF_UP);
 			
@@ -297,12 +300,12 @@ public class NominaSemanalBL {
     	
     	try {
     		diasAnio = new BigDecimal(DIAS_ANIO).setScale(2, BigDecimal.ROUND_HALF_UP);
-    		diasAguinaldo = new BigDecimal(percepcion.getDiasAguinaldo().intValue());
+    		diasAguinaldo = new BigDecimal(parametrosPercepciones.getDiasAguinaldo().intValue());
     		
     		//TODO Dias de vacaciones debe ser un dato calculado, conforme a la ley federal del trabajo
-    		diasVacaciones = new BigDecimal(percepcion.getDiasVacaciones().intValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
+    		diasVacaciones = new BigDecimal(parametrosPercepciones.getDiasVacaciones().intValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
     		
-    		primaVacacional = new BigDecimal(percepcion.getPrimaVacacional().floatValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
+    		primaVacacional = new BigDecimal(parametrosPercepciones.getPrimaVacacional().floatValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
     		sueldoDiario = empleado.getSueldoDiario();
     		
     		factorSDI = primaVacacional
@@ -353,7 +356,7 @@ public class NominaSemanalBL {
     				return BigDecimal.ZERO;
     		}
     		
-    		tasaBonoPuntualidad = new BigDecimal(this.percepcion.getBonoPuntualidad().floatValue());
+    		tasaBonoPuntualidad = new BigDecimal(this.parametrosPercepciones.getBonoPuntualidad().floatValue());
     		diasPeriodo = this.diasTrabajados.add(proporcionalSeptimoDia).setScale(2, BigDecimal.ROUND_HALF_UP);
     		
     		bono = salarioDiarioIntegrado.multiply(tasaBonoPuntualidad).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -374,8 +377,8 @@ public class NominaSemanalBL {
     		if(this.diasTrabajados.compareTo(BigDecimal.ZERO) == 0)
     			throw new SGPException("No es posible asignar bono de puntualidad.");
     		
-    		this.uma = percepcion.getUma();
-    		this.tasaValesDespensa = percepcion.getValeDespensa();
+    		this.uma = parametrosPercepciones.getUma();
+    		this.tasaValesDespensa = parametrosPercepciones.getValeDespensa();
     		
     		vales = uma.multiply(tasaValesDespensa).setScale(4, BigDecimal.ROUND_HALF_UP);
     		vales = vales.multiply(diasPeriodo).setScale(2, BigDecimal.ROUND_HALF_UP);

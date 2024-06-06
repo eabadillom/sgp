@@ -3,8 +3,11 @@ package mx.com.ferbo.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,13 +17,14 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
-/**
- *
- * @author erale
- */
+import mx.com.ferbo.model.sat.CatMetodoPago;
+
 @Entity
 @Table(name = "det_nomina")
 @NamedQueries({
@@ -34,11 +38,92 @@ public class DetNomina implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id_nomina")
-    private Integer idNomina;
+    private Integer id;
     
-    @JoinColumn(name = "id_empleado", referencedColumnName = "id_empleado")
+    @Column(name = "cd_moneda")
+    @Size(max = 5)
+    @Basic(optional = false)
+    private String moneda;
+    
+    @Column(name = "fh_emision")
+    @Basic(optional = false)
+    private Date fechaEmision;
+    
+    @Column(name = "nu_certificado")
+    @Basic(optional = false)
+    private String numeroCertificado;
+    
+    @Column(name = "fh_timbrado")
+    @Basic(optional = true)
+    private Date fechaTimbrado;
+    
+    @Column(name = "cd_uuid")
+    @Basic(optional = true)
+    private String uuid = null;
+    
+    @Column(name = "cd_id_pac")
+    @Basic(optional = true)
+    private String idPac;
+
+    @Column(name = "cd_tp_comp")
+    @Basic(optional = false)
+    private String tipoComprobante;
+    
+    @Column(name = "cd_exportacion")
+    @Basic(optional = false)
+    private String claveExportacion;
+    
+    @JoinColumn(name = "cd_metodo_pago", referencedColumnName = "cd_metodo_pago")
     @ManyToOne(optional = false)
-    private DetEmpleado idEmpleado;
+    private CatMetodoPago metodoPago;
+    
+    @Column(name = "nb_serie")
+    @Basic(optional = true)
+    private String serie;
+    
+    @Column(name = "nb_folio")
+    @Basic(optional = true)
+    private String folio;
+    
+    @Column(name = "nu_subtotal")
+    @Basic(optional = false)
+    private BigDecimal subtotal;
+    
+    @Column(name = "nu_descuento")
+    @Basic(optional = false)
+    private BigDecimal descuento;
+    
+    @Column(name = "nu_total")
+    @Basic(optional = false)
+    private BigDecimal total;
+    
+    @OneToMany(mappedBy = "nomina", cascade = CascadeType.ALL)
+    private List<DetNominaEmisor> emisores;
+    
+    @OneToMany(mappedBy = "nomina", cascade = CascadeType.ALL)
+    private List<DetNominaReceptor> receptores;
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    /**********************************************************************************************************/
+    
+    
     
     @NotNull
     @Column(name = "sueldo")
@@ -183,12 +268,11 @@ public class DetNomina implements Serializable {
     }
 
     public DetNomina(Integer idNomina) {
-        this.idNomina = idNomina;
+        this.id = idNomina;
     }
 
     public DetNomina(Integer idNomina, DetEmpleado idEmpleado, BigDecimal sueldo, BigDecimal septimoDia, BigDecimal horasExtras, BigDecimal destajos, BigDecimal premiosEficiencia, BigDecimal bonoPuntualidad, BigDecimal despensa, BigDecimal otrasPercepciones, BigDecimal totalPercepciones, Float retInvYVida, Float retCesantia, Float retEnfYMatObrero, Float prestamoInfonavitFd, Float prestamoInfonavitCf, BigDecimal subsAlEmpleoAcreditado, BigDecimal subsAlEmpleoMes, BigDecimal isrAntesDeSubsAlEmpleo, BigDecimal isrMes, BigDecimal imss, Float prestamoFonacot, Float ajusteEnSubsidioParaElEmpleo, Float subsEntregadoQueNoCorrespondia, Float ajusteAlNeto, Float isrDeAjusteMensual, Float isrAjustadoPorSubsidio, Float ajusteAlSubsidioCausado, Float pensionAlimienticia, Float otrasDeducciones, BigDecimal totalDeducciones, BigDecimal neto, Float invalidezYVvida, Float cesantiaYVejez, Float enfYMatPatron, Float fondoRetiroSar, Float impuestoEstatal, Float riesgoDeTrabajo9, Float imssEmpresa, Float infonavitEmpresa, Float guarderiaImss7, Float otrasObligaciones, Float totalObligaciones, Date fechaCreacion, DetEmpleado idEmpleadoCreador) {
-        this.idNomina = idNomina;
-        this.idEmpleado = idEmpleado;
+        this.id = idNomina;
         this.sueldo = sueldo;
         this.septimoDia = septimoDia;
         this.horasExtras = horasExtras;
@@ -234,20 +318,12 @@ public class DetNomina implements Serializable {
         this.idEmpleadoCreador = idEmpleadoCreador;
     }
 
-    public Integer getIdNomina() {
-        return idNomina;
+    public Integer getId() {
+        return id;
     }
 
-    public void setIdNomina(Integer idNomina) {
-        this.idNomina = idNomina;
-    }
-
-    public DetEmpleado getIdEmpleado() {
-        return idEmpleado;
-    }
-
-    public void setIdEmpleado(DetEmpleado idEmpleado) {
-        this.idEmpleado = idEmpleado;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public BigDecimal getSueldo() {
@@ -593,6 +669,30 @@ public class DetNomina implements Serializable {
     public void setIdEmpleadoCreador(DetEmpleado idEmpleadoCreador) {
         this.idEmpleadoCreador = idEmpleadoCreador;
     }
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DetNomina other = (DetNomina) obj;
+		return Objects.equals(id, other.id);
+	}
+
+	@Override
+	public String toString() {
+		return "DetNomina [idNomina=" + id + "]";
+	}
+	
+	
 
     
     
