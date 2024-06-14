@@ -39,8 +39,10 @@ import mx.com.ferbo.dto.CatTarifaIsrDTO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.dto.DetNominaDTO;
 import mx.com.ferbo.dto.DetRegistroDTO;
+import mx.com.ferbo.dto.NominaDTO;
+import mx.com.ferbo.dto.NominaEmisorDTO;
+import mx.com.ferbo.dto.NominaReceptorDTO;
 import mx.com.ferbo.util.DateUtils;
-import mx.com.ferbo.util.SGPException;
 
 @Named(value = "nominaBean")
 @ViewScoped
@@ -78,7 +80,7 @@ public class NominaBean implements Serializable {
     private CatTarifaIsrDTO isr;
     private CatSubsidioDTO subsidio;
     private CatImssCuotasDTO imss;
-    private DetNominaDTO nomina;
+    private NominaDTO nomina;
     
     private float sdi;
     private float parteProporcionalDiaDescanso = 0;
@@ -120,7 +122,7 @@ public class NominaBean implements Serializable {
     private String strYear;
     //</editor-fold>
 
-    private List<DetNominaDTO> listaNomina;
+    private List<NominaDTO> listaNomina;
 
     public NominaBean() {
         log.info("====================== entrada constructor nominaBean ======================");
@@ -209,10 +211,23 @@ public class NominaBean implements Serializable {
         
         log.info("Miercoles pasado: {}", periodoFin);
         log.info("Jueves pasado: {}", periodoInicio);
+        
+        
+        this.nomina = this.iniciaNominaDTOVacio();
       
     }
     
-    public void calculaFechaFin() {
+    private NominaDTO iniciaNominaDTOVacio() {
+    	NominaDTO nomina = new NominaDTO();
+    	nomina.setEmisor(new NominaEmisorDTO());
+    	nomina.setReceptor(new NominaReceptorDTO());
+    	nomina.setConceptos(new ArrayList<>());
+    	nomina.setPercepciones(new ArrayList<>());
+    	nomina.setDeducciones(new ArrayList<>());
+		return nomina;
+	}
+
+	public void calculaFechaFin() {
     	log.info("Fecha Inicio: {}", this.periodoInicio);
     	log.info("Fecha Fin: {}", this.periodoFin);
     	this.periodoFin = new Date(this.periodoInicio.getTime());
@@ -246,18 +261,20 @@ public class NominaBean implements Serializable {
     }
     
     private void procesaListaEmpleados(List<DetEmpleadoDTO> listaEmpleados) {
+    	NominaDTO nomina = null;
     	try {
     		for (DetEmpleadoDTO detEmpleadoDTO : listaEmpleados) {
-    			this.nomina = this.procesaEmpleado(detEmpleadoDTO);
+    			nomina = this.procesaEmpleado(detEmpleadoDTO);
     			listaNomina.add(nomina);
     		}
+    		log.info("Lista nomina: {}", this.listaNomina);
     	} catch(Exception ex) {
     		log.error("Problema para procesar la nómina", ex);
     	}
     }
     
-    public DetNominaDTO procesaEmpleado(DetEmpleadoDTO detEmpleadoDTO) {
-    	DetNominaDTO nomina = null;
+    public NominaDTO procesaEmpleado(DetEmpleadoDTO detEmpleadoDTO) {
+    	NominaDTO nomina = null;
     	NominaSemanalBL nominaSemanalBO = null;
     	log.info("Empleado: {} {} {}, Salario diario: {}", detEmpleadoDTO.getNombre(), detEmpleadoDTO.getPrimerAp(), detEmpleadoDTO.getSegundoAp(), detEmpleadoDTO.getSueldoDiario());
 		
@@ -315,6 +332,10 @@ public class NominaBean implements Serializable {
 //		nomina.setIdEmpleadoCreador(empleadoLogin);
 		
 		return nomina;
+    }
+    
+    public void cargaEmpleadoNomina() {
+    	log.info("Cargando información de nómina: {}", this.nomina);
     }
     
 //    //<editor-fold defaultstate="collapsed" desc="Cálculo de ISR">
@@ -384,21 +405,7 @@ public class NominaBean implements Serializable {
 
     //<editor-fold defaultstate="collapsed" desc="Guardando Guardar Nómina">
     public void guardarNominaEmpleado() {
-        int cont = 0;
-        for(DetNominaDTO nomina : listaNomina){
-            try {
-                detNominaDAO.guardar(nomina);
-                cont++;
-            } catch (SGPException ex) {
-                log.warn("EX-0039: " + ex.getMessage() + ". Error al guardar la nómina del empleado: " + nomina.getIdEmpleado().getNumEmpleado() != null ? nomina.getIdEmpleado().getNumEmpleado() : null); 
-            }
-        }
-        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Mexico_City"));
-        cal.setTime(fecha);
-        cal.setFirstDayOfWeek(Calendar.SUNDAY);
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                "Se ejecuto la Nómina de la Empresa: " + lstEmpresas.stream().filter(i -> i.getIdEmpresa().equals(empresaSelected.getIdEmpresa())).findFirst().orElse(null).getDescripcion() + ", de la Semana: " + cal.get(Calendar.WEEK_OF_YEAR) + " con: " + cont + " registros.", null));
-        PrimeFaces.current().ajax().update("formNomina:messages");
+
     }
     //</editor-fold> 
     
@@ -671,11 +678,11 @@ public class NominaBean implements Serializable {
         this.imss = imss;
     }
 
-    public DetNominaDTO getNomina() {
+    public NominaDTO getNomina() {
         return nomina;
     }
 
-    public void setNomina(DetNominaDTO nomina) {
+    public void setNomina(NominaDTO nomina) {
         this.nomina = nomina;
     }
 
@@ -935,11 +942,11 @@ public class NominaBean implements Serializable {
         this.strYear = strYear;
     }
 
-    public List<DetNominaDTO> getListaNomina() {
+    public List<NominaDTO> getListaNomina() {
         return listaNomina;
     }
 
-    public void setListaNomina(List<DetNominaDTO> listaNomina) {
+    public void setListaNomina(List<NominaDTO> listaNomina) {
         this.listaNomina = listaNomina;
     }
 

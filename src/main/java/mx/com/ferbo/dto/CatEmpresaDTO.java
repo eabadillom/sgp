@@ -21,6 +21,7 @@ public class CatEmpresaDTO implements Serializable {
     private String statusPadron;
     private RegimenFiscalDTO regimenFiscal;
     private String registroPatronal;
+    private String codigoPostal;
 
     public CatEmpresaDTO() {
     	
@@ -119,6 +120,22 @@ public class CatEmpresaDTO implements Serializable {
 	public void setStatusPadron(String statusPadron) {
 		this.statusPadron = statusPadron;
 	}
+	
+	public String getRegistroPatronal() {
+		return registroPatronal;
+	}
+
+	public void setRegistroPatronal(String registroPatronal) {
+		this.registroPatronal = registroPatronal;
+	}
+
+	public String getCodigoPostal() {
+		return codigoPostal;
+	}
+
+	public void setCodigoPostal(String codigoPostal) {
+		this.codigoPostal = codigoPostal;
+	}
 
 	@Override
 	public String toString() {
@@ -144,13 +161,5 @@ public class CatEmpresaDTO implements Serializable {
 			return false;
 		CatEmpresaDTO other = (CatEmpresaDTO) obj;
 		return Objects.equals(idEmpresa, other.idEmpresa);
-	}
-
-	public String getRegistroPatronal() {
-		return registroPatronal;
-	}
-
-	public void setRegistroPatronal(String registroPatronal) {
-		this.registroPatronal = registroPatronal;
 	}
 }

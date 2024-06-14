@@ -14,15 +14,8 @@ import org.apache.logging.log4j.Logger;
 import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.model.DetEmpleado;
-import mx.com.ferbo.model.DetEmpleadoFoto;
 import mx.com.ferbo.util.SGPException;
 
-
-
-/**
- *
- * @author Gabo
- */
 @Stateless
 @LocalBean
 public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Serializable {
@@ -50,7 +43,7 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     		dto.setCorreo(model.getCorreo());
     		dto.setFechaIngreso(model.getFechaIngreso());
     		dto.setNss(model.getNss());
-    		dto.setCatEmpresaDTO(CatEmpresaDAO.getDTO(model.getIdEmpresa()));
+    		dto.setCatEmpresaDTO(new CatEmpresaDAO().getDTO(model.getIdEmpresa()));
     		dto.setActivo(model.getActivo());
     		dto.setCatPlantaDTO(CatPlantaDAO.getDTO(model.getIdPlanta()));
     		dto.setCatAreaDTO(CatAreaDAO.getDTO(model.getIdArea()));
@@ -91,7 +84,7 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     		
     		dto.setCatAreaDTO(CatAreaDAO.getDTO(model.getIdArea()));
     		dto.setCatPlantaDTO(CatPlantaDAO.getDTO(model.getIdPlanta()));
-    		dto.setCatEmpresaDTO(CatEmpresaDAO.getDTO(model.getIdEmpresa()));
+    		dto.setCatEmpresaDTO(new CatEmpresaDAO().getDTO(model.getIdEmpresa()));
     		dto.setCatPuestoDTO(CatPuestoDAO.getDTO(model.getIdPuesto()));
     		dto.setDatoEmpresa(new DatoEmpresaDAO().getDTO(model.getDatoEmpresa()));
     		
@@ -120,7 +113,7 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     		model.setCorreo(dto.getCorreo());
     		model.setFechaIngreso(dto.getFechaIngreso());
     		model.setNss(dto.getNss());
-    		model.setIdEmpresa(CatEmpresaDAO.getModel(dto.getCatEmpresaDTO()));
+    		model.setIdEmpresa(new CatEmpresaDAO().getModel(dto.getCatEmpresaDTO()));
     		model.setActivo(dto.getActivo());
     		model.setIdPlanta(CatPlantaDAO.getModel(dto.getCatPlantaDTO()));
     		model.setIdArea(CatAreaDAO.getModel(dto.getCatAreaDTO()));
@@ -160,7 +153,7 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     		
     		model.setIdPerfil(CatPerfilDAO.getModel(dto.getCatPerfilDTO()));
     		model.setIdPuesto(CatPuestoDAO.getModel(dto.getCatPuestoDTO()));
-    		model.setIdEmpresa(CatEmpresaDAO.getModel(dto.getCatEmpresaDTO()));
+    		model.setIdEmpresa(new CatEmpresaDAO().getModel(dto.getCatEmpresaDTO()));
     		model.setIdPlanta(CatPlantaDAO.getModel(dto.getCatPlantaDTO()));
     		model.setIdArea(CatAreaDAO.getModel(dto.getCatAreaDTO()));
     		model.setDatoEmpresa(new DatoEmpresaDAO().getModel(dto.getDatoEmpresa()));

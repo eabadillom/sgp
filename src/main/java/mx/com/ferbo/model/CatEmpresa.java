@@ -2,6 +2,7 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -82,6 +83,11 @@ public class CatEmpresa implements Serializable {
     @Basic(optional = true)
     @Size(max = 20)
     private String registroPatronal;
+    
+    @Column(name = "nu_cp")
+    @Basic(optional = true)
+    @Size(max = 5)
+    private String codigoPostal;
 
     public CatEmpresa() {
     }
@@ -190,5 +196,39 @@ public class CatEmpresa implements Serializable {
 
 	public void setRegistroPatronal(String registroPatronal) {
 		this.registroPatronal = registroPatronal;
+	}
+
+	public String getCodigoPostal() {
+		return codigoPostal;
+	}
+
+	public void setCodigoPostal(String codigoPostal) {
+		this.codigoPostal = codigoPostal;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(idEmpresa);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CatEmpresa other = (CatEmpresa) obj;
+		return Objects.equals(idEmpresa, other.idEmpresa);
+	}
+
+	@Override
+	public String toString() {
+		return "CatEmpresa [idEmpresa=" + idEmpresa + ", descripcion=" + descripcion + ", activo=" + activo
+				+ ", razonSocial=" + razonSocial + ", tipoPersona=" + tipoPersona + ", regimenCapital=" + regimenCapital
+				+ ", rfc=" + rfc + ", fechaInicioOperacion=" + fechaInicioOperacion + ", fechaUltimoCambio="
+				+ fechaUltimoCambio + ", statusPadron=" + statusPadron + ", registroPatronal=" + registroPatronal
+				+ ", codigoPostal=" + codigoPostal + "]";
 	}
 }

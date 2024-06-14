@@ -9,6 +9,9 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
@@ -16,12 +19,15 @@ import mx.com.ferbo.model.sat.CatRegimenFiscal;
 
 @Entity
 @Table(name = "det_nom_emisor")
+@NamedQueries({
+	@NamedQuery(name = "DetNominaEmisor.buscarPorNomina", query = "SELECT e FROM DetNominaEmisor e WHERE e.nomina.id = :idNomina")
+})
 public class DetNominaEmisor implements Serializable {
 
 	private static final long serialVersionUID = 8524892581709741382L;
 	
 	@Id
-	@ManyToOne(optional = false)
+	@OneToOne
 	@JoinColumn(name = "id_nomina", referencedColumnName = "id_nomina")
 	private DetNomina nomina;
 	

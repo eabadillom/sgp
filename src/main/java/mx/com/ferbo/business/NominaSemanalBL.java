@@ -1,6 +1,7 @@
 package mx.com.ferbo.business;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +16,7 @@ import mx.com.ferbo.dao.CatSubsidioDAO;
 import mx.com.ferbo.dao.CatTarifaIsrDAO;
 import mx.com.ferbo.dao.CuotaIMSSDAO;
 import mx.com.ferbo.dao.DiaNoLaboralDAO;
+import mx.com.ferbo.dao.EmpleadoDAO;
 import mx.com.ferbo.dao.RegistroDAO;
 import mx.com.ferbo.dto.CatPercepcionesDTO;
 import mx.com.ferbo.dto.CatSubsidioDTO;
@@ -24,6 +26,12 @@ import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.dto.DetNominaDTO;
 import mx.com.ferbo.dto.DetRegistroDTO;
 import mx.com.ferbo.dto.DiaNoLaboralDTO;
+import mx.com.ferbo.dto.NominaConceptoDTO;
+import mx.com.ferbo.dto.NominaDTO;
+import mx.com.ferbo.dto.NominaDeduccionDTO;
+import mx.com.ferbo.dto.NominaEmisorDTO;
+import mx.com.ferbo.dto.NominaPercepcionDTO;
+import mx.com.ferbo.dto.NominaReceptorDTO;
 import mx.com.ferbo.util.DateUtils;
 import mx.com.ferbo.util.SGPException;
 
@@ -111,16 +119,76 @@ public class NominaSemanalBL {
 		this.semanaAnio = DateUtils.getSemanaAnio(this.periodoInicio);
 	}
 	
-	public DetNominaDTO calculoNomina() {
+	private NominaDTO newNomina() {
+		NominaDTO nomina = null;
+		
+		NominaEmisorDTO emisor = null;
+		NominaReceptorDTO receptor = null;
+		
+		List<NominaConceptoDTO> conceptos = null;
+		NominaConceptoDTO concepto = null;
+		
+		List<NominaPercepcionDTO> percepciones = null;
+		List<NominaDeduccionDTO> deducciones = null;
+		
+		try {
+			nomina = new NominaDTO();
+			
+			conceptos = new ArrayList<>();
+			percepciones = new ArrayList<>();
+			deducciones = new ArrayList<>();
+			
+			emisor = new NominaEmisorDTO();
+			receptor = new NominaReceptorDTO();
+			concepto = new NominaConceptoDTO();
+			conceptos.add(concepto);
+			
+			nomina.setEmisor(emisor);
+			nomina.setReceptor(receptor);
+			nomina.setConceptos(conceptos);
+			nomina.setPercepciones(percepciones);
+			nomina.setDeducciones(deducciones);
+			
+		} catch(Exception ex) {
+			log.error("Problema para generar la estructura básica de la nómina del empleado.");
+		}
+		
+		return nomina;
+	}
+	
+	public NominaDTO calculoNomina() {
 		DetNominaDTO nomina = null;
 		BigDecimal diasTrabajados = null;
 		BigDecimal diasPeriodo = null;
 		CatTarifaIsrDTO tarifaISR = null;
 		CatSubsidioDTO tarifaSubsidio = null;
 		
+		NominaDTO nominaNew = null;
 		
 		try {
+			nomina = new DetNominaDTO();
+			nominaNew = this.newNomina();
+			
+			
+			
+			
 			log.info("Ejecutando la nomina de la semana {} del año en curso...", this.semanaAnio);
+			
+			log.debug("Buscando información empresarial del empleado.");
+			this.empleado = new EmpleadoDAO().buscarPorId(this.empleado.getIdEmpleado(), true);
+			NominaEmisorDTO emisor = nominaNew.getEmisor();
+			emisor.setNomina(nominaNew);
+			emisor.setNombre(this.empleado.getDatoEmpresa().getEmpresa().getRazonSocial());
+			emisor.setRfc(this.empleado.getDatoEmpresa().getEmpresa().getRfc());
+			emisor.setRegimenFiscal(this.empleado.getDatoEmpresa().getEmpresa().getRegimenFiscal());
+			emisor.setCodigoPostal(this.empleado.getDatoEmpresa().getEmpresa().getCodigoPostal());
+			emisor.setRegistroPatronal(this.empleado.getDatoEmpresa().getEmpresa().getRegistroPatronal());
+			
+			
+			NominaReceptorDTO receptor = nominaNew.getReceptor();
+			receptor.setNomina(nominaNew);
+			receptor.setNombre(String.format("%s %s %s", this.empleado.getNombre(), this.empleado.getPrimerAp(), this.empleado.getSegundoAp()));
+			
 			
 			this.parametrosPercepciones = catPercepcionesDAO.buscarActual(this.periodoInicio);
 			mapAsistencias = this.getAsistencias(this.empleado, this.periodoInicio, this.periodoFin);
@@ -150,7 +218,7 @@ public class NominaSemanalBL {
 					.setScale(2, BigDecimal.ROUND_HALF_UP);
 			
 			//percepciones
-			nomina = new DetNominaDTO();
+			
 			nomina.setIdEmpleado(empleado);
 			nomina.setSalarioDiario(this.salarioDiario);
 			nomina.setAsistencia(diasTrabajados);
@@ -208,13 +276,18 @@ public class NominaSemanalBL {
 			this.neto = totalPercepciones.subtract(totalDeducciones);
 			nomina.setNeto(neto);
 			
+			
+			
+			nominaNew.setEmisor(emisor);
+			nominaNew.setReceptor(receptor);
+			
 		} catch(Exception ex) {
 			log.error("Problema para obtener el cálculo de la nómina del empleado {} {} {}", empleado.getNombre(), empleado.getPrimerAp(), empleado.getSegundoAp() );
 			log.error(ex);
 		}
 		
 		
-		return nomina;
+		return nominaNew;
 	}
 	
 	/**Con base en las asistencias del trabajador, se determina cuantos días se presentó a laborar.

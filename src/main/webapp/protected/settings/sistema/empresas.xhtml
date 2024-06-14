@@ -85,6 +85,10 @@
 		    				<f:selectItem itemLabel="Baja" itemValue="B"></f:selectItem>
 		    			</p:selectOneRadio>
 		    		</div>
+		    		<div class="p-field">
+		    			<p:outputLabel value="Codigo Postal" />
+		    			<p:inputMask value="#{empresasBean.empresa.codigoPostal}" maxlength="5" mask="99999" validateMask="true"/>
+		    		</div>
 		    	</p:outputPanel>
 	    		<f:facet name="footer">
 	    			<p:commandButton value="Guardar" actionListener="#{empresasBean.guardar}" process="dg-empresa @this" update="dt-empresa">

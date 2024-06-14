@@ -36,12 +36,12 @@
 				        </div>
 				    </f:facet>
 					<p:column headerText="Num" width="3rem">
-						<h:outputText value="#{nomina.idEmpleado.numEmpleado}" />
+						<h:outputText value="#{nomina.receptor.numeroEmpleado}" />
 					</p:column>
 					<p:column headerText="Empleado" width="10rem" >
-						<h:outputText value="#{nomina.idEmpleado.primerAp} #{nomina.idEmpleado.segundoAp} #{nomina.idEmpleado.nombre} " />
+						<h:outputText value="#{nomina.receptor.nombre}" />
 					</p:column>
-					<p:column headerText="SD" width="4rem">
+					<!-- <p:column headerText="SD" width="4rem">
 						<p:cellEditor>
 				            <f:facet name="output">
 				                <h:outputText value="#{nomina.salarioDiario}" />
@@ -70,8 +70,8 @@
 				                <p:inputText value="#{nomina.asistencia}" style="width:100%"/>
 							</f:facet>
 						</p:cellEditor>
-					</p:column>
-					<p:column headerText="Total percepciones" width="10rem">
+					</p:column> -->
+					<!-- <p:column headerText="Total percepciones" width="10rem">
 						<p:cellEditor>
 							<f:facet name="output">
 								<h:outputText value="#{nomina.totalPercepciones}" />
@@ -100,6 +100,11 @@
 								<p:inputText value="#{nomina.neto}" />
 							</f:facet>
 						</p:cellEditor>
+					</p:column> -->
+					<p:column>
+						<p:commandButton icon="pi pi-bars" oncomplete="PF('dgEmpleado').show();" actionListener="#{nominaBean.cargaEmpleadoNomina}" process="@this" update="formNomina:tvEmpleado">
+							<f:setPropertyActionListener value="#{nomina}" target="#{nominaBean.nomina}" />
+						</p:commandButton>
 					</p:column>
 					<f:facet name="footer" >
 						<p:commandButton value="Guardar" icon="pi pi-pencil" actionListener="#{nominaBean.guardarNominaEmpleado()}" disabled="#{nominaBean.listaNomina.size() eq 0}"/>
@@ -122,6 +127,54 @@
 						<p:commandButton value="Cálcular" icon="pi pi-pencil" actionListener="#{nominaBean.calculandoNomina()}" />
 					</div>
 				</p:outputPanel>
+			</p:dialog>
+			
+			<p:dialog widgetVar="dgEmpleado" header="Empleado" modal="true" responsive="true">
+				<p:tabView id="tvEmpleado" class="ui-fluid" dynamic="true" cache="true">
+					<p:tab title="General">
+					</p:tab>
+					<p:tab title="Emisor">
+						<p:outputPanel>
+							<div class="p-grid ui-fluid p-col-12">
+								<div class="p-col-12 p-md-6">
+									<p:outputLabel value="Emisor"/>
+									<p:inputText value="#{nominaBean.nomina.emisor.nombre}"/>
+								</div>
+							</div>
+						</p:outputPanel>
+					</p:tab>
+					<p:tab title="Receptor">
+						<p:outputPanel>
+							<div class="p-grid ui-fluid p-col-12">
+								<div class="p-col-12 p-md-6">
+									<p:outputLabel value="Receptor"/>
+									<p:inputText value="#{nominaBean.nomina.receptor.nombre}"/>
+								</div>
+							</div>
+						</p:outputPanel>
+					</p:tab>
+					<p:tab title="Percepciones">
+						<p:dataTable>
+							<p:column headerText="Descripción">
+								<p:outputLabel value="Ingreso x" />
+							</p:column>
+							<p:column headerText="Importe">
+								<p:outputLabel value="$100.00"/>
+							</p:column>
+						</p:dataTable>
+					</p:tab>
+					<p:tab title="Deducciones">
+						<p:dataTable>
+							<p:column headerText="Descripción">
+								<p:outputLabel value="Egreso x" />
+							</p:column>
+							<p:column headerText="Importe">
+								<p:outputLabel value="$10.00" />
+							</p:column>
+						</p:dataTable>
+					</p:tab>
+					
+				</p:tabView>
 			</p:dialog>
         </h:form>
     </ui:define>

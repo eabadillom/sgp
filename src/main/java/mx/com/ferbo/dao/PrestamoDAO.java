@@ -26,7 +26,7 @@ public class PrestamoDAO extends IBaseDAO<PrestamoDTO, Integer>{
 			dto.setAcumulado(model.getAcumulado());
 			dto.setImporte(model.getImporte());
 			dto.setTotal(model.getTotal()); 
-			dto.setPeriodicidadPago(PeriodicidadPagoDAO.getDTO(model.getPeriodicidadPago()));
+			dto.setPeriodicidadPago(new PeriodicidadPagoDAO().getDTO(model.getPeriodicidadPago()));
 			dto.setTipoPrestamo(TipoPrestamoDAO.getDTO(model.getTipoPrestamo()));
 		} catch(Exception ex) {
 			dto = null;
@@ -45,7 +45,7 @@ public class PrestamoDAO extends IBaseDAO<PrestamoDTO, Integer>{
 			model.setAcumulado(dto.getAcumulado());
 			model.setImporte(dto.getImporte());
 			model.setTotal(dto.getTotal());
-			model.setPeriodicidadPago(PeriodicidadPagoDAO.getModel(dto.getPeriodicidadPago()));
+			model.setPeriodicidadPago(new PeriodicidadPagoDAO().getModel(dto.getPeriodicidadPago()));
 			model.setTipoPrestamo(TipoPrestamoDAO.getModel(dto.getTipoPrestamo()));
 			
 		} catch(Exception ex) {

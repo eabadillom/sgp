@@ -104,6 +104,9 @@ public class CatTipoIncapacidadDAO extends DAO<TipoIncapacidadDTO,CatTipoIncapac
         throw new UnsupportedOperationException("Unimplemented method 'buscarPorCriterios'");
     }
 
-
-    
+	@Override
+	public TipoIncapacidadDTO buscarPorId(String id, boolean isFullInfo) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'buscarPorId'");
+	}
 }

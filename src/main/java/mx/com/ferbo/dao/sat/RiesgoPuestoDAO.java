@@ -9,7 +9,7 @@ import mx.com.ferbo.commons.dao.DAO;
 import mx.com.ferbo.dto.sat.RiesgoPuestoDTO;
 import mx.com.ferbo.model.sat.CatRiesgoPuesto;
 
-public class CatRiesgoPuestoDAO extends DAO<RiesgoPuestoDTO,CatRiesgoPuesto,Integer>{
+public class RiesgoPuestoDAO extends DAO<RiesgoPuestoDTO,CatRiesgoPuesto,Integer>{
 
     @Override
     public RiesgoPuestoDTO getDTO(CatRiesgoPuesto model) {
@@ -104,6 +104,12 @@ public class CatRiesgoPuestoDAO extends DAO<RiesgoPuestoDTO,CatRiesgoPuesto,Inte
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'buscarPorCriterios'");
     }
+
+	@Override
+	public RiesgoPuestoDTO buscarPorId(Integer id, boolean isFullInfo) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'buscarPorId'");
+	}
 
     
     

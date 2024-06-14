@@ -105,5 +105,11 @@ public class CatTipoDeduccionDAO extends DAO<TipoDeduccionDTO,CatTipoDeduccion,S
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'buscarPorCriterios'");
     }
+
+	@Override
+	public TipoDeduccionDTO buscarPorId(String id, boolean isFullInfo) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'buscarPorId'");
+	}
     
 }

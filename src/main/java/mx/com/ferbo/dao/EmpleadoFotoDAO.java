@@ -66,19 +66,25 @@ public class EmpleadoFotoDAO extends DAO<EmpleadoFotoDTO, DetEmpleadoFoto, Integ
 	@Override
 	public List<EmpleadoFotoDTO> buscarTodos() {
 		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("Unimplemented method 'buscarTodos'");
 	}
 
 	@Override
 	public List<EmpleadoFotoDTO> buscarActivo() {
 		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("Unimplemented method 'buscarActivo'");
 	}
 
 	@Override
 	public List<EmpleadoFotoDTO> buscarPorCriterios(EmpleadoFotoDTO dto) {
 		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("Unimplemented method 'buscarPorCriterios'");
+	}
+
+	@Override
+	public EmpleadoFotoDTO buscarPorId(Integer id, boolean isFullInfo) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'buscarPorId'");
 	}
 
 }

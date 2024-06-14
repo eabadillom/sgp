@@ -5,20 +5,22 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.EntityManager;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.commons.dao.IBaseDAO;
+import mx.com.ferbo.commons.dao.DAO;
 import mx.com.ferbo.dto.PeriodicidadPagoDTO;
 import mx.com.ferbo.model.CatPeriodicidadPago;
 import mx.com.ferbo.util.SGPException;
 
-public class PeriodicidadPagoDAO extends IBaseDAO<PeriodicidadPagoDTO, String> implements Serializable {
+public class PeriodicidadPagoDAO extends DAO<PeriodicidadPagoDTO, CatPeriodicidadPago, String> implements Serializable {
 
 	private static final long serialVersionUID = -6403760078874012505L;
 	private static Logger log = LogManager.getLogger(PeriodicidadPagoDAO.class);
 	
-	public static synchronized PeriodicidadPagoDTO getDTO(CatPeriodicidadPago e) {
+	public synchronized PeriodicidadPagoDTO getDTO(CatPeriodicidadPago e) {
 		PeriodicidadPagoDTO dto = null;
 		try {
 			dto = new PeriodicidadPagoDTO();
@@ -32,7 +34,7 @@ public class PeriodicidadPagoDAO extends IBaseDAO<PeriodicidadPagoDTO, String> i
 		return dto;
 	}
 	
-	public static synchronized CatPeriodicidadPago getModel(PeriodicidadPagoDTO dto) {
+	public synchronized CatPeriodicidadPago getModel(PeriodicidadPagoDTO dto) {
 		CatPeriodicidadPago model;
 		try {
 			model = new CatPeriodicidadPago();
@@ -46,28 +48,21 @@ public class PeriodicidadPagoDAO extends IBaseDAO<PeriodicidadPagoDTO, String> i
 		
 		return model;
 	}
-
+	
 	@Override
-	public PeriodicidadPagoDTO buscarPorId(String id) {
-		PeriodicidadPagoDTO pp = null;
-		CatPeriodicidadPago p = null;
-		
-		try {
-			p = emSGP.find(CatPeriodicidadPago.class, id);
-			pp = getDTO(p);
-		} catch(Exception ex) {
-			log.error("Problema para buscar la periodicidad con id {}", id);
-		}
-		
-		return pp;
+	public PeriodicidadPagoDTO buscarPorId(String id, boolean isFullInfo) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public List<PeriodicidadPagoDTO> buscarTodos() {
 		List<PeriodicidadPagoDTO> result = null;
 		List<CatPeriodicidadPago> list = null;
+		EntityManager emSGP = null;
 		
 		try {
+			emSGP = this.getEntityManager();
 			list = emSGP.createNamedQuery("CatPeriodicidadPago.buscarTodos", CatPeriodicidadPago.class)
 					.getResultList()
 					;
@@ -78,6 +73,8 @@ public class PeriodicidadPagoDAO extends IBaseDAO<PeriodicidadPagoDTO, String> i
 			}
 		} catch(Exception ex) {
 			log.error("Problema para obtener el listado de periodicidades de pago...", ex);
+		} finally {
+			close(emSGP);
 		}
 		
 		return result;
@@ -86,8 +83,10 @@ public class PeriodicidadPagoDAO extends IBaseDAO<PeriodicidadPagoDTO, String> i
 	public List<PeriodicidadPagoDTO> buscarTodos(Date vigenciaFin) {
 		List<PeriodicidadPagoDTO> result = null;
 		List<CatPeriodicidadPago> list = null;
+		EntityManager emSGP = null;
 		
 		try {
+			emSGP = this.getEntityManager();
 			list = emSGP.createNamedQuery("CatPeriodicidadPago.buscarTodosActivos", CatPeriodicidadPago.class)
 					.setParameter("vigenciaFin", vigenciaFin)
 					.getResultList()
@@ -99,6 +98,8 @@ public class PeriodicidadPagoDAO extends IBaseDAO<PeriodicidadPagoDTO, String> i
 			}
 		} catch(Exception ex) {
 			log.error("Problema para obtener el listado de periodicidades de pago...", ex);
+		} finally {
+			close(emSGP);
 		}
 		
 		return result;
@@ -113,8 +114,9 @@ public class PeriodicidadPagoDAO extends IBaseDAO<PeriodicidadPagoDTO, String> i
 		List<PeriodicidadPagoDTO> result = null;
 		List<CatPeriodicidadPago> lista = null;
 		PeriodicidadPagoDTO pp = null;
-		
+		EntityManager emSGP = null;
 		try {
+			emSGP = this.getEntityManager();
 			lista = emSGP.createNamedQuery("CatPeriodicidadPago.buscarActivo", CatPeriodicidadPago.class)
 					.setParameter("fecha", fecha)
 					.getResultList()
@@ -127,6 +129,8 @@ public class PeriodicidadPagoDAO extends IBaseDAO<PeriodicidadPagoDTO, String> i
 			}
 		} catch(Exception ex) {
 			log.error("Problema para obtener el listado de periodicidad de pago...", ex);
+		} finally {
+			close(emSGP);
 		}
 		
 		
@@ -143,13 +147,17 @@ public class PeriodicidadPagoDAO extends IBaseDAO<PeriodicidadPagoDTO, String> i
 	@Override
 	public void actualizar(PeriodicidadPagoDTO e) throws SGPException {
 		CatPeriodicidadPago model = null;
+		EntityManager emSGP = null;
 		try {
+			emSGP = this.getEntityManager();
 			model = getModel(e);
 			emSGP.getTransaction().begin();
 			emSGP.merge(model);
 			emSGP.getTransaction().commit();
 		} catch(Exception ex) {
 			emSGP.getTransaction().rollback();
+		} finally {
+			close(emSGP);
 		}
 	}
 
@@ -162,14 +170,17 @@ public class PeriodicidadPagoDAO extends IBaseDAO<PeriodicidadPagoDTO, String> i
 	@Override
 	public void guardar(PeriodicidadPagoDTO e) throws SGPException {
 		CatPeriodicidadPago model = null;
+		EntityManager emSGP = null;
 		try {
+			emSGP = this.getEntityManager();
 			model = getModel(e);
 			emSGP.getTransaction().begin();
 			emSGP.persist(model);
 			emSGP.getTransaction().commit();
 		} catch(Exception ex) {
 			emSGP.getTransaction().rollback();
+		} finally {
+			close(emSGP);
 		}
 	}
-
 }

@@ -10,6 +10,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -97,15 +98,20 @@ public class DetNomina implements Serializable {
     @Basic(optional = false)
     private BigDecimal total;
     
-    @OneToMany(mappedBy = "nomina", cascade = CascadeType.ALL)
-    private List<DetNominaEmisor> emisores;
+    @OneToOne(mappedBy = "nomina", fetch = FetchType.LAZY)
+    private DetNominaEmisor emisor;
     
-    @OneToMany(mappedBy = "nomina", cascade = CascadeType.ALL)
-    private List<DetNominaReceptor> receptores;
+    @OneToOne(mappedBy = "nomina", fetch = FetchType.LAZY)
+    private DetNominaReceptor receptor;
     
+    @OneToMany(mappedBy = "key.nomina", cascade = CascadeType.ALL)
+    private List<DetNominaConcepto> conceptos;
     
+    @OneToMany(mappedBy = "key.nomina", cascade = CascadeType.ALL)
+    private List<DetNominaPercepcion> percepciones;
     
-    
+    @OneToMany(mappedBy = "key.nomina", cascade = CascadeType.ALL)
+    private List<DetNominaDeduccion> deducciones;
     
     
     
@@ -690,6 +696,158 @@ public class DetNomina implements Serializable {
 	@Override
 	public String toString() {
 		return "DetNomina [idNomina=" + id + "]";
+	}
+
+	public String getMoneda() {
+		return moneda;
+	}
+
+	public void setMoneda(String moneda) {
+		this.moneda = moneda;
+	}
+
+	public Date getFechaEmision() {
+		return fechaEmision;
+	}
+
+	public void setFechaEmision(Date fechaEmision) {
+		this.fechaEmision = fechaEmision;
+	}
+
+	public String getNumeroCertificado() {
+		return numeroCertificado;
+	}
+
+	public void setNumeroCertificado(String numeroCertificado) {
+		this.numeroCertificado = numeroCertificado;
+	}
+
+	public Date getFechaTimbrado() {
+		return fechaTimbrado;
+	}
+
+	public void setFechaTimbrado(Date fechaTimbrado) {
+		this.fechaTimbrado = fechaTimbrado;
+	}
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+
+	public String getIdPac() {
+		return idPac;
+	}
+
+	public void setIdPac(String idPac) {
+		this.idPac = idPac;
+	}
+
+	public String getTipoComprobante() {
+		return tipoComprobante;
+	}
+
+	public void setTipoComprobante(String tipoComprobante) {
+		this.tipoComprobante = tipoComprobante;
+	}
+
+	public String getClaveExportacion() {
+		return claveExportacion;
+	}
+
+	public void setClaveExportacion(String claveExportacion) {
+		this.claveExportacion = claveExportacion;
+	}
+
+	public CatMetodoPago getMetodoPago() {
+		return metodoPago;
+	}
+
+	public void setMetodoPago(CatMetodoPago metodoPago) {
+		this.metodoPago = metodoPago;
+	}
+
+	public String getSerie() {
+		return serie;
+	}
+
+	public void setSerie(String serie) {
+		this.serie = serie;
+	}
+
+	public String getFolio() {
+		return folio;
+	}
+
+	public void setFolio(String folio) {
+		this.folio = folio;
+	}
+
+	public BigDecimal getSubtotal() {
+		return subtotal;
+	}
+
+	public void setSubtotal(BigDecimal subtotal) {
+		this.subtotal = subtotal;
+	}
+
+	public BigDecimal getDescuento() {
+		return descuento;
+	}
+
+	public void setDescuento(BigDecimal descuento) {
+		this.descuento = descuento;
+	}
+
+	public BigDecimal getTotal() {
+		return total;
+	}
+
+	public void setTotal(BigDecimal total) {
+		this.total = total;
+	}
+
+	public DetNominaEmisor getEmisor() {
+		return emisor;
+	}
+
+	public void setEmisor(DetNominaEmisor emisor) {
+		this.emisor = emisor;
+	}
+
+	public DetNominaReceptor getReceptor() {
+		return receptor;
+	}
+
+	public void setReceptor(DetNominaReceptor receptor) {
+		this.receptor = receptor;
+	}
+
+	public List<DetNominaConcepto> getConceptos() {
+		return conceptos;
+	}
+
+	public void setConceptos(List<DetNominaConcepto> conceptos) {
+		this.conceptos = conceptos;
+	}
+
+	public List<DetNominaPercepcion> getPercepciones() {
+		return percepciones;
+	}
+
+	public void setPercepciones(List<DetNominaPercepcion> percepciones) {
+		this.percepciones = percepciones;
+	}
+
+	public List<DetNominaDeduccion> getDeducciones() {
+		return deducciones;
+	}
+
+	public void setDeducciones(List<DetNominaDeduccion> deducciones) {
+		this.deducciones = deducciones;
 	}
 	
 	

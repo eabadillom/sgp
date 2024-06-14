@@ -112,4 +112,10 @@ public class TipoRegimenDAO extends DAO<TipoRegimenDTO, CatTipoRegimen, String> 
 		throw new  UnsupportedOperationException("Not supported yet.");
 	}
 
+	@Override
+	public TipoRegimenDTO buscarPorId(String id, boolean isFullInfo) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'buscarPorId'");
+	}
+
 }
