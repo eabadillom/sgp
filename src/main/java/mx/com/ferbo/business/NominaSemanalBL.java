@@ -18,6 +18,7 @@ import mx.com.ferbo.dao.CuotaIMSSDAO;
 import mx.com.ferbo.dao.DiaNoLaboralDAO;
 import mx.com.ferbo.dao.EmpleadoDAO;
 import mx.com.ferbo.dao.RegistroDAO;
+import mx.com.ferbo.dao.TipoPercepcionDAO;
 import mx.com.ferbo.dto.CatPercepcionesDTO;
 import mx.com.ferbo.dto.CatSubsidioDTO;
 import mx.com.ferbo.dto.CatTarifaIsrDTO;
@@ -31,7 +32,10 @@ import mx.com.ferbo.dto.NominaDTO;
 import mx.com.ferbo.dto.NominaDeduccionDTO;
 import mx.com.ferbo.dto.NominaEmisorDTO;
 import mx.com.ferbo.dto.NominaPercepcionDTO;
+import mx.com.ferbo.dto.NominaPercepcionDTOPK;
 import mx.com.ferbo.dto.NominaReceptorDTO;
+import mx.com.ferbo.dto.sat.TipoPercepcionDTO;
+import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.util.DateUtils;
 import mx.com.ferbo.util.SGPException;
 
@@ -94,6 +98,8 @@ public class NominaSemanalBL {
 	private CatSubsidioDAO subsidioDAO = null;
 	private CuotaIMSSDAO tarifaIMSSDAO = null;
 	
+	private TipoPercepcionDAO tipoPercepcionDAO = null;
+	
 	//OBJETOS RELACIONADOS A LA NOMINA Y CFDI
 	
 	
@@ -108,6 +114,8 @@ public class NominaSemanalBL {
 		this.tarifaISRDAO = new CatTarifaIsrDAO();
 		this.subsidioDAO = new CatSubsidioDAO();
 		this.tarifaIMSSDAO = new CuotaIMSSDAO();
+		this.tipoPercepcionDAO = new TipoPercepcionDAO();
+		
 		
 		anioActual = DateUtils.getAnio(periodoInicio);
 		this.fechaInicioAnio = DateUtils.getDate(anioActual, DateUtils.ENERO, 1);
@@ -164,13 +172,18 @@ public class NominaSemanalBL {
 		CatSubsidioDTO tarifaSubsidio = null;
 		
 		NominaDTO nominaNew = null;
+		NominaPercepcionDTO percepcionSueldo = null;
+		NominaPercepcionDTO percepcionSeptimoDia = null;
+		NominaPercepcionDTO percepcionBonoPuntualidad = null;
+		NominaPercepcionDTO percepcionValeDespensa = null;
+		NominaPercepcionDTO percepcionAjusteAlNeto = null;
+		
+		List<NominaPercepcionDTO> percepciones = null;
+		List<NominaDeduccionDTO> deducciones = null;
 		
 		try {
 			nomina = new DetNominaDTO();
 			nominaNew = this.newNomina();
-			
-			
-			
 			
 			log.info("Ejecutando la nomina de la semana {} del año en curso...", this.semanaAnio);
 			
@@ -188,7 +201,16 @@ public class NominaSemanalBL {
 			NominaReceptorDTO receptor = nominaNew.getReceptor();
 			receptor.setNomina(nominaNew);
 			receptor.setNombre(String.format("%s %s %s", this.empleado.getNombre(), this.empleado.getPrimerAp(), this.empleado.getSegundoAp()));
+			receptor.setRfc(this.empleado.getRfc());
+			receptor.setCurp(this.empleado.getCurp());
+			receptor.setTipoJornada(this.empleado.getDatoEmpresa().getTipoJornada());
+			receptor.setNss(this.empleado.getDatoEmpresa().getNss());
+			receptor.setInicioRelacionLaboral(this.empleado.getDatoEmpresa().getFechaIngreso());
 			
+			percepciones = new ArrayList<NominaPercepcionDTO>();
+			deducciones = new ArrayList<NominaDeduccionDTO>();
+			nominaNew.setPercepciones(percepciones);
+			nominaNew.setDeducciones(deducciones);
 			
 			this.parametrosPercepciones = catPercepcionesDAO.buscarActual(this.periodoInicio);
 			mapAsistencias = this.getAsistencias(this.empleado, this.periodoInicio, this.periodoFin);
@@ -206,6 +228,7 @@ public class NominaSemanalBL {
 			
     		this.salarioDiario = empleado.getSueldoDiario();
     		this.salarioDiarioIntegrado = this.calculoSDI(this.empleado);
+    		
     		this.salarioSemanal = this.salarioDiario.multiply(diasTrabajados);
 			this.septimoDia = this.calculoSeptimoDia(this.empleado);
 			this.bonoPuntualidad = this.calculoBonoPuntualidad(DIAS_POR_PERIODO, empleado, mapAsistencias, this.salarioDiarioIntegrado, proporcionalSeptimoDia);
@@ -276,10 +299,49 @@ public class NominaSemanalBL {
 			this.neto = totalPercepciones.subtract(totalDeducciones);
 			nomina.setNeto(neto);
 			
-			
-			
 			nominaNew.setEmisor(emisor);
 			nominaNew.setReceptor(receptor);
+			
+			
+			percepcionSueldo = new NominaPercepcionDTO();
+			percepcionSeptimoDia = new NominaPercepcionDTO();
+			percepcionBonoPuntualidad = new NominaPercepcionDTO();
+			percepcionValeDespensa = new NominaPercepcionDTO();
+			percepcionAjusteAlNeto = new NominaPercepcionDTO();
+			
+			if(this.isr.compareTo(BigDecimal.ZERO) > 0) {
+				percepcionSueldo.setKey(new NominaPercepcionDTOPK(0, nominaNew));
+				percepcionSueldo.setClave("001");
+				percepcionSueldo.setNombre("Sueldo");
+				TipoPercepcionDTO tpSueldo = tipoPercepcionDAO.buscarPorId("001");
+				percepcionSueldo.setTipoPercepcion(tpSueldo);
+				percepcionSueldo.setImporteGravado(this.salarioSemanal);
+				percepciones.add(percepcionSueldo);
+				
+				percepcionSeptimoDia.setKey(new NominaPercepcionDTOPK(1, nominaNew));
+				percepcionSeptimoDia.setClave("003");
+				percepcionSeptimoDia.setNombre("Séptimo día");
+				TipoPercepcionDTO tpSeptimoDia = tipoPercepcionDAO.buscarPorId("001");
+				percepcionSeptimoDia.setTipoPercepcion(tpSeptimoDia);
+				percepcionSeptimoDia.setImporteGravado(this.septimoDia);
+				percepciones.add(percepcionSeptimoDia);
+				
+				percepcionBonoPuntualidad.setKey(new NominaPercepcionDTOPK(2, nominaNew));
+				percepcionBonoPuntualidad.setClave("015");
+				percepcionBonoPuntualidad.setNombre("Bono puntualidad");
+				TipoPercepcionDTO tpBonoPuntualidad = tipoPercepcionDAO.buscarPorId("010");
+				percepcionBonoPuntualidad.setTipoPercepcion(tpBonoPuntualidad);
+				percepcionBonoPuntualidad.setImporteGravado(this.bonoPuntualidad);
+				percepciones.add(percepcionBonoPuntualidad);
+			}
+			
+			percepcionValeDespensa.setKey(new NominaPercepcionDTOPK(3, nominaNew));
+			percepcionValeDespensa.setClave("032");
+			percepcionValeDespensa.setNombre("Despensa");
+			TipoPercepcionDTO tpValeDespensa = tipoPercepcionDAO.buscarPorId("029");
+			percepcionValeDespensa.setTipoPercepcion(tpValeDespensa);
+			percepcionValeDespensa.setImporteExcento(this.valesDespensa);
+			percepciones.add(percepcionValeDespensa);
 			
 		} catch(Exception ex) {
 			log.error("Problema para obtener el cálculo de la nómina del empleado {} {} {}", empleado.getNombre(), empleado.getPrimerAp(), empleado.getSegundoAp() );

@@ -7,24 +7,17 @@ import mx.com.ferbo.dto.sat.TipoDeduccionDTO;
 
 public class NominaDeduccionDTO {
 	
-	private Integer idNomina;
-	private Integer idDeduccion;
+	private NominaDeduccionDTOPK key;
 	private TipoDeduccionDTO tipoDeduccion;
 	private String clave;
 	private String nombre;
 	private BigDecimal importe;
 	
-	public Integer getIdNomina() {
-		return idNomina;
+	public NominaDeduccionDTOPK getKey() {
+		return key;
 	}
-	public void setIdNomina(Integer idNomina) {
-		this.idNomina = idNomina;
-	}
-	public Integer getIdDeduccion() {
-		return idDeduccion;
-	}
-	public void setIdDeduccion(Integer idDeduccion) {
-		this.idDeduccion = idDeduccion;
+	public void setKey(NominaDeduccionDTOPK key) {
+		this.key = key;
 	}
 	public TipoDeduccionDTO getTipoDeduccion() {
 		return tipoDeduccion;
@@ -52,7 +45,7 @@ public class NominaDeduccionDTO {
 	}
 	@Override
 	public int hashCode() {
-		return Objects.hash(idDeduccion, idNomina);
+		return Objects.hash(key);
 	}
 	@Override
 	public boolean equals(Object obj) {
@@ -63,11 +56,11 @@ public class NominaDeduccionDTO {
 		if (getClass() != obj.getClass())
 			return false;
 		NominaDeduccionDTO other = (NominaDeduccionDTO) obj;
-		return Objects.equals(idDeduccion, other.idDeduccion) && Objects.equals(idNomina, other.idNomina);
+		return Objects.equals(key, other.key);
 	}
 	@Override
 	public String toString() {
-		return "NominaDeduccionDTO [idNomina=" + idNomina + ", idDeduccion=" + idDeduccion + ", tipoDeduccion="
-				+ tipoDeduccion + ", clave=" + clave + ", nombre=" + nombre + ", importe=" + importe + "]";
+		return "NominaDeduccionDTO [key=" + key + ", clave=" + clave + ", nombre=" + nombre + ", importe=" + importe
+				+ "]";
 	}
 }

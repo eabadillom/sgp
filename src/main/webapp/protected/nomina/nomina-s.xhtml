@@ -102,7 +102,7 @@
 						</p:cellEditor>
 					</p:column> -->
 					<p:column>
-						<p:commandButton icon="pi pi-bars" oncomplete="PF('dgEmpleado').show();" actionListener="#{nominaBean.cargaEmpleadoNomina}" process="@this" update="formNomina:tvEmpleado">
+						<p:commandButton icon="pi pi-bars" oncomplete="PF('dgEmpleado').show();" actionListener="#{nominaBean.cargaEmpleadoNomina}" process="@this" update="formNomina:dg-empleado">
 							<f:setPropertyActionListener value="#{nomina}" target="#{nominaBean.nomina}" />
 						</p:commandButton>
 					</p:column>
@@ -129,38 +129,117 @@
 				</p:outputPanel>
 			</p:dialog>
 			
-			<p:dialog widgetVar="dgEmpleado" header="Empleado" modal="true" responsive="true">
-				<p:tabView id="tvEmpleado" class="ui-fluid" dynamic="true" cache="true">
+			<p:dialog id="dg-empleado" widgetVar="dgEmpleado" header="#{nominaBean.nomina.receptor.nombre}" modal="true" responsive="true">
+				<p:tabView class="ui-fluid" dynamic="true" cache="true">
 					<p:tab title="General">
+						<div class="ui-fluid formgrid grid">
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Ejercicio"/>
+								<p:inputText value="202x" readonly="true" />
+							</div>
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Periodo"/>
+								<p:inputText value="periodo" readonly="true"/>
+							</div>
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Dias de pago"/>
+								<p:inputText value="x" />
+							</div>
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Subtotal"/>
+								<p:inputText value="#{nominaBean.nomina.subtotal}" readonly="true"/>
+							</div>
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Descuentos" />
+								<p:inputText value="#{nominaBean.nomina.descuento}" readonly="true"/>
+							</div>
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Total" />
+								<p:inputText value="#{nominaBean.nomina.total}" readonly="true"/>
+							</div>
+						</div>
 					</p:tab>
 					<p:tab title="Emisor">
 						<p:outputPanel>
-							<div class="p-grid ui-fluid p-col-12">
-								<div class="p-col-12 p-md-6">
+							<div class="ui-fluid formgrid grid">
+								<div class="field col-12 md:col-6">
 									<p:outputLabel value="Emisor"/>
-									<p:inputText value="#{nominaBean.nomina.emisor.nombre}"/>
+									<p:inputText value="#{nominaBean.nomina.emisor.nombre}" readonly="true"/>
+								</div>
+								<div class="field col-12 md:col-6">
+									<p:outputLabel value="Regimen Fiscal" />
+									<p:inputText value="#{nominaBean.nomina.emisor.regimenFiscal.clave} - #{nominaBean.nomina.emisor.regimenFiscal.nombre}" readonly="true"/>
+								</div>
+								<div class="field col-12 md:col-3">
+									<p:outputLabel value="RFC"/>
+									<p:inputText value="#{nominaBean.nomina.emisor.rfc}" readonly="true"/>
+								</div>
+								<div class="field col-12 md:col-3">
+									<p:outputLabel value="Registro Patronal" />
+									<p:inputText value="#{nominaBean.nomina.emisor.registroPatronal}" readonly="true"/>
+								</div>
+								<div class="field col-12 md:col-3">
+									<p:outputLabel value="Lugar de expedición"/>
+									<p:inputText value="#{nominaBean.nomina.emisor.codigoPostal}" readonly="true"/>
 								</div>
 							</div>
 						</p:outputPanel>
 					</p:tab>
 					<p:tab title="Receptor">
 						<p:outputPanel>
-							<div class="p-grid ui-fluid p-col-12">
-								<div class="p-col-12 p-md-6">
+							<div class="ui-fluid formgrid grid">
+								<div class="field col-12 md:col-6">
 									<p:outputLabel value="Receptor"/>
-									<p:inputText value="#{nominaBean.nomina.receptor.nombre}"/>
+									<p:inputText value="#{nominaBean.nomina.receptor.nombre}" readonly="true"/>
+								</div>
+								<div class="field col-12 md:col-3">
+									<p:outputLabel value="RFC" />
+									<p:inputText value="#{nominaBean.nomina.receptor.rfc}" readonly="true"/>
+								</div>
+								<div class="field col-12 md:col-3">
+									<p:outputLabel value="CURP" />
+									<p:inputText value="#{nominaBean.nomina.receptor.curp}" readonly="true"/>
+								</div>
+								<div class="field col-12 md:col-3">
+									<p:outputLabel value="Fecha inicio relación laboral" />
+									<p:inputText value="#{nominaBean.nomina.receptor.inicioRelacionLaboral}" readonly="true"/>
+								</div>
+								<div class="field col-12 md:col-3">
+									<p:outputLabel value="Jornada" />
+									<p:inputText value="#{nominaBean.nomina.receptor.tipoJornada.clave} - #{nominaBean.nomina.receptor.tipoJornada.nombre}" readonly="true"/>
+								</div>
+								<div class="field col-12 md:col-3">
+									<p:outputLabel value="NSS" />
+									<p:inputText value="#{nominaBean.nomina.receptor.nss}" />
+								</div>
+								<div class="field col-12 md:col-3">
+									<p:outputLabel value="Tipo salario" />
+									<p:inputText value="Tipo Salario (FIJO)" />
+								</div>
+								<div class="field col-12 md:col-3">
+									<p:outputLabel value="Domicilio fiscal" />
+									<p:inputText value="#{nominaBean.nomina.receptor.codigoPostal}"></p:inputText>
 								</div>
 							</div>
 						</p:outputPanel>
 					</p:tab>
 					<p:tab title="Percepciones">
-						<p:dataTable>
+						<p:dataTable value="#{nominaBean.nomina.percepciones}" var="percepcion">
+							<p:column headerText="SAT" width="4rem">
+								<p:outputLabel value="#{percepcion.tipoPercepcion.clave}" />
+							</p:column>
 							<p:column headerText="Descripción">
-								<p:outputLabel value="Ingreso x" />
+								<p:outputLabel value="#{percepcion.nombre}" />
 							</p:column>
 							<p:column headerText="Importe">
-								<p:outputLabel value="$100.00"/>
+								<p:outputLabel value="$#{percepcion.importeGravado eq null ? percepcion.importeExcento : percepcion.importeGravado}"/>
 							</p:column>
+							<p:columnGroup type="footer" >
+								<p:row>
+									<p:column colspan="2"/>
+									<p:column value="$ #{nominaBean.nomina.percepciones.stream().map(item->item.importeGravado).sum()}"/>
+								</p:row>
+							</p:columnGroup>
 						</p:dataTable>
 					</p:tab>
 					<p:tab title="Deducciones">

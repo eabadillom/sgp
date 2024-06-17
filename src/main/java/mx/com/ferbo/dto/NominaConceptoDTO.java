@@ -7,8 +7,7 @@ import mx.com.ferbo.dto.sat.ConceptoDTO;
 import mx.com.ferbo.dto.sat.UnidadSATDTO;
 
 public class NominaConceptoDTO {
-	private Integer idNomina;
-	private Integer idConcepto;
+	private NominaConceptoPK key;
 	private ConceptoDTO concepto;
 	private BigDecimal cantidad;
 	private UnidadSATDTO unidad;
@@ -18,17 +17,11 @@ public class NominaConceptoDTO {
 	private BigDecimal importe;
 	private BigDecimal descuento;
 	
-	public Integer getIdNomina() {
-		return idNomina;
+	public NominaConceptoPK getKey() {
+		return key;
 	}
-	public void setIdNomina(Integer idNomina) {
-		this.idNomina = idNomina;
-	}
-	public Integer getIdConcepto() {
-		return idConcepto;
-	}
-	public void setIdConcepto(Integer idConcepto) {
-		this.idConcepto = idConcepto;
+	public void setKey(NominaConceptoPK key) {
+		this.key = key;
 	}
 	public ConceptoDTO getConcepto() {
 		return concepto;
@@ -80,7 +73,7 @@ public class NominaConceptoDTO {
 	}
 	@Override
 	public int hashCode() {
-		return Objects.hash(idConcepto, idNomina);
+		return Objects.hash(key);
 	}
 	@Override
 	public boolean equals(Object obj) {
@@ -91,12 +84,11 @@ public class NominaConceptoDTO {
 		if (getClass() != obj.getClass())
 			return false;
 		NominaConceptoDTO other = (NominaConceptoDTO) obj;
-		return Objects.equals(idConcepto, other.idConcepto) && Objects.equals(idNomina, other.idNomina);
+		return Objects.equals(key, other.key);
 	}
 	@Override
 	public String toString() {
-		return "NominaConceptoDTO [idNomina=" + idNomina + ", idConcepto=" + idConcepto + ", concepto=" + concepto
-				+ ", cantidad=" + cantidad + ", unidad=" + unidad + ", nombreConcepto=" + nombreConcepto
+		return "NominaConceptoDTO [key=" + key + ", cantidad=" + cantidad + ", nombreConcepto=" + nombreConcepto
 				+ ", objetoImpuesto=" + objetoImpuesto + ", valorUnitario=" + valorUnitario + ", importe=" + importe
 				+ ", descuento=" + descuento + "]";
 	}

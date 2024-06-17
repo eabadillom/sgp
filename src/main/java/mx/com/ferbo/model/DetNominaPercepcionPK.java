@@ -21,6 +21,15 @@ public class DetNominaPercepcionPK implements Serializable {
 	@Basic(optional = false)
 	@Column(name = "id_percepcion")
 	private Integer id;
+	
+	public DetNominaPercepcionPK() {
+	}
+	
+	public DetNominaPercepcionPK(DetNomina nomina, Integer id) {
+		super();
+		this.nomina = nomina;
+		this.id = id;
+	}
 
 	public DetNomina getNomina() {
 		return nomina;

@@ -6,26 +6,20 @@ import java.util.Objects;
 import mx.com.ferbo.dto.sat.TipoPercepcionDTO;
 
 public class NominaPercepcionDTO {
-	private Integer idNomina;
-	private Integer idPercepcion;
+	private NominaPercepcionDTOPK key;
 	private TipoPercepcionDTO tipoPercepcion;
 	private String clave;
 	private String nombre;
 	private BigDecimal importeGravado;
 	private BigDecimal importeExcento;
 	
-	public Integer getIdNomina() {
-		return idNomina;
+	public NominaPercepcionDTOPK getKey() {
+		return key;
 	}
-	public void setIdNomina(Integer idNomina) {
-		this.idNomina = idNomina;
+	public void setKey(NominaPercepcionDTOPK key) {
+		this.key = key;
 	}
-	public Integer getIdPercepcion() {
-		return idPercepcion;
-	}
-	public void setIdPercepcion(Integer idPercepcion) {
-		this.idPercepcion = idPercepcion;
-	}
+	
 	public TipoPercepcionDTO getTipoPercepcion() {
 		return tipoPercepcion;
 	}
@@ -58,7 +52,7 @@ public class NominaPercepcionDTO {
 	}
 	@Override
 	public int hashCode() {
-		return Objects.hash(idNomina, idPercepcion);
+		return Objects.hash(key);
 	}
 	@Override
 	public boolean equals(Object obj) {
@@ -69,12 +63,11 @@ public class NominaPercepcionDTO {
 		if (getClass() != obj.getClass())
 			return false;
 		NominaPercepcionDTO other = (NominaPercepcionDTO) obj;
-		return Objects.equals(idNomina, other.idNomina) && Objects.equals(idPercepcion, other.idPercepcion);
+		return Objects.equals(key, other.key);
 	}
 	@Override
 	public String toString() {
-		return "NominaPercepcionDTO [idNomina=" + idNomina + ", idPercepcion=" + idPercepcion + ", tipoPercepcion="
-				+ tipoPercepcion + ", clave=" + clave + ", nombre=" + nombre + ", importeGravado=" + importeGravado
-				+ ", importeExcento=" + importeExcento + "]";
+		return "NominaPercepcionDTO [key=" + key + ", clave=" + clave + ", nombre=" + nombre + ", importeGravado="
+				+ importeGravado + ", importeExcento=" + importeExcento + "]";
 	}
 }

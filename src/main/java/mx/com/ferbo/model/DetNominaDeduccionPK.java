@@ -21,6 +21,15 @@ public class DetNominaDeduccionPK implements Serializable {
 	@Basic(optional = false)
 	@Column(name = "id_deduccion")
 	private Integer id;
+	
+	public DetNominaDeduccionPK() {
+		
+	}
+
+	public DetNominaDeduccionPK(DetNomina nomina, Integer id) {
+		this.nomina = nomina;
+		this.id = id;
+	}
 
 	public DetNomina getNomina() {
 		return nomina;

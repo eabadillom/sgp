@@ -8,7 +8,7 @@ import mx.com.ferbo.commons.dao.DAO;
 import mx.com.ferbo.dto.sat.TipoDeduccionDTO;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 
-public class CatTipoDeduccionDAO extends DAO<TipoDeduccionDTO,CatTipoDeduccion,String>{
+public class TipoDeduccionDAO extends DAO<TipoDeduccionDTO,CatTipoDeduccion,String>{
 
     @Override
     public TipoDeduccionDTO getDTO(CatTipoDeduccion model) {

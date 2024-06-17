@@ -21,7 +21,16 @@ public class DetNominaConceptoPK implements Serializable {
 	@Basic(optional = false)
 	@Column(name = "id_concepto")
 	private Integer id;
+	
+	public DetNominaConceptoPK() {
+		
+	}
 
+	public DetNominaConceptoPK(DetNomina nomina, Integer id) {
+		this.nomina = nomina;
+		this.id = id;
+	}
+	
 	public DetNomina getNomina() {
 		return nomina;
 	}
