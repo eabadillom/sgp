@@ -21,7 +21,16 @@ public class DetNominaOtroPagoPK implements Serializable {
 	@Basic(optional = false)
 	@Column(name = "id_otro_pago")
 	private Integer id;
-
+	
+	public DetNominaOtroPagoPK() {
+		
+	}
+	
+	public DetNominaOtroPagoPK(DetNomina nomina, Integer id) {
+		this.nomina = nomina;
+		this.id = id;
+	}
+	
 	public DetNomina getNomina() {
 		return nomina;
 	}

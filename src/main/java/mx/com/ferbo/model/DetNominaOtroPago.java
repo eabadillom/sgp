@@ -27,7 +27,7 @@ public class DetNominaOtroPago implements Serializable {
 	@OneToOne
 	@JoinColumn(name = "tp_otro_pago", referencedColumnName = "cd_tipo_otro_pago")
 	@Basic(optional = false)
-	private CatTipoOtroPago otroPago;
+	private CatTipoOtroPago tipoOtroPago;
 	
 	@Column(name = "cd_otro_pago")
 	@Basic(optional = false)
@@ -51,12 +51,12 @@ public class DetNominaOtroPago implements Serializable {
 		this.key = key;
 	}
 
-	public CatTipoOtroPago getOtroPago() {
-		return otroPago;
+	public CatTipoOtroPago getTipoOtroPago() {
+		return tipoOtroPago;
 	}
 
-	public void setOtroPago(CatTipoOtroPago otroPago) {
-		this.otroPago = otroPago;
+	public void setTipoOtroPago(CatTipoOtroPago otroPago) {
+		this.tipoOtroPago = otroPago;
 	}
 
 	public String getClave() {

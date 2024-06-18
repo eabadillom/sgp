@@ -28,7 +28,15 @@ public class NominaDTO {
 	private NominaReceptorDTO receptor;
 	private List<NominaConceptoDTO> conceptos;
 	private List<NominaPercepcionDTO> percepciones;
+	private List<NominaOtroPagoDTO> otrosPagos;
 	private List<NominaDeduccionDTO> deducciones;
+	
+	private Integer ejercicio;
+	private Integer periodo;
+	private Integer diasLaborados;
+	private Integer diasPagados;
+	private Integer diasAsueto;
+	private Integer diasNoLaborados;
 	
 	public Integer getId() {
 		return id;
@@ -173,6 +181,49 @@ public class NominaDTO {
 				+ metodoPago + ", serie=" + serie + ", folio=" + folio + ", subtotal=" + subtotal + ", descuento="
 				+ descuento + ", total=" + total + ", emisor=" + emisor + ", receptor=" + receptor + ", conceptos="
 				+ conceptos + ", percepciones=" + percepciones + ", deducciones=" + deducciones + "]";
+	}
+	
+	public List<NominaOtroPagoDTO> getOtrosPagos() {
+		return otrosPagos;
+	}
+	public void setOtrosPagos(List<NominaOtroPagoDTO> otrosPagos) {
+		this.otrosPagos = otrosPagos;
+	}
+	public Integer getDiasLaborados() {
+		return diasLaborados;
+	}
+	public void setDiasLaborados(Integer diasLaborados) {
+		this.diasLaborados = diasLaborados;
+	}
+	public Integer getDiasPagados() {
+		return diasPagados;
+	}
+	public void setDiasPagados(Integer diasPagados) {
+		this.diasPagados = diasPagados;
+	}
+	public Integer getDiasAsueto() {
+		return diasAsueto;
+	}
+	public void setDiasAsueto(Integer diasAsueto) {
+		this.diasAsueto = diasAsueto;
+	}
+	public Integer getEjercicio() {
+		return ejercicio;
+	}
+	public void setEjercicio(Integer ejercicio) {
+		this.ejercicio = ejercicio;
+	}
+	public Integer getPeriodo() {
+		return periodo;
+	}
+	public void setPeriodo(Integer periodo) {
+		this.periodo = periodo;
+	}
+	public Integer getDiasNoLaborados() {
+		return diasNoLaborados;
+	}
+	public void setDiasNoLaborados(Integer diasNoLaborados) {
+		this.diasNoLaborados = diasNoLaborados;
 	}
 	
 }

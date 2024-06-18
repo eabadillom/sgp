@@ -111,10 +111,10 @@ public class DetNomina implements Serializable {
     private List<DetNominaPercepcion> percepciones;
     
     @OneToMany(mappedBy = "key.nomina", cascade = CascadeType.ALL)
+    private List<DetNominaOtroPago> otrosPagos;
+    
+    @OneToMany(mappedBy = "key.nomina", cascade = CascadeType.ALL)
     private List<DetNominaDeduccion> deducciones;
-    
-    
-    
     
     
     
@@ -848,6 +848,14 @@ public class DetNomina implements Serializable {
 
 	public void setDeducciones(List<DetNominaDeduccion> deducciones) {
 		this.deducciones = deducciones;
+	}
+
+	public List<DetNominaOtroPago> getOtrosPagos() {
+		return otrosPagos;
+	}
+
+	public void setOtrosPagos(List<DetNominaOtroPago> otrosPagos) {
+		this.otrosPagos = otrosPagos;
 	}
 	
 	

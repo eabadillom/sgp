@@ -1,11 +1,9 @@
-package mx.com.ferbo.dao.sat;
+package mx.com.ferbo.dao;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import mx.com.ferbo.commons.dao.DAO;
-import mx.com.ferbo.dao.NominaDAO;
-import mx.com.ferbo.dao.TipoPercepcionDAO;
 import mx.com.ferbo.dto.NominaPercepcionDTO;
 import mx.com.ferbo.dto.NominaPercepcionDTOPK;
 import mx.com.ferbo.model.DetNominaPercepcion;

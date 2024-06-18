@@ -7,7 +7,6 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.DAO;
 import mx.com.ferbo.dao.sat.MetodoPagoDAO;
-import mx.com.ferbo.dao.sat.NominaPercepcionDAO;
 import mx.com.ferbo.dto.NominaDTO;
 import mx.com.ferbo.model.DetNomina;
 
@@ -40,6 +39,7 @@ public class NominaDAO extends DAO<NominaDTO, DetNomina, Integer> {
 			dto.setReceptor(new NominaReceptorDAO().getDTO(model.getReceptor()));
 			dto.setConceptos(new NominaConceptoDAO().getDTOList(model.getConceptos()));
 			dto.setPercepciones(new NominaPercepcionDAO().getDTOList(model.getPercepciones()));
+			dto.setOtrosPagos(new NominaOtroPagoDAO().getDTOList(model.getOtrosPagos()));
 			dto.setDeducciones(new NominaDeduccionDAO().getDTOList(model.getDeducciones()));
 			
 		} catch(Exception ex) {

@@ -8,7 +8,7 @@ import mx.com.ferbo.commons.dao.DAO;
 import mx.com.ferbo.dto.sat.TipoOtroPagoDTO;
 import mx.com.ferbo.model.sat.CatTipoOtroPago;
 
-public class CatTipoOtroPagoDAO extends DAO<TipoOtroPagoDTO,CatTipoOtroPago,String> {
+public class TipoOtroPagoDAO extends DAO<TipoOtroPagoDTO,CatTipoOtroPago,String> {
 
     @Override
     public TipoOtroPagoDTO getDTO(CatTipoOtroPago model) {

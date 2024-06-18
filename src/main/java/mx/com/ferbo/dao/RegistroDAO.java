@@ -36,7 +36,7 @@ public class RegistroDAO extends IBaseDAO<DetRegistroDTO, Integer> implements Se
     	try {
     		dto = new DetRegistroDTO();
     		dto.setIdRegistro(model.getIdRegistro());
-    		dto.setDetEmpleadoDTO(EmpleadoDAO.getDTO(model.getIdEmpleado()));
+    		dto.setDetEmpleadoDTO(new EmpleadoDAO().getDTO(model.getIdEmpleado()));
     		dto.setFechaEntrada(model.getFechaEntrada());
     		dto.setFechaSalida(model.getFechaSalida());
     		dto.setCatEstatusRegistroDTO(EstatusRegistroDAO.getDTO(model.getIdEstatus()));
@@ -51,7 +51,7 @@ public class RegistroDAO extends IBaseDAO<DetRegistroDTO, Integer> implements Se
     	try {
     		model = new DetRegistro();
     		model.setIdRegistro(dto.getIdRegistro());
-    		model.setIdEmpleado(EmpleadoDAO.getModel(dto.getDetEmpleadoDTO()));
+    		model.setIdEmpleado(new EmpleadoDAO().getModel(dto.getDetEmpleadoDTO()));
     		model.setFechaEntrada(dto.getFechaEntrada());
     		model.setFechaSalida(dto.getFechaSalida());
     		model.setIdEstatus(EstatusRegistroDAO.getModel(dto.getCatEstatusRegistroDTO()));
