@@ -73,9 +73,9 @@
 			<p:dialog header="Seleccionar Empresa" showEffect="fade" modal="true" widgetVar="empresaDialog" responsive="true" draggable="false">
 				<p:outputPanel id="panelDialogEmpresa" class="ui-fluid">
 					<div class="card">
-						<p:selectOneMenu id="soEmpresa" value="#{nominaBean.empresaSelected.idEmpresa}" autoWidth="false" >
+						<p:selectOneMenu id="soEmpresa" value="#{nominaBean.empresaSelected}" autoWidth="false" converter="entityConverter">
 							<f:selectItem itemLabel="--Seleccione--"/>
-							<f:selectItems value="#{nominaBean.lstEmpresas}" var="empresa" itemValue="#{empresa.idEmpresa}" itemLabel="#{empresa.descripcion}"/>
+							<f:selectItems value="#{nominaBean.lstEmpresas}" var="empresa" itemValue="#{empresa}" itemLabel="#{empresa.descripcion}"/>
 						</p:selectOneMenu>
 					</div>
 					<div class="card">

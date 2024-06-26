@@ -198,7 +198,7 @@ public class RegistroDAO extends IBaseDAO<DetRegistroDTO, Integer> implements Se
 			registros = new ArrayList<DetRegistroDTO>();
 			for(DetRegistro model : list) {
 				log.debug("IdEmpleado: {}", model.getIdEmpleado().getIdEmpleado());
-				log.debug("Id Planta: {}", model.getIdEmpleado().getIdPlanta().getIdPlanta());
+				log.debug("Id Planta: {}", model.getIdEmpleado().getDatoEmpresa().getPlanta().getIdPlanta());
 				DetRegistroDTO dto = getDTO(model);
 				registros.add(dto);
 			}

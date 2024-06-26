@@ -16,16 +16,16 @@
 	            </div>
 	            <div class="menu">
 	                <po:menu widgetVar="OmegaMenuWidget">
-	                    <p:menuitem id="registroEmp" value="Registro de Empleados" icon="pi pi-fw pi-list" outcome="/protected/registroEmpleado" rendered="#{SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 1 or SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 2}"/>
+	                    <p:menuitem id="registroEmp" value="Registro de Empleados" icon="pi pi-fw pi-list" outcome="/protected/registroEmpleado" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1 or SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 2}"/>
 	                    <p:menuitem id="asistencia" value="Asistencia" icon="pi pi-fw pi-calendar" outcome="/protected/asistencia"/>
-	                    <p:menuitem id="incidencia" value="Incidencias" icon="pi pi-fw pi-check-circle" outcome="/protected/incidencias" rendered="#{SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 1 or SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 2 or SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 3}"/>
-	                    <p:menuitem id="uniformes" value="Uniforme" icon="pi pi-fw pi-compass" outcome="/protected/uniformes" rendered="#{(SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 1 or SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 4) and SideBarBean.showUniformes}"/>
-	                    <p:menuitem id="articulos" value="Articulos" icon="pi pi-pencil" outcome="/protected/articulosTrabajo" rendered="#{(SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 1 or SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 2 or SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 4) and SideBarBean.showArticulos}"/>
-	                    <p:menuitem id="percepciones" value="Valores para Percepciones" icon="pi pi-book" outcome="/protected/percepciones" rendered="#{SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 1}"/>
-	                    <p:menuitem id="cuotasImss" value="Cuotas del IMSS" icon="pi pi-book" outcome="/protected/cuotasImss" rendered="#{sideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 1}"/>
-	                    <p:menuitem id="nomina" value="Nómina" icon="pi pi-money-bill" outcome="/protected/nomina/nomina-s" rendered="#{SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 1 }"/>
-	                    <p:menuitem id="reportes" value="Reportes" icon="pi pi-chart-bar" outcome="/protected/reportes" rendered="#{SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 1 }"/>
-	                    <p:menuitem id="ajustes" value="Ajustes" icon="pi pi-cog" outcome="/protected/settings/ajustes" rendered="#{SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 1}"></p:menuitem> 
+	                    <p:menuitem id="incidencia" value="Incidencias" icon="pi pi-fw pi-check-circle" outcome="/protected/incidencias" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1 or SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 2 or SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 3}"/>
+	                    <p:menuitem id="uniformes" value="Uniforme" icon="pi pi-fw pi-compass" outcome="/protected/uniformes" rendered="#{(SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1 or SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 4) and SideBarBean.showUniformes}"/>
+	                    <p:menuitem id="articulos" value="Articulos" icon="pi pi-pencil" outcome="/protected/articulosTrabajo" rendered="#{(SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1 or SideBarBean.empleadoSelected.catPerfilDTO.idPerfil eq 2 or SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 4) and SideBarBean.showArticulos}"/>
+	                    <p:menuitem id="percepciones" value="Valores para Percepciones" icon="pi pi-book" outcome="/protected/percepciones" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1}"/>
+	                    <p:menuitem id="cuotasImss" value="Cuotas del IMSS" icon="pi pi-book" outcome="/protected/cuotasImss" rendered="#{sideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1}"/>
+	                    <p:menuitem id="nomina" value="Nómina" icon="pi pi-money-bill" outcome="/protected/nomina/nomina-s" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1 }"/>
+	                    <p:menuitem id="reportes" value="Reportes" icon="pi pi-chart-bar" outcome="/protected/reportes" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1 }"/>
+	                    <p:menuitem id="ajustes" value="Ajustes" icon="pi pi-cog" outcome="/protected/settings/ajustes" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1}"></p:menuitem> 
 	                    <p:menuitem value="Salir" icon="pi pi-fw pi-sign-out" action="#{SideBarBean.killSesion()}"  process="@this" url="/sgp/login.jsp"/>
 	                </po:menu>
 	            </div>

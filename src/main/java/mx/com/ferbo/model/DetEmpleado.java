@@ -9,13 +9,11 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -26,10 +24,6 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-/**
- *
- * @author Gabo
- */
 @Entity
 @Table(name = "det_empleado")
 @NamedQueries({
@@ -40,11 +34,12 @@ import javax.validation.constraints.Size;
                         + "p.idPerfil, p.descripcion, pl.idPlanta, pl.descripcion, pu.idPuesto, pu.descripcion"
                         + ")"
                         + " FROM DetEmpleado e"
-                        + " LEFT JOIN e.idArea a"
-                        + " LEFT JOIN e.idEmpresa em"
-                        + " LEFT JOIN e.idPerfil p"
-                        + " LEFT JOIN e.idPlanta pl"
-                        + " LEFT JOIN e.idPuesto pu"
+                        + " LEFT JOIN e.datoEmpresa de"
+                        + " LEFT JOIN de.area a"
+                        + " LEFT JOIN de.empresa em"
+                        + " LEFT JOIN de.perfil p"
+                        + " LEFT JOIN de.planta pl"
+                        + " LEFT JOIN de.puesto pu"
                         + " WHERE e.activo = 1 ORDER BY e.activo, e.nombre, e.primerAp, e.segundoAp"),
     @NamedQuery(name = "DetEmpleado.findByID",
                 query = "SELECT NEW mx.com.ferbo.dto.DetEmpleadoDTO("
@@ -53,11 +48,12 @@ import javax.validation.constraints.Size;
                         + " em.idEmpresa, em.descripcion, p.idPerfil, p.descripcion, pl.idPlanta, pl.descripcion, pu.idPuesto, pu.descripcion"
                         + ")"
                         + " FROM DetEmpleado e"
-                        + " LEFT JOIN e.idArea a"
-                        + " LEFT JOIN e.idEmpresa em"
-                        + " LEFT JOIN e.idPerfil p"
-                        + " LEFT JOIN e.idPlanta pl"
-                        + " LEFT JOIN e.idPuesto pu"
+                        + " LEFT JOIN e.datoEmpresa de"
+                        + " LEFT JOIN de.area a"
+                        + " LEFT JOIN de.empresa em"
+                        + " LEFT JOIN de.perfil p"
+                        + " LEFT JOIN de.planta pl"
+                        + " LEFT JOIN de.puesto pu"
                         + " WHERE e.idEmpleado = :idEmp"),
     @NamedQuery(name = "DetEmpleado.findByNumEmpl", query = "SELECT NEW mx.com.ferbo.dto.DetEmpleadoDTO("
                         + " e.idEmpleado, e.numEmpleado, e.nombre, e.primerAp, e.segundoAp, e.fechaNacimiento,"
@@ -65,11 +61,12 @@ import javax.validation.constraints.Size;
                         + " em.idEmpresa, em.descripcion, p.idPerfil, p.descripcion, pl.idPlanta, pl.descripcion, pu.idPuesto, pu.descripcion"
                         + ")"
                         + " FROM DetEmpleado e"
-                        + " LEFT JOIN e.idArea a"
-                        + " LEFT JOIN e.idEmpresa em"
-                        + " LEFT JOIN e.idPerfil p"
-                        + " LEFT JOIN e.idPlanta pl"
-                        + " LEFT JOIN e.idPuesto pu"
+                        + " LEFT JOIN e.datoEmpresa de"
+                        + " LEFT JOIN de.area a"
+                        + " LEFT JOIN de.empresa em"
+                        + " LEFT JOIN de.perfil p"
+                        + " LEFT JOIN de.planta pl"
+                        + " LEFT JOIN de.puesto pu"
     		+ " WHERE e.activo = 1 AND e.numEmpleado = :numEmpl"),
     @NamedQuery(name = "DetEmpleado.findByNumero", query = "SELECT e FROM DetEmpleado e WHERE e.numEmpleado = :numero"),
     @NamedQuery(name = "DetEmpleado.findByNumEmplSD", query = "SELECT NEW mx.com.ferbo.dto.DetEmpleadoDTO("
@@ -78,11 +75,12 @@ import javax.validation.constraints.Size;
                         + " em.idEmpresa, em.descripcion, p.idPerfil, p.descripcion, pl.idPlanta, pl.descripcion, pu.idPuesto, pu.descripcion, e.sueldoDiario"
                         + ")"
                         + " FROM DetEmpleado e"
-                        + " LEFT JOIN e.idArea a"
-                        + " LEFT JOIN e.idEmpresa em"
-                        + " LEFT JOIN e.idPerfil p"
-                        + " LEFT JOIN e.idPlanta pl"
-                        + " LEFT JOIN e.idPuesto pu"
+                        + " LEFT JOIN e.datoEmpresa de"
+                        + " LEFT JOIN de.area a"
+                        + " LEFT JOIN de.empresa em"
+                        + " LEFT JOIN de.perfil p"
+                        + " LEFT JOIN de.planta pl"
+                        + " LEFT JOIN de.puesto pu"
     		+ " WHERE e.activo = 1 AND e.idEmpleado = :idEmp"),
     
     @NamedQuery(name = "DetEmpleado.findByActiveSDI",
@@ -93,11 +91,12 @@ import javax.validation.constraints.Size;
                         + "p.idPerfil, p.descripcion, pl.idPlanta, pl.descripcion, pu.idPuesto, pu.descripcion, e.sueldoDiario"
                         + ")"
                         + " FROM DetEmpleado e"
-                        + " LEFT JOIN e.idArea a"
-                        + " LEFT JOIN e.idEmpresa em"
-                        + " LEFT JOIN e.idPerfil p"
-                        + " LEFT JOIN e.idPlanta pl"
-                        + " LEFT JOIN e.idPuesto pu"
+                        + " LEFT JOIN e.datoEmpresa de"
+                        + " LEFT JOIN de.area a"
+                        + " LEFT JOIN de.empresa em"
+                        + " LEFT JOIN de.perfil p"
+                        + " LEFT JOIN de.planta pl"
+                        + " LEFT JOIN de.puesto pu"
                         + " WHERE e.activo = 1 ORDER BY e.primerAp, e.segundoAp, e.nombre"),
     @NamedQuery(name = "DetEmpleado.findByActiveAndIdEmpresa",
     			query = "SELECT NEW mx.com.ferbo.dto.DetEmpleadoDTO("
@@ -107,12 +106,13 @@ import javax.validation.constraints.Size;
                         + "p.idPerfil, p.descripcion, pl.idPlanta, pl.descripcion, pu.idPuesto, pu.descripcion, e.sueldoDiario"
                         + ")"
                         + " FROM DetEmpleado e"
-                        + " LEFT JOIN e.idArea a"
-                        + " LEFT JOIN e.idEmpresa em"
-                        + " LEFT JOIN e.idPerfil p"
-                        + " LEFT JOIN e.idPlanta pl"
-                        + " LEFT JOIN e.idPuesto pu"
-                        + " WHERE e.activo = 1 AND e.idEmpresa.idEmpresa = :idEmpresa ORDER BY e.primerAp, e.segundoAp, e.nombre"),
+                        + " LEFT JOIN e.datoEmpresa de"
+                        + " LEFT JOIN de.area a"
+                        + " LEFT JOIN de.empresa em"
+                        + " LEFT JOIN de.perfil p"
+                        + " LEFT JOIN de.planta pl"
+                        + " LEFT JOIN de.puesto pu"
+                        + " WHERE e.activo = 1 AND de.empresa.idEmpresa = :idEmpresa ORDER BY e.primerAp, e.segundoAp, e.nombre"),
     @NamedQuery(name = "DetEmpleado.getNumEmpleado", query = "SELECT COALESCE(MAX(e.idEmpleado),0) FROM DetEmpleado e"),
     @NamedQuery(name = "DetEmpleado.getAll", query = "SELECT e FROM DetEmpleado e"),
     @NamedQuery(name = "DetEmpleado.getActive", query = "SELECT e FROM DetEmpleado e WHERE e.activo = :activo")
@@ -168,7 +168,7 @@ public class DetEmpleado implements Serializable {
     @Column(name = "curp")
     private String curp;
     
-    @Basic(optional = false)
+    @Basic(optional = true)
     @NotNull
     @Size(min = 1, max = 45)
     @Column(name = "rfc")
@@ -177,8 +177,8 @@ public class DetEmpleado implements Serializable {
     @Size(max = 45)
     @Column(name = "correo")
     private String correo;
-    @Basic(optional = false)
-    @NotNull
+    
+    @Basic(optional = true)
     @Column(name = "fecha_ingreso")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaIngreso;
@@ -220,26 +220,6 @@ public class DetEmpleado implements Serializable {
     
     @OneToMany(mappedBy = "idEmpleadoRev")
     private List<DetSolicitudPrenda> detSolicitudPrendaList;
-    
-    @JoinColumn(name = "id_area", referencedColumnName = "id_area")
-    @ManyToOne(fetch = FetchType.LAZY)
-    private CatArea idArea;
-    
-    @JoinColumn(name = "id_empresa", referencedColumnName = "id_empresa")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    private CatEmpresa idEmpresa;
-    
-    @JoinColumn(name = "id_perfil", referencedColumnName = "id_perfil")
-    @ManyToOne(optional = false)
-    private CatPerfil idPerfil;
-    
-    @JoinColumn(name = "id_planta", referencedColumnName = "id_planta")
-    @ManyToOne(fetch = FetchType.LAZY)
-    private CatPlanta idPlanta;
-    
-    @JoinColumn(name = "id_puesto", referencedColumnName = "id_puesto")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    private CatPuesto idPuesto;
     
     @OneToOne(cascade = {CascadeType.ALL})
     @JoinColumn(name = "id_empleado_empresa")
@@ -452,46 +432,6 @@ public class DetEmpleado implements Serializable {
         this.detSolicitudPrendaList = detSolicitudPrendaList;
     }
 
-    public CatArea getIdArea() {
-        return idArea;
-    }
-
-    public void setIdArea(CatArea idArea) {
-        this.idArea = idArea;
-    }
-
-    public CatEmpresa getIdEmpresa() {
-        return idEmpresa;
-    }
-
-    public void setIdEmpresa(CatEmpresa idEmpresa) {
-        this.idEmpresa = idEmpresa;
-    }
-
-    public CatPerfil getIdPerfil() {
-        return idPerfil;
-    }
-
-    public void setIdPerfil(CatPerfil idPerfil) {
-        this.idPerfil = idPerfil;
-    }
-
-    public CatPlanta getIdPlanta() {
-        return idPlanta;
-    }
-
-    public void setIdPlanta(CatPlanta idPlanta) {
-        this.idPlanta = idPlanta;
-    }
-
-    public CatPuesto getIdPuesto() {
-        return idPuesto;
-    }
-
-    public void setIdPuesto(CatPuesto idPuesto) {
-        this.idPuesto = idPuesto;
-    }
-    
     public String getFotografia() {
         return fotografia;
     }
