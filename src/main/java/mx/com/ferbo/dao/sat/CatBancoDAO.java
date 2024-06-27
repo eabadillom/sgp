@@ -104,6 +104,12 @@ public class CatBancoDAO extends DAO<BancoDTO,CatBanco,String> {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'buscarPorCriterios'");
     }
+
+	@Override
+	public BancoDTO buscarPorId(String id, boolean isFullInfo) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'buscarPorId'");
+	}
     
 
 

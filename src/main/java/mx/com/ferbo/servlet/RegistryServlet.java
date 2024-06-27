@@ -94,7 +94,7 @@ public class RegistryServlet extends HttpServlet {
 			}
 
 			empleadoDAO = new EmpleadoDAO();
-			detEmpleadoDTO = empleadoDAO.buscarPorNumeroEmpleado(numeroEmpleado, false);
+			detEmpleadoDTO = empleadoDAO.buscarPorNumeroEmpleado(numeroEmpleado, true);
 			empleadoConFoto = empleadoDAO.buscarConFoto(detEmpleadoDTO.getIdEmpleado());
 			
 			if(detEmpleadoDTO == null || detEmpleadoDTO.getIdEmpleado() == null)

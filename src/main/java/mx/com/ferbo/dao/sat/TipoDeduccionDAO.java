@@ -8,7 +8,7 @@ import mx.com.ferbo.commons.dao.DAO;
 import mx.com.ferbo.dto.sat.TipoDeduccionDTO;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 
-public class CatTipoDeduccionDAO extends DAO<TipoDeduccionDTO,CatTipoDeduccion,String>{
+public class TipoDeduccionDAO extends DAO<TipoDeduccionDTO,CatTipoDeduccion,String>{
 
     @Override
     public TipoDeduccionDTO getDTO(CatTipoDeduccion model) {
@@ -105,5 +105,11 @@ public class CatTipoDeduccionDAO extends DAO<TipoDeduccionDTO,CatTipoDeduccion,S
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'buscarPorCriterios'");
     }
+
+	@Override
+	public TipoDeduccionDTO buscarPorId(String id, boolean isFullInfo) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'buscarPorId'");
+	}
     
 }

@@ -101,5 +101,11 @@ public class CatTipoPercepcionDAO extends DAO<TipoPercepcionDTO,CatTipoPercepcio
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'buscarPorCriterios'");
     }
+
+	@Override
+	public TipoPercepcionDTO buscarPorId(String id, boolean isFullInfo) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'buscarPorId'");
+	}
     
 }

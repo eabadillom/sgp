@@ -5,177 +5,270 @@
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/plantillas/template.xhtml">
 
-    <ui:define name="title">Nómina</ui:define>
-
-    <ui:define name="content">
-        <h:form id="formNomina">
-            <div class="grid table-demo">
-                <div class="col-12">
-                    <div class="card p-4">
-                        <p:messages id="messages" globalOnly="true" closable="true"/>
-                        <p:growl id="mssgs" showDetail="true" life="5000"/>
-                        <p:remoteCommand name="rcUpdate" update="dtNomina"/>
-                        <p:toolbar>
-                            <p:toolbarGroup>
-                                <p:commandButton value="Exportar" icon="pi pi-upload" styleClass="ui-button-help" ajax="false">
-                                    <p:dataExporter type="csv" target="dtNomina" fileName="raya" preProcessor="#{nominaBean.exportNomina}"/>
-                                </p:commandButton>
-                            </p:toolbarGroup>
-                            <p:toolbarGroup>
-                            	<p:datePicker id="dp-periodo-inicio" value="#{nominaBean.periodoInicio}" placeholder="Periodo Inicio" showIcon="true" >
-                            		<p:ajax process="@this" listener="#{nominaBean.calculaFechaFin}" update="dp-periodo-fin semana" />
-                            		<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
-                            	</p:datePicker>
-                            	<p:datePicker id="dp-periodo-fin" value="#{nominaBean.periodoFin}" placeholder="Periodo Fin" showIcon="true">
-                            		<p:ajax process="@this" listener="#{nominaBean.calculaFechaInicio}" update="dp-periodo-inicio semana" />
-                            		<f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6:00"/>
-                            	</p:datePicker>
-                            	<p:inputText id="semana" value="Semana: #{nominaBean.semana}" readonly="true"></p:inputText>
-                            </p:toolbarGroup>
-                            <p:toolbarGroup>
-                                <p:commandButton styleClass="ui-button-success" style="margin-right: .5rem" process="@this" value="Cálcular por Empleados" 
-                                                 onstart="PF('empleadoDialog').show();" update="panelDialogEmpleados"/>
-                                <p:commandButton styleClass="ui-button-success" style="margin-right: .5rem" process="@this" value="Cálcular por Empresa" 
-                                                 onstart="PF('empresaDialog').show();" update="panelDialogEmpresa"/>
-
-                            </p:toolbarGroup>
-                        </p:toolbar>
-                        <div>
-                            <p:dataTable id="dtNomina" widgetVar="dt-Nomina" var="nomina" value="#{nominaBean.listaNomina}" reflow="true" styleClass="products-table"
-                                         rowKey="#{nomina.idEmpleado.idEmpleado}" rowSelectMode="add" paginatorPosition="bottom" scrollable="true" 
-                                         frozenColumns="2" editable="true" editMode="cell" editInitEvent="dblclick">
-                                <p:ajax event="cellEdit" listener="#{nominaBean.onCellEdit}" update=":formNomina:mssgs"/>
-                                <f:facet name="header">
-                                    <div class="customers-table-header">
-                                        <span style="font-weight: bold">Raya</span>
-
-                                        <span class="ui-input-icon-left filter-container">
-                                            <i class="pi pi-search"/>
-                                            <p:inputText id="globalFilter" onkeyup="PF('dt-Nomina').filter()" placeholder="Buscar"/>
-                                        </span>
-                                    </div>
-                                </f:facet>
-                                <p:column headerText="Num" width="3rem">
-                                    <h:outputText value="#{nomina.idEmpleado.numEmpleado}" />
-                                </p:column>
-                                <p:column headerText="Empleado" width="10rem" >
-                                    <h:outputText value="#{nomina.idEmpleado.primerAp} #{nomina.idEmpleado.segundoAp} #{nomina.idEmpleado.nombre} " />
-                                </p:column>
-                                <p:column headerText="SD" width="4rem">
-                                    <p:cellEditor>
-                                        <f:facet name="output">
-                                            <h:outputText value="#{nomina.salarioDiario}" />
-                                        </f:facet>
-                                        <f:facet name="input">
-                                            <p:inputText value="#{nomina.salarioDiario}" style="width:100%"/>
-                                        </f:facet>
-                                    </p:cellEditor>
-                                </p:column>
-                                <p:column headerText="SDI" width="4rem">
-                                    <p:cellEditor>
-                                        <f:facet name="output">
-                                            <h:outputText value="#{nomina.salarioDiarioIntegrado}" />
-                                        </f:facet>
-                                        <f:facet name="input">
-                                            <p:inputText value="#{nomina.salarioDiarioIntegrado}" style="width:100%"/>
-                                        </f:facet>
-                                    </p:cellEditor>
-                                </p:column>
-                                <p:column headerText="Días trabajados" width="4rem">
-                                    <p:cellEditor>
-                                        <f:facet name="output">
-                                            <h:outputText value="#{nomina.asistencia}" />
-                                        </f:facet>
-                                        <f:facet name="input">
-                                            <p:inputText value="#{nomina.asistencia}" style="width:100%"/>
-                                        </f:facet>
-                                    </p:cellEditor>
-                                </p:column>
-                                <p:column headerText="Total percepciones" width="10rem">
-                                    <p:cellEditor>
-                                        <f:facet name="output">
-                                            <h:outputText value="#{nomina.totalPercepciones}" />
-                                        </f:facet>
-                                        <f:facet name="input">
-                                            <p:inputText value="#{nomina.totalPercepciones}" />
-                                        </f:facet>
-                                    </p:cellEditor>
-                                </p:column>
-                                <p:column headerText="Total deducciones" width="10rem">
-                                    <p:cellEditor>
-                                        <f:facet name="output">
-                                            <h:outputText value="#{nomina.totalDeducciones}" />
-                                        </f:facet>
-                                        <f:facet name="input">
-                                            <p:inputText value="#{nomina.totalDeducciones}" />
-                                        </f:facet>
-                                    </p:cellEditor>
-                                </p:column>
-                                <p:column headerText="Neto" width="10rem">
-                                    <p:cellEditor>
-                                        <f:facet name="output">
-                                            <h:outputText value="#{nomina.neto}" />
-
-                                        </f:facet>
-                                        <f:facet name="input">
-                                            <p:inputText value="#{nomina.neto}" />
-                                        </f:facet>
-                                    </p:cellEditor>
-                                </p:column>
-                                <f:facet name="footer" >
-                                    <p:commandButton value="Guardar" icon="pi pi-pencil" actionListener="#{nominaBean.guardarNominaEmpleado()}" disabled="#{nominaBean.listaNomina.size() eq 0}"
-                                                     oncomplete="rcUpdate()"/>
-                                </f:facet>
-                            </p:dataTable>
-                        </div>
-                        <p:dialog header="Seleccionar Empresa" showEffect="fade" modal="true" widgetVar="empresaDialog" responsive="true" draggable="false">
-                            <p:outputPanel id="panelDialogEmpresa" class="ui-fluid">
-                                <div class="card">
-                                    <p:selectOneMenu id="soEmpresa" value="#{nominaBean.empresaSelected.idEmpresa}" autoWidth="false" >
-                                        <f:selectItem itemLabel="--Seleccione--"/>
-                                        <f:selectItems value="#{nominaBean.lstEmpresas}" var="empresa" itemValue="#{empresa.idEmpresa}" itemLabel="#{empresa.descripcion}"/>
-                                    </p:selectOneMenu>
-                                </div>
-                                <div class="card">
-                                    <p:commandButton value="Cálcular" icon="pi pi-pencil" actionListener="#{nominaBean.calculandoNomina()}" />
-                                </div>
-                            </p:outputPanel>
-                        </p:dialog>
-                        <p:dialog header="Seleccionar Empleado" showEffect="fade" modal="true" widgetVar="empleadoDialog" responsive="true" draggable="false">
-                            <p:outputPanel id="panelDialogEmpleados" class="ui-fluid">
-                                <div class="card">
-                                    <p:selectOneMenu id="soEmpleados" value="#{nominaBean.empleadoSelected.idEmpleado}" autoWidth="false" >
-                                        <f:selectItem itemLabel="--Seleccione--"/>
-                                        <f:selectItems value="#{nominaBean.lstEmpleados}" var="empleado" itemValue="#{empleado.idEmpleado}" itemLabel="#{empleado.primerAp} #{empleado.segundoAp} #{empleado.nombre}"/>
-                                    </p:selectOneMenu>
-                                </div>
-                                <div class="card">
-                                    <p:commandButton value="Cálcular" icon="pi pi-pencil" actionListener="#{nominaBean.searchIdEmpleado()}" />
-                                </div>
-                            </p:outputPanel>
-                        </p:dialog>
-                    </div>
-                </div>
-            </div>
+	<ui:define name="title">Nómina</ui:define>
+	<ui:define name="content">
+		<h:form id="formNomina">
+			<p:growl id="messages" showDetail="true" life="5000"/>
+			<p:toolbar>
+				<p:toolbarGroup>
+					<p:datePicker id="dp-periodo-inicio" value="#{nominaBean.periodoInicio}" placeholder="Periodo Inicio" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
+						<p:ajax process="@this" listener="#{nominaBean.calculaFechaFin}" update="dp-periodo-fin semana" />
+					</p:datePicker>
+					<p:datePicker id="dp-periodo-fin" value="#{nominaBean.periodoFin}" placeholder="Periodo Fin" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
+						<p:ajax process="@this" listener="#{nominaBean.calculaFechaInicio}" update="dp-periodo-inicio semana" />
+					</p:datePicker>
+					<p:inputText id="semana" value="Semana: #{nominaBean.semana}" readonly="true"></p:inputText>
+				</p:toolbarGroup>
+			    <p:toolbarGroup>
+					<p:commandButton styleClass="ui-button-success" style="margin-right: .5rem" process="@this" value="Cálcular por Empresa" onstart="PF('empresaDialog').show();" update="panelDialogEmpresa"/>
+				</p:toolbarGroup>
+			</p:toolbar>
+			<div style="padding-top: 1rem;">
+				<p:dataTable id="dtNomina" widgetVar="dt-Nomina" var="nomina" value="#{nominaBean.listaNomina}" reflow="true" styleClass="products-table" rowKey="#{nomina.idEmpleado.idEmpleado}" rowSelectMode="add" paginatorPosition="bottom" scrollable="true" frozenColumns="2" editable="true" editMode="cell" editInitEvent="dblclick">
+					<p:ajax event="cellEdit" listener="#{nominaBean.onCellEdit}" update=":formNomina:messages"/>
+					<f:facet name="header">
+						<div class="customers-table-header">
+							<span style="font-weight: bold">Raya</span>
+							<span class="ui-input-icon-left filter-container">
+								<i class="pi pi-search"/>
+								<p:inputText id="globalFilter" onkeyup="PF('dt-Nomina').filter()" placeholder="Buscar"/>
+							</span>
+				        </div>
+				    </f:facet>
+					<p:column headerText="Num" width="3rem">
+						<h:outputText value="#{nomina.receptor.numeroEmpleado}" />
+					</p:column>
+					<p:column headerText="Empleado" width="10rem" >
+						<h:outputText value="#{nomina.receptor.nombre}" />
+					</p:column>
+					<p:column headerText="Percepciones" width="4rem" style="text-align: right;">
+						<h:outputText value="#{nomina.subtotal}">
+							<f:convertNumber pattern="$#,000.00" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Deducciones" width="4rem" style="text-align: right;">
+						<p:outputLabel value="#{nomina.descuento}">
+							<f:convertNumber pattern="$#,000.00" />
+						</p:outputLabel>
+					</p:column>
+					<p:column headerText="Neto" width="4rem" style="text-align: right;">
+						<p:outputLabel value="#{nomina.total}">
+							<f:convertNumber pattern="$#,000.00" />
+						</p:outputLabel>
+					</p:column>
+					<p:column width="2rem" style="text-align: right;">
+						<p:commandButton icon="pi pi-bars" oncomplete="PF('dgEmpleado').show();" actionListener="#{nominaBean.cargaEmpleadoNomina}" process="@this" update="formNomina:dg-empleado">
+							<f:setPropertyActionListener value="#{nomina}" target="#{nominaBean.nomina}" />
+						</p:commandButton>
+					</p:column>
+					<f:facet name="footer" >
+						<p:commandButton value="Guardar" icon="pi pi-pencil" actionListener="#{nominaBean.guardarNominaEmpleado()}" disabled="#{nominaBean.listaNomina.size() eq 0}"/>
+						<p:commandButton value="Exportar" icon="pi pi-upload" styleClass="ui-button-help" ajax="false">
+							<p:dataExporter type="csv" target="dtNomina" fileName="raya" preProcessor="#{nominaBean.exportNomina}"/>
+						</p:commandButton>
+					</f:facet>
+				</p:dataTable>
+			</div>
+		
+			<p:dialog header="Seleccionar Empresa" showEffect="fade" modal="true" widgetVar="empresaDialog" responsive="true" draggable="false">
+				<p:outputPanel id="panelDialogEmpresa" class="ui-fluid">
+					<div class="card">
+						<p:selectOneMenu id="soEmpresa" value="#{nominaBean.empresaSelected}" autoWidth="false" converter="entityConverter">
+							<f:selectItem itemLabel="--Seleccione--"/>
+							<f:selectItems value="#{nominaBean.lstEmpresas}" var="empresa" itemValue="#{empresa}" itemLabel="#{empresa.descripcion}"/>
+						</p:selectOneMenu>
+					</div>
+					<div class="card">
+						<p:commandButton value="Cálcular" icon="pi pi-pencil" actionListener="#{nominaBean.calculandoNomina()}" />
+					</div>
+				</p:outputPanel>
+			</p:dialog>
+			
+			<p:dialog id="dg-empleado" widgetVar="dgEmpleado" header="#{nominaBean.nomina.receptor.nombre}" modal="true" responsive="true">
+				<p:tabView class="ui-fluid" dynamic="true" cache="true">
+					<p:tab title="General">
+						<div class="ui-fluid formgrid grid">
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Ejercicio"/>
+								<p:inputText value="#{nominaBean.nomina.ejercicio}" readonly="true" />
+							</div>
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Periodo"/>
+								<p:inputText value="Semana #{nominaBean.semana}" readonly="true"/>
+							</div>
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Dias de pago"/>
+								<p:inputText value="#{nominaBean.nomina.diasLaborados}" />
+							</div>
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Faltas"/>
+								<p:inputText value="#{nominaBean.nomina.diasNoLaborados}" />
+							</div>
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Subtotal"/>
+								<p:inputText value="#{nominaBean.nomina.subtotal}" readonly="true"/>
+							</div>
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Descuentos" />
+								<p:inputText value="#{nominaBean.nomina.descuento}" readonly="true"/>
+							</div>
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Total" />
+								<p:inputText value="#{nominaBean.nomina.total}" readonly="true"/>
+							</div>
+						</div>
+					</p:tab>
+					<p:tab title="Emisor">
+						<p:outputPanel>
+							<div class="ui-fluid formgrid grid">
+								<div class="field col-12 md:col-6">
+									<p:outputLabel value="Emisor"/>
+									<p:inputText value="#{nominaBean.nomina.emisor.nombre}" readonly="true"/>
+								</div>
+								<div class="field col-12 md:col-6">
+									<p:outputLabel value="Regimen Fiscal" />
+									<p:inputText value="#{nominaBean.nomina.emisor.regimenFiscal.clave} - #{nominaBean.nomina.emisor.regimenFiscal.nombre}" readonly="true"/>
+								</div>
+								<div class="field col-12 md:col-3">
+									<p:outputLabel value="RFC"/>
+									<p:inputText value="#{nominaBean.nomina.emisor.rfc}" readonly="true"/>
+								</div>
+								<div class="field col-12 md:col-3">
+									<p:outputLabel value="Registro Patronal" />
+									<p:inputText value="#{nominaBean.nomina.emisor.registroPatronal}" readonly="true"/>
+								</div>
+								<div class="field col-12 md:col-3">
+									<p:outputLabel value="Lugar de expedición"/>
+									<p:inputText value="#{nominaBean.nomina.emisor.codigoPostal}" readonly="true"/>
+								</div>
+							</div>
+						</p:outputPanel>
+					</p:tab>
+					<p:tab title="Receptor">
+						<p:outputPanel>
+							<div class="ui-fluid formgrid grid">
+								<div class="field col-12 md:col-6">
+									<p:outputLabel value="Receptor"/>
+									<p:inputText value="#{nominaBean.nomina.receptor.nombre}" readonly="true"/>
+								</div>
+								<div class="field col-12 md:col-3">
+									<p:outputLabel value="RFC" />
+									<p:inputText value="#{nominaBean.nomina.receptor.rfc}" readonly="true"/>
+								</div>
+								<div class="field col-12 md:col-3">
+									<p:outputLabel value="CURP" />
+									<p:inputText value="#{nominaBean.nomina.receptor.curp}" readonly="true"/>
+								</div>
+								<div class="field col-12 md:col-3">
+									<p:outputLabel value="Fecha inicio relación laboral" />
+									<p:inputText value="#{nominaBean.nomina.receptor.inicioRelacionLaboral}" readonly="true"/>
+								</div>
+								<div class="field col-12 md:col-3">
+									<p:outputLabel value="Jornada" />
+									<p:inputText value="#{nominaBean.nomina.receptor.tipoJornada.clave} - #{nominaBean.nomina.receptor.tipoJornada.nombre}" readonly="true"/>
+								</div>
+								<div class="field col-12 md:col-3">
+									<p:outputLabel value="NSS" />
+									<p:inputText value="#{nominaBean.nomina.receptor.nss}" readonly="true"/>
+								</div>
+								<div class="field col-12 md:col-3">
+									<p:outputLabel value="Tipo salario" />
+									<p:inputText value="Tipo Salario (FIJO)" readonly="true"/>
+								</div>
+								<div class="field col-12 md:col-3">
+									<p:outputLabel value="Domicilio fiscal" />
+									<p:inputText value="#{nominaBean.nomina.receptor.codigoPostal}" readonly="true"/>
+								</div>
+								<div class="field col-12 md:col-3">
+									<p:outputLabel value="Salario diario" />
+									<p:inputText value="#{nominaBean.nomina.receptor.salarioDiario}" readonly="true"/>
+								</div>
+								<div class="field col-12 md:col-3">
+									<p:outputLabel value="Salario diario integrado" />
+									<p:inputText value="#{nominaBean.nomina.receptor.salarioDiarioIntegrado}" readonly="true"/>
+								</div>
+							</div>
+						</p:outputPanel>
+					</p:tab>
+					<p:tab title="Percepciones">
+						<p:dataTable value="#{nominaBean.nomina.percepciones}" var="percepcion" paginator="true" rows="5" paginatorPosition="bottom" >
+							<p:column headerText="SAT" width="4rem">
+								<p:outputLabel value="#{percepcion.tipoPercepcion.clave}" />
+							</p:column>
+							<p:column headerText="Descripción">
+								<p:outputLabel value="#{percepcion.nombre}" />
+							</p:column>
+							<p:column headerText="Importe">
+								<p:outputLabel value="$#{percepcion.importeGravado eq null ? percepcion.importeExcento : percepcion.importeGravado}"/>
+							</p:column>
+							<f:facet name="footer">
+								<p:column colspan="2">
+									<p:outputLabel value="Total: "></p:outputLabel>
+								</p:column>
+								<p:column>
+									<p:outputLabel value="#{nominaBean.nomina.percepciones.stream().map(item-> (item.importeGravado == null ? item.importeExcento : item.importeGravado) ).sum()}">
+										<f:convertNumber pattern="$#,000.00" />
+									</p:outputLabel>
+								</p:column>
+							</f:facet>
+						</p:dataTable>
+					</p:tab>
+					<p:tab title="Otros pagos">
+						<p:dataTable value="#{nominaBean.nomina.otrosPagos}" var="otroPago">
+							<p:column headerText="SAT" width="4rem">
+								<p:outputLabel value="#{otroPago.tipoOtroPago.clave}" />
+							</p:column>
+							<p:column headerText="Descripción">
+								<p:outputLabel value="#{otroPago.nombre}" />
+							</p:column>
+							<p:column headerText="Importe">
+								<p:cellEditor>
+									<f:facet name="output">
+										<p:outputLabel value="#{otroPago.importe}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{otroPago.importe}" style="width: 100%;"/>
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+							<f:facet name="footer">
+								<p:column colspan="2">
+									<p:outputLabel value="Total: "></p:outputLabel>
+								</p:column>
+								<p:column>
+									<p:outputLabel value="#{nominaBean.nomina.otrosPagos.stream().map(item->item.importe).sum()}">
+										<f:convertNumber pattern="$#,000.00" />
+									</p:outputLabel>
+								</p:column>
+							</f:facet>
+						</p:dataTable>
+					</p:tab>
+					<p:tab title="Deducciones">
+						<p:dataTable value="#{nominaBean.nomina.deducciones}" var="deduccion">
+							<p:column headerText="SAT" width="4rem">
+								<p:outputLabel value="#{deduccion.tipoDeduccion.clave}" />
+							</p:column>
+							<p:column headerText="Descripción">
+								<p:outputLabel value="#{deduccion.nombre}" />
+							</p:column>
+							<p:column headerText="Importe">
+								<p:outputLabel value="$#{deduccion.importe}"/>
+							</p:column>
+							<f:facet name="footer">
+								<p:column colspan="2">
+									<p:outputLabel value="Total: "></p:outputLabel>
+								</p:column>
+								<p:column>
+									<p:outputLabel value="#{nominaBean.nomina.deducciones.stream().map(item->item.importe).sum()}">
+										<f:convertNumber pattern="$#,000.00" />
+									</p:outputLabel>
+								</p:column>
+							</f:facet>
+						</p:dataTable>
+					</p:tab>
+					
+				</p:tabView>
+			</p:dialog>
         </h:form>
     </ui:define>
-    <script type="text/javascript">
-        // Get the table element by its ID
-        var table = document.getElementById("form:dtNomina");
-
-        // Get the header row (first row) of the table
-        var headerRow = table.querySelector("thead tr");
-
-        // Get the first two cells in the header row (corresponding to the first two columns)
-        var firstColumnHeader = headerRow.cells[0];
-        var secondColumnHeader = headerRow.cells[1];
-
-        // Set the CSS property 'position' to 'sticky' for the first two column headers
-        firstColumnHeader.style.position = "sticky";
-        secondColumnHeader.style.position = "sticky";
-
-        // Set the CSS property 'left' to '0' for the first two column headers (to stick to the left side)
-        firstColumnHeader.style.left = "0";
-        secondColumnHeader.style.left = "0";
-    </script>
 </ui:composition>

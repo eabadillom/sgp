@@ -99,4 +99,10 @@ public class TipoContratoDAO extends DAO<TipoContratoDTO, CatTipoContrato, Strin
 		return null;
 	}
 
+	@Override
+	public TipoContratoDTO buscarPorId(String id, boolean isFullInfo) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

@@ -7,31 +7,25 @@ import java.util.List;
 
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.commons.dao.IBaseDAO;
+import mx.com.ferbo.commons.dao.DAO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.model.DetEmpleado;
-import mx.com.ferbo.model.DetEmpleadoFoto;
 import mx.com.ferbo.util.SGPException;
 
-
-
-/**
- *
- * @author Gabo
- */
 @Stateless
 @LocalBean
-public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Serializable {
+public class EmpleadoDAO extends DAO<DetEmpleadoDTO, DetEmpleado, Integer> implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
-    private final Logger log = LogManager.getLogger(EmpleadoDAO.class);
+    private static final Logger log = LogManager.getLogger(EmpleadoDAO.class);
     
-    public static synchronized DetEmpleadoDTO getDTO(DetEmpleado model) {
+    public synchronized DetEmpleadoDTO getDTO(DetEmpleado model) {
     	DetEmpleadoDTO dto = null;
     	try {
     		dto = new DetEmpleadoDTO();
@@ -43,17 +37,13 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     		dto.setFechaNacimiento(model.getFechaNacimiento());
     		dto.setFechaRegistro(model.getFechaRegistro());
     		dto.setFechaModificacion(model.getFechaModificacion());
-    		dto.setCatPerfilDTO(CatPerfilDAO.getDTO(model.getIdPerfil()));
-    		dto.setCatPuestoDTO(CatPuestoDAO.getDTO(model.getIdPuesto()));
     		dto.setCurp(model.getCurp());
     		dto.setRfc(model.getRfc());
     		dto.setCorreo(model.getCorreo());
     		dto.setFechaIngreso(model.getFechaIngreso());
     		dto.setNss(model.getNss());
-    		dto.setCatEmpresaDTO(CatEmpresaDAO.getDTO(model.getIdEmpresa()));
     		dto.setActivo(model.getActivo());
-    		dto.setCatPlantaDTO(CatPlantaDAO.getDTO(model.getIdPlanta()));
-    		dto.setCatAreaDTO(CatAreaDAO.getDTO(model.getIdArea()));
+    		dto.setCatAreaDTO(CatAreaDAO.getDTO(model.getDatoEmpresa().getArea()));
     		dto.setFotografia(model.getFotografia());
     		dto.setSueldoDiario(model.getSueldoDiario());
     		dto.setDatoEmpresa(new DatoEmpresaDAO().getDTO(model.getDatoEmpresa()));
@@ -84,24 +74,21 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     		dto.setActivo(model.getActivo());
     		dto.setFotografia(model.getFotografia());
     		dto.setSueldoDiario(model.getSueldoDiario());
-    		dto.setCatPerfilDTO(CatPerfilDAO.getDTO(model.getIdPerfil()));
     		
     		if(isFullInfo == false)
     			return dto;
     		
-    		dto.setCatAreaDTO(CatAreaDAO.getDTO(model.getIdArea()));
-    		dto.setCatPlantaDTO(CatPlantaDAO.getDTO(model.getIdPlanta()));
-    		dto.setCatEmpresaDTO(CatEmpresaDAO.getDTO(model.getIdEmpresa()));
-    		dto.setCatPuestoDTO(CatPuestoDAO.getDTO(model.getIdPuesto()));
+//    		dto.setCatAreaDTO(CatAreaDAO.getDTO(model.getDatoEmpresa().getArea()));
     		dto.setDatoEmpresa(new DatoEmpresaDAO().getDTO(model.getDatoEmpresa()));
     		
     	} catch(Exception ex) {
+    		log.warn("Problema para obtener la información del empleado...", ex);
     		dto = null;
     	}
     	return dto;
     }
     
-    public static synchronized DetEmpleado getModel(DetEmpleadoDTO dto) {
+    public synchronized DetEmpleado getModel(DetEmpleadoDTO dto) {
     	DetEmpleado model = null;
     	try {
     		model = new DetEmpleado();
@@ -113,17 +100,12 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     		model.setFechaNacimiento(dto.getFechaNacimiento());
     		model.setFechaRegistro(dto.getFechaRegistro());
     		model.setFechaModificacion(dto.getFechaModificacion());
-    		model.setIdPerfil(CatPerfilDAO.getModel(dto.getCatPerfilDTO()));
-    		model.setIdPuesto(CatPuestoDAO.getModel(dto.getCatPuestoDTO()));
     		model.setCurp(dto.getCurp());
     		model.setRfc(dto.getRfc());
     		model.setCorreo(dto.getCorreo());
     		model.setFechaIngreso(dto.getFechaIngreso());
     		model.setNss(dto.getNss());
-    		model.setIdEmpresa(CatEmpresaDAO.getModel(dto.getCatEmpresaDTO()));
     		model.setActivo(dto.getActivo());
-    		model.setIdPlanta(CatPlantaDAO.getModel(dto.getCatPlantaDTO()));
-    		model.setIdArea(CatAreaDAO.getModel(dto.getCatAreaDTO()));
     		model.setFotografia(dto.getFotografia());
     		model.setSueldoDiario(dto.getSueldoDiario());
     		model.setDatoEmpresa(new DatoEmpresaDAO().getModel(dto.getDatoEmpresa()));
@@ -158,11 +140,6 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     		if(isFullInfo == false)
     			return model;
     		
-    		model.setIdPerfil(CatPerfilDAO.getModel(dto.getCatPerfilDTO()));
-    		model.setIdPuesto(CatPuestoDAO.getModel(dto.getCatPuestoDTO()));
-    		model.setIdEmpresa(CatEmpresaDAO.getModel(dto.getCatEmpresaDTO()));
-    		model.setIdPlanta(CatPlantaDAO.getModel(dto.getCatPlantaDTO()));
-    		model.setIdArea(CatAreaDAO.getModel(dto.getCatAreaDTO()));
     		model.setDatoEmpresa(new DatoEmpresaDAO().getModel(dto.getDatoEmpresa()));
     		
     	} catch(Exception ex) {
@@ -175,28 +152,39 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     
     @Override
     public DetEmpleadoDTO buscarPorId(Integer id) {
-        List<DetEmpleadoDTO> empleado = emSGP.createNamedQuery("DetEmpleado.findByID", DetEmpleadoDTO.class).setParameter("idEmp", id).getResultList();
-        return empleado.isEmpty() ? new DetEmpleadoDTO() : empleado.get(0);
+    	EntityManager emSGP = null;
+    	List<DetEmpleadoDTO> empleados = null;
+    	DetEmpleadoDTO empleado = null;
+    	try {
+    		emSGP = getEntityManager();
+    		empleados = emSGP.createNamedQuery("DetEmpleado.findByID", DetEmpleadoDTO.class).setParameter("idEmp", id).getResultList();
+    	} catch(Exception ex) {
+    		
+    	} finally {
+    		close(emSGP);
+    		empleado = empleados.isEmpty() ? new DetEmpleadoDTO() : empleados.get(0);
+    	}
+        
+        return empleado;
     }
     
     public DetEmpleadoDTO buscarPorId(Integer id, boolean isFullInfo) {
     	DetEmpleadoDTO dto = null;
     	DetEmpleado model = null;
+    	EntityManager emSGP = null;
     	
     	try {
+    		emSGP = getEntityManager();
     		model = emSGP.find(DetEmpleado.class, id);
     		if(isFullInfo) {
     			log.info("id dato empresa: {}", model.getDatoEmpresa() == null ? null : model.getDatoEmpresa().getId());
-    			log.info("id area: {}", model.getIdArea() == null ? null : model.getIdArea().getIdArea());
-    			log.info("id empresa: {}", model.getIdEmpresa() == null ? null : model.getIdEmpresa().getIdEmpresa());
-    			log.info("id perfil: {}", model.getIdPerfil() == null ? null : model.getIdPerfil().getIdPerfil());
-    			log.info("id planta: {}", model.getIdPlanta() == null ? null : model.getIdPlanta().getIdPlanta());
-    			log.info("id puesto: {}", model.getIdPuesto() == null ? null : model.getIdPuesto().getIdPuesto());
     			log.info("id foto: {}", model.getEmpleadoFoto() == null ? null : model.getEmpleadoFoto().getId());
     		}
-    		dto = getDTO(model);
+    		dto = getDTO(model, isFullInfo);
     	} catch(Exception ex) {
     		log.error("Problema para obtener el empleado con id " + id, ex);
+    	} finally {
+    		close(emSGP);
     	}
     	
     	return dto;
@@ -206,8 +194,10 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     public List<DetEmpleadoDTO> buscarTodos() {
         List<DetEmpleadoDTO> dtoList = null;
         List<DetEmpleado> modelList = null;
+        EntityManager emSGP = null;
         
         try {
+        	emSGP = getEntityManager();
         	modelList = emSGP.createNamedQuery("DetEmpleado.getAll", DetEmpleado.class)
         			.getResultList();
         	
@@ -218,6 +208,8 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
         	}
         } catch(Exception ex) {
         	log.error("Problema para obtener el listado de empleados...", ex);
+        } finally {
+        	close(emSGP);
         }
         
         return dtoList;
@@ -226,29 +218,29 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     public List<DetEmpleadoDTO> buscarTodos(boolean isFullInfo) {
         List<DetEmpleadoDTO> dtoList = null;
         List<DetEmpleado> modelList = null;
+        EntityManager emSGP = null;
         
         try {
+        	emSGP = getEntityManager();
         	modelList = emSGP.createNamedQuery("DetEmpleado.getAll", DetEmpleado.class)
         			.getResultList();
         	
         	dtoList = new ArrayList<DetEmpleadoDTO>();
         	for(DetEmpleado model : modelList) {
-        		DetEmpleadoDTO dto = getDTO(model);
+        		DetEmpleadoDTO dto = getDTO(model, isFullInfo);
         		dtoList.add(dto);
         		
         		if(isFullInfo == false) {
         			continue;
         		}
         		
-        		log.info("id area: {}", model.getIdArea().getIdArea());
-        		log.info("id empresa: {}", model.getIdEmpresa().getIdEmpresa());
-        		log.info("id perfil: {}", model.getIdPerfil().getIdPerfil());
-        		log.info("id planta: {}", model.getIdPlanta().getIdPlanta());
-        		log.info("id puesto: {}", model.getIdPuesto());
+        		log.info("id area: {}", model.getDatoEmpresa().getArea().getIdArea());
         		log.info("id dato empresa: {}", model.getDatoEmpresa());
         	}
         } catch(Exception ex) {
         	log.error("Problema para obtener el listado de empleados...", ex);
+        } finally {
+        	close(emSGP);
         }
         
         return dtoList;
@@ -256,14 +248,24 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     
     @Override
     public List<DetEmpleadoDTO> buscarActivo() {
-        return emSGP.createNamedQuery("DetEmpleado.findByActive", DetEmpleadoDTO.class).getResultList();
+    	EntityManager emSGP = null;
+    	List<DetEmpleadoDTO> empleados = null;
+    	try {
+    		emSGP = getEntityManager();
+    		empleados = emSGP.createNamedQuery("DetEmpleado.findByActive", DetEmpleadoDTO.class).getResultList();
+    	} catch(Exception ex) {
+    		log.warn("Problema para obtener el listado de empleados...", ex);
+    	}
+        return empleados;
     }
     
     public List<DetEmpleadoDTO> buscarActivo(boolean isFullInfo) {
     	List<DetEmpleadoDTO> dtoList = null;
     	List<DetEmpleado> modelList = null;
+    	EntityManager emSGP = null;
     	
     	try {
+    		emSGP = this.getEntityManager();
     		modelList = emSGP.createNamedQuery("DetEmpleado.getAll", DetEmpleado.class)
     				.getResultList()
     				;
@@ -275,6 +277,8 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     		}
     	} catch(Exception ex) {
     		log.error("Problema para obtener el listado de empleados...", ex);
+    	} finally {
+    		close(emSGP);
     	}
     	
     	return dtoList;
@@ -288,7 +292,9 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     @Override
     public void actualizar(DetEmpleadoDTO e)throws SGPException {
         DetEmpleado model = null;
+        EntityManager emSGP = null;
         try {
+        	emSGP = this.getEntityManager();
         	model = getModel(e);
             emSGP.getTransaction().begin();
             emSGP.merge(model);
@@ -298,13 +304,17 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
             emSGP.getTransaction().rollback();
             log.warn("EX-0011: " + ex.getMessage() + ". Error al actualizar el empleado " + e.getNumEmpleado() != null ? e.getNumEmpleado() : null);
             log.error("Problema al actualizar el empleado...", ex);
+        } finally {
+        	close(emSGP);
         }
     }
     
     @Override
     public void eliminar(DetEmpleadoDTO e) throws SGPException {
         DetEmpleado empleado = new DetEmpleado();
+        EntityManager emSGP = null;
         try {
+        	emSGP = this.getEntityManager();
             emSGP.getTransaction().begin();
             empleado = emSGP.getReference(DetEmpleado.class, e.getIdEmpleado());
             empleado.setActivo((short) 0);
@@ -315,13 +325,17 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
         } catch (Exception ex) {
             emSGP.getTransaction().rollback();
             throw new SGPException("Error al eliminar al empleado");
+        } finally {
+        	close(emSGP);
         }
     }
     
     @Override
     public void guardar(DetEmpleadoDTO e) throws SGPException {
         DetEmpleado model = null;
+        EntityManager emSGP = null;
         try {
+        	emSGP = this.getEntityManager();
         	model = getModel(e);
         	
             emSGP.getTransaction().begin();
@@ -332,18 +346,34 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
             emSGP.getTransaction().rollback();
             ex.printStackTrace();
             log.warn("EX-0009: " + ex.getMessage() + ". Error al guardar empleado " + e.getNumEmpleado() != null ? e.getNumEmpleado() : null);
+        } finally {
+        	close(emSGP);
         }
     }
     
     public DetEmpleadoDTO buscarPorNumEmpl(String numEmpl) {
-    	List<DetEmpleadoDTO> empleado = emSGP.createNamedQuery("DetEmpleado.findByNumEmpl", DetEmpleadoDTO.class).setParameter("numEmpl", numEmpl).getResultList();
-    	return !empleado.isEmpty() ? empleado.get(0) : null;
+    	List<DetEmpleadoDTO> empleados = null;
+    	DetEmpleadoDTO empleado = null;
+    	EntityManager emSGP = null;
+    	try {
+    		emSGP = this.getEntityManager();
+    		empleados = emSGP.createNamedQuery("DetEmpleado.findByNumEmpl", DetEmpleadoDTO.class).setParameter("numEmpl", numEmpl).getResultList();
+    	} catch(Exception ex) {
+    		log.warn("Problema para obtener el empleado...", ex);
+    	} finally {
+    		close(emSGP);
+    		empleado = !empleados.isEmpty() ? empleados.get(0) : null;
+    	}
+    	
+    	return empleado;
     }
     
     public DetEmpleadoDTO buscarPorNumeroEmpleado(String numeroEmpleado, boolean isFullInfo) {
     	DetEmpleadoDTO dto = null;
     	DetEmpleado model = null;
+    	EntityManager emSGP = null;
     	try {
+    		emSGP = this.getEntityManager();
     		model = emSGP.createNamedQuery("DetEmpleado.findByNumero", DetEmpleado.class)
     				.setParameter("numero",numeroEmpleado)
     				.getSingleResult()
@@ -353,21 +383,37 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     	} catch(Exception ex) {
     		log.error("Problema para obtener el número de empleado " + numeroEmpleado, ex);
     		dto = null;
+    	} finally {
+    		close(emSGP);
     	}
     	
     	return dto;
     }
     
     public DetEmpleadoDTO buscarPorNumEmplAndBiometricos(String numEmpl) {
-    	List<DetEmpleadoDTO> empleado = emSGP.createNamedQuery("DetEmpleado.findByNumEmpl", DetEmpleadoDTO.class).setParameter("numEmpl", numEmpl).getResultList();
-    	return !empleado.isEmpty() ? empleado.get(0) : null;
+    	List<DetEmpleadoDTO> empleados = null;
+    	DetEmpleadoDTO empleado = null;
+    	EntityManager emSGP = null;
+    	try {
+    		emSGP = this.getEntityManager();
+    		empleados = emSGP.createNamedQuery("DetEmpleado.findByNumEmpl", DetEmpleadoDTO.class).setParameter("numEmpl", numEmpl).getResultList();
+    	} catch(Exception ex) {
+    		log.warn("Problema para obtener el listado de empleados...", ex);
+    	} finally {
+    		close(emSGP);
+    		empleado = (!empleados.isEmpty()) ? empleados.get(0) : null;
+    	}
+    	
+    	return empleado;
     }
     
     public DetEmpleadoDTO buscarConFoto(Integer idEmpleado) {
     	DetEmpleadoDTO dto = null;
     	DetEmpleado model = null;
+    	EntityManager emSGP = null;
     	
     	try {
+    		emSGP = this.getEntityManager();
     		model = emSGP.find(DetEmpleado.class, idEmpleado);
     		
     		if(model.getEmpleadoFoto() != null)
@@ -378,32 +424,75 @@ public class EmpleadoDAO extends IBaseDAO<DetEmpleadoDTO, Integer> implements Se
     		
     	} catch(Exception ex) {
     		log.error("Problema para obtener la foto del empleado...", ex);
+    	} finally {
+    		close(emSGP);
     	}
     	
     	return dto;
     }
     
     public DetEmpleadoDTO buscarPorNumEmplFechaRegistro(String numEmpl, String fechaEntrada) {
-    	List<DetEmpleadoDTO> empleado = emSGP.createNamedQuery("DetEmpleado.findByNumEmpl", DetEmpleadoDTO.class).setParameter("numEmpl", numEmpl).getResultList();
-    	return !empleado.isEmpty() ? empleado.get(0) : null;
+    	List<DetEmpleadoDTO> empleados = null;
+    	DetEmpleadoDTO empleado = null;
+    	EntityManager emSGP = null;
+    	try {
+    		emSGP = this.getEntityManager();
+    		empleados = emSGP.createNamedQuery("DetEmpleado.findByNumEmpl", DetEmpleadoDTO.class).setParameter("numEmpl", numEmpl).getResultList();
+    	} catch(Exception ex) {
+    		log.warn("Problema para obtener el empleado...", ex);
+    	} finally {
+    		close(emSGP);
+    		empleado = !empleados.isEmpty() ? empleados.get(0) : null;
+    	}
+    	
+    	
+    	return empleado;
     }
     
     public DetEmpleadoDTO buscarPorIdSDI(Integer id) {
-        List<DetEmpleadoDTO> empleado = emSGP.createNamedQuery("DetEmpleado.findByNumEmplSD", DetEmpleadoDTO.class).setParameter("idEmp", id).getResultList();
-        return empleado.isEmpty() ? new DetEmpleadoDTO() : empleado.get(0);
+    	List<DetEmpleadoDTO> empleados = null;
+    	DetEmpleadoDTO empleado = null;
+    	EntityManager emSGP = null;
+    	try {
+    		emSGP = this.getEntityManager();
+    		empleados = emSGP.createNamedQuery("DetEmpleado.findByNumEmplSD", DetEmpleadoDTO.class).setParameter("idEmp", id).getResultList();
+    	} catch(Exception ex) {
+    		log.warn("Problema para obtener el empleado...", ex);
+    	} finally {
+    		close(emSGP);
+    		empleado = empleados.isEmpty() ? new DetEmpleadoDTO() : empleados.get(0);
+    	}
+        
+        return empleado;
     }
     
     public List<DetEmpleadoDTO> buscarActivoConSDI() {
-        return emSGP.createNamedQuery("DetEmpleado.findByActiveSDI", DetEmpleadoDTO.class).getResultList();
+    	EntityManager emSGP = null;
+    	List<DetEmpleadoDTO> dtoList = null;
+    	try {
+    		emSGP = this.getEntityManager();
+    		dtoList = emSGP.createNamedQuery("DetEmpleado.findByActiveSDI", DetEmpleadoDTO.class).getResultList();
+    	} catch(Exception ex) {
+    		log.warn("Problema para obtener la lista de empleados...", ex);
+    	} finally {
+    		close(emSGP);
+    	}
+        return dtoList;
     }
     
     public List<DetEmpleadoDTO> buscarActivoAndEmpresa(Integer idEmpresa) {
+    	EntityManager emSGP = null;
     	List<DetEmpleadoDTO> lista = null;
-    	lista = emSGP.createNamedQuery("DetEmpleado.findByActiveAndIdEmpresa", DetEmpleadoDTO.class)
-    			.setParameter("idEmpresa", idEmpresa)
-    			.getResultList();
-    	
+    	try {
+    		emSGP = this.getEntityManager();
+    		lista = emSGP.createNamedQuery("DetEmpleado.findByActiveAndIdEmpresa", DetEmpleadoDTO.class)
+        			.setParameter("idEmpresa", idEmpresa)
+        			.getResultList();
+    	} catch(Exception ex) {
+    		log.warn("Problema para obtener la lista de empleados...", ex);
+    	} finally {
+    		close(emSGP);
+    	}
     	return lista;
     }
-
 }

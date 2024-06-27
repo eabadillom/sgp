@@ -62,7 +62,6 @@ public class DetNominaDAO extends IBaseDAO<DetNominaDTO, Integer> implements Ser
         final DetNomina nomina = new DetNomina();
         try {
             emSGP.getTransaction().begin();
-            nomina.setIdEmpleado(e.getIdEmpleado()!= null ? emSGP.getReference(DetEmpleado.class, e.getIdEmpleado().getIdEmpleado()) : null);
             nomina.setSueldo(e.getSueldo());
             nomina.setSeptimoDia(e.getSeptimoDia());
             nomina.setHorasExtras(e.getHorasExtras());
