@@ -188,7 +188,6 @@ public class NominaSemanalBL {
 		NominaOtroPagoDTO opAjusteAlNeto = null;
 		NominaOtroPagoDTO opSubsidioEmpleo = null;
 		
-		NominaDeduccionDTO dISRAntesSubsidio = null;
 		NominaDeduccionDTO dISR = null;
 		NominaDeduccionDTO dIMSS = null;
 		
@@ -197,7 +196,6 @@ public class NominaSemanalBL {
 		List<NominaDeduccionDTO> deducciones = null;
 		
 		try {
-//			nomina = new DetNominaDTO();
 			nominaNew = this.newNomina();
 			
 			log.info("Ejecutando la nomina de la semana {} del año en curso...", this.semanaAnio);
@@ -233,21 +231,6 @@ public class NominaSemanalBL {
 					.add(this.valesDespensa)
 					.setScale(2, BigDecimal.ROUND_HALF_UP);
 			
-			//percepciones
-//			nomina.setIdEmpleado(empleado);
-//			nomina.setSalarioDiario(this.salarioDiario);
-//			nomina.setAsistencia(diasTrabajados);
-//			nomina.setSalarioDiarioIntegrado(this.salarioDiarioIntegrado);
-//			nomina.setSueldo(this.salarioSemanal);
-//			nomina.setSeptimoDia(this.septimoDia);
-//			nomina.setHorasExtras(BigDecimal.ZERO);
-//			nomina.setDestajos(BigDecimal.ZERO);
-//			nomina.setPremiosEficiencia(BigDecimal.ZERO);
-//			nomina.setBonoPuntualidad(this.bonoPuntualidad);
-//			nomina.setDespensa(this.valesDespensa);
-//			nomina.setOtrasPercepciones(BigDecimal.ZERO);
-//			nomina.setTotalPercepciones(this.totalPercepciones);
-			
 			//deducciones
 			//Para el cálculo del ISR a retener al empleado se deben sumar las percepciones 
 			//que gravan para ISR, en este caso son:
@@ -265,11 +248,6 @@ public class NominaSemanalBL {
 			this.subsidioEmpleo = calculoSubsidioEmpleo(tarifaSubsidio);
 			this.isr = impuestoAntesSubsidio.subtract(subsidioEmpleo);
 			
-			
-//			nomina.setSubsAlEmpleoAcreditado(this.subsidioEmpleo);
-//			nomina.setIsrAntesDeSubsAlEmpleo(impuestoAntesSubsidio);
-//			nomina.setIsr(this.isr);
-			
 			//Cálculo del IMSS
 			this.enfermedadYmaternidad = this.calculoEnfermedadMaternidad();
 			this.gastosMedicosPensionadosBeneficiarios = this.calculoGastosMedicosPensionadosBeneficiarios();
@@ -283,22 +261,8 @@ public class NominaSemanalBL {
 					.add(this.cesantiaEdadAvanzadaVejez)
 					;
 			
-//			nomina.setImss(this.imss);
-			
 			this.totalDeducciones = this.isr.add(this.imss);
-//			nomina.setTotalDeducciones(this.totalDeducciones);
-			
-			this.neto = totalPercepciones.subtract(totalDeducciones);
-//			nomina.setNeto(neto);
-			
-			
-			
-			
-			
-			
-			
-			
-			
+			this.neto = this.totalPercepciones.subtract(totalDeducciones);
 			
 			
 			//NUEVA NOMINA...........................................
@@ -400,15 +364,6 @@ public class NominaSemanalBL {
 			otrosPagos.add(opSubsidioEmpleo);
 			
 			//DEDUCCIONES...
-//			dISRAntesSubsidio = new NominaDeduccionDTO();
-//			dISRAntesSubsidio.setKey(new NominaDeduccionDTOPK(idxD++, nominaNew));
-//			TipoDeduccionDTO tdISRAntesSubsidio = this.tipoDeduccionDAO.buscarPorId("002");
-//			dISRAntesSubsidio.setTipoDeduccion(tdISRAntesSubsidio);
-//			dISRAntesSubsidio.setClave("045");
-//			dISRAntesSubsidio.setNombre("I.S.R. antes subs. al empleo");
-//			dISRAntesSubsidio.setImporte(this.impuestoAntesSubsidio);
-//			deducciones.add(dISRAntesSubsidio);
-			
 			dISR = new NominaDeduccionDTO();
 			dISR.setKey(new NominaDeduccionDTOPK(idxD++, nominaNew));
 			TipoDeduccionDTO tdISR = this.tipoDeduccionDAO.buscarPorId("002");
@@ -431,7 +386,6 @@ public class NominaSemanalBL {
 			log.error("Problema para obtener el cálculo de la nómina del empleado {} {} {}", empleado.getNombre(), empleado.getPrimerAp(), empleado.getSegundoAp() );
 			log.error(ex);
 		}
-		
 		
 		return nominaNew;
 	}

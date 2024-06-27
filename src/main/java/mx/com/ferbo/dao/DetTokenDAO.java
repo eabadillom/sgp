@@ -97,6 +97,21 @@ public class DetTokenDAO extends IBaseDAO<DetTokenDTO, Integer> implements Seria
 		return token.isEmpty() ? new DetTokenDTO() : token.get(0);
 	}
 	
+	public DetTokenDTO buscarPorToken(String token) {
+		DetTokenDTO dto = null;
+		DetToken model = null;
+		try {
+			model = emSGP.createNamedQuery("DetToken.findByToken",DetToken.class)
+					.setParameter("token", token)
+					.getSingleResult()
+					;
+			dto = getDTO(model);
+		} catch(Exception ex) {
+			log.error("Problema para obtener el token...", ex);
+		}
+		return dto;
+	}
+	
 	public DetTokenDTO buscarPorIdEmpleadoAndFecha(Integer idEmpleado) {
 		DetToken model = null;
 		DetTokenDTO dto = null;
@@ -227,5 +242,4 @@ public class DetTokenDAO extends IBaseDAO<DetTokenDTO, Integer> implements Seria
         }
 		
 	}
-
 }
