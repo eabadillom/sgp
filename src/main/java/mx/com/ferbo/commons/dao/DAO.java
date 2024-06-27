@@ -10,10 +10,21 @@ import javax.persistence.Persistence;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.SGPException;
 
 public abstract class DAO<DTO, MODEL, PK> {
 	private static Logger log = LogManager.getLogger(DAO.class);
+	
+	private Class<MODEL> modelClass;
+	
+	public DAO() {
+		super();
+	}
+	
+	public DAO(Class<MODEL> modelClass) {
+		this.modelClass = modelClass;
+	}
 	
 	public EntityManager getEntityManager() {
 		EntityManager em = null;
@@ -52,8 +63,28 @@ public abstract class DAO<DTO, MODEL, PK> {
 		return modelList;
 	}
 	    
-	public abstract DTO buscarPorId(PK id);
+	public DTO buscarPorId(PK id) {
+		DTO dto = null;
+		MODEL model;
+		
+		EntityManager em = null;
+		
+		try {
+			em = EntityManagerUtil.getEntityManager();
+			model = em.find(modelClass, id);
+			dto = this.getDTO(model);
+		} catch(Exception ex) {
+			log.warn("Problema para obtener el elemento por ID: {}", id);
+		} finally {
+			EntityManagerUtil.close(em);
+		}
+		
+		return dto;
+	}
+	
+	public abstract DTO buscarPorId(PK id, boolean isFullInfo);
 	public abstract List<DTO> buscarTodos();
+	
 	public synchronized void guardar(DTO dto) throws SGPException {
 		EntityManager em = null;
 		MODEL model = null;

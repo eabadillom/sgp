@@ -116,29 +116,41 @@
 							        <div class="formgrid grid">
 							            <div class="field col">
 							                <p:outputLabel for="@next" value="Nombre"/>
-							                <p:inputText id="nombreEmp" value="#{registroEmpleadosBean.empleadoSelected.nombre}"/>  
+							                <p:inputText id="nombreEmp" value="#{registroEmpleadosBean.empleadoSelected.nombre}" style="text-transform: uppercase">
+							                	<p:ajax process="@this" />
+							                </p:inputText>
 							            </div>
 							            <div class="field col">
 							                <p:outputLabel for="@next" value="Primer Apellido"/>
-							                <p:inputText id="primerAp" value="#{registroEmpleadosBean.empleadoSelected.primerAp}"/>  
+							                <p:inputText id="primerAp" value="#{registroEmpleadosBean.empleadoSelected.primerAp}" style="text-transform: uppercase">
+							                	<p:ajax process="@this" />
+							                </p:inputText>
 							            </div>
 							            <div class="field col">
 							                <p:outputLabel for="@next" value="Segundo Apellido"/>
-							                <p:inputText id="segundoAp" value="#{registroEmpleadosBean.empleadoSelected.segundoAp}"/>  
+							                <p:inputText id="segundoAp" value="#{registroEmpleadosBean.empleadoSelected.segundoAp}" style="text-transform: uppercase">
+							                	<p:ajax process="@this" />
+							                </p:inputText>
 							            </div>
 							        </div>
 							        <div class="formgrid grid">
 							            <div class="field col">
 							                <p:outputLabel for="@next" value="CURP"/>
-							                <p:inputText id="curp" value="#{registroEmpleadosBean.empleadoSelected.curp}" maxlength="18" class="uppercase" onblur="value.toUpperCase()"/>  
+							                <p:inputText id="curp" value="#{registroEmpleadosBean.empleadoSelected.curp}" maxlength="18" style="text-transform: uppercase">
+							                	<p:ajax process="@this" />
+							                </p:inputText>  
 							     		</div>
 									     <div class="field col">
 									         <p:outputLabel for="@next" value="Fecha de nacimiento" />
-									         <p:datePicker id="fNac" value="#{registroEmpleadosBean.empleadoSelected.fechaNacimiento}" monthNavigator="true" yearNavigator="true" yearRange="1940:2015" pattern="dd/MM/yyyy" showIcon="true" locale="es" timeZone="GMT-6"/>
+									         <p:datePicker id="fNac" value="#{registroEmpleadosBean.empleadoSelected.fechaNacimiento}" monthNavigator="true" yearNavigator="true" yearRange="1940:2015" pattern="dd/MM/yyyy" showIcon="true" locale="es" timeZone="GMT-6">
+									         	<p:ajax process="@this" />
+									         </p:datePicker>
 									     </div>
 									     <div class="field col">
 									         <p:outputLabel for="@next" value="Correo"/>
-									         <p:inputText id="correo" value="#{registroEmpleadosBean.empleadoSelected.correo}"/>  
+									         <p:inputText id="correo" value="#{registroEmpleadosBean.empleadoSelected.correo}">
+									         	<p:ajax process="@this" />
+									         </p:inputText>  
 									     </div>
 							 		</div>
 								</p:tab>
@@ -147,21 +159,25 @@
 										<div class="ui-fluid formgrid grid">
 											<div class="field col-12 md:col-3">
 												<p:outputLabel for="@next" value="RFC" />
-								                <p:inputText id="nss" value="#{registroEmpleadosBean.datoEmpresa.rfc}">
-								                	<p:ajax process="@this"/>
-								                </p:inputText>
+												<p:inputText id="rfc" value="#{registroEmpleadosBean.datoEmpresa.rfc}" maxlength="18" style="text-transform: uppercase">
+													<p:ajax process="@this"/>
+												</p:inputText>
 											</div>
 											<div class="field col-12 md:col-3">
 												<p:outputLabel for="@next" value="NSS" />
-							                	<p:inputText id="rfc" value="#{registroEmpleadosBean.datoEmpresa.nss}"/>
+												<p:inputText id="nss" value="#{registroEmpleadosBean.datoEmpresa.nss}" maxlength="15" style="text-transform: uppercase">
+													<p:ajax process="@this"/>
+												</p:inputText>
 											</div>
 											<div class="field col-12 md:col-3">
 												<p:outputLabel for="@next" value="Salario Diario" />
-							                	<p:inputText id="salario" value="#{registroEmpleadosBean.datoEmpresa.salarioDiario}"/>
+												<p:inputNumber id="salario" value="#{registroEmpleadosBean.datoEmpresa.salarioDiario}" symbol="$ " symbolPosition="p" decimalSeparator="." decimalPlaces="2">
+													<p:ajax process="@this"/>
+												</p:inputNumber>
 											</div>
 											<div class="field col-12 md:col-3">
 												<p:outputLabel for="@next" value="Fecha de ingreso" />
-							                <p:datePicker id="fIngreso" value="#{registroEmpleadosBean.datoEmpresa.fechaIngreso}" monthNavigator="true" yearNavigator="true" pattern="dd/MM/yyyy" showIcon="true" readonlyInput="true"/>
+							                <p:datePicker id="fIngreso" value="#{registroEmpleadosBean.datoEmpresa.fechaIngreso}" monthNavigator="true" yearNavigator="true" pattern="dd/MM/yyyy" showIcon="true" locale="es" timeZone="GMT-6"/>
 											</div>
 											<div class="field col-12 md:col-3">
 												<p:outputLabel for="@next" value="Perfil" />

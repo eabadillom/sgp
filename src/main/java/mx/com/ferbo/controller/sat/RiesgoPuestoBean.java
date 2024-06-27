@@ -15,7 +15,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.sat.CatRiesgoPuestoDAO;
+import mx.com.ferbo.dao.sat.RiesgoPuestoDAO;
 import mx.com.ferbo.dto.sat.RiesgoPuestoDTO;
 import mx.com.ferbo.util.SGPException;
 
@@ -29,14 +29,14 @@ public class RiesgoPuestoBean implements Serializable {
     private RiesgoPuestoDTO riesgoPuestoDTO;
     private List<RiesgoPuestoDTO> listDTO;
 
-    private CatRiesgoPuestoDAO catRiesgoPuestoDAO;
+    private RiesgoPuestoDAO catRiesgoPuestoDAO;
 
     private boolean guardar;
     private boolean primaryEdit;
 
     public RiesgoPuestoBean(){
 
-        catRiesgoPuestoDAO = new CatRiesgoPuestoDAO();
+        catRiesgoPuestoDAO = new RiesgoPuestoDAO();
         listDTO = new ArrayList<>();
     }
 

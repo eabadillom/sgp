@@ -152,6 +152,8 @@ public class DetEmpleadoDTO implements Serializable, Cloneable {
     }
 
     public void setNumEmpleado(String numEmpleado) {
+    	if(numEmpleado != null)
+    		numEmpleado = numEmpleado.toUpperCase();
         this.numEmpleado = numEmpleado;
     }
 
@@ -160,6 +162,8 @@ public class DetEmpleadoDTO implements Serializable, Cloneable {
     }
 
     public void setNombre(String nombre) {
+    	if(nombre != null)
+    		nombre = nombre.toUpperCase();
         this.nombre = nombre;
     }
 
@@ -168,6 +172,8 @@ public class DetEmpleadoDTO implements Serializable, Cloneable {
     }
 
     public void setPrimerAp(String primerAp) {
+    	if(primerAp != null)
+    		primerAp = primerAp.toUpperCase();
         this.primerAp = primerAp;
     }
 
@@ -176,6 +182,8 @@ public class DetEmpleadoDTO implements Serializable, Cloneable {
     }
 
     public void setSegundoAp(String segundoAp) {
+    	if(segundoAp != null)
+    		segundoAp = segundoAp.toUpperCase();
         this.segundoAp = segundoAp;
     }
 
@@ -184,6 +192,8 @@ public class DetEmpleadoDTO implements Serializable, Cloneable {
     }
 
     public void setCurp(String curp) {
+    	if(curp != null)
+    		curp = curp.toUpperCase();
         this.curp = curp;
     }
 
@@ -192,6 +202,8 @@ public class DetEmpleadoDTO implements Serializable, Cloneable {
     }
 
     public void setRfc(String rfc) {
+    	if(rfc != null)
+    		rfc = rfc.toUpperCase();
         this.rfc = rfc;
     }
 

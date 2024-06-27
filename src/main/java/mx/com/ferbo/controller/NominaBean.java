@@ -39,13 +39,11 @@ import mx.com.ferbo.dto.CatTarifaIsrDTO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.dto.DetNominaDTO;
 import mx.com.ferbo.dto.DetRegistroDTO;
+import mx.com.ferbo.dto.NominaDTO;
+import mx.com.ferbo.dto.NominaEmisorDTO;
+import mx.com.ferbo.dto.NominaReceptorDTO;
 import mx.com.ferbo.util.DateUtils;
-import mx.com.ferbo.util.SGPException;
 
-/**
- *
- * @author erale
- */
 @Named(value = "nominaBean")
 @ViewScoped
 public class NominaBean implements Serializable {
@@ -53,11 +51,6 @@ public class NominaBean implements Serializable {
     private static final long serialVersionUID = 1L;
     private static Logger log = LogManager.getLogger(NominaBean.class);
 
-    //<editor-fold defaultstate="collapsed" desc="Constantes">
-    private static final int DIAS_TRABAJADOS = 6;
-    private static final int SEPTIMO_DIA = 1;
-    //</editor-fold> 
-    //<editor-fold defaultstate="collapsed" desc="DAOs">
     private RegistroDAO registroDAO;
     private CatPercepcionesDAO catPercepcionesDAO;
     private EmpleadoDAO empleadoDAO;
@@ -66,20 +59,14 @@ public class NominaBean implements Serializable {
     private CatImssCuotasDAO catImssCuotasDAO;
     private DetNominaDAO detNominaDAO;
     private CatEmpresaDAO empresaDAO;
-    //</editor-fold> 
-    //<editor-fold defaultstate="collapsed" desc="DTOs">
+    
     private List<DetEmpleadoDTO> lstEmpleadosTmp;
-    private List<DetRegistroDTO> lstRegistrosEmpleadoIncidencias;
-    List<DetRegistroDTO> lstRegistrosPorEmpresaSemanaAnteriorTmp;
 
     private List<CatEmpresaDTO> lstEmpresas;
     private List<DetRegistroDTO> lstRegistrosAlAnio;
     private List<CatPercepcionesDTO> lstPercepcionActual;
     private List<CatTarifaIsrDTO> lstIsrActualMensual;
-//    private List<CatImssCuotasDTO> lstCuotaImssActual;
     private List<DetEmpleadoDTO> lstEmpleados;
-    private List<DetRegistroDTO> lstRegistrosEmpleadoSemanaAnterior;
-    private List<DetRegistroDTO> lstRegistrosPorEmpresaSemanaAnterior;
 
     private List<DetNominaDTO> lstNominaByFecha;
     private List<DetRegistroDTO> lstRegistrosEmpleado;
@@ -93,9 +80,8 @@ public class NominaBean implements Serializable {
     private CatTarifaIsrDTO isr;
     private CatSubsidioDTO subsidio;
     private CatImssCuotasDTO imss;
-    private DetNominaDTO nomina;
-    //</editor-fold>
-    //<editor-fold defaultstate="collapsed" desc="Objetos">
+    private NominaDTO nomina;
+    
     private float sdi;
     private float parteProporcionalDiaDescanso = 0;
     private float salSem = 0;
@@ -124,7 +110,7 @@ public class NominaBean implements Serializable {
     private Date periodoFin;
     private Integer semana;
 
-    private HttpServletRequest httpServletRequest;
+    private HttpServletRequest request;
 
     private boolean divVisibleCalculoNomina;
     private boolean divDataTableEmpleados;
@@ -136,25 +122,12 @@ public class NominaBean implements Serializable {
     private String strYear;
     //</editor-fold>
 
-    private List<DetEmpleadoDTO> listaEmpleadosDeEmpresaSeleccionada;
-    private List<DetRegistroDTO> listaRegistrosEmpleadosDeEmpresaSeleccionadaSemanaAnterior;
-    private List<DetRegistroDTO> listaRegistrosEmpleadosDeEmpresaSeleccionadaSemanaAnteriorConFaltas;
-    private List<DetRegistroDTO> listaRegistrosEmpleadosDeEmpresaSeleccionadaSemanaAnteriorConFaltasTmp;
-    private List<DetNominaDTO> listaNomina;
+    private List<NominaDTO> listaNomina;
 
     public NominaBean() {
         log.info("====================== entrada constructor nominaBean ======================");
         lstEmpleadosTmp = new ArrayList<>();
-        lstRegistrosEmpleadoIncidencias = new ArrayList<>();
-        lstRegistrosPorEmpresaSemanaAnteriorTmp = new ArrayList<>();
 
-        listaEmpleadosDeEmpresaSeleccionada = new ArrayList<>();
-        listaRegistrosEmpleadosDeEmpresaSeleccionadaSemanaAnterior = new ArrayList<>();
-        listaRegistrosEmpleadosDeEmpresaSeleccionadaSemanaAnteriorConFaltas = new ArrayList<>();
-        listaRegistrosEmpleadosDeEmpresaSeleccionadaSemanaAnteriorConFaltasTmp = new ArrayList<>();
-
-        lstRegistrosEmpleadoSemanaAnterior = new ArrayList<>();
-        lstRegistrosEmpleadoIncidencias = new ArrayList<>();
         lstPercepcionActual = new ArrayList<>();
         lstNominaByFecha = new ArrayList<>();
         lstEmpresas = new ArrayList<>();
@@ -172,28 +145,25 @@ public class NominaBean implements Serializable {
 
         Integer idEmpleado = searchIdEmpleado();
         if (idEmpleado == null) {
-            httpServletRequest = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-            empleadoLogin = (DetEmpleadoDTO) httpServletRequest.getSession(true).getAttribute("empleado");
+            request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+            empleadoLogin = (DetEmpleadoDTO) request.getSession(true).getAttribute("empleado");
             empleadoSelected = empleadoDAO.buscarPorIdSDI(empleadoLogin.getIdEmpleado());
         } else {
-            httpServletRequest = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-            empleadoLogin = (DetEmpleadoDTO) httpServletRequest.getSession(true).getAttribute("empleado");
+            request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+            empleadoLogin = (DetEmpleadoDTO) request.getSession(true).getAttribute("empleado");
             empleadoSelected = empleadoDAO.buscarPorIdSDI(idEmpleado);
-            //divDataTableEmpleados = !divDataTableEmpleados;
         }
 
         Integer idEmpresa = searchIdEmpresa();
         if (idEmpresa == null) {
-            httpServletRequest = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-            empleadoLogin = (DetEmpleadoDTO) httpServletRequest.getSession(true).getAttribute("empleado");
-            // Utilizado en obteniendoListaEmpleadosDeEmpresaSeleccionada();
+            request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+            empleadoLogin = (DetEmpleadoDTO) request.getSession(true).getAttribute("empleado");
+            empleadoLogin = empleadoDAO.buscarPorId(empleadoLogin.getIdEmpleado(),  true);
             empresaSelected = empresaDAO.buscarPorId(empleadoLogin.getCatEmpresaDTO().getIdEmpresa());
         } else {
-            httpServletRequest = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-            empleadoLogin = (DetEmpleadoDTO) httpServletRequest.getSession(true).getAttribute("empleado");
-            // Utilizado en obteniendoListaEmpleadosDeEmpresaSeleccionada();
+            request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+            empleadoLogin = (DetEmpleadoDTO) request.getSession(true).getAttribute("empleado");
             empresaSelected = empresaDAO.buscarPorId(idEmpresa);
-            // divDataTableEmpresas = !divDataTableEmpresas;
         }
         log.info("====================== salida constructor nominaBean ======================");
         log.info("Largo de Lista constructor {}", listaNomina.size());
@@ -232,14 +202,8 @@ public class NominaBean implements Serializable {
         
         
         lstEmpresas = empresaDAO.buscarActivo();
-        // Utilizado en obteniendoListaEmpleadosDeEmpresaSeleccionada();
-//        lstEmpleados = empleadoDAO.buscarActivoConSDI();//EABM REMOVED
-
-        lstRegistrosEmpleadoSemanaAnterior = registroDAO.buscarRegistroNomina(periodoInicio, periodoFin);
-
         lstPercepcionActual = catPercepcionesDAO.buscarActivo();
         percepcion = (CatPercepcionesDTO) lstPercepcionActual.get(0);
-//        lstCuotaImssActual = catImssCuotasDAO.buscarActuales(year);
 
         isr = new CatTarifaIsrDTO();
         subsidio = new CatSubsidioDTO();
@@ -247,10 +211,23 @@ public class NominaBean implements Serializable {
         
         log.info("Miercoles pasado: {}", periodoFin);
         log.info("Jueves pasado: {}", periodoInicio);
+        
+        
+        this.nomina = this.iniciaNominaDTOVacio();
       
     }
     
-    public void calculaFechaFin() {
+    private NominaDTO iniciaNominaDTOVacio() {
+    	NominaDTO nomina = new NominaDTO();
+    	nomina.setEmisor(new NominaEmisorDTO());
+    	nomina.setReceptor(new NominaReceptorDTO());
+    	nomina.setConceptos(new ArrayList<>());
+    	nomina.setPercepciones(new ArrayList<>());
+    	nomina.setDeducciones(new ArrayList<>());
+		return nomina;
+	}
+
+	public void calculaFechaFin() {
     	log.info("Fecha Inicio: {}", this.periodoInicio);
     	log.info("Fecha Fin: {}", this.periodoFin);
     	this.periodoFin = new Date(this.periodoInicio.getTime());
@@ -274,10 +251,6 @@ public class NominaBean implements Serializable {
 
     public void calculandoNomina() {
         listaNomina.clear();
-//        listaEmpleadosDeEmpresaSeleccionada = getEmpleados(empresaSelected.getIdEmpresa());
-        
-        //¿¿ES LISTA DE ASISTENCIAS??
-//        listaRegistrosEmpleadosDeEmpresaSeleccionadaSemanaAnterior = obteniendoListaRegistrosEmpleadosDeEmpresaSeleccionada();
         
         List<DetEmpleadoDTO> listaEmpleados = empleadoDAO.buscarActivoAndEmpresa(empresaSelected.getIdEmpresa());
       
@@ -286,56 +259,24 @@ public class NominaBean implements Serializable {
         PrimeFaces.current().ajax().update("formNomina:dtNomina");
         PrimeFaces.current().executeScript("PF('empresaDialog').hide()");
     }
-
-//    private List<DetEmpleadoDTO> getEmpleados(Integer idEmpresa) {
-//    	lstEmpleadosTmp = empleadoDAO.buscarActivoAndEmpresa(idEmpresa);
-//    	return lstEmpleadosTmp;
-//    }
-
-//    private List<DetRegistroDTO> obteniendoListaRegistrosEmpleadosDeEmpresaSeleccionada() {
-//        lstRegistrosPorEmpresaSemanaAnterior = lstRegistrosEmpleadoSemanaAnterior.stream().filter(rg -> lstEmpleadosTmp.stream().anyMatch(empl -> empl.getIdEmpleado().equals(rg.getDetEmpleadoDTO().getIdEmpleado()))).collect(Collectors.toList());
-//        lstRegistrosPorEmpresaSemanaAnterior.sort(Comparator.comparingInt(DetEmpleadoDTO -> DetEmpleadoDTO.getDetEmpleadoDTO().getIdEmpleado()));
-//        return lstRegistrosPorEmpresaSemanaAnterior;
-//    }
-
+    
     private void procesaListaEmpleados(List<DetEmpleadoDTO> listaEmpleados) {
+    	NominaDTO nomina = null;
     	try {
     		for (DetEmpleadoDTO detEmpleadoDTO : listaEmpleados) {
-    			this.nomina = this.procesaEmpleado(detEmpleadoDTO);
-    			
+    			nomina = this.procesaEmpleado(detEmpleadoDTO);
     			listaNomina.add(nomina);
-    			
-    			lstRegistrosEmpleadoIncidencias.clear();
     		}
-    		
+    		log.info("Lista nomina: {}", this.listaNomina);
     	} catch(Exception ex) {
     		log.error("Problema para procesar la nómina", ex);
     	}
     }
     
-    public DetNominaDTO procesaEmpleado(DetEmpleadoDTO detEmpleadoDTO) {
-    	DetNominaDTO nomina = null;
+    public NominaDTO procesaEmpleado(DetEmpleadoDTO detEmpleadoDTO) {
+    	NominaDTO nomina = null;
     	NominaSemanalBL nominaSemanalBO = null;
     	log.info("Empleado: {} {} {}, Salario diario: {}", detEmpleadoDTO.getNombre(), detEmpleadoDTO.getPrimerAp(), detEmpleadoDTO.getSegundoAp(), detEmpleadoDTO.getSueldoDiario());
-		
-//		lstRegistrosPorEmpresaSemanaAnteriorTmp = 
-//				lstRegistrosPorEmpresaSemanaAnterior.stream()
-//				.filter(i -> i.getDetEmpleadoDTO().getIdEmpleado().equals(detEmpleadoDTO.getIdEmpleado()))
-//				.collect(Collectors.toList());
-		
-//		DetRegistroDTO registroNuevo = new DetRegistroDTO(0, detEmpleadoDTO.getIdEmpleado(), new Date(), new Date(), 3, "Falta");
-//		
-//		for (int i = 0; i <= lstRegistrosPorEmpresaSemanaAnteriorTmp.size(); i++) {
-//			if (lstRegistrosPorEmpresaSemanaAnteriorTmp.size() < 6) {
-//				lstRegistrosPorEmpresaSemanaAnteriorTmp.add(registroNuevo);
-//			}
-//		}
-//		
-//		for (DetRegistroDTO registro : lstRegistrosPorEmpresaSemanaAnteriorTmp) {
-//			if (registro.getCatEstatusRegistroDTO().getIdEstatus() == 2 || registro.getCatEstatusRegistroDTO().getIdEstatus() == 3) {
-//				lstRegistrosEmpleadoIncidencias.add(registro);
-//			}
-//		}
 		
 		nominaSemanalBO = new NominaSemanalBL(detEmpleadoDTO, periodoInicio, periodoFin);
 		
@@ -391,6 +332,10 @@ public class NominaBean implements Serializable {
 //		nomina.setIdEmpleadoCreador(empleadoLogin);
 		
 		return nomina;
+    }
+    
+    public void cargaEmpleadoNomina() {
+    	log.info("Cargando información de nómina: {}", this.nomina);
     }
     
 //    //<editor-fold defaultstate="collapsed" desc="Cálculo de ISR">
@@ -460,21 +405,7 @@ public class NominaBean implements Serializable {
 
     //<editor-fold defaultstate="collapsed" desc="Guardando Guardar Nómina">
     public void guardarNominaEmpleado() {
-        int cont = 0;
-        for(DetNominaDTO nomina : listaNomina){
-            try {
-                detNominaDAO.guardar(nomina);
-                cont++;
-            } catch (SGPException ex) {
-                log.warn("EX-0039: " + ex.getMessage() + ". Error al guardar la nómina del empleado: " + nomina.getIdEmpleado().getNumEmpleado() != null ? nomina.getIdEmpleado().getNumEmpleado() : null); 
-            }
-        }
-        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Mexico_City"));
-        cal.setTime(fecha);
-        cal.setFirstDayOfWeek(Calendar.SUNDAY);
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                "Se ejecuto la Nómina de la Empresa: " + lstEmpresas.stream().filter(i -> i.getIdEmpresa().equals(empresaSelected.getIdEmpresa())).findFirst().orElse(null).getDescripcion() + ", de la Semana: " + cal.get(Calendar.WEEK_OF_YEAR) + " con: " + cont + " registros.", null));
-        PrimeFaces.current().ajax().update("formNomina:messages");
+
     }
     //</editor-fold> 
     
@@ -659,30 +590,6 @@ public class NominaBean implements Serializable {
         this.lstEmpleados = lstEmpleados;
     }
 
-    public List<DetRegistroDTO> getLstRegistrosEmpleadoSemanaAnterior() {
-        return lstRegistrosEmpleadoSemanaAnterior;
-    }
-
-    public void setLstRegistrosEmpleadoSemanaAnterior(List<DetRegistroDTO> lstRegistrosEmpleadoSemanaAnterior) {
-        this.lstRegistrosEmpleadoSemanaAnterior = lstRegistrosEmpleadoSemanaAnterior;
-    }
-
-    public List<DetRegistroDTO> getLstRegistrosPorEmpresaSemanaAnterior() {
-        return lstRegistrosPorEmpresaSemanaAnterior;
-    }
-
-    public void setLstRegistrosPorEmpresaSemanaAnterior(List<DetRegistroDTO> lstRegistrosPorEmpresaSemanaAnterior) {
-        this.lstRegistrosPorEmpresaSemanaAnterior = lstRegistrosPorEmpresaSemanaAnterior;
-    }
-
-    public List<DetRegistroDTO> getLstRegistrosEmpleadoIncidencias() {
-        return lstRegistrosEmpleadoIncidencias;
-    }
-
-    public void setLstRegistrosEmpleadoIncidencias(List<DetRegistroDTO> lstRegistrosEmpleadoIncidencias) {
-        this.lstRegistrosEmpleadoIncidencias = lstRegistrosEmpleadoIncidencias;
-    }
-
     public List<DetNominaDTO> getLstNominaByFecha() {
         return lstNominaByFecha;
     }
@@ -771,11 +678,11 @@ public class NominaBean implements Serializable {
         this.imss = imss;
     }
 
-    public DetNominaDTO getNomina() {
+    public NominaDTO getNomina() {
         return nomina;
     }
 
-    public void setNomina(DetNominaDTO nomina) {
+    public void setNomina(NominaDTO nomina) {
         this.nomina = nomina;
     }
 
@@ -972,11 +879,11 @@ public class NominaBean implements Serializable {
     }
 
     public HttpServletRequest getHttpServletRequest() {
-        return httpServletRequest;
+        return request;
     }
 
     public void setHttpServletRequest(HttpServletRequest httpServletRequest) {
-        this.httpServletRequest = httpServletRequest;
+        this.request = httpServletRequest;
     }
 
     public boolean isDivVisibleCalculoNomina() {
@@ -1035,51 +942,11 @@ public class NominaBean implements Serializable {
         this.strYear = strYear;
     }
 
-    public List<DetRegistroDTO> getLstRegistrosPorEmpresaSemanaAnteriorTmp() {
-        return lstRegistrosPorEmpresaSemanaAnteriorTmp;
-    }
-
-    public void setLstRegistrosPorEmpresaSemanaAnteriorTmp(List<DetRegistroDTO> lstRegistrosPorEmpresaSemanaAnteriorTmp) {
-        this.lstRegistrosPorEmpresaSemanaAnteriorTmp = lstRegistrosPorEmpresaSemanaAnteriorTmp;
-    }
-
-    public List<DetEmpleadoDTO> getListaEmpleadosDeEmpresaSeleccionada() {
-        return listaEmpleadosDeEmpresaSeleccionada;
-    }
-
-    public void setListaEmpleadosDeEmpresaSeleccionada(List<DetEmpleadoDTO> listaEmpleadosDeEmpresaSeleccionada) {
-        this.listaEmpleadosDeEmpresaSeleccionada = listaEmpleadosDeEmpresaSeleccionada;
-    }
-
-    public List<DetRegistroDTO> getListaRegistrosEmpleadosDeEmpresaSeleccionadaSemanaAnterior() {
-        return listaRegistrosEmpleadosDeEmpresaSeleccionadaSemanaAnterior;
-    }
-
-    public void setListaRegistrosEmpleadosDeEmpresaSeleccionadaSemanaAnterior(List<DetRegistroDTO> listaRegistrosEmpleadosDeEmpresaSeleccionadaSemanaAnterior) {
-        this.listaRegistrosEmpleadosDeEmpresaSeleccionadaSemanaAnterior = listaRegistrosEmpleadosDeEmpresaSeleccionadaSemanaAnterior;
-    }
-
-    public List<DetRegistroDTO> getListaRegistrosEmpleadosDeEmpresaSeleccionadaSemanaAnteriorConFaltas() {
-        return listaRegistrosEmpleadosDeEmpresaSeleccionadaSemanaAnteriorConFaltas;
-    }
-
-    public void setListaRegistrosEmpleadosDeEmpresaSeleccionadaSemanaAnteriorConFaltas(List<DetRegistroDTO> listaRegistrosEmpleadosDeEmpresaSeleccionadaSemanaAnteriorConFaltas) {
-        this.listaRegistrosEmpleadosDeEmpresaSeleccionadaSemanaAnteriorConFaltas = listaRegistrosEmpleadosDeEmpresaSeleccionadaSemanaAnteriorConFaltas;
-    }
-
-    public List<DetRegistroDTO> getListaRegistrosEmpleadosDeEmpresaSeleccionadaSemanaAnteriorConFaltasTmp() {
-        return listaRegistrosEmpleadosDeEmpresaSeleccionadaSemanaAnteriorConFaltasTmp;
-    }
-
-    public void setListaRegistrosEmpleadosDeEmpresaSeleccionadaSemanaAnteriorConFaltasTmp(List<DetRegistroDTO> listaRegistrosEmpleadosDeEmpresaSeleccionadaSemanaAnteriorConFaltasTmp) {
-        this.listaRegistrosEmpleadosDeEmpresaSeleccionadaSemanaAnteriorConFaltasTmp = listaRegistrosEmpleadosDeEmpresaSeleccionadaSemanaAnteriorConFaltasTmp;
-    }
-
-    public List<DetNominaDTO> getListaNomina() {
+    public List<NominaDTO> getListaNomina() {
         return listaNomina;
     }
 
-    public void setListaNomina(List<DetNominaDTO> listaNomina) {
+    public void setListaNomina(List<NominaDTO> listaNomina) {
         this.listaNomina = listaNomina;
     }
 

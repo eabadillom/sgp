@@ -3,6 +3,7 @@ package mx.com.ferbo.controller;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -24,6 +25,7 @@ import mx.com.ferbo.dao.CatPlantaDAO;
 import mx.com.ferbo.dao.CatPuestoDAO;
 import mx.com.ferbo.dao.DetBiometricoDAO;
 import mx.com.ferbo.dao.EmpleadoDAO;
+import mx.com.ferbo.dao.ParametroDAO;
 import mx.com.ferbo.dao.sat.TipoContratoDAO;
 import mx.com.ferbo.dao.sat.TipoJornadaDAO;
 import mx.com.ferbo.dao.sat.TipoRegimenDAO;
@@ -36,6 +38,7 @@ import mx.com.ferbo.dto.DatoEmpresaDTO;
 import mx.com.ferbo.dto.DetBiometricoDTO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.dto.EmpleadoFotoDTO;
+import mx.com.ferbo.dto.ParametroDTO;
 import mx.com.ferbo.dto.sat.TipoContratoDTO;
 import mx.com.ferbo.dto.sat.TipoJornadaDTO;
 import mx.com.ferbo.dto.sat.TipoRegimenDTO;
@@ -77,10 +80,15 @@ public class RegistroEmpleadosBean implements Serializable {
     private TipoJornadaDAO tipoJornadaDAO;
     private List<TipoRegimenDTO> tiposRegimen;
     private TipoRegimenDAO tipoRegimenDAO;
+    private ParametroDAO parametroDAO;
 
     private DetBiometricoDTO detBiometrico;
     private String biometrico;
     private int numBiometrico;
+    
+    private String curp;
+    private String rfc;
+    private String nss;
     
     public RegistroEmpleadosBean() {
         catEmpresaDAO = new CatEmpresaDAO();
@@ -93,6 +101,7 @@ public class RegistroEmpleadosBean implements Serializable {
         tipoContratoDAO = new TipoContratoDAO();
         tipoJornadaDAO = new TipoJornadaDAO();
         tipoRegimenDAO = new TipoRegimenDAO();
+        parametroDAO = new ParametroDAO();
         
         empleadoSelected = new DetEmpleadoDTO();
         lstEmpleados = new ArrayList<>();
@@ -148,6 +157,7 @@ public class RegistroEmpleadosBean implements Serializable {
      */
     public void agregarEmpleado() {
         this.empleadoSelected = new DetEmpleadoDTO();
+        this.empleadoSelected.setActivo((short)1);
         this.datoEmpresa = new DatoEmpresaDTO();
         this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
     }
@@ -163,6 +173,9 @@ public class RegistroEmpleadosBean implements Serializable {
     		this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
     	} else {
     		this.datoEmpresa = datoEmpresa;
+    		this.rfc = this.datoEmpresa.getRfc();
+    		this.nss = this.datoEmpresa.getNss();
+    		this.curp = this.empleadoSelected.getCurp();
     	}
     	
     	log.info("Empleado seleccionado: {}", this.empleadoSelected.getIdEmpleado());
@@ -171,17 +184,33 @@ public class RegistroEmpleadosBean implements Serializable {
     /*
      * Método para guardar empleado
      */
-    public void guardarEmpleado() {
+    public synchronized void guardarEmpleado() {
     	FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
 		String titulo = "Guardar empleado";
-		
+		ParametroDTO pNumeroEmpleado = null;
+		String sNumeroEmpleado = null;
+		int numeroEmpleado = -1;
     	try {
+    		pNumeroEmpleado = this.parametroDAO.buscarPorClave("NBEMP");
+    		
+    		sNumeroEmpleado = pNumeroEmpleado.getValor();
+    		numeroEmpleado = Integer.parseInt(sNumeroEmpleado);
+    		sNumeroEmpleado = String.format("%04d", ++numeroEmpleado);
+    		this.empleadoSelected.setNumEmpleado(sNumeroEmpleado);
     		this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
+    		this.empleadoSelected.setFechaRegistro(new Date());
+    		
+    		this.empleadoSelected.setCatAreaDTO(null);
+    		this.empleadoSelected.setCatPuestoDTO(null);
+    		this.empleadoSelected.setCatEmpresaDTO(null);
+    		this.empleadoSelected.setCatPerfilDTO(null);
+    		this.empleadoSelected.setCatPlantaDTO(null);
     		
     		if (this.empleadoSelected.getIdEmpleado() == null) {
     			empleadoDAO.guardar(empleadoSelected);
+    			
     		} else {
     			empleadoDAO.actualizar(empleadoSelected);
     		}
@@ -422,6 +451,30 @@ public class RegistroEmpleadosBean implements Serializable {
 
 	public void setTiposRegimen(List<TipoRegimenDTO> tiposRegimen) {
 		this.tiposRegimen = tiposRegimen;
+	}
+
+	public String getRfc() {
+		return rfc;
+	}
+
+	public void setRfc(String rfc) {
+		this.rfc = rfc;
+	}
+
+	public String getCurp() {
+		return curp;
+	}
+
+	public void setCurp(String curp) {
+		this.curp = curp;
+	}
+
+	public String getNss() {
+		return nss;
+	}
+
+	public void setNss(String nss) {
+		this.nss = nss;
 	}
     
 //</editor-fold> 

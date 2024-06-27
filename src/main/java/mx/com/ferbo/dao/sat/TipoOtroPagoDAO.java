@@ -1,20 +1,18 @@
 package mx.com.ferbo.dao.sat;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 
 import mx.com.ferbo.commons.dao.DAO;
-import mx.com.ferbo.dto.sat.RiesgoPuestoDTO;
-import mx.com.ferbo.model.sat.CatRiesgoPuesto;
+import mx.com.ferbo.dto.sat.TipoOtroPagoDTO;
+import mx.com.ferbo.model.sat.CatTipoOtroPago;
 
-public class CatRiesgoPuestoDAO extends DAO<RiesgoPuestoDTO,CatRiesgoPuesto,Integer>{
+public class TipoOtroPagoDAO extends DAO<TipoOtroPagoDTO,CatTipoOtroPago,String> {
 
     @Override
-    public RiesgoPuestoDTO getDTO(CatRiesgoPuesto model) {
-        
-        RiesgoPuestoDTO dto = new RiesgoPuestoDTO();
+    public TipoOtroPagoDTO getDTO(CatTipoOtroPago model) {
+        TipoOtroPagoDTO dto = new TipoOtroPagoDTO();
 
         try {
             
@@ -24,6 +22,7 @@ public class CatRiesgoPuestoDAO extends DAO<RiesgoPuestoDTO,CatRiesgoPuesto,Inte
             dto.setVigenciaFin(model.getVigenciaFin());
 
         } catch (Exception e) {
+            dto = null;
             e.getMessage();
         }
 
@@ -31,9 +30,9 @@ public class CatRiesgoPuestoDAO extends DAO<RiesgoPuestoDTO,CatRiesgoPuesto,Inte
     }
 
     @Override
-    public CatRiesgoPuesto getModel(RiesgoPuestoDTO dto) {
-        
-        CatRiesgoPuesto model = new CatRiesgoPuesto();
+    public CatTipoOtroPago getModel(TipoOtroPagoDTO dto) {
+
+        CatTipoOtroPago model = new CatTipoOtroPago();
 
         try {
             
@@ -43,6 +42,7 @@ public class CatRiesgoPuestoDAO extends DAO<RiesgoPuestoDTO,CatRiesgoPuesto,Inte
             model.setVigenciaFin(dto.getVigenciaFin());
 
         } catch (Exception e) {
+            model = null;
             e.getMessage();
         }
 
@@ -50,61 +50,63 @@ public class CatRiesgoPuestoDAO extends DAO<RiesgoPuestoDTO,CatRiesgoPuesto,Inte
     }
 
     @Override
-    public RiesgoPuestoDTO buscarPorId(Integer id) {
-
+    public TipoOtroPagoDTO buscarPorId(String id) {
         EntityManager em = null;
-        RiesgoPuestoDTO dto = new RiesgoPuestoDTO();
-        CatRiesgoPuesto model = new CatRiesgoPuesto();
+        CatTipoOtroPago model = null;
+        TipoOtroPagoDTO dto = null;
 
         try {
-
+            
             em = getEntityManager();
-            model = em.find(CatRiesgoPuesto.class, id);
+            model = em.find(CatTipoOtroPago.class, id);
             dto = this.getDTO(model);
 
         } catch (Exception e) {
             e.getMessage();
         }finally{
-            close(em);
+            close(em);            
         }
 
         return dto;
     }
 
     @Override
-    public List<RiesgoPuestoDTO> buscarTodos() {
-        
+    public List<TipoOtroPagoDTO> buscarTodos() {
         EntityManager em = null;
-        List<CatRiesgoPuesto> listModel = new ArrayList<>();
-        List<RiesgoPuestoDTO> listDTO = new ArrayList<>();
+        List<CatTipoOtroPago> listModel = null;
+        List<TipoOtroPagoDTO> listDto = null;
 
         try {
             
             em = getEntityManager();
-            listModel = em.createNamedQuery("CatRiesgoPuesto.findByAll", CatRiesgoPuesto.class).getResultList();
-            listDTO = toDTOList(listModel);
+            listModel = em.createNamedQuery("CatTipoOtroPago.findByAll", CatTipoOtroPago.class).getResultList();
+            listDto = toDTOList(listModel);
 
         } catch (Exception e) {
             e.getMessage();
         }finally{
             close(em);
         }
-        
-        return listDTO;
+
+        return listDto;
     }
 
     @Override
-    public List<RiesgoPuestoDTO> buscarActivo() {
+    public List<TipoOtroPagoDTO> buscarActivo() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'buscarActivo'");
     }
 
     @Override
-    public List<RiesgoPuestoDTO> buscarPorCriterios(RiesgoPuestoDTO dto) {
+    public List<TipoOtroPagoDTO> buscarPorCriterios(TipoOtroPagoDTO dto) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'buscarPorCriterios'");
     }
 
-    
+	@Override
+	public TipoOtroPagoDTO buscarPorId(String id, boolean isFullInfo) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'buscarPorId'");
+	}
     
 }

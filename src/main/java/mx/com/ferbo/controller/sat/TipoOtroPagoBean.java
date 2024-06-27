@@ -15,7 +15,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.sat.CatTipoOtroPagoDAO;
+import mx.com.ferbo.dao.sat.TipoOtroPagoDAO;
 import mx.com.ferbo.dto.sat.TipoOtroPagoDTO;
 import mx.com.ferbo.util.SGPException;
 
@@ -26,7 +26,7 @@ public class TipoOtroPagoBean implements Serializable {
     private static final long serialVersionUID = -3103728579268351267L;
     private static Logger log = LogManager.getLogger(TipoOtroPagoBean.class);
     
-    private CatTipoOtroPagoDAO catTipoOtroPagoDAO;
+    private TipoOtroPagoDAO catTipoOtroPagoDAO;
     
     private TipoOtroPagoDTO tipoOtroPagoDTO;
     private List<TipoOtroPagoDTO> listDTO;
@@ -38,7 +38,7 @@ public class TipoOtroPagoBean implements Serializable {
     public TipoOtroPagoBean(){
         
         listDTO = new ArrayList<>();
-        catTipoOtroPagoDAO = new CatTipoOtroPagoDAO();
+        catTipoOtroPagoDAO = new TipoOtroPagoDAO();
 
     }
 

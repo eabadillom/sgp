@@ -2,6 +2,7 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -14,6 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
 
 import mx.com.ferbo.model.sat.CatRegimenFiscal;
 
@@ -76,6 +78,16 @@ public class CatEmpresa implements Serializable {
     @JoinColumn(name = "cd_regimen", referencedColumnName = "cd_regimen")
     @ManyToOne(optional = true)
     private CatRegimenFiscal regimenFiscal;
+    
+    @Column(name = "nu_reg_pat")
+    @Basic(optional = true)
+    @Size(max = 20)
+    private String registroPatronal;
+    
+    @Column(name = "nu_cp")
+    @Basic(optional = true)
+    @Size(max = 5)
+    private String codigoPostal;
 
     public CatEmpresa() {
     }
@@ -176,5 +188,47 @@ public class CatEmpresa implements Serializable {
 
 	public void setRegimenFiscal(CatRegimenFiscal regimenFiscal) {
 		this.regimenFiscal = regimenFiscal;
+	}
+
+	public String getRegistroPatronal() {
+		return registroPatronal;
+	}
+
+	public void setRegistroPatronal(String registroPatronal) {
+		this.registroPatronal = registroPatronal;
+	}
+
+	public String getCodigoPostal() {
+		return codigoPostal;
+	}
+
+	public void setCodigoPostal(String codigoPostal) {
+		this.codigoPostal = codigoPostal;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(idEmpresa);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CatEmpresa other = (CatEmpresa) obj;
+		return Objects.equals(idEmpresa, other.idEmpresa);
+	}
+
+	@Override
+	public String toString() {
+		return "CatEmpresa [idEmpresa=" + idEmpresa + ", descripcion=" + descripcion + ", activo=" + activo
+				+ ", razonSocial=" + razonSocial + ", tipoPersona=" + tipoPersona + ", regimenCapital=" + regimenCapital
+				+ ", rfc=" + rfc + ", fechaInicioOperacion=" + fechaInicioOperacion + ", fechaUltimoCambio="
+				+ fechaUltimoCambio + ", statusPadron=" + statusPadron + ", registroPatronal=" + registroPatronal
+				+ ", codigoPostal=" + codigoPostal + "]";
 	}
 }

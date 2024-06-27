@@ -15,7 +15,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.sat.CatTipoDeduccionDAO;
+import mx.com.ferbo.dao.sat.TipoDeduccionDAO;
 import mx.com.ferbo.dto.sat.TipoDeduccionDTO;
 import mx.com.ferbo.util.SGPException;
 
@@ -29,14 +29,14 @@ public class TipoDeduccionBean implements Serializable{
     private TipoDeduccionDTO tipoDeduccionDTO;
     private List<TipoDeduccionDTO> listTipoDeduccion;
 
-    private CatTipoDeduccionDAO catTipoDeduccionDAO;
+    private TipoDeduccionDAO catTipoDeduccionDAO;
 
     private boolean guardar;
     private boolean primaryEdit;
 
     public TipoDeduccionBean(){
 
-        catTipoDeduccionDAO = new CatTipoDeduccionDAO();
+        catTipoDeduccionDAO = new TipoDeduccionDAO();
         listTipoDeduccion = new ArrayList<>();
 
     }
