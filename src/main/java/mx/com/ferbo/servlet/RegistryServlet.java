@@ -101,7 +101,8 @@ public class RegistryServlet extends HttpServlet {
 				throw new SGPException("El empleado indicado es incorrecto.");
 
 			detTokenDAO = new DetTokenDAO();
-			detTokenDTO = detTokenDAO.buscarPorIdEmpleadoAndFecha(detEmpleadoDTO.getIdEmpleado());
+			//detTokenDTO = detTokenDAO.buscarPorIdEmpleadoAndFecha(detEmpleadoDTO.getIdEmpleado());
+			detTokenDTO = detTokenDAO.buscarPorToken(token);
 			log.info("Token: {}, Caducidad: {}", detTokenDTO.getNbToken(), detTokenDTO.getCaducidad());
 			log.info("Fecha hora actual: {}", fechaActual);
 			
