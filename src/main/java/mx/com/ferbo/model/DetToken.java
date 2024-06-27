@@ -23,7 +23,8 @@ import javax.validation.constraints.Size;
 @Table(name = "det_token_empleado")
 @NamedQueries({
 	@NamedQuery(name = "DetToken.findAll", query = "SELECT DT FROM DetToken DT"),
-	@NamedQuery(name = "DetToken.findIdEmpleado", query= "SELECT NEW mx.com.ferbo.dto.DetTokenDTO( DT.idToken, em.idEmpleado, DT.nbToken, DT.caducidad, DT.valido) FROM DetToken DT INNER JOIN DT.empleado em WHERE em.numEmpleado = :numEmpleado")
+	@NamedQuery(name = "DetToken.findIdEmpleado", query= "SELECT NEW mx.com.ferbo.dto.DetTokenDTO( DT.idToken, em.idEmpleado, DT.nbToken, DT.caducidad, DT.valido) FROM DetToken DT INNER JOIN DT.empleado em WHERE em.numEmpleado = :numEmpleado"),
+	@NamedQuery(name = "DetToken.findByToken", query = "SELECT t FROM DetToken t WHERE t.nbToken = :token")
 	//@NamedQuery(name = "DetToken.findByEmpleadoAndFecha", query = "SELECT te FROM DetToken te WHERE te.empleado.idEmpleado = :idEmpleado AND te.caducidad = (SELECT MAX(d.caducidad) FROM DetToken d WHERE d.empleado.idEmpleado = :idEmpleado)")
 })
 public class DetToken implements Serializable {
