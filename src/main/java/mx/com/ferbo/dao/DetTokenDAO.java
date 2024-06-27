@@ -22,7 +22,7 @@ public class DetTokenDAO extends IBaseDAO<DetTokenDTO, Integer> implements Seria
 		try {
 			dto = new DetTokenDTO();
 			dto.setIdToken(model.getIdToken());
-			dto.setDetEmpleadoDTO(EmpleadoDAO.getDTO(model.getEmpleado()));
+			dto.setDetEmpleadoDTO(new EmpleadoDAO().getDTO(model.getEmpleado()));
 			dto.setNbToken(model.getNbToken());
 			dto.setCaducidad(model.getCaducidad());
 			dto.setValido(model.isValido());
@@ -42,7 +42,7 @@ public class DetTokenDAO extends IBaseDAO<DetTokenDTO, Integer> implements Seria
 			dto.setValido(model.isValido());
 			if(isFullInfo == false)
 				return dto;
-			dto.setDetEmpleadoDTO(EmpleadoDAO.getDTO(model.getEmpleado()));
+			dto.setDetEmpleadoDTO(new EmpleadoDAO().getDTO(model.getEmpleado()));
 		} catch(Exception ex) {
 			dto = null;
 		}
@@ -55,7 +55,7 @@ public class DetTokenDAO extends IBaseDAO<DetTokenDTO, Integer> implements Seria
 		try {
 			model = new DetToken();
 			model.setIdToken(dto.getIdToken());
-			model.setEmpleado(EmpleadoDAO.getModel(dto.getDetEmpleadoDTO()));
+			model.setEmpleado(new EmpleadoDAO().getModel(dto.getDetEmpleadoDTO()));
 			model.setNbToken(dto.getNbToken());
 			model.setCaducidad(dto.getCaducidad());
 			model.setValido(dto.isValido());
@@ -78,7 +78,7 @@ public class DetTokenDAO extends IBaseDAO<DetTokenDTO, Integer> implements Seria
 			if(isFullInfo == false)
 				return model;
 			
-			model.setEmpleado(EmpleadoDAO.getModel(dto.getDetEmpleadoDTO()));
+			model.setEmpleado(new EmpleadoDAO().getModel(dto.getDetEmpleadoDTO()));
 		} catch(Exception ex) {
 			model = null;
 		}

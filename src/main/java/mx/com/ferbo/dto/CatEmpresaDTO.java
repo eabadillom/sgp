@@ -20,6 +20,8 @@ public class CatEmpresaDTO implements Serializable {
     private Date fechaUltimoCambio;
     private String statusPadron;
     private RegimenFiscalDTO regimenFiscal;
+    private String registroPatronal;
+    private String codigoPostal;
 
     public CatEmpresaDTO() {
     	
@@ -117,6 +119,22 @@ public class CatEmpresaDTO implements Serializable {
 
 	public void setStatusPadron(String statusPadron) {
 		this.statusPadron = statusPadron;
+	}
+	
+	public String getRegistroPatronal() {
+		return registroPatronal;
+	}
+
+	public void setRegistroPatronal(String registroPatronal) {
+		this.registroPatronal = registroPatronal;
+	}
+
+	public String getCodigoPostal() {
+		return codigoPostal;
+	}
+
+	public void setCodigoPostal(String codigoPostal) {
+		this.codigoPostal = codigoPostal;
 	}
 
 	@Override

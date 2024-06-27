@@ -18,7 +18,7 @@ public class CatEmpresaDAO extends IBaseDAO<CatEmpresaDTO, Integer> implements S
 
     private static final Logger log = LogManager.getLogger(CatEmpresaDAO.class);
     
-    public static synchronized CatEmpresaDTO getDTO(CatEmpresa model) {
+    public synchronized CatEmpresaDTO getDTO(CatEmpresa model) {
     	CatEmpresaDTO dto = null;
     	try {
     		dto = new CatEmpresaDTO();
@@ -32,7 +32,9 @@ public class CatEmpresaDAO extends IBaseDAO<CatEmpresaDTO, Integer> implements S
     	    dto.setFechaInicioOperacion(model.getFechaInicioOperacion());
     	    dto.setFechaUltimoCambio(model.getFechaUltimoCambio());
     	    dto.setStatusPadron(model.getStatusPadron());
-    	    dto.setRegimenFiscal(RegimenFiscalDAO.getDTO(model.getRegimenFiscal()));
+    	    dto.setRegimenFiscal(new RegimenFiscalDAO().getDTO(model.getRegimenFiscal()));
+    	    dto.setRegistroPatronal(model.getRegistroPatronal());
+    	    dto.setCodigoPostal(model.getCodigoPostal());
     		
     	} catch(Exception ex) {
     		log.warn("Problema para generar el DTO...", ex);
@@ -41,7 +43,7 @@ public class CatEmpresaDAO extends IBaseDAO<CatEmpresaDTO, Integer> implements S
     	return dto;
     }
     
-    public static synchronized CatEmpresa getModel(CatEmpresaDTO dto) {
+    public synchronized CatEmpresa getModel(CatEmpresaDTO dto) {
     	CatEmpresa model = null;
     	try {
     		model = new CatEmpresa();
@@ -55,7 +57,9 @@ public class CatEmpresaDAO extends IBaseDAO<CatEmpresaDTO, Integer> implements S
     	    model.setFechaInicioOperacion(dto.getFechaInicioOperacion());
     	    model.setFechaUltimoCambio(dto.getFechaUltimoCambio());
     	    model.setStatusPadron(dto.getStatusPadron());
-    	    model.setRegimenFiscal(RegimenFiscalDAO.getModel(dto.getRegimenFiscal()));
+    	    model.setRegimenFiscal(new RegimenFiscalDAO().getModel(dto.getRegimenFiscal()));
+    	    model.setRegistroPatronal(dto.getRegistroPatronal());
+    	    model.setCodigoPostal(dto.getCodigoPostal());
     	    
     	} catch(Exception ex) {
     		log.warn("Problema para generar el model...", ex.getMessage());

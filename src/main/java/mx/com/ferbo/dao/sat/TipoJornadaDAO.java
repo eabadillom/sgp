@@ -93,4 +93,10 @@ public class TipoJornadaDAO extends DAO<TipoJornadaDTO, CatTipoJornada, String> 
 		return null;
 	}
 
+	@Override
+	public TipoJornadaDTO buscarPorId(String id, boolean isFullInfo) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'buscarPorId'");
+	}
+
 }

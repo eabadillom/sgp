@@ -96,6 +96,8 @@ public class DatoEmpresaDTO {
 		return rfc;
 	}
 	public void setRfc(String rfc) {
+		if(rfc != null)
+			rfc = rfc.toUpperCase();
 		this.rfc = rfc;
 	}
 	public BigDecimal getSalarioDiario() {

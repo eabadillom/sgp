@@ -22,7 +22,7 @@ public class DatoEmpresaDAO extends DAO<DatoEmpresaDTO, InfDatoEmpresa, Integer>
 			dto = new DatoEmpresaDTO();
 			dto.setId(model.getId());
 			dto.setPerfil(CatPerfilDAO.getDTO(model.getPerfil()));
-			dto.setEmpresa(CatEmpresaDAO.getDTO(model.getEmpresa()));
+			dto.setEmpresa(new CatEmpresaDAO().getDTO(model.getEmpresa()));
 			dto.setPlanta(CatPlantaDAO.getDTO(model.getPlanta()));
 			dto.setArea(CatAreaDAO.getDTO(model.getArea()));
 			dto.setPuesto(CatPuestoDAO.getDTO(model.getPuesto()));
@@ -51,7 +51,7 @@ public class DatoEmpresaDAO extends DAO<DatoEmpresaDTO, InfDatoEmpresa, Integer>
 			model = new InfDatoEmpresa();
 			model.setId(dto.getId());
 			model.setPerfil(CatPerfilDAO.getModel(dto.getPerfil()));
-			model.setEmpresa(CatEmpresaDAO.getModel(dto.getEmpresa()));
+			model.setEmpresa(new CatEmpresaDAO().getModel(dto.getEmpresa()));
 			model.setPlanta(CatPlantaDAO.getModel(dto.getPlanta()));
 			model.setArea(CatAreaDAO.getModel(dto.getArea()));
 			model.setPuesto(CatPuestoDAO.getModel(dto.getPuesto()));
@@ -73,24 +73,30 @@ public class DatoEmpresaDAO extends DAO<DatoEmpresaDTO, InfDatoEmpresa, Integer>
 	@Override
 	public DatoEmpresaDTO buscarPorId(Integer id) {
 		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("Unimplemented method 'buscarPorId'");
 	}
 
 	@Override
 	public List<DatoEmpresaDTO> buscarTodos() {
 		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("Unimplemented method 'buscarTodos'");
 	}
 
 	@Override
 	public List<DatoEmpresaDTO> buscarActivo() {
 		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("Unimplemented method 'buscarActivo'");
 	}
 
 	@Override
 	public List<DatoEmpresaDTO> buscarPorCriterios(DatoEmpresaDTO dto) {
 		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("Unimplemented method 'buscarPorCriterios'");
+	}
+
+	@Override
+	public DatoEmpresaDTO buscarPorId(Integer id, boolean isFullInfo) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'buscarPorId'");
 	}
 }

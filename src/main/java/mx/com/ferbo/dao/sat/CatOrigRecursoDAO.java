@@ -99,5 +99,11 @@ public class CatOrigRecursoDAO extends DAO<OrigRecursoDTO,CatOrigRecurso,String>
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'buscarPorCriterios'");
     }
+
+	@Override
+	public OrigRecursoDTO buscarPorId(String id, boolean isFullInfo) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'buscarPorId'");
+	}
     
 }
