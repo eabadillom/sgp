@@ -7,9 +7,13 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import mx.com.ferbo.model.sat.CatTipoDeduccion;
 
 @NamedQueries({
 	@NamedQuery(name = "CatTipoPrestamo.findAll", query = "SELECT t FROM CatTipoPrestamo t")
@@ -28,6 +32,11 @@ public class CatTipoPrestamo implements Serializable {
 	@Basic(optional = false)
 	@Column(name = "descripcion", length = 30)
 	private String descripcion;
+	
+	@OneToOne
+	@JoinColumn(name = "tp_deduccion")
+	@Basic(optional = true)
+	private CatTipoDeduccion tipoDeduccion;
 
 	public String getTipoPrestamo() {
 		return tipoPrestamo;
@@ -43,6 +52,14 @@ public class CatTipoPrestamo implements Serializable {
 
 	public void setDescripcion(String descripcion) {
 		this.descripcion = descripcion;
+	}
+	
+	public CatTipoDeduccion getTipoDeduccion() {
+		return tipoDeduccion;
+	}
+
+	public void setTipoDeduccion(CatTipoDeduccion tipoDeduccion) {
+		this.tipoDeduccion = tipoDeduccion;
 	}
 
 	@Override

@@ -44,7 +44,7 @@ public class EmpleadoDAO extends DAO<DetEmpleadoDTO, DetEmpleado, Integer> imple
     		dto.setNss(model.getNss());
     		dto.setActivo(model.getActivo());
     		dto.setCatAreaDTO(CatAreaDAO.getDTO(model.getDatoEmpresa().getArea()));
-    		dto.setFotografia(model.getFotografia());
+    		dto.setFotografia(null);
     		dto.setSueldoDiario(model.getSueldoDiario());
     		dto.setDatoEmpresa(new DatoEmpresaDAO().getDTO(model.getDatoEmpresa()));
     		dto.setEmpleadoFoto(new EmpleadoFotoDAO().getDTO(model.getEmpleadoFoto()));
@@ -72,7 +72,7 @@ public class EmpleadoDAO extends DAO<DetEmpleadoDTO, DetEmpleado, Integer> imple
     		dto.setFechaIngreso(model.getFechaIngreso());
     		dto.setNss(model.getNss());
     		dto.setActivo(model.getActivo());
-    		dto.setFotografia(model.getFotografia());
+    		dto.setFotografia(null);
     		dto.setSueldoDiario(model.getSueldoDiario());
     		
     		if(isFullInfo == false)
@@ -106,7 +106,6 @@ public class EmpleadoDAO extends DAO<DetEmpleadoDTO, DetEmpleado, Integer> imple
     		model.setFechaIngreso(dto.getFechaIngreso());
     		model.setNss(dto.getNss());
     		model.setActivo(dto.getActivo());
-    		model.setFotografia(dto.getFotografia());
     		model.setSueldoDiario(dto.getSueldoDiario());
     		model.setDatoEmpresa(new DatoEmpresaDAO().getModel(dto.getDatoEmpresa()));
     		model.setEmpleadoFoto(new EmpleadoFotoDAO().getModel(dto.getEmpleadoFoto()));
@@ -134,7 +133,6 @@ public class EmpleadoDAO extends DAO<DetEmpleadoDTO, DetEmpleado, Integer> imple
     		model.setFechaIngreso(dto.getFechaIngreso());
     		model.setNss(dto.getNss());
     		model.setActivo(dto.getActivo());
-    		model.setFotografia(dto.getFotografia());
     		model.setSueldoDiario(dto.getSueldoDiario());
     		
     		if(isFullInfo == false)
@@ -177,10 +175,33 @@ public class EmpleadoDAO extends DAO<DetEmpleadoDTO, DetEmpleado, Integer> imple
     		emSGP = getEntityManager();
     		model = emSGP.find(DetEmpleado.class, id);
     		if(isFullInfo) {
-    			log.info("id dato empresa: {}", model.getDatoEmpresa() == null ? null : model.getDatoEmpresa().getId());
-    			log.info("id foto: {}", model.getEmpleadoFoto() == null ? null : model.getEmpleadoFoto().getId());
+    			log.info("id dato empresa: {}", model.getDatoEmpresa().getId() == null ? null : model.getDatoEmpresa().getId());
+//    			log.info("id foto: {}", model.getEmpleadoFoto().getId() == null ? null : model.getEmpleadoFoto().getId());
     		}
     		dto = getDTO(model, isFullInfo);
+    	} catch(Exception ex) {
+    		log.error("Problema para obtener el empleado con id " + id, ex);
+    	} finally {
+    		close(emSGP);
+    	}
+    	
+    	return dto;
+    }
+    
+    public DetEmpleadoDTO buscarPorId(Integer id, boolean isFullInfo, boolean isGetFoto) {
+    	DetEmpleadoDTO dto = null;
+    	DetEmpleado model = null;
+    	EntityManager emSGP = null;
+    	
+    	try {
+    		emSGP = getEntityManager();
+    		model = emSGP.find(DetEmpleado.class, id);
+    		if(isFullInfo) {
+    			log.info("id dato empresa: {}", model.getDatoEmpresa().getId() == null ? null : model.getDatoEmpresa().getId());
+    		}
+    		dto = getDTO(model, isFullInfo);
+    		log.info("id foto: {}", model.getEmpleadoFoto().getId());
+    		dto.setEmpleadoFoto(new EmpleadoFotoDAO().getDTO(model.getEmpleadoFoto()));
     	} catch(Exception ex) {
     		log.error("Problema para obtener el empleado con id " + id, ex);
     	} finally {

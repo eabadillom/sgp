@@ -39,6 +39,17 @@ public class AjustesBean implements Serializable {
 		}
 	}
 	
+	public void tipoPrestamo() {
+		String path = null;
+		try {
+			log.info("Redirigiendo a catálogo tipo préstamo...");
+			path = this.contextPath + "/protected/settings/tipoPrestamo.xhtml";
+			FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+		} catch (IOException ex) {
+			log.error("Problema para redirigir al catálogo tipo préstamo...", ex);
+		} 
+	}
+	
 	public void configNonWorkingDays() {
 		String path = null;
 		try {

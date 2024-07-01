@@ -92,7 +92,7 @@
                             	<h:outputText value="#{empleado.activo}"></h:outputText>
                             </p:column>
                             <p:column exportable="false">
-                                <p:commandButton action="#{registroEmpleadosBean.editar}" process="@this" update=":formRegistroEmpleado:panelDialogEmpleado" oncomplete="PF('dialogEmpleado').show()" icon="pi pi-pencil" styleClass="edit-button rounded-button ui-button-warning m-1">
+                                <p:commandButton action="#{registroEmpleadosBean.editar}" process="@this" update=":formRegistroEmpleado:panelDialogEmpleado" oncomplete="PF('dialogEmpleado').show();" icon="pi pi-pencil" styleClass="edit-button rounded-button ui-button-warning m-1">
                                     <f:setPropertyActionListener value="#{empleado}" target="#{registroEmpleadosBean.empleadoSelected}" />
                                 </p:commandButton>
                                 <p:commandButton class="ui-button-danger rounded-button m-1" icon="pi pi-trash" process="@this" oncomplete="PF('dialogEliminarEmpleado').show()" >
@@ -255,17 +255,22 @@
 									</div>
 								</p:tab>
 								<p:tab title="Datos Biometricos">
-									<p:outputPanel class="p-grid ui-fluid p-col-3">
-										<div >
+									<p:panelGrid columns="2">
+										<p:card>
 							               <div class="field column">
-							                   <p:commandButton value="Biométrico" icon="pi pi-sync" process="@this" actionListener="#{registroEmpleadosBean.consultaBiometrico()}" immediate="true"/>
+							                   <p:commandButton value="Fotografía" icon="pi pi-camera" process="@this" immediate="true" update="formRegistroEmpleado:photo" oncomplete="PF('dialogFotografia').show();" />
 							               </div>
 							               <div class="field column">
-							                   <p:commandButton value="Fotografía" icon="pi pi-camera" process="@this" immediate="true"
-							                                    onclick="PF('dialogFotografia').show();"/>
+							                   <p:commandButton value="Biométrico" icon="pi pi-sync" process="@this" actionListener="#{registroEmpleadosBean.consultaBiometrico()}" immediate="true"/>
 							                </div>
-										</div>
-									</p:outputPanel>
+										</p:card>
+										<p:card>
+											<div class="card">
+												<p:graphicImage height="150" value="#{registroEmpleadosBean.empleadoSelected.empleadoFoto.fotografia}"/>
+												<!-- <h:graphicImage value="#{registroEmpleadosBean.empleadoSelected.empleadoFoto.fotografia}" style="border-radius: 30%;width: auto; height: 7rem;"/> -->
+											</div>
+										</p:card>
+									</p:panelGrid>
 								</p:tab>
 							</p:tabView>
 							
