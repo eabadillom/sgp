@@ -15,18 +15,23 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.EmpleadoDAO;
 import mx.com.ferbo.dao.RegistroDAO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.dto.DetRegistroDTO;
+import mx.com.ferbo.dto.EmpleadoFotoDTO;
 
 @Named(value = "bienvenidaBean")
 @ViewScoped
 public class BienvenidaBean implements Serializable {
     private static final long serialVersionUID = 1L;
+    private static final Logger log = LogManager.getLogger(BienvenidaBean.class);
     
 	private DetEmpleadoDTO empleadoSelected;
     private final EmpleadoDAO empleadoDAO;
@@ -39,11 +44,13 @@ public class BienvenidaBean implements Serializable {
     private String strFechaActual;
     private String strFechaCumpleanios;
 
-    private FacesContext faceContext;
-    private HttpServletRequest httpServletRequest;
+    private FacesContext context;
+    private HttpServletRequest request;
+    private HttpSession session = null;
     
     private DetRegistroDTO registro;
     private final RegistroDAO registroDAO;
+    private EmpleadoFotoDTO empleadoFoto;
 
     public BienvenidaBean() {
         registroDAO = new RegistroDAO();
@@ -57,14 +64,21 @@ public class BienvenidaBean implements Serializable {
 
     @PostConstruct
     public void init() {
-        faceContext = FacesContext.getCurrentInstance();
-        httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
-        this.empleadoSelected = (DetEmpleadoDTO) httpServletRequest.getSession(true).getAttribute("empleado");
-        empleadoLogeado();
-        consultaRegistro();
-        
-        PrimeFaces.current().executeScript("PF('bar').show()");
-        
+    	
+    	try {
+    		this.context = FacesContext.getCurrentInstance();
+    		this.request = (HttpServletRequest) this.context.getExternalContext().getRequest();
+    		this.session = this.request.getSession(false);
+    		this.empleadoSelected = (DetEmpleadoDTO) this.request.getSession(true).getAttribute("empleado");
+    		this.empleadoFoto = (EmpleadoFotoDTO) session.getAttribute("fotografia");
+    		
+    		empleadoLogeado();
+    		consultaRegistro();
+    		
+    		PrimeFaces.current().executeScript("PF('bar').show()");
+    	} catch(Exception ex) {
+    		log.error("Problema en el registro de asistencia del empleado...");
+    	}
     }
 
     public String pasoDeEmpleado(DetEmpleadoDTO detEmpleadoDTO) {
@@ -164,4 +178,12 @@ public class BienvenidaBean implements Serializable {
         this.registro = registro;
     }
     //</editor-fold>
+
+	public EmpleadoFotoDTO getEmpleadoFoto() {
+		return empleadoFoto;
+	}
+
+	public void setEmpleadoFoto(EmpleadoFotoDTO empleadoFoto) {
+		this.empleadoFoto = empleadoFoto;
+	}
 }
