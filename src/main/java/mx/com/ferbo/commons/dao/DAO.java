@@ -16,7 +16,7 @@ import mx.com.ferbo.util.SGPException;
 public abstract class DAO<DTO, MODEL, PK> {
 	private static Logger log = LogManager.getLogger(DAO.class);
 	
-	private Class<MODEL> modelClass;
+	protected Class<MODEL> modelClass;
 	
 	public DAO() {
 		super();
@@ -163,8 +163,8 @@ public abstract class DAO<DTO, MODEL, PK> {
 	}
 	
 	@Deprecated
-    public abstract List<DTO> buscarActivo(); //TODO Por compatibilidad se deja este método. Se pretende eliminar a futuro.
+    public abstract List<DTO> buscarActivo(); //TODO Por compatibilidad con la clase IBaseDAO, se deja este método. Se pretende eliminar a futuro.
 	
 	@Deprecated
-    public abstract List<DTO> buscarPorCriterios(DTO dto); //TODO Por compatibilidad se deja este metodo. Se pretende eliminar a futuro.
+    public abstract List<DTO> buscarPorCriterios(DTO dto); //TODO Por compatibilidad con la clase IBaseDAO, se deja este metodo. Se pretende eliminar a futuro.
 }

@@ -1,0 +1,63 @@
+<ui:composition
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/plantillas/template.xhtml">
+	<ui:define name="title">Préstamos</ui:define>
+	<ui:define name="content">
+		<h:form id="form">
+			<p:growl id="messages" showDetail="true" life="3000"/>
+			<p:dialog modal="true" widgetVar="statusDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
+		    </p:dialog>
+		    <p:toolbar>
+                <p:toolbarGroup>
+                    <p:commandButton value="Agregar" actionListener="#{tipoPrestamoBean.nuevo()}" onclick="PF('statusDialog').show();" oncomplete="PF('dlgTipoPrestamo').show();PF('statusDialog').hide();" process="@this" update="form:dlg-TipoPrestamo" ></p:commandButton>
+                </p:toolbarGroup>
+            </p:toolbar>
+			<div style="padding-top: 1rem">
+				<p:dataTable id="dt-tipoPrestamo" widgetVar="dtTipoPrestamo" value="#{tipoPrestamoBean.tiposPrestamo}" var="tp" allowUnsorting="true" sortMode="single">
+					<p:column headerText="Clave" width="5rem">
+						<p:outputLabel value="#{tp.clave}" />
+					</p:column>
+					<p:column headerText="Descripción">
+						<p:outputLabel value="#{tp.descripcion}" />
+					</p:column>
+					<p:column width="3rem">
+						<p:commandButton icon="pi pi-bars" actionListener="#{tipoPrestamoBean.editar}" onclick="PF('statusDialog').show();" oncomplete="PF('dlgTipoPrestamo').show();PF('statusDialog').hide();" process="@this form:dt-tipoPrestamo" update="form:dlg-TipoPrestamo" >
+							<f:setPropertyActionListener value="#{tp}" target="#{tipoPrestamoBean.tipoPrestamo}" />
+						</p:commandButton>
+					</p:column>
+				</p:dataTable>
+			</div>
+			<p:dialog id="dlg-TipoPrestamo" widgetVar="dlgTipoPrestamo" header="Tipo de préstamo" showEffect="true" modal="true">
+				<p:outputPanel class="ui-fluid">
+					<div class="p-field">
+						<p:outputLabel value="Clave"/>
+						<p:inputText value="#{tipoPrestamoBean.tipoPrestamo.clave}" readonly="#{not tipoPrestamoBean.crear}" />
+					</div>
+					<div class="p-field">
+						<p:outputLabel value="Descripcion" for="@next"/>
+						<p:inputText value="#{tipoPrestamoBean.tipoPrestamo.descripcion}" />
+					</div>
+					<div class="p-field">
+						<p:outputLabel value="Tipo de deducción asociado (SAT)" for="@next"/>
+						<p:selectOneMenu value="#{tipoPrestamoBean.tipoPrestamo.tipoDeduccion}" converter="entityConverter" filter="true" filterMatchMode="contains">
+							<f:selectItem itemLabel="Seleccione un tipo de deduccion" noSelectionOption="true"/>
+							<f:selectItems value="#{tipoPrestamoBean.tiposDeduccion}" var="tipoDeduccion" itemLabel="#{tipoDeduccion.clave} - #{tipoDeduccion.descripcion}" itemValue="#{tipoDeduccion}"/>
+							<p:ajax process="@this"/>
+						</p:selectOneMenu>
+					</div>
+				</p:outputPanel>
+				<f:facet name="footer">
+					<p:commandButton value = "Guardar" icon="pi pi-save" actionListener="#{tipoPrestamoBean.guardar()}" process="@this form:dlg-TipoPrestamo" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();"/>
+					<p:commandButton value = "Cerrar" icon="pi pi-times" onclick="PF('dlgTipoPrestamo').hide();"></p:commandButton>
+				</f:facet>
+			</p:dialog>
+		</h:form>
+	</ui:define>
+</ui:composition>
