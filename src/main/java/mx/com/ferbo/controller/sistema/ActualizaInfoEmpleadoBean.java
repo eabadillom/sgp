@@ -15,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.EmpleadoDAO;
+import mx.com.ferbo.dao.EmpleadoFotoDAO;
 import mx.com.ferbo.dto.DatoEmpresaDTO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.dto.EmpleadoFotoDTO;
@@ -50,6 +51,8 @@ public class ActualizaInfoEmpleadoBean implements Serializable {
 		try {
 			log.info("Actualizando empleado: {}", this.empleado);
 			this.empleado = this.empleadoDAO.buscarPorId(this.empleado.getIdEmpleado(), true);
+//			this.empleado = this.empleadoDAO.buscarPorId(this.empleado.getIdEmpleado(), true, true);
+			
 			
 			if(this.empleado.getDatoEmpresa() == null) {
 				datoEmpresa = new DatoEmpresaDTO();
@@ -64,8 +67,10 @@ public class ActualizaInfoEmpleadoBean implements Serializable {
 				datoEmpresa.setSalarioDiario(empleado.getSueldoDiario());
 				this.empleado.setDatoEmpresa(datoEmpresa);
 			}
+			
+			empleadoFoto = this.empleadoDAO.buscarConFoto(this.empleado.getIdEmpleado()).getEmpleadoFoto();
 				
-			if(this.empleado.getEmpleadoFoto() == null && this.empleado.getFotografia() != null) {
+			if(empleadoFoto == null && this.empleado.getFotografia() != null) {
 				empleadoFoto = new EmpleadoFotoDTO();
 				empleadoFoto.setFotografia(empleado.getFotografia());
 				this.empleado.setEmpleadoFoto(empleadoFoto);
