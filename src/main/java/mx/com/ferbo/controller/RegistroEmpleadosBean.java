@@ -25,6 +25,7 @@ import mx.com.ferbo.dao.CatPlantaDAO;
 import mx.com.ferbo.dao.CatPuestoDAO;
 import mx.com.ferbo.dao.DetBiometricoDAO;
 import mx.com.ferbo.dao.EmpleadoDAO;
+import mx.com.ferbo.dao.EmpleadoFotoDAO;
 import mx.com.ferbo.dao.ParametroDAO;
 import mx.com.ferbo.dao.sat.TipoContratoDAO;
 import mx.com.ferbo.dao.sat.TipoJornadaDAO;
@@ -72,6 +73,8 @@ public class RegistroEmpleadosBean implements Serializable {
     private final CatPuestoDAO catPuestoDAO;
     private final CatAreaDAO catAreaDAO;
     private final EmpleadoDAO empleadoDAO;
+    private EmpleadoFotoDAO empleadoFotoDAO;
+    
     private DatoEmpresaDTO datoEmpresa;
     private final DetBiometricoDAO biometricoDAO;
     private List<TipoContratoDTO> tiposContrato;
@@ -102,6 +105,7 @@ public class RegistroEmpleadosBean implements Serializable {
         tipoJornadaDAO = new TipoJornadaDAO();
         tipoRegimenDAO = new TipoRegimenDAO();
         parametroDAO = new ParametroDAO();
+        empleadoFotoDAO = new EmpleadoFotoDAO();
         
         empleadoSelected = new DetEmpleadoDTO();
         lstEmpleados = new ArrayList<>();
@@ -165,7 +169,7 @@ public class RegistroEmpleadosBean implements Serializable {
     public void editar() {
     	log.info("Cargando información del empleado: {}", this.empleadoSelected);
     	Integer idEmpleado = this.empleadoSelected.getIdEmpleado();
-    	DetEmpleadoDTO e = empleadoDAO.buscarPorId(idEmpleado, true);
+    	DetEmpleadoDTO e = empleadoDAO.buscarPorId(idEmpleado, true, true);
     	DatoEmpresaDTO datoEmpresa = e.getDatoEmpresa();
     	EmpleadoFotoDTO empleadoFoto = e.getEmpleadoFoto();
     	if(datoEmpresa == null) {
@@ -179,6 +183,8 @@ public class RegistroEmpleadosBean implements Serializable {
     	}
     	
     	log.info("Empleado seleccionado: {}", this.empleadoSelected.getIdEmpleado());
+    	log.info("Foto: {}", empleadoFoto.getFotografia());
+    	PrimeFaces.current().ajax().update("formRegistroEmpleado:panelDialogFoto");
     }
 
     /*
@@ -250,14 +256,6 @@ public class RegistroEmpleadosBean implements Serializable {
 	        PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:dtEmpleados");
 			
     	}
-    	
-    	
-        
-
-//        detBiometrico = new DetBiometricoDTO();
-//        consultaEmpleados();
-//        PrimeFaces.current().executeScript("PF('dialogEmpleado').hide()");
-//        PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:dtEmpleados");
     }
 
     /*
@@ -307,7 +305,7 @@ public class RegistroEmpleadosBean implements Serializable {
     }
 
     public void oncapture(CaptureEvent captureEvent) {
-        empleadoSelected.setFotografia("data:image/jpeg;base64," + Base64.getEncoder().encodeToString(captureEvent.getData()));
+        this.empleadoSelected.getEmpleadoFoto().setFotografia("data:image/jpeg;base64," + Base64.getEncoder().encodeToString(captureEvent.getData()));
     }
 
     public void consultaBiometrico() {
