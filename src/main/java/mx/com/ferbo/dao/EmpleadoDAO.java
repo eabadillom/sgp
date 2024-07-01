@@ -72,7 +72,8 @@ public class EmpleadoDAO extends DAO<DetEmpleadoDTO, DetEmpleado, Integer> imple
     		dto.setFechaIngreso(model.getFechaIngreso());
     		dto.setNss(model.getNss());
     		dto.setActivo(model.getActivo());
-    		dto.setFotografia(null);
+    		//TODO deshabilitar la extracción de fotografía...
+    		dto.setFotografia(model.getFotografia());
     		dto.setSueldoDiario(model.getSueldoDiario());
     		
     		if(isFullInfo == false)
@@ -106,6 +107,8 @@ public class EmpleadoDAO extends DAO<DetEmpleadoDTO, DetEmpleado, Integer> imple
     		model.setFechaIngreso(dto.getFechaIngreso());
     		model.setNss(dto.getNss());
     		model.setActivo(dto.getActivo());
+    		//TODO deshabilitar la extracción de fotografía...
+    		model.setFotografia(dto.getFotografia());
     		model.setSueldoDiario(dto.getSueldoDiario());
     		model.setDatoEmpresa(new DatoEmpresaDAO().getModel(dto.getDatoEmpresa()));
     		model.setEmpleadoFoto(new EmpleadoFotoDAO().getModel(dto.getEmpleadoFoto()));
@@ -200,8 +203,11 @@ public class EmpleadoDAO extends DAO<DetEmpleadoDTO, DetEmpleado, Integer> imple
     			log.info("id dato empresa: {}", model.getDatoEmpresa().getId() == null ? null : model.getDatoEmpresa().getId());
     		}
     		dto = getDTO(model, isFullInfo);
-    		log.info("id foto: {}", model.getEmpleadoFoto().getId());
-    		dto.setEmpleadoFoto(new EmpleadoFotoDAO().getDTO(model.getEmpleadoFoto()));
+    		
+    		if(isGetFoto) {
+    			dto.setEmpleadoFoto(new EmpleadoFotoDAO().getDTO(model.getEmpleadoFoto()));
+    			log.info("id foto: {}", model.getEmpleadoFoto() == null ? null : model.getEmpleadoFoto().getId());
+    		}
     	} catch(Exception ex) {
     		log.error("Problema para obtener el empleado con id " + id, ex);
     	} finally {
