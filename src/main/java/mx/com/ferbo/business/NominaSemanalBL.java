@@ -17,6 +17,7 @@ import mx.com.ferbo.dao.CatTarifaIsrDAO;
 import mx.com.ferbo.dao.CuotaIMSSDAO;
 import mx.com.ferbo.dao.DiaNoLaboralDAO;
 import mx.com.ferbo.dao.EmpleadoDAO;
+import mx.com.ferbo.dao.PrestamoDAO;
 import mx.com.ferbo.dao.RegistroDAO;
 import mx.com.ferbo.dao.TipoPercepcionDAO;
 import mx.com.ferbo.dao.sat.TipoDeduccionDAO;
@@ -38,6 +39,7 @@ import mx.com.ferbo.dto.NominaOtroPagoPK;
 import mx.com.ferbo.dto.NominaPercepcionDTO;
 import mx.com.ferbo.dto.NominaPercepcionDTOPK;
 import mx.com.ferbo.dto.NominaReceptorDTO;
+import mx.com.ferbo.dto.PrestamoDTO;
 import mx.com.ferbo.dto.sat.TipoDeduccionDTO;
 import mx.com.ferbo.dto.sat.TipoOtroPagoDTO;
 import mx.com.ferbo.dto.sat.TipoPercepcionDTO;
@@ -84,6 +86,8 @@ public class NominaSemanalBL {
 	private BigDecimal invalidezVida = null;
 	private BigDecimal cesantiaEdadAvanzadaVejez = null;
 	private BigDecimal imss = null;
+	//PRESTAMOS
+	private BigDecimal totalPrestamos = null;
 	//TOTAL DEDUCCIONES
 	private BigDecimal totalDeducciones;
 	
@@ -106,6 +110,7 @@ public class NominaSemanalBL {
 	private TipoPercepcionDAO tipoPercepcionDAO = null;
 	private TipoOtroPagoDAO tipoOtroPagoDAO = null;
 	private TipoDeduccionDAO tipoDeduccionDAO = null;
+	private PrestamoDAO prestamoDAO = null;
 	
 	//OBJETOS RELACIONADOS A LA NOMINA Y CFDI
 	public NominaSemanalBL(DetEmpleadoDTO empleado, Date periodoInicio, Date periodoFin) {
@@ -178,6 +183,8 @@ public class NominaSemanalBL {
 		BigDecimal diasPeriodo = null;
 		CatTarifaIsrDTO tarifaISR = null;
 		CatSubsidioDTO tarifaSubsidio = null;
+		
+		List<PrestamoDTO> prestamos = null;
 		
 		NominaDTO nominaNew = null;
 		NominaPercepcionDTO pSueldo = null;
@@ -260,6 +267,14 @@ public class NominaSemanalBL {
 					.add(this.invalidezVida)
 					.add(this.cesantiaEdadAvanzadaVejez)
 					;
+			
+			
+			this.totalPrestamos = this.procesaPrestamos(this.empleado);
+			
+			
+			
+			
+			
 			
 			this.totalDeducciones = this.isr.add(this.imss);
 			this.neto = this.totalPercepciones.subtract(totalDeducciones);
@@ -390,6 +405,27 @@ public class NominaSemanalBL {
 		return nominaNew;
 	}
 	
+	private BigDecimal procesaPrestamos(DetEmpleadoDTO empleado) {
+		BigDecimal totalPrestamos = null;
+		List<PrestamoDTO> prestamos = null;
+		NominaDeduccionDTO deduccion = null;
+		List<NominaDeduccionDTO> deducciones = null;
+		try {
+			prestamos = prestamoDAO.buscar(empleado.getIdEmpleado());
+			
+			deducciones = new ArrayList<NominaDeduccionDTO>();
+			for(PrestamoDTO prestamo : prestamos) {
+				deduccion = new NominaDeduccionDTO();
+				
+				
+			}
+			
+		} catch(Exception ex) {
+			log.error("Problema para procesar los préstamos del empleado");
+		}
+		return totalPrestamos;
+	}
+
 	/**Con base en las asistencias del trabajador, se determina cuantos días se presentó a laborar.
 	 * @param mapAsistencias Registro de asistencias del trabajador
 	 * @param diasPorSemana Máximo de días por periodo que un trabajador puede laborar (según contrato).<br>

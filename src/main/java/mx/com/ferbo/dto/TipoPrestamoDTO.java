@@ -2,16 +2,18 @@ package mx.com.ferbo.dto;
 
 import java.util.Objects;
 
+import mx.com.ferbo.dto.sat.TipoDeduccionDTO;
+
 public class TipoPrestamoDTO {
 	
-	private String tipoPrestamo;
+	private String clave;
 	private String descripcion;
-	
-	public String getTipoPrestamo() {
-		return tipoPrestamo;
+	private TipoDeduccionDTO tipoDeduccion;
+	public String getClave() {
+		return clave;
 	}
-	public void setTipoPrestamo(String tipoPrestamo) {
-		this.tipoPrestamo = tipoPrestamo;
+	public void setClave(String clave) {
+		this.clave = clave;
 	}
 	public String getDescripcion() {
 		return descripcion;
@@ -19,13 +21,15 @@ public class TipoPrestamoDTO {
 	public void setDescripcion(String descripcion) {
 		this.descripcion = descripcion;
 	}
-	@Override
-	public String toString() {
-		return "TipoPrestamoDTO [tipoPrestamo=" + tipoPrestamo + ", descripcion=" + descripcion + "]";
+	public TipoDeduccionDTO getTipoDeduccion() {
+		return tipoDeduccion;
+	}
+	public void setTipoDeduccion(TipoDeduccionDTO tipoDeduccion) {
+		this.tipoDeduccion = tipoDeduccion;
 	}
 	@Override
 	public int hashCode() {
-		return Objects.hash(descripcion, tipoPrestamo);
+		return Objects.hash(clave, descripcion);
 	}
 	@Override
 	public boolean equals(Object obj) {
@@ -36,6 +40,10 @@ public class TipoPrestamoDTO {
 		if (getClass() != obj.getClass())
 			return false;
 		TipoPrestamoDTO other = (TipoPrestamoDTO) obj;
-		return Objects.equals(descripcion, other.descripcion) && Objects.equals(tipoPrestamo, other.tipoPrestamo);
+		return Objects.equals(clave, other.clave) && Objects.equals(descripcion, other.descripcion);
+	}
+	@Override
+	public String toString() {
+		return "TipoPrestamoDTO [clave=" + clave + ", descripcion=" + descripcion + "]";
 	}
 }

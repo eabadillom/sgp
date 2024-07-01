@@ -9,6 +9,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -225,7 +226,7 @@ public class DetEmpleado implements Serializable {
     @JoinColumn(name = "id_empleado_empresa")
     private InfDatoEmpresa datoEmpresa;
     
-    @OneToOne(cascade = {CascadeType.ALL})
+    @OneToOne(cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
     @JoinColumn(name = "id_empleado_foto")
     private DetEmpleadoFoto empleadoFoto;
 
