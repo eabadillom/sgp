@@ -156,15 +156,15 @@ table{
     margin: 0px;
 }
 
-#introduceHuella{
+#dialogSystem{
     box-shadow: 8px 8px 5px #444;
 }
 
-#escanea, #valida, #invalida{
+#reporte, #escanea, #valida, #invalida{
     align-content: center;
 }
 
-#mensajeHuella, #espere{
+#mensajeUsuario, #espere{
     align-self: center;
     font-size: 20px;
     font-family: Tahoma;
@@ -177,7 +177,7 @@ table{
     align-self: auto;
 }
 
-#imagenHuella{
+#aviso{
     align-content: center;
     vertical-align: middle;
 }

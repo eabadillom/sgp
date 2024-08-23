@@ -9,7 +9,7 @@ $(document).ready(function () {
         }
     });
 
-    $('#introduceHuella').dialog({
+    $('#dialogSystem').dialog({
         autoOpen: false,
         modal: true,
         width: 'auto',
@@ -63,63 +63,71 @@ $(document).ready(function () {
         accion.val("perfil");
     });
 });
-function myAlert(mensaje) {
-    dialogos(3);
-    jQuery("#dialog-message").text(mensaje);
-    $("#dialog-message").dialog({title: "Aviso del sistema..."});
-    $("#dialog-message").dialog("open");
-}
 
 function dialogos(st) {
 
     switch (st) {
         case 1:
-            $('#introduceHuella').dialog('open');
+            $('#dialogSystem').dialog('open');
             $('#procesando').dialog('close');
             break;
 
         case 2:
-            $('#introduceHuella').dialog('close');
+            $('#dialogSystem').dialog('close');
             $('#procesando').dialog('open');
             break;
 
         case 3:
-            $('#introduceHuella').dialog('close');
+            $('#dialogSystem').dialog('close');
             $('#procesando').dialog('close');
             break;
     }
 }
 
-function tipoHuella(caso) {
+function tipoMensaje(numDialog, message) {
+    
+    $('#mensajeUsuario').html(message);
 
-    switch (caso) {
+    switch (numDialog) {
         case 1:
+            $('#reporte').hide();
             $('#escanea').show();
             $('#coloca').show();
             $('#valida').hide();
             $('#acepta').hide();
             $('#invalida').hide();
             $('#niega').hide();
-            $('#mensajeHuella').html("Coloca tu huella en el lector");
             break;
+            
         case 2:
+            $('#reporte').hide();
             $('#escanea').hide();
             $('#coloca').hide();
             $('#valida').show();
             $('#acepta').show();
             $('#invalida').hide();
             $('#niega').hide();
-            $('#mensajeHuella').html("Huella capturada correctamente");
             break;
+            
         case 3:
+            $('#reporte').hide();
             $('#escanea').hide();
             $('#coloca').hide();
             $('#valida').hide();
             $('#acepta').hide();
             $('#invalida').show();
             $('#niega').show();
-            $('#mensajeHuella').html("Huella invalida. Intenta de nuevo");
             break;
+            
+        case 4:
+            $('#reporte').show();
+            $('#escanea').hide();
+            $('#coloca').hide();
+            $('#valida').hide();
+            $('#acepta').hide();
+            $('#invalida').hide();
+            $('#niega').show();
+            break;  
     }
 }
 
@@ -127,17 +135,16 @@ function delay(time) {
     return new Promise(resolve => setTimeout(resolve, time));
 }
 
+async function freeze(isFreeze, st, numDialog, message, token, appPath) {
 
-async function freeze(t, valor1, valor2, token, appPath) {
-
-    if (t) {
-        dialogos(valor1);
-        tipoHuella(valor2);
+    if (isFreeze) {
+        dialogos(st);
+        tipoMensaje(numDialog, message);
         await delay(3000);
         dialogos(3);
     } else {
-        dialogos(valor1);
-        tipoHuella(valor2);
+        dialogos(st);
+        tipoMensaje(numDialog, message);
         await delay(1000);
         registryServlet(token, appPath);
     }
@@ -150,7 +157,8 @@ function lectura(accion, appPath) {
     var num = $("#numero").val();
 
     if (num.length === 0) {
-        myAlert("Debe indicar un numero de empleado.");
+        $('#dialogSystem').dialog({title: "Aviso del sistema"});
+        freeze(true, 1, 4, "Debe ingresar un numero de usuario", null, null);
         $("#inoutES").prop("disabled", false);
         $("#inoutP").prop("disabled", false);
         return;
@@ -162,9 +170,9 @@ function lectura(accion, appPath) {
     var jsonString = JSON.stringify(obj);
     var botonES = $("#inoutES").prop("disabled", false);
 
-    $('#introduceHuella').dialog({title: "Lectura de huella"});
+    $('#dialogSystem').dialog({title: "Lectura de huella"});
     dialogos(1);
-    tipoHuella(1);
+    tipoMensaje(1,"Coloca tu huella en el lector");
 
     $.ajax({
         async: true,
@@ -177,14 +185,15 @@ function lectura(accion, appPath) {
 
         success: function (jsonObj) {
             jsonObj.biometricData1;
-            console.log("Entrando a funcion validar.....")
+            console.log("Entrando a funcion validar.....");
             validar(jsonObj.biometricData1, appPath);
-            console.log("Saliendo de funcion lectura...................")
+            console.log("Saliendo de funcion lectura...................");
             $("#inoutES").prop("disabled", false);
             $("#inoutP").prop("disabled", false);
         },
         error: function (jsonObj) {
-            myAlert("No hay respuesta del lector de huella.");
+            $('dialogSystem').dialog({title: 'Aviso del sistema'});
+            freeze(true, 1, 4, "Lector de huella no detectado", null, null);
             $("#inoutES").prop("disabled", false);
             $("#inoutP").prop("disabled", false);
         }
@@ -216,12 +225,12 @@ function validar(captura, appPath) {
             var token = jsonObj.token;
             var verificacion = jsonObj.verifyBiometricData;
             if (verificacion) {
-                $('#introduceHuella').dialog({title: "Exito"});
-                freeze(false, 1, 2, token, appPath);
+                $('#dialogSystem').dialog({title: "Exito"});
+                freeze(false, 1, 2, "Huella capturada correctamente",token, appPath);
 
             } else {
-                $('#introduceHuella').dialog({title: "Error"});
-                freeze(true, 1, 3, null, null);
+                $('#dialogSystem').dialog({title: "Error"});
+                freeze(true, 1, 3, "Huella invalida. Intente de nuevo.", null, null);
             }
 
         },
@@ -229,15 +238,17 @@ function validar(captura, appPath) {
             var jsonText = jsonText = jsonObj.responseText;
             var respuesta = null;
             if (jsonText === undefined || jsonText === null) {
-                respuesta = {"lastMessageError": "No hay respuesta de Facturama."};
+                //respuesta = {"lastMessageError": "No hay respuesta de Facturama."};
             } else {
+               $('#dialogSystem').dialog({title: "Aviso del sistema"});
+                freeze(true, 1, 4, "El numero " + numeroEmp + " no esta registrado.", null, null);
                 respuesta = JSON.parse(jsonText);
             }
-
-            myAlert(respuesta.lastMessageError);
+            $('#dialogSystem').dialog({title: "Error"});
+                freeze(true, 1, 4, "No hay respuesta de facturama.", null, null);
         }
     });
-    console.log("Saliendo de funcion validar.............")
+    console.log("Saliendo de funcion validar.............");
 }
 
 function registryServlet(objeto1, appPath) {
@@ -260,12 +271,13 @@ function registryServlet(objeto1, appPath) {
         success: function (jsonObj) {
             var url = jsonObj.url;
             var myUrl = appPath + url;
-            console.log("function jsonObj..........")
+            console.log("function jsonObj..........");
             console.log("Registo exitoso");
             location.href = myUrl;
         },
         error: function (jsonObj) {
-            myAlert("No hay respuesta del lector de huella.");
+            $('#dialogSystem').dialog({title: "Aviso del sistema"});
+            freeze(true, 1, 4, "Notifique al admistrador de sistemas.", null, null);
         }
     });
     var prueba = new Arrar(3);
