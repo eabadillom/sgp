@@ -8,7 +8,7 @@
 <%
     String path = request.getContextPath();
     String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + path;
-    String imagesPath = basePath + "/resources/recursos/images/huella";
+    String imagesPath = basePath + "/resources/recursos/images/dialog";
 
     if (empleado != null) {
         request.getSession().invalidate();
@@ -32,8 +32,6 @@
         <script src="<%= basePath%>/scriptLogin.js"></script>
     </head>
     <body  class="login-body">
-        <div id="dialog-message" class="dialog-box" style="background-color: #FFFFFF; color: #000000; display: none;"></div>
-
         <div align="center">
             <img src="resources/recursos/images/login.png" width="400" height="170" >
         </div>
@@ -61,21 +59,23 @@
                 </div>
             </form>
         </div>
-        <div id="introduceHuella" title="un titulo" style="display: none;">
+        <div id="dialogSystem" title="un titulo" style="display: none;">
             <table id="tab-introduce">
                 <tr>
-                    <td id="imagenHuella" align="center" valign="center">
+                    <td id="aviso" align="center" valign="center">
+                        <img id="reporte" src="<%= imagesPath %>/administrador.png">
                         <img id="escanea" src="<%= imagesPath %>/finger_print_01s.png">
                         <img id="valida" src="<%= imagesPath %>/finger_print_02s.png">
                         <img id="invalida" src="<%= imagesPath %>/finger_print_03s.png">
+                        
                     </td>
                 </tr>
                 <tr>
-                    <td>
+                    <td id="estado">
                         <img id="coloca" src="<%= imagesPath %>/huella.gif">
                         <img id="acepta" src="<%= imagesPath %>/pasa.png">
                         <img id="niega" src="<%= imagesPath %>/nopasa.png">
-                        <label id="mensajeHuella">unTexto</label>
+                        <label id="mensajeUsuario">unTexto</label>
                     </td>
                 </tr>
                 
