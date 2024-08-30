@@ -14,8 +14,8 @@ import javax.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.dto.DetEmpleadoDTO;
-import mx.com.ferbo.dto.EmpleadoFotoDTO;
+import mx.com.ferbo.model.DetEmpleado;
+import mx.com.ferbo.model.DetEmpleadoFoto;
 import mx.com.ferbo.util.DateUtil;
 
 @Named(value = "SideBarBean")
@@ -23,8 +23,8 @@ import mx.com.ferbo.util.DateUtil;
 public class SideBarBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private DetEmpleadoDTO empleadoSelected;
-	private EmpleadoFotoDTO empleadoFoto;
+	private DetEmpleado empleadoSelected;
+	private DetEmpleadoFoto empleadoFoto;
 	private HttpServletRequest request;
 	private static Logger log = LogManager.getLogger(SideBarBean.class);
 	private Date fechaActual;
@@ -45,8 +45,8 @@ public class SideBarBean implements Serializable {
 		try {
 			request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
 			session = request.getSession(false);
-			empleadoSelected = (DetEmpleadoDTO) session.getAttribute("empleado");
-			empleadoFoto = (EmpleadoFotoDTO) session.getAttribute("fotografia");
+			empleadoSelected = (DetEmpleado) session.getAttribute("empleado");
+			empleadoFoto = (DetEmpleadoFoto) session.getAttribute("fotografia");
 			showUniformes = validarUniformes();
 			showArticulos = validarArticulos();
 			
@@ -105,11 +105,11 @@ public class SideBarBean implements Serializable {
 		log.info("Finalizando sesion..........");
 	}
 
-	public DetEmpleadoDTO getEmpleadoSelected() {
+	public DetEmpleado getEmpleadoSelected() {
 		return empleadoSelected;
 	}
 
-	public void setEmpleadoSelected(DetEmpleadoDTO empleadoSelected) {
+	public void setEmpleadoSelected(DetEmpleado empleadoSelected) {
 		this.empleadoSelected = empleadoSelected;
 	}
 
@@ -153,11 +153,11 @@ public class SideBarBean implements Serializable {
 		this.showArticulos = showArticulos;
 	}
 
-	public EmpleadoFotoDTO getEmpleadoFoto() {
+	public DetEmpleadoFoto getEmpleadoFoto() {
 		return empleadoFoto;
 	}
 
-	public void setEmpleadoFoto(EmpleadoFotoDTO empleadoFoto) {
+	public void setEmpleadoFoto(DetEmpleadoFoto empleadoFoto) {
 		this.empleadoFoto = empleadoFoto;
 	}
 

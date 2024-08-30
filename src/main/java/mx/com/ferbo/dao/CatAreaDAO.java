@@ -13,10 +13,7 @@ import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.dto.CatAreaDTO;
 import mx.com.ferbo.model.CatArea;
 
-/**
- *
- * @author Gabo
- */
+@Deprecated
 @Stateless
 @LocalBean
 public class CatAreaDAO extends IBaseDAO<CatAreaDTO, Integer> implements Serializable {

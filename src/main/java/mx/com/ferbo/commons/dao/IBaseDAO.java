@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.SGPException;
 
+@Deprecated
 public abstract class IBaseDAO<DTO, ID> {
 
     protected EntityManager emSGP = EntityManagerUtil.getEntityManager();

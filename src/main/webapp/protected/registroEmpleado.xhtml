@@ -292,7 +292,7 @@
                             <f:facet name="footer">
                                 <p:commandButton  value="Capture" icon="pi pi-camera" onclick="PF('pc').capture()" process="@this" 
                                                   update="formRegistroEmpleado:photo formRegistroEmpleado:btnAceptarFoto"/>
-                                <p:commandButton id="btnAceptarFoto" value="Aceptar" disabled="#{registroEmpleadosBean.empleadoSelected.fotografia eq null}" 
+                                <p:commandButton id="btnAceptarFoto" value="Aceptar" disabled="#{registroEmpleadosBean.empleadoSelected.empleadoFoto.fotografia eq null}" 
                                                  oncomplete="PF('pc').detach();" class="ui-button-success" icon="pi pi-check" onclick="PF('dialogFotografia').hide()" process="@this"/>
                                 <p:commandButton value="Cancelar" icon="pi pi-times" actionListener="#{registroEmpleadosBean.empleadoSelected.setFotografia(null)}" onclick="PF('dialogFotografia').hide(); PF('pc').detach();" class="ui-button-secondary" />
                             </f:facet>

@@ -13,10 +13,7 @@ import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.dto.CatPerfilDTO;
 import mx.com.ferbo.model.CatPerfil;
 
-/**
- *
- * @author Gabo
- */
+@Deprecated
 @Stateless
 @LocalBean
 public class CatPerfilDAO extends IBaseDAO<CatPerfilDTO, Integer> implements Serializable {

@@ -19,6 +19,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "cat_puesto")
 @NamedQueries({
+	@NamedQuery(name = "CatPuesto.findActive", query = "SELECT c FROM CatPuesto c WHERE c.activo = 1 "),
     @NamedQuery(name = "CatPuesto.findAll", query = "SELECT new mx.com.ferbo.dto.CatPuestoDTO("
             + " c.idPuesto,"
             + " c.descripcion,"

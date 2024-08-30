@@ -21,6 +21,7 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "cat_area")
 @NamedQueries({
+	@NamedQuery(name = "CatArea.findActive", query = "SELECT c FROM CatArea c WHERE c.activo = 1"),
     @NamedQuery(name = "CatArea.findAll", query = "SELECT new mx.com.ferbo.dto.CatAreaDTO("
             + " c.idArea,"
             + " c.descripcion,"

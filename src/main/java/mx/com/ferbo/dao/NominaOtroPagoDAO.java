@@ -5,18 +5,18 @@ import java.util.List;
 
 import mx.com.ferbo.commons.dao.DAO;
 import mx.com.ferbo.dao.sat.TipoOtroPagoDAO;
-import mx.com.ferbo.dto.NominaOtroPagoDTO;
-import mx.com.ferbo.dto.NominaOtroPagoPK;
 import mx.com.ferbo.model.DetNominaOtroPago;
 import mx.com.ferbo.model.DetNominaOtroPagoPK;
+import mx.com.ferbo.model.NominaOtroPago;
+import mx.com.ferbo.model.NominaOtroPagoPK;
 
-public class NominaOtroPagoDAO extends DAO<NominaOtroPagoDTO, DetNominaOtroPago, DetNominaOtroPagoPK> {
+public class NominaOtroPagoDAO extends DAO<NominaOtroPago, DetNominaOtroPago, DetNominaOtroPagoPK> {
 
 	@Override
-	public NominaOtroPagoDTO getDTO(DetNominaOtroPago model) {
-		NominaOtroPagoDTO dto = null;
+	public NominaOtroPago getDTO(DetNominaOtroPago model) {
+		NominaOtroPago dto = null;
 		try {
-			dto = new NominaOtroPagoDTO();
+			dto = new NominaOtroPago();
 			dto.setKey(new NominaOtroPagoPK(new NominaDAO().buscarPorId(model.getKey().getNomina().getId(), false), model.getKey().getId()));
 			dto.setTipoOtroPago(new TipoOtroPagoDAO().getDTO(model.getTipoOtroPago()));
 			dto.setClave(model.getClave());
@@ -28,10 +28,10 @@ public class NominaOtroPagoDAO extends DAO<NominaOtroPagoDTO, DetNominaOtroPago,
 		return dto;
 	}
 	
-	public NominaOtroPagoDTO getDTO(DetNominaOtroPago model, boolean isFullInfo) {
-		NominaOtroPagoDTO dto = null;
+	public NominaOtroPago getDTO(DetNominaOtroPago model, boolean isFullInfo) {
+		NominaOtroPago dto = null;
 		try {
-			dto = new NominaOtroPagoDTO();
+			dto = new NominaOtroPago();
 			dto.setKey(new NominaOtroPagoPK(new NominaDAO().buscarPorId(model.getKey().getNomina().getId(), false), model.getKey().getId()));
 			dto.setClave(model.getClave());
 			dto.setNombre(model.getNombre());
@@ -46,7 +46,7 @@ public class NominaOtroPagoDAO extends DAO<NominaOtroPagoDTO, DetNominaOtroPago,
 	}
 
 	@Override
-	public DetNominaOtroPago getModel(NominaOtroPagoDTO dto) {
+	public DetNominaOtroPago getModel(NominaOtroPago dto) {
 		DetNominaOtroPago model = null;
 		try {
 			model = new DetNominaOtroPago();
@@ -61,7 +61,7 @@ public class NominaOtroPagoDAO extends DAO<NominaOtroPagoDTO, DetNominaOtroPago,
 		return model;
 	}
 	
-	public DetNominaOtroPago getModel(NominaOtroPagoDTO dto, boolean isFullInfo) {
+	public DetNominaOtroPago getModel(NominaOtroPago dto, boolean isFullInfo) {
 		DetNominaOtroPago model = null;
 		try {
 			model = new DetNominaOtroPago();
@@ -79,13 +79,13 @@ public class NominaOtroPagoDAO extends DAO<NominaOtroPagoDTO, DetNominaOtroPago,
 		return model;
 	}
 	
-	public List<NominaOtroPagoDTO> getDTOList(List<DetNominaOtroPago> modelList) {
-		List<NominaOtroPagoDTO> dtoList = null;
+	public List<NominaOtroPago> getDTOList(List<DetNominaOtroPago> modelList) {
+		List<NominaOtroPago> dtoList = null;
 		
 		try {
 			dtoList = new ArrayList<>();
 			for(DetNominaOtroPago model : modelList) {
-				NominaOtroPagoDTO dto = this.getDTO(model, false);
+				NominaOtroPago dto = this.getDTO(model, false);
 				dtoList.add(dto);
 			}
 			
@@ -96,25 +96,25 @@ public class NominaOtroPagoDAO extends DAO<NominaOtroPagoDTO, DetNominaOtroPago,
 	}
 
 	@Override
-	public NominaOtroPagoDTO buscarPorId(DetNominaOtroPagoPK id, boolean isFullInfo) {
+	public NominaOtroPago buscarPorId(DetNominaOtroPagoPK id, boolean isFullInfo) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<NominaOtroPagoDTO> buscarTodos() {
+	public List<NominaOtroPago> buscarTodos() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<NominaOtroPagoDTO> buscarActivo() {
+	public List<NominaOtroPago> buscarActivo() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<NominaOtroPagoDTO> buscarPorCriterios(NominaOtroPagoDTO dto) {
+	public List<NominaOtroPago> buscarPorCriterios(NominaOtroPago dto) {
 		// TODO Auto-generated method stub
 		return null;
 	}

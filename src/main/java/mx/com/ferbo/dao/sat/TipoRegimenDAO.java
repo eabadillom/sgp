@@ -12,6 +12,7 @@ import mx.com.ferbo.commons.dao.DAO;
 import mx.com.ferbo.dto.sat.TipoRegimenDTO;
 import mx.com.ferbo.model.sat.CatTipoRegimen;
 
+@Deprecated
 public class TipoRegimenDAO extends DAO<TipoRegimenDTO, CatTipoRegimen, String> {
 	private static Logger log = LogManager.getLogger(TipoRegimenDAO.class);
 

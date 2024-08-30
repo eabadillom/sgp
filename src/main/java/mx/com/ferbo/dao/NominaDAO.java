@@ -7,19 +7,19 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.DAO;
 import mx.com.ferbo.dao.sat.MetodoPagoDAO;
-import mx.com.ferbo.dto.NominaDTO;
 import mx.com.ferbo.model.DetNomina;
+import mx.com.ferbo.model.Nomina;
 
-public class NominaDAO extends DAO<NominaDTO, DetNomina, Integer> {
+public class NominaDAO extends DAO<Nomina, DetNomina, Integer> {
 	
 	private static Logger log = LogManager.getLogger(NominaDAO.class);
 
 	@Override
-	public NominaDTO getDTO(DetNomina model) {
-		NominaDTO dto = null;
+	public Nomina getDTO(DetNomina model) {
+		Nomina dto = null;
 		
 		try {
-			dto = new NominaDTO();
+			dto = new Nomina();
 			dto.setId(model.getId());
 			dto.setMoneda(model.getMoneda());
 			dto.setFechaEmision(model.getFechaEmision());
@@ -51,11 +51,11 @@ public class NominaDAO extends DAO<NominaDTO, DetNomina, Integer> {
 		return dto;
 	}
 	
-	public NominaDTO getDTO(DetNomina model, boolean isFullInfo) {
-		NominaDTO dto = null;
+	public Nomina getDTO(DetNomina model, boolean isFullInfo) {
+		Nomina dto = null;
 		
 		try {
-			dto = new NominaDTO();
+			dto = new Nomina();
 			dto.setId(model.getId());
 			dto.setMoneda(model.getMoneda());
 			dto.setFechaEmision(model.getFechaEmision());
@@ -85,37 +85,37 @@ public class NominaDAO extends DAO<NominaDTO, DetNomina, Integer> {
 	}
 
 	@Override
-	public DetNomina getModel(NominaDTO dto) {
+	public DetNomina getModel(Nomina dto) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public NominaDTO buscarPorId(Integer id) {
+	public Nomina buscarPorId(Integer id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<NominaDTO> buscarTodos() {
+	public List<Nomina> buscarTodos() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<NominaDTO> buscarActivo() {
+	public List<Nomina> buscarActivo() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<NominaDTO> buscarPorCriterios(NominaDTO dto) {
+	public List<Nomina> buscarPorCriterios(Nomina dto) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public NominaDTO buscarPorId(Integer id, boolean isFullInfo) {
+	public Nomina buscarPorId(Integer id, boolean isFullInfo) {
 		// TODO Auto-generated method stub
 		return null;
 	}

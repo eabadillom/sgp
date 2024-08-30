@@ -1,13 +1,13 @@
-package mx.com.ferbo.dto;
+package mx.com.ferbo.model;
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import mx.com.ferbo.dto.sat.MetodoPagoDTO;
+import mx.com.ferbo.model.sat.CatMetodoPago;
 
-public class NominaDTO {
+public class Nomina {
 	
 	private Integer id;
 	private String moneda;
@@ -18,19 +18,20 @@ public class NominaDTO {
 	private String idPac;
 	private String tipoComprobante;
 	private String claveExportacion;
-	private MetodoPagoDTO metodoPago;
+	private CatMetodoPago metodoPago;
 	private String serie;
 	private String folio;
 	private BigDecimal subtotal;
 	private BigDecimal descuento;
 	private BigDecimal total;
-	private NominaEmisorDTO emisor;
-	private NominaReceptorDTO receptor;
-	private List<NominaConceptoDTO> conceptos;
-	private List<NominaPercepcionDTO> percepciones;
-	private List<NominaOtroPagoDTO> otrosPagos;
-	private List<NominaDeduccionDTO> deducciones;
+	private DetNominaEmisor emisor;
+	private DetNominaReceptor receptor;
+	private List<NominaConcepto> conceptos;
+	private List<NominaPercepcion> percepciones;
+	private List<NominaOtroPago> otrosPagos;
+	private List<NominaDeduccion> deducciones;
 	
+	//TODO Revisar si los siguientes datos NO son parte del CFDI.
 	private Integer ejercicio;
 	private Integer periodo;
 	private Integer diasLaborados;
@@ -92,10 +93,10 @@ public class NominaDTO {
 	public void setClaveExportacion(String claveExportacion) {
 		this.claveExportacion = claveExportacion;
 	}
-	public MetodoPagoDTO getMetodoPago() {
+	public CatMetodoPago getMetodoPago() {
 		return metodoPago;
 	}
-	public void setMetodoPago(MetodoPagoDTO metodoPago) {
+	public void setMetodoPago(CatMetodoPago metodoPago) {
 		this.metodoPago = metodoPago;
 	}
 	public String getSerie() {
@@ -128,34 +129,34 @@ public class NominaDTO {
 	public void setTotal(BigDecimal total) {
 		this.total = total;
 	}
-	public NominaEmisorDTO getEmisor() {
+	public DetNominaEmisor getEmisor() {
 		return emisor;
 	}
-	public void setEmisor(NominaEmisorDTO emisor) {
+	public void setEmisor(DetNominaEmisor emisor) {
 		this.emisor = emisor;
 	}
-	public NominaReceptorDTO getReceptor() {
+	public DetNominaReceptor getReceptor() {
 		return receptor;
 	}
-	public void setReceptor(NominaReceptorDTO receptor) {
+	public void setReceptor(DetNominaReceptor receptor) {
 		this.receptor = receptor;
 	}
-	public List<NominaConceptoDTO> getConceptos() {
+	public List<NominaConcepto> getConceptos() {
 		return conceptos;
 	}
-	public void setConceptos(List<NominaConceptoDTO> conceptos) {
+	public void setConceptos(List<NominaConcepto> conceptos) {
 		this.conceptos = conceptos;
 	}
-	public List<NominaPercepcionDTO> getPercepciones() {
+	public List<NominaPercepcion> getPercepciones() {
 		return percepciones;
 	}
-	public void setPercepciones(List<NominaPercepcionDTO> percepciones) {
+	public void setPercepciones(List<NominaPercepcion> percepciones) {
 		this.percepciones = percepciones;
 	}
-	public List<NominaDeduccionDTO> getDeducciones() {
+	public List<NominaDeduccion> getDeducciones() {
 		return deducciones;
 	}
-	public void setDeducciones(List<NominaDeduccionDTO> deducciones) {
+	public void setDeducciones(List<NominaDeduccion> deducciones) {
 		this.deducciones = deducciones;
 	}
 	@Override
@@ -170,7 +171,7 @@ public class NominaDTO {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		NominaDTO other = (NominaDTO) obj;
+		Nomina other = (Nomina) obj;
 		return Objects.equals(id, other.id);
 	}
 	@Override
@@ -183,10 +184,10 @@ public class NominaDTO {
 				+ conceptos + ", percepciones=" + percepciones + ", deducciones=" + deducciones + "]";
 	}
 	
-	public List<NominaOtroPagoDTO> getOtrosPagos() {
+	public List<NominaOtroPago> getOtrosPagos() {
 		return otrosPagos;
 	}
-	public void setOtrosPagos(List<NominaOtroPagoDTO> otrosPagos) {
+	public void setOtrosPagos(List<NominaOtroPago> otrosPagos) {
 		this.otrosPagos = otrosPagos;
 	}
 	public Integer getDiasLaborados() {

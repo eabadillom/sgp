@@ -11,6 +11,7 @@ import mx.com.ferbo.commons.dao.DAO;
 import mx.com.ferbo.dto.ParametroDTO;
 import mx.com.ferbo.model.CatParametro;
 
+@Deprecated
 public class ParametroDAO extends DAO<ParametroDTO, CatParametro, Integer> {
 	private static Logger log = LogManager.getLogger(ParametroDAO.class);
 	

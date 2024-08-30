@@ -5,6 +5,7 @@ import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -51,6 +52,8 @@ import javax.persistence.TemporalType;
     @NamedQuery(name = "DetRegistro.findByNomina", query = "SELECT NEW mx.com.ferbo.dto.DetRegistroDTO( d.idRegistro, e.idEmpleado, d.fechaEntrada, d.fechaSalida, ce.idEstatus, ce.descripcion, ce.codigo) FROM DetRegistro d INNER JOIN d.idEmpleado e INNER JOIN d.idEstatus ce WHERE d.fechaEntrada BETWEEN :fechaEntrada AND :fechaSalida"),
     
     @NamedQuery(name = "DetRegistro.findByIdEmpleadoPeriodo", query = "SELECT NEW mx.com.ferbo.dto.DetRegistroDTO( d.idRegistro, e.idEmpleado, d.fechaEntrada, d.fechaSalida, ce.idEstatus, ce.descripcion, ce.codigo) FROM DetRegistro d INNER JOIN d.idEmpleado e INNER JOIN d.idEstatus ce WHERE d.idEmpleado.idEmpleado = :idEmpleado AND d.fechaEntrada BETWEEN :fechaEntrada AND :fechaSalida"),
+    
+    @NamedQuery(name = "DetRegistro.findByEmpleadoPeriodo", query = "SELECT d FROM DetRegistro d WHERE d.idEmpleado.idEmpleado = :idEmpleado AND d.fechaEntrada BETWEEN :fechaEntrada AND :fechaSalida"),
     
     @NamedQuery(name = "DetRegistro.findByIdEmplActivo", query = "SELECT NEW mx.com.ferbo.dto.DetRegistroDTO("
                                                   + " d.idRegistro,"
@@ -103,7 +106,7 @@ public class DetRegistro implements Serializable {
     private CatEstatusRegistro idEstatus;
     
     @JoinColumn(name = "id_empleado", referencedColumnName = "id_empleado")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private DetEmpleado idEmpleado;
 
     public DetRegistro() {
@@ -113,7 +116,14 @@ public class DetRegistro implements Serializable {
         this.idRegistro = idRegistro;
     }
 
-    public Integer getIdRegistro() {
+    public DetRegistro(Integer idRegistro, Date fechaEntrada, Date fechaSalida, Integer idEstatus, String descripcionEstatus) {
+		this.idRegistro = idRegistro;
+		this.fechaEntrada = fechaEntrada;
+		this.fechaSalida = fechaSalida;
+		this.idEstatus = new CatEstatusRegistro(idEstatus, descripcionEstatus,(short)0);
+	}
+
+	public Integer getIdRegistro() {
         return idRegistro;
     }
 

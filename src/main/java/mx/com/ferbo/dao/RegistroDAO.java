@@ -19,10 +19,7 @@ import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetRegistro;
 import mx.com.ferbo.util.SGPException;
 
-/**
- *
- * @author Gabo
- */
+@Deprecated
 @LocalBean
 @Stateless
 public class RegistroDAO extends IBaseDAO<DetRegistroDTO, Integer> implements Serializable {
@@ -173,6 +170,7 @@ public class RegistroDAO extends IBaseDAO<DetRegistroDTO, Integer> implements Se
         return registros.isEmpty() ? null : registros.get(0);
     }
     
+    @Deprecated
     public List<DetRegistroDTO> buscar(Integer idEmpleado, Date fechaEntrada, Date fechaSalida) {
     	List<DetRegistroDTO> lista = null;
     	lista = emSGP.createNamedQuery("DetRegistro.findByIdEmpleadoPeriodo", DetRegistroDTO.class)

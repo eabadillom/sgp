@@ -15,6 +15,7 @@ import mx.com.ferbo.dto.PaisDTO;
 import mx.com.ferbo.model.CatDiaNoLaboral;
 import mx.com.ferbo.util.SGPException;
 
+@Deprecated
 public class DiaNoLaboralDAO extends IBaseDAO<DiaNoLaboralDTO, Integer> {
 	private static Logger log = LogManager.getLogger(DiaNoLaboralDAO.class);
 

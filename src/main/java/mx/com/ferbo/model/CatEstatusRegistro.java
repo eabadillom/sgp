@@ -43,6 +43,19 @@ public class CatEstatusRegistro implements Serializable {
     
     public CatEstatusRegistro() {
     }
+    
+    public CatEstatusRegistro(Integer idEstatus, String descripcion, Short activo) {
+    	this.idEstatus = idEstatus;
+    	this.descripcion = descripcion;
+    	this.activo = activo;
+    }
+    
+    public CatEstatusRegistro(Integer idEstatus, String descripcion, String codigo, Short activo) {
+    	this.idEstatus = idEstatus;
+    	this.descripcion = descripcion;
+    	this.codigo = codigo;
+    	this.activo = activo;
+    }
 
     public CatEstatusRegistro(Integer idEstatus) {
         this.idEstatus = idEstatus;

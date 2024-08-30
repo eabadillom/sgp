@@ -22,6 +22,8 @@ import mx.com.ferbo.model.sat.CatRegimenFiscal;
 @Entity
 @Table(name = "cat_empresa")
 @NamedQueries({
+	@NamedQuery(name = "CatEmpresa.findActive", query = "SELECT c FROM CatEmpresa c WHERE c.activo = true"),
+	
     @NamedQuery(name = "CatEmpresa.findAll", query = "SELECT c "
             + "FROM CatEmpresa c"),
     @NamedQuery(name = "CatEmpresa.findByActive", query = "SELECT c "

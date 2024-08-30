@@ -3,20 +3,21 @@ package mx.com.ferbo.dto;
 import java.util.Objects;
 
 import mx.com.ferbo.dto.sat.RegimenFiscalDTO;
+import mx.com.ferbo.model.Nomina;
 
 public class NominaEmisorDTO {
 	
-	private NominaDTO nomina;
+	private Nomina nomina;
 	private String nombre;
 	private String rfc;
 	private RegimenFiscalDTO regimenFiscal;
 	private String codigoPostal;
 	private String registroPatronal;
 	
-	public NominaDTO getNomina() {
+	public Nomina getNomina() {
 		return nomina;
 	}
-	public void setNomina(NominaDTO nomina) {
+	public void setNomina(Nomina nomina) {
 		this.nomina = nomina;
 	}
 	public String getNombre() {
