@@ -17,32 +17,33 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.CaptureEvent;
+import org.primefaces.event.TabChangeEvent;
 
-import mx.com.ferbo.dao.CatAreaDAO;
-import mx.com.ferbo.dao.CatEmpresaDAO;
-import mx.com.ferbo.dao.CatPerfilDAO;
-import mx.com.ferbo.dao.CatPlantaDAO;
-import mx.com.ferbo.dao.CatPuestoDAO;
-import mx.com.ferbo.dao.DetBiometricoDAO;
-import mx.com.ferbo.dao.EmpleadoDAO;
-import mx.com.ferbo.dao.EmpleadoFotoDAO;
-import mx.com.ferbo.dao.ParametroDAO;
-import mx.com.ferbo.dao.sat.TipoContratoDAO;
-import mx.com.ferbo.dao.sat.TipoJornadaDAO;
-import mx.com.ferbo.dao.sat.TipoRegimenDAO;
-import mx.com.ferbo.dto.CatAreaDTO;
-import mx.com.ferbo.dto.CatEmpresaDTO;
-import mx.com.ferbo.dto.CatPerfilDTO;
-import mx.com.ferbo.dto.CatPlantaDTO;
-import mx.com.ferbo.dto.CatPuestoDTO;
-import mx.com.ferbo.dto.DatoEmpresaDTO;
-import mx.com.ferbo.dto.DetBiometricoDTO;
-import mx.com.ferbo.dto.DetEmpleadoDTO;
-import mx.com.ferbo.dto.EmpleadoFotoDTO;
-import mx.com.ferbo.dto.ParametroDTO;
-import mx.com.ferbo.dto.sat.TipoContratoDTO;
-import mx.com.ferbo.dto.sat.TipoJornadaDTO;
-import mx.com.ferbo.dto.sat.TipoRegimenDTO;
+import mx.com.ferbo.dao.n.AreaDAO;
+import mx.com.ferbo.dao.n.BiometricoDAO;
+import mx.com.ferbo.dao.n.EmpleadoDAO;
+import mx.com.ferbo.dao.n.EmpleadoFotoDAO;
+import mx.com.ferbo.dao.n.EmpresaDAO;
+import mx.com.ferbo.dao.n.ParametroDAO;
+import mx.com.ferbo.dao.n.PerfilDAO;
+import mx.com.ferbo.dao.n.PlantaDAO;
+import mx.com.ferbo.dao.n.PuestoDAO;
+import mx.com.ferbo.dao.n.TipoContratoDAO;
+import mx.com.ferbo.dao.n.TipoJornadaDAO;
+import mx.com.ferbo.dao.n.TipoRegimenDAO;
+import mx.com.ferbo.model.CatArea;
+import mx.com.ferbo.model.CatEmpresa;
+import mx.com.ferbo.model.CatParametro;
+import mx.com.ferbo.model.CatPerfil;
+import mx.com.ferbo.model.CatPlanta;
+import mx.com.ferbo.model.CatPuesto;
+import mx.com.ferbo.model.DetBiometrico;
+import mx.com.ferbo.model.DetEmpleado;
+import mx.com.ferbo.model.DetEmpleadoFoto;
+import mx.com.ferbo.model.InfDatoEmpresa;
+import mx.com.ferbo.model.sat.CatTipoContrato;
+import mx.com.ferbo.model.sat.CatTipoJornada;
+import mx.com.ferbo.model.sat.CatTipoRegimen;
 import mx.com.ferbo.util.SGPException;
 
 
@@ -57,35 +58,36 @@ public class RegistroEmpleadosBean implements Serializable {
     private static final long serialVersionUID = 1L;
     private static final Logger log = LogManager.getLogger(RegistroEmpleadosBean.class);
 
-    private DetEmpleadoDTO empleadoSelected;
+    private DetEmpleado empleadoSelected;
 
-    private List<DetEmpleadoDTO> lstEmpleados;
-    private List<DetEmpleadoDTO> lstEmpleadosSelected;
-    private List<CatEmpresaDTO> lstCatEmpresa;
-    private List<CatPerfilDTO> lstCatPerfil;
-    private List<CatPlantaDTO> lstCatPlanta;
-    private List<CatPuestoDTO> lstCatPuesto;
-    private List<CatAreaDTO> lstCatArea;
+    private List<DetEmpleado> lstEmpleados;
+    private List<DetEmpleado> lstEmpleadosSelected;
+    private List<CatEmpresa> lstCatEmpresa;
+    private List<CatPerfil> lstCatPerfil;
+    private List<CatPlanta> lstCatPlanta;
+    private List<CatPuesto> lstCatPuesto;
+    private List<CatArea> lstCatArea;
 
-    private final CatEmpresaDAO catEmpresaDAO;
-    private final CatPerfilDAO catPerfilDAO;
-    private final CatPlantaDAO catPlantaDAO;
-    private final CatPuestoDAO catPuestoDAO;
-    private final CatAreaDAO catAreaDAO;
-    private final EmpleadoDAO empleadoDAO;
+    private EmpresaDAO empresaDAO;
     private EmpleadoFotoDAO empleadoFotoDAO;
+    private PerfilDAO perfilDAO;
+    private PlantaDAO plantaDAO;
+    private PuestoDAO puestoDAO;
+    private AreaDAO areaDAO;
+    private EmpleadoDAO empleadoDAO;
     
-    private DatoEmpresaDTO datoEmpresa;
-    private final DetBiometricoDAO biometricoDAO;
-    private List<TipoContratoDTO> tiposContrato;
+    private InfDatoEmpresa datoEmpresa;
+    private BiometricoDAO biometricoDAO;
+    private List<CatTipoContrato> tiposContrato;
     private TipoContratoDAO tipoContratoDAO;
-    private List<TipoJornadaDTO> tiposJornada;
+    private List<CatTipoJornada> tiposJornada;
     private TipoJornadaDAO tipoJornadaDAO;
-    private List<TipoRegimenDTO> tiposRegimen;
+    private List<CatTipoRegimen> tiposRegimen;
     private TipoRegimenDAO tipoRegimenDAO;
     private ParametroDAO parametroDAO;
 
-    private DetBiometricoDTO detBiometrico;
+    private DetBiometrico detBiometrico;
+    private DetEmpleadoFoto empleadoFoto;
     private String biometrico;
     private int numBiometrico;
     
@@ -94,20 +96,20 @@ public class RegistroEmpleadosBean implements Serializable {
     private String nss;
     
     public RegistroEmpleadosBean() {
-        catEmpresaDAO = new CatEmpresaDAO();
-        catPerfilDAO = new CatPerfilDAO();
-        catPlantaDAO = new CatPlantaDAO();
-        catPuestoDAO = new CatPuestoDAO();
-        biometricoDAO = new DetBiometricoDAO();
-        catAreaDAO = new CatAreaDAO();
-        empleadoDAO = new EmpleadoDAO();
-        tipoContratoDAO = new TipoContratoDAO();
-        tipoJornadaDAO = new TipoJornadaDAO();
-        tipoRegimenDAO = new TipoRegimenDAO();
-        parametroDAO = new ParametroDAO();
-        empleadoFotoDAO = new EmpleadoFotoDAO();
+    	empleadoFotoDAO = new EmpleadoFotoDAO(DetEmpleadoFoto.class);
+        empresaDAO = new EmpresaDAO(CatEmpresa.class);
+        perfilDAO = new PerfilDAO(CatPerfil.class);
+        plantaDAO = new PlantaDAO(CatPlanta.class);
+        puestoDAO = new PuestoDAO(CatPuesto.class);
+        biometricoDAO = new BiometricoDAO(DetBiometrico.class);
+        areaDAO = new AreaDAO(CatArea.class);
+        empleadoDAO = new EmpleadoDAO(DetEmpleado.class);
+        tipoContratoDAO = new TipoContratoDAO(CatTipoContrato.class);
+        tipoJornadaDAO = new TipoJornadaDAO(CatTipoJornada.class);
+        tipoRegimenDAO = new TipoRegimenDAO(CatTipoRegimen.class);
+        parametroDAO = new ParametroDAO(CatParametro.class);
         
-        empleadoSelected = new DetEmpleadoDTO();
+        empleadoSelected = new DetEmpleado();
         lstEmpleados = new ArrayList<>();
         lstEmpleadosSelected = new ArrayList<>();
     }
@@ -115,14 +117,18 @@ public class RegistroEmpleadosBean implements Serializable {
     @PostConstruct
     public void init() {
         try {
-            lstCatEmpresa = catEmpresaDAO.buscarActivo();
-            lstCatPerfil = catPerfilDAO.buscarActivo();
-            lstCatPlanta = catPlantaDAO.buscarActivo();
-            lstCatPuesto = catPuestoDAO.buscarActivo();
-            lstCatArea = catAreaDAO.buscarActivo();
+            lstCatEmpresa = empresaDAO.buscarActivo();
+            lstCatPerfil = perfilDAO.buscarActivo();
+            lstCatPlanta = plantaDAO.buscarActivo();
+            lstCatPuesto = puestoDAO.buscarActivo();
+            lstCatArea = areaDAO.buscarActivo();
             tiposContrato = tipoContratoDAO.buscarTodos();
             tiposJornada = tipoJornadaDAO.buscarTodos();
             tiposRegimen = tipoRegimenDAO.buscarTodos();
+            
+            
+            
+            
             consultaEmpleados();
         } catch (Exception ex) {
             log.warn("EX-0008: " + ex.getMessage() + ". Error al cargar init()");
@@ -133,8 +139,6 @@ public class RegistroEmpleadosBean implements Serializable {
      * Método para consultar a los empleados
      */
     private void consultaEmpleados() {
-    	
-//        lstEmpleados = empleadoDAO.buscarActivoConSDI();
     	this.lstEmpleados = empleadoDAO.buscarTodos(false);
     }
 
@@ -160,20 +164,21 @@ public class RegistroEmpleadosBean implements Serializable {
      * Método para inicializar objeto empleado
      */
     public void agregarEmpleado() {
-        this.empleadoSelected = new DetEmpleadoDTO();
+        this.empleadoSelected = new DetEmpleado();
         this.empleadoSelected.setActivo((short)1);
-        this.datoEmpresa = new DatoEmpresaDTO();
+        this.datoEmpresa = new InfDatoEmpresa();
         this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
     }
     
     public void editar() {
     	log.info("Cargando información del empleado: {}", this.empleadoSelected);
-    	Integer idEmpleado = this.empleadoSelected.getIdEmpleado();
-    	DetEmpleadoDTO e = empleadoDAO.buscarPorId(idEmpleado, true, true);
-    	DatoEmpresaDTO datoEmpresa = e.getDatoEmpresa();
-    	EmpleadoFotoDTO empleadoFoto = e.getEmpleadoFoto();
+//    	Integer idEmpleado = this.empleadoSelected.getIdEmpleado();
+//    	DetEmpleado e = empleadoDAO.buscarPorId(idEmpleado, true, true);
+//    	InfDatoEmpresa datoEmpresa = e.getDatoEmpresa();
+    	InfDatoEmpresa datoEmpresa = this.empleadoSelected.getDatoEmpresa();
+    	this.empleadoFoto = empleadoFotoDAO.buscar(this.empleadoSelected.getNumEmpleado());
     	if(datoEmpresa == null) {
-    		this.datoEmpresa = new DatoEmpresaDTO();
+    		this.datoEmpresa = new InfDatoEmpresa();
     		this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
     	} else {
     		this.datoEmpresa = datoEmpresa;
@@ -182,9 +187,18 @@ public class RegistroEmpleadosBean implements Serializable {
     		this.curp = this.empleadoSelected.getCurp();
     	}
     	
+    	this.detBiometrico = biometricoDAO.consultaBiometricoByNumEmpleado(this.empleadoSelected.getNumEmpleado());
+    	
     	log.info("Empleado seleccionado: {}", this.empleadoSelected.getIdEmpleado());
-    	log.info("Foto: {}", empleadoFoto.getFotografia());
+    	if(empleadoFoto != null)
+    		log.debug("Foto: {}", empleadoFoto.getFotografia());
     	PrimeFaces.current().ajax().update("formRegistroEmpleado:panelDialogFoto");
+    }
+    
+    public void tabChange(TabChangeEvent event) {
+    	FacesMessage msg = new FacesMessage("Información...", event.getTab().getTitle());
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+        PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogEmpleado:previewFotografia");
     }
 
     /*
@@ -195,35 +209,32 @@ public class RegistroEmpleadosBean implements Serializable {
 		Severity severity = null;
 		String mensaje = null;
 		String titulo = "Guardar empleado";
-		ParametroDTO pNumeroEmpleado = null;
+		CatParametro pNumeroEmpleado = null;
 		String sNumeroEmpleado = null;
 		int numeroEmpleado = -1;
     	try {
-    		pNumeroEmpleado = this.parametroDAO.buscarPorClave("NBEMP");
-    		
-    		sNumeroEmpleado = pNumeroEmpleado.getValor();
-    		numeroEmpleado = Integer.parseInt(sNumeroEmpleado);
-    		sNumeroEmpleado = String.format("%04d", ++numeroEmpleado);
-    		this.empleadoSelected.setNumEmpleado(sNumeroEmpleado);
-    		this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
-    		this.empleadoSelected.setFechaRegistro(new Date());
-    		
-    		this.empleadoSelected.setCatAreaDTO(null);
-    		this.empleadoSelected.setCatPuestoDTO(null);
-    		this.empleadoSelected.setCatEmpresaDTO(null);
-    		this.empleadoSelected.setCatPerfilDTO(null);
-    		this.empleadoSelected.setCatPlantaDTO(null);
     		
     		if (this.empleadoSelected.getIdEmpleado() == null) {
-    			empleadoDAO.guardar(empleadoSelected);
     			
+    			pNumeroEmpleado = this.parametroDAO.buscarPorClave("NBEMP");
+    			sNumeroEmpleado = pNumeroEmpleado.getValor();
+        		numeroEmpleado = Integer.parseInt(sNumeroEmpleado);
+        		sNumeroEmpleado = String.format("%04d", ++numeroEmpleado);
+        		this.empleadoSelected.setNumEmpleado(sNumeroEmpleado);
+        		this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
+        		this.empleadoSelected.setFechaRegistro(new Date());
+    			empleadoDAO.guardar(empleadoSelected);
     		} else {
     			empleadoDAO.actualizar(empleadoSelected);
     		}
     		
+    		if(this.empleadoFoto != null) {
+    			empleadoFotoDAO.actualizar(empleadoFoto);
+    		}
+    		
     		if (biometrico != null) {
                 try {
-                    detBiometrico.setDetEmpleadoDTO(empleadoSelected);
+                    detBiometrico.setIdEmpleado(empleadoSelected);
                     if (detBiometrico.getIdBiometrico() == null) {
                         biometricoDAO.guardar(detBiometrico);
                     } else {
@@ -238,7 +249,7 @@ public class RegistroEmpleadosBean implements Serializable {
                 biometrico = null;
             }
     		
-    		detBiometrico = new DetBiometricoDTO();
+    		detBiometrico = new DetBiometrico();
 	        consultaEmpleados();
 	        PrimeFaces.current().executeScript("PF('dialogEmpleado').hide()");
     		 
@@ -264,7 +275,7 @@ public class RegistroEmpleadosBean implements Serializable {
     public void eliminaEmpleadosSeleccionados() {
         List<String> numEmpl = new ArrayList<>();
         try {
-            for (DetEmpleadoDTO empleado : lstEmpleadosSelected) {
+            for (DetEmpleado empleado : lstEmpleadosSelected) {
                 empleadoDAO.eliminar(empleado);
                 numEmpl.add(empleado.getNumEmpleado());
             }
@@ -278,6 +289,10 @@ public class RegistroEmpleadosBean implements Serializable {
         }
         PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:dtEmpleados");
         this.lstEmpleadosSelected.clear();
+    }
+    
+    public void sinFoto() {
+    	this.empleadoFoto = null;
     }
 
     /*
@@ -296,16 +311,18 @@ public class RegistroEmpleadosBean implements Serializable {
         PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:dtEmpleados");
     }
  
-    /* 
-     * Método para redirigir al kárdex
-     */
     public String redirectKardex() {
         String redirect = "/protected/kardexEmpleado.xhtml?faces-redirect=true&idEmpleado=" + empleadoSelected.getIdEmpleado();
         return redirect;
     }
 
     public void oncapture(CaptureEvent captureEvent) {
-        this.empleadoSelected.getEmpleadoFoto().setFotografia("data:image/jpeg;base64," + Base64.getEncoder().encodeToString(captureEvent.getData()));
+    	if(this.empleadoFoto == null) {
+    		this.empleadoFoto = new DetEmpleadoFoto();
+    		this.empleadoSelected.setEmpleadoFoto(empleadoFoto);
+    	}
+    	
+        this.empleadoFoto.setFotografia("data:image/jpeg;base64," + Base64.getEncoder().encodeToString(captureEvent.getData()));
     }
 
     public void consultaBiometrico() {
@@ -325,73 +342,73 @@ public class RegistroEmpleadosBean implements Serializable {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Error al asignar biométrico"));
             
-            log.warn("EX-0019: Error al consultar por huella al empleado " + detBiometrico.getDetEmpleadoDTO().getNumEmpleado() != null ? detBiometrico.getDetEmpleadoDTO().getNumEmpleado() : null);
+            log.warn("EX-0019: Error al consultar por huella al empleado " + detBiometrico.getIdEmpleado().getNumEmpleado() != null ? detBiometrico.getIdEmpleado().getNumEmpleado() : null);
         }
         PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogBiometrico");
     }
     //<editor-fold defaultstate="collapsed" desc="Getters&Setters">
 
-    public List<CatEmpresaDTO> getLstCatEmpresa() {
+    public List<CatEmpresa> getLstCatEmpresa() {
         return lstCatEmpresa;
     }
 
-    public void setLstCatEmpresa(List<CatEmpresaDTO> lstCatEmpresa) {
+    public void setLstCatEmpresa(List<CatEmpresa> lstCatEmpresa) {
         this.lstCatEmpresa = lstCatEmpresa;
     }
 
-    public DetEmpleadoDTO getEmpleadoSelected() {
+    public DetEmpleado getEmpleadoSelected() {
         return empleadoSelected;
     }
 
-    public void setEmpleadoSelected(DetEmpleadoDTO empleadoSelected) {
+    public void setEmpleadoSelected(DetEmpleado empleadoSelected) {
         this.empleadoSelected = empleadoSelected;
     }
 
-    public List<CatPerfilDTO> getLstCatPerfil() {
+    public List<CatPerfil> getLstCatPerfil() {
         return lstCatPerfil;
     }
 
-    public void setLstCatPerfil(List<CatPerfilDTO> lstCatPerfil) {
+    public void setLstCatPerfil(List<CatPerfil> lstCatPerfil) {
         this.lstCatPerfil = lstCatPerfil;
     }
 
-    public List<CatPlantaDTO> getLstCatPlanta() {
+    public List<CatPlanta> getLstCatPlanta() {
         return lstCatPlanta;
     }
 
-    public void setLstCatPlanta(List<CatPlantaDTO> lstCatPlanta) {
+    public void setLstCatPlanta(List<CatPlanta> lstCatPlanta) {
         this.lstCatPlanta = lstCatPlanta;
     }
 
-    public List<CatPuestoDTO> getLstCatPuesto() {
+    public List<CatPuesto> getLstCatPuesto() {
         return lstCatPuesto;
     }
 
-    public void setLstCatPuesto(List<CatPuestoDTO> lstCatPuesto) {
+    public void setLstCatPuesto(List<CatPuesto> lstCatPuesto) {
         this.lstCatPuesto = lstCatPuesto;
     }
 
-    public List<CatAreaDTO> getLstCatArea() {
+    public List<CatArea> getLstCatArea() {
         return lstCatArea;
     }
 
-    public void setLstCatArea(List<CatAreaDTO> lstCatArea) {
+    public void setLstCatArea(List<CatArea> lstCatArea) {
         this.lstCatArea = lstCatArea;
     }
 
-    public List<DetEmpleadoDTO> getLstEmpleados() {
+    public List<DetEmpleado> getLstEmpleados() {
         return lstEmpleados;
     }
 
-    public void setLstEmpleados(List<DetEmpleadoDTO> lstEmpleados) {
+    public void setLstEmpleados(List<DetEmpleado> lstEmpleados) {
         this.lstEmpleados = lstEmpleados;
     }
 
-    public List<DetEmpleadoDTO> getLstEmpleadosSelected() {
+    public List<DetEmpleado> getLstEmpleadosSelected() {
         return lstEmpleadosSelected;
     }
 
-    public void setLstEmpleadosSelected(List<DetEmpleadoDTO> lstEmpleadosSelected) {
+    public void setLstEmpleadosSelected(List<DetEmpleado> lstEmpleadosSelected) {
         this.lstEmpleadosSelected = lstEmpleadosSelected;
     }
 
@@ -411,43 +428,43 @@ public class RegistroEmpleadosBean implements Serializable {
         this.numBiometrico = numBiometrico;
     }
     
-    public DetBiometricoDTO getDetBiometrico() {
+    public DetBiometrico getDetBiometrico() {
         return detBiometrico;
     }
 
-    public void setDetBiometrico(DetBiometricoDTO detBiometrico) {
+    public void setDetBiometrico(DetBiometrico detBiometrico) {
         this.detBiometrico = detBiometrico;
     }
 
-	public DatoEmpresaDTO getDatoEmpresa() {
+	public InfDatoEmpresa getDatoEmpresa() {
 		return datoEmpresa;
 	}
 
-	public void setDatoEmpresa(DatoEmpresaDTO datoEmpresa) {
+	public void setDatoEmpresa(InfDatoEmpresa datoEmpresa) {
 		this.datoEmpresa = datoEmpresa;
 	}
 
-	public List<TipoContratoDTO> getTiposContrato() {
+	public List<CatTipoContrato> getTiposContrato() {
 		return tiposContrato;
 	}
 
-	public void setTiposContrato(List<TipoContratoDTO> tiposContrato) {
+	public void setTiposContrato(List<CatTipoContrato> tiposContrato) {
 		this.tiposContrato = tiposContrato;
 	}
 
-	public List<TipoJornadaDTO> getTiposJornada() {
+	public List<CatTipoJornada> getTiposJornada() {
 		return tiposJornada;
 	}
 
-	public void setTiposJornada(List<TipoJornadaDTO> tiposJornada) {
+	public void setTiposJornada(List<CatTipoJornada> tiposJornada) {
 		this.tiposJornada = tiposJornada;
 	}
 
-	public List<TipoRegimenDTO> getTiposRegimen() {
+	public List<CatTipoRegimen> getTiposRegimen() {
 		return tiposRegimen;
 	}
 
-	public void setTiposRegimen(List<TipoRegimenDTO> tiposRegimen) {
+	public void setTiposRegimen(List<CatTipoRegimen> tiposRegimen) {
 		this.tiposRegimen = tiposRegimen;
 	}
 
@@ -473,6 +490,14 @@ public class RegistroEmpleadosBean implements Serializable {
 
 	public void setNss(String nss) {
 		this.nss = nss;
+	}
+
+	public DetEmpleadoFoto getEmpleadoFoto() {
+		return empleadoFoto;
+	}
+
+	public void setEmpleadoFoto(DetEmpleadoFoto empleadoFoto) {
+		this.empleadoFoto = empleadoFoto;
 	}
     
 //</editor-fold> 

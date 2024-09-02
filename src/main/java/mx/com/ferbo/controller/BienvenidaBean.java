@@ -21,11 +21,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.EmpleadoDAO;
 import mx.com.ferbo.dao.RegistroDAO;
-import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.dto.DetRegistroDTO;
-import mx.com.ferbo.dto.EmpleadoFotoDTO;
+import mx.com.ferbo.model.DetEmpleado;
+import mx.com.ferbo.model.DetEmpleadoFoto;
 
 @Named(value = "bienvenidaBean")
 @ViewScoped
@@ -33,8 +32,7 @@ public class BienvenidaBean implements Serializable {
     private static final long serialVersionUID = 1L;
     private static final Logger log = LogManager.getLogger(BienvenidaBean.class);
     
-	private DetEmpleadoDTO empleadoSelected;
-    private final EmpleadoDAO empleadoDAO;
+	private DetEmpleado empleadoSelected;
     private String numeroEmpl;
     private String strCumpleanios;
     private DateFormat dateFormat;
@@ -50,12 +48,11 @@ public class BienvenidaBean implements Serializable {
     
     private DetRegistroDTO registro;
     private final RegistroDAO registroDAO;
-    private EmpleadoFotoDTO empleadoFoto;
+    private DetEmpleadoFoto empleadoFoto;
 
     public BienvenidaBean() {
         registroDAO = new RegistroDAO();
-        empleadoDAO = new EmpleadoDAO();
-        empleadoSelected = new DetEmpleadoDTO();
+        empleadoSelected = new DetEmpleado();
         dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         currentDate = LocalDate.parse(getDateFormat().format(new Date()));
         strCumpleanios = "";
@@ -69,8 +66,8 @@ public class BienvenidaBean implements Serializable {
     		this.context = FacesContext.getCurrentInstance();
     		this.request = (HttpServletRequest) this.context.getExternalContext().getRequest();
     		this.session = this.request.getSession(false);
-    		this.empleadoSelected = (DetEmpleadoDTO) this.request.getSession(true).getAttribute("empleado");
-    		this.empleadoFoto = (EmpleadoFotoDTO) session.getAttribute("fotografia");
+    		this.empleadoSelected = (DetEmpleado) this.request.getSession(true).getAttribute("empleado");
+    		this.empleadoFoto = (DetEmpleadoFoto) session.getAttribute("fotografia");
     		
     		empleadoLogeado();
     		consultaRegistro();
@@ -81,7 +78,7 @@ public class BienvenidaBean implements Serializable {
     	}
     }
 
-    public String pasoDeEmpleado(DetEmpleadoDTO detEmpleadoDTO) {
+    public String pasoDeEmpleado(DetEmpleado detEmpleadoDTO) {
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Acceso correcto", null));
         empleadoSelected = detEmpleadoDTO;
         return "protected/registroAsistencia.xhtml";
@@ -110,16 +107,12 @@ public class BienvenidaBean implements Serializable {
     }
 
     //<editor-fold defaultstate="collapsed" desc="Getters&Setters">
-    public DetEmpleadoDTO getEmpleadoSelected() {
+    public DetEmpleado getEmpleadoSelected() {
         return empleadoSelected;
     }
 
-    public void setEmpleadoSelected(DetEmpleadoDTO empleadoSelected) {
+    public void setEmpleadoSelected(DetEmpleado empleadoSelected) {
         this.empleadoSelected = empleadoSelected;
-    }
-
-    public EmpleadoDAO getEmpleadoDAO() {
-        return empleadoDAO;
     }
 
     public String getNumeroEmpl() {
@@ -179,11 +172,11 @@ public class BienvenidaBean implements Serializable {
     }
     //</editor-fold>
 
-	public EmpleadoFotoDTO getEmpleadoFoto() {
+	public DetEmpleadoFoto getEmpleadoFoto() {
 		return empleadoFoto;
 	}
 
-	public void setEmpleadoFoto(EmpleadoFotoDTO empleadoFoto) {
+	public void setEmpleadoFoto(DetEmpleadoFoto empleadoFoto) {
 		this.empleadoFoto = empleadoFoto;
 	}
 }

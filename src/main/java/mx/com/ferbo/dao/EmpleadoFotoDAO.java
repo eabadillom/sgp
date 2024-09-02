@@ -11,6 +11,7 @@ import mx.com.ferbo.commons.dao.DAO;
 import mx.com.ferbo.dto.EmpleadoFotoDTO;
 import mx.com.ferbo.model.DetEmpleadoFoto;
 
+@Deprecated
 public class EmpleadoFotoDAO extends DAO<EmpleadoFotoDTO, DetEmpleadoFoto, Integer> {
 	
 	private static Logger log = LogManager.getLogger();

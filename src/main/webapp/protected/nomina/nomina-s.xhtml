@@ -7,6 +7,39 @@
 
 	<ui:define name="title">Nómina</ui:define>
 	<ui:define name="content">
+		<script>
+			PrimeFaces.locales['es'] = {
+				monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+				monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+				dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+				dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
+				dayNamesMin: ['D', 'L', 'M', 'X', 'J', 'V', 'S'],
+				weekHeader: 'Semana',
+				firstDay: 1,
+				isRTL: false,
+				showMonthAfterYear: false,
+				yearSuffix: '',
+				timeOnlyTitle: 'Sólo hora',
+				timeText: 'Tiempo',
+				hourText: 'Hora',
+				minuteText: 'Minuto',
+				secondText: 'Segundo',
+				millisecondText: 'Milisegundo',
+				ampm: false,
+				month: 'Mes',
+				week: 'Semana',
+				day: 'Día',
+				allDayText: 'Todo el día',
+				today: 'Hoy',
+				now: 'Ahora',
+				clear: 'Limpiar',
+				aria: {
+				   close: 'Cerrar',
+				   previous: 'Anterior',
+				   next: 'Siguiente',
+				}
+			};
+		</script>
 		<h:form id="formNomina">
 			<p:growl id="messages" showDetail="true" life="5000"/>
 			<p:toolbar>
@@ -43,17 +76,17 @@
 					</p:column>
 					<p:column headerText="Percepciones" width="4rem" style="text-align: right;">
 						<h:outputText value="#{nomina.subtotal}">
-							<f:convertNumber pattern="$#,000.00" />
+							<f:convertNumber pattern="$#,##0.00" />
 						</h:outputText>
 					</p:column>
 					<p:column headerText="Deducciones" width="4rem" style="text-align: right;">
 						<p:outputLabel value="#{nomina.descuento}">
-							<f:convertNumber pattern="$#,000.00" />
+							<f:convertNumber pattern="$#,##0.00" />
 						</p:outputLabel>
 					</p:column>
 					<p:column headerText="Neto" width="4rem" style="text-align: right;">
 						<p:outputLabel value="#{nomina.total}">
-							<f:convertNumber pattern="$#,000.00" />
+							<f:convertNumber pattern="$#,##0.00" />
 						</p:outputLabel>
 					</p:column>
 					<p:column width="2rem" style="text-align: right;">
@@ -198,8 +231,10 @@
 							<p:column headerText="Descripción">
 								<p:outputLabel value="#{percepcion.nombre}" />
 							</p:column>
-							<p:column headerText="Importe">
-								<p:outputLabel value="$#{percepcion.importeGravado eq null ? percepcion.importeExcento : percepcion.importeGravado}"/>
+							<p:column headerText="Importe" width="10rem">
+								<p:inputNumber value="#{percepcion.importeGravado eq null ? percepcion.importeExcento : percepcion.importeGravado}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator=",">
+									<p:ajax process="@this" update="formNomina:dg-empleado" />
+								</p:inputNumber>
 							</p:column>
 							<f:facet name="footer">
 								<p:column colspan="2">
@@ -207,7 +242,7 @@
 								</p:column>
 								<p:column>
 									<p:outputLabel value="#{nominaBean.nomina.percepciones.stream().map(item-> (item.importeGravado == null ? item.importeExcento : item.importeGravado) ).sum()}">
-										<f:convertNumber pattern="$#,000.00" />
+										<f:convertNumber pattern="$ #,##0.00" />
 									</p:outputLabel>
 								</p:column>
 							</f:facet>
@@ -221,15 +256,10 @@
 							<p:column headerText="Descripción">
 								<p:outputLabel value="#{otroPago.nombre}" />
 							</p:column>
-							<p:column headerText="Importe">
-								<p:cellEditor>
-									<f:facet name="output">
-										<p:outputLabel value="#{otroPago.importe}" />
-									</f:facet>
-									<f:facet name="input">
-										<p:inputText value="#{otroPago.importe}" style="width: 100%;"/>
-									</f:facet>
-								</p:cellEditor>
+							<p:column headerText="Importe" width="10rem">
+								<p:inputNumber value="#{otroPago.importe}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator=",">
+									
+								</p:inputNumber>
 							</p:column>
 							<f:facet name="footer">
 								<p:column colspan="2">
@@ -237,7 +267,7 @@
 								</p:column>
 								<p:column>
 									<p:outputLabel value="#{nominaBean.nomina.otrosPagos.stream().map(item->item.importe).sum()}">
-										<f:convertNumber pattern="$#,000.00" />
+										<f:convertNumber pattern="$ #,##0.00" />
 									</p:outputLabel>
 								</p:column>
 							</f:facet>
@@ -251,8 +281,10 @@
 							<p:column headerText="Descripción">
 								<p:outputLabel value="#{deduccion.nombre}" />
 							</p:column>
-							<p:column headerText="Importe">
-								<p:outputLabel value="$#{deduccion.importe}"/>
+							<p:column headerText="Importe" width="10rem">
+								<p:inputNumber value="#{deduccion.importe}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator=",">
+								</p:inputNumber>
+								<!-- <p:outputLabel value="$#{deduccion.importe}"/> -->
 							</p:column>
 							<f:facet name="footer">
 								<p:column colspan="2">
@@ -260,7 +292,7 @@
 								</p:column>
 								<p:column>
 									<p:outputLabel value="#{nominaBean.nomina.deducciones.stream().map(item->item.importe).sum()}">
-										<f:convertNumber pattern="$#,000.00" />
+										<f:convertNumber pattern="$ #,##0.00" />
 									</p:outputLabel>
 								</p:column>
 							</f:facet>

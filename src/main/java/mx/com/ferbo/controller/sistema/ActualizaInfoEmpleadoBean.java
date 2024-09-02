@@ -76,6 +76,8 @@ public class ActualizaInfoEmpleadoBean implements Serializable {
 				this.empleado.setEmpleadoFoto(empleadoFoto);
 			}
 			
+			this.empleado.setEmpleadoFoto(empleadoFoto);
+			
 			this.empleadoDAO.actualizar(this.empleado);
 			
 			empleados = empleadoDAO.buscarTodos();

@@ -1,29 +1,29 @@
-package mx.com.ferbo.dto;
+package mx.com.ferbo.model;
 
 import java.math.BigDecimal;
 import java.util.Objects;
 
-import mx.com.ferbo.dto.sat.TipoPercepcionDTO;
+import mx.com.ferbo.model.sat.CatTipoPercepcion;
 
-public class NominaPercepcionDTO {
-	private NominaPercepcionDTOPK key;
-	private TipoPercepcionDTO tipoPercepcion;
+public class NominaPercepcion {
+	private NominaPercepcionPK key;
+	private CatTipoPercepcion tipoPercepcion;
 	private String clave;
 	private String nombre;
 	private BigDecimal importeGravado;
 	private BigDecimal importeExcento;
 	
-	public NominaPercepcionDTOPK getKey() {
+	public NominaPercepcionPK getKey() {
 		return key;
 	}
-	public void setKey(NominaPercepcionDTOPK key) {
+	public void setKey(NominaPercepcionPK key) {
 		this.key = key;
 	}
 	
-	public TipoPercepcionDTO getTipoPercepcion() {
+	public CatTipoPercepcion getTipoPercepcion() {
 		return tipoPercepcion;
 	}
-	public void setTipoPercepcion(TipoPercepcionDTO tipoPercepcion) {
+	public void setTipoPercepcion(CatTipoPercepcion tipoPercepcion) {
 		this.tipoPercepcion = tipoPercepcion;
 	}
 	public String getClave() {
@@ -62,7 +62,7 @@ public class NominaPercepcionDTO {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		NominaPercepcionDTO other = (NominaPercepcionDTO) obj;
+		NominaPercepcion other = (NominaPercepcion) obj;
 		return Objects.equals(key, other.key);
 	}
 	@Override

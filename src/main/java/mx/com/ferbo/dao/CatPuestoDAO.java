@@ -13,6 +13,7 @@ import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.dto.CatPuestoDTO;
 import mx.com.ferbo.model.CatPuesto;
 
+@Deprecated
 @Stateless
 @LocalBean
 public class CatPuestoDAO extends IBaseDAO<CatPuestoDTO, Integer>  implements Serializable{

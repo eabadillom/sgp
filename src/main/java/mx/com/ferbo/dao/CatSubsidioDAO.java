@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
+import javax.persistence.NoResultException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -68,13 +69,21 @@ public class CatSubsidioDAO extends IBaseDAO<CatSubsidioDTO, Integer> implements
     
     public CatSubsidioDTO buscar(Date fechaInicio, Date fechaFin, String periodo, BigDecimal ingreso) {
     	CatSubsidioDTO subsidio = null;
-    	subsidio = emSGP.createNamedQuery("CatSubsidio.findByPeriodoTipoIngreso", CatSubsidioDTO.class)
-    			.setParameter("fechaInicio", fechaInicio)
-    			.setParameter("fechaFin", fechaFin)
-    			.setParameter("periodo", periodo)
-    			.setParameter("ingreso", ingreso)
-    			.getSingleResult()
-    			;
+    	try {
+    		subsidio = emSGP.createNamedQuery("CatSubsidio.findByPeriodoTipoIngreso", CatSubsidioDTO.class)
+    				.setParameter("fechaInicio", fechaInicio)
+    				.setParameter("fechaFin", fechaFin)
+    				.setParameter("periodo", periodo)
+    				.setParameter("ingreso", ingreso)
+    				.getSingleResult()
+    				;
+    	} catch(NoResultException ex) {
+    		subsidio = new CatSubsidioDTO();
+    		subsidio.setCantidadSubsidio(BigDecimal.ZERO);
+    		subsidio.setFechaSubsidio(fechaInicio);
+    		subsidio.setHastaIngresosDe(BigDecimal.ZERO);
+    		subsidio.setParaIngresosDe(BigDecimal.ZERO);
+    	}
     	
     	return subsidio;
     }

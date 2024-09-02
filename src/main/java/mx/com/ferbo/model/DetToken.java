@@ -7,6 +7,7 @@ import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -38,7 +39,7 @@ public class DetToken implements Serializable {
     private Integer idToken;
 	
 	@JoinColumn(name = "id_empleado", referencedColumnName = "id_empleado")
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     private DetEmpleado empleado;
     
     @Basic(optional = false)

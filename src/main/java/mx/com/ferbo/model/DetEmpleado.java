@@ -14,7 +14,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -31,7 +30,7 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "DetEmpleado.findByActive",query = "SELECT NEW mx.com.ferbo.dto.DetEmpleadoDTO("
                         + " e.idEmpleado, e.numEmpleado, e.nombre, e.primerAp, e.segundoAp, e.fechaNacimiento,"
                         + " e.fechaRegistro, e.fechaModificacion, e.curp, e.rfc, e.correo, e.fechaIngreso, e.nss, "
-                        + " e.activo, e.fotografia, a.idArea, a.descripcion, em.idEmpresa, em.descripcion, "
+                        + " e.activo, e.empleadoFoto.fotografia, a.idArea, a.descripcion, em.idEmpresa, em.descripcion, "
                         + "p.idPerfil, p.descripcion, pl.idPlanta, pl.descripcion, pu.idPuesto, pu.descripcion"
                         + ")"
                         + " FROM DetEmpleado e"
@@ -45,7 +44,7 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "DetEmpleado.findByID",
                 query = "SELECT NEW mx.com.ferbo.dto.DetEmpleadoDTO("
                         + " e.idEmpleado, e.numEmpleado, e.nombre, e.primerAp, e.segundoAp, e.fechaNacimiento,"
-                        + " e.fechaRegistro, e.fechaModificacion, e.curp, e.rfc, e.correo, e.fechaIngreso, e.nss, e.activo, e.fotografia, a.idArea, a.descripcion,"
+                        + " e.fechaRegistro, e.fechaModificacion, e.curp, e.rfc, e.correo, e.fechaIngreso, e.nss, e.activo, e.empleadoFoto.fotografia, a.idArea, a.descripcion,"
                         + " em.idEmpresa, em.descripcion, p.idPerfil, p.descripcion, pl.idPlanta, pl.descripcion, pu.idPuesto, pu.descripcion"
                         + ")"
                         + " FROM DetEmpleado e"
@@ -58,7 +57,7 @@ import javax.validation.constraints.Size;
                         + " WHERE e.idEmpleado = :idEmp"),
     @NamedQuery(name = "DetEmpleado.findByNumEmpl", query = "SELECT NEW mx.com.ferbo.dto.DetEmpleadoDTO("
                         + " e.idEmpleado, e.numEmpleado, e.nombre, e.primerAp, e.segundoAp, e.fechaNacimiento,"
-                        + " e.fechaRegistro, e.fechaModificacion, e.curp, e.rfc, e.correo, e.fechaIngreso, e.nss, e.activo, e.fotografia, a.idArea, a.descripcion,"
+                        + " e.fechaRegistro, e.fechaModificacion, e.curp, e.rfc, e.correo, e.fechaIngreso, e.nss, e.activo, e.empleadoFoto.fotografia, a.idArea, a.descripcion,"
                         + " em.idEmpresa, em.descripcion, p.idPerfil, p.descripcion, pl.idPlanta, pl.descripcion, pu.idPuesto, pu.descripcion"
                         + ")"
                         + " FROM DetEmpleado e"
@@ -69,10 +68,9 @@ import javax.validation.constraints.Size;
                         + " LEFT JOIN de.planta pl"
                         + " LEFT JOIN de.puesto pu"
     		+ " WHERE e.activo = 1 AND e.numEmpleado = :numEmpl"),
-    @NamedQuery(name = "DetEmpleado.findByNumero", query = "SELECT e FROM DetEmpleado e WHERE e.numEmpleado = :numero"),
     @NamedQuery(name = "DetEmpleado.findByNumEmplSD", query = "SELECT NEW mx.com.ferbo.dto.DetEmpleadoDTO("
                         + " e.idEmpleado, e.numEmpleado, e.nombre, e.primerAp, e.segundoAp, e.fechaNacimiento,"
-                        + " e.fechaRegistro, e.fechaModificacion, e.curp, e.rfc, e.correo, e.fechaIngreso, e.nss, e.activo, e.fotografia, a.idArea, a.descripcion,"
+                        + " e.fechaRegistro, e.fechaModificacion, e.curp, e.rfc, e.correo, e.fechaIngreso, e.nss, e.activo, e.empleadoFoto.fotografia, a.idArea, a.descripcion,"
                         + " em.idEmpresa, em.descripcion, p.idPerfil, p.descripcion, pl.idPlanta, pl.descripcion, pu.idPuesto, pu.descripcion, e.sueldoDiario"
                         + ")"
                         + " FROM DetEmpleado e"
@@ -88,7 +86,7 @@ import javax.validation.constraints.Size;
                 query = "SELECT NEW mx.com.ferbo.dto.DetEmpleadoDTO("
                         + " e.idEmpleado, e.numEmpleado, e.nombre, e.primerAp, e.segundoAp, e.fechaNacimiento,"
                         + " e.fechaRegistro, e.fechaModificacion, e.curp, e.rfc, e.correo, e.fechaIngreso, e.nss, "
-                        + " e.activo, e.fotografia, a.idArea, a.descripcion, em.idEmpresa, em.descripcion, "
+                        + " e.activo, e.empleadoFoto.fotografia, a.idArea, a.descripcion, em.idEmpresa, em.descripcion, "
                         + "p.idPerfil, p.descripcion, pl.idPlanta, pl.descripcion, pu.idPuesto, pu.descripcion, e.sueldoDiario"
                         + ")"
                         + " FROM DetEmpleado e"
@@ -103,7 +101,7 @@ import javax.validation.constraints.Size;
     			query = "SELECT NEW mx.com.ferbo.dto.DetEmpleadoDTO("
                         + " e.idEmpleado, e.numEmpleado, e.nombre, e.primerAp, e.segundoAp, e.fechaNacimiento,"
                         + " e.fechaRegistro, e.fechaModificacion, e.curp, e.rfc, e.correo, e.fechaIngreso, e.nss, "
-                        + " e.activo, e.fotografia, a.idArea, a.descripcion, em.idEmpresa, em.descripcion, "
+                        + " e.activo, e.empleadoFoto.fotografia, a.idArea, a.descripcion, em.idEmpresa, em.descripcion, "
                         + "p.idPerfil, p.descripcion, pl.idPlanta, pl.descripcion, pu.idPuesto, pu.descripcion, e.sueldoDiario"
                         + ")"
                         + " FROM DetEmpleado e"
@@ -114,9 +112,14 @@ import javax.validation.constraints.Size;
                         + " LEFT JOIN de.planta pl"
                         + " LEFT JOIN de.puesto pu"
                         + " WHERE e.activo = 1 AND de.empresa.idEmpresa = :idEmpresa ORDER BY e.primerAp, e.segundoAp, e.nombre"),
+    
+    
+    
+    @NamedQuery(name = "DetEmpleado.findByNumero", query = "SELECT e FROM DetEmpleado e WHERE e.numEmpleado = :numero"),
     @NamedQuery(name = "DetEmpleado.getNumEmpleado", query = "SELECT COALESCE(MAX(e.idEmpleado),0) FROM DetEmpleado e"),
     @NamedQuery(name = "DetEmpleado.getAll", query = "SELECT e FROM DetEmpleado e"),
     @NamedQuery(name = "DetEmpleado.getActive", query = "SELECT e FROM DetEmpleado e WHERE e.activo = :activo"),
+    @NamedQuery(name = "DetEmpleado.findByActiveEmpresaIngreso", query = "SELECT e FROM DetEmpleado e WHERE e.activo = 1 AND e.datoEmpresa.empresa.idEmpresa = :idEmpresa AND e.fechaIngreso <= :periodoPagoInicio ")
 })
 public class DetEmpleado implements Serializable {
 
@@ -192,11 +195,6 @@ public class DetEmpleado implements Serializable {
     @NotNull
     @Column(name = "activo")
     private short activo;
-    
-    @Lob
-    @Size(max = 2147483647)
-    @Column(name = "fotografia")
-    private String fotografia;
     
     @Column(name = "sueldo_diario")
     private BigDecimal sueldoDiario;
@@ -431,14 +429,6 @@ public class DetEmpleado implements Serializable {
 
     public void setDetSolicitudPrendaList(List<DetSolicitudPrenda> detSolicitudPrendaList) {
         this.detSolicitudPrendaList = detSolicitudPrendaList;
-    }
-
-    public String getFotografia() {
-        return fotografia;
-    }
-
-    public void setFotografia(String fotografia) {
-        this.fotografia = fotografia;
     }
 
     public BigDecimal getSueldoDiario() {

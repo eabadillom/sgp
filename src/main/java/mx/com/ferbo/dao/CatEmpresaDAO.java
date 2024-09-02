@@ -12,6 +12,7 @@ import mx.com.ferbo.dao.sat.RegimenFiscalDAO;
 import mx.com.ferbo.dto.CatEmpresaDTO;
 import mx.com.ferbo.model.CatEmpresa;
 
+@Deprecated
 public class CatEmpresaDAO extends IBaseDAO<CatEmpresaDTO, Integer> implements Serializable {
     
     private static final long serialVersionUID = 1L;
@@ -138,6 +139,7 @@ public class CatEmpresaDAO extends IBaseDAO<CatEmpresaDTO, Integer> implements S
         }
     }
 
+    @Deprecated
     @Override
     public List<CatEmpresaDTO> buscarActivo() {
     	List<CatEmpresaDTO> list = null;

@@ -2,9 +2,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8"%>
 <%@ page import="mx.com.ferbo.controller.LoginBean" %>
-<%@ page import="mx.com.ferbo.dto.DetEmpleadoDTO" %>
+<%@ page import="mx.com.ferbo.model.DetEmpleado" %>
 <%@ page import="javax.faces.context.FacesContext" %>    
-<%DetEmpleadoDTO empleado = (DetEmpleadoDTO) session.getAttribute("empleado"); %>
+<%DetEmpleado empleado = (DetEmpleado) session.getAttribute("empleado"); %>
 <%
     String path = request.getContextPath();
     String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + path;

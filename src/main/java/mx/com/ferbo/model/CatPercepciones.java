@@ -50,6 +50,7 @@ import javax.validation.constraints.NotNull;
                                                   + ")"
                                                   + " FROM CatPercepciones cp"
                                                   + " WHERE cp.fechaCap LIKE :fechaCap AND cp.activo = 1"),
+    @NamedQuery(name = "CatPercepciones.findVigente", query = "SELECT c FROM CatPercepciones c where c.fechaCap = (SELECT MAX(p.fechaCap) FROM CatPercepciones p WHERE p.activo = 1 and p.fechaCap <= :fechaCorte )"),
     @NamedQuery(name = "CatPercepciones.findLastActive", query =
     		  "SELECT NEW mx.com.ferbo.dto.CatPercepcionesDTO("
             + " cp.idPercepciones,"
