@@ -17,6 +17,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.CaptureEvent;
+import org.primefaces.event.TabChangeEvent;
 
 import mx.com.ferbo.dao.n.AreaDAO;
 import mx.com.ferbo.dao.n.BiometricoDAO;
@@ -67,16 +68,16 @@ public class RegistroEmpleadosBean implements Serializable {
     private List<CatPuesto> lstCatPuesto;
     private List<CatArea> lstCatArea;
 
-    private final EmpresaDAO empresaDAO;
-    private final EmpleadoFotoDAO empleadoFotoDAO;
-    private final PerfilDAO perfilDAO;
-    private final PlantaDAO plantaDAO;
-    private final PuestoDAO puestoDAO;
-    private final AreaDAO areaDAO;
-    private final EmpleadoDAO empleadoDAO;
+    private EmpresaDAO empresaDAO;
+    private EmpleadoFotoDAO empleadoFotoDAO;
+    private PerfilDAO perfilDAO;
+    private PlantaDAO plantaDAO;
+    private PuestoDAO puestoDAO;
+    private AreaDAO areaDAO;
+    private EmpleadoDAO empleadoDAO;
     
     private InfDatoEmpresa datoEmpresa;
-    private final BiometricoDAO biometricoDAO;
+    private BiometricoDAO biometricoDAO;
     private List<CatTipoContrato> tiposContrato;
     private TipoContratoDAO tipoContratoDAO;
     private List<CatTipoJornada> tiposJornada;
@@ -86,6 +87,7 @@ public class RegistroEmpleadosBean implements Serializable {
     private ParametroDAO parametroDAO;
 
     private DetBiometrico detBiometrico;
+    private DetEmpleadoFoto empleadoFoto;
     private String biometrico;
     private int numBiometrico;
     
@@ -170,10 +172,11 @@ public class RegistroEmpleadosBean implements Serializable {
     
     public void editar() {
     	log.info("Cargando información del empleado: {}", this.empleadoSelected);
-    	Integer idEmpleado = this.empleadoSelected.getIdEmpleado();
-    	DetEmpleado e = empleadoDAO.buscarPorId(idEmpleado, true, true);
-    	InfDatoEmpresa datoEmpresa = e.getDatoEmpresa();
-    	DetEmpleadoFoto empleadoFoto = empleadoFotoDAO.buscar(e.getNumEmpleado());
+//    	Integer idEmpleado = this.empleadoSelected.getIdEmpleado();
+//    	DetEmpleado e = empleadoDAO.buscarPorId(idEmpleado, true, true);
+//    	InfDatoEmpresa datoEmpresa = e.getDatoEmpresa();
+    	InfDatoEmpresa datoEmpresa = this.empleadoSelected.getDatoEmpresa();
+    	this.empleadoFoto = empleadoFotoDAO.buscar(this.empleadoSelected.getNumEmpleado());
     	if(datoEmpresa == null) {
     		this.datoEmpresa = new InfDatoEmpresa();
     		this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
@@ -184,9 +187,18 @@ public class RegistroEmpleadosBean implements Serializable {
     		this.curp = this.empleadoSelected.getCurp();
     	}
     	
+    	this.detBiometrico = biometricoDAO.consultaBiometricoByNumEmpleado(this.empleadoSelected.getNumEmpleado());
+    	
     	log.info("Empleado seleccionado: {}", this.empleadoSelected.getIdEmpleado());
-    	log.info("Foto: {}", empleadoFoto.getFotografia());
+    	if(empleadoFoto != null)
+    		log.debug("Foto: {}", empleadoFoto.getFotografia());
     	PrimeFaces.current().ajax().update("formRegistroEmpleado:panelDialogFoto");
+    }
+    
+    public void tabChange(TabChangeEvent event) {
+    	FacesMessage msg = new FacesMessage("Información...", event.getTab().getTitle());
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+        PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogEmpleado:previewFotografia");
     }
 
     /*
@@ -201,19 +213,23 @@ public class RegistroEmpleadosBean implements Serializable {
 		String sNumeroEmpleado = null;
 		int numeroEmpleado = -1;
     	try {
-    		pNumeroEmpleado = this.parametroDAO.buscarPorClave("NBEMP");
-    		
-    		sNumeroEmpleado = pNumeroEmpleado.getValor();
-    		numeroEmpleado = Integer.parseInt(sNumeroEmpleado);
-    		sNumeroEmpleado = String.format("%04d", ++numeroEmpleado);
-    		this.empleadoSelected.setNumEmpleado(sNumeroEmpleado);
-    		this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
-    		this.empleadoSelected.setFechaRegistro(new Date());
     		
     		if (this.empleadoSelected.getIdEmpleado() == null) {
+    			
+    			pNumeroEmpleado = this.parametroDAO.buscarPorClave("NBEMP");
+    			sNumeroEmpleado = pNumeroEmpleado.getValor();
+        		numeroEmpleado = Integer.parseInt(sNumeroEmpleado);
+        		sNumeroEmpleado = String.format("%04d", ++numeroEmpleado);
+        		this.empleadoSelected.setNumEmpleado(sNumeroEmpleado);
+        		this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
+        		this.empleadoSelected.setFechaRegistro(new Date());
     			empleadoDAO.guardar(empleadoSelected);
     		} else {
     			empleadoDAO.actualizar(empleadoSelected);
+    		}
+    		
+    		if(this.empleadoFoto != null) {
+    			empleadoFotoDAO.actualizar(empleadoFoto);
     		}
     		
     		if (biometrico != null) {
@@ -274,6 +290,10 @@ public class RegistroEmpleadosBean implements Serializable {
         PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:dtEmpleados");
         this.lstEmpleadosSelected.clear();
     }
+    
+    public void sinFoto() {
+    	this.empleadoFoto = null;
+    }
 
     /*
      * Método para eliminar 1 empleado
@@ -291,16 +311,18 @@ public class RegistroEmpleadosBean implements Serializable {
         PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:dtEmpleados");
     }
  
-    /* 
-     * Método para redirigir al kárdex
-     */
     public String redirectKardex() {
         String redirect = "/protected/kardexEmpleado.xhtml?faces-redirect=true&idEmpleado=" + empleadoSelected.getIdEmpleado();
         return redirect;
     }
 
     public void oncapture(CaptureEvent captureEvent) {
-        this.empleadoSelected.getEmpleadoFoto().setFotografia("data:image/jpeg;base64," + Base64.getEncoder().encodeToString(captureEvent.getData()));
+    	if(this.empleadoFoto == null) {
+    		this.empleadoFoto = new DetEmpleadoFoto();
+    		this.empleadoSelected.setEmpleadoFoto(empleadoFoto);
+    	}
+    	
+        this.empleadoFoto.setFotografia("data:image/jpeg;base64," + Base64.getEncoder().encodeToString(captureEvent.getData()));
     }
 
     public void consultaBiometrico() {
@@ -468,6 +490,14 @@ public class RegistroEmpleadosBean implements Serializable {
 
 	public void setNss(String nss) {
 		this.nss = nss;
+	}
+
+	public DetEmpleadoFoto getEmpleadoFoto() {
+		return empleadoFoto;
+	}
+
+	public void setEmpleadoFoto(DetEmpleadoFoto empleadoFoto) {
+		this.empleadoFoto = empleadoFoto;
 	}
     
 //</editor-fold> 

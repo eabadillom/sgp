@@ -10,6 +10,7 @@ import mx.com.ferbo.dao.sat.MetodoPagoDAO;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.Nomina;
 
+@Deprecated
 public class NominaDAO extends DAO<Nomina, DetNomina, Integer> {
 	
 	private static Logger log = LogManager.getLogger(NominaDAO.class);
@@ -29,14 +30,14 @@ public class NominaDAO extends DAO<Nomina, DetNomina, Integer> {
 			dto.setIdPac(model.getIdPac());
 			dto.setTipoComprobante(model.getTipoComprobante());
 			dto.setClaveExportacion(model.getClaveExportacion());
-			dto.setMetodoPago(new MetodoPagoDAO().getDTO(model.getMetodoPago()));
+//			dto.setMetodoPago(new MetodoPagoDAO().getDTO(model.getMetodoPago()));
 			dto.setSerie(model.getSerie());
 			dto.setFolio(model.getFolio());
 			dto.setSubtotal(model.getSubtotal());
 			dto.setDescuento(model.getDescuento());
 			dto.setTotal(model.getTotal());
-			dto.setEmisor(new NominaEmisorDAO().getDTO(model.getEmisor()));
-			dto.setReceptor(new NominaReceptorDAO().getDTO(model.getReceptor()));
+//			dto.setEmisor(new NominaEmisorDAO().getDTO(model.getEmisor()));
+//			dto.setReceptor(new NominaReceptorDAO().getDTO(model.getReceptor()));
 			dto.setConceptos(new NominaConceptoDAO().getDTOList(model.getConceptos()));
 			dto.setPercepciones(new NominaPercepcionDAO().getDTOList(model.getPercepciones()));
 			dto.setOtrosPagos(new NominaOtroPagoDAO().getDTOList(model.getOtrosPagos()));
@@ -71,8 +72,8 @@ public class NominaDAO extends DAO<Nomina, DetNomina, Integer> {
 			dto.setDescuento(model.getDescuento());
 			dto.setTotal(model.getTotal());
 			if(isFullInfo) {
-				dto.setMetodoPago(new MetodoPagoDAO().getDTO(model.getMetodoPago()));
-				dto.setEmisor(new NominaEmisorDAO().buscarPorNomina(model.getId(), true));
+//				dto.setMetodoPago(new MetodoPagoDAO().getDTO(model.getMetodoPago()));
+//				dto.setEmisor(new NominaEmisorDAO().buscarPorNomina(model.getId(), true));
 				
 			}
 		} catch(Exception ex) {

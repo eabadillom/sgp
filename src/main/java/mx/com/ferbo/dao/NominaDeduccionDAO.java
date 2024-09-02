@@ -10,6 +10,7 @@ import mx.com.ferbo.model.DetNominaDeduccionPK;
 import mx.com.ferbo.model.NominaDeduccion;
 import mx.com.ferbo.model.NominaDeduccionPK;
 
+@Deprecated
 public class NominaDeduccionDAO extends DAO<NominaDeduccion, DetNominaDeduccion, DetNominaDeduccionPK> {
 
 	@Override
@@ -18,7 +19,7 @@ public class NominaDeduccionDAO extends DAO<NominaDeduccion, DetNominaDeduccion,
 		try {
 			dto = new NominaDeduccion();
 			dto.setKey(new NominaDeduccionPK(model.getKey().getId(), new NominaDAO().buscarPorId(model.getKey().getNomina().getId(), false)));
-			dto.setTipoDeduccion(new TipoDeduccionDAO().getDTO(model.getTipoDeduccion()));
+//			dto.setTipoDeduccion(new TipoDeduccionDAO().getDTO(model.getTipoDeduccion()));
 			dto.setClave(model.getClave());
 			dto.setNombre(model.getNombre());
 			dto.setImporte(model.getImporte());
@@ -34,7 +35,7 @@ public class NominaDeduccionDAO extends DAO<NominaDeduccion, DetNominaDeduccion,
 		try {
 			model = new DetNominaDeduccion();
 			model.setKey(new DetNominaDeduccionPK(new NominaDAO().getModel(dto.getKey().getNomina()), dto.getKey().getIdDeduccion()));
-			model.setTipoDeduccion(new TipoDeduccionDAO().getModel(dto.getTipoDeduccion()));
+//			model.setTipoDeduccion(new TipoDeduccionDAO().getModel(dto.getTipoDeduccion()));
 			model.setClave(dto.getClave());
 			model.setNombre(dto.getNombre());
 			model.setImporte(dto.getImporte());

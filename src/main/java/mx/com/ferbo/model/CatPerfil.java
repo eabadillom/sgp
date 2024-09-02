@@ -2,6 +2,7 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -91,4 +92,26 @@ public class CatPerfil implements Serializable {
     public void setBitacoraCatPerfilList(List<BitacoraCatPerfil> bitacoraCatPerfilList) {
         this.bitacoraCatPerfilList = bitacoraCatPerfilList;
     }
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(idPerfil);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CatPerfil other = (CatPerfil) obj;
+		return Objects.equals(idPerfil, other.idPerfil);
+	}
+
+	@Override
+	public String toString() {
+		return "CatPerfil [idPerfil=" + idPerfil + ", descripcion=" + descripcion + ", activo=" + activo + "]";
+	}
 }

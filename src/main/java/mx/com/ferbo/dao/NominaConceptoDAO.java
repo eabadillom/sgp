@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mx.com.ferbo.commons.dao.DAO;
-import mx.com.ferbo.dao.sat.ConceptoDAO;
-import mx.com.ferbo.dao.sat.UnidadSATDAO;
 import mx.com.ferbo.model.DetNominaConcepto;
 import mx.com.ferbo.model.DetNominaConceptoPK;
 import mx.com.ferbo.model.NominaConcepto;
 import mx.com.ferbo.model.NominaConceptoPK;
 
+@Deprecated
 public class NominaConceptoDAO extends DAO<NominaConcepto, DetNominaConcepto, DetNominaConceptoPK>{
 
 	@Override
@@ -19,9 +18,9 @@ public class NominaConceptoDAO extends DAO<NominaConcepto, DetNominaConcepto, De
 		try {
 			dto = new NominaConcepto();
 			dto.setKey(new NominaConceptoPK(model.getKey().getId(), new NominaDAO().buscarPorId(model.getKey().getNomina().getId(), false)));
-			dto.setConcepto(new ConceptoDAO().getDTO(model.getConcepto()));
+//			dto.setConcepto(new ConceptoDAO().getDTO(model.getConcepto()));
 			dto.setCantidad(model.getCantidad());
-			dto.setUnidad(new UnidadSATDAO().getDTO(model.getUnidad()));
+//			dto.setUnidad(new UnidadSATDAO().getDTO(model.getUnidad()));
 			dto.setNombreConcepto(model.getNombreConcepto());
 			dto.setObjetoImpuesto(model.getObjetoImpuesto());
 			dto.setValorUnitario(model.getValorUnitario());
@@ -39,9 +38,9 @@ public class NominaConceptoDAO extends DAO<NominaConcepto, DetNominaConcepto, De
 		try {
 			model = new DetNominaConcepto();
 			model.setKey(new DetNominaConceptoPK(new NominaDAO().getModel(dto.getKey().getNomina()), dto.getKey().getIdConcepto()));
-			model.setConcepto(new ConceptoDAO().getModel(dto.getConcepto()));
+//			model.setConcepto(new ConceptoDAO().getModel(dto.getConcepto()));
 			model.setCantidad(dto.getCantidad());
-			model.setUnidad(new UnidadSATDAO().getModel(dto.getUnidad()));
+//			model.setUnidad(new UnidadSATDAO().getModel(dto.getUnidad()));
 			model.setNombreConcepto(dto.getNombreConcepto());
 			model.setObjetoImpuesto(dto.getObjetoImpuesto());
 			model.setValorUnitario(dto.getValorUnitario());

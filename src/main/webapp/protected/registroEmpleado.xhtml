@@ -104,8 +104,10 @@
                             </p:column>
                         </p:dataTable>
                         
-                        <p:dialog header="Empleado" showEffect="fade" modal="true" widgetVar="dialogEmpleado" responsive="true" draggable="true" resizable="true">
+                        <p:dialog header="Información del empleado..."
+                        showEffect="fade" modal="true" widgetVar="dialogEmpleado" responsive="true" draggable="true" resizable="true">
 							<p:tabView id="panelDialogEmpleado" title="Información del empleado" class="ui-fluid" dynamic="true" cache="true">
+								<p:ajax event="tabChange" update="formRegistroEmpleado:panelDialogEmpleado formRegistroEmpleado:panelDialogEmpleado:previewFotografia" listener="#{registroEmpleadosBean.tabChange}"/>
 								<p:tab title="Datos Personales">
 							        <div class="formgrid grid">
 							            <div class="field col-4">
@@ -257,17 +259,26 @@
 								<p:tab title="Datos Biometricos">
 									<p:panelGrid columns="2">
 										<p:card>
-							               <div class="field column">
-							                   <p:commandButton value="Fotografía" icon="pi pi-camera" process="@this" immediate="true" update="formRegistroEmpleado:photo" oncomplete="PF('dialogFotografia').show();" />
-							               </div>
-							               <div class="field column">
-							                   <p:commandButton value="Biométrico" icon="pi pi-sync" process="@this" actionListener="#{registroEmpleadosBean.consultaBiometrico()}" immediate="true"/>
-							                </div>
+											<div class="field column">
+												<p:panelGrid columns="2">
+													<p:outputPanel id="previewFingerprint1">
+														<p:graphicImage rendered="#{registroEmpleadosBean.detBiometrico.huella eq null}" name="images/huella/finger_print_01.png" library="recursos" style="max-height: 14rem;"/>
+	                                        			<p:graphicImage rendered="#{registroEmpleadosBean.detBiometrico.huella ne null}" name="images/huella/finger_print_02.png" library="recursos" style="max-height: 14rem;"/>
+													</p:outputPanel>
+													<p:outputPanel id="previewFingerprint2">
+														<p:graphicImage rendered="#{registroEmpleadosBean.detBiometrico.huella2 eq null}" name="images/huella/finger_print_01.png" library="recursos" style="max-height: 14rem;"/>
+	                                        			<p:graphicImage rendered="#{registroEmpleadosBean.detBiometrico.huella2 ne null}" name="images/huella/finger_print_02.png" library="recursos" style="max-height: 14rem;"/>
+													</p:outputPanel>
+												</p:panelGrid>
+												<p:commandButton value="Capturar biométricos" icon="pi pi-sync" process="@this" actionListener="#{registroEmpleadosBean.consultaBiometrico()}" immediate="true"/>
+											</div>
 										</p:card>
 										<p:card>
 											<div class="card">
-												<p:graphicImage height="150" value="#{registroEmpleadosBean.empleadoSelected.empleadoFoto.fotografia}"/>
-												<!-- <h:graphicImage value="#{registroEmpleadosBean.empleadoSelected.empleadoFoto.fotografia}" style="border-radius: 30%;width: auto; height: 7rem;"/> -->
+												<p:outputPanel id="previewFotografia">
+													<img src="#{registroEmpleadosBean.empleadoFoto.fotografia}" style="height: 15rem;"/>
+												</p:outputPanel>
+												<p:commandButton value="Tomar fotografía" icon="pi pi-camera" process="@this" immediate="true" update="formRegistroEmpleado:photo" oncomplete="PF('dialogFotografia').show();" />
 											</div>
 										</p:card>
 									</p:panelGrid>
@@ -285,16 +296,16 @@
                                 <h:panelGrid columns="3" cellpadding="5">
                                     <p:photoCam id="foto" widgetVar="pc" listener="#{registroEmpleadosBean.oncapture}"/>
                                     <p:outputPanel id="photo">
-                                        <img src="#{registroEmpleadosBean.empleadoSelected.empleadoFoto.fotografia}"/>
+                                        <img src="#{registroEmpleadosBean.empleadoFoto.fotografia}"/>
                                     </p:outputPanel>
                                 </h:panelGrid>
                             </p:outputPanel>
                             <f:facet name="footer">
                                 <p:commandButton  value="Capture" icon="pi pi-camera" onclick="PF('pc').capture()" process="@this" 
                                                   update="formRegistroEmpleado:photo formRegistroEmpleado:btnAceptarFoto"/>
-                                <p:commandButton id="btnAceptarFoto" value="Aceptar" disabled="#{registroEmpleadosBean.empleadoSelected.empleadoFoto.fotografia eq null}" 
+                                <p:commandButton id="btnAceptarFoto" value="Aceptar" disabled="#{registroEmpleadosBean.empleadoFoto.fotografia eq null}" update="formRegistroEmpleado:panelDialogEmpleado"
                                                  oncomplete="PF('pc').detach();" class="ui-button-success" icon="pi pi-check" onclick="PF('dialogFotografia').hide()" process="@this"/>
-                                <p:commandButton value="Cancelar" icon="pi pi-times" actionListener="#{registroEmpleadosBean.empleadoSelected.setFotografia(null)}" onclick="PF('dialogFotografia').hide(); PF('pc').detach();" class="ui-button-secondary" />
+                                <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogFotografia').hide(); PF('pc').detach();" class="ui-button-secondary" />
                             </f:facet>
                         </p:dialog> 
 

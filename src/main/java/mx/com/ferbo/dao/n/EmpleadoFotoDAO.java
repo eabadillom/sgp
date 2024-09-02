@@ -1,6 +1,7 @@
 package mx.com.ferbo.dao.n;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,6 +28,8 @@ public class EmpleadoFotoDAO extends BaseDAO<DetEmpleadoFoto, Integer> {
 					.getSingleResult()
 					;
 			
+		} catch(NoResultException ex) {
+			log.warn("No hay registro de foto para el empleado {}", numeroEmpleado);
 		} catch(Exception ex) {
 			log.error("Problema para obtener la foto del empleado " + numeroEmpleado, ex);
 		} finally {

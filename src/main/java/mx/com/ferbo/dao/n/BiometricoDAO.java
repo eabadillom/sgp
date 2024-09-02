@@ -1,6 +1,7 @@
 package mx.com.ferbo.dao.n;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,9 +23,12 @@ public class BiometricoDAO extends BaseDAO<DetBiometrico, Integer> {
 		
 		try {
 			em = this.getEntityManager();
-			model = em.createNamedQuery("DetBiometrico.findByNumEmpl", modelClass)
-					.setParameter("numEmpl", numeroEmpleado)
+			model = em.createNamedQuery("DetBiometrico.findByNumeroEmpleado", modelClass)
+					.setParameter("numeroEmpleado", numeroEmpleado)
 					.getSingleResult();
+		} catch(NoResultException ex){
+			log.warn("No se encontró informacion de biometricos para el empleado {}", numeroEmpleado);
+		
 		} catch(Exception ex) {
 			log.error("Problema para obtener el biometrico del empleado " + numeroEmpleado, ex);
 		} finally {

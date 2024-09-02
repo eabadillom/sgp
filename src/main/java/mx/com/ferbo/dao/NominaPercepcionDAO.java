@@ -17,7 +17,7 @@ public class NominaPercepcionDAO extends DAO<NominaPercepcion, DetNominaPercepci
 		try {
 			dto = new NominaPercepcion();
 			dto.setKey(new NominaPercepcionPK(model.getKey().getId(), new NominaDAO().getDTO(model.getKey().getNomina(), false)));
-			dto.setTipoPercepcion(new TipoPercepcionDAO().getDTO(model.getTipoPercepcion()));
+//			dto.setTipoPercepcion(new TipoPercepcionDAO().getDTO(model.getTipoPercepcion()));
 			dto.setClave(model.getClave());
 			dto.setNombre(model.getNombre());
 			dto.setImporteGravado(model.getImporteGravado());
@@ -34,7 +34,7 @@ public class NominaPercepcionDAO extends DAO<NominaPercepcion, DetNominaPercepci
 		try {
 			model = new DetNominaPercepcion();
 			model.setKey(new DetNominaPercepcionPK(new NominaDAO().getModel(dto.getKey().getNomina()), dto.getKey().getIdPercepcion()));
-			model.setTipoPercepcion(new TipoPercepcionDAO().getModel(dto.getTipoPercepcion()));
+//			model.setTipoPercepcion(new TipoPercepcionDAO().getModel(dto.getTipoPercepcion()));
 			model.setClave(dto.getClave());
 			model.setNombre(dto.getNombre());
 			model.setImporteGravado(dto.getImporteGravado());

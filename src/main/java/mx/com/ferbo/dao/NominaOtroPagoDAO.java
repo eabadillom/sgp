@@ -10,6 +10,7 @@ import mx.com.ferbo.model.DetNominaOtroPagoPK;
 import mx.com.ferbo.model.NominaOtroPago;
 import mx.com.ferbo.model.NominaOtroPagoPK;
 
+@Deprecated
 public class NominaOtroPagoDAO extends DAO<NominaOtroPago, DetNominaOtroPago, DetNominaOtroPagoPK> {
 
 	@Override
@@ -18,7 +19,7 @@ public class NominaOtroPagoDAO extends DAO<NominaOtroPago, DetNominaOtroPago, De
 		try {
 			dto = new NominaOtroPago();
 			dto.setKey(new NominaOtroPagoPK(new NominaDAO().buscarPorId(model.getKey().getNomina().getId(), false), model.getKey().getId()));
-			dto.setTipoOtroPago(new TipoOtroPagoDAO().getDTO(model.getTipoOtroPago()));
+//			dto.setTipoOtroPago(new TipoOtroPagoDAO().getDTO(model.getTipoOtroPago()));
 			dto.setClave(model.getClave());
 			dto.setNombre(model.getNombre());
 			dto.setImporte(model.getImporte());
@@ -37,7 +38,7 @@ public class NominaOtroPagoDAO extends DAO<NominaOtroPago, DetNominaOtroPago, De
 			dto.setNombre(model.getNombre());
 			dto.setImporte(model.getImporte());
 			if(isFullInfo == true) {
-				dto.setTipoOtroPago(new TipoOtroPagoDAO().getDTO(model.getTipoOtroPago()));
+//				dto.setTipoOtroPago(new TipoOtroPagoDAO().getDTO(model.getTipoOtroPago()));
 			}
 		} catch(Exception ex) {
 			dto = null;
@@ -51,7 +52,7 @@ public class NominaOtroPagoDAO extends DAO<NominaOtroPago, DetNominaOtroPago, De
 		try {
 			model = new DetNominaOtroPago();
 			model.setKey(new DetNominaOtroPagoPK(new NominaDAO().getModel(dto.getKey().getNomina()), dto.getKey().getId()));
-			model.setTipoOtroPago(new TipoOtroPagoDAO().getModel(dto.getTipoOtroPago()));
+//			model.setTipoOtroPago(new TipoOtroPagoDAO().getModel(dto.getTipoOtroPago()));
 			model.setClave(dto.getClave());
 			model.setNombre(dto.getNombre());
 			model.setImporte(dto.getImporte());
@@ -71,7 +72,7 @@ public class NominaOtroPagoDAO extends DAO<NominaOtroPago, DetNominaOtroPago, De
 			model.setImporte(dto.getImporte());
 			
 			if(isFullInfo == true) {
-				model.setTipoOtroPago(new TipoOtroPagoDAO().getModel(dto.getTipoOtroPago()));
+//				model.setTipoOtroPago(new TipoOtroPagoDAO().getModel(dto.getTipoOtroPago()));
 			}
 		} catch(Exception ex) {
 			model = null;
