@@ -37,5 +37,26 @@ public class BiometricoDAO extends BaseDAO<DetBiometrico, Integer> {
 		
 		return model;
 	}
+	
+	public DetBiometrico consultaBiometricoByIdEmpleado(Integer idEmpleado) {
+		DetBiometrico model = null;
+EntityManager em = null;
+		
+		try {
+			em = this.getEntityManager();
+			model = em.createNamedQuery("DetBiometrico.findByIdEmpleado", modelClass)
+					.setParameter("idEmpleado", idEmpleado)
+					.getSingleResult();
+		} catch(NoResultException ex){
+			log.warn("No se encontró informacion de biometricos para el empleado {}", idEmpleado);
+		
+		} catch(Exception ex) {
+			log.error("Problema para obtener el biometrico del empleado " + idEmpleado, ex);
+		} finally {
+			this.close(em);
+		}
+		
+		return model;
+	}
 
 }

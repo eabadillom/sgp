@@ -2,6 +2,7 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -10,9 +11,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -33,7 +34,8 @@ import javax.persistence.TemporalType;
             + " FROM DetBiometrico d"
             + " INNER JOIN d.idEmpleado emp"
             + " WHERE emp.numEmpleado = :numEmpl"),
-    @NamedQuery(name = "DetBiometrico.findByNumeroEmpleado", query = "SELECT d FROM DetBiometrico d WHERE d.idEmpleado.numEmpleado = :numeroEmpleado")
+    @NamedQuery(name = "DetBiometrico.findByNumeroEmpleado", query = "SELECT d FROM DetBiometrico d INNER JOIN d.idEmpleado e WHERE e.numEmpleado = :numeroEmpleado"),
+    @NamedQuery(name = "DetBiometrico.findByIdEmpleado", query = "SELECT d FROM DetBiometrico d WHERE d.idEmpleado.idEmpleado = :idEmpleado")
 })
 public class DetBiometrico implements Serializable {
 
@@ -55,9 +57,10 @@ public class DetBiometrico implements Serializable {
     private String huella; 
     @Basic(optional = false)
     @Column(name = "huella2")
-    private String huella2; 
+    private String huella2;
+    
     @JoinColumn(name = "id_empleado", referencedColumnName = "id_empleado")
-    @ManyToOne(optional = false)
+    @OneToOne(optional = false)
     private DetEmpleado idEmpleado;
 
     public DetBiometrico() {
@@ -121,5 +124,28 @@ public class DetBiometrico implements Serializable {
     public void setIdEmpleado(DetEmpleado idEmpleado) {
         this.idEmpleado = idEmpleado;
     }
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(idBiometrico);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DetBiometrico other = (DetBiometrico) obj;
+		return Objects.equals(idBiometrico, other.idBiometrico);
+	}
+
+	@Override
+	public String toString() {
+		return "DetBiometrico [idBiometrico=" + idBiometrico + ", fechaCaptura=" + fechaCaptura + ", activo=" + activo
+				+ ", huella=" + huella + ", huella2=" + huella2 + "]";
+	}
     
 }
