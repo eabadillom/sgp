@@ -46,11 +46,6 @@ import mx.com.ferbo.model.sat.CatTipoJornada;
 import mx.com.ferbo.model.sat.CatTipoRegimen;
 import mx.com.ferbo.util.SGPException;
 
-
-/**
- *
- * @author Gabo
- */
 @Named(value = "registroEmpleadosBean")
 @ViewScoped
 public class RegistroEmpleadosBean implements Serializable {
@@ -172,9 +167,6 @@ public class RegistroEmpleadosBean implements Serializable {
     
     public void editar() {
     	log.info("Cargando información del empleado: {}", this.empleadoSelected);
-//    	Integer idEmpleado = this.empleadoSelected.getIdEmpleado();
-//    	DetEmpleado e = empleadoDAO.buscarPorId(idEmpleado, true, true);
-//    	InfDatoEmpresa datoEmpresa = e.getDatoEmpresa();
     	InfDatoEmpresa datoEmpresa = this.empleadoSelected.getDatoEmpresa();
     	this.empleadoFoto = empleadoFotoDAO.buscar(this.empleadoSelected.getNumEmpleado());
     	if(datoEmpresa == null) {
@@ -187,15 +179,19 @@ public class RegistroEmpleadosBean implements Serializable {
     		this.curp = this.empleadoSelected.getCurp();
     	}
     	
-    	this.detBiometrico = biometricoDAO.consultaBiometricoByNumEmpleado(this.empleadoSelected.getNumEmpleado());
-    	
     	log.info("Empleado seleccionado: {}", this.empleadoSelected.getIdEmpleado());
     	if(empleadoFoto != null)
     		log.debug("Foto: {}", empleadoFoto.getFotografia());
+    	
+    	this.detBiometrico = biometricoDAO.consultaBiometricoByIdEmpleado(this.empleadoSelected.getIdEmpleado());
+    	
+		log.info("Biometrico: {}", this.detBiometrico);
+    	
     	PrimeFaces.current().ajax().update("formRegistroEmpleado:panelDialogFoto");
     }
     
     public void tabChange(TabChangeEvent event) {
+    	log.info("Detalle biometrico: {}", this.detBiometrico);
     	FacesMessage msg = new FacesMessage("Información...", event.getTab().getTitle());
         FacesContext.getCurrentInstance().addMessage(null, msg);
         PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogEmpleado:previewFotografia");

@@ -92,7 +92,7 @@
                             	<h:outputText value="#{empleado.activo}"></h:outputText>
                             </p:column>
                             <p:column exportable="false">
-                                <p:commandButton action="#{registroEmpleadosBean.editar}" process="@this" update=":formRegistroEmpleado:panelDialogEmpleado" oncomplete="PF('dialogEmpleado').show();" icon="pi pi-pencil" styleClass="edit-button rounded-button ui-button-warning m-1">
+                                <p:commandButton action="#{registroEmpleadosBean.editar}" process="@this" update=":formRegistroEmpleado:panelDialogEmpleado formRegistroEmpleado:panelDialogEmpleado:previewFingerprint1" oncomplete="PF('dialogEmpleado').show();" icon="pi pi-pencil" styleClass="edit-button rounded-button ui-button-warning m-1">
                                     <f:setPropertyActionListener value="#{empleado}" target="#{registroEmpleadosBean.empleadoSelected}" />
                                 </p:commandButton>
                                 <p:commandButton class="ui-button-danger rounded-button m-1" icon="pi pi-trash" process="@this" oncomplete="PF('dialogEliminarEmpleado').show()" >
@@ -262,11 +262,11 @@
 											<div class="field column">
 												<p:panelGrid columns="2">
 													<p:outputPanel id="previewFingerprint1">
-														<p:graphicImage rendered="#{registroEmpleadosBean.detBiometrico.huella eq null}" name="images/huella/finger_print_01.png" library="recursos" style="max-height: 14rem;"/>
-	                                        			<p:graphicImage rendered="#{registroEmpleadosBean.detBiometrico.huella ne null}" name="images/huella/finger_print_02.png" library="recursos" style="max-height: 14rem;"/>
+														<p:graphicImage rendered="#{empty registroEmpleadosBean.detBiometrico.huella}" name="images/huella/finger_print_01.png" library="recursos" style="max-height: 14rem;"/>
+	                                        			<p:graphicImage rendered="#{not empty registroEmpleadosBean.detBiometrico.huella}" name="images/huella/finger_print_02.png" library="recursos" style="max-height: 14rem;"/>
 													</p:outputPanel>
 													<p:outputPanel id="previewFingerprint2">
-														<p:graphicImage rendered="#{registroEmpleadosBean.detBiometrico.huella2 eq null}" name="images/huella/finger_print_01.png" library="recursos" style="max-height: 14rem;"/>
+														<p:graphicImage rendered="#{registroEmpleadosBean.detBiometrico eq null}" name="images/huella/finger_print_01.png" library="recursos" style="max-height: 14rem;"/>
 	                                        			<p:graphicImage rendered="#{registroEmpleadosBean.detBiometrico.huella2 ne null}" name="images/huella/finger_print_02.png" library="recursos" style="max-height: 14rem;"/>
 													</p:outputPanel>
 												</p:panelGrid>
@@ -276,6 +276,7 @@
 										<p:card>
 											<div class="card">
 												<p:outputPanel id="previewFotografia">
+													<p:graphicImage rendered="#{empty registroEmpleadosBean.empleadoFoto.fotografia}" library="recursos" name="images/user-icon.png" style="height: 15rem;" />
 													<img src="#{registroEmpleadosBean.empleadoFoto.fotografia}" style="height: 15rem;"/>
 												</p:outputPanel>
 												<p:commandButton value="Tomar fotografía" icon="pi pi-camera" process="@this" immediate="true" update="formRegistroEmpleado:photo" oncomplete="PF('dialogFotografia').show();" />
@@ -296,6 +297,7 @@
                                 <h:panelGrid columns="3" cellpadding="5">
                                     <p:photoCam id="foto" widgetVar="pc" listener="#{registroEmpleadosBean.oncapture}"/>
                                     <p:outputPanel id="photo">
+                                    	<p:graphicImage rendered="#{not empty registroEmpleadosBean.empleadoFoto.fotografia}" library="recursos" name="images/user-icon.png" style="max-width: 100px;"></p:graphicImage>
                                         <img src="#{registroEmpleadosBean.empleadoFoto.fotografia}"/>
                                     </p:outputPanel>
                                 </h:panelGrid>
