@@ -24,10 +24,13 @@ import mx.com.ferbo.dao.n.BiometricoDAO;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.EmpleadoFotoDAO;
 import mx.com.ferbo.dao.n.EmpresaDAO;
+import mx.com.ferbo.dao.n.EntidadFederativaDAO;
 import mx.com.ferbo.dao.n.ParametroDAO;
 import mx.com.ferbo.dao.n.PerfilDAO;
+import mx.com.ferbo.dao.n.PeriodicidadPagoDAO;
 import mx.com.ferbo.dao.n.PlantaDAO;
 import mx.com.ferbo.dao.n.PuestoDAO;
+import mx.com.ferbo.dao.n.RiesgoPuestoDAO;
 import mx.com.ferbo.dao.n.TipoContratoDAO;
 import mx.com.ferbo.dao.n.TipoJornadaDAO;
 import mx.com.ferbo.dao.n.TipoRegimenDAO;
@@ -35,12 +38,15 @@ import mx.com.ferbo.model.CatArea;
 import mx.com.ferbo.model.CatEmpresa;
 import mx.com.ferbo.model.CatParametro;
 import mx.com.ferbo.model.CatPerfil;
+import mx.com.ferbo.model.CatPeriodicidadPago;
 import mx.com.ferbo.model.CatPlanta;
 import mx.com.ferbo.model.CatPuesto;
 import mx.com.ferbo.model.DetBiometrico;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetEmpleadoFoto;
 import mx.com.ferbo.model.InfDatoEmpresa;
+import mx.com.ferbo.model.sat.CatEntidadFederativa;
+import mx.com.ferbo.model.sat.CatRiesgoPuesto;
 import mx.com.ferbo.model.sat.CatTipoContrato;
 import mx.com.ferbo.model.sat.CatTipoJornada;
 import mx.com.ferbo.model.sat.CatTipoRegimen;
@@ -52,16 +58,6 @@ public class RegistroEmpleadosBean implements Serializable {
     
     private static final long serialVersionUID = 1L;
     private static final Logger log = LogManager.getLogger(RegistroEmpleadosBean.class);
-
-    private DetEmpleado empleadoSelected;
-
-    private List<DetEmpleado> lstEmpleados;
-    private List<DetEmpleado> lstEmpleadosSelected;
-    private List<CatEmpresa> lstCatEmpresa;
-    private List<CatPerfil> lstCatPerfil;
-    private List<CatPlanta> lstCatPlanta;
-    private List<CatPuesto> lstCatPuesto;
-    private List<CatArea> lstCatArea;
 
     private EmpresaDAO empresaDAO;
     private EmpleadoFotoDAO empleadoFotoDAO;
@@ -80,7 +76,22 @@ public class RegistroEmpleadosBean implements Serializable {
     private List<CatTipoRegimen> tiposRegimen;
     private TipoRegimenDAO tipoRegimenDAO;
     private ParametroDAO parametroDAO;
+    private EntidadFederativaDAO entidadDAO;
+    private RiesgoPuestoDAO riesgoDAO;
+    private PeriodicidadPagoDAO periodicidadDAO;
 
+    private List<DetEmpleado> lstEmpleados;
+    private List<DetEmpleado> lstEmpleadosSelected;
+    private List<CatEmpresa> lstCatEmpresa;
+    private List<CatPerfil> lstCatPerfil;
+    private List<CatPlanta> lstCatPlanta;
+    private List<CatPuesto> lstCatPuesto;
+    private List<CatArea> lstCatArea;
+    private List<CatEntidadFederativa> entidadesFederativas;
+    private List<CatRiesgoPuesto> riesgosPuesto;
+    private List<CatPeriodicidadPago> periodicidadesPago;
+
+    private DetEmpleado empleadoSelected;
     private DetBiometrico detBiometrico;
     private DetEmpleadoFoto empleadoFoto;
     private String biometrico;
@@ -103,6 +114,9 @@ public class RegistroEmpleadosBean implements Serializable {
         tipoJornadaDAO = new TipoJornadaDAO(CatTipoJornada.class);
         tipoRegimenDAO = new TipoRegimenDAO(CatTipoRegimen.class);
         parametroDAO = new ParametroDAO(CatParametro.class);
+        entidadDAO = new EntidadFederativaDAO(CatEntidadFederativa.class);
+        riesgoDAO = new RiesgoPuestoDAO(CatRiesgoPuesto.class);
+        periodicidadDAO = new PeriodicidadPagoDAO(CatPeriodicidadPago.class);
         
         empleadoSelected = new DetEmpleado();
         lstEmpleados = new ArrayList<>();
@@ -120,9 +134,9 @@ public class RegistroEmpleadosBean implements Serializable {
             tiposContrato = tipoContratoDAO.buscarTodos();
             tiposJornada = tipoJornadaDAO.buscarTodos();
             tiposRegimen = tipoRegimenDAO.buscarTodos();
-            
-            
-            
+            entidadesFederativas = entidadDAO.buscarTodos();
+            riesgosPuesto = riesgoDAO.buscarTodos();
+            periodicidadesPago = periodicidadDAO.buscarActivos(new Date());
             
             consultaEmpleados();
         } catch (Exception ex) {
@@ -494,6 +508,30 @@ public class RegistroEmpleadosBean implements Serializable {
 
 	public void setEmpleadoFoto(DetEmpleadoFoto empleadoFoto) {
 		this.empleadoFoto = empleadoFoto;
+	}
+
+	public List<CatEntidadFederativa> getEntidadesFederativas() {
+		return entidadesFederativas;
+	}
+
+	public void setEntidadesFederativas(List<CatEntidadFederativa> entidadesFederativas) {
+		this.entidadesFederativas = entidadesFederativas;
+	}
+
+	public List<CatRiesgoPuesto> getRiesgosPuesto() {
+		return riesgosPuesto;
+	}
+
+	public void setRiesgosPuesto(List<CatRiesgoPuesto> riesgosPuesto) {
+		this.riesgosPuesto = riesgosPuesto;
+	}
+
+	public List<CatPeriodicidadPago> getPeriodicidadesPago() {
+		return periodicidadesPago;
+	}
+
+	public void setPeriodicidadesPago(List<CatPeriodicidadPago> periodicidadesPago) {
+		this.periodicidadesPago = periodicidadesPago;
 	}
     
 //</editor-fold> 

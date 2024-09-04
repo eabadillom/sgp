@@ -256,6 +256,37 @@
 												<p:outputLabel for="@next" value="Tolerancia (minutos)"></p:outputLabel>
 												<p:inputNumber value="#{registroEmpleadosBean.datoEmpresa.minutosTolerancia}"></p:inputNumber>
 											</div>
+											<div class="field col-12 md:col-3">
+												<p:outputLabel for="@next" value="Código Postal"/>
+												<p:inputText value="#{registroEmpleadosBean.datoEmpresa.codigoPostal}" maxlength="5">
+													<p:ajax process="@this" />
+												</p:inputText>
+											</div>
+											<div class="field col-12 md:col-3">
+												<p:outputLabel for="@next" value="Entidad Federativa" />
+												<p:selectOneMenu id="soEntidadFederativa" value="#{registroEmpleadosBean.datoEmpresa.entidadFederativa}" autoWidth="false" converter="entityConverter">
+													<f:selectItem itemLabel="--Seleccione--" noSelectionOption="true"/>
+													<f:selectItems value="#{registroEmpleadosBean.entidadesFederativas}" var="entidad" itemLabel="#{entidad.clave} - #{entidad.nombre}" itemValue="#{entidad}"/>
+												</p:selectOneMenu>
+											</div>
+											<div class="field col-12 md:col-3">
+												<p:outputLabel for="@next" value="Riesgo puesto" />
+												<p:selectOneMenu id="soRiesgoPuesto" value="#{registroEmpleadosBean.datoEmpresa.riesgoPuesto}" autoWidth="false" converter="entityConverter">
+													<f:selectItem itemLabel="--Seleccione--" noSelectionOption="true"/>
+													<f:selectItems value="#{registroEmpleadosBean.riesgosPuesto}" var="riesgo" itemLabel="#{riesgo.clave} - #{riesgo.descripcion}"/>
+												</p:selectOneMenu>
+											</div>
+											<div class="field col-12 md:col-3">
+												<p:outputLabel for="@next" value="Periodicidad de pago" />
+												<p:selectOneMenu id="soPeriodicidadPago" value="#{registroEmpleadosBean.datoEmpresa.periodicidadPago}" autoWidth="false" converter="entityConverter">
+													<f:selectItem itemLabel="--Seleccione--" noSelectionOption="true"/>
+													<f:selectItems value="#{registroEmpleadosBean.periodicidadesPago}" var="periodicidad" itemLabel="#{periodicidad.periodicidad} - #{periodicidad.descripcion}" itemValue="#{periodicidad}"/>
+												</p:selectOneMenu>
+											</div>
+											<div class="field col-12 md:col-1">
+												<p:outputLabel for="@next" value="Sindicalizado"/>
+												<p:selectBooleanButton value="#{registroEmpleadosBean.datoEmpresa.sindicalizado}" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem" />
+											</div>
 										</div>
 									</div>
 								</p:tab>

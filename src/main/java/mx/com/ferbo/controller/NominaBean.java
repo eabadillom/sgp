@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.TimeZone;
 
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.application.FacesMessage.Severity;
+import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
@@ -16,21 +19,35 @@ import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.business.NominaSemanalBL;
+import mx.com.ferbo.dao.n.ConceptoDAO;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.EmpresaDAO;
+import mx.com.ferbo.dao.n.MetodoPagoDAO;
+import mx.com.ferbo.dao.n.NominaDAO;
 import mx.com.ferbo.dao.n.PercepcionesDAO;
+import mx.com.ferbo.dao.n.PeriodicidadPagoDAO;
+import mx.com.ferbo.dao.n.RegimenFiscalDAO;
 import mx.com.ferbo.dao.n.SubsidioDAO;
 import mx.com.ferbo.dao.n.TarifaISRDAO;
+import mx.com.ferbo.dao.n.UnidadSATDAO;
+import mx.com.ferbo.dao.n.UsoCFDIDAO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.model.CatEmpresa;
 import mx.com.ferbo.model.CatPercepciones;
+import mx.com.ferbo.model.CatPeriodicidadPago;
 import mx.com.ferbo.model.CatSubsidio;
 import mx.com.ferbo.model.CatTarifaISR;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaEmisor;
 import mx.com.ferbo.model.DetNominaReceptor;
+import mx.com.ferbo.model.sat.CatConcepto;
+import mx.com.ferbo.model.sat.CatMetodoPago;
+import mx.com.ferbo.model.sat.CatRegimenFiscal;
+import mx.com.ferbo.model.sat.CatUnidadSAT;
+import mx.com.ferbo.model.sat.CatUsoCFDI;
 import mx.com.ferbo.util.DateUtils;
+import mx.com.ferbo.util.SGPException;
 
 @Named(value = "nominaBean")
 @ViewScoped
@@ -44,18 +61,30 @@ public class NominaBean implements Serializable {
     private PercepcionesDAO catPercepcionesDAO;
     private TarifaISRDAO tarifaISRDAO;
     private SubsidioDAO subsidioDAO;
+    private NominaDAO nominaDAO;
+    private MetodoPagoDAO metodoPagoDAO;
+    private ConceptoDAO conceptoDAO;
+    private UnidadSATDAO unidadSATDAO;
+    private PeriodicidadPagoDAO periodicidadDAO;
+    private RegimenFiscalDAO regimenFiscalDAO;
+    private UsoCFDIDAO usoCfdiDAO;
     
     private List<DetEmpleadoDTO> lstEmpleadosTmp;
     private List<CatEmpresa> lstEmpresas;
     private CatPercepciones parametrosPercepciones;
     private List<CatTarifaISR> tablaISRsemanal;
     private List<CatSubsidio> tablaSubsidioSemanal;
-    private DetEmpleadoDTO empleadoSelected;
     private CatEmpresa empresaSelected;
     private DetNomina nomina;
+    private CatMetodoPago metodoPago;
+    private CatConcepto concepto;
+    private CatUnidadSAT unidadSAT;
+    private CatPeriodicidadPago periodicidad;
+    private CatRegimenFiscal regimenFiscalReceptor;
+    private CatUsoCFDI usoCFDI;
     
     private Date fecha;
-    private int year;
+    private Integer year;
 
     private Date periodoInicio;
     private Date periodoFin;
@@ -78,6 +107,13 @@ public class NominaBean implements Serializable {
         catPercepcionesDAO = new PercepcionesDAO(CatPercepciones.class);
         tarifaISRDAO = new TarifaISRDAO(CatTarifaISR.class);
         subsidioDAO = new SubsidioDAO(CatSubsidio.class);
+        nominaDAO = new NominaDAO(DetNomina.class);
+        metodoPagoDAO = new MetodoPagoDAO(CatMetodoPago.class);
+        conceptoDAO = new ConceptoDAO(CatConcepto.class);
+        unidadSATDAO = new UnidadSATDAO(CatUnidadSAT.class);
+        periodicidadDAO = new PeriodicidadPagoDAO(CatPeriodicidadPago.class);
+        regimenFiscalDAO = new RegimenFiscalDAO(CatRegimenFiscal.class);
+        usoCfdiDAO = new UsoCFDIDAO(CatUsoCFDI.class);
 
         log.info("====================== salida constructor nominaBean ======================");
         log.info("Largo de Lista constructor {}", listaNomina.size());
@@ -165,6 +201,8 @@ public class NominaBean implements Serializable {
 		
     	log.info("Fecha Inicio: {}", this.periodoInicio);
     	log.info("Fecha Fin: {}", this.periodoFin);
+    	
+    	this.year = new Integer(anioActual);
     }
 
     public void calculandoNomina() {
@@ -183,6 +221,12 @@ public class NominaBean implements Serializable {
     		this.parametrosPercepciones = catPercepcionesDAO.buscarActual(this.periodoInicio);
     		this.tablaISRsemanal = tarifaISRDAO.buscar(fechaInicioAnio, fechafinAnio, "s");
     		this.tablaSubsidioSemanal = subsidioDAO.buscar(fechaInicioAnio, fechafinAnio, "s");
+    		this.metodoPago = this.metodoPagoDAO.buscarPorId("PUE");
+    		this.concepto = this.conceptoDAO.buscarPorId("84111505");
+    		this.unidadSAT = this.unidadSATDAO.buscarPorId("ACT");
+    		this.periodicidad = this.periodicidadDAO.buscarPorId("02");
+    		this.regimenFiscalReceptor = this.regimenFiscalDAO.buscarPorId("605");
+    		this.usoCFDI = this.usoCfdiDAO.buscarPorId("CN01");
     		
     		for (DetEmpleado empleado : listaEmpleados) {
     			nomina = this.procesaEmpleado(empleado);
@@ -202,6 +246,13 @@ public class NominaBean implements Serializable {
 		nominaSemanalBO.setParametrosPercepciones(parametrosPercepciones);
 		nominaSemanalBO.setTablaISRSemanal(this.tablaISRsemanal);
 		nominaSemanalBO.setTablaSubsidioSemanal(this.tablaSubsidioSemanal);
+		nominaSemanalBO.setMetodoPago(this.metodoPago);
+		nominaSemanalBO.setConcepto(this.concepto);
+		nominaSemanalBO.setUnidadSAT(this.unidadSAT);
+		nominaSemanalBO.setAnio(this.year);
+		nominaSemanalBO.setPeriodicidad(this.periodicidad);
+		nominaSemanalBO.setRegimenFiscalReceptor(this.regimenFiscalReceptor);
+		nominaSemanalBO.setUsoCFDI(this.usoCFDI);
 		nomina = nominaSemanalBO.calculoNomina();
 		return nomina;
     }
@@ -211,7 +262,41 @@ public class NominaBean implements Serializable {
     }
 
     public void guardarNominaEmpleado() {
-
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Nómina";
+    	
+    	try {
+    		
+    		if(this.listaNomina == null)
+    			throw new SGPException("No hay información de nómina.");
+    	
+    		if(this.listaNomina.size() <= 0)
+    			throw new SGPException("No hay información de nómina.");
+    		
+    		for(DetNomina nomina : listaNomina) {
+    			log.info("Nomina: {}", nomina);
+    			nominaDAO.guardar(nomina);
+    		}
+    		
+    		mensaje = "La información se guardó correctamente.";
+    		severity = FacesMessage.SEVERITY_INFO;
+    	} catch(SGPException ex) {
+    		mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+    	} catch(Exception ex) {
+    		log.error("Problema para guardar la nómina...", ex);
+			mensaje = "Hay un problema para guardar nómina.";
+			severity = FacesMessage.SEVERITY_ERROR;
+    	} finally {
+    		message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update(":formNomina:messages");
+    	}
+    	
+    	log.info("Guardando nomina...");
+    	
     }
     
     public List<DetEmpleadoDTO> getLstEmpleadosTmp() {
@@ -228,14 +313,6 @@ public class NominaBean implements Serializable {
 
     public void setLstEmpresas(List<CatEmpresa> lstEmpresas) {
         this.lstEmpresas = lstEmpresas;
-    }
-
-    public DetEmpleadoDTO getEmpleadoSelected() {
-        return empleadoSelected;
-    }
-
-    public void setEmpleadoSelected(DetEmpleadoDTO empleadoSelected) {
-        this.empleadoSelected = empleadoSelected;
     }
 
     public CatEmpresa getEmpresaSelected() {

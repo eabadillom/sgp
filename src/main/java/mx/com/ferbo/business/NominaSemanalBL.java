@@ -23,11 +23,13 @@ import mx.com.ferbo.dto.CuotaIMSSDTO;
 import mx.com.ferbo.dto.PrestamoDTO;
 import mx.com.ferbo.model.CatDiaNoLaboral;
 import mx.com.ferbo.model.CatPercepciones;
+import mx.com.ferbo.model.CatPeriodicidadPago;
 import mx.com.ferbo.model.CatSubsidio;
 import mx.com.ferbo.model.CatTarifaISR;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaConcepto;
+import mx.com.ferbo.model.DetNominaConceptoPK;
 import mx.com.ferbo.model.DetNominaDeduccion;
 import mx.com.ferbo.model.DetNominaDeduccionPK;
 import mx.com.ferbo.model.DetNominaEmisor;
@@ -38,9 +40,14 @@ import mx.com.ferbo.model.DetNominaPercepcionPK;
 import mx.com.ferbo.model.DetNominaReceptor;
 import mx.com.ferbo.model.DetPrestamo;
 import mx.com.ferbo.model.DetRegistro;
+import mx.com.ferbo.model.sat.CatConcepto;
+import mx.com.ferbo.model.sat.CatMetodoPago;
+import mx.com.ferbo.model.sat.CatRegimenFiscal;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.model.sat.CatTipoOtroPago;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
+import mx.com.ferbo.model.sat.CatUnidadSAT;
+import mx.com.ferbo.model.sat.CatUsoCFDI;
 import mx.com.ferbo.util.DateUtils;
 import mx.com.ferbo.util.SGPException;
 
@@ -110,6 +117,13 @@ public class NominaSemanalBL {
 	private TipoOtroPagoDAO tipoOtroPagoDAO = null;
 	private TipoDeduccionDAO tipoDeduccionDAO = null;
 	private PrestamoDAO prestamoDAO = null;
+	private CatMetodoPago metodoPago = null;
+	private CatConcepto concepto = null;
+	private CatUnidadSAT unidadSAT = null;
+	private CatPeriodicidadPago periodicidad = null;
+	private CatRegimenFiscal regimenFiscalReceptor = null;
+	private CatUsoCFDI usoCFDI = null;
+	private Integer anio = null;
 	
 	
 	//OBJETOS RELACIONADOS A LA NOMINA Y CFDI
@@ -145,15 +159,14 @@ public class NominaSemanalBL {
 		DetNominaReceptor receptor = null;
 		
 		List<DetNominaConcepto> conceptos = null;
-		DetNominaConcepto concepto = null;
-		
 		List<DetNominaPercepcion> percepciones = null;
 		List<DetNominaOtroPago> otrosPagos = null;
 		List<DetNominaDeduccion> deducciones = null;
 		
 		try {
-			nomina = new DetNomina();
 			
+			
+			nomina = new DetNomina();
 			conceptos = new ArrayList<>();
 			percepciones = new ArrayList<>();
 			otrosPagos = new ArrayList<>();
@@ -161,8 +174,6 @@ public class NominaSemanalBL {
 			
 			emisor = new DetNominaEmisor();
 			receptor = new DetNominaReceptor();
-			concepto = new DetNominaConcepto();
-			conceptos.add(concepto);
 			
 			nomina.setEmisor(emisor);
 			nomina.setReceptor(receptor);
@@ -302,6 +313,14 @@ public class NominaSemanalBL {
 			
 			
 			//NUEVA NOMINA...........................................
+			nominaNew.setFechaEmision(new Date());
+			nominaNew.setClaveExportacion("01");
+			nominaNew.setTipoComprobante("N");
+			nominaNew.setMoneda("MXN");
+			nominaNew.setMetodoPago(this.metodoPago);
+			nominaNew.setSerie(String.format("%d", this.anio));
+			nominaNew.setFolio(String.format("%d", this.semanaAnio));
+			nominaNew.setLugarExpedicion(this.empleado.getDatoEmpresa().getEmpresa().getCodigoPostal());
 			nominaNew.setEjercicio(DateUtils.getAnio(this.fechaInicioAnio));
 			nominaNew.setDiasLaborados(this.diasTrabajados.intValue());
 			nominaNew.setDiasNoLaborados(this.diasPeriodo.subtract(diasTrabajados).intValue());
@@ -316,23 +335,48 @@ public class NominaSemanalBL {
 			emisor.setRfc(this.empleado.getDatoEmpresa().getEmpresa().getRfc());
 			emisor.setCodigoPostal(this.empleado.getDatoEmpresa().getEmpresa().getCodigoPostal());
 			emisor.setRegistroPatronal(this.empleado.getDatoEmpresa().getEmpresa().getRegistroPatronal());
+			emisor.setRegimenFiscal(this.empleado.getDatoEmpresa().getEmpresa().getRegimenFiscal());
 			
 			
 			DetNominaReceptor receptor = nominaNew.getReceptor();
 			receptor.setNomina(nominaNew);
 			receptor.setNombre(String.format("%s %s %s", this.empleado.getNombre(), this.empleado.getPrimerAp(), this.empleado.getSegundoAp()));
 			receptor.setRfc(this.empleado.getRfc());
+			receptor.setCodigoPostal(this.empleado.getDatoEmpresa().getCodigoPostal());
+			receptor.setRegimenFiscal(this.regimenFiscalReceptor);//TODO pendiente revisar el regimen fiscal del receptor.
+			receptor.setUsoCfdi(this.usoCFDI);
 			receptor.setCurp(this.empleado.getCurp());
 			receptor.setNss(this.empleado.getDatoEmpresa().getNss());
 			receptor.setInicioRelacionLaboral(this.empleado.getDatoEmpresa().getFechaIngreso());
+			receptor.setAntiguedad("P----");//TODO pendiente implementar antiguedad
+			receptor.setTipoContrato(this.empleado.getDatoEmpresa().getTipoContrato());
+			receptor.setSindicalizado(this.empleado.getDatoEmpresa().getSindicalizado());
+			receptor.setTipoJornada(this.empleado.getDatoEmpresa().getTipoJornada());
+			receptor.setTipoRegimen(this.empleado.getDatoEmpresa().getTipoRegimen());
+			receptor.setNumeroEmpleado(this.empleado.getNumEmpleado());
+			receptor.setDepartamento(this.empleado.getDatoEmpresa().getArea().getDescripcion());
+			receptor.setPuesto(this.empleado.getDatoEmpresa().getPuesto().getDescripcion());
+			receptor.setRiesgoPuesto(this.empleado.getDatoEmpresa().getRiesgoPuesto());
+			receptor.setPeriodicidadPago(this.empleado.getDatoEmpresa().getPeriodicidadPago());
 			receptor.setSalarioDiario(this.salarioDiario);
 			receptor.setSalarioDiarioIntegrado(this.salarioDiarioIntegrado);
-			receptor.setNumeroEmpleado(this.empleado.getNumEmpleado());
+			receptor.setEntidadFederativa(this.empleado.getDatoEmpresa().getEntidadFederativa());
 			
 			percepciones = nominaNew.getPercepciones();
 			otrosPagos = nominaNew.getOtrosPagos();
 			deducciones = nominaNew.getDeducciones();
 			
+			DetNominaConcepto concepto = new DetNominaConcepto();
+			concepto.setKey(new DetNominaConceptoPK(nominaNew, 0));
+			concepto.setConcepto(this.concepto);
+			concepto.setCantidad(new BigDecimal("1").setScale(2, BigDecimal.ROUND_HALF_UP));
+			concepto.setUnidad(this.unidadSAT);
+			concepto.setNombreConcepto("Pago de nómina");
+			concepto.setObjetoImpuesto("01");
+			concepto.setValorUnitario(this.totalPercepciones);
+			concepto.setImporte(this.totalPercepciones);
+			concepto.setDescuento(this.totalDeducciones);
+			nominaNew.getConceptos().add(concepto);
 			
 			int idxP = 0;
 			int idxOP = 0;
@@ -351,6 +395,8 @@ public class NominaSemanalBL {
 				CatTipoPercepcion tpSueldo = tipoPercepcionDAO.buscarPorId("001");
 				pSueldo.setTipoPercepcion(tpSueldo);
 				pSueldo.setImporteGravado(this.salarioSemanal);
+				pSueldo.setImporteExcento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
+				pSueldo.setClave("FRB-" + tpSueldo.getClave());
 				percepciones.add(pSueldo);
 				
 				pSeptimoDia.setKey(new DetNominaPercepcionPK(nominaNew, idxP++));
@@ -359,6 +405,8 @@ public class NominaSemanalBL {
 				CatTipoPercepcion tpSeptimoDia = tipoPercepcionDAO.buscarPorId("001");
 				pSeptimoDia.setTipoPercepcion(tpSeptimoDia);
 				pSeptimoDia.setImporteGravado(this.septimoDia);
+				pSeptimoDia.setImporteExcento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
+				pSeptimoDia.setClave("FRB-" + tpSeptimoDia.getClave());
 				percepciones.add(pSeptimoDia);
 				
 				pBonoPuntualidad.setKey(new DetNominaPercepcionPK(nominaNew, idxP++));
@@ -367,6 +415,8 @@ public class NominaSemanalBL {
 				CatTipoPercepcion tpBonoPuntualidad = tipoPercepcionDAO.buscarPorId("010");
 				pBonoPuntualidad.setTipoPercepcion(tpBonoPuntualidad);
 				pBonoPuntualidad.setImporteGravado(this.bonoPuntualidad);
+				pBonoPuntualidad.setImporteExcento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
+				pBonoPuntualidad.setClave("FRB-" + tpBonoPuntualidad.getClave());
 				percepciones.add(pBonoPuntualidad);
 			}
 			
@@ -375,7 +425,9 @@ public class NominaSemanalBL {
 			pValeDespensa.setNombre("Despensa");
 			CatTipoPercepcion tpValeDespensa = tipoPercepcionDAO.buscarPorId("029");
 			pValeDespensa.setTipoPercepcion(tpValeDespensa);
-			pValeDespensa.setImporteExcento(this.valesDespensa);
+			pValeDespensa.setImporteGravado(this.valesDespensa);
+			pValeDespensa.setImporteExcento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
+			pValeDespensa.setClave("FRB-" + tpValeDespensa.getClave());
 			percepciones.add(pValeDespensa);
 			
 			
@@ -384,7 +436,7 @@ public class NominaSemanalBL {
 			opAjusteAlNeto.setKey(new DetNominaOtroPagoPK(nominaNew, idxOP++));
 			CatTipoOtroPago tpAjusteAlNeto = this.tipoOtroPagoDAO.buscarPorId("999");
 			opAjusteAlNeto.setTipoOtroPago(tpAjusteAlNeto);
-			opAjusteAlNeto.setClave("099");
+			opAjusteAlNeto.setClave("FRB-099");
 			opAjusteAlNeto.setNombre("Ajuste al neto");
 			opAjusteAlNeto.setImporte(new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP));
 			otrosPagos.add(opAjusteAlNeto);
@@ -393,7 +445,7 @@ public class NominaSemanalBL {
 			opSubsidioEmpleo.setKey(new DetNominaOtroPagoPK(nominaNew, idxOP++));
 			CatTipoOtroPago topSubsidioEmpleo = this.tipoOtroPagoDAO.buscarPorId("002");
 			opSubsidioEmpleo.setTipoOtroPago(topSubsidioEmpleo);
-			opSubsidioEmpleo.setClave("035");
+			opSubsidioEmpleo.setClave("FRB-035");
 			opSubsidioEmpleo.setNombre("Subs. al empleo mes");
 			opSubsidioEmpleo.setImporte(this.subsidioEmpleo);
 			otrosPagos.add(opSubsidioEmpleo);
@@ -412,7 +464,7 @@ public class NominaSemanalBL {
 			dIMSS.setKey(new DetNominaDeduccionPK(nominaNew, idxD++));
 			CatTipoDeduccion tdIMSS = this.tipoDeduccionDAO.buscarPorId("001");
 			dIMSS.setTipoDeduccion(tdIMSS);
-			dIMSS.setClave("052");
+			dIMSS.setClave("FRB-052");
 			dIMSS.setNombre("I.M.S.S.");
 			dIMSS.setImporte(this.imss);
 			deducciones.add(dIMSS);
@@ -1002,5 +1054,61 @@ public class NominaSemanalBL {
 	
 	public void setTablaSubsidioSemanal(List<CatSubsidio> tablaSubsidioSemanal) {
 		this.tablaSubsidioSemanal = tablaSubsidioSemanal;
+	}
+
+	public CatMetodoPago getMetodoPago() {
+		return metodoPago;
+	}
+
+	public void setMetodoPago(CatMetodoPago metodoPago) {
+		this.metodoPago = metodoPago;
+	}
+
+	public Integer getAnio() {
+		return anio;
+	}
+
+	public void setAnio(Integer anio) {
+		this.anio = anio;
+	}
+
+	public CatConcepto getConcepto() {
+		return concepto;
+	}
+
+	public void setConcepto(CatConcepto concepto) {
+		this.concepto = concepto;
+	}
+
+	public CatUnidadSAT getUnidadSAT() {
+		return unidadSAT;
+	}
+
+	public void setUnidadSAT(CatUnidadSAT unidadSAT) {
+		this.unidadSAT = unidadSAT;
+	}
+
+	public CatPeriodicidadPago getPeriodicidad() {
+		return periodicidad;
+	}
+
+	public void setPeriodicidad(CatPeriodicidadPago periodicidad) {
+		this.periodicidad = periodicidad;
+	}
+
+	public CatRegimenFiscal getRegimenFiscalReceptor() {
+		return regimenFiscalReceptor;
+	}
+
+	public void setRegimenFiscalReceptor(CatRegimenFiscal regimenFiscalReceptor) {
+		this.regimenFiscalReceptor = regimenFiscalReceptor;
+	}
+
+	public CatUsoCFDI getUsoCFDI() {
+		return usoCFDI;
+	}
+
+	public void setUsoCFDI(CatUsoCFDI usoCFDI) {
+		this.usoCFDI = usoCFDI;
 	}
 }

@@ -13,6 +13,7 @@ import mx.com.ferbo.dao.sat.UsoCfdiDAO;
 import mx.com.ferbo.dto.NominaReceptorDTO;
 import mx.com.ferbo.model.DetNominaReceptor;
 
+@Deprecated
 public class NominaReceptorDAO extends DAO<NominaReceptorDTO, DetNominaReceptor, Integer> {
 
 	@Override
