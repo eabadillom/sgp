@@ -15,7 +15,7 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "cat_riesgo_puesto")
 @NamedQueries({
-    @NamedQuery(name = "CatRiesgoPuesto.findByAll", query = "SELECT rp FROM CatRiesgoPuesto rp")
+    @NamedQuery(name = "CatRiesgoPuesto.findByAll", query = "SELECT rp FROM CatRiesgoPuesto rp ORDER BY rp.clave")
 })
 public class CatRiesgoPuesto implements Serializable{
 

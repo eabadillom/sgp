@@ -95,7 +95,7 @@
 						</p:commandButton>
 					</p:column>
 					<f:facet name="footer" >
-						<p:commandButton value="Guardar" icon="pi pi-pencil" actionListener="#{nominaBean.guardarNominaEmpleado()}" disabled="#{nominaBean.listaNomina.size() eq 0}"/>
+						<p:commandButton value="Guardar" icon="pi pi-pencil" actionListener="#{nominaBean.guardarNominaEmpleado()}" disabled="#{empty nominaBean.listaNomina.size()}"/>
 						<p:commandButton value="Exportar" icon="pi pi-upload" styleClass="ui-button-help" ajax="false">
 							<p:dataExporter type="csv" target="dtNomina" fileName="raya" preProcessor="#{nominaBean.exportNomina}"/>
 						</p:commandButton>
