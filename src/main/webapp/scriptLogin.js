@@ -17,8 +17,17 @@ $(document).ready(function () {
         'max-height': '100%',
         'max-width': '100%'
     });
-    
+
     $('#procesando').dialog({
+        autoOpen: false,
+        modal: true,
+        width: 'auto',
+        height: 'auto',
+        'max-height': '100%',
+        'max-width': '100%'
+    });
+
+    $('#registro').dialog({
         autoOpen: false,
         modal: true,
         width: 'auto',
@@ -70,22 +79,32 @@ function dialogos(st) {
         case 1:
             $('#dialogSystem').dialog('open');
             $('#procesando').dialog('close');
+            $('#registro').dialog('close');
             break;
 
         case 2:
             $('#dialogSystem').dialog('close');
             $('#procesando').dialog('open');
+            $('#registro').dialog('close');
             break;
 
         case 3:
             $('#dialogSystem').dialog('close');
             $('#procesando').dialog('close');
+            $('#registro').dialog('close');
             break;
+
+        case 4:
+            $('#dialogSystem').dialog('close');
+            $('#procesando').dialog('close');
+            $('#registro').dialog('open');
+            break;
+
     }
 }
 
 function tipoMensaje(numDialog, message) {
-    
+
     $('#mensajeUsuario').html(message);
 
     switch (numDialog) {
@@ -98,7 +117,7 @@ function tipoMensaje(numDialog, message) {
             $('#invalida').hide();
             $('#niega').hide();
             break;
-            
+
         case 2:
             $('#reporte').hide();
             $('#escanea').hide();
@@ -108,7 +127,7 @@ function tipoMensaje(numDialog, message) {
             $('#invalida').hide();
             $('#niega').hide();
             break;
-            
+
         case 3:
             $('#reporte').hide();
             $('#escanea').hide();
@@ -118,7 +137,7 @@ function tipoMensaje(numDialog, message) {
             $('#invalida').show();
             $('#niega').show();
             break;
-            
+
         case 4:
             $('#reporte').show();
             $('#escanea').hide();
@@ -127,7 +146,7 @@ function tipoMensaje(numDialog, message) {
             $('#acepta').hide();
             $('#invalida').hide();
             $('#niega').show();
-            break;  
+            break;
     }
 }
 
@@ -135,18 +154,63 @@ function delay(time) {
     return new Promise(resolve => setTimeout(resolve, time));
 }
 
-async function freeze(isFreeze, st, numDialog, message, token, appPath) {
+async function freeze(isFreeze, st, numDialog, message, token, appPath, jsonObj) {
 
-    if (isFreeze) {
+    if (isFreeze === 1) {
         dialogos(st);
         tipoMensaje(numDialog, message);
         await delay(3000);
         dialogos(3);
-    } else {
+    } else if (isFreeze === 2) {
         dialogos(st);
         tipoMensaje(numDialog, message);
         await delay(1000);
         registryServlet(token, appPath);
+    } else {
+        descifrar(jsonObj);
+        dialogos(4);
+        await delay(5000);
+        dialogos(3);
+    }
+}
+
+function formatDate(unafecha){
+    const fecha = new Date(unafecha);
+    
+    const anio = fecha.getFullYear();
+    const mes = String(fecha.getMonth() + 1).padStart(2,'0');
+    const dia = String(fecha.getDay()).padStart(2,'0');
+    const horas = String(fecha.getHours()).padStart(2,'0');
+    const minutos = String(fecha.getMinutes()).padStart(2,'0');
+    const segundos = String(fecha.getSeconds()).padStart(2,'0');
+    
+    return `${anio}-${mes}-${dia} ${horas}:${minutos}:${segundos}`;
+}
+
+function descifrar(jsonObj){
+  
+    const nuevaEntrada = formatDate(jsonObj.responseJSON.horaEntrada);
+    const nuevaSalida = formatDate(jsonObj.responseJSON.horaSalida);
+     
+    $('#empleado').html(jsonObj.responseJSON.numero);
+    $('#entrada').html(nuevaEntrada);
+    $('#salida').html(nuevaSalida);
+    $('#mensajeRegistro').html("Tu registro se guardo con exito");
+    
+    if(jsonObj.responseJSON.horaSalida === null){
+        $('#LEmpleado').show();
+        $('#empleado').show();
+        $('#LEntrada').show();
+        $('#entrada').show();
+        $('#LSalida').hide();
+        $('#salida').hide();
+    }else{
+        $('#LEmpleado').show();
+        $('#empleado').show();
+        $('#LEntrada').show();
+        $('#entrada').show();
+        $('#LSalida').show();
+        $('#salida').show();
     }
 }
 
@@ -158,7 +222,7 @@ function lectura(accion, appPath) {
 
     if (num.length === 0) {
         $('#dialogSystem').dialog({title: "Aviso del sistema"});
-        freeze(true, 1, 4, "Debe ingresar un numero de usuario", null, null);
+        freeze(1, 1, 4, "Debe ingresar un numero de usuario", null, null, null);
         $("#inoutES").prop("disabled", false);
         $("#inoutP").prop("disabled", false);
         return;
@@ -172,7 +236,7 @@ function lectura(accion, appPath) {
 
     $('#dialogSystem').dialog({title: "Lectura de huella"});
     dialogos(1);
-    tipoMensaje(1,"Coloca tu huella en el lector");
+    tipoMensaje(1, "Coloca tu huella en el lector");
 
     $.ajax({
         async: true,
@@ -193,7 +257,7 @@ function lectura(accion, appPath) {
         },
         error: function (jsonObj) {
             $('dialogSystem').dialog({title: 'Aviso del sistema'});
-            freeze(true, 1, 4, "Lector de huella no detectado", null, null);
+            freeze(1, 1, 4, "Lector de huella no detectado", null, null, null);
             $("#inoutES").prop("disabled", false);
             $("#inoutP").prop("disabled", false);
         }
@@ -226,26 +290,27 @@ function validar(captura, appPath) {
             var verificacion = jsonObj.verifyBiometricData;
             if (verificacion) {
                 $('#dialogSystem').dialog({title: "Exito"});
-                freeze(false, 1, 2, "Huella capturada correctamente",token, appPath);
+                freeze(2, 1, 2, "Huella capturada correctamente", token, appPath, null);
 
             } else {
                 $('#dialogSystem').dialog({title: "Error"});
-                freeze(true, 1, 3, "Huella invalida. Intente de nuevo.", null, null);
+                freeze(1, 1, 3, "Huella invalida. Intente de nuevo.", null, null, null);
             }
 
         },
         error: function (jsonObj) {
-            var jsonText = jsonText = jsonObj.responseText;
-            var respuesta = null;
-            if (jsonText === undefined || jsonText === null) {
-                //respuesta = {"lastMessageError": "No hay respuesta de Facturama."};
-            } else {
-               $('#dialogSystem').dialog({title: "Aviso del sistema"});
-                freeze(true, 1, 4, "El numero " + numeroEmp + " no esta registrado.", null, null);
-                respuesta = JSON.parse(jsonText);
+            if (jsonObj.responseJSON.message === "Hubo algun problema con la base de datos") {
+                $('#dialogSystem').dialog({title: "Error"});
+                freeze(1, 1, 3, "Huella invalida. Intente de nuevo.", null, null, null);
+                $('#numero').val('');
+            } else if (jsonObj.responseJSON.horaEntrada !== null){
+                freeze(3, 1, 4, "", null, null, jsonObj);
+                $('#numero').val('');
+            }else{
+                $('#dialogSystem').dialog({title: "Error"});
+                freeze(1, 1, 3, "Huella invalida. Intente de nuevo.", null, null, null);
+                $('#numero').val('');
             }
-            $('#dialogSystem').dialog({title: "Error"});
-                freeze(true, 1, 4, "No hay respuesta de facturama.", null, null);
         }
     });
     console.log("Saliendo de funcion validar.............");
@@ -277,8 +342,8 @@ function registryServlet(objeto1, appPath) {
         },
         error: function (jsonObj) {
             $('#dialogSystem').dialog({title: "Aviso del sistema"});
-            freeze(true, 1, 4, "Notifique al admistrador de sistemas.", null, null);
+            freeze(1, 1, 4, "Notifique al admistrador de sistemas.", null, null, null);
         }
     });
-    var prueba = new Arrar(3);
+    var prueba = new Array(3);
 }
