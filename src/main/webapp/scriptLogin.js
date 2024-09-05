@@ -73,9 +73,9 @@ $(document).ready(function () {
     });
 });
 
-function dialogos(st) {
+function dialogos(stD) {
 
-    switch (st) {
+    switch (stD) {
         case 1:
             $('#dialogSystem').dialog('open');
             $('#procesando').dialog('close');
@@ -154,15 +154,15 @@ function delay(time) {
     return new Promise(resolve => setTimeout(resolve, time));
 }
 
-async function freeze(isFreeze, st, numDialog, message, token, appPath, jsonObj) {
+async function freeze(tF, stD, numDialog, message, token, appPath, jsonObj) {
 
-    if (isFreeze === 1) {
-        dialogos(st);
+    if (tF === 1) {
+        dialogos(stD);
         tipoMensaje(numDialog, message);
         await delay(3000);
         dialogos(3);
-    } else if (isFreeze === 2) {
-        dialogos(st);
+    } else if (tF === 2) {
+        dialogos(stD);
         tipoMensaje(numDialog, message);
         await delay(1000);
         registryServlet(token, appPath);
@@ -214,7 +214,7 @@ function descifrar(jsonObj){
     }
 }
 
-function lectura(accion, appPath) {
+function lectura(accion, appPath, tP) {
     console.log("Entrando a funcion lectura..................");
     $("#inoutES").prop("disabled", true);
     $("#inoutP").prop("disabled", true);
@@ -222,7 +222,15 @@ function lectura(accion, appPath) {
 
     if (num.length === 0) {
         $('#dialogSystem').dialog({title: "Aviso del sistema"});
-        freeze(1, 1, 4, "Debe ingresar un numero de usuario", null, null, null);
+        freeze(1, 1, 4, "Debe ingresar un numero de empleado.", null, null, null);
+        $("#inoutES").prop("disabled", false);
+        $("#inoutP").prop("disabled", false);
+        return;
+    }
+    
+    if(num.length < tP || num.length > tP){
+        $('#dialogSystem').dialog({title: "Aviso del sistema"});
+        freeze(1, 1, 4, "El numero de empleado debe ser de " + tP + " digitos.", null, null, null);
         $("#inoutES").prop("disabled", false);
         $("#inoutP").prop("disabled", false);
         return;
@@ -236,7 +244,7 @@ function lectura(accion, appPath) {
 
     $('#dialogSystem').dialog({title: "Lectura de huella"});
     dialogos(1);
-    tipoMensaje(1, "Coloca tu huella en el lector");
+    tipoMensaje(1, "Coloca tu huella en el lector.");
 
     $.ajax({
         async: true,
@@ -257,13 +265,12 @@ function lectura(accion, appPath) {
         },
         error: function (jsonObj) {
             $('dialogSystem').dialog({title: 'Aviso del sistema'});
-            freeze(1, 1, 4, "Lector de huella no detectado", null, null, null);
+            freeze(1, 1, 4, "Lector de huella no detectado.", null, null, null);
             $("#inoutES").prop("disabled", false);
             $("#inoutP").prop("disabled", false);
         }
     });
 }
-
 
 function validar(captura, appPath) {
     console.log("Entrando a funcion validar..........");
@@ -290,20 +297,19 @@ function validar(captura, appPath) {
             var verificacion = jsonObj.verifyBiometricData;
             if (verificacion) {
                 $('#dialogSystem').dialog({title: "Exito"});
-                freeze(2, 1, 2, "Huella capturada correctamente", token, appPath, null);
+                freeze(2, 1, 2, "Huella capturada correctamente.", token, appPath, null);
 
             } else {
                 $('#dialogSystem').dialog({title: "Error"});
                 freeze(1, 1, 3, "Huella invalida. Intente de nuevo.", null, null, null);
             }
-
         },
         error: function (jsonObj) {
             if (jsonObj.responseJSON.message === "Hubo algun problema con la base de datos") {
                 $('#dialogSystem').dialog({title: "Error"});
                 freeze(1, 1, 3, "Huella invalida. Intente de nuevo.", null, null, null);
                 $('#numero').val('');
-            } else if (jsonObj.responseJSON.horaEntrada !== null){
+            } else if (jsonObj.responseJSON.horaEntrada !== undefined && jsonObj.responseJSON.horaEntrada !== null){
                 freeze(3, 1, 4, "", null, null, jsonObj);
                 $('#numero').val('');
             }else{

@@ -15,7 +15,7 @@
     }
 
     String numEmpleado = "";
-
+    Integer tamanioPermitido = 4;
 %>
 <!DOCTYPE html>
 <html>
@@ -54,8 +54,8 @@
 
                 <div align="center">
                     <input type="hidden" id="accion" value=""  style="display:none">
-                    <input type="button" id="inoutES" value="Entrada / Salida" name="" onclick="lectura('registro', '<%=basePath%>');" class=" btnfos btnfos-5" />
-                    <input type="button" id="inoutP" value="Mi Perfil" onclick="lectura('perfil', '<%=basePath%>');" class=" btnfos btnfos-5"  />
+                    <input type="button" id="inoutES" value="Entrada / Salida" name="" onclick="lectura('registro', '<%=basePath%>', '<%=tamanioPermitido%>');" class=" btnfos btnfos-5" />
+                    <input type="button" id="inoutP" value="Mi Perfil" onclick="lectura('perfil', '<%=basePath%>', '<%=tamanioPermitido%>');" class=" btnfos btnfos-5"  />
                 </div>
             </form>
         </div>
