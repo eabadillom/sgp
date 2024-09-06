@@ -24,6 +24,9 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+
 import mx.com.ferbo.model.sat.CatMetodoPago;
 
 @Entity
@@ -117,19 +120,19 @@ public class DetNomina implements Serializable {
     @OneToOne(mappedBy = "nomina", cascade = CascadeType.PERSIST)
     private DetNominaReceptor receptor;
     
-//    @LazyCollection(LazyCollectionOption.FALSE)
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "key.nomina", cascade = CascadeType.ALL)
     private List<DetNominaConcepto> conceptos;
     
-//    @LazyCollection(LazyCollectionOption.FALSE)
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "key.nomina", cascade = CascadeType.ALL)
     private List<DetNominaPercepcion> percepciones;
     
-//    @LazyCollection(LazyCollectionOption.FALSE)
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "key.nomina", cascade = CascadeType.ALL)
     private List<DetNominaOtroPago> otrosPagos;
     
-//    @LazyCollection(LazyCollectionOption.FALSE)
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "key.nomina", cascade = CascadeType.ALL)
     private List<DetNominaDeduccion> deducciones;
     

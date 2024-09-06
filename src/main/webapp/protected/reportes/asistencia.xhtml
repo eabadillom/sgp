@@ -30,9 +30,9 @@
 				</p:panelGrid>
 			</div>
 			<div style="padding-top: 1rem;">
-				<p:dataTable id="dt-registros" value="#{repAsistenciaBean.registros}" var="registro">
-					<p:column headerText="Empleado" sortBy="#{registro.detEmpleadoDTO.nombre}">
-						<p:outputLabel value="#{registro.detEmpleadoDTO.nombre} #{registro.detEmpleadoDTO.primerAp} #{registro.detEmpleadoDTO.segundoAp}"></p:outputLabel>
+				<p:dataTable id="dt-registros" value="#{repAsistenciaBean.registros}" var="registro" lazy="true">
+					<p:column headerText="Empleado" sortBy="#{registro.idEmpleado.nombre}">
+						<p:outputLabel value="#{registro.idEmpleado.nombre} #{registro.idEmpleado.primerAp} #{registro.idEmpleado.segundoAp}"/>
 					</p:column>
 					<p:column headerText="Entrada" style="width: 10rem; text-align: center;" sortBy="#{registro.fechaEntrada}">
 						<p:outputLabel value="#{registro.fechaEntrada}">

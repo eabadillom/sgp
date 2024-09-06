@@ -371,16 +371,10 @@
                                 <p:commandButton value="Cancelar" class="ui-button-secondary" icon="pi pi-times" oncomplete="PF('dialogBiometrico').hide();" process="@this"/>
                             </f:facet>
                         </p:dialog> 
-
-
-
-
-
                         <p:confirmDialog widgetVar="dialogEliminarEmpleado" showEffect="fade" width="300" message="Eliminar el empleado?" header="Confirmar" severity="warn">
                             <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{registroEmpleadosBean.eliminaEmpleado()}" process="@this" oncomplete="PF('dialogEliminarEmpleado').hide()"/>
                             <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('dialogEliminarEmpleado').hide()" />
                         </p:confirmDialog>
-
                         <p:confirmDialog global="true" showEffect="fade" width="300">
                             <p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
                             <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary" icon="pi pi-times" />
@@ -388,7 +382,6 @@
                     </div>
                 </div>
             </div>
-
             <script>
                 $('.respresultado').hide();
                 $(".clean").click(function () {
@@ -451,15 +444,10 @@
                                         
                     var obj = new Object();
                     obj.tpAccion = TpAccion;
-                    //obj.FingerPrinToVerify = [];
                     var jsonString = JSON.stringify(obj);
                     request.send(jsonString);
                 }
-
-
             </script>      
-
         </h:form>
     </ui:define>
-
 </ui:composition>

@@ -58,15 +58,15 @@ public class NominaDAO extends BaseDAO<DetNomina, Integer> {
 			}
 			
 			for(DetNominaPercepcion percepcion : model.getPercepciones()) {
-				log.info("Percepcion: {}", percepcion.getKey().getId());
+				log.info("Percepcion: {} - {}", percepcion.getKey().getId(), percepcion.getClave());
 			}
 			
 			for(DetNominaOtroPago otroPago: model.getOtrosPagos()) {
-				log.info("Otro pago: {}", otroPago.getKey().getId());
+				log.info("Otro pago: {} - {}", otroPago.getKey().getId(), otroPago.getClave());
 			}
 			
 			for(DetNominaDeduccion deduccion : model.getDeducciones()) {
-				log.info("Deduccion: {}", deduccion.getKey().getId());
+				log.info("Deduccion: {} - ", deduccion.getKey().getId(), deduccion.getClave());
 			}
 			
 		} catch(Exception ex) {

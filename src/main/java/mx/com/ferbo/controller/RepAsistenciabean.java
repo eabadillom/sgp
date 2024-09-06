@@ -23,10 +23,10 @@ import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 import org.primefaces.model.StreamedContent;
 
-import mx.com.ferbo.dao.CatPlantaDAO;
-import mx.com.ferbo.dao.RegistroDAO;
-import mx.com.ferbo.dto.CatPlantaDTO;
-import mx.com.ferbo.dto.DetRegistroDTO;
+import mx.com.ferbo.dao.n.PlantaDAO;
+import mx.com.ferbo.dao.n.RegistroDAO;
+import mx.com.ferbo.model.CatPlanta;
+import mx.com.ferbo.model.DetRegistro;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.JasperReportUtil;
@@ -39,20 +39,23 @@ public class RepAsistenciabean implements Serializable {
 
 	private static final long serialVersionUID = -1127550691400298355L;
 	private static Logger log = LogManager.getLogger(RepAsistenciabean.class);
-	private List<CatPlantaDTO> plantas;
-	private CatPlantaDTO planta = null;
-	private CatPlantaDAO plantaDAO;
+	
+	private PlantaDAO plantaDAO;
+	private RegistroDAO registroDAO;
+	
+	private List<CatPlanta> plantas;
+	private List<DetRegistro> registros;
+	
+	private CatPlanta planta = null;
 	private Date fechaInicio;
 	private Date fechaFin;
-	private List<DetRegistroDTO> registros;
-	private RegistroDAO registroDAO;
 	
 	private StreamedContent pdfFile;
 	private StreamedContent xlsFile;
 	
 	public RepAsistenciabean() {
-		plantaDAO = new CatPlantaDAO();
-		registroDAO = new RegistroDAO();
+		plantaDAO = new PlantaDAO(CatPlanta.class);
+		registroDAO = new RegistroDAO(DetRegistro.class);
 	}
 	
 	@PostConstruct
@@ -222,19 +225,19 @@ public class RepAsistenciabean implements Serializable {
 		}
 	}
 
-	public List<CatPlantaDTO> getPlantas() {
+	public List<CatPlanta> getPlantas() {
 		return plantas;
 	}
 
-	public void setPlantas(List<CatPlantaDTO> plantas) {
+	public void setPlantas(List<CatPlanta> plantas) {
 		this.plantas = plantas;
 	}
 
-	public CatPlantaDTO getPlanta() {
+	public CatPlanta getPlanta() {
 		return planta;
 	}
 
-	public void setPlanta(CatPlantaDTO planta) {
+	public void setPlanta(CatPlanta planta) {
 		this.planta = planta;
 	}
 
@@ -254,11 +257,11 @@ public class RepAsistenciabean implements Serializable {
 		this.fechaFin = fechaFin;
 	}
 
-	public List<DetRegistroDTO> getRegistros() {
+	public List<DetRegistro> getRegistros() {
 		return registros;
 	}
 
-	public void setRegistros(List<DetRegistroDTO> registros) {
+	public void setRegistros(List<DetRegistro> registros) {
 		this.registros = registros;
 	}
 
