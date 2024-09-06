@@ -1,6 +1,7 @@
 package mx.com.ferbo.business;
 
 import java.math.BigDecimal;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -328,6 +329,8 @@ public class NominaSemanalBL {
 			nominaNew.setSubtotal(this.totalPercepciones);
 			nominaNew.setDescuento(this.totalDeducciones);
 			nominaNew.setTotal(this.neto);
+			nominaNew.setPeriodoInicio(this.periodoInicio.toInstant().atZone(ZoneId.of("GMT-6")).toLocalDate());
+			nominaNew.setPeriodoFin(this.periodoFin.toInstant().atZone(ZoneId.of("GMT-6")).toLocalDate());
 			
 			DetNominaEmisor emisor = nominaNew.getEmisor();
 			emisor.setNomina(nominaNew);

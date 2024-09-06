@@ -1,6 +1,7 @@
 package mx.com.ferbo.controller;
 
 import java.io.Serializable;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -206,13 +207,38 @@ public class NominaBean implements Serializable {
     }
 
     public void calculandoNomina() {
-        listaNomina.clear();
-        List<DetEmpleado> listaEmpleados = empleadoDAO.buscarActivoEmpresaIngreso(empresaSelected.getIdEmpresa(), this.periodoInicio);
-      
-        procesaListaEmpleados(listaEmpleados);
-
-        PrimeFaces.current().ajax().update("formNomina:dtNomina");
-        PrimeFaces.current().executeScript("PF('empresaDialog').hide()");
+    	FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Nómina";
+		
+    	List<DetEmpleado> listaEmpleados = null;
+    	try {
+    		this.listaNomina.clear();
+    		this.listaNomina = nominaDAO.buscarPorPeriodo(
+    				this.periodoInicio.toInstant().atZone(ZoneId.of("GMT-6")).toLocalDate(),
+    				this.periodoFin.toInstant().atZone(ZoneId.of("GMT-6")).toLocalDate()
+    		);
+    		
+    		if(this.listaNomina.size() <= 0) {
+    			listaEmpleados = empleadoDAO.buscarActivoEmpresaIngreso(empresaSelected.getIdEmpresa(), this.periodoInicio);
+    			procesaListaEmpleados(listaEmpleados);
+    		}
+    		
+    		mensaje = "Nomina cargada correctamente.";
+    		severity = FacesMessage.SEVERITY_INFO;
+    	} catch(Exception ex) {
+    		log.error("Problema para procesar la nómina.");
+    		mensaje = "Hay un problema para procesar la nómina.";
+    		severity = FacesMessage.SEVERITY_ERROR;
+    	} finally {
+    		if(listaEmpleados != null)
+    			listaEmpleados.clear();
+    		message = new FacesMessage(severity, titulo, mensaje);
+    		FacesContext.getCurrentInstance().addMessage(null, message);
+    		PrimeFaces.current().ajax().update(":formNomina:messages", "formNomina:dtNomina");
+    		PrimeFaces.current().executeScript("PF('empresaDialog').hide()");
+    	}
     }
     
     private void procesaListaEmpleados(List<DetEmpleado> listaEmpleados) {
@@ -259,6 +285,15 @@ public class NominaBean implements Serializable {
     
     public void cargaEmpleadoNomina() {
     	log.info("Cargando información de nómina: {}", this.nomina);
+    	
+    	//Si el ID de Nómina es NULL, entonces el objeto de nómina fue generado por el proceso de cálculo y
+    	//la información debería estar completamente cargada en memoria.
+    	if(this.nomina.getId() == null)
+    		return;
+    	
+    	//En el caso del ID de Nómina diferente de NULL, el objeto de nómina fue extraido por consulta a la
+    	//base de datos sin el detalle completo, por lo que debe extraerse a través del DAO.
+    	this.nomina = nominaDAO.buscarPorId(this.nomina.getId());
     }
 
     public void guardarNominaEmpleado() {
@@ -268,6 +303,7 @@ public class NominaBean implements Serializable {
 		String titulo = "Nómina";
     	
     	try {
+    		log.info("Guardando nomina...");
     		
     		if(this.listaNomina == null)
     			throw new SGPException("No hay información de nómina.");
@@ -279,6 +315,8 @@ public class NominaBean implements Serializable {
     			log.info("Nomina: {}", nomina);
     			nominaDAO.guardar(nomina);
     		}
+    		
+    		log.info("Nomina guardada correctamente.");
     		
     		mensaje = "La información se guardó correctamente.";
     		severity = FacesMessage.SEVERITY_INFO;
@@ -295,7 +333,6 @@ public class NominaBean implements Serializable {
 			PrimeFaces.current().ajax().update(":formNomina:messages");
     	}
     	
-    	log.info("Guardando nomina...");
     	
     }
     

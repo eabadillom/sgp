@@ -2,6 +2,7 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -28,7 +29,8 @@ import mx.com.ferbo.model.sat.CatMetodoPago;
 @Entity
 @Table(name = "det_nomina")
 @NamedQueries({
-    @NamedQuery(name = "DetNomina.findAll", query = "SELECT n FROM DetNomina n")
+    @NamedQuery(name = "DetNomina.findAll", query = "SELECT n FROM DetNomina n"),
+    @NamedQuery(name = "DetNomina.findByPeriodo", query = "SELECT n FROM DetNomina n WHERE n.periodoInicio = :periodoInicio AND n.periodoFin = :periodoFin")
 })
 public class DetNomina implements Serializable {
 
@@ -101,21 +103,33 @@ public class DetNomina implements Serializable {
     @Basic(optional = false)
     private BigDecimal total;
     
+    @Column(name = "fh_periodo_inicio")
+    @Basic(optional = false)
+    private LocalDate periodoInicio;
+    
+    @Column(name = "fh_periodo_fin")
+    @Basic(optional = false)
+    private LocalDate periodoFin;
+    
     @OneToOne(mappedBy = "nomina", cascade = CascadeType.PERSIST)
     private DetNominaEmisor emisor;
     
     @OneToOne(mappedBy = "nomina", cascade = CascadeType.PERSIST)
     private DetNominaReceptor receptor;
     
+//    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "key.nomina", cascade = CascadeType.ALL)
     private List<DetNominaConcepto> conceptos;
     
+//    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "key.nomina", cascade = CascadeType.ALL)
     private List<DetNominaPercepcion> percepciones;
     
+//    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "key.nomina", cascade = CascadeType.ALL)
     private List<DetNominaOtroPago> otrosPagos;
     
+//    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "key.nomina", cascade = CascadeType.ALL)
     private List<DetNominaDeduccion> deducciones;
     
@@ -392,5 +406,21 @@ public class DetNomina implements Serializable {
 	@Override
 	public String toString() {
 		return "DetNomina [idNomina=" + id + "]";
+	}
+
+	public LocalDate getPeriodoInicio() {
+		return periodoInicio;
+	}
+
+	public void setPeriodoInicio(LocalDate periodoInicio) {
+		this.periodoInicio = periodoInicio;
+	}
+
+	public LocalDate getPeriodoFin() {
+		return periodoFin;
+	}
+
+	public void setPeriodoFin(LocalDate periodoFin) {
+		this.periodoFin = periodoFin;
 	}
 }

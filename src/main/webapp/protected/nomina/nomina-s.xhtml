@@ -42,6 +42,11 @@
 		</script>
 		<h:form id="formNomina">
 			<p:growl id="messages" showDetail="true" life="5000"/>
+			<p:dialog modal="true" widgetVar="statusInfoDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+					<i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
+			</p:dialog>
 			<p:toolbar>
 				<p:toolbarGroup>
 					<p:datePicker id="dp-periodo-inicio" value="#{nominaBean.periodoInicio}" placeholder="Periodo Inicio" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
@@ -57,8 +62,8 @@
 				</p:toolbarGroup>
 			</p:toolbar>
 			<div style="padding-top: 1rem;">
-				<p:dataTable id="dtNomina" widgetVar="dt-Nomina" var="nomina" value="#{nominaBean.listaNomina}" reflow="true" styleClass="products-table" rowKey="#{nomina.idEmpleado.idEmpleado}" rowSelectMode="add" paginatorPosition="bottom" scrollable="true" frozenColumns="2" editable="true" editMode="cell" editInitEvent="dblclick">
-					<p:ajax event="cellEdit" listener="#{nominaBean.onCellEdit}" update=":formNomina:messages"/>
+				<p:dataTable id="dtNomina" widgetVar="dt-Nomina" var="nomina" value="#{nominaBean.listaNomina}" lazy="true" reflow="true" styleClass="products-table" rowSelectMode="add" paginatorPosition="bottom" scrollable="true" frozenColumns="2" editable="true" editMode="cell" editInitEvent="dblclick">
+					<!-- <p:ajax event="cellEdit" listener="#{nominaBean.onCellEdit}" update=":formNomina:messages"/> -->
 					<f:facet name="header">
 						<div class="customers-table-header">
 							<span style="font-weight: bold">Raya</span>
@@ -95,7 +100,7 @@
 						</p:commandButton>
 					</p:column>
 					<f:facet name="footer" >
-						<p:commandButton value="Guardar" icon="pi pi-pencil" actionListener="#{nominaBean.guardarNominaEmpleado()}" disabled="#{empty nominaBean.listaNomina.size()}"/>
+						<p:commandButton value="Guardar" icon="pi pi-pencil" actionListener="#{nominaBean.guardarNominaEmpleado()}" disabled="#{empty nominaBean.listaNomina.size()}" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
 						<p:commandButton value="Exportar" icon="pi pi-upload" styleClass="ui-button-help" ajax="false">
 							<p:dataExporter type="csv" target="dtNomina" fileName="raya" preProcessor="#{nominaBean.exportNomina}"/>
 						</p:commandButton>
@@ -117,8 +122,9 @@
 				</p:outputPanel>
 			</p:dialog>
 			
-			<p:dialog id="dg-empleado" widgetVar="dgEmpleado" header="#{nominaBean.nomina.receptor.nombre}" modal="true" responsive="true">
+			<p:dialog id="dg-empleado" widgetVar="dgEmpleado" header="#{nominaBean.nomina.receptor.nombre}" modal="true" responsive="true" position="center top" height="100%" resizable="false">
 				<p:tabView class="ui-fluid" dynamic="true" cache="true">
+					<p:ajax event="tabChange" oncomplete="PF('dgEmpleado').initPosition();"/>
 					<p:tab title="General">
 						<div class="ui-fluid formgrid grid">
 							<div class="field col-12 md:col-3">
@@ -231,9 +237,14 @@
 							<p:column headerText="Descripción">
 								<p:outputLabel value="#{percepcion.nombre}" />
 							</p:column>
-							<p:column headerText="Importe" width="10rem">
-								<p:inputNumber value="#{percepcion.importeGravado eq null ? percepcion.importeExcento : percepcion.importeGravado}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator=",">
+							<p:column headerText="Importe excento" width="10rem">
+								<p:inputNumber value="#{percepcion.importeExcento}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator=",">
 									<p:ajax process="@this" update="formNomina:dg-empleado" />
+								</p:inputNumber>
+							</p:column>
+							<p:column headerText="Importe gravado" width="10rem">
+								<p:inputNumber value="#{percepcion.importeGravado}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator=",">
+									<p:ajax process="@this" update="formNomina:dg-empleado"/>
 								</p:inputNumber>
 							</p:column>
 							<f:facet name="footer">
@@ -284,7 +295,6 @@
 							<p:column headerText="Importe" width="10rem">
 								<p:inputNumber value="#{deduccion.importe}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator=",">
 								</p:inputNumber>
-								<!-- <p:outputLabel value="$#{deduccion.importe}"/> -->
 							</p:column>
 							<f:facet name="footer">
 								<p:column colspan="2">
@@ -298,7 +308,6 @@
 							</f:facet>
 						</p:dataTable>
 					</p:tab>
-					
 				</p:tabView>
 			</p:dialog>
         </h:form>
