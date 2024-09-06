@@ -1,5 +1,6 @@
 package mx.com.ferbo.dao.n;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -66,5 +67,30 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
 		
 		return modelList;
 	}
+	
+	public List<DetRegistro> buscarPorPlantaPeriodo(Integer idPlanta, Date fechaInicio, Date fechaFin) {
+		List<DetRegistro> modelList = null;
+		EntityManager em = null;
+		try {
+			em = this.getEntityManager();
+			modelList =  em.createNamedQuery("DetRegistro.findByPlantaPeriodo", DetRegistro.class)
+			.setParameter("idPlanta", idPlanta)
+			.setParameter("fechaInicio", fechaInicio)
+			.setParameter("fechaFin", fechaFin)
+			.getResultList()
+			;
+			for(DetRegistro model : modelList) {
+				log.debug("IdEmpleado: {}", model.getIdEmpleado().getIdEmpleado());
+				log.debug("Id Planta: {}", model.getIdEmpleado().getDatoEmpresa().getPlanta().getIdPlanta());
+			}
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de registros...", ex);
+			modelList = new ArrayList<>();
+		} finally {
+			this.close(em);
+		}
+		return modelList;
+	}
+	
 
 }

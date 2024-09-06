@@ -15,16 +15,15 @@ import org.apache.logging.log4j.Logger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import mx.com.ferbo.dao.DetTokenDAO;
-import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.EmpleadoFotoDAO;
 import mx.com.ferbo.dao.n.EstatusRegistroDAO;
 import mx.com.ferbo.dao.n.RegistroDAO;
-import mx.com.ferbo.dto.DetTokenDTO;
+import mx.com.ferbo.dao.n.TokenDAO;
 import mx.com.ferbo.model.CatEstatusRegistro;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetEmpleadoFoto;
 import mx.com.ferbo.model.DetRegistro;
+import mx.com.ferbo.model.DetToken;
 import mx.com.ferbo.response.RegistryResponse;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.SGPException;
@@ -53,17 +52,16 @@ public class RegistryServlet extends HttpServlet {
 		Date horaSistema;
 		Date horaLimiteEntrada = null;
 
-		EmpleadoDAO empleadoDAO = null;
 		EmpleadoFotoDAO empleadoFotoDAO = null;
 		EstatusRegistroDAO estatusDAO = null;
-		DetTokenDAO detTokenDAO = null;
+		TokenDAO detTokenDAO = null;
 		RegistroDAO registroDAO = null;
 		
 		CatEstatusRegistro statusEnTiempo = null;
 		CatEstatusRegistro statusRetardo = null;
 		DetEmpleado empleado = null;
 		DetEmpleadoFoto foto = null;
-		DetTokenDTO tokenEmpleado = null;
+		DetToken tokenEmpleado = null;
 		DetRegistro registro = null;
 		String tipoRegistro = null;
 		Date fechaActual = null;
@@ -101,22 +99,18 @@ public class RegistryServlet extends HttpServlet {
 			if ("".equalsIgnoreCase(numeroEmpleado.trim()))
 				throw new Exception("Información incorrecta.");
 
-			empleadoDAO = new EmpleadoDAO(DetEmpleado.class);
-			
-			empleado = empleadoDAO.buscarPorNumeroEmpleado(numeroEmpleado, true);
-			
-			if(empleado == null || empleado.getIdEmpleado() == null)
-				throw new SGPException("El empleado indicado es incorrecto.");
-			
 			estatusDAO = new EstatusRegistroDAO(CatEstatusRegistro.class);
 			statusEnTiempo = estatusDAO.buscarPorId(1);
 			statusRetardo = estatusDAO.buscarPorId(2);
 
-			detTokenDAO = new DetTokenDAO();
+			detTokenDAO = new TokenDAO(DetToken.class);
 			log.info("Buscando token........: " + token);
 			tokenEmpleado = detTokenDAO.buscarPorToken(token);
 			log.info("Token: {}, Caducidad: {}", tokenEmpleado.getNbToken(), tokenEmpleado.getCaducidad());
 			log.info("Fecha hora actual: {}", fechaActual);
+			
+			if(tokenEmpleado.getEmpleado().getNumEmpleado().equals(numeroEmpleado) == false)
+				throw new SGPException("La información proporcionada es incorrecta.");
 			
 			if (tokenEmpleado.getCaducidad().before(fechaActual)) {
 				log.info("La fecha recuperada es valida: {}", tokenEmpleado.getCaducidad());
@@ -127,6 +121,8 @@ public class RegistryServlet extends HttpServlet {
 				log.info("El token no es válido: {}", tokenEmpleado.isValido());
 				throw new SGPException("El token no es válido.");
 			}
+			
+			empleado = tokenEmpleado.getEmpleado();
 			
 			prettyGson = new GsonBuilder().setPrettyPrinting().create();
 			

@@ -23,6 +23,7 @@ import javax.persistence.Table;
             + " c.activo"
             + ")"
             + " FROM CatPlanta c"),
+    @NamedQuery(name = "CatPlanta.getAll", query = "SELECT p FROM CatPlanta p ORDER BY p.descripcion"),
     @NamedQuery(name = "CatPlanta.findByActive", query = "SELECT new mx.com.ferbo.dto.CatPlantaDTO("
             + " c.idPlanta,"
             + " c.descripcion,"

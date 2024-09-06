@@ -32,5 +32,20 @@ public class PlantaDAO extends BaseDAO<CatPlanta, Integer> {
 		}
 		return modelList;
 	}
+	
+	public List<CatPlanta> buscarTodos() {
+		List<CatPlanta> modelList = null;
+		EntityManager em = null;
+		
+		try {
+			em = this.getEntityManager();
+			modelList = em.createNamedQuery("CatPlanta.getAll", modelClass).getResultList();
+		} catch(Exception ex) {
+			log.error("Problema para obtener la lista de plantas...", ex);
+		} finally {
+			this.close(em);
+		}
+		return modelList;
+	}
 
 }

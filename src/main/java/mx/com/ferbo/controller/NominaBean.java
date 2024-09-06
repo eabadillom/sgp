@@ -1,6 +1,7 @@
 package mx.com.ferbo.controller;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -294,6 +295,57 @@ public class NominaBean implements Serializable {
     	//En el caso del ID de Nómina diferente de NULL, el objeto de nómina fue extraido por consulta a la
     	//base de datos sin el detalle completo, por lo que debe extraerse a través del DAO.
     	this.nomina = nominaDAO.buscarPorId(this.nomina.getId());
+    }
+    
+    public void actualizar() {
+    	FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Nómina";
+		
+    	BigDecimal totalPercepciones = null;
+    	BigDecimal totalOtrosPagos = null;
+    	BigDecimal totalDeducciones = null;
+    	BigDecimal subtotal = null;
+    	BigDecimal descuentos = null;
+    	BigDecimal total = null;
+    	
+    	try {
+    		log.info("Actualizando {}", this.nomina);
+    		totalPercepciones = this.nomina.getPercepciones().stream()
+    				.map(item -> item.getImporteExcento().add(item.getImporteGravado()))
+    				.reduce(BigDecimal.ZERO, BigDecimal :: add);
+    		
+    		totalOtrosPagos = this.nomina.getOtrosPagos().stream()
+    				.map(item -> item.getImporte())
+    				.reduce(BigDecimal.ZERO, BigDecimal :: add);
+    		
+    		totalDeducciones = this.nomina.getDeducciones().stream()
+    				.map(item -> item.getImporte())
+    				.reduce(BigDecimal.ZERO, BigDecimal :: add);
+    		
+    		
+    		subtotal = totalPercepciones.add(BigDecimal.ZERO);
+    		descuentos = totalDeducciones.subtract(totalOtrosPagos);
+    		total = subtotal.subtract(descuentos);
+    		
+    		log.info("Subtotal recalculado: {}", subtotal);
+    		log.info("Descuentos: {}", descuentos);
+    		log.info("Total: {}", total);
+    		this.nomina.setSubtotal(subtotal);
+    		this.nomina.setDescuento(descuentos);
+    		this.nomina.setTotal(total);
+    		
+    	} catch(Exception ex) {
+    		log.error("Problema para recalcular la nómina...", ex);
+    		mensaje = "Hay un problema para actualizar la nómina.";
+			severity = FacesMessage.SEVERITY_ERROR;
+			
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+    	} finally {
+    		PrimeFaces.current().ajax().update(":formNomina:messages", ":formNomina:dtNomina");
+    	}
     }
 
     public void guardarNominaEmpleado() {

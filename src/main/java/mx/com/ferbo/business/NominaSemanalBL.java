@@ -428,8 +428,8 @@ public class NominaSemanalBL {
 			pValeDespensa.setNombre("Despensa");
 			CatTipoPercepcion tpValeDespensa = tipoPercepcionDAO.buscarPorId("029");
 			pValeDespensa.setTipoPercepcion(tpValeDespensa);
-			pValeDespensa.setImporteGravado(this.valesDespensa);
-			pValeDespensa.setImporteExcento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
+			pValeDespensa.setImporteGravado(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
+			pValeDespensa.setImporteExcento(this.valesDespensa);
 			pValeDespensa.setClave("FRB-" + tpValeDespensa.getClave());
 			percepciones.add(pValeDespensa);
 			
