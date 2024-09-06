@@ -220,6 +220,7 @@ function lectura(accion, appPath, tP) {
     $("#inoutP").prop("disabled", true);
     var num = $("#numero").val();
 
+
     if (num.length === 0) {
         $('#dialogSystem').dialog({title: "Aviso del sistema"});
         freeze(1, 1, 4, "Debe ingresar un numero de empleado.", null, null, null);
@@ -228,7 +229,7 @@ function lectura(accion, appPath, tP) {
         return;
     }
     
-    if(num.length < tP || num.length > tP){
+    if(num.length != tP){
         $('#dialogSystem').dialog({title: "Aviso del sistema"});
         freeze(1, 1, 4, "El numero de empleado debe ser de " + tP + " digitos.", null, null, null);
         $("#inoutES").prop("disabled", false);
@@ -238,6 +239,7 @@ function lectura(accion, appPath, tP) {
 
     $("#accion").val(accion);
     var obj = new Object();
+    obj.captureTimeout = 15000;
     obj.tpAccion = "Capture";
     var jsonString = JSON.stringify(obj);
     var botonES = $("#inoutES").prop("disabled", false);
@@ -245,6 +247,8 @@ function lectura(accion, appPath, tP) {
     $('#dialogSystem').dialog({title: "Lectura de huella"});
     dialogos(1);
     tipoMensaje(1, "Coloca tu huella en el lector.");
+    $("#inoutES").prop("disabled", false);
+    $("#inoutP").prop("disabled", false);
 
     $.ajax({
         async: true,
@@ -253,7 +257,7 @@ function lectura(accion, appPath, tP) {
         data: jsonString,
         contentType: "application/json;charset=utf-8",
         url: "http://localhost:8090/finger",
-        timeout: 60000,
+        timeout: 15000,
 
         success: function (jsonObj) {
             jsonObj.biometricData1;
@@ -265,9 +269,10 @@ function lectura(accion, appPath, tP) {
         },
         error: function (jsonObj) {
             $('dialogSystem').dialog({title: 'Aviso del sistema'});
-            freeze(1, 1, 4, "Lector de huella no detectado.", null, null, null);
+            freeze(1, 1, 4, "No hay respuesta en el lector.", null, null, null);
             $("#inoutES").prop("disabled", false);
             $("#inoutP").prop("disabled", false);
+            $('#numero').val('');
         }
     });
 }
@@ -290,7 +295,7 @@ function validar(captura, appPath) {
         data: jsonString,
         contentType: "application/json;charset=utf-8",
         url: "http://localhost:8090/finger",
-        timeout: 60000,
+        timeout: 15000,
         success: function (jsonObj) {
             console.log("function jsonObj..........");
             var token = jsonObj.token;
@@ -338,7 +343,7 @@ function registryServlet(objeto1, appPath) {
         dataType: 'json',
         contentType: "application/json;charset=utf-8",
         url: path,
-        timeout: 60000,
+        timeout: 15000,
         success: function (jsonObj) {
             var url = jsonObj.url;
             var myUrl = appPath + url;
