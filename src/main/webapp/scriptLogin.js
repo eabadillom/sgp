@@ -244,12 +244,6 @@ function lectura(accion, appPath, tP) {
     var jsonString = JSON.stringify(obj);
     var botonES = $("#inoutES").prop("disabled", false);
 
-    $('#dialogSystem').dialog({title: "Lectura de huella"});
-    dialogos(1);
-    tipoMensaje(1, "Coloca tu huella en el lector.");
-    $("#inoutES").prop("disabled", false);
-    $("#inoutP").prop("disabled", false);
-
     $.ajax({
         async: true,
         type: "POST",
@@ -268,7 +262,7 @@ function lectura(accion, appPath, tP) {
             $("#inoutP").prop("disabled", false);
         },
         error: function (jsonObj) {
-            $('dialogSystem').dialog({title: 'Aviso del sistema'});
+            $('#dialogSystem').dialog({title: "Aviso del sistema"});
             freeze(1, 1, 4, "No hay respuesta en el lector.", null, null, null);
             $("#inoutES").prop("disabled", false);
             $("#inoutP").prop("disabled", false);
@@ -338,7 +332,7 @@ function registryServlet(objeto1, appPath) {
     };
     var path = appPath + "/registry?" + $.param(parametros);
     $.ajax({
-        async: false,
+        async: true,
         type: "GET",
         dataType: 'json',
         contentType: "application/json;charset=utf-8",
@@ -356,5 +350,4 @@ function registryServlet(objeto1, appPath) {
             freeze(1, 1, 4, "Notifique al admistrador de sistemas.", null, null, null);
         }
     });
-    var prueba = new Array(3);
 }
