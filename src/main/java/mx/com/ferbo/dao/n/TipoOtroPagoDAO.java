@@ -9,6 +9,7 @@ public class TipoOtroPagoDAO extends BaseDAO<CatTipoOtroPago, String> {
 		super(modelClass);
 	}
 	
-	
-
+	public TipoOtroPagoDAO() {
+		super(CatTipoOtroPago.class);
+	}
 }

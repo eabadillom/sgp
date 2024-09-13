@@ -9,6 +9,8 @@ public class TipoDeduccionDAO extends BaseDAO<CatTipoDeduccion, String> {
 		super(modelClass);
 	}
 	
-	
+	public TipoDeduccionDAO() {
+		super(CatTipoDeduccion.class);
+	}
 
 }

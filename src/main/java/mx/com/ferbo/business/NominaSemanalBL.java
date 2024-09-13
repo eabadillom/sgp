@@ -13,6 +13,16 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import mx.com.ferbo.business.deduccion.BaseISRDeduccion;
+import mx.com.ferbo.business.deduccion.IMSSEnfermedadMaternidadDeduccion;
+import mx.com.ferbo.business.deduccion.ISRAntesSubsidioDeduccion;
+import mx.com.ferbo.business.deduccion.TarifaISRDeduccion;
+import mx.com.ferbo.business.deduccion.TarifaSubsidioDeduccion;
+import mx.com.ferbo.business.otropago.AjusteNetoOtroPago;
+import mx.com.ferbo.business.percepcion.BonoPuntualidadPercepcion;
+import mx.com.ferbo.business.percepcion.SeptimoDiaPercepcion;
+import mx.com.ferbo.business.percepcion.SueldoPercepcion;
+import mx.com.ferbo.business.percepcion.ValesDespensaPercepcion;
 import mx.com.ferbo.dao.CuotaIMSSDAO;
 import mx.com.ferbo.dao.n.DiaNoLaboralDAO;
 import mx.com.ferbo.dao.n.PrestamoDAO;
@@ -37,7 +47,6 @@ import mx.com.ferbo.model.DetNominaEmisor;
 import mx.com.ferbo.model.DetNominaOtroPago;
 import mx.com.ferbo.model.DetNominaOtroPagoPK;
 import mx.com.ferbo.model.DetNominaPercepcion;
-import mx.com.ferbo.model.DetNominaPercepcionPK;
 import mx.com.ferbo.model.DetNominaReceptor;
 import mx.com.ferbo.model.DetPrestamo;
 import mx.com.ferbo.model.DetRegistro;
@@ -65,7 +74,7 @@ public class NominaSemanalBL {
 	private Integer semanaAnio = null;
 	private Boolean ultimaSemanaMes = null;
 	
-	private BigDecimal diasPeriodo = null;
+	private BigDecimal diasLaboralesPeriodo = null;
 	private BigDecimal diasTrabajados = null;
 	private BigDecimal diasAsueto = null;
 	private BigDecimal diasAusencia = null;
@@ -85,7 +94,7 @@ public class NominaSemanalBL {
 	private BigDecimal baseISR = null;
 	private BigDecimal excedente = null;
 	private BigDecimal isrPrevio = null;
-	private BigDecimal impuestoAntesSubsidio = null;
+	private BigDecimal isrPreSubsidio = null;
 	private BigDecimal subsidioEmpleo = null;
 	private BigDecimal isr = null;
 	//CUOTAS DEL IMSS
@@ -110,7 +119,6 @@ public class NominaSemanalBL {
     private CatPercepciones parametrosPercepciones = null;
     private List<CatTarifaISR> tablaISRSemanal = null;
     private List<CatSubsidio> tablaSubsidioSemanal = null;
-    private BigDecimal tasaValesDespensa = null;
 	private BigDecimal uma = null;
 	
 	private CuotaIMSSDAO tarifaIMSSDAO = null;
@@ -130,6 +138,8 @@ public class NominaSemanalBL {
 	//OBJETOS RELACIONADOS A LA NOMINA Y CFDI
 	public NominaSemanalBL(DetEmpleado empleado, Date periodoInicio, Date periodoFin) {
 		Integer anioActual = null;
+		Integer mesActual = null;
+		Integer mesSiguiente = null;
 		
 		this.empleado = empleado;
 		this.periodoInicio = periodoInicio;
@@ -199,7 +209,7 @@ public class NominaSemanalBL {
 		
 		List<PrestamoDTO> prestamos = null;
 		
-		DetNomina nominaNew = null;
+		DetNomina nomina = null;
 		DetNominaPercepcion pSueldo = null;
 		DetNominaPercepcion pSeptimoDia = null;
 		DetNominaPercepcion pBonoPuntualidad = null;
@@ -208,7 +218,10 @@ public class NominaSemanalBL {
 		DetNominaOtroPago opAjusteAlNeto = null;
 		DetNominaOtroPago opSubsidioEmpleo = null;
 		
+		DetNominaDeduccion dBaseISR = null;
+		DetNominaDeduccion dISRAntesSubsidio = null;
 		DetNominaDeduccion dISR = null;
+		DetNominaDeduccion dEnfermedadMaternidad = null;
 		DetNominaDeduccion dIMSS = null;
 		List<DetNominaDeduccion> listaPrestamos = null;
 		
@@ -216,9 +229,32 @@ public class NominaSemanalBL {
 		List<DetNominaOtroPago> otrosPagos = null;
 		List<DetNominaDeduccion> deducciones = null;
 		
+		SueldoPercepcion sueldoBO = null;
+		SeptimoDiaPercepcion septimoDiaBO = null;
+		BonoPuntualidadPercepcion bonoPuntualidadBO = null;
+		ValesDespensaPercepcion valesDespensaBO = null;
+		
+		BaseISRDeduccion baseISRBO = null;
+		TarifaISRDeduccion tarifaISRBO = null; 
+		TarifaSubsidioDeduccion tarifaSubsidioBO = null;
+		ISRAntesSubsidioDeduccion isrPreSubsidioBO = null;
+		IMSSEnfermedadMaternidadDeduccion imssEnfMatBO = null;
+		
+		AjusteNetoOtroPago ajusteNetoBO = null;
+		
+		int idxP = 0;
+		int idxOP = 0;
+		int idxD = 0;
+		
+		BigDecimal tasaBonoPuntualidad = null;
+		
 		try {
 			log.info("Ejecutando la nomina de la semana {} del año en curso...", this.semanaAnio);
-			nominaNew = this.newNomina();
+			this.uma = parametrosPercepciones.getUma();
+			nomina = this.newNomina();
+			percepciones = nomina.getPercepciones();
+			otrosPagos = nomina.getOtrosPagos();
+			deducciones = nomina.getDeducciones();
 			
 			this.esUltimaSemanaMes();
 			
@@ -231,7 +267,7 @@ public class NominaSemanalBL {
 			//al trabajador le corresponde laborar, tuvo alguna falta.
 			diasTrabajados = this.getDiasTrabajados(mapAsistencias, DIAS_POR_PERIODO); //EL SEGUNDO PARAMETRO (6) CORRESPONDE A LOS DÍAS QUE DEBE LABORAR UN TRABAJADOR POR SEMANA.
 			this.diasTrabajados = diasTrabajados;
-			this.diasPeriodo = new BigDecimal(DIAS_POR_PERIODO).setScale(2, BigDecimal.ROUND_HALF_UP);
+			this.diasLaboralesPeriodo = new BigDecimal(DIAS_POR_PERIODO).setScale(2, BigDecimal.ROUND_HALF_UP);
 			
 			//Para el séptimo día, se considera el salario diario (sin SDI), dividiendolo entre los días de la semana que se deben laborar,
     		//multiplicado por los días que si laboró el trabajador (parte proporcional de los días trabajados).
@@ -239,38 +275,92 @@ public class NominaSemanalBL {
 			
     		this.salarioDiario = empleado.getSueldoDiario();
     		this.salarioDiarioIntegrado = this.calculoSDI(this.empleado);
+    		sueldoBO = new SueldoPercepcion(empleado.getSueldoDiario(), diasTrabajados);
+    		sueldoBO.setTipoPercepcionDAO(tipoPercepcionDAO);
+    		pSueldo = sueldoBO.calcular(nomina, idxP++);
+    		this.salarioSemanal = pSueldo.getImporteExcento()
+    				.add(pSueldo.getImporteGravado());
+    		if(this.salarioSemanal.compareTo(BigDecimal.ZERO) > 0)
+    			percepciones.add(pSueldo);
     		
-    		this.salarioSemanal = this.salarioDiario.multiply(diasTrabajados).setScale(2, BigDecimal.ROUND_HALF_UP);
-			this.septimoDia = this.calculoSeptimoDia(this.empleado);
-			this.bonoPuntualidad = this.calculoBonoPuntualidad(DIAS_POR_PERIODO, empleado, mapAsistencias, this.salarioDiarioIntegrado, proporcionalSeptimoDia);
-			this.valesDespensa = this.calculoValesDespensa(diasPeriodo);
+    		septimoDiaBO = new SeptimoDiaPercepcion(empleado.getSueldoDiario(), this.diasLaboralesPeriodo, diasTrabajados);
+    		septimoDiaBO.setTipoPercepcionDAO(tipoPercepcionDAO);
+    		pSeptimoDia  = septimoDiaBO.calcular(nomina, idxP++);
+    		this.septimoDia = pSeptimoDia.getImporteExcento()
+    				.add(pSeptimoDia.getImporteGravado());
+    		if(this.septimoDia.compareTo(BigDecimal.ZERO) > 0)
+    			percepciones.add(pSeptimoDia);
+    		
+			tasaBonoPuntualidad = this.parametrosPercepciones.getBonoPuntualidad();
+			bonoPuntualidadBO = new BonoPuntualidadPercepcion(tasaBonoPuntualidad, diasTrabajados, mapAsistencias, DIAS_POR_PERIODO, salarioDiarioIntegrado, proporcionalSeptimoDia);
+			bonoPuntualidadBO.setTipoPercepcionDAO(tipoPercepcionDAO);
+			pBonoPuntualidad = bonoPuntualidadBO.calcular(nomina, idxP++);
+			this.bonoPuntualidad = pBonoPuntualidad.getImporteExcento()
+					.add(pBonoPuntualidad.getImporteGravado());
+			if(this.bonoPuntualidad.compareTo(BigDecimal.ZERO) > 0)
+				percepciones.add(pBonoPuntualidad);
 			
-			this.totalPercepciones = this.salarioSemanal
-					.add(this.septimoDia)
-					.add(this.bonoPuntualidad)
-					.add(this.valesDespensa)
-					.setScale(2, BigDecimal.ROUND_HALF_UP);
+			valesDespensaBO = new ValesDespensaPercepcion(diasTrabajados, parametrosPercepciones.getUma(), parametrosPercepciones.getValeDespensa(), diasPeriodo);
+			pValeDespensa = valesDespensaBO.calcular(nomina, idxP++);
+			this.valesDespensa = pValeDespensa.getImporteExcento()
+					.add(pValeDespensa.getImporteGravado());
+			if(this.valesDespensa.compareTo(BigDecimal.ZERO) > 0)
+				percepciones.add(pValeDespensa);
+			
+			this.totalPercepciones = percepciones.stream()
+					.map(item -> item.getImporteExcento().add(item.getImporteGravado()))
+					.reduce(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP), BigDecimal :: add)
+					;
 			
 			//deducciones
-			//Para el cálculo del ISR a retener al empleado se deben sumar las percepciones 
-			//que gravan para ISR, en este caso son:
+			//Para el cálculo del ISR a retener al empleado se deben sumar las percepciones que gravan para ISR
 			if(this.salarioSemanal.compareTo(BigDecimal.ZERO) > 0) {
-				this.baseISR = this.salarioSemanal
-						.add(this.septimoDia)
-						.add(this.bonoPuntualidad)
-						.setScale(2, BigDecimal.ROUND_HALF_UP);
 				
-				tarifaISR = this.getTarifaISR(this.baseISR);
-				tarifaSubsidio = this.getTarifaSubsidio(this.baseISR);
+				baseISRBO = new BaseISRDeduccion(percepciones);
+				baseISRBO.setTipoDeduccionDAO(tipoDeduccionDAO);
+				dBaseISR = baseISRBO.calcular(nomina, idxD++);
+				this.baseISR = dBaseISR.getImporte();
 				
-				this.excedente = this.calculoExcedente(tarifaISR);
-				this.isrPrevio = this.calculoISRPrevio(tarifaISR);
-				this.impuestoAntesSubsidio = calculoImpuestoAntesSubsidio(tarifaISR);
+				tarifaISRBO = new TarifaISRDeduccion(tablaISRSemanal, this.baseISR);
+				tarifaISR = tarifaISRBO.calcular();
+				
+				tarifaSubsidioBO = new TarifaSubsidioDeduccion(tablaSubsidioSemanal, this.baseISR);
+				tarifaSubsidio = tarifaSubsidioBO.calcular();
+				
+				isrPreSubsidioBO = new ISRAntesSubsidioDeduccion(this.baseISR, tarifaISR);
+				dISRAntesSubsidio = isrPreSubsidioBO.calcular(nomina, idxD++);
+				this.excedente = isrPreSubsidioBO.getExcedente();
+				this.isrPrevio = isrPreSubsidioBO.getIsrPrevio();
+				this.isrPreSubsidio = dISRAntesSubsidio.getImporte();
+				deducciones.add(dISRAntesSubsidio);
+
+				
+				
+				
+				
+				
+				
+				
+				
+				//TODO pendiente calculo del subsidio al empleo
 				this.subsidioEmpleo = calculoSubsidioEmpleo(tarifaSubsidio);
-				this.isr = impuestoAntesSubsidio.subtract(subsidioEmpleo);
+				this.isr = isrPreSubsidio.subtract(subsidioEmpleo);
+				
+				
+				
+				
+				
+				
 				
 				//Cálculo del IMSS
-				this.enfermedadYmaternidad = this.calculoEnfermedadMaternidad();
+				imssEnfMatBO = new IMSSEnfermedadMaternidadDeduccion(this.fechaInicioAnio, this.fechafinAnio, new BigDecimal(DIAS_POR_PERIODO + SEPTIMO_DIA).setScale(2, BigDecimal.ROUND_HALF_UP), this.uma, this.salarioDiarioIntegrado);
+				imssEnfMatBO.setTipoDeduccionDAO(tipoDeduccionDAO);
+				dEnfermedadMaternidad = imssEnfMatBO.calcular(nomina, idxD++);
+				this.enfermedadYmaternidad = dEnfermedadMaternidad.getImporte();
+				deducciones.add(dEnfermedadMaternidad);
+				
+				
+				
 				this.gastosMedicosPensionadosBeneficiarios = this.calculoGastosMedicosPensionadosBeneficiarios();
 				this.enDinero = this.calculoEnDinero();
 				this.invalidezVida = this.calculoInvalidezVida();
@@ -294,7 +384,7 @@ public class NominaSemanalBL {
 				this.baseISR = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
 				this.excedente = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
 				this.isrPrevio = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
-				this.impuestoAntesSubsidio = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
+				this.isrPreSubsidio = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
 				this.subsidioEmpleo = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
 				this.isr = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
 				
@@ -314,39 +404,99 @@ public class NominaSemanalBL {
 			
 			
 			//NUEVA NOMINA...........................................
-			nominaNew.setFechaEmision(new Date());
-			nominaNew.setClaveExportacion("01");
-			nominaNew.setTipoComprobante("N");
-			nominaNew.setMoneda("MXN");
-			nominaNew.setMetodoPago(this.metodoPago);
-			nominaNew.setSerie(String.format("%d", this.anio));
-			nominaNew.setFolio(String.format("%d", this.semanaAnio));
-			nominaNew.setLugarExpedicion(this.empleado.getDatoEmpresa().getEmpresa().getCodigoPostal());
-			nominaNew.setEjercicio(DateUtils.getAnio(this.fechaInicioAnio));
-			nominaNew.setDiasLaborados(this.diasTrabajados.intValue());
-			nominaNew.setDiasNoLaborados(this.diasPeriodo.subtract(diasTrabajados).intValue());
-			nominaNew.setPeriodo(DateUtils.getSemanaAnio(this.fechaInicioAnio));
-			nominaNew.setSubtotal(this.totalPercepciones);
-			nominaNew.setDescuento(this.totalDeducciones);
-			nominaNew.setTotal(this.neto);
-			nominaNew.setPeriodoInicio(this.periodoInicio.toInstant().atZone(ZoneId.of("GMT-6")).toLocalDate());
-			nominaNew.setPeriodoFin(this.periodoFin.toInstant().atZone(ZoneId.of("GMT-6")).toLocalDate());
+			nomina.setFechaEmision(new Date());
+			nomina.setClaveExportacion("01");
+			nomina.setTipoComprobante("N");
+			nomina.setMoneda("MXN");
+			nomina.setMetodoPago(this.metodoPago);
+			nomina.setSerie(String.format("%d", this.anio));
+			nomina.setFolio(String.format("%d", this.semanaAnio));
+			nomina.setLugarExpedicion(this.empleado.getDatoEmpresa().getEmpresa().getCodigoPostal());
+			nomina.setEjercicio(DateUtils.getAnio(this.fechaInicioAnio));
+			nomina.setDiasLaborados(this.diasTrabajados.intValue());
+			nomina.setDiasNoLaborados(this.diasLaboralesPeriodo.subtract(diasTrabajados).intValue());
+			nomina.setPeriodo(DateUtils.getSemanaAnio(this.fechaInicioAnio));
+			nomina.setSubtotal(this.totalPercepciones);
+			nomina.setDescuento(this.totalDeducciones);
+			nomina.setTotal(this.neto);
+			nomina.setPeriodoInicio(this.periodoInicio.toInstant().atZone(ZoneId.of("GMT-6")).toLocalDate());
+			nomina.setPeriodoFin(this.periodoFin.toInstant().atZone(ZoneId.of("GMT-6")).toLocalDate());
 			
-			DetNominaEmisor emisor = nominaNew.getEmisor();
-			emisor.setNomina(nominaNew);
-			emisor.setNombre(this.empleado.getDatoEmpresa().getEmpresa().getRazonSocial());
-			emisor.setRfc(this.empleado.getDatoEmpresa().getEmpresa().getRfc());
-			emisor.setCodigoPostal(this.empleado.getDatoEmpresa().getEmpresa().getCodigoPostal());
-			emisor.setRegistroPatronal(this.empleado.getDatoEmpresa().getEmpresa().getRegistroPatronal());
-			emisor.setRegimenFiscal(this.empleado.getDatoEmpresa().getEmpresa().getRegimenFiscal());
+			DetNominaEmisor emisor = this.getEmisor(nomina);
+			log.info("Emisor: {}", emisor.getNombre());
 			
+			DetNominaReceptor receptor = this.getNominaReceptor(nomina);
+			log.info("Receptor: {}", receptor.getNombre());
+					
+			DetNominaConcepto concepto = new DetNominaConcepto();
+			concepto.setKey(new DetNominaConceptoPK(nomina, 0));
+			concepto.setConcepto(this.concepto);
+			concepto.setCantidad(new BigDecimal("1").setScale(2, BigDecimal.ROUND_HALF_UP));
+			concepto.setUnidad(this.unidadSAT);
+			concepto.setNombreConcepto("Pago de nómina");
+			concepto.setObjetoImpuesto("01");
+			concepto.setValorUnitario(this.totalPercepciones);
+			concepto.setImporte(this.totalPercepciones);
+			concepto.setDescuento(this.totalDeducciones);
+			nomina.getConceptos().add(concepto);
 			
-			DetNominaReceptor receptor = nominaNew.getReceptor();
-			receptor.setNomina(nominaNew);
-			receptor.setNombre(String.format("%s %s %s", this.empleado.getNombre(), this.empleado.getPrimerAp(), this.empleado.getSegundoAp()));
+			//OTROS PAGOS...
+			ajusteNetoBO = new AjusteNetoOtroPago();
+			opAjusteAlNeto = ajusteNetoBO.calcular(nomina, idxOP++);
+			otrosPagos.add(opAjusteAlNeto);
+			
+			opSubsidioEmpleo = new DetNominaOtroPago();
+			opSubsidioEmpleo.setKey(new DetNominaOtroPagoPK(nomina, idxOP++));
+			CatTipoOtroPago topSubsidioEmpleo = this.tipoOtroPagoDAO.buscarPorId("002");
+			opSubsidioEmpleo.setTipoOtroPago(topSubsidioEmpleo);
+			opSubsidioEmpleo.setClave("FRB-035");
+			opSubsidioEmpleo.setNombre("Subs. al empleo mes");
+			opSubsidioEmpleo.setImporte(this.subsidioEmpleo);
+			otrosPagos.add(opSubsidioEmpleo);
+			
+			//DEDUCCIONES...
+			dISR = new DetNominaDeduccion();
+			dISR.setKey(new DetNominaDeduccionPK(nomina, idxD++));
+			CatTipoDeduccion tdISR = this.tipoDeduccionDAO.buscarPorId("002");
+			dISR.setTipoDeduccion(tdISR);
+			dISR.setClave("045");
+			dISR.setNombre("I.S.R.");
+			dISR.setImporte(this.isr);
+			dISR.setProcesar(true);
+			deducciones.add(dISR);
+			
+			dIMSS = new DetNominaDeduccion();
+			dIMSS.setKey(new DetNominaDeduccionPK(nomina, idxD++));
+			CatTipoDeduccion tdIMSS = this.tipoDeduccionDAO.buscarPorId("001");
+			dIMSS.setTipoDeduccion(tdIMSS);
+			dIMSS.setClave("FRB-052");
+			dIMSS.setNombre("I.M.S.S.");
+			dIMSS.setImporte(this.imss);
+			dIMSS.setProcesar(true);
+			deducciones.add(dIMSS);
+			
+			deducciones.addAll(listaPrestamos);
+			
+		} catch(Exception ex) {
+			log.error("Problema para obtener el cálculo de la nómina del empleado {} {} {}", empleado.getNombre(), empleado.getPrimerAp(), empleado.getSegundoAp() );
+			log.error(ex);
+		}
+		
+		return nomina;
+	}
+	
+	private DetNominaReceptor getNominaReceptor(DetNomina nomina) {
+		DetNominaReceptor receptor = null;
+		try {
+			if(nomina.getReceptor() == null)
+				nomina.setReceptor(new DetNominaReceptor());
+			
+			receptor = nomina.getReceptor();
+			receptor.setNomina(nomina);
+			receptor.setNombre(String.format("%s %s %s", this.empleado.getNombre(), this.empleado.getPrimerAp(), this.empleado.getSegundoAp()).trim());
 			receptor.setRfc(this.empleado.getRfc());
 			receptor.setCodigoPostal(this.empleado.getDatoEmpresa().getCodigoPostal());
-			receptor.setRegimenFiscal(this.regimenFiscalReceptor);//TODO pendiente revisar el regimen fiscal del receptor.
+			receptor.setRegimenFiscal(this.regimenFiscalReceptor);
 			receptor.setUsoCfdi(this.usoCFDI);
 			receptor.setCurp(this.empleado.getCurp());
 			receptor.setNss(this.empleado.getDatoEmpresa().getNss());
@@ -365,121 +515,32 @@ public class NominaSemanalBL {
 			receptor.setSalarioDiarioIntegrado(this.salarioDiarioIntegrado);
 			receptor.setEntidadFederativa(this.empleado.getDatoEmpresa().getEntidadFederativa());
 			
-			percepciones = nominaNew.getPercepciones();
-			otrosPagos = nominaNew.getOtrosPagos();
-			deducciones = nominaNew.getDeducciones();
-			
-			DetNominaConcepto concepto = new DetNominaConcepto();
-			concepto.setKey(new DetNominaConceptoPK(nominaNew, 0));
-			concepto.setConcepto(this.concepto);
-			concepto.setCantidad(new BigDecimal("1").setScale(2, BigDecimal.ROUND_HALF_UP));
-			concepto.setUnidad(this.unidadSAT);
-			concepto.setNombreConcepto("Pago de nómina");
-			concepto.setObjetoImpuesto("01");
-			concepto.setValorUnitario(this.totalPercepciones);
-			concepto.setImporte(this.totalPercepciones);
-			concepto.setDescuento(this.totalDeducciones);
-			nominaNew.getConceptos().add(concepto);
-			
-			int idxP = 0;
-			int idxOP = 0;
-			int idxD = 0;
-			
-			//PERCEPCIONES...
-			pSueldo = new DetNominaPercepcion();
-			pSeptimoDia = new DetNominaPercepcion();
-			pBonoPuntualidad = new DetNominaPercepcion();
-			pValeDespensa = new DetNominaPercepcion();
-			if(this.isr.compareTo(BigDecimal.ZERO) > 0) {
-				
-				pSueldo.setKey(new DetNominaPercepcionPK(nominaNew, idxP++));
-				pSueldo.setClave("001");
-				pSueldo.setNombre("Sueldo");
-				CatTipoPercepcion tpSueldo = tipoPercepcionDAO.buscarPorId("001");
-				pSueldo.setTipoPercepcion(tpSueldo);
-				pSueldo.setImporteGravado(this.salarioSemanal);
-				pSueldo.setImporteExcento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
-				pSueldo.setClave("FRB-" + tpSueldo.getClave());
-				percepciones.add(pSueldo);
-				
-				pSeptimoDia.setKey(new DetNominaPercepcionPK(nominaNew, idxP++));
-				pSeptimoDia.setClave("003");
-				pSeptimoDia.setNombre("Séptimo día");
-				CatTipoPercepcion tpSeptimoDia = tipoPercepcionDAO.buscarPorId("001");
-				pSeptimoDia.setTipoPercepcion(tpSeptimoDia);
-				pSeptimoDia.setImporteGravado(this.septimoDia);
-				pSeptimoDia.setImporteExcento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
-				pSeptimoDia.setClave("FRB-" + tpSeptimoDia.getClave());
-				percepciones.add(pSeptimoDia);
-				
-				pBonoPuntualidad.setKey(new DetNominaPercepcionPK(nominaNew, idxP++));
-				pBonoPuntualidad.setClave("015");
-				pBonoPuntualidad.setNombre("Bono puntualidad");
-				CatTipoPercepcion tpBonoPuntualidad = tipoPercepcionDAO.buscarPorId("010");
-				pBonoPuntualidad.setTipoPercepcion(tpBonoPuntualidad);
-				pBonoPuntualidad.setImporteGravado(this.bonoPuntualidad);
-				pBonoPuntualidad.setImporteExcento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
-				pBonoPuntualidad.setClave("FRB-" + tpBonoPuntualidad.getClave());
-				percepciones.add(pBonoPuntualidad);
-			}
-			
-			pValeDespensa.setKey(new DetNominaPercepcionPK(nominaNew, idxP++));
-			pValeDespensa.setClave("032");
-			pValeDespensa.setNombre("Despensa");
-			CatTipoPercepcion tpValeDespensa = tipoPercepcionDAO.buscarPorId("029");
-			pValeDespensa.setTipoPercepcion(tpValeDespensa);
-			pValeDespensa.setImporteGravado(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
-			pValeDespensa.setImporteExcento(this.valesDespensa);
-			pValeDespensa.setClave("FRB-" + tpValeDespensa.getClave());
-			percepciones.add(pValeDespensa);
-			
-			
-			//OTROS PAGOS...
-			opAjusteAlNeto = new DetNominaOtroPago();
-			opAjusteAlNeto.setKey(new DetNominaOtroPagoPK(nominaNew, idxOP++));
-			CatTipoOtroPago tpAjusteAlNeto = this.tipoOtroPagoDAO.buscarPorId("999");
-			opAjusteAlNeto.setTipoOtroPago(tpAjusteAlNeto);
-			opAjusteAlNeto.setClave("FRB-099");
-			opAjusteAlNeto.setNombre("Ajuste al neto");
-			opAjusteAlNeto.setImporte(new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP));
-			otrosPagos.add(opAjusteAlNeto);
-			
-			opSubsidioEmpleo = new DetNominaOtroPago();
-			opSubsidioEmpleo.setKey(new DetNominaOtroPagoPK(nominaNew, idxOP++));
-			CatTipoOtroPago topSubsidioEmpleo = this.tipoOtroPagoDAO.buscarPorId("002");
-			opSubsidioEmpleo.setTipoOtroPago(topSubsidioEmpleo);
-			opSubsidioEmpleo.setClave("FRB-035");
-			opSubsidioEmpleo.setNombre("Subs. al empleo mes");
-			opSubsidioEmpleo.setImporte(this.subsidioEmpleo);
-			otrosPagos.add(opSubsidioEmpleo);
-			
-			//DEDUCCIONES...
-			dISR = new DetNominaDeduccion();
-			dISR.setKey(new DetNominaDeduccionPK(nominaNew, idxD++));
-			CatTipoDeduccion tdISR = this.tipoDeduccionDAO.buscarPorId("002");
-			dISR.setTipoDeduccion(tdISR);
-			dISR.setClave("045");
-			dISR.setNombre("I.S.R.");
-			dISR.setImporte(this.isr);
-			deducciones.add(dISR);
-			
-			dIMSS = new DetNominaDeduccion();
-			dIMSS.setKey(new DetNominaDeduccionPK(nominaNew, idxD++));
-			CatTipoDeduccion tdIMSS = this.tipoDeduccionDAO.buscarPorId("001");
-			dIMSS.setTipoDeduccion(tdIMSS);
-			dIMSS.setClave("FRB-052");
-			dIMSS.setNombre("I.M.S.S.");
-			dIMSS.setImporte(this.imss);
-			deducciones.add(dIMSS);
-			
-			deducciones.addAll(listaPrestamos);
-			
 		} catch(Exception ex) {
-			log.error("Problema para obtener el cálculo de la nómina del empleado {} {} {}", empleado.getNombre(), empleado.getPrimerAp(), empleado.getSegundoAp() );
-			log.error(ex);
+			receptor = new DetNominaReceptor();
+			receptor.setNomina(nomina);
+		}
+		return receptor;
+	}
+
+	private DetNominaEmisor getEmisor(DetNomina nomina) {
+		DetNominaEmisor emisor = null;
+		
+		try {
+			if(nomina.getEmisor() == null)
+				nomina.setEmisor(new DetNominaEmisor());
+			emisor = nomina.getEmisor();
+			emisor.setNomina(nomina);
+			emisor.setNombre(this.empleado.getDatoEmpresa().getEmpresa().getRazonSocial());
+			emisor.setRfc(this.empleado.getDatoEmpresa().getEmpresa().getRfc());
+			emisor.setCodigoPostal(this.empleado.getDatoEmpresa().getEmpresa().getCodigoPostal());
+			emisor.setRegistroPatronal(this.empleado.getDatoEmpresa().getEmpresa().getRegistroPatronal());
+			emisor.setRegimenFiscal(this.empleado.getDatoEmpresa().getEmpresa().getRegimenFiscal());
+		} catch(Exception ex) {
+			emisor = new DetNominaEmisor();
+			emisor.setNomina(nomina);
 		}
 		
-		return nominaNew;
+		return emisor;
 	}
 	
 	private CatSubsidio getTarifaSubsidio(BigDecimal baseISR) throws SGPException {
@@ -670,112 +731,43 @@ public class NominaSemanalBL {
         return sdi;
 	}
 	
-	private BigDecimal calculoSeptimoDia(DetEmpleado empleado) {
-		BigDecimal septimoDia = null;
-		
-		try {
-			septimoDia = this.salarioDiario
-					.divide(this.diasPeriodo, 4, BigDecimal.ROUND_HALF_UP)
-					.multiply(this.diasTrabajados).setScale(2, BigDecimal.ROUND_HALF_UP)
-					;
-			
-		} catch(Exception ex) {
-			log.error("Problema para obtener el cálculo del septimo día.",  ex);
-			septimoDia = BigDecimal.ZERO;
-		}
-		return septimoDia;
-	}
-	
-	private BigDecimal calculoBonoPuntualidad(int diasPorPeriodo, DetEmpleado empleado, Map<String, DetRegistro> mapAsistencia, BigDecimal salarioDiarioIntegrado, BigDecimal proporcionalSeptimoDia) {
-		BigDecimal bono = null;
-    	BigDecimal tasaBonoPuntualidad = null;
-    	BigDecimal diasPeriodo = null;
-    	
-    	try {
-    		//TODO VALIDAR PRIMERO SI NO HAY RETARDOS.
-    		//En caso de existir retardos en el periodo de calculo, el bono de puntualidad es CERO.
-    		if(this.diasTrabajados.intValue() < diasPorPeriodo)
-    			return BigDecimal.ZERO;
-    		
-    		for(Map.Entry<String, DetRegistro> entry :  this.mapAsistencias.entrySet()) {
-    			String codigo = entry.getValue().getIdEstatus().getCodigo();
-    			if("R".equalsIgnoreCase(codigo) || "F".equalsIgnoreCase(codigo))
-    				return BigDecimal.ZERO;
-    		}
-    		
-    		tasaBonoPuntualidad = new BigDecimal(this.parametrosPercepciones.getBonoPuntualidad().floatValue());
-    		diasPeriodo = this.diasTrabajados.add(proporcionalSeptimoDia).setScale(2, BigDecimal.ROUND_HALF_UP);
-    		
-    		bono = salarioDiarioIntegrado.multiply(tasaBonoPuntualidad).setScale(2, BigDecimal.ROUND_HALF_UP);
-    		bono = bono.multiply(diasPeriodo).setScale(2, BigDecimal.ROUND_HALF_UP);
-    		
-    	} catch(Exception ex) {
-    		bono = BigDecimal.ZERO;
-    	}
-    	
-        return bono;
-	}
-	
-	private BigDecimal calculoValesDespensa(BigDecimal diasPeriodo) {
-		BigDecimal vales = null;
-		
-    	try {
-    		
-    		if(this.diasTrabajados.compareTo(BigDecimal.ZERO) == 0)
-    			throw new SGPException("No es posible asignar bono de puntualidad.");
-    		
-    		this.uma = parametrosPercepciones.getUma();
-    		this.tasaValesDespensa = parametrosPercepciones.getValeDespensa();
-    		
-    		vales = uma.multiply(tasaValesDespensa).setScale(4, BigDecimal.ROUND_HALF_UP);
-    		vales = vales.multiply(diasPeriodo).setScale(2, BigDecimal.ROUND_HALF_UP);
-    		
-    	} catch(Exception ex) {
-    		vales = BigDecimal.ZERO;
-    	}
-    	
-    	return vales;
-	}
-	/********************TERMINAN PERCEPCIONES****************/
-	
-	
 	/********************EMPIEZAN DEDUCCIONES****************/
 	
-	private BigDecimal calculoExcedente(CatTarifaISR tarifaISR) {
-		BigDecimal excedente = null;
-		excedente = baseISR.subtract(tarifaISR.getLimiteInferior()) ;
-		return excedente;
-	}
+//	private BigDecimal calculoExcedente(CatTarifaISR tarifaISR) {
+//		BigDecimal excedente = null;
+//		excedente = baseISR.subtract(tarifaISR.getLimiteInferior()) ;
+//		return excedente;
+//	}
 	
-	private BigDecimal calculoISRPrevio(CatTarifaISR tarifaISR) {
-		BigDecimal isrPrevio = null;
-		BigDecimal porcentajeExcedente = null;
-		BigDecimal cien = null;
-		BigDecimal porcentaje = null;
-		
-		try {
-			porcentajeExcedente = tarifaISR.getPorcAplExceLimInf();
-			
-			cien = new BigDecimal("100.00").setScale(2, BigDecimal.ROUND_HALF_UP);
-			if(porcentajeExcedente.compareTo(cien) >= 0)
-				porcentaje = porcentajeExcedente;
-			else
-				porcentaje = porcentajeExcedente.divide(cien, 4, BigDecimal.ROUND_HALF_UP);
-			
-			isrPrevio = this.excedente.multiply(porcentaje).setScale(2, BigDecimal.ROUND_HALF_UP);
-		} catch(Exception ex) {
-			log.error("Problema para obtener el ISR previo");
-			isrPrevio = BigDecimal.ZERO;
-		}
-		
-		return isrPrevio;
-	}
+//	private BigDecimal calculoISRPrevio(CatTarifaISR tarifaISR) {
+//		BigDecimal isrPrevio = null;
+//		BigDecimal porcentajeExcedente = null;
+//		BigDecimal cien = null;
+//		BigDecimal porcentaje = null;
+//		
+//		try {
+//			porcentajeExcedente = tarifaISR.getPorcAplExceLimInf();
+//			
+//			cien = new BigDecimal("100.00").setScale(2, BigDecimal.ROUND_HALF_UP);
+//			if(porcentajeExcedente.compareTo(cien) >= 0)
+//				porcentaje = porcentajeExcedente;
+//			else
+//				porcentaje = porcentajeExcedente.divide(cien, 4, BigDecimal.ROUND_HALF_UP);
+//			
+//			isrPrevio = this.excedente.multiply(porcentaje).setScale(2, BigDecimal.ROUND_HALF_UP);
+//		} catch(Exception ex) {
+//			log.error("Problema para obtener el ISR previo");
+//			isrPrevio = BigDecimal.ZERO;
+//		}
+//		
+//		return isrPrevio;
+//	}
 	
-	private BigDecimal calculoImpuestoAntesSubsidio(CatTarifaISR tarifaISR) {
-		BigDecimal impuesto = null;
-		impuesto = this.isrPrevio.add(tarifaISR.getCuotaFija());
-		return impuesto;
-	}
+//	private BigDecimal calculoImpuestoAntesSubsidio(CatTarifaISR tarifaISR) {
+//		BigDecimal impuesto = null;
+//		impuesto = this.isrPrevio.add(tarifaISR.getCuotaFija());
+//		return impuesto;
+//	}
 	
 	private BigDecimal calculoSubsidioEmpleo(CatSubsidio tarifaSubsidio) {
 		BigDecimal subsidioEmpleo = null;
@@ -972,11 +964,11 @@ public class NominaSemanalBL {
 	}
 
 	public BigDecimal getDiasPeriodo() {
-		return diasPeriodo;
+		return diasLaboralesPeriodo;
 	}
 
 	public void setDiasPeriodo(BigDecimal diasPeriodo) {
-		this.diasPeriodo = diasPeriodo;
+		this.diasLaboralesPeriodo = diasPeriodo;
 	}
 
 	public BigDecimal getDiasTrabajados() {

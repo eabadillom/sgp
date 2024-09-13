@@ -312,6 +312,7 @@ public class NominaBean implements Serializable {
     	
     	try {
     		log.info("Actualizando {}", this.nomina);
+    		
     		totalPercepciones = this.nomina.getPercepciones().stream()
     				.map(item -> item.getImporteExcento().add(item.getImporteGravado()))
     				.reduce(BigDecimal.ZERO, BigDecimal :: add);
@@ -321,9 +322,9 @@ public class NominaBean implements Serializable {
     				.reduce(BigDecimal.ZERO, BigDecimal :: add);
     		
     		totalDeducciones = this.nomina.getDeducciones().stream()
+    				.filter(d -> d.getProcesar())
     				.map(item -> item.getImporte())
     				.reduce(BigDecimal.ZERO, BigDecimal :: add);
-    		
     		
     		subtotal = totalPercepciones.add(BigDecimal.ZERO);
     		descuentos = totalDeducciones.subtract(totalOtrosPagos);
@@ -384,7 +385,37 @@ public class NominaBean implements Serializable {
 			FacesContext.getCurrentInstance().addMessage(null, message);
 			PrimeFaces.current().ajax().update(":formNomina:messages");
     	}
-    	
+    }
+    
+    public void actualizarNomina() {
+    	FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Nómina";
+		
+		try {
+			log.info("Actualizando nomina...");
+			
+			if(this.nomina == null)
+				throw new SGPException("No hay información de nómina.");
+			nominaDAO.actualizar(nomina);
+			log.info("Nomina actualizada correctamente.");
+			
+			mensaje = "La información se actualizó correctamente.";
+    		severity = FacesMessage.SEVERITY_INFO;
+			PrimeFaces.current().executeScript("PF('dgEmpleado').hide()");
+		} catch(SGPException ex) {
+    		mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+    	} catch(Exception ex) {
+    		log.error("Problema para guardar la nómina...", ex);
+			mensaje = "Hay un problema para guardar nómina.";
+			severity = FacesMessage.SEVERITY_ERROR;
+    	} finally {
+    		message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update(":formNomina:messages");
+    	}
     	
     }
     

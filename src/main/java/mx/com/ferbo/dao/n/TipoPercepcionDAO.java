@@ -14,6 +14,7 @@ public class TipoPercepcionDAO extends BaseDAO<CatTipoPercepcion, String> {
 		super(modelClass);
 	}
 	
-	
-
+	public TipoPercepcionDAO() {
+		super(CatTipoPercepcion.class);
+	}
 }
