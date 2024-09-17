@@ -1,23 +1,23 @@
-package mx.com.ferbo.dto;
+package mx.com.ferbo.model;
 
 import java.util.Objects;
 
 public class NominaOtroPagoPK {
-	private NominaDTO nomina;
+	private Nomina nomina;
 	private Integer id;
 	
 	public NominaOtroPagoPK() {
 		
 	}
-	public NominaOtroPagoPK(NominaDTO nomina, Integer id) {
+	public NominaOtroPagoPK(Nomina nomina, Integer id) {
 		super();
 		this.nomina = nomina;
 		this.id = id;
 	}
-	public NominaDTO getNomina() {
+	public Nomina getNomina() {
 		return nomina;
 	}
-	public void setNomina(NominaDTO nomina) {
+	public void setNomina(Nomina nomina) {
 		this.nomina = nomina;
 	}
 	public Integer getId() {

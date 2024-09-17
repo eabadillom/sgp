@@ -12,6 +12,7 @@ import mx.com.ferbo.commons.dao.DAO;
 import mx.com.ferbo.dto.sat.TipoContratoDTO;
 import mx.com.ferbo.model.sat.CatTipoContrato;
 
+@Deprecated 
 public class TipoContratoDAO extends DAO<TipoContratoDTO, CatTipoContrato, String> {
 	
 	private static Logger log = LogManager.getLogger(TipoContratoDAO.class);

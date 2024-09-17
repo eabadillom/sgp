@@ -1,28 +1,29 @@
-package mx.com.ferbo.dto;
+package mx.com.ferbo.model;
 
 import java.math.BigDecimal;
 import java.util.Objects;
 
-import mx.com.ferbo.dto.sat.TipoOtroPagoDTO;
+import mx.com.ferbo.model.sat.CatTipoDeduccion;
 
-public class NominaOtroPagoDTO {
+public class NominaDeduccion {
 	
-	private NominaOtroPagoPK key;
-	private TipoOtroPagoDTO tipoOtroPago;
+	private NominaDeduccionPK key;
+	private CatTipoDeduccion tipoDeduccion;
 	private String clave;
 	private String nombre;
 	private BigDecimal importe;
-	public NominaOtroPagoPK getKey() {
+	
+	public NominaDeduccionPK getKey() {
 		return key;
 	}
-	public void setKey(NominaOtroPagoPK key) {
+	public void setKey(NominaDeduccionPK key) {
 		this.key = key;
 	}
-	public TipoOtroPagoDTO getTipoOtroPago() {
-		return tipoOtroPago;
+	public CatTipoDeduccion getTipoDeduccion() {
+		return tipoDeduccion;
 	}
-	public void setTipoOtroPago(TipoOtroPagoDTO otroPago) {
-		this.tipoOtroPago = otroPago;
+	public void setTipoDeduccion(CatTipoDeduccion tipoDeduccion) {
+		this.tipoDeduccion = tipoDeduccion;
 	}
 	public String getClave() {
 		return clave;
@@ -54,11 +55,12 @@ public class NominaOtroPagoDTO {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		NominaOtroPagoDTO other = (NominaOtroPagoDTO) obj;
+		NominaDeduccion other = (NominaDeduccion) obj;
 		return Objects.equals(key, other.key);
 	}
 	@Override
 	public String toString() {
-		return "NominaOtroPago [key=" + key + ", clave=" + clave + ", nombre=" + nombre + ", importe=" + importe + "]";
+		return "NominaDeduccionDTO [key=" + key + ", clave=" + clave + ", nombre=" + nombre + ", importe=" + importe
+				+ "]";
 	}
 }

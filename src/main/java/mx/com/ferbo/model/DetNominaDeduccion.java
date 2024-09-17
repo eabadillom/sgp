@@ -9,7 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
@@ -24,7 +24,7 @@ public class DetNominaDeduccion implements Serializable {
 	@EmbeddedId
 	private DetNominaDeduccionPK key;
 	
-	@OneToOne
+	@ManyToOne
 	@JoinColumn(name = "tp_deduccion", referencedColumnName = "cd_tipo_deduccion")
 	@Basic(optional = false)
 	private CatTipoDeduccion tipoDeduccion;

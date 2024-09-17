@@ -23,6 +23,7 @@ import javax.validation.constraints.NotNull;
 @Table(name = "cat_subsidio")
 @NamedQueries({
     @NamedQuery(name = "CatSubsidio.findAll", query = "SELECT s FROM CatSubsidio s"),
+    @NamedQuery(name = "CatSubsidio.findByPeriodoTipo", query = "SELECT s FROM CatSubsidio s WHERE s.fecha BETWEEN :fechaInicio AND :fechaFin AND s.periodo = :periodo"),
     @NamedQuery(name = "CatSubsidio.findByPeriodoTipoIngreso", query = "SELECT new mx.com.ferbo.dto.CatSubsidioDTO(s.idSubsidio, s.paraIngresosDe, s.hastaIngresosDe, s.cantidadSubsidio, s.fecha) FROM CatSubsidio s WHERE s.fecha BETWEEN :fechaInicio AND :fechaFin AND s.periodo = :periodo AND :ingreso BETWEEN s.paraIngresosDe AND s.hastaIngresosDe"),
     @NamedQuery(name = "CatSubsidio.findActual", query = "SELECT NEW mx.com.ferbo.dto.CatSubsidioDTO(s.idSubsidio, s.paraIngresosDe, s.hastaIngresosDe, s.cantidadSubsidio, s.fecha) FROM CatSubsidio s WHERE s.fecha LIKE :fecha")})
 public class CatSubsidio implements Serializable {

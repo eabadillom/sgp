@@ -11,6 +11,7 @@ import mx.com.ferbo.commons.dao.DAO;
 import mx.com.ferbo.dto.sat.TipoJornadaDTO;
 import mx.com.ferbo.model.sat.CatTipoJornada;
 
+@Deprecated
 public class TipoJornadaDAO extends DAO<TipoJornadaDTO, CatTipoJornada, String> {
 	
 	private static Logger log = LogManager.getLogger(TipoJornadaDAO.class);

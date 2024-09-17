@@ -11,10 +11,11 @@ import mx.com.ferbo.dto.sat.TipoContratoDTO;
 import mx.com.ferbo.dto.sat.TipoJornadaDTO;
 import mx.com.ferbo.dto.sat.TipoRegimenDTO;
 import mx.com.ferbo.dto.sat.UsoCFDIDTO;
+import mx.com.ferbo.model.Nomina;
 
 public class NominaReceptorDTO {
 	
-	private NominaDTO nomina;
+	private Nomina nomina;
 	private String nombre;
 	private String rfc;
 	private String codigoPostal;
@@ -37,10 +38,10 @@ public class NominaReceptorDTO {
 	private BigDecimal salarioDiarioIntegrado;
 	private EntidadFederativaDTO entidadFederativa;
 	
-	public NominaDTO getNomina() {
+	public Nomina getNomina() {
 		return nomina;
 	}
-	public void setNomina(NominaDTO nomina) {
+	public void setNomina(Nomina nomina) {
 		this.nomina = nomina;
 	}
 	public String getNombre() {

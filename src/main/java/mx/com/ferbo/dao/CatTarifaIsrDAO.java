@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
+import javax.persistence.NoResultException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -69,13 +70,24 @@ public class CatTarifaIsrDAO extends IBaseDAO<CatTarifaIsrDTO, Integer>{
     public CatTarifaIsrDTO buscar(Date fechaInicio, Date fechaFin, String tipo, BigDecimal baseISR ) {
     	CatTarifaIsrDTO tarifa = null;
     	
-    	tarifa = emSGP.createNamedQuery("CatTarifaISR.findByTipoAndAnioandBaseISR", CatTarifaIsrDTO.class)
-    			.setParameter("fechaInicio", fechaInicio)
-    			.setParameter("fechaFin", fechaFin)
-    			.setParameter("tipo", tipo)
-    			.setParameter("baseISR", baseISR)
-    			.getSingleResult()
-    			;
+    	try {
+    		tarifa = emSGP.createNamedQuery("CatTarifaISR.findByTipoAndAnioandBaseISR", CatTarifaIsrDTO.class)
+    				.setParameter("fechaInicio", fechaInicio)
+    				.setParameter("fechaFin", fechaFin)
+    				.setParameter("tipo", tipo)
+    				.setParameter("baseISR", baseISR)
+    				.getSingleResult()
+    				;
+    		
+    	} catch(NoResultException ex) {
+    		tarifa = new CatTarifaIsrDTO();
+    		tarifa.setTipo(tipo);
+    		tarifa.setFecha(fechaInicio);
+    		tarifa.setLimiteInferior(BigDecimal.ZERO);
+    		tarifa.setLimiteSuperior(BigDecimal.ZERO);
+    		tarifa.setPorcAplExceLimInf(BigDecimal.ZERO);
+    		tarifa.setCuotaFija(BigDecimal.ZERO);
+    	}
     	
     	return tarifa;
     }

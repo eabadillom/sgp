@@ -11,9 +11,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -25,7 +25,6 @@ import javax.validation.constraints.Size;
 	@NamedQuery(name = "DetToken.findAll", query = "SELECT DT FROM DetToken DT"),
 	@NamedQuery(name = "DetToken.findIdEmpleado", query= "SELECT NEW mx.com.ferbo.dto.DetTokenDTO( DT.idToken, em.idEmpleado, DT.nbToken, DT.caducidad, DT.valido) FROM DetToken DT INNER JOIN DT.empleado em WHERE em.numEmpleado = :numEmpleado"),
 	@NamedQuery(name = "DetToken.findByToken", query = "SELECT t FROM DetToken t WHERE t.nbToken = :token")
-	//@NamedQuery(name = "DetToken.findByEmpleadoAndFecha", query = "SELECT te FROM DetToken te WHERE te.empleado.idEmpleado = :idEmpleado AND te.caducidad = (SELECT MAX(d.caducidad) FROM DetToken d WHERE d.empleado.idEmpleado = :idEmpleado)")
 })
 public class DetToken implements Serializable {
 
@@ -38,7 +37,7 @@ public class DetToken implements Serializable {
     private Integer idToken;
 	
 	@JoinColumn(name = "id_empleado", referencedColumnName = "id_empleado")
-    @OneToOne
+    @ManyToOne
     private DetEmpleado empleado;
     
     @Basic(optional = false)

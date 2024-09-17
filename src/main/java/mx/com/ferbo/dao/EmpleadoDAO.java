@@ -17,6 +17,7 @@ import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.util.SGPException;
 
+@Deprecated
 @Stateless
 @LocalBean
 public class EmpleadoDAO extends DAO<DetEmpleadoDTO, DetEmpleado, Integer> implements Serializable {
@@ -73,7 +74,7 @@ public class EmpleadoDAO extends DAO<DetEmpleadoDTO, DetEmpleado, Integer> imple
     		dto.setNss(model.getNss());
     		dto.setActivo(model.getActivo());
     		//TODO deshabilitar la extracción de fotografía...
-    		dto.setFotografia(model.getFotografia());
+//    		dto.setFotografia(model.getFotografia());
     		dto.setSueldoDiario(model.getSueldoDiario());
     		
     		if(isFullInfo == false)
@@ -108,7 +109,7 @@ public class EmpleadoDAO extends DAO<DetEmpleadoDTO, DetEmpleado, Integer> imple
     		model.setNss(dto.getNss());
     		model.setActivo(dto.getActivo());
     		//TODO deshabilitar la extracción de fotografía...
-    		model.setFotografia(dto.getFotografia());
+//    		model.setFotografia(dto.getFotografia());
     		model.setSueldoDiario(dto.getSueldoDiario());
     		model.setDatoEmpresa(new DatoEmpresaDAO().getModel(dto.getDatoEmpresa()));
     		model.setEmpleadoFoto(new EmpleadoFotoDAO().getModel(dto.getEmpleadoFoto()));
@@ -521,5 +522,32 @@ public class EmpleadoDAO extends DAO<DetEmpleadoDTO, DetEmpleado, Integer> imple
     		close(emSGP);
     	}
     	return lista;
+    }
+    
+    @Deprecated
+    public List<DetEmpleadoDTO> buscarActivoEmpresaIngreso(Integer idEmpresa, Date periodoPagoInicio) {
+    	List<DetEmpleadoDTO> dtoList = null;
+    	List<DetEmpleado> modelList = null;
+    	EntityManager emSGP = null;
+    	
+    	try {
+    		emSGP = this.getEntityManager();
+    		
+    		modelList = emSGP.createNamedQuery("DetEmpleado.findByActiveEmpresaIngreso", DetEmpleado.class)
+    				.setParameter("idEmpresa", idEmpresa)
+    				.setParameter("periodoPagoInicio", periodoPagoInicio)
+    				.getResultList()
+    				;
+    		
+    		dtoList = this.toDTOList(modelList);
+    		
+    	} catch(Exception ex) {
+    		log.warn("Problema para obtener la lista de empleados...", ex);
+    	} finally {
+    		close(emSGP);
+    		
+    	}
+    	
+    	return dtoList;
     }
 }

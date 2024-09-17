@@ -23,7 +23,7 @@ import mx.com.ferbo.model.sat.CatUsoCFDI;
 
 
 @Entity
-@Table(name = "det_nom_emisor")
+@Table(name = "det_nom_receptor")
 public class DetNominaReceptor implements Serializable {
 
 	private static final long serialVersionUID = -8691279351662644877L;

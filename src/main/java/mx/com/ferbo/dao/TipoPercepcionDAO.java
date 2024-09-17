@@ -6,6 +6,7 @@ import mx.com.ferbo.commons.dao.DAO;
 import mx.com.ferbo.dto.sat.TipoPercepcionDTO;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
 
+@Deprecated
 public class TipoPercepcionDAO extends DAO<TipoPercepcionDTO, CatTipoPercepcion, String> {
 	
 	public TipoPercepcionDAO() {

@@ -1,6 +1,7 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -21,6 +22,7 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "cat_area")
 @NamedQueries({
+	@NamedQuery(name = "CatArea.findActive", query = "SELECT c FROM CatArea c WHERE c.activo = 1"),
     @NamedQuery(name = "CatArea.findAll", query = "SELECT new mx.com.ferbo.dto.CatAreaDTO("
             + " c.idArea,"
             + " c.descripcion,"
@@ -90,4 +92,26 @@ public class CatArea implements Serializable {
     public void setActivo(short activo) {
         this.activo = activo;
     }
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(idArea);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CatArea other = (CatArea) obj;
+		return Objects.equals(idArea, other.idArea);
+	}
+
+	@Override
+	public String toString() {
+		return "CatArea [idArea=" + idArea + ", descripcion=" + descripcion + ", activo=" + activo + "]";
+	}
 }

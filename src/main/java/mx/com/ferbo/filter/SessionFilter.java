@@ -12,7 +12,6 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -20,15 +19,13 @@ import javax.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.dto.DetEmpleadoDTO;
+import mx.com.ferbo.model.DetEmpleado;
 
 /**
  *
  * @author erale
  */
 public class SessionFilter implements Filter {
-
-    private static final long serialVersionUID = 1L;
 
     private static final Logger log = LogManager.getLogger(SessionFilter.class);
 
@@ -47,14 +44,12 @@ public class SessionFilter implements Filter {
      * Default constructor.
      */
     public SessionFilter() {
-        // TODO Auto-generated constructor stub
     }
 
     /**
      * @see Filter#destroy()
      */
     public void destroy() {
-        // TODO Auto-generated method stub
     }
 
     /**
@@ -67,11 +62,10 @@ public class SessionFilter implements Filter {
     private void doAction(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
         HttpSession session = request.getSession(false);
-        Cookie[] cookies = request.getCookies();
         String context = null;
         String pagina = null;
 
-        DetEmpleadoDTO usuario = null;
+        DetEmpleado usuario = null;
 
         context = request.getContextPath();
         pagina = request.getServletPath();
@@ -106,7 +100,7 @@ public class SessionFilter implements Filter {
 
         log.debug("Id de sesion: " + session.getId());
         log.debug("Verificando existencia datos de inicio de sesion...");
-        usuario = (DetEmpleadoDTO) session.getAttribute("empleado");
+        usuario = (DetEmpleado) session.getAttribute("empleado");
 
         log.debug("Verificando existencia de usuario en sesion...");
 

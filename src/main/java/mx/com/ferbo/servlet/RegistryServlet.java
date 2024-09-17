@@ -15,13 +15,15 @@ import org.apache.logging.log4j.Logger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import mx.com.ferbo.dao.DetTokenDAO;
-import mx.com.ferbo.dao.EmpleadoDAO;
-import mx.com.ferbo.dao.RegistroDAO;
-import mx.com.ferbo.dto.CatEstatusRegistroDTO;
-import mx.com.ferbo.dto.DetEmpleadoDTO;
-import mx.com.ferbo.dto.DetRegistroDTO;
-import mx.com.ferbo.dto.DetTokenDTO;
+import mx.com.ferbo.dao.n.EmpleadoFotoDAO;
+import mx.com.ferbo.dao.n.EstatusRegistroDAO;
+import mx.com.ferbo.dao.n.RegistroDAO;
+import mx.com.ferbo.dao.n.TokenDAO;
+import mx.com.ferbo.model.CatEstatusRegistro;
+import mx.com.ferbo.model.DetEmpleado;
+import mx.com.ferbo.model.DetEmpleadoFoto;
+import mx.com.ferbo.model.DetRegistro;
+import mx.com.ferbo.model.DetToken;
 import mx.com.ferbo.response.RegistryResponse;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.SGPException;
@@ -50,14 +52,18 @@ public class RegistryServlet extends HttpServlet {
 		Date horaSistema;
 		Date horaLimiteEntrada = null;
 
-		EmpleadoDAO empleadoDAO = null;
-		DetEmpleadoDTO detEmpleadoDTO = null;
-		DetEmpleadoDTO empleadoConFoto = null;
-		DetTokenDAO detTokenDAO = null;
-		DetTokenDTO detTokenDTO = null;
-		DetRegistroDTO registroDTO = null;
-		String registro = null;
+		EmpleadoFotoDAO empleadoFotoDAO = null;
+		EstatusRegistroDAO estatusDAO = null;
+		TokenDAO detTokenDAO = null;
 		RegistroDAO registroDAO = null;
+		
+		CatEstatusRegistro statusEnTiempo = null;
+		CatEstatusRegistro statusRetardo = null;
+		DetEmpleado empleado = null;
+		DetEmpleadoFoto foto = null;
+		DetToken tokenEmpleado = null;
+		DetRegistro registro = null;
+		String tipoRegistro = null;
 		Date fechaActual = null;
 		Date fechaEntradaInicio = null;
 		Date fechaEntradaFin = null;
@@ -69,7 +75,6 @@ public class RegistryServlet extends HttpServlet {
 		String accion = null;
 		RegistryResponse respuesta = null;
 		Gson prettyGson = null;
-		CatEstatusRegistroDTO status = null;
 		try {
 			session = request.getSession(true);
 			
@@ -79,49 +84,54 @@ public class RegistryServlet extends HttpServlet {
 			DateUtil.setTime(fechaEntradaInicio, 0, 0, 0, 0);
 			DateUtil.setTime(fechaEntradaFin, 23, 59, 59, 999);
 			
-			status = new CatEstatusRegistroDTO();
-			registroDTO = new DetRegistroDTO();
-			registroDAO = new RegistroDAO();
+			registro = new DetRegistro();
+			registroDAO = new RegistroDAO(DetRegistro.class);
 			numeroEmpleado = request.getParameter("numero");
 			token = request.getParameter("token");
 			accion = request.getParameter("accion");// registro, Entrada/Salida
 			fechaActual = new Date();
 			log.info("Buscando biometricos para el empleado numero: " + numeroEmpleado);
-			log.info("Buscando token........: " + token);
 			
 			if (numeroEmpleado == null) {
-				throw new Exception("El Numero de Empleado esta vacio");
+				throw new Exception("Información incorrecta.");
 			}
-
-			empleadoDAO = new EmpleadoDAO();
-			detEmpleadoDTO = empleadoDAO.buscarPorNumeroEmpleado(numeroEmpleado, true);
-			empleadoConFoto = empleadoDAO.buscarConFoto(detEmpleadoDTO.getIdEmpleado());
 			
-			if(detEmpleadoDTO == null || detEmpleadoDTO.getIdEmpleado() == null)
-				throw new SGPException("El empleado indicado es incorrecto.");
+			if ("".equalsIgnoreCase(numeroEmpleado.trim()))
+				throw new Exception("Información incorrecta.");
 
-			detTokenDAO = new DetTokenDAO();
-			//detTokenDTO = detTokenDAO.buscarPorIdEmpleadoAndFecha(detEmpleadoDTO.getIdEmpleado());
-			detTokenDTO = detTokenDAO.buscarPorToken(token);
-			log.info("Token: {}, Caducidad: {}", detTokenDTO.getNbToken(), detTokenDTO.getCaducidad());
+			estatusDAO = new EstatusRegistroDAO(CatEstatusRegistro.class);
+			statusEnTiempo = estatusDAO.buscarPorId(1);
+			statusRetardo = estatusDAO.buscarPorId(2);
+
+			detTokenDAO = new TokenDAO(DetToken.class);
+			log.info("Buscando token........: " + token);
+			tokenEmpleado = detTokenDAO.buscarPorToken(token);
+			log.info("Token: {}, Caducidad: {}", tokenEmpleado.getNbToken(), tokenEmpleado.getCaducidad());
 			log.info("Fecha hora actual: {}", fechaActual);
 			
-			if (detTokenDTO.getCaducidad().before(fechaActual)) {
-				log.info("La fecha recuperada es valida: {}", detTokenDTO.getCaducidad());
+			if(tokenEmpleado.getEmpleado().getNumEmpleado().equals(numeroEmpleado) == false)
+				throw new SGPException("La información proporcionada es incorrecta.");
+			
+			if (tokenEmpleado.getCaducidad().before(fechaActual)) {
+				log.info("La fecha recuperada es valida: {}", tokenEmpleado.getCaducidad());
 				throw new SGPException("El token ha expirado.");
 			}
 			
-			if(detTokenDTO.isValido() == false) {
-				log.info("El token no es válido: {}", detTokenDTO.isValido());
+			if(tokenEmpleado.isValido() == false) {
+				log.info("El token no es válido: {}", tokenEmpleado.isValido());
 				throw new SGPException("El token no es válido.");
 			}
 			
+			empleado = tokenEmpleado.getEmpleado();
+			
 			prettyGson = new GsonBuilder().setPrettyPrinting().create();
 			
-			detTokenDTO.setValido(false);
-			detTokenDAO.actualizar(detTokenDTO);
-			session.setAttribute("empleado", detEmpleadoDTO);
-			session.setAttribute("fotografia", empleadoConFoto.getEmpleadoFoto());
+			tokenEmpleado.setValido(false);
+			empleadoFotoDAO = new EmpleadoFotoDAO(DetEmpleadoFoto.class);
+			foto = empleadoFotoDAO.buscar(empleado.getNumEmpleado());
+			detTokenDAO.actualizar(tokenEmpleado);
+			session.setAttribute("empleado", empleado);
+			session.setAttribute("fotografia", foto);
 			
 			respuesta = new RegistryResponse();
 			respuesta.setCodigo(0);
@@ -132,43 +142,42 @@ public class RegistryServlet extends HttpServlet {
 				respuesta.setUrl("/protected/registroAsistencia.xhtml");
 				
 				log.info("Buscando entrada del empleado {} entre las {} y las {}", 
-						detEmpleadoDTO.getNumEmpleado(),
+						empleado.getNumEmpleado(),
 						DateUtil.getString(fechaEntradaInicio, DateUtil.FORMATO_YYYY_MM_DD_HH_MM_SS),
 						DateUtil.getString(fechaEntradaFin, DateUtil.FORMATO_YYYY_MM_DD_HH_MM_SS));
-				registroDTO = registroDAO.buscarPorEmpleadoFechaEntrada(detEmpleadoDTO.getIdEmpleado(), fechaEntradaInicio, fechaEntradaFin);
-				if(registroDTO == null || registroDTO.getIdRegistro() == null)
-					registro = "Entrada";
+				registro = registroDAO.buscarPorEmpleadoFechaEntrada(empleado.getIdEmpleado(), fechaEntradaInicio, fechaEntradaFin);
+				if(registro == null || registro.getIdRegistro() == null)
+					tipoRegistro = "Entrada";
 				else
-					registro = "Salida";
+					tipoRegistro = "Salida";
 				
 				horaLimiteEntrada = new Date();
 				DateUtil.setTime(horaLimiteEntrada, 7, 10, 0, 0);
 				
-				switch (registro) {
+				switch (tipoRegistro) {
 				
 				case "Entrada":
 				case "ENTRADA":
 				case "entrada":
 					log.info("Registrando entrada...");
-					registroDTO = new DetRegistroDTO();
-					registroDTO.setFechaEntrada(fechaActual);
-					registroDTO.setFechaSalida(null);
-					registroDTO.setDetEmpleadoDTO(detEmpleadoDTO);
+					registro = new DetRegistro();
+					registro.setFechaEntrada(fechaActual);
+					registro.setFechaSalida(null);
+					registro.setIdEmpleado(empleado);
 					if (horaSistema.after(horaLimiteEntrada)) {
-						status.setIdEstatus(2);
+						registro.setIdEstatus(statusRetardo);
 					} else {
-						status.setIdEstatus(1);
+						registro.setIdEstatus(statusEnTiempo);
 					}
-					registroDTO.setCatEstatusRegistroDTO(status);
-					registroDAO.guardar(registroDTO);
+					registroDAO.guardar(registro);
 					log.info("Entrada registrada correctamente");
 					break;
 				case "Salida":
 				case "SALIDA":
 				case "salida":
 					log.info("Registrando salida...");
-					registroDTO.setFechaSalida(fechaActual);
-					registroDAO.actualizar(registroDTO);
+					registro.setFechaSalida(fechaActual);
+					registroDAO.actualizar(registro);
 					log.info("Salida registrada correctamente");
 					break;
 				}

@@ -38,6 +38,7 @@ public class CatPercepcionesDAO extends IBaseDAO<CatPercepcionesDTO, Integer> im
         return emSGP.createNamedQuery("CatPercepciones.findByActive", CatPercepcionesDTO.class).getResultList();
     }
     
+    @Deprecated
     public CatPercepcionesDTO buscarActual(Date fechaCorte) {
     	CatPercepcionesDTO percepcion = null;
     	percepcion = emSGP.createNamedQuery("CatPercepciones.findLastActive", CatPercepcionesDTO.class)

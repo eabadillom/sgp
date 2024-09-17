@@ -8,11 +8,16 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "cat_ent_fed")
+@NamedQueries({
+	@NamedQuery(name = "CatEntidadFederativa.getAll", query = "SELECT e FROM CatEntidadFederativa e ORDER BY e.nombre")
+})
 public class CatEntidadFederativa implements Serializable {
 
 	private static final long serialVersionUID = -7186224031916960721L;

@@ -12,6 +12,7 @@ import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetToken;
 import mx.com.ferbo.util.SGPException;
 
+@Deprecated
 public class DetTokenDAO extends IBaseDAO<DetTokenDTO, Integer> implements Serializable{
 
 	private static final long serialVersionUID = 1L;
