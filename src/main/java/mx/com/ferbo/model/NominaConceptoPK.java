@@ -1,15 +1,15 @@
-package mx.com.ferbo.dto;
+package mx.com.ferbo.model;
 
 import java.util.Objects;
 
 public class NominaConceptoPK {
 	private Integer idConcepto;
-	private NominaDTO nomina;
+	private Nomina nomina;
 	
 	public NominaConceptoPK() {
 		
 	}
-	public NominaConceptoPK(Integer idConcepto, NominaDTO nomina) {
+	public NominaConceptoPK(Integer idConcepto, Nomina nomina) {
 		super();
 		this.idConcepto = idConcepto;
 		this.nomina = nomina;
@@ -20,10 +20,10 @@ public class NominaConceptoPK {
 	public void setIdConcepto(Integer idConcepto) {
 		this.idConcepto = idConcepto;
 	}
-	public NominaDTO getNomina() {
+	public Nomina getNomina() {
 		return nomina;
 	}
-	public void setNomina(NominaDTO nomina) {
+	public void setNomina(Nomina nomina) {
 		this.nomina = nomina;
 	}
 	@Override

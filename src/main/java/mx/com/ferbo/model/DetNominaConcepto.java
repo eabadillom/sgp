@@ -9,7 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
@@ -25,14 +25,14 @@ public class DetNominaConcepto implements Serializable {
 	@EmbeddedId
 	private DetNominaConceptoPK key;
 	
-	@OneToOne
+	@ManyToOne
 	@JoinColumn(name = "cd_concepto", referencedColumnName = "cd_concepto")
 	private CatConcepto concepto;
 	
 	@Column(name = "nu_cantidad")
 	private BigDecimal cantidad;
 	
-	@OneToOne
+	@ManyToOne
 	@JoinColumn(name = "cd_unidad", referencedColumnName = "cd_unidad")
 	private CatUnidadSAT unidad;
 	

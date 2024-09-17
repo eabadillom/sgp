@@ -14,10 +14,7 @@ import mx.com.ferbo.commons.dao.IBaseDAO;
 import mx.com.ferbo.dto.CatPlantaDTO;
 import mx.com.ferbo.model.CatPlanta;
 
-/**
- *
- * @author Gabo
- */
+@Deprecated
 @Stateless
 @LocalBean
 public class CatPlantaDAO extends IBaseDAO<CatPlantaDTO, Integer> implements Serializable{

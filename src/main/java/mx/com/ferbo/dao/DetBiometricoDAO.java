@@ -16,10 +16,7 @@ import mx.com.ferbo.model.DetBiometrico;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.util.SGPException;
 
-/**
- *
- * @author Gabriel
- */
+@Deprecated
 @Stateless
 @LocalBean
 public class DetBiometricoDAO extends IBaseDAO<DetBiometricoDTO, Integer> implements Serializable{

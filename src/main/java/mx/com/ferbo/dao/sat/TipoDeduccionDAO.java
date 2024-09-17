@@ -8,6 +8,7 @@ import mx.com.ferbo.commons.dao.DAO;
 import mx.com.ferbo.dto.sat.TipoDeduccionDTO;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 
+@Deprecated
 public class TipoDeduccionDAO extends DAO<TipoDeduccionDTO,CatTipoDeduccion,String>{
 
     @Override

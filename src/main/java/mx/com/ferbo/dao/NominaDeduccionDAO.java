@@ -5,20 +5,21 @@ import java.util.List;
 
 import mx.com.ferbo.commons.dao.DAO;
 import mx.com.ferbo.dao.sat.TipoDeduccionDAO;
-import mx.com.ferbo.dto.NominaDeduccionDTO;
-import mx.com.ferbo.dto.NominaDeduccionDTOPK;
 import mx.com.ferbo.model.DetNominaDeduccion;
 import mx.com.ferbo.model.DetNominaDeduccionPK;
+import mx.com.ferbo.model.NominaDeduccion;
+import mx.com.ferbo.model.NominaDeduccionPK;
 
-public class NominaDeduccionDAO extends DAO<NominaDeduccionDTO, DetNominaDeduccion, DetNominaDeduccionPK> {
+@Deprecated
+public class NominaDeduccionDAO extends DAO<NominaDeduccion, DetNominaDeduccion, DetNominaDeduccionPK> {
 
 	@Override
-	public NominaDeduccionDTO getDTO(DetNominaDeduccion model) {
-		NominaDeduccionDTO dto = null;
+	public NominaDeduccion getDTO(DetNominaDeduccion model) {
+		NominaDeduccion dto = null;
 		try {
-			dto = new NominaDeduccionDTO();
-			dto.setKey(new NominaDeduccionDTOPK(model.getKey().getId(), new NominaDAO().buscarPorId(model.getKey().getNomina().getId(), false)));
-			dto.setTipoDeduccion(new TipoDeduccionDAO().getDTO(model.getTipoDeduccion()));
+			dto = new NominaDeduccion();
+			dto.setKey(new NominaDeduccionPK(model.getKey().getId(), new NominaDAO().buscarPorId(model.getKey().getNomina().getId(), false)));
+//			dto.setTipoDeduccion(new TipoDeduccionDAO().getDTO(model.getTipoDeduccion()));
 			dto.setClave(model.getClave());
 			dto.setNombre(model.getNombre());
 			dto.setImporte(model.getImporte());
@@ -29,12 +30,12 @@ public class NominaDeduccionDAO extends DAO<NominaDeduccionDTO, DetNominaDeducci
 	}
 
 	@Override
-	public DetNominaDeduccion getModel(NominaDeduccionDTO dto) {
+	public DetNominaDeduccion getModel(NominaDeduccion dto) {
 		DetNominaDeduccion model = null;
 		try {
 			model = new DetNominaDeduccion();
 			model.setKey(new DetNominaDeduccionPK(new NominaDAO().getModel(dto.getKey().getNomina()), dto.getKey().getIdDeduccion()));
-			model.setTipoDeduccion(new TipoDeduccionDAO().getModel(dto.getTipoDeduccion()));
+//			model.setTipoDeduccion(new TipoDeduccionDAO().getModel(dto.getTipoDeduccion()));
 			model.setClave(dto.getClave());
 			model.setNombre(dto.getNombre());
 			model.setImporte(dto.getImporte());
@@ -44,12 +45,12 @@ public class NominaDeduccionDAO extends DAO<NominaDeduccionDTO, DetNominaDeducci
 		return model;
 	}
 	
-	public List<NominaDeduccionDTO> getDTOList(List<DetNominaDeduccion> modelList) {
-		List<NominaDeduccionDTO> dtoList = null;
+	public List<NominaDeduccion> getDTOList(List<DetNominaDeduccion> modelList) {
+		List<NominaDeduccion> dtoList = null;
 		try {
 			dtoList = new ArrayList<>();
 			for(DetNominaDeduccion model: modelList) {
-				NominaDeduccionDTO dto = this.getDTO(model);
+				NominaDeduccion dto = this.getDTO(model);
 				dtoList.add(dto);
 			}
 		} catch(Exception ex) {
@@ -59,25 +60,25 @@ public class NominaDeduccionDAO extends DAO<NominaDeduccionDTO, DetNominaDeducci
 	}
 
 	@Override
-	public NominaDeduccionDTO buscarPorId(DetNominaDeduccionPK id, boolean isFullInfo) {
+	public NominaDeduccion buscarPorId(DetNominaDeduccionPK id, boolean isFullInfo) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<NominaDeduccionDTO> buscarTodos() {
+	public List<NominaDeduccion> buscarTodos() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<NominaDeduccionDTO> buscarActivo() {
+	public List<NominaDeduccion> buscarActivo() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<NominaDeduccionDTO> buscarPorCriterios(NominaDeduccionDTO dto) {
+	public List<NominaDeduccion> buscarPorCriterios(NominaDeduccion dto) {
 		// TODO Auto-generated method stub
 		return null;
 	}

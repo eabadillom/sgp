@@ -115,6 +115,7 @@ public class PrestamoDAO extends IBaseDAO<PrestamoDTO, Integer>{
 			for(DetPrestamo model : result) {
 				log.debug("Tipo prestamo: {}", model.getTipoPrestamo().getTipoPrestamo());
 				log.debug("Periodicidad: {}", model.getPeriodicidadPago().getPeriodicidad());
+				log.debug("Tipo deduccion{}", model.getTipoPrestamo().getTipoDeduccion().getClave());
 				PrestamoDTO dto = getDTO(model);
 				list.add(dto);
 			}

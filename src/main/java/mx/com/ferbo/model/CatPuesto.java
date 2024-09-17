@@ -1,6 +1,7 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -19,6 +20,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "cat_puesto")
 @NamedQueries({
+	@NamedQuery(name = "CatPuesto.findActive", query = "SELECT c FROM CatPuesto c WHERE c.activo = 1 "),
     @NamedQuery(name = "CatPuesto.findAll", query = "SELECT new mx.com.ferbo.dto.CatPuestoDTO("
             + " c.idPuesto,"
             + " c.descripcion,"
@@ -83,4 +85,26 @@ public class CatPuesto implements Serializable {
     public void setActivo(short activo) {
         this.activo = activo;
     }
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(idPuesto);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CatPuesto other = (CatPuesto) obj;
+		return Objects.equals(idPuesto, other.idPuesto);
+	}
+
+	@Override
+	public String toString() {
+		return "CatPuesto [idPuesto=" + idPuesto + ", descripcion=" + descripcion + ", activo=" + activo + "]";
+	}
 }

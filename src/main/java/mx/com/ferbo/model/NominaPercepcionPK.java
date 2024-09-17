@@ -1,16 +1,16 @@
-package mx.com.ferbo.dto;
+package mx.com.ferbo.model;
 
 import java.util.Objects;
 
-public class NominaPercepcionDTOPK {
+public class NominaPercepcionPK {
 	
 	private Integer idPercepcion;
-	private NominaDTO nomina;
+	private Nomina nomina;
 	
-	public NominaPercepcionDTOPK() {
+	public NominaPercepcionPK() {
 		
 	}
-	public NominaPercepcionDTOPK(Integer idPercepcion, NominaDTO nomina) {
+	public NominaPercepcionPK(Integer idPercepcion, Nomina nomina) {
 		this.idPercepcion = idPercepcion;
 		this.nomina = nomina;
 	}
@@ -20,10 +20,10 @@ public class NominaPercepcionDTOPK {
 	public void setIdPercepcion(Integer idPercepcion) {
 		this.idPercepcion = idPercepcion;
 	}
-	public NominaDTO getNomina() {
+	public Nomina getNomina() {
 		return nomina;
 	}
-	public void setNomina(NominaDTO nomina) {
+	public void setNomina(Nomina nomina) {
 		this.nomina = nomina;
 	}
 	@Override
@@ -38,7 +38,7 @@ public class NominaPercepcionDTOPK {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		NominaPercepcionDTOPK other = (NominaPercepcionDTOPK) obj;
+		NominaPercepcionPK other = (NominaPercepcionPK) obj;
 		return Objects.equals(idPercepcion, other.idPercepcion) && Objects.equals(nomina, other.nomina);
 	}
 	@Override

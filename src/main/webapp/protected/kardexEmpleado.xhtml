@@ -22,7 +22,7 @@
                     <div class="pl-2 pr-2 pt-0 pb-0">
                         <p:divider id="dvd" align="center" class="mb-0">
                             <h:graphicImage id="imgEmpleado" value="#{kardexBean.empleadoFoto.fotografia}" 
-                                            style="vertical-align: middle;width: auto; height: 8rem; border-radius: 30%;" pt:data-zoom-src="#{kardexBean.empleadoSelected.fotografia}"/>
+                                            style="vertical-align: middle;width: auto; height: 8rem; border-radius: 30%;" pt:data-zoom-src="#{kardexBean.empleadoFoto.fotografia}"/>
                             <pe:imageZoom for="imgEmpleado"/>
                         </p:divider>
                     </div>
@@ -31,27 +31,27 @@
                             <div class="ui-fluid formgrid grid">
                                 <div class="field col-12 md:col-4">
                                     <p:outputLabel for="@next" value="Nombre"/>
-                                    <p:inputText id="nombre" value="#{kardexBean.empleadoSelected.nombre}" readonly="true"/>
+                                    <p:inputText id="nombre" value="#{kardexBean.empleado.nombre}" readonly="true"/>
                                 </div>
                                 <div class="field col-12 md:col-4">
                                     <p:outputLabel for="@next" value="Primer Apellido" />
-                                    <p:inputText id="pAp" value="#{kardexBean.empleadoSelected.primerAp}" readonly="true"/>
+                                    <p:inputText id="pAp" value="#{kardexBean.empleado.primerAp}" readonly="true"/>
                                 </div>
                                 <div class="field col-12 md:col-4">
                                     <p:outputLabel for="@next" value="Segundo Apellido" />
-                                    <p:inputText id="sAp" value="#{kardexBean.empleadoSelected.segundoAp}" readonly="true"/>
+                                    <p:inputText id="sAp" value="#{kardexBean.empleado.segundoAp}" readonly="true"/>
                                 </div>
                                 <div class="field col-12 md:col-4">
                                     <p:outputLabel for="@next" value="CURP" />
-                                    <p:inputText id="curp" value="#{kardexBean.empleadoSelected.curp}" readonly="true"/>
+                                    <p:inputText id="curp" value="#{kardexBean.empleado.curp}" readonly="true"/>
                                 </div>
                                 <div class="field col-12 md:col-4">
                                     <p:outputLabel for="@next" value="Fecha de nacimiento" />
-                                    <p:calendar id="fNac" value="#{kardexBean.empleadoSelected.fechaNacimiento}" readonly="true"/>
+                                    <p:calendar id="fNac" value="#{kardexBean.empleado.fechaNacimiento}" readonly="true"/>
                                 </div>
                                 <div class="field col-12 md:col-4">
                                     <p:outputLabel for="@next" value="Correo" />
-                                    <p:inputText id="sCorreo" value="#{kardexBean.empleadoSelected.correo}" readonly="true"/>
+                                    <p:inputText id="sCorreo" value="#{kardexBean.empleado.correo}" readonly="true"/>
                                 </div>
                             </div>
                         </p:fieldset>
@@ -61,31 +61,31 @@
                             <div class="ui-fluid formgrid grid">
                                 <div class="field col-12 md:col-4">
                                     <p:outputLabel for="@next" value="# Empleado"/>
-                                    <p:inputText id="nEmpleado" value="#{kardexBean.empleadoSelected.numEmpleado}" readonly="true"/>
+                                    <p:inputText id="nEmpleado" value="#{kardexBean.empleado.numEmpleado}" readonly="true"/>
                                 </div>
                                 <div class="field col-12 md:col-4">
                                     <p:outputLabel for="@next" value="NSS" />
-                                    <p:inputText id="nss" value="#{kardexBean.empleadoSelected.datoEmpresa.nss}" readonly="true"/>
+                                    <p:inputText id="nss" value="#{kardexBean.empleado.datoEmpresa.nss}" readonly="true"/>
                                 </div>
                                 <div class="field col-12 md:col-4">
                                     <p:outputLabel for="@next" value="Fecha de ingreso" />
-                                    <p:calendar id="fIngreso" value="#{kardexBean.empleadoSelected.datoEmpresa.fechaIngreso}" readonly="true"/>
+                                    <p:calendar id="fIngreso" value="#{kardexBean.empleado.datoEmpresa.fechaIngreso}" readonly="true"/>
                                 </div>
                                 <div class="field col-12 md:col-4">
                                     <p:outputLabel for="@next" value="Empresa" />
-                                    <p:inputText value="#{kardexBean.empleadoSelected.datoEmpresa.empresa.razonSocial}" readonly="true" />
+                                    <p:inputText value="#{kardexBean.empleado.datoEmpresa.empresa.razonSocial}" readonly="true" />
                                 </div>
                                 <div class="field col-12 md:col-4">
                                     <p:outputLabel for="@next" value="Puesto" />
-                                    <p:inputText value="#{kardexBean.empleadoSelected.datoEmpresa.puesto.descripcion}" readonly="true" />
+                                    <p:inputText value="#{kardexBean.empleado.datoEmpresa.puesto.descripcion}" readonly="true" />
                                 </div>
                                 <div class="field col-12 md:col-4">
                                     <p:outputLabel for="@next" value="Área" />
-                                    <p:inputText value="#{kardexBean.empleadoSelected.datoEmpresa.area.descripcion}" readonly="true" />
+                                    <p:inputText value="#{kardexBean.empleado.datoEmpresa.area.descripcion}" readonly="true" />
                                 </div>
                                 <div class="field col-12 md:col-4">
                                     <p:outputLabel for="@next" value="Ubicación" />
-                                    <p:inputText value="#{kardexBean.empleadoSelected.datoEmpresa.planta.descripcion}" readonly="true"></p:inputText>
+                                    <p:inputText value="#{kardexBean.empleado.datoEmpresa.planta.descripcion}" readonly="true"></p:inputText>
                                 </div>
                             </div>
                         </p:fieldset>

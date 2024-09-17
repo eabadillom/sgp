@@ -15,6 +15,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import mx.com.ferbo.model.sat.CatEntidadFederativa;
+import mx.com.ferbo.model.sat.CatRiesgoPuesto;
 import mx.com.ferbo.model.sat.CatTipoContrato;
 import mx.com.ferbo.model.sat.CatTipoJornada;
 import mx.com.ferbo.model.sat.CatTipoRegimen;
@@ -85,6 +87,26 @@ public class InfDatoEmpresa implements Serializable {
 	@Basic(optional = true)
 	@Column(name = "nu_tolerancia")
 	private Integer minutosTolerancia;
+	
+	@Basic(optional = true)
+	@Column(name = "nu_cp")
+	private String codigoPostal;
+	
+	@ManyToOne
+	@JoinColumn(name = "cd_estado", referencedColumnName = "cd_estado")
+	private CatEntidadFederativa entidadFederativa;
+	
+	@ManyToOne
+	@JoinColumn(name = "cd_riesgo", referencedColumnName = "cd_riesgo")
+	private CatRiesgoPuesto riesgoPuesto;
+	
+	@ManyToOne
+	@JoinColumn(name = "cd_periodicidad", referencedColumnName = "periodicidad")
+	private CatPeriodicidadPago periodicidadPago;
+	
+	@Basic(optional = true)
+	@Column(name = "st_sindicalizado")
+	private Boolean sindicalizado;
 	
 	
 	public Integer getId() {
@@ -197,5 +219,35 @@ public class InfDatoEmpresa implements Serializable {
 		return "{\"id\":\"" + id + "\", \"perfil\":\"" + perfil + "\", \"fechaIngreso\":\"" + fechaIngreso
 				+ "\", \"nss\":\"" + nss + "\", \"rfc\":\"" + rfc + "\", \"salarioDiario\":\"" + salarioDiario
 				+ "\", \"horaEntrada\":\"" + horaEntrada + "\", \"minutosTolerancia\":\"" + minutosTolerancia + "\"}";
+	}
+	public String getCodigoPostal() {
+		return codigoPostal;
+	}
+	public void setCodigoPostal(String codigoPostal) {
+		this.codigoPostal = codigoPostal;
+	}
+	public CatEntidadFederativa getEntidadFederativa() {
+		return entidadFederativa;
+	}
+	public void setEntidadFederativa(CatEntidadFederativa entidadFederativa) {
+		this.entidadFederativa = entidadFederativa;
+	}
+	public CatRiesgoPuesto getRiesgoPuesto() {
+		return riesgoPuesto;
+	}
+	public void setRiesgoPuesto(CatRiesgoPuesto riesgoPuesto) {
+		this.riesgoPuesto = riesgoPuesto;
+	}
+	public CatPeriodicidadPago getPeriodicidadPago() {
+		return periodicidadPago;
+	}
+	public void setPeriodicidadPago(CatPeriodicidadPago periodicidadPago) {
+		this.periodicidadPago = periodicidadPago;
+	}
+	public Boolean getSindicalizado() {
+		return sindicalizado;
+	}
+	public void setSindicalizado(Boolean sindicalizado) {
+		this.sindicalizado = sindicalizado;
 	}
 }

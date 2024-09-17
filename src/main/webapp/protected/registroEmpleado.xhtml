@@ -30,14 +30,17 @@
 
     <ui:define name="content">
         <h:form id="formRegistroEmpleado">
+			<p:growl id="messages" showDetail="true" life="2500"/>
+			<p:dialog modal="true" widgetVar="statusInfoDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+					<i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
+			</p:dialog>
             <div class="grid table-demo">
                 <div class="col-12">
                     <div class="card p-4">
-
-                        <p:growl id="messages" showDetail="true" life="2500"/>
                          <p:blockUI block="formRegistroEmpleado:dialogBiometrico" widgetVar="bui"/>
                          <p:remoteCommand name="verificaEstado" onstart="PF('bui').hide();" actionListener="#{registroEmpleadosBean.validaHuella()}"/>
-
                         <p:toolbar styleClass="mb-4">
                             <p:toolbarGroup>
                                 <p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{registroEmpleadosBean.agregarEmpleado()}" update="panelDialogEmpleado" oncomplete="PF('dialogEmpleado').show()" 
@@ -56,7 +59,7 @@
 
                         <p:dataTable id="dtEmpleados" widgetVar="dtEmpleados" var="empleado" value="#{registroEmpleadosBean.lstEmpleados}" reflow="true" styleClass="products-table"
                                      selection="#{registroEmpleadosBean.lstEmpleadosSelected}" rowKey="#{empleado.idEmpleado}" paginator="true" rows="10" rowSelectMode="add" 
-                                     paginatorPosition="bottom">
+                                     paginatorPosition="bottom" lazy="true">
                             <f:facet name="header">
                                 <div class="customers-table-header">
                                     <span style="font-weight: bold">Empleados</span>
@@ -92,7 +95,7 @@
                             	<h:outputText value="#{empleado.activo}"></h:outputText>
                             </p:column>
                             <p:column exportable="false">
-                                <p:commandButton action="#{registroEmpleadosBean.editar}" process="@this" update=":formRegistroEmpleado:panelDialogEmpleado" oncomplete="PF('dialogEmpleado').show();" icon="pi pi-pencil" styleClass="edit-button rounded-button ui-button-warning m-1">
+                                <p:commandButton action="#{registroEmpleadosBean.editar}" process="@this" update=":formRegistroEmpleado:panelDialogEmpleado formRegistroEmpleado:panelDialogEmpleado:previewFingerprint1" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dialogEmpleado').show();" icon="pi pi-pencil" styleClass="edit-button rounded-button ui-button-warning m-1">
                                     <f:setPropertyActionListener value="#{empleado}" target="#{registroEmpleadosBean.empleadoSelected}" />
                                 </p:commandButton>
                                 <p:commandButton class="ui-button-danger rounded-button m-1" icon="pi pi-trash" process="@this" oncomplete="PF('dialogEliminarEmpleado').show()" >
@@ -104,8 +107,10 @@
                             </p:column>
                         </p:dataTable>
                         
-                        <p:dialog header="Empleado" showEffect="fade" modal="true" widgetVar="dialogEmpleado" responsive="true" draggable="true" resizable="true">
+                        <p:dialog header="Información del empleado..."
+                        showEffect="fade" modal="true" widgetVar="dialogEmpleado" responsive="true" draggable="true" resizable="false" width="100%" height="90%" position="center center">
 							<p:tabView id="panelDialogEmpleado" title="Información del empleado" class="ui-fluid" dynamic="true" cache="true">
+								<p:ajax event="tabChange" update="formRegistroEmpleado:panelDialogEmpleado formRegistroEmpleado:panelDialogEmpleado:previewFotografia" listener="#{registroEmpleadosBean.tabChange}" oncomplete="PF('dialogEmpleado').initPosition();"/>
 								<p:tab title="Datos Personales">
 							        <div class="formgrid grid">
 							            <div class="field col-4">
@@ -251,31 +256,74 @@
 												<p:outputLabel for="@next" value="Tolerancia (minutos)"></p:outputLabel>
 												<p:inputNumber value="#{registroEmpleadosBean.datoEmpresa.minutosTolerancia}"></p:inputNumber>
 											</div>
+											<div class="field col-12 md:col-3">
+												<p:outputLabel for="@next" value="Código Postal"/>
+												<p:inputText value="#{registroEmpleadosBean.datoEmpresa.codigoPostal}" maxlength="5">
+													<p:ajax process="@this" />
+												</p:inputText>
+											</div>
+											<div class="field col-12 md:col-3">
+												<p:outputLabel for="@next" value="Entidad Federativa" />
+												<p:selectOneMenu id="soEntidadFederativa" value="#{registroEmpleadosBean.datoEmpresa.entidadFederativa}" autoWidth="false" converter="entityConverter">
+													<f:selectItem itemLabel="--Seleccione--" noSelectionOption="true"/>
+													<f:selectItems value="#{registroEmpleadosBean.entidadesFederativas}" var="entidad" itemLabel="#{entidad.clave} - #{entidad.nombre}" itemValue="#{entidad}"/>
+												</p:selectOneMenu>
+											</div>
+											<div class="field col-12 md:col-3">
+												<p:outputLabel for="@next" value="Riesgo puesto" />
+												<p:selectOneMenu id="soRiesgoPuesto" value="#{registroEmpleadosBean.datoEmpresa.riesgoPuesto}" autoWidth="false" converter="entityConverter">
+													<f:selectItem itemLabel="--Seleccione--" noSelectionOption="true"/>
+													<f:selectItems value="#{registroEmpleadosBean.riesgosPuesto}" var="riesgo" itemLabel="#{riesgo.clave} - #{riesgo.descripcion}"/>
+												</p:selectOneMenu>
+											</div>
+											<div class="field col-12 md:col-3">
+												<p:outputLabel for="@next" value="Periodicidad de pago" />
+												<p:selectOneMenu id="soPeriodicidadPago" value="#{registroEmpleadosBean.datoEmpresa.periodicidadPago}" autoWidth="false" converter="entityConverter">
+													<f:selectItem itemLabel="--Seleccione--" noSelectionOption="true"/>
+													<f:selectItems value="#{registroEmpleadosBean.periodicidadesPago}" var="periodicidad" itemLabel="#{periodicidad.periodicidad} - #{periodicidad.descripcion}" itemValue="#{periodicidad}"/>
+												</p:selectOneMenu>
+											</div>
+											<div class="field col-12 md:col-1">
+												<p:outputLabel for="@next" value="Sindicalizado"/>
+												<p:selectBooleanButton value="#{registroEmpleadosBean.datoEmpresa.sindicalizado}" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem" />
+											</div>
 										</div>
 									</div>
 								</p:tab>
 								<p:tab title="Datos Biometricos">
-									<p:panelGrid columns="2">
-										<p:card>
-							               <div class="field column">
-							                   <p:commandButton value="Fotografía" icon="pi pi-camera" process="@this" immediate="true" update="formRegistroEmpleado:photo" oncomplete="PF('dialogFotografia').show();" />
-							               </div>
-							               <div class="field column">
-							                   <p:commandButton value="Biométrico" icon="pi pi-sync" process="@this" actionListener="#{registroEmpleadosBean.consultaBiometrico()}" immediate="true"/>
-							                </div>
-										</p:card>
-										<p:card>
-											<div class="card">
-												<p:graphicImage height="150" value="#{registroEmpleadosBean.empleadoSelected.empleadoFoto.fotografia}"/>
-												<!-- <h:graphicImage value="#{registroEmpleadosBean.empleadoSelected.empleadoFoto.fotografia}" style="border-radius: 30%;width: auto; height: 7rem;"/> -->
-											</div>
-										</p:card>
-									</p:panelGrid>
+									<div align="center">
+										<p:panelGrid columns="2">
+											<p:card>
+												<div class="field column">
+													<p:panelGrid columns="2">
+														<p:outputPanel id="previewFingerprint1">
+															<p:graphicImage rendered="#{empty registroEmpleadosBean.detBiometrico.huella}" name="images/huella/finger_print_01.png" library="recursos" style="max-height: 14rem;"/>
+		                                        			<p:graphicImage rendered="#{not empty registroEmpleadosBean.detBiometrico.huella}" name="images/huella/finger_print_02.png" library="recursos" style="max-height: 14rem;"/>
+														</p:outputPanel>
+														<p:outputPanel id="previewFingerprint2">
+															<p:graphicImage rendered="#{registroEmpleadosBean.detBiometrico eq null}" name="images/huella/finger_print_01.png" library="recursos" style="max-height: 14rem;"/>
+		                                        			<p:graphicImage rendered="#{registroEmpleadosBean.detBiometrico.huella2 ne null}" name="images/huella/finger_print_02.png" library="recursos" style="max-height: 14rem;"/>
+														</p:outputPanel>
+													</p:panelGrid>
+													<p:commandButton value="Capturar biométricos" icon="pi pi-sync" process="@this" actionListener="#{registroEmpleadosBean.consultaBiometrico()}" immediate="true"/>
+												</div>
+											</p:card>
+											<p:card>
+												<div class="card">
+													<p:outputPanel id="previewFotografia">
+														<p:graphicImage rendered="#{empty registroEmpleadosBean.empleadoFoto.fotografia}" library="recursos" name="images/user-icon.png" style="height: 15rem;" />
+														<img src="#{registroEmpleadosBean.empleadoFoto.fotografia}" style="height: 15rem;"/>
+													</p:outputPanel>
+													<p:commandButton value="Tomar fotografía" icon="pi pi-camera" process="@this" immediate="true" update="formRegistroEmpleado:photo" oncomplete="PF('dialogFotografia').show();" />
+												</div>
+											</p:card>
+										</p:panelGrid>
+									</div>
 								</p:tab>
 							</p:tabView>
 							
                             <f:facet name="footer">
-                                <p:commandButton value="Guardar" icon="pi pi-save" actionListener="#{registroEmpleadosBean.guardarEmpleado()}" process="panelDialogEmpleado @this" />
+                                <p:commandButton value="Guardar" icon="pi pi-save" actionListener="#{registroEmpleadosBean.guardarEmpleado()}" process="panelDialogEmpleado @this" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
                                 <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogEmpleado').hide()" class="ui-button-secondary" resetValues="true"/>
                             </f:facet>
                         </p:dialog> 
@@ -285,16 +333,17 @@
                                 <h:panelGrid columns="3" cellpadding="5">
                                     <p:photoCam id="foto" widgetVar="pc" listener="#{registroEmpleadosBean.oncapture}"/>
                                     <p:outputPanel id="photo">
-                                        <img src="#{registroEmpleadosBean.empleadoSelected.empleadoFoto.fotografia}"/>
+                                    	<p:graphicImage rendered="#{not empty registroEmpleadosBean.empleadoFoto.fotografia}" library="recursos" name="images/user-icon.png" style="max-width: 100px;"></p:graphicImage>
+                                        <img src="#{registroEmpleadosBean.empleadoFoto.fotografia}"/>
                                     </p:outputPanel>
                                 </h:panelGrid>
                             </p:outputPanel>
                             <f:facet name="footer">
                                 <p:commandButton  value="Capture" icon="pi pi-camera" onclick="PF('pc').capture()" process="@this" 
                                                   update="formRegistroEmpleado:photo formRegistroEmpleado:btnAceptarFoto"/>
-                                <p:commandButton id="btnAceptarFoto" value="Aceptar" disabled="#{registroEmpleadosBean.empleadoSelected.fotografia eq null}" 
+                                <p:commandButton id="btnAceptarFoto" value="Aceptar" disabled="#{registroEmpleadosBean.empleadoFoto.fotografia eq null}" update="formRegistroEmpleado:panelDialogEmpleado"
                                                  oncomplete="PF('pc').detach();" class="ui-button-success" icon="pi pi-check" onclick="PF('dialogFotografia').hide()" process="@this"/>
-                                <p:commandButton value="Cancelar" icon="pi pi-times" actionListener="#{registroEmpleadosBean.empleadoSelected.setFotografia(null)}" onclick="PF('dialogFotografia').hide(); PF('pc').detach();" class="ui-button-secondary" />
+                                <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogFotografia').hide(); PF('pc').detach();" class="ui-button-secondary" />
                             </f:facet>
                         </p:dialog> 
 
@@ -322,16 +371,10 @@
                                 <p:commandButton value="Cancelar" class="ui-button-secondary" icon="pi pi-times" oncomplete="PF('dialogBiometrico').hide();" process="@this"/>
                             </f:facet>
                         </p:dialog> 
-
-
-
-
-
                         <p:confirmDialog widgetVar="dialogEliminarEmpleado" showEffect="fade" width="300" message="Eliminar el empleado?" header="Confirmar" severity="warn">
                             <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{registroEmpleadosBean.eliminaEmpleado()}" process="@this" oncomplete="PF('dialogEliminarEmpleado').hide()"/>
                             <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('dialogEliminarEmpleado').hide()" />
                         </p:confirmDialog>
-
                         <p:confirmDialog global="true" showEffect="fade" width="300">
                             <p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
                             <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary" icon="pi pi-times" />
@@ -339,7 +382,6 @@
                     </div>
                 </div>
             </div>
-
             <script>
                 $('.respresultado').hide();
                 $(".clean").click(function () {
@@ -402,15 +444,10 @@
                                         
                     var obj = new Object();
                     obj.tpAccion = TpAccion;
-                    //obj.FingerPrinToVerify = [];
                     var jsonString = JSON.stringify(obj);
                     request.send(jsonString);
                 }
-
-
             </script>      
-
         </h:form>
     </ui:define>
-
 </ui:composition>

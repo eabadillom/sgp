@@ -1,16 +1,16 @@
-package mx.com.ferbo.dto;
+package mx.com.ferbo.model;
 
 import java.math.BigDecimal;
 import java.util.Objects;
 
-import mx.com.ferbo.dto.sat.ConceptoDTO;
-import mx.com.ferbo.dto.sat.UnidadSATDTO;
+import mx.com.ferbo.model.sat.CatConcepto;
+import mx.com.ferbo.model.sat.CatUnidadSAT;
 
-public class NominaConceptoDTO {
+public class NominaConcepto {
 	private NominaConceptoPK key;
-	private ConceptoDTO concepto;
+	private CatConcepto concepto;
 	private BigDecimal cantidad;
-	private UnidadSATDTO unidad;
+	private CatUnidadSAT unidad;
 	private String nombreConcepto;
 	private String objetoImpuesto;
 	private BigDecimal valorUnitario;
@@ -23,10 +23,10 @@ public class NominaConceptoDTO {
 	public void setKey(NominaConceptoPK key) {
 		this.key = key;
 	}
-	public ConceptoDTO getConcepto() {
+	public CatConcepto getConcepto() {
 		return concepto;
 	}
-	public void setConcepto(ConceptoDTO concepto) {
+	public void setConcepto(CatConcepto concepto) {
 		this.concepto = concepto;
 	}
 	public BigDecimal getCantidad() {
@@ -35,10 +35,10 @@ public class NominaConceptoDTO {
 	public void setCantidad(BigDecimal cantidad) {
 		this.cantidad = cantidad;
 	}
-	public UnidadSATDTO getUnidad() {
+	public CatUnidadSAT getUnidad() {
 		return unidad;
 	}
-	public void setUnidad(UnidadSATDTO unidad) {
+	public void setUnidad(CatUnidadSAT unidad) {
 		this.unidad = unidad;
 	}
 	public String getNombreConcepto() {
@@ -83,7 +83,7 @@ public class NominaConceptoDTO {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		NominaConceptoDTO other = (NominaConceptoDTO) obj;
+		NominaConcepto other = (NominaConcepto) obj;
 		return Objects.equals(key, other.key);
 	}
 	@Override

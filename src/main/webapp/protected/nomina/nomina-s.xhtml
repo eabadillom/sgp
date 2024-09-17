@@ -7,8 +7,46 @@
 
 	<ui:define name="title">Nómina</ui:define>
 	<ui:define name="content">
+		<script>
+			PrimeFaces.locales['es'] = {
+				monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+				monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+				dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+				dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
+				dayNamesMin: ['D', 'L', 'M', 'X', 'J', 'V', 'S'],
+				weekHeader: 'Semana',
+				firstDay: 1,
+				isRTL: false,
+				showMonthAfterYear: false,
+				yearSuffix: '',
+				timeOnlyTitle: 'Sólo hora',
+				timeText: 'Tiempo',
+				hourText: 'Hora',
+				minuteText: 'Minuto',
+				secondText: 'Segundo',
+				millisecondText: 'Milisegundo',
+				ampm: false,
+				month: 'Mes',
+				week: 'Semana',
+				day: 'Día',
+				allDayText: 'Todo el día',
+				today: 'Hoy',
+				now: 'Ahora',
+				clear: 'Limpiar',
+				aria: {
+				   close: 'Cerrar',
+				   previous: 'Anterior',
+				   next: 'Siguiente',
+				}
+			};
+		</script>
 		<h:form id="formNomina">
 			<p:growl id="messages" showDetail="true" life="5000"/>
+			<p:dialog modal="true" widgetVar="statusInfoDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+					<i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
+			</p:dialog>
 			<p:toolbar>
 				<p:toolbarGroup>
 					<p:datePicker id="dp-periodo-inicio" value="#{nominaBean.periodoInicio}" placeholder="Periodo Inicio" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
@@ -24,17 +62,7 @@
 				</p:toolbarGroup>
 			</p:toolbar>
 			<div style="padding-top: 1rem;">
-				<p:dataTable id="dtNomina" widgetVar="dt-Nomina" var="nomina" value="#{nominaBean.listaNomina}" reflow="true" styleClass="products-table" rowKey="#{nomina.idEmpleado.idEmpleado}" rowSelectMode="add" paginatorPosition="bottom" scrollable="true" frozenColumns="2" editable="true" editMode="cell" editInitEvent="dblclick">
-					<p:ajax event="cellEdit" listener="#{nominaBean.onCellEdit}" update=":formNomina:messages"/>
-					<f:facet name="header">
-						<div class="customers-table-header">
-							<span style="font-weight: bold">Raya</span>
-							<span class="ui-input-icon-left filter-container">
-								<i class="pi pi-search"/>
-								<p:inputText id="globalFilter" onkeyup="PF('dt-Nomina').filter()" placeholder="Buscar"/>
-							</span>
-				        </div>
-				    </f:facet>
+				<p:dataTable id="dtNomina" widgetVar="dt-Nomina" var="nomina" value="#{nominaBean.listaNomina}" lazy="true" reflow="true" styleClass="products-table" rowSelectMode="add" paginatorPosition="bottom" scrollable="true">
 					<p:column headerText="Num" width="3rem">
 						<h:outputText value="#{nomina.receptor.numeroEmpleado}" />
 					</p:column>
@@ -43,17 +71,17 @@
 					</p:column>
 					<p:column headerText="Percepciones" width="4rem" style="text-align: right;">
 						<h:outputText value="#{nomina.subtotal}">
-							<f:convertNumber pattern="$#,000.00" />
+							<f:convertNumber pattern="$#,##0.00" />
 						</h:outputText>
 					</p:column>
 					<p:column headerText="Deducciones" width="4rem" style="text-align: right;">
 						<p:outputLabel value="#{nomina.descuento}">
-							<f:convertNumber pattern="$#,000.00" />
+							<f:convertNumber pattern="$#,##0.00" />
 						</p:outputLabel>
 					</p:column>
 					<p:column headerText="Neto" width="4rem" style="text-align: right;">
 						<p:outputLabel value="#{nomina.total}">
-							<f:convertNumber pattern="$#,000.00" />
+							<f:convertNumber pattern="$#,##0.00" />
 						</p:outputLabel>
 					</p:column>
 					<p:column width="2rem" style="text-align: right;">
@@ -62,7 +90,7 @@
 						</p:commandButton>
 					</p:column>
 					<f:facet name="footer" >
-						<p:commandButton value="Guardar" icon="pi pi-pencil" actionListener="#{nominaBean.guardarNominaEmpleado()}" disabled="#{nominaBean.listaNomina.size() eq 0}"/>
+						<p:commandButton value="Guardar" icon="pi pi-pencil" actionListener="#{nominaBean.guardarNominaEmpleado()}" disabled="#{empty nominaBean.listaNomina.size()}" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
 						<p:commandButton value="Exportar" icon="pi pi-upload" styleClass="ui-button-help" ajax="false">
 							<p:dataExporter type="csv" target="dtNomina" fileName="raya" preProcessor="#{nominaBean.exportNomina}"/>
 						</p:commandButton>
@@ -84,8 +112,9 @@
 				</p:outputPanel>
 			</p:dialog>
 			
-			<p:dialog id="dg-empleado" widgetVar="dgEmpleado" header="#{nominaBean.nomina.receptor.nombre}" modal="true" responsive="true">
-				<p:tabView class="ui-fluid" dynamic="true" cache="true">
+			<p:dialog id="dg-empleado" widgetVar="dgEmpleado" header="#{nominaBean.nomina.receptor.nombre}" modal="true" responsive="true" position="center top" height="100%" resizable="false">
+				<p:tabView id="tv-nomina" class="ui-fluid" dynamic="true" cache="true">
+					<p:ajax event="tabChange" oncomplete="PF('dgEmpleado').initPosition();"/>
 					<p:tab title="General">
 						<div class="ui-fluid formgrid grid">
 							<div class="field col-12 md:col-3">
@@ -106,15 +135,15 @@
 							</div>
 							<div class="field col-12 md:col-3">
 								<p:outputLabel value="Subtotal"/>
-								<p:inputText value="#{nominaBean.nomina.subtotal}" readonly="true"/>
+								<p:inputNumber value="#{nominaBean.nomina.subtotal}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," readonly="true"/>
 							</div>
 							<div class="field col-12 md:col-3">
 								<p:outputLabel value="Descuentos" />
-								<p:inputText value="#{nominaBean.nomina.descuento}" readonly="true"/>
+								<p:inputNumber value="#{nominaBean.nomina.descuento}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," readonly="true"/>
 							</div>
 							<div class="field col-12 md:col-3">
 								<p:outputLabel value="Total" />
-								<p:inputText value="#{nominaBean.nomina.total}" readonly="true"/>
+								<p:inputNumber value="#{nominaBean.nomina.total}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," readonly="true"/>
 							</div>
 						</div>
 					</p:tab>
@@ -161,7 +190,7 @@
 								</div>
 								<div class="field col-12 md:col-3">
 									<p:outputLabel value="Fecha inicio relación laboral" />
-									<p:inputText value="#{nominaBean.nomina.receptor.inicioRelacionLaboral}" readonly="true"/>
+									<p:datePicker value="#{nominaBean.nomina.receptor.inicioRelacionLaboral}" readonly="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
 								</div>
 								<div class="field col-12 md:col-3">
 									<p:outputLabel value="Jornada" />
@@ -181,11 +210,11 @@
 								</div>
 								<div class="field col-12 md:col-3">
 									<p:outputLabel value="Salario diario" />
-									<p:inputText value="#{nominaBean.nomina.receptor.salarioDiario}" readonly="true"/>
+									<p:inputNumber value="#{nominaBean.nomina.receptor.salarioDiario}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," readonly="true"/>
 								</div>
 								<div class="field col-12 md:col-3">
 									<p:outputLabel value="Salario diario integrado" />
-									<p:inputText value="#{nominaBean.nomina.receptor.salarioDiarioIntegrado}" readonly="true"/>
+									<p:inputNumber value="#{nominaBean.nomina.receptor.salarioDiarioIntegrado}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," readonly="true"/>
 								</div>
 							</div>
 						</p:outputPanel>
@@ -198,16 +227,23 @@
 							<p:column headerText="Descripción">
 								<p:outputLabel value="#{percepcion.nombre}" />
 							</p:column>
-							<p:column headerText="Importe">
-								<p:outputLabel value="$#{percepcion.importeGravado eq null ? percepcion.importeExcento : percepcion.importeGravado}"/>
+							<p:column headerText="Importe excento" width="10rem">
+								<p:inputNumber value="#{percepcion.importeExcento}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," readonly="#{not empty nominaBean.nomina.id}">
+									<p:ajax process="@this" update="formNomina:tv-nomina" event="change" listener="#{nominaBean.actualizar()}"/>
+								</p:inputNumber>
+							</p:column>
+							<p:column headerText="Importe gravado" width="10rem">
+								<p:inputNumber value="#{percepcion.importeGravado}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," readonly="#{not empty nominaBean.nomina.id}">
+									<p:ajax process="@this" update="formNomina:tv-nomina" event="change" listener="#{nominaBean.actualizar()}"/>
+								</p:inputNumber>
 							</p:column>
 							<f:facet name="footer">
 								<p:column colspan="2">
 									<p:outputLabel value="Total: "></p:outputLabel>
 								</p:column>
 								<p:column>
-									<p:outputLabel value="#{nominaBean.nomina.percepciones.stream().map(item-> (item.importeGravado == null ? item.importeExcento : item.importeGravado) ).sum()}">
-										<f:convertNumber pattern="$#,000.00" />
+									<p:outputLabel value="#{nominaBean.nomina.percepciones.stream().map(item-> (item.importeGravado.add(item.importeExcento) ) ).sum()}">
+										<f:convertNumber pattern="$ #,##0.00" />
 									</p:outputLabel>
 								</p:column>
 							</f:facet>
@@ -221,15 +257,10 @@
 							<p:column headerText="Descripción">
 								<p:outputLabel value="#{otroPago.nombre}" />
 							</p:column>
-							<p:column headerText="Importe">
-								<p:cellEditor>
-									<f:facet name="output">
-										<p:outputLabel value="#{otroPago.importe}" />
-									</f:facet>
-									<f:facet name="input">
-										<p:inputText value="#{otroPago.importe}" style="width: 100%;"/>
-									</f:facet>
-								</p:cellEditor>
+							<p:column headerText="Importe" width="10rem">
+								<p:inputNumber value="#{otroPago.importe}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," readonly="#{not empty nominaBean.nomina.id}">
+									<p:ajax process="@this" update="formNomina:tv-nomina" event="blur" listener="#{nominaBean.actualizar()}"/>
+								</p:inputNumber>
 							</p:column>
 							<f:facet name="footer">
 								<p:column colspan="2">
@@ -237,7 +268,7 @@
 								</p:column>
 								<p:column>
 									<p:outputLabel value="#{nominaBean.nomina.otrosPagos.stream().map(item->item.importe).sum()}">
-										<f:convertNumber pattern="$#,000.00" />
+										<f:convertNumber pattern="$ #,##0.00" />
 									</p:outputLabel>
 								</p:column>
 							</f:facet>
@@ -251,8 +282,10 @@
 							<p:column headerText="Descripción">
 								<p:outputLabel value="#{deduccion.nombre}" />
 							</p:column>
-							<p:column headerText="Importe">
-								<p:outputLabel value="$#{deduccion.importe}"/>
+							<p:column headerText="Importe" width="10rem">
+								<p:inputNumber value="#{deduccion.importe}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," readonly="#{not empty nominaBean.nomina.id}">
+									<p:ajax process="@this" update="formNomina:tv-nomina" event="blur" listener="#{nominaBean.actualizar()}"/>
+								</p:inputNumber>
 							</p:column>
 							<f:facet name="footer">
 								<p:column colspan="2">
@@ -260,13 +293,12 @@
 								</p:column>
 								<p:column>
 									<p:outputLabel value="#{nominaBean.nomina.deducciones.stream().map(item->item.importe).sum()}">
-										<f:convertNumber pattern="$#,000.00" />
+										<f:convertNumber pattern="$ #,##0.00" />
 									</p:outputLabel>
 								</p:column>
 							</f:facet>
 						</p:dataTable>
 					</p:tab>
-					
 				</p:tabView>
 			</p:dialog>
         </h:form>
