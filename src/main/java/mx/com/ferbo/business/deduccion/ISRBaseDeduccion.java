@@ -14,14 +14,14 @@ import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.util.SGPException;
 
-public class BaseISRDeduccion implements IDeduccion {
+public class ISRBaseDeduccion extends AbstractDeduccion implements IDeduccion {
 	
-	private static Logger log = LogManager.getLogger(BaseISRDeduccion.class);
+	private static Logger log = LogManager.getLogger(ISRBaseDeduccion.class);
 	
 	private TipoDeduccionDAO tipoDeduccionDAO = null;
 	private List<DetNominaPercepcion> percepciones = null;
 	
-	public BaseISRDeduccion(List<DetNominaPercepcion> percepciones) {
+	public ISRBaseDeduccion(List<DetNominaPercepcion> percepciones) {
 		this.percepciones = percepciones;
 	}
 
@@ -29,37 +29,34 @@ public class BaseISRDeduccion implements IDeduccion {
 	public DetNominaDeduccion calcular(DetNomina nomina, Integer index) {
 		DetNominaDeduccion deduccion = null;
 		CatTipoDeduccion tdISR = null;
-		BigDecimal isr = null;
+		BigDecimal baseISR = null;
 		
 		try {
 			if(this.percepciones == null)
 				throw new SGPException("No hay percepciones gravadas.");
 			
 			if(this.percepciones.size() == 0)
-				throw new SGPException("No hayy percepciones gravadas.");
+				throw new SGPException("No hay percepciones gravadas.");
 			
-			if(tipoDeduccionDAO == null)
-				tipoDeduccionDAO = new TipoDeduccionDAO();
+			tdISR = this.getTipoDeduccion("002");
 			
-			tdISR = this.tipoDeduccionDAO.buscarPorId("002");
-			
-			isr = this.percepciones.stream()
+			baseISR = this.percepciones.stream()
 					.map(item -> item.getImporteGravado())
 					.reduce(BigDecimal.ZERO, BigDecimal :: add);
 			
-			if(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP).compareTo(isr) > 0 )
+			if(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP).compareTo(baseISR) > 0 )
 				throw new SGPException("No hay percepciones gravadas.");
 			
 		} catch(Exception ex) {
 			log.error("Problema para obtener la base para el ISR...", ex);
-			isr = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+			baseISR = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 		} finally {
 			deduccion = new DetNominaDeduccion();
 			deduccion.setKey(new DetNominaDeduccionPK(nomina, index));
 			deduccion.setTipoDeduccion(tdISR);
 			deduccion.setClave("---");
 			deduccion.setNombre("Base I.S.R.");
-			deduccion.setImporte(isr);
+			deduccion.setImporte(baseISR);
 			deduccion.setProcesar(false);
 		}
 		

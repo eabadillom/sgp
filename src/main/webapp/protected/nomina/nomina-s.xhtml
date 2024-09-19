@@ -124,7 +124,7 @@
 			</p:dialog>
 			
 			<p:dialog id="dg-empleado" widgetVar="dgEmpleado" header="#{nominaBean.nomina.receptor.nombre}" modal="true" responsive="true" position="center top" height="100%" resizable="false">
-				<p:tabView id="tv-nomina" class="ui-fluid" dynamic="true" cache="true">
+				<p:tabView id="tv-nomina" class="ui-fluid" dynamic="true" cache="true" effect="drop">
 					<p:ajax event="tabChange" oncomplete="PF('dgEmpleado').initPosition();"/>
 					<p:tab title="General">
 						<div class="ui-fluid formgrid grid">
@@ -261,7 +261,7 @@
 						</p:dataTable>
 					</p:tab>
 					<p:tab title="Otros pagos">
-						<p:dataTable value="#{nominaBean.nomina.otrosPagos}" var="otroPago" paginator="true" rows="5" lazy="true">
+						<p:dataTable value="#{nominaBean.nomina.otrosPagos}" var="otroPago" paginator="true" paginatorPosition="bottom" rows="5" lazy="true">
 							<p:column headerText="SAT" width="4rem">
 								<p:outputLabel value="#{otroPago.tipoOtroPago.clave}" />
 							</p:column>
@@ -286,12 +286,12 @@
 						</p:dataTable>
 					</p:tab>
 					<p:tab title="Deducciones">
-						<p:dataTable value="#{nominaBean.nomina.deducciones}" var="deduccion" paginator="true" rows="5" lazy="true">
+						<p:dataTable value="#{nominaBean.nomina.deducciones}" var="deduccion" paginator="true" paginatorPosition="bottom" rows="5" lazy="true">
 							<p:column headerText="SAT" width="4rem">
 								<p:outputLabel value="#{deduccion.tipoDeduccion.clave}" />
 							</p:column>
 							<p:column headerText="Descripción">
-								<p:outputLabel value="#{deduccion.nombre}" />
+								<p:outputLabel value="#{deduccion.nombre}"/>
 							</p:column>
 							<p:column headerText="Importe" width="10rem">
 								<p:inputNumber value="#{deduccion.importe}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," readonly="#{not empty nominaBean.nomina.id}">

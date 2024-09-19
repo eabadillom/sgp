@@ -31,6 +31,8 @@ import mx.com.ferbo.dao.n.PeriodicidadPagoDAO;
 import mx.com.ferbo.dao.n.RegimenFiscalDAO;
 import mx.com.ferbo.dao.n.SubsidioDAO;
 import mx.com.ferbo.dao.n.TarifaISRDAO;
+import mx.com.ferbo.dao.n.TipoDeduccionDAO;
+import mx.com.ferbo.dao.n.TipoOtroPagoDAO;
 import mx.com.ferbo.dao.n.UnidadSATDAO;
 import mx.com.ferbo.dao.n.UsoCFDIDAO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
@@ -46,6 +48,8 @@ import mx.com.ferbo.model.DetNominaReceptor;
 import mx.com.ferbo.model.sat.CatConcepto;
 import mx.com.ferbo.model.sat.CatMetodoPago;
 import mx.com.ferbo.model.sat.CatRegimenFiscal;
+import mx.com.ferbo.model.sat.CatTipoDeduccion;
+import mx.com.ferbo.model.sat.CatTipoOtroPago;
 import mx.com.ferbo.model.sat.CatUnidadSAT;
 import mx.com.ferbo.model.sat.CatUsoCFDI;
 import mx.com.ferbo.util.DateUtils;
@@ -70,12 +74,16 @@ public class NominaBean implements Serializable {
     private PeriodicidadPagoDAO periodicidadDAO;
     private RegimenFiscalDAO regimenFiscalDAO;
     private UsoCFDIDAO usoCfdiDAO;
+    private TipoDeduccionDAO tipoDeduccionDAO = null;
+    private TipoOtroPagoDAO tipoOtroPagoDAO = null;
     
     private List<DetEmpleadoDTO> lstEmpleadosTmp;
     private List<CatEmpresa> lstEmpresas;
     private CatPercepciones parametrosPercepciones;
     private List<CatTarifaISR> tablaISRsemanal;
     private List<CatSubsidio> tablaSubsidioSemanal;
+    private List<CatTipoDeduccion> tiposDeduccion;
+    private List<CatTipoOtroPago> tiposOtroPago;
     private CatEmpresa empresaSelected;
     private DetNomina nomina;
     private CatMetodoPago metodoPago;
@@ -96,30 +104,32 @@ public class NominaBean implements Serializable {
 
     private List<DetNomina> listaNomina;
 
-    public NominaBean() {
-        log.info("====================== entrada constructor nominaBean ======================");
-        lstEmpleadosTmp = new ArrayList<>();
+	public NominaBean() {
+		log.info("====================== entrada constructor nominaBean ======================");
+		lstEmpleadosTmp = new ArrayList<>();
 
-        lstEmpresas = new ArrayList<>();
+		lstEmpresas = new ArrayList<>();
 
-        listaNomina = new ArrayList<>();
+		listaNomina = new ArrayList<>();
 
-        empleadoDAO = new EmpleadoDAO(DetEmpleado.class);
-        empresaDAO = new EmpresaDAO(CatEmpresa.class);
-        catPercepcionesDAO = new PercepcionesDAO(CatPercepciones.class);
-        tarifaISRDAO = new TarifaISRDAO(CatTarifaISR.class);
-        subsidioDAO = new SubsidioDAO(CatSubsidio.class);
-        nominaDAO = new NominaDAO(DetNomina.class);
-        metodoPagoDAO = new MetodoPagoDAO(CatMetodoPago.class);
-        conceptoDAO = new ConceptoDAO(CatConcepto.class);
-        unidadSATDAO = new UnidadSATDAO(CatUnidadSAT.class);
-        periodicidadDAO = new PeriodicidadPagoDAO(CatPeriodicidadPago.class);
-        regimenFiscalDAO = new RegimenFiscalDAO(CatRegimenFiscal.class);
-        usoCfdiDAO = new UsoCFDIDAO(CatUsoCFDI.class);
+		empleadoDAO = new EmpleadoDAO(DetEmpleado.class);
+		empresaDAO = new EmpresaDAO(CatEmpresa.class);
+		catPercepcionesDAO = new PercepcionesDAO(CatPercepciones.class);
+		tarifaISRDAO = new TarifaISRDAO(CatTarifaISR.class);
+		subsidioDAO = new SubsidioDAO(CatSubsidio.class);
+		nominaDAO = new NominaDAO(DetNomina.class);
+		metodoPagoDAO = new MetodoPagoDAO(CatMetodoPago.class);
+		conceptoDAO = new ConceptoDAO(CatConcepto.class);
+		unidadSATDAO = new UnidadSATDAO(CatUnidadSAT.class);
+		periodicidadDAO = new PeriodicidadPagoDAO(CatPeriodicidadPago.class);
+		regimenFiscalDAO = new RegimenFiscalDAO(CatRegimenFiscal.class);
+		usoCfdiDAO = new UsoCFDIDAO(CatUsoCFDI.class);
+		tipoDeduccionDAO = new TipoDeduccionDAO();
+		tipoOtroPagoDAO = new TipoOtroPagoDAO();
 
-        log.info("====================== salida constructor nominaBean ======================");
-        log.info("Largo de Lista constructor {}", listaNomina.size());
-    }
+		log.info("====================== salida constructor nominaBean ======================");
+		log.info("Largo de Lista constructor {}", listaNomina.size());
+	}
     
     @PostConstruct
     public void init() {
@@ -254,6 +264,8 @@ public class NominaBean implements Serializable {
     		this.periodicidad = this.periodicidadDAO.buscarPorId("02");
     		this.regimenFiscalReceptor = this.regimenFiscalDAO.buscarPorId("605");
     		this.usoCFDI = this.usoCfdiDAO.buscarPorId("CN01");
+    		this.tiposDeduccion = this.tipoDeduccionDAO.buscarTodos();
+    		this.tiposOtroPago = this.tipoOtroPagoDAO.buscarTodos();
     		
     		for (DetEmpleado empleado : listaEmpleados) {
     			nomina = this.procesaEmpleado(empleado);
@@ -280,6 +292,8 @@ public class NominaBean implements Serializable {
 		nominaSemanalBO.setPeriodicidad(this.periodicidad);
 		nominaSemanalBO.setRegimenFiscalReceptor(this.regimenFiscalReceptor);
 		nominaSemanalBO.setUsoCFDI(this.usoCFDI);
+		nominaSemanalBO.setTiposDeduccion(this.tiposDeduccion);
+		nominaSemanalBO.setTiposOtroPago(this.tiposOtroPago);
 		nomina = nominaSemanalBO.calculoNomina();
 		return nomina;
     }
