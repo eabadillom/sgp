@@ -9,6 +9,7 @@ import mx.com.ferbo.dto.CuotaIMSSDTO;
 import mx.com.ferbo.model.CatCuotaIMSSPK;
 import mx.com.ferbo.util.SGPException;
 
+@Deprecated
 public class CuotaIMSSDAO extends IBaseDAO<CuotaIMSSDTO, CatCuotaIMSSPK > {
 
 	@Override
