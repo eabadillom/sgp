@@ -3,10 +3,10 @@ package mx.com.ferbo.controller;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
@@ -14,9 +14,11 @@ import javax.inject.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.dao.CatImssCuotasDAO;
-import mx.com.ferbo.dto.CatImssCuotasDTO;
+import mx.com.ferbo.dao.n.CuotaIMSSDAO;
+import mx.com.ferbo.model.CatCuotaIMSS;
+import mx.com.ferbo.model.CatCuotaIMSSPK;
 import mx.com.ferbo.util.SGPException; 
+import org.primefaces.PrimeFaces;
 /**
  *
  * @author erale
@@ -28,76 +30,94 @@ public class CuotasImssBean implements Serializable {
     private static final long serialVersionUID = 1L;
     private static Logger log = LogManager.getLogger(CuotasImssBean.class); 
     
-    private Date fechaCap;
-    private CatImssCuotasDTO cuotaImssNueva;
-    private final CatImssCuotasDAO catImssCuotasDAO;
-    private List<CatImssCuotasDTO> cuotaImssSeleccionada;
-    private List<CatImssCuotasDTO> cuotasImss;
-    private String cuotaSelect;
+    private CatCuotaIMSS cuotaIMSSNueva;
+    private final CuotaIMSSDAO cuotaIMSSDAO;
+    private List<CatCuotaIMSS> cuotaIMSSSeleccionada;
+    private List<CatCuotaIMSS> cuotasIMSS;
 
-    public CuotasImssBean() {
-        cuotaImssSeleccionada = new ArrayList<>();
-        cuotasImss = new ArrayList<>();
-        catImssCuotasDAO = new CatImssCuotasDAO();
-        cuotasImss = catImssCuotasDAO.buscarTodos();
+    public CuotasImssBean() 
+    {
+        this.cuotaIMSSSeleccionada = new ArrayList<>();
+        this.cuotaIMSSDAO = new CuotaIMSSDAO();
     }
     
     @PostConstruct
-    public void init() {
-        cuotaImssNueva = new CatImssCuotasDTO();
-        cuotaImssSeleccionada = catImssCuotasDAO.buscarActivo();
+    public void init() 
+    {
+        this.cuotasIMSS = this.cuotaIMSSDAO.obtenerLista();
     }
     
-    public void crearCuotaImssNueva() {
+    public void actualizarListaCuotas()
+    {
+        this.cuotasIMSS = this.cuotaIMSSDAO.obtenerLista();
+    }
+    
+    public void crearCuotaIMSSNueva() {
         try {
-            if (!cuotaImssNueva.getCuota().equals("")) {
-                catImssCuotasDAO.guardar(cuotaImssNueva);
-                FacesContext.getCurrentInstance().getExternalContext().redirect("/sgp/protected/cuotasImss.xhtml");
+            if (this.cuotaIMSSNueva.getKey().getNumeroClave() == null) {
+                Integer numeroClave = this.obtenerNoClaveMax();
+                this.cuotaIMSSNueva.getKey().setNumeroClave(numeroClave);
+                this.cuotaIMSSDAO.guardar(this.cuotaIMSSNueva);
+                this.actualizarListaCuotas();
+                PrimeFaces.current().ajax().update("form:messages", "form:dt-percepcion");
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Cuota Añadida"));
+            }else{
+                this.cuotaIMSSDAO.actualizar(this.cuotaIMSSNueva);
+                PrimeFaces.current().ajax().update("form:messages", "form:dt-percepcion");
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Cuota Actualizada"));
             }
-        } catch (IOException | SGPException ex) {
-            log.warn("EX-0037: " + ex.getMessage() + ". Error al guardar las cuotas del IMSS. " + cuotaImssNueva.getCuota() != null ? cuotaImssNueva.getCuota() : null); 
+            PrimeFaces.current().executeScript("PF('manageProductDialog').hide()");
+        } catch (SGPException ex) {
+            log.warn("EX-0037: " + ex.getMessage() + ". Error al guardar las cuotas del IMSS. " + cuotaIMSSNueva.getCuota() != null ? cuotaIMSSNueva.getCuota() : null); 
         }
     }
     
-    //<editor-fold defaultstate="collapsed" desc="Getters&Setters"> 
-    public Date getFechaCap() {
-        return fechaCap;
+    public Integer obtenerNoClaveMax()
+    {
+        Integer maxNumero = 0;
+        Integer iterador = 0;
+        String clave = this.cuotaIMSSNueva.getKey().getClave();
+        
+        for(CatCuotaIMSS auxCatCuotaIMSS : this.cuotasIMSS)
+        {
+            if(auxCatCuotaIMSS.getKey().getClave().equals(clave))
+            {
+                iterador++;
+            }
+        }
+        
+        maxNumero = iterador;        
+        return maxNumero;
+    }
+    
+    public void openNew() {
+        this.cuotaIMSSNueva = new CatCuotaIMSS();
+        this.cuotaIMSSNueva.setKey(new CatCuotaIMSSPK());
+    }
+    
+    //<editor-fold defaultstate="collapsed" desc="Getters&Setters">
+    public CatCuotaIMSS getCuotaIMSSNueva() {
+        return cuotaIMSSNueva;
+    }
+    
+    public void setCuotaIMSSNueva(CatCuotaIMSS cuotaImssNueva) {
+        this.cuotaIMSSNueva = cuotaImssNueva;
     }
 
-    public void setFechaCap(Date fechaCap) {
-        this.fechaCap = fechaCap;
+    public List<CatCuotaIMSS> getCuotaIMSSSeleccionada() {
+        return cuotaIMSSSeleccionada;
     }
 
-    public CatImssCuotasDTO getCuotaImssNueva() {
-        return cuotaImssNueva;
+    public void setCuotaIMSSSeleccionada(List<CatCuotaIMSS> cuotaIMSSSeleccionada) {
+        this.cuotaIMSSSeleccionada = cuotaIMSSSeleccionada;
     }
 
-    public void setCuotaImssNueva(CatImssCuotasDTO cuotaImssNueva) {
-        this.cuotaImssNueva = cuotaImssNueva;
+    public List<CatCuotaIMSS> getCuotasIMSS() {
+        return cuotasIMSS;
     }
 
-    public List<CatImssCuotasDTO> getCuotaImssSeleccionada() {
-        return cuotaImssSeleccionada;
-    }
-
-    public void setCuotaImssSeleccionada(List<CatImssCuotasDTO> cuotaImssSeleccionada) {
-        this.cuotaImssSeleccionada = cuotaImssSeleccionada;
-    }
-
-    public List<CatImssCuotasDTO> getCuotasImss() {
-        return cuotasImss;
-    }
-
-    public void setCuotasImss(List<CatImssCuotasDTO> cuotasImss) {
-        this.cuotasImss = cuotasImss;
-    }
-
-    public String getCuotaSelect() {
-        return cuotaSelect;
-    }
-
-    public void setCuotaSelect(String cuotaSelect) {
-        this.cuotaSelect = cuotaSelect;
+    public void setCuotasIMSS(List<CatCuotaIMSS> cuotasIMSS) {
+        this.cuotasIMSS = cuotasIMSS;
     }
     //</editor-fold> 
 }
