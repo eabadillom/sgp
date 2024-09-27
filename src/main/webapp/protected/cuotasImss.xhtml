@@ -9,147 +9,108 @@
 
     <ui:define name="content">
         <h:form id="form">
-            <div class="grid crud-demo">
-                <div class="col-12">
-                    <div class="card">
-                        <p:growl id="messages" showDetail="true" />
-                        <p:toolbar styleClass="mb-4">
-                            <p:toolbarGroup>
-                                <p:commandButton value="Nuevo" icon="pi pi-plus" actionListener="#{cuotasImssBean.crearCuotaImssNueva()}" update="manage-cuotaImss-content" oncomplete="PF('manageCuotasImssDialog').show()" 
-                                                 styleClass="ui-button-success" style="margin-right: .5rem" />
-
-                            </p:toolbarGroup>
-                        </p:toolbar>
-                        <p:dataTable id="dt-imss" widgetVar="dtImss" var="cuotaImss" value="#{cuotasImssBean.cuotaImssSeleccionada}" reflow="true" 
-                                     rowKey="#{cuotaImss.idImssCuotas}" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
-                            <p:columnGroup type="header">
-                                <p:row>
-                                    <p:column headerText="Riesgos de Trabajo" style="text-align: center;" />
-                                    <p:column colspan="4" headerText="Enf. y Mat." style="text-align: center;" />
-                                    <p:column headerText="Inval. y Vida" style="text-align: center;" />
-                                    <p:column colspan="2" headerText="Retiro, Ces. en Edad Avanz. y Vejez" style="text-align: center;" />
-                                    <p:column headerText="Guar. y Prest. Soc." style="text-align: center;" />
-                                    <p:column rowspan="3" headerText="INFONAVIT" style="text-align: center;" />
-                                </p:row>
-                                <p:row>
-                                    <p:column headerText="En Especie y Dinero" style="text-align: center;" />
-                                    <p:column colspan="2" headerText="En Especie" style="text-align: center;" />
-                                    <p:column headerText="GM Pens. y Benef." style="text-align: center;" />
-                                    <p:column headerText="En Dinero" style="text-align: center;" />
-                                    <p:column headerText="En Esp. y Dinero" style="text-align: center;" />
-                                    <p:column headerText="Retiro" style="text-align: center;" />
-                                    <p:column headerText="Ces. Edad Avanz. y Vejez" style="text-align: center;" />
-                                    <p:column headerText="En Especie" style="text-align: center;" />
-                                </p:row>
-                                <p:row>
-                                    <p:column/>
-                                    <p:column headerText="Cuota Fija" style="text-align: center; width:1px;" />
-                                    <p:column headerText="Cuota Adicional" style="text-align: center; width:1px;" />
-                                    <p:column/>
-                                    <p:column/>
-                                    <p:column/>
-                                    <p:column/>
-                                    <p:column/>
-                                    <p:column/>
-                                </p:row>
-                            </p:columnGroup>
-                            <p:column>
-                                <h:outputText value="#{cuotaImss.riesgoTrabajo}" style="text-align: center;"/>
-                            </p:column>
-                            <p:column>
-                                <h:outputText value="#{cuotaImss.enfMatEspCtFija}" style="text-align: center;"/>
-                            </p:column>
-                            <p:column>
-                                <h:outputText value="#{cuotaImss.enfMatEspCtAd}" style="text-align: center;"/>
-                            </p:column>
-                            <p:column>
-                                <h:outputText value="#{cuotaImss.enfMatGastosMed}" style="text-align: center;"/>
-                            </p:column>
-                            <p:column>
-                                <h:outputText value="#{cuotaImss.enfMatDinero}" style="text-align: center;"/>
-                            </p:column>
-                            <p:column>
-                                <h:outputText value="#{cuotaImss.invVida}" style="text-align: center;"/>
-                            </p:column>
-                            <p:column>
-                                <h:outputText value="#{cuotaImss.retCesantiaVejezRetiro}" style="text-align: center;"/>
-                            </p:column>
-                            <p:column>
-                                <h:outputText value="#{cuotaImss.retCesantiaVejezCeav}" style="text-align: center;"/>
-                            </p:column>
-                            <p:column>
-                                <h:outputText value="#{cuotaImss.guarderia}" style="text-align: center;"/>
-                            </p:column>
-                            <p:column>
-                                <h:outputText value="#{cuotaImss.infonavit}" style="text-align: center;"/>
-                            </p:column>
-                        </p:dataTable>
-
-                        <p:dialog header="Cuotas Imss" showEffect="fade" modal="true" widgetVar="manageCuotasImssDialog" responsive="true">
-                            <p:outputPanel id="manage-cuotaImss-content" class="ui-fluid">
-                                <p:outputPanel rendered="#{not empty cuotasImssBean.cuotaImssNueva}">
-                                    <div class="field">
-                                        <p:outputLabel for="riesgoTrabajo">Riesgos de Trabajo</p:outputLabel>
-                                        <p:inputNumber id="riesgoTrabajo" value="#{cuotasImssBean.cuotaImssNueva.riesgoTrabajo}" required="true"/>
-                                    </div>
-                                    <div class="field">
-                                        <p:outputLabel for="enfMatEspCtFija">Enf. Mat. En Esp. Cuota fija</p:outputLabel>
-                                        <p:inputNumber id="enfMatEspCtFija" value="#{cuotasImssBean.cuotaImssNueva.enfMatEspCtFija}" required="true"/>
-                                    </div>
-                                    <div class="field">
-                                        <p:outputLabel for="enfMatEspCtAd">Enf. Mat. En Esp. Cuota adicional</p:outputLabel>
-                                        <p:inputNumber id="enfMatEspCtAd" value="#{cuotasImssBean.cuotaImssNueva.enfMatEspCtAd}" required="true"/>
-                                    </div>
-                                    <div class="field">
-                                        <p:outputLabel for="enfMatGastosMed">Enf. Mat. Gastos Med.</p:outputLabel>
-                                        <p:inputNumber id="enfMatGastosMed" value="#{cuotasImssBean.cuotaImssNueva.enfMatGastosMed}" required="true"/>
-                                    </div>
-                                    <div class="field">
-                                        <p:outputLabel for="enfMatDinero">Enf. Mat. En Dinero</p:outputLabel>
-                                        <p:inputNumber id="enfMatDinero" value="#{cuotasImssBean.cuotaImssNueva.enfMatDinero}" required="true"/>
-                                    </div>
-                                    <div class="field">
-                                        <p:outputLabel for="invVida">Invalidez y vida</p:outputLabel>
-                                        <p:inputNumber id="invVida" value="#{cuotasImssBean.cuotaImssNueva.invVida}" required="true"/>
-                                    </div>
-                                    <div class="field">
-                                        <p:outputLabel for="retCesantiaVejezRetiro">Retiro Cesantia y Vejez Retiro</p:outputLabel>
-                                        <p:inputNumber id="retCesantiaVejezRetiro" value="#{cuotasImssBean.cuotaImssNueva.retCesantiaVejezRetiro}" required="true"/>
-                                    </div>
-                                    <div class="field">
-                                        <p:outputLabel for="retCesantiaVejezCeav">Retiro Cesantia y Vejez Cesantía</p:outputLabel>
-                                        <p:inputNumber id="retCesantiaVejezCeav" value="#{cuotasImssBean.cuotaImssNueva.retCesantiaVejezCeav}" required="true"/>
-                                    </div>
-                                    <div class="field">
-                                        <p:outputLabel for="guarderia">Guardería en Especie</p:outputLabel>
-                                        <p:inputNumber id="guarderia" value="#{cuotasImssBean.cuotaImssNueva.guarderia}" required="true"/>
-                                    </div>
-                                    <div class="field">
-                                        <p:outputLabel for="infonavit">Infonavit</p:outputLabel>
-                                        <p:inputNumber id="infonavit" value="#{cuotasImssBean.cuotaImssNueva.infonavit}" required="true"/>
-                                    </div>
-                                    <div class="field">
-                                        <p:outputLabel for="cuota">Cuota</p:outputLabel>
-                                        <p:selectOneMenu id="cuota" value="#{cuotasImssBean.cuotaImssNueva.cuota}">
-                                            <f:selectItem itemLabel="Seleccione" itemValue=""/>
-                                            <f:selectItem itemLabel="Trabajador" itemValue="T"/>
-                                            <f:selectItem itemLabel="Patron" itemValue="P"/>
-                                        </p:selectOneMenu>
-                                    </div>
-                                </p:outputPanel>
-                            </p:outputPanel>
-
-                            <f:facet name="footer">
-                                <p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{cuotasImssBean.crearCuotaImssNueva}" update="manage-cuotaImss-content" process="manage-cuotaImss-content @this" />
-                                <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('manageCuotasImssDialog').hide()" class="ui-button-secondary" />
-                            </f:facet>
-                        </p:dialog>
-
-                    </div>
-                </div>
-            </div>
+            <p:growl id="messages" showDetail="true" />
+            <p:toolbar>
+                <p:toolbarGroup>
+                    <p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{cuotasImssBean.openNew}"
+                        update=":dialogs:manage-product-content" oncomplete="PF('manageProductDialog').show()"
+                        style="margin-right: .5rem" >
+                        <p:resetInput target=":dialogs:manage-product-content" />
+                    </p:commandButton>
+                </p:toolbarGroup>
+            </p:toolbar>
+            <p:dataTable id="dt-percepcion" widgetVar="dtPercepcion" var="cuotaImss" value="#{cuotasImssBean.cuotasIMSS}" reflow="true" styleClass="products-table"
+                         selection="#{cuotasImssBean.cuotaIMSSSeleccionada}" rowKey="#{cuotaImss.getKey().clave}" paginator="true" rows="10" paginatorPosition="bottom"
+                         lazy="true">
+                <p:column headerText="Clave" style="text-align: center;" width="4rem">
+                    <h:outputText value="#{cuotaImss.getKey().clave}" />
+                </p:column>
+                <p:column headerText="Descripción" style="text-align: center;" width="auto">
+                    <h:outputText value="#{cuotaImss.descripcion}" />
+                </p:column>
+                <p:column headerText="Base Salarial" style="text-align: center;" width="6rem">
+                    <h:outputText value="#{cuotaImss.baseSalarial}" />
+                </p:column>
+                <p:column headerText="Vigencia" style="text-align: center;" width="6rem">
+                    <h:outputText value="#{cuotaImss.vigencia}" >
+                        <f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
+                    </h:outputText>
+                </p:column>
+                <p:column exportable="false" ariaHeaderText="Actions" width="2rem">
+                    <p:commandButton icon="pi pi-bars" update=":dialogs:manage-product-content"
+                        oncomplete="PF('manageProductDialog').show()"
+                        styleClass="edit-button " process="@this">
+                        <f:setPropertyActionListener value="#{cuotaImss}" target="#{cuotasImssBean.cuotaIMSSNueva}" />
+                        <p:resetInput target=":dialogs:manage-product-content" />
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
         </h:form>
-
+        <h:form id="dialogs">
+            <p:dialog header="Detalles de la Cuota" showEffect="fade" modal="true" widgetVar="manageProductDialog"
+                      responsive="true" draggable="true" resizable="false" dynamic="true" style="margin: auto">
+                
+                    <p:outputPanel id="manage-product-content" class="ui-fluid" rendered="#{not empty cuotasImssBean.cuotaIMSSNueva}">
+                        <div class="field">
+                            <p:outputLabel for="@next">Clave</p:outputLabel>
+                            <p:inputText id="clave" value="#{cuotasImssBean.cuotaIMSSNueva.key.clave}" required="true" >
+                                <p:ajax process="@this"/>
+                            </p:inputText>
+                        </div>
+                        <div class="field">
+                            <p:outputLabel for="@next">Descripción</p:outputLabel>
+                            <p:inputText id="descripcion" value="#{cuotasImssBean.cuotaIMSSNueva.descripcion}" required="true" >
+                                <p:ajax process="@this"/>
+                            </p:inputText>
+                        </div>
+                        <div class="field">
+                            <p:outputLabel for="@next">Base Salarial</p:outputLabel>
+                            <p:inputText id="baseSalarial" value="#{cuotasImssBean.cuotaIMSSNueva.baseSalarial}" required="true" >
+                                <p:ajax process="@this"/>
+                            </p:inputText>
+                        </div>
+                        <div class="field">
+                            <p:outputLabel for="@next">Base Minimo</p:outputLabel>
+                            <p:inputText id="baseMinimo" value="#{cuotasImssBean.cuotaIMSSNueva.baseMinimo}" required="true" >
+                                <p:ajax process="@this"/>
+                            </p:inputText>
+                        </div>
+                        <div class="field">
+                            <p:outputLabel for="@next">Base Maximo</p:outputLabel>
+                            <p:inputText id="baseMaximo" value="#{cuotasImssBean.cuotaIMSSNueva.baseMaximo}" required="true" >
+                                <p:ajax process="@this"/>
+                            </p:inputText>
+                        </div>
+                        <div class="field">
+                            <p:outputLabel for="@next">Cuota</p:outputLabel>
+                            <p:inputText id="cuota" value="#{cuotasImssBean.cuotaIMSSNueva.cuota}" required="true" >
+                                <p:ajax process="@this"/>
+                            </p:inputText>
+                        </div>
+                        <div class="field">
+                            <p:outputLabel for="@next">Tipo Cuota</p:outputLabel>
+                            <p:inputText id="tipoCuota" value="#{cuotasImssBean.cuotaIMSSNueva.tipoCuota}" required="true" >
+                                <p:ajax process="@this"/>
+                            </p:inputText>
+                        </div>
+                        <div class="field">
+                            <p:outputLabel for="@next">Vigencia</p:outputLabel>
+                            <p:datePicker id="vigencia" value="#{cuotasImssBean.cuotaIMSSNueva.vigencia}" required="true" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
+                                <p:ajax process="@this"/>
+                            </p:datePicker>
+                        </div>
+                    </p:outputPanel>
+                
+                
+                <f:facet name="footer">
+                    <p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{cuotasImssBean.crearCuotaIMSSNueva}"
+                                     update="manage-product-content form:dt-percepcion" process="manage-product-content @this">
+                    </p:commandButton>
+                    <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('manageProductDialog').hide()"
+                        class="ui-button-secondary" type="button" />
+                </f:facet>
+            </p:dialog>
+        </h:form>
     </ui:define>
 
 </ui:composition>

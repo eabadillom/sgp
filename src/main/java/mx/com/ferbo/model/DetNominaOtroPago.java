@@ -42,7 +42,34 @@ public class DetNominaOtroPago implements Serializable {
 	@Column(name = "nu_importe", scale = 12, precision = 2)
 	@Basic(optional = false)
 	private BigDecimal importe;
+	
+	@Column(name = "st_procesar")
+	@Basic(optional = false)
+	private Boolean procesar;
 
+	@Override
+	public int hashCode() {
+		return Objects.hash(key);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DetNominaOtroPago other = (DetNominaOtroPago) obj;
+		return Objects.equals(key, other.key);
+	}
+	
+	@Override
+	public String toString() {
+		return "DetNominaOtroPago [key=" + key + ", clave=" + clave + ", nombre=" + nombre + ", importe=" + importe
+				+ "]";
+	}
+	
 	public DetNominaOtroPagoPK getKey() {
 		return key;
 	}
@@ -83,26 +110,12 @@ public class DetNominaOtroPago implements Serializable {
 		this.importe = importe;
 	}
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(key);
+
+	public Boolean getProcesar() {
+		return procesar;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		DetNominaOtroPago other = (DetNominaOtroPago) obj;
-		return Objects.equals(key, other.key);
-	}
-
-	@Override
-	public String toString() {
-		return "DetNominaOtroPago [key=" + key + ", clave=" + clave + ", nombre=" + nombre + ", importe=" + importe
-				+ "]";
+	public void setProcesar(Boolean procesar) {
+		this.procesar = procesar;
 	}
 }

@@ -235,5 +235,33 @@ public class AjustesBean implements Serializable {
 			e.getMessage();
 		}
 	}
-
+        
+        public void cuotaIMSS()
+        {
+            String path = null;
+            try
+            {
+                path = contextPath + "/protected/cuotasImss.xhtml";
+                FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+            }catch(Exception e)
+            {
+                e.getMessage();
+            }
+            
+        }
+        
+        public void uma()
+        {
+            String path = null;
+            try
+            {
+                path = contextPath + "/protected/settings/sistema/uma.xhtml";
+                FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+            }catch(Exception e)
+            {
+                e.getMessage();
+            }
+            
+        }
+        
 }

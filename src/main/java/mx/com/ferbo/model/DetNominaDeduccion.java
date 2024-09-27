@@ -42,6 +42,10 @@ public class DetNominaDeduccion implements Serializable {
 	@Column(name = "nu_importe", scale = 12, precision = 2)
 	@Basic(optional = false)
 	private BigDecimal importe;
+	
+	@Column(name = "st_procesar")
+	@Basic(optional = true)
+	private Boolean procesar;
 
 	public DetNominaDeduccionPK getKey() {
 		return key;
@@ -104,5 +108,13 @@ public class DetNominaDeduccion implements Serializable {
 	public String toString() {
 		return "DetNominaDeduccion [key=" + key + ", claveDeduccion=" + clave + ", nombreDeduccion="
 				+ nombre + ", importe=" + importe + "]";
+	}
+
+	public Boolean getProcesar() {
+		return procesar;
+	}
+
+	public void setProcesar(Boolean procesar) {
+		this.procesar = procesar;
 	}
 }

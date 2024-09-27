@@ -85,9 +85,16 @@
 						</p:outputLabel>
 					</p:column>
 					<p:column width="2rem" style="text-align: right;">
-						<p:commandButton icon="pi pi-bars" oncomplete="PF('dgEmpleado').show();" actionListener="#{nominaBean.cargaEmpleadoNomina}" process="@this" update="formNomina:dg-empleado">
-							<f:setPropertyActionListener value="#{nomina}" target="#{nominaBean.nomina}" />
-						</p:commandButton>
+						<!-- <span style="padding-left: 0.5rem; padding-right: 0.5rem;">
+							<p:commandButton icon="pi pi-save" process="@this">
+								<p:confirm header="Guardar" message="¿Está seguro que desea guardar la información de nómina?"  styleClass="mr-2" icon="pi pi-check"/>
+							</p:commandButton>
+						</span> -->
+						<span style="padding-left: 0.5rem; padding-right: 0.5rem;">
+							<p:commandButton icon="pi pi-bars" oncomplete="PF('dgEmpleado').show();" actionListener="#{nominaBean.cargaEmpleadoNomina}" process="@this" update="formNomina:dg-empleado">
+								<f:setPropertyActionListener value="#{nomina}" target="#{nominaBean.nomina}" />
+							</p:commandButton>
+						</span>
 					</p:column>
 					<f:facet name="footer" >
 						<p:commandButton value="Guardar" icon="pi pi-pencil" actionListener="#{nominaBean.guardarNominaEmpleado()}" disabled="#{empty nominaBean.listaNomina.size()}" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
@@ -96,6 +103,10 @@
 						</p:commandButton>
 					</f:facet>
 				</p:dataTable>
+				<!-- <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+		            <p:commandButton value="NO" type="button" styleClass="ui-confirmdialog-no ui-button-flat"/>
+		            <p:commandButton value="SI" type="button" styleClass="ui-confirmdialog-yes" />
+		        </p:confirmDialog> -->
 			</div>
 		
 			<p:dialog header="Seleccionar Empresa" showEffect="fade" modal="true" widgetVar="empresaDialog" responsive="true" draggable="false">
@@ -113,7 +124,7 @@
 			</p:dialog>
 			
 			<p:dialog id="dg-empleado" widgetVar="dgEmpleado" header="#{nominaBean.nomina.receptor.nombre}" modal="true" responsive="true" position="center top" height="100%" resizable="false">
-				<p:tabView id="tv-nomina" class="ui-fluid" dynamic="true" cache="true">
+				<p:tabView id="tv-nomina" class="ui-fluid" dynamic="true" cache="true" effect="drop">
 					<p:ajax event="tabChange" oncomplete="PF('dgEmpleado').initPosition();"/>
 					<p:tab title="General">
 						<div class="ui-fluid formgrid grid">
@@ -220,7 +231,7 @@
 						</p:outputPanel>
 					</p:tab>
 					<p:tab title="Percepciones">
-						<p:dataTable value="#{nominaBean.nomina.percepciones}" var="percepcion" paginator="true" rows="5" paginatorPosition="bottom" >
+						<p:dataTable value="#{nominaBean.nomina.percepciones}" var="percepcion" paginator="true" rows="5" paginatorPosition="bottom" lazy="true">
 							<p:column headerText="SAT" width="4rem">
 								<p:outputLabel value="#{percepcion.tipoPercepcion.clave}" />
 							</p:column>
@@ -250,7 +261,7 @@
 						</p:dataTable>
 					</p:tab>
 					<p:tab title="Otros pagos">
-						<p:dataTable value="#{nominaBean.nomina.otrosPagos}" var="otroPago">
+						<p:dataTable value="#{nominaBean.nomina.otrosPagos}" var="otroPago" paginator="true" paginatorPosition="bottom" rows="5" lazy="true">
 							<p:column headerText="SAT" width="4rem">
 								<p:outputLabel value="#{otroPago.tipoOtroPago.clave}" />
 							</p:column>
@@ -275,12 +286,12 @@
 						</p:dataTable>
 					</p:tab>
 					<p:tab title="Deducciones">
-						<p:dataTable value="#{nominaBean.nomina.deducciones}" var="deduccion">
+						<p:dataTable value="#{nominaBean.nomina.deducciones}" var="deduccion" paginator="true" paginatorPosition="bottom" rows="5" lazy="true">
 							<p:column headerText="SAT" width="4rem">
 								<p:outputLabel value="#{deduccion.tipoDeduccion.clave}" />
 							</p:column>
 							<p:column headerText="Descripción">
-								<p:outputLabel value="#{deduccion.nombre}" />
+								<p:outputLabel value="#{deduccion.nombre}"/>
 							</p:column>
 							<p:column headerText="Importe" width="10rem">
 								<p:inputNumber value="#{deduccion.importe}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," readonly="#{not empty nominaBean.nomina.id}">
@@ -292,7 +303,7 @@
 									<p:outputLabel value="Total: "></p:outputLabel>
 								</p:column>
 								<p:column>
-									<p:outputLabel value="#{nominaBean.nomina.deducciones.stream().map(item->item.importe).sum()}">
+									<p:outputLabel value="#{nominaBean.nomina.deducciones.stream().filter(d -> d.procesar).map(item->item.importe).sum()}">
 										<f:convertNumber pattern="$ #,##0.00" />
 									</p:outputLabel>
 								</p:column>
@@ -300,6 +311,10 @@
 						</p:dataTable>
 					</p:tab>
 				</p:tabView>
+				<f:facet name="footer">
+					<p:commandButton value="Guardar" icon="pi pi-save" actionListener="#{nominaBean.actualizarNomina}" process="@this" disabled="true" />
+					<p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dgEmpleado').hide();" styleClass="ui-button-outlined ui-button-secondary" />
+				</f:facet>
 			</p:dialog>
         </h:form>
     </ui:define>

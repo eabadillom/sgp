@@ -15,11 +15,13 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "cat_tipo_deduccion")
 @NamedQueries({
-    @NamedQuery(name = "CatTipoDeduccion.findByAll", query = "SELECT td FROM CatTipoDeduccion td")
+    @NamedQuery(name = "CatTipoDeduccion.findByAll", query = "SELECT td FROM CatTipoDeduccion td ORDER BY td.clave")
 })
 public class CatTipoDeduccion implements Serializable {
 
-    @Id
+    private static final long serialVersionUID = 1846019709266356321L;
+
+	@Id
     @Column(name = "cd_tipo_deduccion")
     @Basic(optional = false)
     @Size(max = 4)

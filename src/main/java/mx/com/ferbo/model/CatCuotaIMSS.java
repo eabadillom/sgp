@@ -16,7 +16,9 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name = "cat_cuota_imss")
 @NamedQueries({
-	@NamedQuery(name = "CatCuotaIMSS.findByClavePeriodoCuota", query = "SELECT new mx.com.ferbo.dto.CuotaIMSSDTO(c.key.clave, c.key.numeroClave, c.descripcion, c.baseSalarial, c.baseMinimo, c.baseMaximo, c.cuota, c.tipoCuota, c.vigencia) from CatCuotaIMSS c WHERE c.tipoCuota = :tipoCuota AND c.key.clave = :clave and c.vigencia BETWEEN :fechaInicio AND :fechaFin and :cuota BETWEEN c.baseMinimo AND c.baseMaximo")
+	@NamedQuery(name = "CatCuotaIMSS.findByClavePeriodoCuota", query = "SELECT new mx.com.ferbo.dto.CuotaIMSSDTO(c.key.clave, c.key.numeroClave, c.descripcion, c.baseSalarial, c.baseMinimo, c.baseMaximo, c.cuota, c.tipoCuota, c.vigencia) from CatCuotaIMSS c WHERE c.tipoCuota = :tipoCuota AND c.key.clave = :clave and c.vigencia BETWEEN :fechaInicio AND :fechaFin and :cuota BETWEEN c.baseMinimo AND c.baseMaximo"),
+	@NamedQuery(name = "CatCuotaIMSS.findByClavePeriodoBase", query = "SELECT c FROM CatCuotaIMSS c WHERE c.tipoCuota = :tipoCuota AND c.key.clave = :clave and c.vigencia BETWEEN :fechaInicio AND :fechaFin and :base BETWEEN c.baseMinimo AND c.baseMaximo"),
+        @NamedQuery(name = "CatCuotaIMSS.findAll", query = "SELECT c FROM CatCuotaIMSS c")
 })
 public class CatCuotaIMSS implements Serializable {
 
