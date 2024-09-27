@@ -249,4 +249,19 @@ public class AjustesBean implements Serializable {
             }
             
         }
+        
+        public void uma()
+        {
+            String path = null;
+            try
+            {
+                path = contextPath + "/protected/settings/sistema/uma.xhtml";
+                FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+            }catch(Exception e)
+            {
+                e.getMessage();
+            }
+            
+        }
+        
 }

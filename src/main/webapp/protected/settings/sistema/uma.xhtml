@@ -1,0 +1,100 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/plantillas/template.xhtml">
+    <ui:define name="title">UMA</ui:define>
+    <ui:define name="content">
+        <h:form id="form">
+            <p:growl id="messages" showDetail="true" />
+            <p:toolbar>
+                <p:toolbarGroup>
+                    <p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{umaBean.openNew}"
+                        update=":dialogs:manage-uma-content" oncomplete="PF('manageUMADialog').show()"
+                        style="margin-right: .5rem" >
+                        <p:resetInput target=":dialogs:manage-uma-content" />
+                    </p:commandButton>
+                </p:toolbarGroup>
+            </p:toolbar>
+            <p:dataTable id="dt-uma" widgetVar="dtUMA" var="uma" value="#{umaBean.catUMAS}" reflow="true" styleClass="products-table"
+                selection="#{umaBean.catUMASeleccionada}" rowKey="#{uma.anio}" paginator="true" rows="10" paginatorPosition="bottom"
+                lazy="true">
+                <p:column headerText="Año" style="text-align: center;" width="4rem">
+                    <h:outputText value="#{uma.anio}" />
+                </p:column>
+                <p:column headerText="Valor Diario" style="text-align: center;" width="4rem">
+                    <h:outputText value="#{uma.importeDiario}" >
+                        <f:convertNumber type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="2" locale="es_MX"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Valor Mensual" style="text-align: center;" width="4rem">
+                    <h:outputText value="#{uma.importeMensual}" >
+                        <f:convertNumber type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="2" locale="es_MX"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Valor Anual" style="text-align: center;" width="4rem">
+                    <h:outputText value="#{uma.importeAnual}" >
+                        <f:convertNumber type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="2" locale="es_MX"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Fecha de Publicacion" style="text-align: center;" width="5rem">
+                    <h:outputText value="#{uma.fechaPublicacion}" >
+                        <p:calendar pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Fecha de Aplicacion" style="text-align: center;" width="5rem">
+                    <h:outputText value="#{uma.fechaAplicacion}" >
+                        <p:calendar pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
+                    </h:outputText>
+                </p:column>
+                <p:column exportable="false" ariaHeaderText="Actions" width="2rem">
+                    <p:commandButton icon="pi pi-bars" update=":dialogs:manage-uma-content"
+                        oncomplete="PF('manageUMADialog').show()"
+                        styleClass="edit-button " process="@this">
+                        <f:setPropertyActionListener value="#{uma}" target="#{umaBean.uma}" />
+                        <p:resetInput target=":dialogs:manage-uma-content" />
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+        <h:form id="dialogs">
+            <p:dialog header="Detalles de la UMA" showEffect="fade" modal="true" widgetVar="manageUMADialog"
+                responsive="true" draggable="true" resizable="false" dynamic="true" style="margin: auto">
+                <p:outputPanel id="manage-uma-content" class="ui-fluid" rendered="#{not empty umaBean.uma}">
+                    <div class="field">
+                        <p:outputLabel for="@next">Año</p:outputLabel>
+                        <p:inputText id="clave" value="#{umaBean.uma.anio}" required="true" >
+                            <p:ajax process="@this"/>
+                        </p:inputText>
+                    </div>
+                    <div class="field">
+                        <p:outputLabel for="@next">Valor Diario</p:outputLabel>
+                        <p:inputText id="vDiario" value="#{umaBean.uma.importeDiario}" required="true" >
+                            <p:ajax process="@this"/>
+                        </p:inputText>
+                    </div>
+                    <div class="field">
+                        <p:outputLabel for="@next">Fecha Publicación</p:outputLabel>
+                        <p:calendar id="fPublicacion" value="#{umaBean.uma.fechaPublicacion}" required="true" pattern="dd/MM/yyyy" locale="es" >
+                            <p:ajax process="@this"/>
+                        </p:calendar>
+                    </div>
+                    <div class="field">
+                        <p:outputLabel for="@next">Fecha Aplicación</p:outputLabel>
+                        <p:calendar id="fAplicacion" value="#{umaBean.uma.fechaAplicacion}" required="true" pattern="dd/MM/yyyy" locale="es" >
+                            <p:ajax process="@this"/>
+                        </p:calendar>
+                    </div>
+                </p:outputPanel>
+                <f:facet name="footer">
+                    <p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{umaBean.crearUMA()}"
+                                     update="manage-uma-content form:dt-uma" process="manage-uma-content @this">
+                    </p:commandButton>
+                    <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('manageUMADialog').hide()"
+                        class="ui-button-secondary" type="button" />
+                </f:facet>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+</ui:composition>
