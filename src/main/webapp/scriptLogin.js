@@ -49,11 +49,11 @@ $(document).ready(function () {
     });
     const input_value = $("#numero");
     const accion = $("#accion");
-    //disable input from typing
+    
     $("#numero").keypress(function () {
         return false;
     });
-    //add password
+    
     $(".calc").click(function () {
         let value = $(this).val();
         field(value);
@@ -332,7 +332,7 @@ function registryServlet(objeto1, appPath) {
     };
     var path = appPath + "/registry?" + $.param(parametros);
     $.ajax({
-        async: true,
+        async: false,
         type: "GET",
         dataType: 'json',
         contentType: "application/json;charset=utf-8",
