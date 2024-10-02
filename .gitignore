@@ -38,3 +38,4 @@ target/
 .settings/
 /.apt_generated/
 /.apt_generated_tests/
+nb-configuration.xml
