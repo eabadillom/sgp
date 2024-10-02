@@ -91,7 +91,7 @@ public abstract class BaseDAO<MODEL, PK> {
 			log.info("Eliminando objeto: {}", model);
 			em = getEntityManager();
 			em.getTransaction().begin();
-			em.remove(model);
+			em.remove(em.contains(model) ? model : em.merge(model));
 			em.getTransaction().commit();
 			log.info("Objeto eliminado correctamente: {}", model);
 		} catch(Exception ex) {
