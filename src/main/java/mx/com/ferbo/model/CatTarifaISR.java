@@ -22,10 +22,7 @@ import javax.persistence.Table;
 @Table(name = "cat_tarifa_isr")
 @NamedQueries({
     @NamedQuery(name = "CatTarifaISR.findAll", query = "SELECT i FROM CatTarifaISR i"),
-    @NamedQuery(name = "CatTarifaISR.findActualSemanal", query = "SELECT NEW mx.com.ferbo.dto.CatTarifaIsrDTO(i.idIsr, i.limiteInferior, i.limiteSuperior, i.cuotaFija, i.porcAplExceLimInf, i.tipo, i.fecha) FROM CatTarifaISR i WHERE i.fecha LIKE :fecha AND i.tipo = :tipo "),
-    @NamedQuery(name = "CatTarifaISR.findByTipoAndAnioandBaseISR", query = "SELECT NEW mx.com.ferbo.dto.CatTarifaIsrDTO(i.idIsr, i.limiteInferior, i.limiteSuperior, i.cuotaFija, i.porcAplExceLimInf, i.tipo, i.fecha) FROM CatTarifaISR i WHERE i.tipo = :tipo AND i.fecha BETWEEN :fechaInicio AND :fechaFin AND :baseISR BETWEEN i.limiteInferior AND i.limiteSuperior"),
-    @NamedQuery(name = "CatTarifaISR.findByTipoAnioBaseISR", query = "SELECT i FROM CatTarifaISR i WHERE i.tipo = :tipo AND i.fecha BETWEEN :fechaInicio AND :fechaFin"),
-    @NamedQuery(name = "CatTarifaISR.findActualMensual", query = "SELECT NEW mx.com.ferbo.dto.CatTarifaIsrDTO(i.idIsr, i.limiteInferior, i.limiteSuperior, i.cuotaFija, i.porcAplExceLimInf, i.tipo, i.fecha) FROM CatTarifaISR i WHERE i.fecha LIKE :fecha AND i.tipo = :tipo")})
+    @NamedQuery(name = "CatTarifaISR.findByTipoAnioBaseISR", query = "SELECT i FROM CatTarifaISR i WHERE i.tipo = :tipo AND i.fecha BETWEEN :fechaInicio AND :fechaFin")})
 public class CatTarifaISR implements Serializable {
 
     private static final long serialVersionUID = 1L;
