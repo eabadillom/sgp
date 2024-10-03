@@ -1,0 +1,54 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/plantillas/template.xhtml">
+    <ui:define name="title">Subsidio</ui:define>
+    <ui:define name="content">
+        <h:form id="form">
+            <p:growl id="messages" showDetail="true" />
+            <p:dataTable id="dt-subsidio" widgetVar="dtSubsidio" var="subsidio" value="#{subsidioBean.listSubsidio}" reflow="true" styleClass="products-table"
+                selection="#{subsidioBean.listSubsidioSelected}" rowKey="#{subsidio.idSubsidio}" paginator="true" rows="10" paginatorPosition="bottom"
+                lazy="true" allowUnsorting="true" sortMode="single">
+                <p:columnGroup type="header">
+                    <p:row>
+                        <p:column colspan="2" headerText="Ingresos" style="text-align: center;" width="22rem"/>
+                    </p:row>
+                    <p:row>
+                        <p:column headerText="Desde" style="text-align: center;" width="6rem" sortOrder="asc" />
+                        <p:column headerText="Hasta" style="text-align: center;" width="6rem" />
+                        <p:column headerText="Subsidio" style="text-align: center;" width="4rem" />
+                        <p:column headerText="Periodo" style="text-align: center;" width="4rem" sortOrder="asc" />
+                        <p:column headerText="Fecha" style="text-align: center;" width="4rem" />
+                    </p:row>
+                </p:columnGroup>
+                <p:column style="text-align: center;" width="4rem">
+                    <h:outputText value="#{subsidio.paraIngresosDe}" >
+                        <f:convertNumber type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="2" locale="es_MX"/>
+                    </h:outputText>
+                </p:column>
+                <p:column style="text-align: center;" width="4rem">
+                    <h:outputText value="#{subsidio.hastaIngresosDe}" >
+                        <f:convertNumber type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="2" locale="es_MX"/>
+                    </h:outputText>
+                </p:column>
+                <p:column style="text-align: center;" width="4rem">
+                    <h:outputText value="#{subsidio.cantidadSubsidio}" >
+                        <f:convertNumber type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="2" locale="es_MX"/>
+                    </h:outputText>
+                </p:column>
+                <p:column style="text-align: center;" width="4rem">
+                    <h:outputText value="#{subsidio.periodo}" >
+                    </h:outputText>
+                </p:column>
+                <p:column style="text-align: center;" width="4rem">
+                    <h:outputText value="#{subsidio.fecha}" >
+                        <f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
+                    </h:outputText>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </ui:define>
+</ui:composition>

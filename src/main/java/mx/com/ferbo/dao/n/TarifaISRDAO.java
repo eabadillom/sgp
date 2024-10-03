@@ -20,7 +20,12 @@ public class TarifaISRDAO extends BaseDAO<CatTarifaISR, Integer> {
 	public TarifaISRDAO(Class<CatTarifaISR> modelClass) {
 		super(modelClass);
 	}
-	
+        
+        public TarifaISRDAO()
+        {
+            super(CatTarifaISR.class);
+        }
+        
 	public List<CatTarifaISR> buscar(Date fechaInicio, Date fechaFin, String tipo) {
     	List<CatTarifaISR> modelList = null;
     	EntityManager em = null;
@@ -42,6 +47,28 @@ public class TarifaISRDAO extends BaseDAO<CatTarifaISR, Integer> {
     	}
     	
     	return modelList;
+    }
+    
+    public List<CatTarifaISR> buscarTodos()
+    {
+        List<CatTarifaISR> modelList = null;
+        EntityManager em = null;
+        
+        try
+        {
+            em = this.getEntityManager();
+            modelList = em.createNamedQuery("CatTarifaISR.findAll", CatTarifaISR.class)
+                .getResultList();
+        }catch(Exception ex)
+        {
+            log.error("Problema al obtener la lista de ISR", ex);
+            modelList = new ArrayList<>();
+        }finally
+        {
+            this.close(em);
+        }
+        
+        return modelList;
     }
 
 }
