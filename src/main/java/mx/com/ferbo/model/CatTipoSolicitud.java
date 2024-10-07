@@ -24,13 +24,7 @@ import javax.validation.constraints.Size;
 @Table(name = "cat_tipo_solicitud")
 @NamedQueries({
     @NamedQuery(name = "CatTipoSolicitud.findAll", query = "SELECT c FROM CatTipoSolicitud c"),
-    @NamedQuery(name = "CatTipoSolicitud.findByActive", query = "SELECT NEW mx.com.ferbo.dto.CatTipoSolicitudDTO("
-            + " c.idTipoSolicitud,"
-            + " c.descripcion"
-            + ")"
-            + " FROM CatTipoSolicitud c"
-            + " WHERE c.activo = 1")
-    
+    @NamedQuery(name = "CatTipoSolicitud.findByActive", query = "SELECT cts FROM CatTipoSolicitud cts")
 })
 public class CatTipoSolicitud implements Serializable {
 
