@@ -28,15 +28,17 @@ import org.primefaces.model.DefaultScheduleModel;
 import org.primefaces.model.ScheduleEvent;
 import org.primefaces.model.ScheduleModel;
 
-import mx.com.ferbo.dao.CatTipoSolicitudDAO;
+//import mx.com.ferbo.dao.CatTipoSolicitudDAO;
 import mx.com.ferbo.dao.IncidenciaDAO;
-import mx.com.ferbo.dao.RegistroDAO;
-import mx.com.ferbo.dao.SolicitudPermisoDAO;
-import mx.com.ferbo.dto.CatTipoSolicitudDTO;
-import mx.com.ferbo.dto.DetEmpleadoDTO;
+//import mx.com.ferbo.dao.RegistroDAO;
+import mx.com.ferbo.dao.n.TipoSolicitudDAO;
+import mx.com.ferbo.dao.n.RegistroDAO;
+import mx.com.ferbo.dao.n.SolicitudPermisoDAO;
 import mx.com.ferbo.dto.DetIncidenciaDTO;
-import mx.com.ferbo.dto.DetRegistroDTO;
-import mx.com.ferbo.dto.DetSolicitudPermisoDTO;
+import mx.com.ferbo.model.CatTipoSolicitud;
+import mx.com.ferbo.model.DetEmpleado;
+import mx.com.ferbo.model.DetRegistro;
+import mx.com.ferbo.model.DetSolicitudPermiso;
 import mx.com.ferbo.util.SGPException;
 
 /**
@@ -54,15 +56,15 @@ public class AsistenciaBean implements Serializable {
     private ScheduleEvent evento;
     private final RegistroDAO registroDAO;
     private final SolicitudPermisoDAO solicitudPermisoDAO;
-    private final CatTipoSolicitudDAO catTipoSolicitudDAO;
-    private DetSolicitudPermisoDTO solicitudSelected;
+    private final TipoSolicitudDAO tipoSolicitudDAO;
+    private DetSolicitudPermiso solicitudSelected;
     private final IncidenciaDAO incidenciaDAO;
     private final SimpleDateFormat sdf = new SimpleDateFormat("hh:mm aa");
     private final Date minDate = new Date();
 
-    private List<DetRegistroDTO> lstRegistros;
-    private List<DetSolicitudPermisoDTO> lstSolicitudes;
-    private List<CatTipoSolicitudDTO> lstTipoSol;
+    private List<DetRegistro> lstRegistros;
+    private List<DetSolicitudPermiso> lstSolicitudes;
+    private List<CatTipoSolicitud> lstTipoSol;
     private List<DetIncidenciaDTO> lstIncidencias;
     private final List<Integer> invalidDays;
     private List<Date> lstRangoRegistro;
@@ -70,7 +72,7 @@ public class AsistenciaBean implements Serializable {
     private Date fechaSeleccionada;
 
     // Obteniendo Empleado
-    private DetEmpleadoDTO empleadoSelected;
+    private DetEmpleado empleadoSelected;
     private final HttpServletRequest httpServletRequest;
 
     @SuppressWarnings("OverridableMethodCallInConstructor")
@@ -78,7 +80,7 @@ public class AsistenciaBean implements Serializable {
         calendario = new DefaultScheduleModel();
         registroDAO = new RegistroDAO();
         solicitudPermisoDAO = new SolicitudPermisoDAO();
-        catTipoSolicitudDAO = new CatTipoSolicitudDAO();
+        tipoSolicitudDAO = new TipoSolicitudDAO();
         incidenciaDAO = new IncidenciaDAO();
         inicializaSolicitud();
         sdf.setTimeZone(TimeZone.getTimeZone(ZoneId.of("GMT-6").normalized()));
@@ -87,16 +89,16 @@ public class AsistenciaBean implements Serializable {
         lstTipoSolSelect = new ArrayList<>();
         invalidDays.add(0);
 
-        empleadoSelected = new DetEmpleadoDTO();
+        empleadoSelected = new DetEmpleado();
         httpServletRequest = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-        this.empleadoSelected = (DetEmpleadoDTO) httpServletRequest.getSession(true).getAttribute("empleado");
+        this.empleadoSelected = (DetEmpleado) httpServletRequest.getSession(true).getAttribute("empleado"); //Esta es la que causa el problema
     }
 
     @PostConstruct
     public void init() {
         evento = new DefaultScheduleEvent();
-        lstTipoSol = catTipoSolicitudDAO.buscarActivo();
-        lstTipoSol.forEach((CatTipoSolicitudDTO tipo) -> {
+        lstTipoSol = tipoSolicitudDAO.buscarActivos();
+        lstTipoSol.forEach((CatTipoSolicitud tipo) -> {
             lstTipoSolSelect.add(new SelectItem(tipo.getIdTipoSolicitud(),
                     tipo.getDescripcion(),
                     tipo.getIdTipoSolicitud() == 3 ? "Solo 1 día" : tipo.getIdTipoSolicitud() == 4 ? "Más de 1 día" : null));
@@ -106,14 +108,14 @@ public class AsistenciaBean implements Serializable {
         lstIncidencias = incidenciaDAO.consultaPorIdEmpleado(empleadoSelected.getIdEmpleado());
         generaEventosRegistros(lstRegistros);
         generaEventosIncidencias(lstIncidencias);
-        lstSolicitudes = solicitudPermisoDAO.consultaPorIdEmpleado(empleadoSelected.getIdEmpleado());
+        lstSolicitudes = solicitudPermisoDAO.buscarPor(empleadoSelected.getIdEmpleado());
     }
 
-    private void generaEventosRegistros(List<DetRegistroDTO> registros) {
+    private void generaEventosRegistros(List<DetRegistro> registros) {
         int retardosSemana = 0;
         int diaInicioSemana = 5; //JUEVES
         int diaInicioRegistros;
-        for (DetRegistroDTO registro : registros) {
+        for (DetRegistro registro : registros) {
 
             Calendar cal = Calendar.getInstance();
             cal.setTime(registro.getFechaEntrada());
@@ -125,7 +127,7 @@ public class AsistenciaBean implements Serializable {
                 diaInicioRegistros = cal.get(Calendar.DAY_OF_WEEK);
             }
 
-            if (registro.getCatEstatusRegistroDTO().getIdEstatus() == 2) {
+            if (registro.getIdEstatus().getIdEstatus() == 2) {
                 retardosSemana += 1;
             }
 
@@ -135,8 +137,8 @@ public class AsistenciaBean implements Serializable {
                     .startDate(convertirDateToLocalDateTime(registro.getFechaEntrada()))
                     .endDate(convertirDateToLocalDateTime(registro.getFechaEntrada()))
                     .description(null)
-                    .backgroundColor(findBgColor(registro.getCatEstatusRegistroDTO().getIdEstatus()))
-                    .dynamicProperty("estatus", registro.getCatEstatusRegistroDTO().getDescripcion())
+                    .backgroundColor(findBgColor(registro.getIdEstatus().getIdEstatus()))
+                    .dynamicProperty("estatus", registro.getIdEstatus().getDescripcion())
                     .build();
 
             calendario.addEvent(eventoEntrada);
@@ -160,7 +162,7 @@ public class AsistenciaBean implements Serializable {
                         .startDate(convertirDateToLocalDateTime(registro.getFechaSalida()))
                         .endDate(convertirDateToLocalDateTime(registro.getFechaSalida()))
                         .description(sdf.format(registro.getFechaSalida()))
-                        .dynamicProperty("estatus", registro.getCatEstatusRegistroDTO().getDescripcion())
+                        .dynamicProperty("estatus", registro.getIdEstatus().getDescripcion())
                         .build();
                 calendario.addEvent(eventoSalida);
             }
@@ -245,7 +247,7 @@ public class AsistenciaBean implements Serializable {
                 solicitudSelected.setFechaInicio(lstRangoRegistro.get(0));
                 solicitudSelected.setFechaFin(lstRangoRegistro.size() > 1 ? lstRangoRegistro.get(1) : lstRangoRegistro.get(0));
             }
-            solicitudSelected.setEmpleadoSol(new DetEmpleadoDTO(empleadoSelected.getIdEmpleado()));
+            solicitudSelected.setIdEmpleadoSol(new DetEmpleado(empleadoSelected.getIdEmpleado()));
             solicitudPermisoDAO.guardar(solicitudSelected);
 
             lstSolicitudes.add(solicitudSelected);
@@ -265,11 +267,11 @@ public class AsistenciaBean implements Serializable {
     }
 
     public void inicializaSolicitud() {
-        solicitudSelected = new DetSolicitudPermisoDTO();
+        solicitudSelected = new DetSolicitudPermiso();
     }
 
     public void actualizaCalendarioSeleccionado() {
-        switch (solicitudSelected.getCatTipoSolicitud().getIdTipoSolicitud()) {
+        switch (solicitudSelected.getIdTipoSolicitud().getIdTipoSolicitud()) {
             case 1://PERMISO
             case 3://INCAPACIDAD CORTA
                 fechaSeleccionada = solicitudSelected.getFechaInicio();
@@ -316,19 +318,19 @@ public class AsistenciaBean implements Serializable {
         return minDate;
     }
 
-    public List<DetSolicitudPermisoDTO> getLstSolicitudes() {
+    public List<DetSolicitudPermiso> getLstSolicitudes() {
         return lstSolicitudes;
     }
 
-    public void setLstSolicitudes(List<DetSolicitudPermisoDTO> lstSolicitudes) {
+    public void setLstSolicitudes(List<DetSolicitudPermiso> lstSolicitudes) {
         this.lstSolicitudes = lstSolicitudes;
     }
 
-    public DetSolicitudPermisoDTO getSolicitudSelected() {
+    public DetSolicitudPermiso getSolicitudSelected() {
         return solicitudSelected;
     }
 
-    public void setSolicitudSelected(DetSolicitudPermisoDTO solicitudSelected) {
+    public void setSolicitudSelected(DetSolicitudPermiso solicitudSelected) {
         this.solicitudSelected = solicitudSelected;
     }
 
@@ -336,7 +338,7 @@ public class AsistenciaBean implements Serializable {
         return invalidDays;
     }
 
-    public List<CatTipoSolicitudDTO> getLstTipoSol() {
+    public List<CatTipoSolicitud> getLstTipoSol() {
         return lstTipoSol;
     }
 
@@ -356,11 +358,11 @@ public class AsistenciaBean implements Serializable {
         this.fechaSeleccionada = fechaSeleccionada;
     }
 
-    public DetEmpleadoDTO getEmpleadoSelected() {
+    public DetEmpleado getEmpleadoSelected() {
         return empleadoSelected;
     }
 
-    public void setEmpleadoSelected(DetEmpleadoDTO empleadoSelected) {
+    public void setEmpleadoSelected(DetEmpleado empleadoSelected) {
         this.empleadoSelected = empleadoSelected;
     }
 

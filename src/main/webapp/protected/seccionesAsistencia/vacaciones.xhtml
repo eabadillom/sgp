@@ -53,7 +53,7 @@
                 <div class="field col">
                     <p:outputLabel for="soTipoPermiso" value="Tipo"/>
                     <p:selectOneMenu id="soTipoPermiso" required="true" requiredMessage="Campo requerido" autoWidth="false" 
-                                     value="#{asistenciaBean.solicitudSelected.catTipoSolicitud.idTipoSolicitud}">
+                                     value="#{asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud}">
                         <f:selectItem itemLabel="--Seleccione--"/>
                         <f:selectItems value="#{asistenciaBean.lstTipoSolSelect}" var="tipo" />
                         <p:ajax update="formActividades:tabView:pnlDetalleVacaciones" process="@this" resetValues="true"/>
@@ -119,7 +119,7 @@
                           inline="true" selectionMode="range" disabledDays="#{asistenciaBean.invalidDays}"/>
             <p:datePicker id="dpSimpleView" rendered="#{asistenciaBean.solicitudSelected.catTipoSolicitud.idTipoSolicitud ne null 
                                                         and asistenciaBean.solicitudSelected.catTipoSolicitud.idTipoSolicitud ne 2 
-                                                        and asistenciaBean.solicitudSelected.catTipoSolicitud.idTipoSolicitud ne 4}" 
+                                                        and asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud ne 4}" 
                           styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" disabled="true"
                           readonlyInput="true" timeZone="Mexico/General" value="#{asistenciaBean.fechaSeleccionada}"
                           inline="true" disabledDays="#{asistenciaBean.invalidDays}"/>

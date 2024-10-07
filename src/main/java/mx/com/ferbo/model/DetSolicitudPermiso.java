@@ -27,22 +27,7 @@ import javax.validation.constraints.NotNull;
 @Table(name = "det_solicitud_permiso")
 @NamedQueries({
     @NamedQuery(name = "DetSolicitudPermiso.findAll", query = "SELECT d FROM DetSolicitudPermiso d"),
-    @NamedQuery(name = "DetSolicitudPermiso.findByIdEmp", query = "SELECT NEW mx.com.ferbo.dto.DetSolicitudPermisoDTO("
-            + " d.idSolicitud,"
-            + " d.fechaCap,"
-            + " d.fechaMod,"
-            + " d.fechaInicio,"
-            + " d.fechaFin,"
-            + " d.aprobada,"
-            + " d.descripcionRechazo,"
-            + " ts.idTipoSolicitud,"
-            + " ts.descripcion"
-            + ")"
-            + " FROM DetSolicitudPermiso d"
-            + " INNER JOIN d.idEmpleadoSol es"
-            + " INNER JOIN d.idTipoSolicitud ts"
-            + " WHERE es.idEmpleado = :idEmp"
-            + " ORDER BY d.fechaCap"),
+    @NamedQuery(name = "DetSolicitudPermiso.findByIdEmp", query = "SELECT dsp FROM DetSolicitudPermiso dsp INNER JOIN dsp.idEmpleadoSol de INNER JOIN dsp.idTipoSolicitud cts WHERE de.idEmpleado = :idEmp ORDER BY dsp.fechaCap")
 })
 public class DetSolicitudPermiso implements Serializable {
 
