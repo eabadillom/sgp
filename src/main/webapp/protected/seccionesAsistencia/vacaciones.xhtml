@@ -22,7 +22,7 @@
             </div>
         </f:facet>
         <p:column headerText="Tipo de solicitud">
-            <p:outputLabel value="#{solicitud.catTipoSolicitud.descripcion}" />
+            <p:outputLabel value="#{solicitud.idTipoSolicitud.descripcion}" />
         </p:column>
         <p:column headerText="Fecha de inicio" sortBy="#{solicitud.fechaInicio}" filterBy="#{solicitud.fechaInicio}">
             <p:outputLabel value="#{solicitud.fechaInicio}">
@@ -61,15 +61,15 @@
                     <p:message for="soTipoPermiso"/>
                 </div>
             </div>
-            <p:datePicker id="dpRango" rendered="#{asistenciaBean.solicitudSelected.catTipoSolicitud.idTipoSolicitud ne null 
-                                                   and (asistenciaBean.solicitudSelected.catTipoSolicitud.idTipoSolicitud eq 2 
-                                                        or asistenciaBean.solicitudSelected.catTipoSolicitud.idTipoSolicitud eq 4)}" 
+            <p:datePicker id="dpRango" rendered="#{asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud ne null 
+                                                   and (asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud eq 2 
+                                                   or asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud eq 4)}" 
                           styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" 
                           pattern="dd-MM-yyyy" showIcon="true" readonlyInput="true" timeZone="Mexico/General" value="#{asistenciaBean.lstRangoRegistro}"
                           mindate="#{asistenciaBean.minDate}" inline="true" selectionMode="range" disabledDays="#{asistenciaBean.invalidDays}"/>
-            <p:datePicker id="dpSimple" rendered="#{asistenciaBean.solicitudSelected.catTipoSolicitud.idTipoSolicitud ne null 
-                                                    and asistenciaBean.solicitudSelected.catTipoSolicitud.idTipoSolicitud ne 2 
-                                                    and asistenciaBean.solicitudSelected.catTipoSolicitud.idTipoSolicitud ne 4}" 
+            <p:datePicker id="dpSimple" rendered="#{asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud ne null 
+                                                    and asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud ne 2 
+                                                    and asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud ne 4}" 
                           styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" 
                           pattern="dd-MM-yyyy" showIcon="true" readonlyInput="true" timeZone="Mexico/General" value="#{asistenciaBean.fechaSeleccionada}"
                           mindate="#{asistenciaBean.minDate}" inline="true" disabledDays="#{asistenciaBean.invalidDays}"/>
@@ -88,7 +88,7 @@
             <div class="formgrid grid">
                 <div class="field col">
                     <p:outputLabel for="soTipoPermisoView" value="Tipo"/>
-                    <p:selectOneMenu id="soTipoPermisoView" autoWidth="false" value="#{asistenciaBean.solicitudSelected.catTipoSolicitud.idTipoSolicitud}" 
+                    <p:selectOneMenu id="soTipoPermisoView" autoWidth="false" value="#{asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud}" 
                                      disabled="true">
                         <f:selectItem itemLabel="--Seleccione--"/>
                         <f:selectItems value="#{asistenciaBean.lstTipoSol}" var="tipoV" itemLabel="#{tipoV.descripcion}" itemValue="#{tipoV.idTipoSolicitud}"/>
@@ -111,14 +111,14 @@
                     <p:inputTextarea id="txtMotivo" value="#{asistenciaBean.solicitudSelected.descripcionRechazo}" disabled="true"/>
                 </div>
             </div>
-            <p:datePicker id="dpRangoView" rendered="#{asistenciaBean.solicitudSelected.catTipoSolicitud.idTipoSolicitud ne null 
-                                                       and (asistenciaBean.solicitudSelected.catTipoSolicitud.idTipoSolicitud eq 2 
-                                                            or asistenciaBean.solicitudSelected.catTipoSolicitud.idTipoSolicitud eq 4)}" 
+            <p:datePicker id="dpRangoView" rendered="#{asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud ne null 
+                                                       and (asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud eq 2 
+                                                            or asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud eq 4)}" 
                           styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" disabled="true"
                           readonlyInput="true" timeZone="Mexico/General" value="#{asistenciaBean.lstRangoRegistro}"
                           inline="true" selectionMode="range" disabledDays="#{asistenciaBean.invalidDays}"/>
-            <p:datePicker id="dpSimpleView" rendered="#{asistenciaBean.solicitudSelected.catTipoSolicitud.idTipoSolicitud ne null 
-                                                        and asistenciaBean.solicitudSelected.catTipoSolicitud.idTipoSolicitud ne 2 
+            <p:datePicker id="dpSimpleView" rendered="#{asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud ne null 
+                                                        and asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud ne 2 
                                                         and asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud ne 4}" 
                           styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" disabled="true"
                           readonlyInput="true" timeZone="Mexico/General" value="#{asistenciaBean.fechaSeleccionada}"

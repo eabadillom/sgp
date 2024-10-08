@@ -24,32 +24,8 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name = "det_incidencia")
 @NamedQueries({
-    @NamedQuery(name = "DetIncidencia.findAll", query = "SELECT NEW mx.com.ferbo.dto.DetIncidenciaDTO("
-            + " d.idIncidencia, d.visible, d.fechaCap, d.fechaMod,"
-            + " e.idEmpleado, e.numEmpleado, e.nombre, e.primerAp, e.segundoAp,"
-            + " ct.idTipo, ct.descripcion,"
-            + " ce.idEstatus, ce.descripcion,"
-            + " sp.idSolicitud, sp.fechaCap, sp.fechaMod, sp.fechaInicio, sp.fechaFin, sp.aprobada,"
-            + " tp.idTipoSolicitud, tp.descripcion,"
-            + " sa.idSolicitud, sa.cantidad, sa.aprobada, sa.fechaCap, sa.fechaMod,"
-            + " a.idArticulo, a.descripcion, a.cantidadMax, a.unidad,"
-            + " spr.idSolicitud, spr.cantidad, spr.aprobada, spr.fechaCap, spr.fechaMod,"
-            + " p.idPrenda, p.descripcion,"
-            + " t.idTalla, t.descripcion"
-            + ")"
-            + " FROM DetIncidencia d"
-            + " JOIN d.idEmpleado e"
-            + " JOIN d.idTipo ct"
-            + " JOIN d.idEstatus ce"
-            + " LEFT JOIN d.idSolPermiso sp"
-            + " LEFT JOIN d.idSolArticulo sa"
-            + " LEFT JOIN d.idSolPrenda spr"
-            + " LEFT JOIN sp.idTipoSolicitud tp"
-            + " LEFT JOIN sa.idArticulo a"
-            + " LEFT JOIN spr.idPrenda p"
-            + " LEFT JOIN spr.idTalla t"
-            + " ORDER BY d.fechaCap"),
-    @NamedQuery(name = "DetIncidencia.findByIdEmpleado", query = "SELECT NEW mx.com.ferbo.dto.DetIncidenciaDTO("
+    @NamedQuery(name = "DetIncidencia.findAll", query = "SELECT d FROM DetIncidencia d JOIN d.idEmpleado e JOIN d.idTipo ct JOIN d.idEstatus ce LEFT JOIN d.idSolPermiso sp LEFT JOIN d.idSolArticulo sa LEFT JOIN d.idSolPrenda spr LEFT JOIN sp.idTipoSolicitud tp LEFT JOIN sa.idArticulo a LEFT JOIN spr.idPrenda p LEFT JOIN spr.idTalla t ORDER BY d.fechaCap"),
+    /*@NamedQuery(name = "DetIncidencia.findByIdEmpleado", query = "SELECT NEW mx.com.ferbo.dto.DetIncidenciaDTO("
             + " d.idIncidencia,"
             + " d.visible,"
             + " d.fechaCap,"
@@ -79,7 +55,8 @@ import javax.validation.constraints.NotNull;
             + " LEFT JOIN d.idSolPermiso sp"
             + " JOIN sp.idTipoSolicitud tp"
             + " WHERE e.idEmpleado = :idEmpleado"
-            + " AND ce.idEstatus = 2")
+            + " AND ce.idEstatus = 2"),*/
+    @NamedQuery(name = "DetIncidencia.findByIdEmpleado", query = "SELECT d FROM DetIncidencia d JOIN d.idEmpleado e JOIN d.idTipo ct JOIN d.idEstatus ce LEFT JOIN d.idSolPermiso sp JOIN sp.idTipoSolicitud tp WHERE e.idEmpleado = :idEmpleado AND ce.idEstatus = 2")
 })
 public class DetIncidencia implements Serializable {
 

@@ -29,14 +29,14 @@ import org.primefaces.model.ScheduleEvent;
 import org.primefaces.model.ScheduleModel;
 
 //import mx.com.ferbo.dao.CatTipoSolicitudDAO;
-import mx.com.ferbo.dao.IncidenciaDAO;
+import mx.com.ferbo.dao.n.IncidenciaDAO;
 //import mx.com.ferbo.dao.RegistroDAO;
 import mx.com.ferbo.dao.n.TipoSolicitudDAO;
 import mx.com.ferbo.dao.n.RegistroDAO;
 import mx.com.ferbo.dao.n.SolicitudPermisoDAO;
-import mx.com.ferbo.dto.DetIncidenciaDTO;
 import mx.com.ferbo.model.CatTipoSolicitud;
 import mx.com.ferbo.model.DetEmpleado;
+import mx.com.ferbo.model.DetIncidencia;
 import mx.com.ferbo.model.DetRegistro;
 import mx.com.ferbo.model.DetSolicitudPermiso;
 import mx.com.ferbo.util.SGPException;
@@ -65,7 +65,7 @@ public class AsistenciaBean implements Serializable {
     private List<DetRegistro> lstRegistros;
     private List<DetSolicitudPermiso> lstSolicitudes;
     private List<CatTipoSolicitud> lstTipoSol;
-    private List<DetIncidenciaDTO> lstIncidencias;
+    private List<DetIncidencia> lstIncidencias;
     private final List<Integer> invalidDays;
     private List<Date> lstRangoRegistro;
     private List<SelectItem> lstTipoSolSelect;
@@ -105,10 +105,10 @@ public class AsistenciaBean implements Serializable {
         });
 
         lstRegistros = registroDAO.consultaRegistrosPorIdEmp(empleadoSelected.getIdEmpleado());
-        lstIncidencias = incidenciaDAO.consultaPorIdEmpleado(empleadoSelected.getIdEmpleado());
+        lstIncidencias = incidenciaDAO.buscarPorIdEmpleado(empleadoSelected.getIdEmpleado());
         generaEventosRegistros(lstRegistros);
         generaEventosIncidencias(lstIncidencias);
-        lstSolicitudes = solicitudPermisoDAO.buscarPor(empleadoSelected.getIdEmpleado());
+        lstSolicitudes = solicitudPermisoDAO.buscarPorIdEmpleado(empleadoSelected.getIdEmpleado());
     }
 
     private void generaEventosRegistros(List<DetRegistro> registros) {
@@ -170,17 +170,17 @@ public class AsistenciaBean implements Serializable {
 
     }
 
-    private void generaEventosIncidencias(List<DetIncidenciaDTO> incidencias) {
-        for (DetIncidenciaDTO incidencia : incidencias) {
+    private void generaEventosIncidencias(List<DetIncidencia> incidencias) {
+        for (DetIncidencia incidencia : incidencias) {
             DefaultScheduleEvent eventoEntrada = DefaultScheduleEvent.builder()
-                    .title(incidencia.getDetSolicitudPermisoDTO().getCatTipoSolicitud().getDescripcion())
-                    .startDate(convertirDateToLocalDateTime(incidencia.getDetSolicitudPermisoDTO().getFechaInicio()))
-                    .endDate(convertirDateToLocalDateTime(incidencia.getDetSolicitudPermisoDTO().getFechaFin()))
+                    .title(incidencia.getIdSolPermiso().getIdTipoSolicitud().getDescripcion())
+                    .startDate(convertirDateToLocalDateTime(incidencia.getIdSolPermiso().getFechaInicio()))
+                    .endDate(convertirDateToLocalDateTime(incidencia.getIdSolPermiso().getFechaFin()))
                     .allDay(true)
                     .description(null)
-                    .styleClass(estiloByTipo(incidencia.getDetSolicitudPermisoDTO().getCatTipoSolicitud().getIdTipoSolicitud()))
-                    .dynamicProperty("tipoSolicitud", incidencia.getDetSolicitudPermisoDTO().getCatTipoSolicitud().getDescripcion())
-                    .dynamicProperty("idTipoSolicitud", incidencia.getDetSolicitudPermisoDTO().getCatTipoSolicitud().getIdTipoSolicitud())
+                    .styleClass(estiloByTipo(incidencia.getIdSolPermiso().getIdTipoSolicitud().getIdTipoSolicitud()))
+                    .dynamicProperty("tipoSolicitud", incidencia.getIdSolPermiso().getIdTipoSolicitud().getDescripcion())
+                    .dynamicProperty("idTipoSolicitud", incidencia.getIdSolPermiso().getIdTipoSolicitud().getIdTipoSolicitud())
                     .build();
             calendario.addEvent(eventoEntrada);
         }

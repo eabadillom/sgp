@@ -17,12 +17,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.CatTipoSolicitudDAO;
-import mx.com.ferbo.dao.EmpleadoDAO;
-import mx.com.ferbo.dao.IncidenciaDAO;
-import mx.com.ferbo.dto.CatTipoSolicitudDTO;
-import mx.com.ferbo.dto.DetEmpleadoDTO;
-import mx.com.ferbo.dto.DetIncidenciaDTO;
+import mx.com.ferbo.dao.n.EmpleadoDAO;
+import mx.com.ferbo.dao.n.IncidenciaDAO;
+import mx.com.ferbo.dao.n.TipoSolicitudDAO;
+import mx.com.ferbo.model.CatTipoSolicitud;
+import mx.com.ferbo.model.DetEmpleado;
+import mx.com.ferbo.model.DetIncidencia;
 import mx.com.ferbo.util.SGPException;
 
 /**
@@ -37,30 +37,30 @@ public class IncidenciaBean implements Serializable {
     private static Logger log = LogManager.getLogger(IncidenciaBean.class);
 
     private final IncidenciaDAO incidenciaDAO;
-    private DetIncidenciaDTO incidenciaSelected;
+    private DetIncidencia incidenciaSelected;
     private Date fechaSeleccionada;
-    private List<DetIncidenciaDTO> lstIncidencias;
-    private List<DetIncidenciaDTO> listaPermisos;
-    private List<DetIncidenciaDTO> listaPrendas;
-    private List<DetIncidenciaDTO> listaArticulos;
-    private List<CatTipoSolicitudDTO> lstTipoSol;
-    private final CatTipoSolicitudDAO catTipoSolicitudDAO;
+    private List<DetIncidencia> lstIncidencias;
+    private List<DetIncidencia> listaPermisos;
+    private List<DetIncidencia> listaPrendas;
+    private List<DetIncidencia> listaArticulos;
+    private List<CatTipoSolicitud> lstTipoSol;
+    private final TipoSolicitudDAO catTipoSolicitudDAO;
     private List<Date> lstRangoRegistro;
     private List<Integer> invalidDays;
     private Date minDate;
 
-    private DetEmpleadoDTO empleadoSelected;
+    private DetEmpleado empleadoSelected;
     private final HttpServletRequest httpServletRequest;
     private final EmpleadoDAO empleadoDAO;
 
     public IncidenciaBean() {
         incidenciaDAO = new IncidenciaDAO();
-        catTipoSolicitudDAO = new CatTipoSolicitudDAO();
+        catTipoSolicitudDAO = new TipoSolicitudDAO();
         minDate = new Date();
 
         empleadoDAO = new EmpleadoDAO();
         httpServletRequest = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-        this.empleadoSelected = (DetEmpleadoDTO) httpServletRequest.getSession(true).getAttribute("empleado");
+        this.empleadoSelected = (DetEmpleado) httpServletRequest.getSession(true).getAttribute("empleado");
 
         empleadoSelected = empleadoDAO.buscarPorId(empleadoSelected.getIdEmpleado());
     }
@@ -68,7 +68,7 @@ public class IncidenciaBean implements Serializable {
     @PostConstruct
     public void init() {
         consultaIncidencias();
-        lstTipoSol = catTipoSolicitudDAO.buscarActivo();
+        lstTipoSol = catTipoSolicitudDAO.buscarActivos();
         invalidDays = Arrays.asList(0);
     }
 
@@ -76,32 +76,32 @@ public class IncidenciaBean implements Serializable {
         lstIncidencias = incidenciaDAO.buscarTodos();
 
         listaPermisos = lstIncidencias.stream()
-                .filter(objeto -> objeto.getCatTipoIncidenciaDTO().getIdTipo().equals(1))
+                .filter(objeto -> objeto.getIdTipo().getIdTipo().equals(1))
                 .map(objeto -> objeto)
                 .collect(Collectors.toList());
         
         listaPrendas = lstIncidencias.stream()
-                .filter(objeto -> objeto.getCatTipoIncidenciaDTO().getIdTipo().equals(3))
+                .filter(objeto -> objeto.getIdTipo().getIdTipo().equals(3))
                 .map(objeto -> objeto)
                 .collect(Collectors.toList());
         
         listaArticulos = lstIncidencias.stream()
-                .filter(objeto -> objeto.getCatTipoIncidenciaDTO().getIdTipo().equals(4))
+                .filter(objeto -> objeto.getIdTipo().getIdTipo().equals(4))
                 .map(objeto -> objeto)
                 .collect(Collectors.toList());
     }
 
     public void visualizaDialog() {
-        switch (incidenciaSelected.getCatTipoIncidenciaDTO().getIdTipo()) {
+        switch (incidenciaSelected.getIdTipo().getIdTipo()) {
             // Tipo Permisos
             case 1:
-                switch (incidenciaSelected.getDetSolicitudPermisoDTO().getCatTipoSolicitud().getIdTipoSolicitud()) {
+                switch (incidenciaSelected.getIdSolPermiso().getIdTipoSolicitud().getIdTipoSolicitud()) {
                     case 1://PERMISO
                     case 3://INCAPACDAD CORTA
-                        fechaSeleccionada = incidenciaSelected.getDetSolicitudPermisoDTO().getFechaInicio();
+                        fechaSeleccionada = incidenciaSelected.getIdSolPermiso().getFechaInicio();
                         break;
                     default:
-                        lstRangoRegistro = Arrays.asList(incidenciaSelected.getDetSolicitudPermisoDTO().getFechaInicio(), incidenciaSelected.getDetSolicitudPermisoDTO().getFechaFin());
+                        lstRangoRegistro = Arrays.asList(incidenciaSelected.getIdSolPermiso().getFechaInicio(), incidenciaSelected.getIdSolPermiso().getFechaFin());
                         break;
                 }
                 PrimeFaces.current().executeScript("PF('dialogPermisos').show();");
@@ -124,13 +124,13 @@ public class IncidenciaBean implements Serializable {
     }
 
     public void guardarEstatusIncidencia(boolean aprobada) {
-        incidenciaSelected.setDetEmpleadoRevDTO(new DetEmpleadoDTO(empleadoSelected.getIdEmpleado()));
+        incidenciaSelected.setIdEmpleadoRev(new DetEmpleado(empleadoSelected.getIdEmpleado()));
         try {
-            incidenciaSelected.getCatEstatusIncidenciaDTO().setIdEstatus(aprobada ? 2 : 3);
+            incidenciaSelected.getIdEstatus().setIdEstatus(aprobada ? 2 : 3);
             incidenciaDAO.actualizar(incidenciaSelected);
 
             String mensaje = "";
-            if (incidenciaSelected.getCatEstatusIncidenciaDTO().getIdEstatus() == 2) {
+            if (incidenciaSelected.getIdEstatus().getIdEstatus() == 2) {
                 mensaje = "Solicitud aprobada correctamente";
             } else {
                 mensaje = "Solicitud rechazada correctamente";
@@ -143,23 +143,23 @@ public class IncidenciaBean implements Serializable {
         }
         consultaIncidencias();
         PrimeFaces.current().ajax().update("formIncidencias:messages", "formIncidencias:tabViewI:dtIncidencias");
-        if(incidenciaSelected.getDetSolicitudPermisoDTO().getIdSolicitud() != null){
+        if(incidenciaSelected.getIdSolPermiso().getIdSolicitud() != null){
             PrimeFaces.current().executeScript("PF('dialogPermisos').hide()");
-        }else if(incidenciaSelected.getDetSolicitudPrendaDTO().getIdSolicitud() != null){
+        }else if(incidenciaSelected.getIdSolPrenda().getIdSolicitud() != null){
             PrimeFaces.current().executeScript("PF('dialogPrendas').hide()");
-        }else if(incidenciaSelected.getDetSolicitudArticuloDTO().getIdSolicitud() != null){
+        }else if(incidenciaSelected.getIdSolArticulo().getIdSolicitud() != null){
             PrimeFaces.current().executeScript("PF('dialogArticulos').hide()");
         }
     }
     
     public void guardarEstatusArticulo(boolean aprobada) {
-        incidenciaSelected.setDetEmpleadoRevDTO(new DetEmpleadoDTO(empleadoSelected.getIdEmpleado()));
+        incidenciaSelected.setIdEmpleadoRev(new DetEmpleado(empleadoSelected.getIdEmpleado()));
         try {
-            incidenciaSelected.getCatEstatusIncidenciaDTO().setIdEstatus(aprobada ? 2 : 3);
+            incidenciaSelected.getIdEstatus().setIdEstatus(aprobada ? 2 : 3);
             incidenciaDAO.actualizar(incidenciaSelected);
 
             String mensaje = "";
-            if (incidenciaSelected.getCatEstatusIncidenciaDTO().getIdEstatus() == 2) {
+            if (incidenciaSelected.getIdEstatus().getIdEstatus() == 2) {
                 mensaje = "Solicitud aprobada correctamente";
             } else {
                 mensaje = "Solicitud rechazada correctamente";
@@ -176,13 +176,13 @@ public class IncidenciaBean implements Serializable {
     }
     
     public void guardarEstatusPrenda(boolean aprobada) {
-        incidenciaSelected.setDetEmpleadoRevDTO(new DetEmpleadoDTO(empleadoSelected.getIdEmpleado()));
+        incidenciaSelected.setIdEmpleadoRev(new DetEmpleado(empleadoSelected.getIdEmpleado()));
         try {
-            incidenciaSelected.getCatEstatusIncidenciaDTO().setIdEstatus(aprobada ? 2 : 3);
+            incidenciaSelected.getIdEstatus().setIdEstatus(aprobada ? 2 : 3);
             incidenciaDAO.actualizar(incidenciaSelected);
 
             String mensaje = "";
-            if (incidenciaSelected.getCatEstatusIncidenciaDTO().getIdEstatus() == 2) {
+            if (incidenciaSelected.getIdEstatus().getIdEstatus() == 2) {
                 mensaje = "Solicitud aprobada correctamente";
             } else {
                 mensaje = "Solicitud rechazada correctamente";
@@ -199,35 +199,35 @@ public class IncidenciaBean implements Serializable {
     }
 
     //<editor-fold defaultstate="collapsed" desc="Getters&Setters">
-    public DetIncidenciaDTO getIncidenciaSelected() {
+    public DetIncidencia getIncidenciaSelected() {
         return incidenciaSelected;
     }
 
-    public void setIncidenciaSelected(DetIncidenciaDTO incidenciaSelected) {
+    public void setIncidenciaSelected(DetIncidencia incidenciaSelected) {
         this.incidenciaSelected = incidenciaSelected;
     }
 
-    public List<DetIncidenciaDTO> getLstIncidencias() {
+    public List<DetIncidencia> getLstIncidencias() {
         return lstIncidencias;
     }
 
-    public void setLstIncidencias(List<DetIncidenciaDTO> lstIncidencias) {
+    public void setLstIncidencias(List<DetIncidencia> lstIncidencias) {
         this.lstIncidencias = lstIncidencias;
     }
 
-    public List<DetIncidenciaDTO> getListaPermisos() {
+    public List<DetIncidencia> getListaPermisos() {
         return listaPermisos;
     }
 
-    public void setListaPermisos(List<DetIncidenciaDTO> listaPermisos) {
+    public void setListaPermisos(List<DetIncidencia> listaPermisos) {
         this.listaPermisos = listaPermisos;
     }
 
-    public List<DetIncidenciaDTO> getListaArticulos() {
+    public List<DetIncidencia> getListaArticulos() {
         return listaArticulos;
     }
 
-    public void setListaArticulos(List<DetIncidenciaDTO> listaArticulos) {
+    public void setListaArticulos(List<DetIncidencia> listaArticulos) {
         this.listaArticulos = listaArticulos;
     }
 
@@ -255,11 +255,11 @@ public class IncidenciaBean implements Serializable {
         this.invalidDays = invalidDays;
     }
 
-    public List<CatTipoSolicitudDTO> getLstTipoSol() {
+    public List<CatTipoSolicitud> getLstTipoSol() {
         return lstTipoSol;
     }
 
-    public void setLstTipoSol(List<CatTipoSolicitudDTO> lstTipoSol) {
+    public void setLstTipoSol(List<CatTipoSolicitud> lstTipoSol) {
         this.lstTipoSol = lstTipoSol;
     }
 
@@ -271,19 +271,19 @@ public class IncidenciaBean implements Serializable {
         this.minDate = minDate;
     }
 
-    public DetEmpleadoDTO getEmpleadoSelected() {
+    public DetEmpleado getEmpleadoSelected() {
         return empleadoSelected;
     }
 
-    public void setEmpleadoSelected(DetEmpleadoDTO empleadoSelected) {
+    public void setEmpleadoSelected(DetEmpleado empleadoSelected) {
         this.empleadoSelected = empleadoSelected;
     }
 
-    public List<DetIncidenciaDTO> getListaPrendas() {
+    public List<DetIncidencia> getListaPrendas() {
         return listaPrendas;
     }
 
-    public void setListaPrendas(List<DetIncidenciaDTO> listaPrendas) {
+    public void setListaPrendas(List<DetIncidencia> listaPrendas) {
         this.listaPrendas = listaPrendas;
     }
     //</editor-fold>
