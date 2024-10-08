@@ -19,6 +19,11 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
     public EmpleadoDAO(Class<DetEmpleado> modelClass) {
         super(modelClass);
     }
+    
+    public EmpleadoDAO()
+    {
+        super(DetEmpleado.class);
+    }
 
     public DetEmpleado buscarPorId(Integer id, boolean isFullInfo, boolean isGetFoto) {
         DetEmpleado model = null;

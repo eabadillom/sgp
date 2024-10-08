@@ -30,7 +30,7 @@ public class SolicitudPermisoDAO extends BaseDAO<DetSolicitudPermiso, Integer>
         super(DetSolicitudPermiso.class);
     }
     
-    public List<DetSolicitudPermiso> buscarPor(Integer idEmpleado)
+    public List<DetSolicitudPermiso> buscarPorIdEmpleado(Integer idEmpleado)
     {
         List<DetSolicitudPermiso> modelList = null;
         EntityManager em = null;

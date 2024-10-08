@@ -29,6 +29,27 @@ public class TipoSolicitudDAO extends BaseDAO<CatTipoSolicitud, Integer>
         super(CatTipoSolicitud.class);
     }
     
+    public List<CatTipoSolicitud> buscarTodos()
+    {
+        List<CatTipoSolicitud> modelList = null;
+        EntityManager em = null;
+        
+        try
+        {
+            em = getEntityManager();
+            modelList = em.createNamedQuery("CatTipoSolicitud.findAll", CatTipoSolicitud.class)
+                .getResultList();
+        }catch(Exception ex) 
+        {
+            log.error("Problema para obtener el listado de tipos de solicitud...", ex);
+        }finally 
+        {
+           close(em);
+        }
+        
+        return modelList;
+    }
+    
     public List<CatTipoSolicitud> buscarActivos()
     {
         List<CatTipoSolicitud> modelList = null;

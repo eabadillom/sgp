@@ -24,7 +24,7 @@ import javax.validation.constraints.Size;
 @Table(name = "cat_tipo_solicitud")
 @NamedQueries({
     @NamedQuery(name = "CatTipoSolicitud.findAll", query = "SELECT c FROM CatTipoSolicitud c"),
-    @NamedQuery(name = "CatTipoSolicitud.findByActive", query = "SELECT cts FROM CatTipoSolicitud cts")
+    @NamedQuery(name = "CatTipoSolicitud.findByActive", query = "SELECT c FROM CatTipoSolicitud c")
 })
 public class CatTipoSolicitud implements Serializable {
 
