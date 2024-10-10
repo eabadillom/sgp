@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -26,13 +27,6 @@ import javax.persistence.TemporalType;
 @Table(name = "det_solicitud_prenda")
 @NamedQueries({
     @NamedQuery(name = "DetSolicitudPrenda.findAll", query = "SELECT d FROM DetSolicitudPrenda d"),
-    /*@NamedQuery(name = "DetSolicitudPrenda.findPrendasIdEmpleado", query = "SELECT NEW mx.com.ferbo.dto.DetSolicitudPrendaDTO("
-                                                                    + "d.idSolicitud, p.idPrenda, p.descripcion, p.precio, d.cantidad, d.aprobada, d.fechaCap, d.fechaMod, e.idEmpleado, t.idTalla, t.descripcion) "
-                                                                    + "FROM DetSolicitudPrenda d "
-                                                                    + "INNER JOIN d.idEmpleadoSol e "
-                                                                    + "INNER JOIN d.idPrenda p "
-                                                                    + "INNER JOIN d.idTalla t "
-                                                                    + "WHERE e.idEmpleado = :numEmpl"),*/
     @NamedQuery(name = "DetSolicitudPrenda.findPrendasIdEmpleado", query = "SELECT dsp FROM DetSolicitudPrenda dsp INNER JOIN dsp.idEmpleadoSol e INNER JOIN dsp.idPrenda p INNER JOIN dsp.idTalla t WHERE e.idEmpleado = :numEmpl")
 })
 public class DetSolicitudPrenda implements Serializable {
@@ -61,7 +55,7 @@ public class DetSolicitudPrenda implements Serializable {
     @ManyToOne(optional = false)
     private CatPrenda idPrenda;
     @JoinColumn(name = "id_empleado_rev", referencedColumnName = "id_empleado")
-    @ManyToOne
+    @ManyToOne()
     private DetEmpleado idEmpleadoRev;
     @JoinColumn(name = "id_empleado_sol", referencedColumnName = "id_empleado")
     @ManyToOne(optional = false)

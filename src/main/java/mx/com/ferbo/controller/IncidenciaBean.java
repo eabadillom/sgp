@@ -20,9 +20,14 @@ import org.primefaces.PrimeFaces;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.IncidenciaDAO;
 import mx.com.ferbo.dao.n.TipoSolicitudDAO;
+import mx.com.ferbo.model.CatEstatusIncidencia;
+import mx.com.ferbo.model.CatTipoIncidencia;
 import mx.com.ferbo.model.CatTipoSolicitud;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetIncidencia;
+import mx.com.ferbo.model.DetSolicitudArticulo;
+import mx.com.ferbo.model.DetSolicitudPermiso;
+import mx.com.ferbo.model.DetSolicitudPrenda;
 import mx.com.ferbo.util.SGPException;
 
 /**
@@ -44,7 +49,7 @@ public class IncidenciaBean implements Serializable {
     private List<DetIncidencia> listaPrendas;
     private List<DetIncidencia> listaArticulos;
     private List<CatTipoSolicitud> lstTipoSol;
-    private final TipoSolicitudDAO catTipoSolicitudDAO;
+    private final TipoSolicitudDAO tipoSolicitudDAO;
     private List<Date> lstRangoRegistro;
     private List<Integer> invalidDays;
     private Date minDate;
@@ -52,10 +57,11 @@ public class IncidenciaBean implements Serializable {
     private DetEmpleado empleadoSelected;
     private final HttpServletRequest httpServletRequest;
     private final EmpleadoDAO empleadoDAO;
-
+    
+    @SuppressWarnings("OverridableMethodCallInConstructor")
     public IncidenciaBean() {
         incidenciaDAO = new IncidenciaDAO();
-        catTipoSolicitudDAO = new TipoSolicitudDAO();
+        tipoSolicitudDAO = new TipoSolicitudDAO();
         minDate = new Date();
 
         empleadoDAO = new EmpleadoDAO();
@@ -63,12 +69,13 @@ public class IncidenciaBean implements Serializable {
         this.empleadoSelected = (DetEmpleado) httpServletRequest.getSession(true).getAttribute("empleado");
 
         empleadoSelected = empleadoDAO.buscarPorId(empleadoSelected.getIdEmpleado());
+        inicializarIncidencia();
     }
 
     @PostConstruct
     public void init() {
         consultaIncidencias();
-        lstTipoSol = catTipoSolicitudDAO.buscarActivos();
+        lstTipoSol = tipoSolicitudDAO.buscarActivos();
         invalidDays = Arrays.asList(0);
     }
 
@@ -122,6 +129,16 @@ public class IncidenciaBean implements Serializable {
                 log.warn("EX-0023: Error al seleccionar opción");
         }
     }
+    
+    public void inicializarIncidencia()
+    {
+        incidenciaSelected = new DetIncidencia();
+        incidenciaSelected.setIdEstatus(new CatEstatusIncidencia());
+        incidenciaSelected.setIdSolArticulo(new DetSolicitudArticulo());
+        incidenciaSelected.setIdSolPermiso(new DetSolicitudPermiso());
+        incidenciaSelected.setIdSolPrenda(new DetSolicitudPrenda());
+        incidenciaSelected.setIdTipo(new CatTipoIncidencia());
+    }
 
     public void guardarEstatusIncidencia(boolean aprobada) {
         incidenciaSelected.setIdEmpleadoRev(new DetEmpleado(empleadoSelected.getIdEmpleado()));
@@ -143,11 +160,11 @@ public class IncidenciaBean implements Serializable {
         }
         consultaIncidencias();
         PrimeFaces.current().ajax().update("formIncidencias:messages", "formIncidencias:tabViewI:dtIncidencias");
-        if(incidenciaSelected.getIdSolPermiso().getIdSolicitud() != null){
+        if(incidenciaSelected.getIdSolPermiso() != null){
             PrimeFaces.current().executeScript("PF('dialogPermisos').hide()");
-        }else if(incidenciaSelected.getIdSolPrenda().getIdSolicitud() != null){
+        }else if(incidenciaSelected.getIdSolPrenda() != null){
             PrimeFaces.current().executeScript("PF('dialogPrendas').hide()");
-        }else if(incidenciaSelected.getIdSolArticulo().getIdSolicitud() != null){
+        }else if(incidenciaSelected.getIdSolArticulo() != null){
             PrimeFaces.current().executeScript("PF('dialogArticulos').hide()");
         }
     }
@@ -197,7 +214,7 @@ public class IncidenciaBean implements Serializable {
         PrimeFaces.current().ajax().update("formIncidencias:messages", "formIncidencias:tabViewI:dtPrendasSolicitados");
         PrimeFaces.current().executeScript("PF('dialogPrendas').hide()");
     }
-
+    
     //<editor-fold defaultstate="collapsed" desc="Getters&Setters">
     public DetIncidencia getIncidenciaSelected() {
         return incidenciaSelected;

@@ -18,18 +18,18 @@ import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 import org.primefaces.model.ResponsiveOption;
 
-import mx.com.ferbo.dao.CatPrendaDAO;
-import mx.com.ferbo.dao.CatTallaDAO;
-import mx.com.ferbo.dao.DetSolicitudPrendaDAO;
-import mx.com.ferbo.dao.EmpleadoDAO;
-import mx.com.ferbo.dao.IncidenciaDAO;
-import mx.com.ferbo.dto.CatEstatusIncidenciaDTO;
-import mx.com.ferbo.dto.CatPrendaDTO;
-import mx.com.ferbo.dto.CatTallaDTO;
-import mx.com.ferbo.dto.CatTipoIncidenciaDTO;
-import mx.com.ferbo.dto.DetEmpleadoDTO;
-import mx.com.ferbo.dto.DetIncidenciaDTO;
-import mx.com.ferbo.dto.DetSolicitudPrendaDTO;
+import mx.com.ferbo.dao.n.PrendaDAO;
+import mx.com.ferbo.dao.n.TallaDAO;
+import mx.com.ferbo.dao.n.SolicitudPrendaDAO;
+import mx.com.ferbo.dao.n.EmpleadoDAO;
+import mx.com.ferbo.dao.n.IncidenciaDAO;
+import mx.com.ferbo.model.CatEstatusIncidencia;
+import mx.com.ferbo.model.CatPrenda;
+import mx.com.ferbo.model.CatTalla;
+import mx.com.ferbo.model.CatTipoIncidencia;
+import mx.com.ferbo.model.DetEmpleado;
+import mx.com.ferbo.model.DetIncidencia;
+import mx.com.ferbo.model.DetSolicitudPrenda;
 import mx.com.ferbo.util.SGPException;
 
 @Named(value = "uniformesBean")
@@ -41,64 +41,64 @@ public class UniformesBean implements Serializable {
 
     private String numeroEmpl;
 
-    private List<CatPrendaDTO> lstPrendasActivas;
-    private List<CatTallaDTO> lstTallasActivas;
-    private List<DetSolicitudPrendaDTO> lstSolicitudPrendas;
-    private List<DetSolicitudPrendaDTO> lstSolicitudPrendasRealizadas;
+    private List<CatPrenda> lstPrendasActivas;
+    private List<CatTalla> lstTallasActivas;
+    private List<DetSolicitudPrenda> lstSolicitudPrendas;
+    private List<DetSolicitudPrenda> lstSolicitudPrendasRealizadas;
     private List<ResponsiveOption> responsiveOptions;
 
-    private DetEmpleadoDTO empleadoSelected;
-    private DetSolicitudPrendaDTO solicitud;
+    private DetEmpleado empleadoSelected;
+    private DetSolicitudPrenda solicitud;
 
-    private CatPrendaDAO uniformesDAO;
+    private PrendaDAO uniformesDAO;
     private final EmpleadoDAO empleadoDAO;
-    private final DetSolicitudPrendaDAO detSolicitudPrendaDAO;
-    private final CatTallaDAO tallaDAO;
+    private final SolicitudPrendaDAO solicitudPrendaDAO;
+    private final TallaDAO tallaDAO;
     private final IncidenciaDAO incidenciaDAO;
 
-    private CatPrendaDTO prendaSelected;
-    private CatTallaDTO tallaSelected;
+    private CatPrenda prendaSelected;
+    private CatTalla tallaSelected;
     private Integer cantidadSelected;
 
     private final FacesContext faceContext;
     private final HttpServletRequest httpServletRequest;
     
-    private final DetIncidenciaDTO incidenciaDTO;
-    private final CatTipoIncidenciaDTO catTipoIncidenciaDTO;
-    private final CatEstatusIncidenciaDTO catEstatusIncidenciaDTO;
+    private final DetIncidencia incidencia;
+    private final CatTipoIncidencia catTipoIncidencia;
+    private final CatEstatusIncidencia catEstatusIncidencia;
 
     public UniformesBean() {
         lstPrendasActivas = new ArrayList<>();
         lstTallasActivas = new ArrayList<>();
 
-        empleadoSelected = new DetEmpleadoDTO();
-        prendaSelected = new CatPrendaDTO();
-        tallaSelected = new CatTallaDTO();
+        empleadoSelected = new DetEmpleado();
+        prendaSelected = new CatPrenda();
+        tallaSelected = new CatTalla();
         cantidadSelected = 0;
 
-        uniformesDAO = new CatPrendaDAO();
-        tallaDAO = new CatTallaDAO();
+        uniformesDAO = new PrendaDAO();
+        tallaDAO = new TallaDAO();
         empleadoDAO = new EmpleadoDAO();
-        detSolicitudPrendaDAO = new DetSolicitudPrendaDAO();
+        solicitudPrendaDAO = new SolicitudPrendaDAO();
         incidenciaDAO = new IncidenciaDAO();
 
         faceContext = FacesContext.getCurrentInstance();
         httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
-        this.empleadoSelected = (DetEmpleadoDTO) httpServletRequest.getSession(true).getAttribute("empleado");
+        this.empleadoSelected = (DetEmpleado) httpServletRequest.getSession(true).getAttribute("empleado");
 
-        solicitud = new DetSolicitudPrendaDTO();
-        incidenciaDTO = new DetIncidenciaDTO();
-        catTipoIncidenciaDTO = new CatTipoIncidenciaDTO();
-        catEstatusIncidenciaDTO = new CatEstatusIncidenciaDTO();
+        solicitud = new DetSolicitudPrenda();
+        incidencia = new DetIncidencia();
+        catTipoIncidencia = new CatTipoIncidencia();
+        catEstatusIncidencia = new CatEstatusIncidencia();
     }
 
     @PostConstruct
     public void init() {
         lstSolicitudPrendas = new ArrayList<>();
-        solicitud.setEmpleadoSol(empleadoSelected);
-        lstSolicitudPrendasRealizadas = detSolicitudPrendaDAO.buscarPorCriterios(solicitud);
-        lstPrendasActivas = uniformesDAO.buscarActivo();
-        lstTallasActivas = tallaDAO.buscarActivo();
+        solicitud.setIdEmpleadoSol(empleadoSelected);
+        lstSolicitudPrendasRealizadas = solicitudPrendaDAO.buscarPorIdEmpleado(solicitud.getIdEmpleadoSol().getIdEmpleado());
+        lstPrendasActivas = uniformesDAO.buscarTodosActivos();
+        lstTallasActivas = tallaDAO.buscarTodosActivos();
 
         responsiveOptions = new ArrayList<>();
         responsiveOptions.add(new ResponsiveOption("560px", 3, 3));
@@ -106,9 +106,9 @@ public class UniformesBean implements Serializable {
         responsiveOptions.add(new ResponsiveOption("140px", 1, 1));
     }
 
-    public void seleccionarItem(CatPrendaDTO item) {
+    public void seleccionarItem(CatPrenda item) {
         prendaSelected = item;
-        solicitud = new DetSolicitudPrendaDTO();
+        solicitud = new DetSolicitudPrenda();
         PrimeFaces.current().executeScript("PF('dialogComplementoPrenda').show();");
     }
 
@@ -119,15 +119,15 @@ public class UniformesBean implements Serializable {
             PrimeFaces.current().ajax().update("formActividadesUniformes:tabView:pnlPrendas");
             return;
         }
-        if (solicitud.getTalla() == null) {
+        if (solicitud.getIdTalla().getIdTalla() == null) {
             FacesContext.getCurrentInstance().addMessage(FacesContext.getCurrentInstance().getViewRoot().findComponent("formActividadesUniformes:tabView:soTalla").getClientId(),
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, null, "Campo requerido"));
             PrimeFaces.current().ajax().update("formActividadesUniformes:tabView:pnlPrendas");
             return;
         }
         solicitud.setFechaCap(new Date());
-        solicitud.setEmpleadoSol(empleadoSelected);
-        solicitud.setPrenda(prendaSelected);
+        solicitud.setIdEmpleadoSol(empleadoSelected);
+        solicitud.setIdPrenda(prendaSelected);
         lstSolicitudPrendas.add(solicitud);
         PrimeFaces.current().executeInitScript("PF('dialogComplementoPrenda').hide()");
         PrimeFaces.current().executeInitScript("PF('uniformeDialog').hide()");
@@ -135,23 +135,23 @@ public class UniformesBean implements Serializable {
 
     }
 
-    public void registro()  throws IOException {
-        for (DetSolicitudPrendaDTO detSolicitudPrendaDTO : lstSolicitudPrendas) {
+    public void registro() throws IOException {
+        for (DetSolicitudPrenda detSolicitudPrenda : lstSolicitudPrendas) {
             try {
-                detSolicitudPrendaDAO.guardar(detSolicitudPrendaDTO);
-                lstSolicitudPrendasRealizadas = detSolicitudPrendaDAO.buscarPorCriterios(detSolicitudPrendaDTO);
+                solicitudPrendaDAO.guardar(detSolicitudPrenda);
+                lstSolicitudPrendasRealizadas = solicitudPrendaDAO.buscarPorIdEmpleado(detSolicitudPrenda.getIdEmpleadoSol().getIdEmpleado());
                 
-                catTipoIncidenciaDTO.setIdTipo(3);
-                catEstatusIncidenciaDTO.setIdEstatus(1);
+                catTipoIncidencia.setIdTipo(3);
+                catEstatusIncidencia.setIdEstatus(1);
 
-                incidenciaDTO.setCatTipoIncidenciaDTO(catTipoIncidenciaDTO);
-                incidenciaDTO.setDetEmpleadoDTO(empleadoSelected);
-                incidenciaDTO.setCatEstatusIncidenciaDTO(catEstatusIncidenciaDTO);
-                incidenciaDTO.setVisible((short) 1);
-                incidenciaDTO.setDetSolicitudPrendaDTO(detSolicitudPrendaDTO);
-                incidenciaDTO.setFechaCap(new Date());
+                incidencia.setIdTipo(catTipoIncidencia);
+                incidencia.setIdEmpleado(empleadoSelected);
+                incidencia.setIdEstatus(catEstatusIncidencia);
+                incidencia.setVisible((short) 1);
+                incidencia.setIdSolPrenda(detSolicitudPrenda);
+                incidencia.setFechaCap(new Date());
 
-                incidenciaDAO.guardar(incidenciaDTO);
+                incidenciaDAO.guardar(incidencia);
             } catch (SGPException e) {
                 log.warn("EX-0032: " + e.getMessage() + ". Error al guardar el registro de la prenda del empleado: " + empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
             }
@@ -162,34 +162,34 @@ public class UniformesBean implements Serializable {
 
     //<editor-fold defaultstate="collapsed" desc="Getters&Setters">
     public void inicializaPrenda() {
-        prendaSelected = new CatPrendaDTO();
+        prendaSelected = new CatPrenda();
     }
 
     public void eliminaSolicitud() {
         lstSolicitudPrendas.remove(solicitud);
     }
 
-    public List<CatPrendaDTO> getLstPrendasActivas() {
+    public List<CatPrenda> getLstPrendasActivas() {
         return lstPrendasActivas;
     }
 
-    public void setLstPrendasActivas(List<CatPrendaDTO> lstPrendasActivas) {
+    public void setLstPrendasActivas(List<CatPrenda> lstPrendasActivas) {
         this.lstPrendasActivas = lstPrendasActivas;
     }
 
-    public DetEmpleadoDTO getEmpleadoSelected() {
+    public DetEmpleado getEmpleadoSelected() {
         return empleadoSelected;
     }
 
-    public void setEmpleadoSelected(DetEmpleadoDTO empleadoSelected) {
+    public void setEmpleadoSelected(DetEmpleado empleadoSelected) {
         this.empleadoSelected = empleadoSelected;
     }
 
-    public CatPrendaDAO getUniformesDAO() {
+    public PrendaDAO getUniformesDAO() {
         return uniformesDAO;
     }
 
-    public void setUniformesDAO(CatPrendaDAO uniformesDAO) {
+    public void setUniformesDAO(PrendaDAO uniformesDAO) {
         this.uniformesDAO = uniformesDAO;
     }
 
@@ -205,27 +205,27 @@ public class UniformesBean implements Serializable {
         this.numeroEmpl = numeroEmpl;
     }
 
-    public CatPrendaDTO getPrendaSelected() {
+    public CatPrenda getPrendaSelected() {
         return prendaSelected;
     }
 
-    public void setPrendaSelected(CatPrendaDTO prendaSelected) {
+    public void setPrendaSelected(CatPrenda prendaSelected) {
         this.prendaSelected = prendaSelected;
     }
 
-    public List<CatTallaDTO> getLstTallasActivas() {
+    public List<CatTalla> getLstTallasActivas() {
         return lstTallasActivas;
     }
 
-    public void setLstTallasActivas(List<CatTallaDTO> lstTallasActivas) {
+    public void setLstTallasActivas(List<CatTalla> lstTallasActivas) {
         this.lstTallasActivas = lstTallasActivas;
     }
 
-    public CatTallaDTO getTallaSelected() {
+    public CatTalla getTallaSelected() {
         return tallaSelected;
     }
 
-    public void setTallaSelected(CatTallaDTO tallaSelected) {
+    public void setTallaSelected(CatTalla tallaSelected) {
         this.tallaSelected = tallaSelected;
     }
 
@@ -237,27 +237,27 @@ public class UniformesBean implements Serializable {
         this.cantidadSelected = cantidadSelected;
     }
 
-    public List<DetSolicitudPrendaDTO> getLstSolicitudPrendas() {
+    public List<DetSolicitudPrenda> getLstSolicitudPrendas() {
         return lstSolicitudPrendas;
     }
 
-    public void setLstSolicitudPrendas(List<DetSolicitudPrendaDTO> lstSolicitudPrendas) {
+    public void setLstSolicitudPrendas(List<DetSolicitudPrenda> lstSolicitudPrendas) {
         this.lstSolicitudPrendas = lstSolicitudPrendas;
     }
 
-    public DetSolicitudPrendaDTO getSolicitud() {
+    public DetSolicitudPrenda getSolicitud() {
         return solicitud;
     }
 
-    public void setSolicitud(DetSolicitudPrendaDTO solicitud) {
+    public void setSolicitud(DetSolicitudPrenda solicitud) {
         this.solicitud = solicitud;
     }
 
-    public List<DetSolicitudPrendaDTO> getLstSolicitudPrendasRealizadas() {
+    public List<DetSolicitudPrenda> getLstSolicitudPrendasRealizadas() {
         return lstSolicitudPrendasRealizadas;
     }
 
-    public void setLstSolicitudPrendasRealizadas(List<DetSolicitudPrendaDTO> lstSolicitudPrendasRealizadas) {
+    public void setLstSolicitudPrendasRealizadas(List<DetSolicitudPrenda> lstSolicitudPrendasRealizadas) {
         this.lstSolicitudPrendasRealizadas = lstSolicitudPrendasRealizadas;
     }
 

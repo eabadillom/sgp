@@ -15,20 +15,20 @@
     <p:dataTable id="dt-uniformes" widgetVar="dtUniformes"
                  var="uniforme" value="#{uniformesBean.lstSolicitudPrendas}"
                  reflow="true" styleClass="products-table" rowKey="uniforme.idSolicitud">
-        <p:column headerText="Prenda" sortBy="#{uniforme.getPrenda().idPrenda}" width="22%">
-            <h:outputText value="#{uniforme.getPrenda().descripcion}" />
+        <p:column headerText="Prenda" sortBy="#{uniforme.idPrenda.idPrenda}" width="22%">
+            <h:outputText value="#{uniforme.idPrenda.descripcion}" />
         </p:column>
         <p:column headerText="Imagen" width="18%">
-            <p:graphicImage name="images/prendas/#{uniforme.getPrenda().descripcion}.jpg" library="recursos" width="57" />
+            <p:graphicImage name="images/prendas/#{uniforme.idPrenda.descripcion}.jpg" library="recursos" width="57" />
         </p:column>
         <p:column headerText="Precio" sortBy="#{uniforme.cantidad}" width="18%">
-            <h:outputText value="$#{uniforme.getPrenda().precio * uniforme.cantidad}" />
+            <h:outputText value="$#{uniforme.idPrenda.precio * uniforme.cantidad}" />
         </p:column>
         <p:column headerText="Cantidad" sortBy="#{uniforme.cantidad}" width="18%">
             <h:outputText value="#{uniforme.cantidad}" />
         </p:column>
-        <p:column headerText="Talla" sortBy="#{uniforme.getTalla().idTalla}" width="18%">
-            <h:outputText value="#{uniforme.getTalla().descripcion}" />
+        <p:column headerText="Talla" sortBy="#{uniforme.idTalla.idTalla}" width="18%">
+            <h:outputText value="#{uniforme.idTalla.descripcion}" />
         </p:column>
         <p:column width="6%">
             <p:commandButton class="ui-button-danger rounded-button m-1" icon="pi pi-trash" process="@this" title="Eliminar"
@@ -124,7 +124,7 @@
 
                 <div class="field">
                     <p:outputLabel for="@next" value="Talla" />
-                    <p:selectOneMenu id="soTalla" value="#{uniformesBean.solicitud.talla}" converter="entityConverter">
+                    <p:selectOneMenu id="soTalla" value="#{uniformesBean.solicitud.idTalla}" converter="entityConverter">
                         <f:selectItem itemLabel="--Seleccione--" />
                         <f:selectItems value="#{uniformesBean.lstTallasActivas}" var="talla" itemValue="#{talla}" itemLabel="#{talla.descripcion}" />
                         <p:ajax event="itemSelect" process="@this formActividadesUniformes:tabView:soTalla"/>

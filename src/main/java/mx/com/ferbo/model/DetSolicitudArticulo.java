@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -26,12 +27,6 @@ import javax.persistence.TemporalType;
 @Table(name = "det_solicitud_articulo")
 @NamedQueries({
     @NamedQuery(name = "DetSolicitudArticulo.findAll", query = "SELECT d FROM DetSolicitudArticulo d"),
-    /*@NamedQuery(name = "DetSolicitudArticulo.findArticulosIdEmpleado", query = "SELECT NEW mx.com.ferbo.dto.DetSolicitudArticuloDTO("
-                                                                    + "d.idSolicitud, a.idArticulo, a.descripcion, a.unidad, a.cantidadMax, d.cantidad, d.aprobada, d.fechaCap, d.fechaMod, e.idEmpleado) "
-                                                                    + "FROM DetSolicitudArticulo d "
-                                                                    + "INNER JOIN d.idEmpleadoSol e "
-                                                                    + "INNER JOIN d.idArticulo a "
-                                                                    + "WHERE e.idEmpleado = :numEmpl"),*/
     @NamedQuery(name = "DetSolicitudArticulo.findArticulosIdEmpleado", query = "SELECT dsa FROM DetSolicitudArticulo dsa INNER JOIN dsa.idEmpleadoSol e INNER JOIN dsa.idArticulo a WHERE e.idEmpleado = :numEmpl")
 })
 public class DetSolicitudArticulo implements Serializable {

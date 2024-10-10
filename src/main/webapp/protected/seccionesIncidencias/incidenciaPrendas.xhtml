@@ -14,35 +14,32 @@
     </p:toolbar>
 
     <p:dataTable id="dtPrendasSolicitados" widgetVar="dtPrendasSolicitados" lazy="false" value="#{incidenciaBean.listaPrendas}" 
-                 var="prendas" rowKey="#{prendas.idIncidencia}" >
-        <p:column headerText="# Empleado">
-            <p:outputLabel value="#{prendas.idEmpleado.numEmpleado}"/>
-        </p:column>
-        <p:column headerText="Nombre">
+                 var="prendas" rowKey="#{prendas.idIncidencia}" paginator="true" rows="5" paginatorPosition="bottom" >
+        <p:column headerText="Nombre" width="8rem">
             <p:outputLabel value="#{prendas.idEmpleado.nombre} #{prendas.idEmpleado.primerAp} #{prendas.idEmpleado.segundoAp}"/>
         </p:column>
-        <p:column headerText="Prendas">
+        <p:column headerText="Prendas" width="5rem">
             <p:outputLabel value="#{prendas.idTipo.idTipo eq 3 ? prendas.idSolPrenda.idPrenda.descripcion :''}"/>
         </p:column>
-        <p:column headerText="Imagen">
+        <p:column headerText="Imagen" width="5rem">
             <h:graphicImage name="images/prendas/#{prendas.idSolPrenda.idPrenda.descripcion}.jpg" library="recursos" width="57" />
         </p:column>
-        <p:column headerText="Cantidad">
+        <p:column headerText="Cantidad" width="5rem">
             <p:outputLabel value="#{prendas.idTipo.idTipo eq 3 ? prendas.idSolPrenda.cantidad :''}"/>
         </p:column>
-        <p:column headerText="Talla">
+        <p:column headerText="Talla" width="5rem">
             <p:outputLabel value="#{prendas.idTipo.idTipo eq 3 ? prendas.idSolPrenda.idTalla.descripcion :''}"/>
         </p:column>
-        <p:column headerText="Fecha Captura">
+        <p:column headerText="Captura" width="5rem">
             <p:outputLabel value="#{prendas.idTipo.idTipo eq 3 ? prendas.fechaCap :''}">
                 <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
             </p:outputLabel>
         </p:column>
-        <p:column headerText="Estatus">
+        <p:column headerText="Estatus" width="5rem">
             <p:outputLabel class="customer-badge status-#{prendas.idEstatus.idEstatus eq 1 ? 'proposal' : prendas.idEstatus.idEstatus eq  2 ? 'qualified' : 'unqualified'}"
                            value="#{prendas.idEstatus.descripcion}" style="display: block; width: 7rem"/>
         </p:column>
-        <p:column exportable="false" style="text-align: center" width="20px">
+        <p:column exportable="false" style="text-align: center" width="5rem">
             <p:commandButton icon="pi pi-search" styleClass="rounded-button ui-button-secondary mr-2 mb-2"  process="@this"
                              action="#{incidenciaBean.visualizaDialog()}" update="formIncidencias:tabViewI:dialogPrendas">
                 <f:setPropertyActionListener value="#{prendas}" target="#{incidenciaBean.incidenciaSelected}" for="@previous"/>

@@ -22,49 +22,11 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name = "cat_percepciones")
 @NamedQueries({
-    @NamedQuery(name = "CatPercepciones"
-            + ".findAll", query = "SELECT p FROM CatPercepciones p"),
-    @NamedQuery(name = "CatPercepciones.findByActive", query = "SELECT NEW mx.com.ferbo.dto.CatPercepcionesDTO("
-                                                  + " cp.idPercepciones,"
-                                                  + " cp.diasAguinaldo,"
-                                                  + " cp.diasVacaciones,"
-                                                  + " cp.primaVacacional,"
-                                                  + " cp.bonoPuntualidad,"
-                                                  + " cp.valeDespensa,"
-                                                  + " cp.uma,"
-                                                  + " cp.fechaCap,"
-                                                  + " cp.activo"
-                                                  + ")"
-                                                  + " FROM CatPercepciones cp"
-                                                  + " WHERE cp.activo = 1"),
-    @NamedQuery(name = "CatPercepciones.findByFecha", query = "SELECT NEW mx.com.ferbo.dto.CatPercepcionesDTO("
-                                                  + " cp.idPercepciones,"
-                                                  + " cp.diasAguinaldo,"
-                                                  + " cp.diasVacaciones,"
-                                                  + " cp.primaVacacional,"
-                                                  + " cp.bonoPuntualidad,"
-                                                  + " cp.valeDespensa,"
-                                                  + " cp.uma,"
-                                                  + " cp.fechaCap,"
-                                                  + " cp.activo"
-                                                  + ")"
-                                                  + " FROM CatPercepciones cp"
-                                                  + " WHERE cp.fechaCap LIKE :fechaCap AND cp.activo = 1"),
+    @NamedQuery(name = "CatPercepciones.findAll", query = "SELECT p FROM CatPercepciones p"),
+    @NamedQuery(name = "CatPercepciones.findByActive", query = "SELECT cp FROM CatPercepciones cp WHERE cp.activo = 1"),
+    @NamedQuery(name = "CatPercepciones.findByFecha", query = "SELECT cp FROM CatPercepciones cp WHERE cp.fechaCap LIKE :fechaCap AND cp.activo = 1"),
     @NamedQuery(name = "CatPercepciones.findVigente", query = "SELECT c FROM CatPercepciones c where c.fechaCap = (SELECT MAX(p.fechaCap) FROM CatPercepciones p WHERE p.activo = 1 and p.fechaCap <= :fechaCorte )"),
-    @NamedQuery(name = "CatPercepciones.findLastActive", query =
-    		  "SELECT NEW mx.com.ferbo.dto.CatPercepcionesDTO("
-            + " cp.idPercepciones,"
-            + " cp.diasAguinaldo,"
-            + " cp.diasVacaciones,"
-            + " cp.primaVacacional,"
-            + " cp.bonoPuntualidad,"
-            + " cp.valeDespensa,"
-            + " cp.uma,"
-            + " cp.fechaCap,"
-            + " cp.activo"
-            + ")"
-            + " FROM CatPercepciones cp"
-            + " WHERE cp.fechaCap = (SELECT MAX(p.fechaCap) FROM CatPercepciones p WHERE p.activo = 1 and p.fechaCap <= :fechaCorte )")
+    @NamedQuery(name = "CatPercepciones.findLastActive", query = "SELECT cp FROM CatPercepciones cp WHERE cp.fechaCap = (SELECT MAX(p.fechaCap) FROM CatPercepciones p WHERE p.activo = 1 and p.fechaCap <= :fechaCorte )")
 })
 public class CatPercepciones implements Serializable {
     

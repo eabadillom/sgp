@@ -14,32 +14,29 @@
     </p:toolbar>
 
     <p:dataTable id="dtIncidencias" widgetVar="dtIncidencias" lazy="false" value="#{incidenciaBean.listaPermisos}" 
-                 var="incidencia" rowKey="#{incidencia.idIncidencia}">
-        <p:column headerText="# Empleado">
-            <p:outputLabel value="#{incidencia.idEmpleado.numEmpleado}"/>
-        </p:column>
-        <p:column headerText="Nombre">
+                 var="incidencia" rowKey="#{incidencia.idIncidencia}" paginator="true" rows="5" paginatorPosition="bottom">
+        <p:column headerText="Nombre" width="8rem">
             <p:outputLabel value="#{incidencia.idEmpleado.nombre} #{incidencia.idEmpleado.primerAp} #{incidencia.idEmpleado.segundoAp}"/>
         </p:column>
-        <p:column headerText="Tipo Incidencia">
+        <p:column headerText="Tipo Incidencia" width="5rem">
             <p:outputLabel value="#{incidencia.idTipo.idTipo eq 1 ? incidencia.idSolPermiso.idTipoSolicitud.descripcion :''}"/>
         </p:column>
-        <p:column headerText="Fecha Inicio">
+        <p:column headerText="Inicio" width="5rem">
             <p:outputLabel value="#{incidencia.idTipo.idTipo eq 1 ? incidencia.idSolPermiso.fechaInicio :''}">
                 <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
             </p:outputLabel>
         </p:column>
-        <p:column headerText="Fecha Fin">
+        <p:column headerText="Fin" width="5rem">
             <p:outputLabel value="#{incidencia.idTipo.idTipo eq 1 ? incidencia.idSolPermiso.fechaFin :''}">
                 <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
             </p:outputLabel>
         </p:column>
-        <p:column headerText="Fecha Captura">
+        <p:column headerText="Captura" width="5rem">
             <p:outputLabel value="#{incidencia.idTipo.idTipo eq 1 ? incidencia.fechaCap :''}">
                 <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
             </p:outputLabel>
         </p:column>
-        <p:column headerText="Estatus">
+        <p:column headerText="Estatus" width="5rem">
             <p:outputLabel class="customer-badge status-#{incidencia.idEstatus.idEstatus eq 1 ? 'proposal' : incidencia.idEstatus.idEstatus eq  2 ? 'qualified' : 'unqualified'}"
                            value="#{incidencia.idEstatus.descripcion}" style="display: block; width: 7rem"/>
         </p:column>
