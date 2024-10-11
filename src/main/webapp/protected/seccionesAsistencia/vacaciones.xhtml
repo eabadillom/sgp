@@ -4,9 +4,9 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:jsf="http://xmlns.jcp.org/jsf">
 
-    <p:dataTable id="dtSolicitudes" widgetVar="vacacionesDT" var="solicitud" value="#{asistenciaBean.lstSolicitudes}" reflow="true"
+    <p:dataTable id="dtSolicitudes" widgetVar="dtSolicitudes" var="solicitud" value="#{asistenciaBean.lstSolicitudes}" reflow="true"
                  selection="#{asistenciaBean.solicitudSelected}" rowKey="#{solicitud.idSolicitud}" 
-                 paginator="true" rows="10" paginatorPosition="bottom" rowSelectMode="add" lazy="true" >
+                 paginator="true" rows="5" paginatorPosition="bottom" rowSelectMode="add" lazy="true" >
         <f:facet name="header">
             <div class="customers-table-header">
                 <span style="font-weight: bold">Solicitudes registradas</span>
@@ -15,7 +15,7 @@
                         <p:commandButton value="Registrar" icon="pi pi-plus" styleClass="ui-button-success" style="margin-right: .5rem" process="@this"
                                          oncomplete="PF('dialogVacaciones').show();"/>
                         <p:commandButton value="Descargar" icon="pi pi-download" styleClass="ui-button-secondary" ajax="false">
-                            <p:dataExporter type="pdf" target="vacacionesDT" fileName="empleados"/>
+                            <p:dataExporter type="pdf" target="dtSolicitudes" fileName="empleados"/>
                         </p:commandButton>
                     </p:toolbarGroup>
                 </p:toolbar>
@@ -24,12 +24,12 @@
         <p:column headerText="Tipo de solicitud">
             <p:outputLabel value="#{solicitud.idTipoSolicitud.descripcion}" />
         </p:column>
-        <p:column headerText="Fecha de inicio" sortBy="#{solicitud.fechaInicio}" filterBy="#{solicitud.fechaInicio}">
+        <p:column headerText="Inicio" sortBy="#{solicitud.fechaInicio}" filterBy="#{solicitud.fechaInicio}">
             <p:outputLabel value="#{solicitud.fechaInicio}">
                 <f:convertDateTime type="date" pattern="dd-MM-yyyy" timeZone="Mexico/General"/>
             </p:outputLabel>
         </p:column>
-        <p:column headerText="Fecha de fin" sortBy="#{solicitud.fechaFin}" filterBy="#{solicitud.fechaFin}">
+        <p:column headerText="Fin" sortBy="#{solicitud.fechaFin}" filterBy="#{solicitud.fechaFin}">
             <p:outputLabel value="#{solicitud.fechaFin}">
                 <f:convertDateTime type="date" pattern="dd-MM-yyyy" timeZone="Mexico/General"/>
             </p:outputLabel>
@@ -76,7 +76,7 @@
         </p:outputPanel>
         <f:facet name="footer">
             <p:commandButton value="Guardar" icon="pi pi-save" actionListener="#{asistenciaBean.guardaSolicitud()}" 
-                             process="pnlDetalleVacaciones @this" update="pnlDetalleVacaciones"/>
+                             process="pnlDetalleVacaciones @this" update="pnlDetalleVacaciones dtSolicitudes"/>
             <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogVacaciones').hide()" class="ui-button-secondary" />
         </f:facet>
     </p:dialog>

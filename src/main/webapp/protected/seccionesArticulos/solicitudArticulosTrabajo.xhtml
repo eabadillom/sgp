@@ -16,18 +16,18 @@
                  var="articuloOficina" value="#{articuloOficinasBean.lstSolicitudArticulos}"
                  reflow="true" styleClass="products-table"
                  rowKey="articuloOficina.idSolicitud">
-        <p:column headerText="Articulo" sortBy="#{articuloOficina.getArticulo().idArticulo}" width="22%">
-            <h:outputText value="#{articuloOficina.getArticulo().descripcion}" />
+        <p:column headerText="Articulo" sortBy="#{articuloOficina.idArticulo.idArticulo}" width="22%">
+            <h:outputText value="#{articuloOficina.idArticulo.descripcion}" />
         </p:column>
         <p:column headerText="Imagen" width="18%">
-            <h:graphicImage name="images/articulos/#{articuloOficina.getArticulo().descripcion}.jpg" library="recursos" width="57" />
+            <h:graphicImage name="images/articulos/#{articuloOficina.idArticulo.descripcion}.jpg" library="recursos" width="57" />
         </p:column>
         <p:column headerText="Cantidad" sortBy="#{articuloOficina.cantidad}" width="18%">
             <h:outputText value="#{articuloOficina.cantidad}" />
         </p:column>
-        <p:column headerText="Unidad" sortBy="#{articuloOficina.getArticulo().unidad}"
+        <p:column headerText="Unidad" sortBy="#{articuloOficina.idArticulo.unidad}"
                   width="100px">
-            <h:outputText value="#{articuloOficina.getArticulo().unidad}" />
+            <h:outputText value="#{articuloOficina.idArticulo.unidad}" />
         </p:column>
         <p:column width="6%">
             <p:commandButton class="ui-button-danger rounded-button m-1" icon="pi pi-trash" process="@this" title="Eliminar"

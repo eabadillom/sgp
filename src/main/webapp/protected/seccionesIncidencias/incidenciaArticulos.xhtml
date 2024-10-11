@@ -14,32 +14,29 @@
     </p:toolbar>
 
     <p:dataTable id="dtArticulosSolicitados" widgetVar="dtArticulosSolicitados" lazy="false" value="#{incidenciaBean.listaArticulos}" 
-                 var="articulos" rowKey="#{articulos.idIncidencia}">
-        <p:column headerText="# Empleado">
-            <p:outputLabel value="#{articulos.idEmpleado.numEmpleado}"/>
-        </p:column>
-        <p:column headerText="Nombre">
+                 var="articulos" rowKey="#{articulos.idIncidencia}" paginator="true" rows="5" paginatorPosition="bottom">
+        <p:column headerText="Nombre" width="8rem">
             <p:outputLabel value="#{articulos.idEmpleado.nombre} #{articulos.idEmpleado.primerAp} #{articulos.idEmpleado.segundoAp}"/>
         </p:column>
-        <p:column headerText="Articulos">
+        <p:column headerText="Articulos" width="5rem">
             <p:outputLabel value="#{articulos.idTipo.idTipo eq 4 ? articulos.idSolArticulo.idArticulo.descripcion :''}"/>
         </p:column>
-        <p:column headerText="Imagen">
+        <p:column headerText="Imagen" width="5rem">
             <h:graphicImage name="images/articulos/#{articulos.idSolArticulo.idArticulo.descripcion}.jpg" library="recursos" width="57" />
         </p:column>
-        <p:column headerText="Cantidad / Unidad">
+        <p:column headerText="Cantidad / Unidad" width="5rem">
             <p:outputLabel value="#{articulos.idTipo.idTipo eq 4 ? articulos.idSolArticulo.cantidad :''} #{articulos.idTipo.idTipo eq 4 ? articulos.idSolArticulo.idArticulo.unidad :''}"/>
         </p:column>
-        <p:column headerText="Fecha Captura">
+        <p:column headerText="Captura" width="5rem">
             <p:outputLabel value="#{articulos.idTipo.idTipo eq 4 ? articulos.fechaCap :''}">
                 <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
             </p:outputLabel>
         </p:column>
-        <p:column headerText="Estatus">
+        <p:column headerText="Estatus" width="5rem">
             <p:outputLabel class="customer-badge status-#{articulos.idEstatus.idEstatus eq 1 ? 'proposal' : articulos.idEstatus.idEstatus eq  2 ? 'qualified' : 'unqualified'}"
                            value="#{articulos.idEstatus.descripcion}" style="display: block; width: 7rem"/>
         </p:column>
-        <p:column exportable="false" style="text-align: center" width="20px">
+        <p:column exportable="false" style="text-align: center" width="5rem">
             <p:commandButton icon="pi pi-search" styleClass="rounded-button ui-button-secondary mr-2 mb-2"  process="@this"
                              action="#{incidenciaBean.visualizaDialog()}" update="formIncidencias:tabViewI:dialogArticulos">
                 <f:setPropertyActionListener value="#{articulos}" target="#{incidenciaBean.incidenciaSelected}" for="@previous"/>

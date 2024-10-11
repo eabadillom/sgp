@@ -3,6 +3,7 @@ package mx.com.ferbo.model;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -25,37 +26,6 @@ import javax.validation.constraints.NotNull;
 @Table(name = "det_incidencia")
 @NamedQueries({
     @NamedQuery(name = "DetIncidencia.findAll", query = "SELECT d FROM DetIncidencia d JOIN d.idEmpleado e JOIN d.idTipo ct JOIN d.idEstatus ce LEFT JOIN d.idSolPermiso sp LEFT JOIN d.idSolArticulo sa LEFT JOIN d.idSolPrenda spr LEFT JOIN sp.idTipoSolicitud tp LEFT JOIN sa.idArticulo a LEFT JOIN spr.idPrenda p LEFT JOIN spr.idTalla t ORDER BY d.fechaCap"),
-    /*@NamedQuery(name = "DetIncidencia.findByIdEmpleado", query = "SELECT NEW mx.com.ferbo.dto.DetIncidenciaDTO("
-            + " d.idIncidencia,"
-            + " d.visible,"
-            + " d.fechaCap,"
-            + " d.fechaMod,"
-            + " e.idEmpleado,"
-            + " e.numEmpleado,"
-            + " e.nombre,"
-            + " e.primerAp,"
-            + " e.segundoAp,"
-            + " ct.idTipo,"
-            + " ct.descripcion,"
-            + " ce.idEstatus,"
-            + " ce.descripcion,"
-            + " sp.idSolicitud,"
-            + " sp.fechaCap,"
-            + " sp.fechaMod,"
-            + " sp.fechaInicio,"
-            + " sp.fechaFin,"
-            + " sp.aprobada,"
-            + " tp.idTipoSolicitud,"
-            + " tp.descripcion"
-            + ")"
-            + " FROM DetIncidencia d"
-            + " JOIN d.idEmpleado e"
-            + " JOIN d.idTipo ct"
-            + " JOIN d.idEstatus ce"
-            + " LEFT JOIN d.idSolPermiso sp"
-            + " JOIN sp.idTipoSolicitud tp"
-            + " WHERE e.idEmpleado = :idEmpleado"
-            + " AND ce.idEstatus = 2"),*/
     @NamedQuery(name = "DetIncidencia.findByIdEmpleado", query = "SELECT d FROM DetIncidencia d JOIN d.idEmpleado e JOIN d.idTipo ct JOIN d.idEstatus ce LEFT JOIN d.idSolPermiso sp JOIN sp.idTipoSolicitud tp WHERE e.idEmpleado = :idEmpleado AND ce.idEstatus = 2")
 })
 public class DetIncidencia implements Serializable {
@@ -67,27 +37,27 @@ public class DetIncidencia implements Serializable {
     @Column(name = "id_incidencia")
     private Integer idIncidencia;
     @JoinColumn(name = "id_empleado", referencedColumnName = "id_empleado")
-    @ManyToOne
+    @ManyToOne()
     private DetEmpleado idEmpleado;
     @JoinColumn(name = "id_empleado_rev", referencedColumnName = "id_empleado")
-    @ManyToOne
+    @ManyToOne()
     private DetEmpleado idEmpleadoRev;
     @Column(name = "visible")
     private Short visible;
     @JoinColumn(name = "id_estatus", referencedColumnName = "id_estatus")
-    @ManyToOne
+    @ManyToOne()
     private CatEstatusIncidencia idEstatus;
     @JoinColumn(name = "id_tipo", referencedColumnName = "id_tipo")
-    @ManyToOne
+    @ManyToOne()
     private CatTipoIncidencia idTipo;
     @JoinColumn(name = "id_sol_articulo", referencedColumnName = "id_solicitud")
-    @ManyToOne
+    @ManyToOne()
     private DetSolicitudArticulo idSolArticulo;
     @JoinColumn(name = "id_sol_permiso", referencedColumnName = "id_solicitud")
-    @ManyToOne
+    @ManyToOne()
     private DetSolicitudPermiso idSolPermiso;
     @JoinColumn(name = "id_sol_prenda", referencedColumnName = "id_solicitud")
-    @ManyToOne
+    @ManyToOne()
     private DetSolicitudPrenda idSolPrenda;
     @Basic(optional = false)
     @NotNull

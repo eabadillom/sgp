@@ -28,12 +28,12 @@ import org.primefaces.model.DefaultScheduleModel;
 import org.primefaces.model.ScheduleEvent;
 import org.primefaces.model.ScheduleModel;
 
-//import mx.com.ferbo.dao.CatTipoSolicitudDAO;
 import mx.com.ferbo.dao.n.IncidenciaDAO;
-//import mx.com.ferbo.dao.RegistroDAO;
 import mx.com.ferbo.dao.n.TipoSolicitudDAO;
 import mx.com.ferbo.dao.n.RegistroDAO;
 import mx.com.ferbo.dao.n.SolicitudPermisoDAO;
+import mx.com.ferbo.model.CatEstatusIncidencia;
+import mx.com.ferbo.model.CatTipoIncidencia;
 import mx.com.ferbo.model.CatTipoSolicitud;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetIncidencia;
@@ -73,6 +73,9 @@ public class AsistenciaBean implements Serializable {
 
     // Obteniendo Empleado
     private DetEmpleado empleadoSelected;
+    private final DetIncidencia incidencia;
+    private final CatTipoIncidencia catTipoIncidencia;
+    private final CatEstatusIncidencia catEstatusIncidencia;
     private final HttpServletRequest httpServletRequest;
 
     @SuppressWarnings("OverridableMethodCallInConstructor")
@@ -91,13 +94,16 @@ public class AsistenciaBean implements Serializable {
 
         empleadoSelected = new DetEmpleado();
         httpServletRequest = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-        this.empleadoSelected = (DetEmpleado) httpServletRequest.getSession(true).getAttribute("empleado"); //Esta es la que causa el problema
+        this.empleadoSelected = (DetEmpleado) httpServletRequest.getSession(true).getAttribute("empleado");
+        incidencia = new DetIncidencia();
+        catTipoIncidencia = new CatTipoIncidencia();
+        catEstatusIncidencia = new CatEstatusIncidencia();
     }
 
     @PostConstruct
     public void init() {
         evento = new DefaultScheduleEvent();
-        lstTipoSol = tipoSolicitudDAO.buscarActivos();
+        actualizarSolicitudPermiso();
         lstTipoSol.forEach((CatTipoSolicitud tipo) -> {
             lstTipoSolSelect.add(new SelectItem(tipo.getIdTipoSolicitud(),
                     tipo.getDescripcion(),
@@ -108,7 +114,6 @@ public class AsistenciaBean implements Serializable {
         lstIncidencias = incidenciaDAO.buscarPorIdEmpleado(empleadoSelected.getIdEmpleado());
         generaEventosRegistros(lstRegistros);
         generaEventosIncidencias(lstIncidencias);
-        lstSolicitudes = solicitudPermisoDAO.buscarPorIdEmpleado(empleadoSelected.getIdEmpleado());
     }
 
     private void generaEventosRegistros(List<DetRegistro> registros) {
@@ -237,6 +242,12 @@ public class AsistenciaBean implements Serializable {
         }
         return estilo;
     }
+    
+    public void actualizarSolicitudPermiso()
+    {
+        lstSolicitudes = solicitudPermisoDAO.buscarPorIdEmpleado(empleadoSelected.getIdEmpleado());
+        lstTipoSol = tipoSolicitudDAO.buscarActivos();
+    }
 
     public void guardaSolicitud() {
         try {
@@ -247,10 +258,43 @@ public class AsistenciaBean implements Serializable {
                 solicitudSelected.setFechaInicio(lstRangoRegistro.get(0));
                 solicitudSelected.setFechaFin(lstRangoRegistro.size() > 1 ? lstRangoRegistro.get(1) : lstRangoRegistro.get(0));
             }
+            solicitudSelected.setFechaCap(new Date());
             solicitudSelected.setIdEmpleadoSol(new DetEmpleado(empleadoSelected.getIdEmpleado()));
             solicitudPermisoDAO.guardar(solicitudSelected);
-
-            lstSolicitudes.add(solicitudSelected);
+            
+            switch (solicitudSelected.getIdTipoSolicitud().getIdTipoSolicitud()) 
+            {
+                // Tipo Permisos
+                case 1:
+                    catTipoIncidencia.setIdTipo(1);
+                    break;
+                // Tipo Vacaciones
+                case 2:
+                    catTipoIncidencia.setIdTipo(2);
+                    break;
+                // Incapacidad Corta
+                case 3:
+                    catTipoIncidencia.setIdTipo(1);
+                    break;
+                // Incapacidad Larga
+                case 4:
+                    catTipoIncidencia.setIdTipo(1);
+                    break;
+                default:
+                    log.warn("EX-0023: Error al seleccionar opción");
+            }
+            catEstatusIncidencia.setIdEstatus(1);
+            
+            incidencia.setIdTipo(catTipoIncidencia);
+            incidencia.setIdEmpleado(empleadoSelected);
+            incidencia.setIdEstatus(catEstatusIncidencia);
+            incidencia.setVisible((short) 1);
+            incidencia.setIdSolPermiso(solicitudSelected);
+            incidencia.setFechaCap(new Date());
+            
+            incidenciaDAO.guardar(incidencia);
+            
+            actualizarSolicitudPermiso();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Solicitud registrada"));
         } catch (SGPException ex) {
             FacesContext.getCurrentInstance()
@@ -268,6 +312,7 @@ public class AsistenciaBean implements Serializable {
 
     public void inicializaSolicitud() {
         solicitudSelected = new DetSolicitudPermiso();
+        solicitudSelected.setIdTipoSolicitud(new CatTipoSolicitud());
     }
 
     public void actualizaCalendarioSeleccionado() {
