@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.TimeZone;
 
 import javax.annotation.PostConstruct;
@@ -40,6 +41,7 @@ import mx.com.ferbo.model.DetIncidencia;
 import mx.com.ferbo.model.DetRegistro;
 import mx.com.ferbo.model.DetSolicitudPermiso;
 import mx.com.ferbo.util.SGPException;
+import mx.com.ferbo.util.ManageStatus;
 
 /**
  *
@@ -66,6 +68,7 @@ public class AsistenciaBean implements Serializable {
     private List<DetSolicitudPermiso> lstSolicitudes;
     private List<CatTipoSolicitud> lstTipoSol;
     private List<DetIncidencia> lstIncidencias;
+    private List<DetIncidencia> incidenciasBuscada;
     private final List<Integer> invalidDays;
     private List<Date> lstRangoRegistro;
     private List<SelectItem> lstTipoSolSelect;
@@ -73,10 +76,11 @@ public class AsistenciaBean implements Serializable {
 
     // Obteniendo Empleado
     private DetEmpleado empleadoSelected;
-    private final DetIncidencia incidencia;
-    private final CatTipoIncidencia catTipoIncidencia;
-    private final CatEstatusIncidencia catEstatusIncidencia;
+    private DetIncidencia incidencia;
+    private CatTipoIncidencia catTipoIncidencia;
+    private CatEstatusIncidencia catEstatusIncidencia;
     private final HttpServletRequest httpServletRequest;
+    private ManageStatus status;
 
     @SuppressWarnings("OverridableMethodCallInConstructor")
     public AsistenciaBean() {
@@ -95,9 +99,6 @@ public class AsistenciaBean implements Serializable {
         empleadoSelected = new DetEmpleado();
         httpServletRequest = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         this.empleadoSelected = (DetEmpleado) httpServletRequest.getSession(true).getAttribute("empleado");
-        incidencia = new DetIncidencia();
-        catTipoIncidencia = new CatTipoIncidencia();
-        catEstatusIncidencia = new CatEstatusIncidencia();
     }
 
     @PostConstruct
@@ -109,11 +110,11 @@ public class AsistenciaBean implements Serializable {
                     tipo.getDescripcion(),
                     tipo.getIdTipoSolicitud() == 3 ? "Solo 1 día" : tipo.getIdTipoSolicitud() == 4 ? "Más de 1 día" : null));
         });
-
-        lstRegistros = registroDAO.consultaRegistrosPorIdEmp(empleadoSelected.getIdEmpleado());
-        lstIncidencias = incidenciaDAO.buscarPorIdEmpleado(empleadoSelected.getIdEmpleado());
+        
+        actualizarListas();
         generaEventosRegistros(lstRegistros);
         generaEventosIncidencias(lstIncidencias);
+        status = new ManageStatus();
     }
 
     private void generaEventosRegistros(List<DetRegistro> registros) {
@@ -248,6 +249,13 @@ public class AsistenciaBean implements Serializable {
         lstSolicitudes = solicitudPermisoDAO.buscarPorIdEmpleado(empleadoSelected.getIdEmpleado());
         lstTipoSol = tipoSolicitudDAO.buscarActivos();
     }
+    
+    public void actualizarListas()
+    {
+        lstRegistros = registroDAO.consultaRegistrosPorIdEmp(empleadoSelected.getIdEmpleado());
+        lstIncidencias = incidenciaDAO.buscarPorIdEmpleado(empleadoSelected.getIdEmpleado());
+        incidenciasBuscada = incidenciaDAO.buscarPorIdEmpleadoPermiso(empleadoSelected.getIdEmpleado());
+    }
 
     public void guardaSolicitud() {
         try {
@@ -258,10 +266,12 @@ public class AsistenciaBean implements Serializable {
                 solicitudSelected.setFechaInicio(lstRangoRegistro.get(0));
                 solicitudSelected.setFechaFin(lstRangoRegistro.size() > 1 ? lstRangoRegistro.get(1) : lstRangoRegistro.get(0));
             }
+            solicitudSelected.setAprobada((short)1);
             solicitudSelected.setFechaCap(new Date());
             solicitudSelected.setIdEmpleadoSol(new DetEmpleado(empleadoSelected.getIdEmpleado()));
             solicitudPermisoDAO.guardar(solicitudSelected);
             
+            catTipoIncidencia = new CatTipoIncidencia();
             switch (solicitudSelected.getIdTipoSolicitud().getIdTipoSolicitud()) 
             {
                 // Tipo Permisos
@@ -283,8 +293,10 @@ public class AsistenciaBean implements Serializable {
                 default:
                     log.warn("EX-0023: Error al seleccionar opción");
             }
+            catEstatusIncidencia = new CatEstatusIncidencia();
             catEstatusIncidencia.setIdEstatus(1);
             
+            incidencia = new DetIncidencia();
             incidencia.setIdTipo(catTipoIncidencia);
             incidencia.setIdEmpleado(empleadoSelected);
             incidencia.setIdEstatus(catEstatusIncidencia);
@@ -308,6 +320,68 @@ public class AsistenciaBean implements Serializable {
         }
         PrimeFaces.current().executeScript("PF('dialogVacaciones').hide()");
         PrimeFaces.current().ajax().update("formActividades:messages", "formActividades:tabView:dtSolicitudes");
+    }
+    
+    public void actualizarSolicitud() 
+    {
+        actualizarListas();
+        FacesMessage message = null;
+        FacesMessage.Severity severity = null;
+        String mensaje = null;
+        String titulo = "Permiso";
+        try
+        {
+            if(incidenciasBuscada == null)
+            {
+                throw new SGPException("Error con la conexión a la base de datos!!!");
+            }
+            
+            switch (solicitudSelected.getAprobada().intValue()) 
+            {
+                case 2:
+                    throw new SGPException("No se puede modificar el permiso");
+                case 3:
+                    throw new SGPException("No se puede modificar el permiso");
+                case 4:
+                    throw new SGPException("No se puede modificar el permiso");
+            }
+            
+            for(DetIncidencia auxIncidenciaBuscada : incidenciasBuscada)
+            {
+                if(Objects.equals(auxIncidenciaBuscada.getIdSolPermiso().getIdSolicitud(), solicitudSelected.getIdSolicitud()))
+                {
+                    catEstatusIncidencia = new CatEstatusIncidencia();
+                    catEstatusIncidencia.setIdEstatus(4);
+                    
+                    auxIncidenciaBuscada.setIdEstatus(catEstatusIncidencia);
+                    auxIncidenciaBuscada.setIdSolPermiso(solicitudSelected);
+                    incidenciaDAO.actualizar(auxIncidenciaBuscada);
+                }
+            }
+            solicitudSelected.setAprobada((short) 4);
+            solicitudPermisoDAO.actualizar(solicitudSelected);
+            
+            actualizarListas();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Estatus Modificada"));
+            PrimeFaces.current().ajax().update("formActividades:tabView:dtSolicitudes");
+            PrimeFaces.current().executeScript("PF('dialogVacacionesView').hide()");
+        }catch(SGPException e)
+        {
+            mensaje = e.getMessage();
+            severity = FacesMessage.SEVERITY_INFO;
+        }catch(Exception e)
+        {
+            log.warn("EX-0032: " + e.getMessage() + ". Error al actualizar el registro del permiso del empleado: " + empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
+        }finally
+        {
+            if(severity != null)
+            {
+                message = new FacesMessage(severity, titulo, mensaje);
+                FacesContext.getCurrentInstance().addMessage(null, message);
+                PrimeFaces.current().ajax().update(":formActividades:messages");
+                PrimeFaces.current().executeScript("PF('dialogVacacionesView').hide()");
+            }
+        }
     }
 
     public void inicializaSolicitud() {
@@ -417,6 +491,10 @@ public class AsistenciaBean implements Serializable {
 
     public void setLstTipoSolSelect(List<SelectItem> lstTipoSolSelect) {
         this.lstTipoSolSelect = lstTipoSolSelect;
+    }
+    
+    public ManageStatus getStatus() {
+        return status;
     }
     //</editor-fold>
 }

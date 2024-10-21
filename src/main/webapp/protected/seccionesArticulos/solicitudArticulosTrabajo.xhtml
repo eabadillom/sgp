@@ -91,13 +91,13 @@
                              actionListener="#{articuloOficinasBean.preRegistro()}" />
             <p:commandButton value="Cancelar" icon="pi pi-times"
                              onclick="PF('dialogComplementoArtiulo').hide()"
-                             class="ui-button-secondary" process="@this formActividadesArticulos:tabViewA:pnlArticulos"/>
+                             class="ui-button-secondary" process="@this formActividadesArticulos:tabView:pnlArticulos"/>
         </f:facet>
     </p:dialog>
 
     <p:confirmDialog widgetVar="dialogEliminarArticulo" showEffect="fade" width="300" message="Eliminar articulo?" header="Confirmar" severity="warn">
         <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{articuloOficinasBean.eliminaSolicitud()}" process="@this" 
-                         oncomplete="PF('dialogEliminarArticulo').hide()" update="formActividadesArticulos:tabViewA:dt-articuloOficinas formActividadesArticulos:tabViewA:btnRegistro"/>
+                         oncomplete="PF('dialogEliminarArticulo').hide()" update="formActividadesArticulos:tabView:dt-articuloOficinas formActividadesArticulos:tabView:btnRegistro"/>
         <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('dialogEliminarArticulo').hide()" />
     </p:confirmDialog>
 

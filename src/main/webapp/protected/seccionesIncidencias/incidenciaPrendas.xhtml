@@ -36,7 +36,7 @@
             </p:outputLabel>
         </p:column>
         <p:column headerText="Estatus" width="5rem">
-            <p:outputLabel class="customer-badge status-#{prendas.idEstatus.idEstatus eq 1 ? 'proposal' : prendas.idEstatus.idEstatus eq  2 ? 'qualified' : 'unqualified'}"
+            <p:outputLabel class="customer-badge status-#{incidenciaBean.status.getStatusClass(prendas.idEstatus.idEstatus)}"
                            value="#{prendas.idEstatus.descripcion}" style="display: block; width: 7rem"/>
         </p:column>
         <p:column exportable="false" style="text-align: center" width="5rem">
@@ -48,7 +48,7 @@
     </p:dataTable>
 
     <p:dialog id="dialogPrendas" widgetVar="dialogPrendas" header="Detalle solicitud uniforme" showEffect="fade" responsive="true" modal="true" 
-              styleClass="ferbo-dialog" dynamic="true" cache="false" >
+              styleClass="ferbo-dialog-complemento-articulo" dynamic="true" cache="false" >
         <p:outputPanel id="pnlPrendas" rendered="#{not empty incidenciaBean.incidenciaSelected}">
             <div class="formgrid grid">
                 <div class="field col">
@@ -69,9 +69,9 @@
         <f:facet name="footer">
             <p:commandButton value="Aprobar" icon="pi pi-check" class="ui-button-success" process="pnlPrendas @this"
                              actionListener="#{incidenciaBean.guardarEstatusPrenda(true)}" 
-                             disabled="#{incidenciaBean.incidenciaSelected.idSolPrenda.aprobada ne null}"/>
+                             disabled="#{incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 2 or incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 3 or incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 4}"/>
             <p:commandButton value="Rechazar" icon="pi pi-times" class="ui-button-danger" process="pnlPrendas @this"
-                             disabled="#{incidenciaBean.incidenciaSelected.idSolPrenda.aprobada ne null}"
+                             disabled="#{incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 2 or incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 3 or incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 4}"
                              oncomplete="PF('dialogRechazarPrendas').show()"/>
         </f:facet>
     </p:dialog>
@@ -88,7 +88,7 @@
         </p:outputPanel>
         <f:facet name="footer">
             <p:commandButton value="Aceptar" icon="pi pi-check" class="ui-button-success" process="pnlDetalleRechazoPrendas @this"
-                             actionListener="#{incidenciaBean.guardarEstatusIncidencia(false)}" oncomplete="PF('dialogRechazarPrendas').hide()" update="formIncidencias:tabViewI:dtPrendasSolicitados"/>
+                             actionListener="#{incidenciaBean.guardarEstatusPrenda(false)}" oncomplete="PF('dialogRechazarPrendas').hide()" update="formIncidencias:tabViewI:dtPrendasSolicitados"/>
             <p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-secondary" process="@this" 
                              oncomplete="PF('dialogRechazarPrendas').hide()"/>
         </f:facet>

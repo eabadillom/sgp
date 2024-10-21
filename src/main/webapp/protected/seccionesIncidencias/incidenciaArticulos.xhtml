@@ -33,7 +33,7 @@
             </p:outputLabel>
         </p:column>
         <p:column headerText="Estatus" width="5rem">
-            <p:outputLabel class="customer-badge status-#{articulos.idEstatus.idEstatus eq 1 ? 'proposal' : articulos.idEstatus.idEstatus eq  2 ? 'qualified' : 'unqualified'}"
+            <p:outputLabel class="customer-badge status-#{incidenciaBean.status.getStatusClass(articulos.idEstatus.idEstatus)}"
                            value="#{articulos.idEstatus.descripcion}" style="display: block; width: 7rem"/>
         </p:column>
         <p:column exportable="false" style="text-align: center" width="5rem">
@@ -66,10 +66,10 @@
         <f:facet name="footer">
             <p:commandButton value="Aprobar" icon="pi pi-check" class="ui-button-success" process="pnlArticulos @this"
                              actionListener="#{incidenciaBean.guardarEstatusArticulo(true)}" 
-                             disabled="#{incidenciaBean.incidenciaSelected.idSolArticulo.aprobada ne null}"/>
+                             disabled="#{incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 2 or incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 3 or incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 4}"/>
             <p:commandButton value="Rechazar" icon="pi pi-times" class="ui-button-danger" process="pnlArticulos @this"
                              onclick="PF('dialogArticulos').hide()"
-                             disabled="#{incidenciaBean.incidenciaSelected.idSolArticulo.aprobada ne null}"
+                             disabled="#{incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 2 or incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 3 or incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 4}"
                              oncomplete="PF('dialogRechazarArticulo').show()"/>
         </f:facet>
     </p:dialog>
@@ -86,7 +86,7 @@
         </p:outputPanel>
         <f:facet name="footer">
             <p:commandButton value="Aceptar" icon="pi pi-check" class="ui-button-success" process="pnlDetalleRechazoArticulo @this"
-                             actionListener="#{incidenciaBean.guardarEstatusIncidencia(false)}" oncomplete="PF('dialogRechazarArticulo').hide()" update="formIncidencias:tabViewI:dtArticulosSolicitados"/>
+                             actionListener="#{incidenciaBean.guardarEstatusArticulo(false)}" oncomplete="PF('dialogRechazarArticulo').hide()" update="formIncidencias:tabViewI:dtArticulosSolicitados"/>
             <p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-secondary" process="@this" 
                              oncomplete="PF('dialogRechazarArticulo').hide()"/>
         </f:facet>

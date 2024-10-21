@@ -19,6 +19,9 @@ import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.IncidenciaDAO;
+import mx.com.ferbo.dao.n.SolicitudArticuloDAO;
+import mx.com.ferbo.dao.n.SolicitudPermisoDAO;
+import mx.com.ferbo.dao.n.SolicitudPrendaDAO;
 import mx.com.ferbo.dao.n.TipoSolicitudDAO;
 import mx.com.ferbo.model.CatEstatusIncidencia;
 import mx.com.ferbo.model.CatTipoIncidencia;
@@ -28,6 +31,7 @@ import mx.com.ferbo.model.DetIncidencia;
 import mx.com.ferbo.model.DetSolicitudArticulo;
 import mx.com.ferbo.model.DetSolicitudPermiso;
 import mx.com.ferbo.model.DetSolicitudPrenda;
+import mx.com.ferbo.util.ManageStatus;
 import mx.com.ferbo.util.SGPException;
 
 /**
@@ -42,6 +46,10 @@ public class IncidenciaBean implements Serializable {
     private static Logger log = LogManager.getLogger(IncidenciaBean.class);
 
     private final IncidenciaDAO incidenciaDAO;
+    private final SolicitudPermisoDAO solicitudPermisoDAO;
+    private final TipoSolicitudDAO tipoSolicitudDAO;
+    private final SolicitudPrendaDAO solicitudPrendaDAO;
+    private final SolicitudArticuloDAO solicitudArticulosDAO;
     private DetIncidencia incidenciaSelected;
     private Date fechaSeleccionada;
     private List<DetIncidencia> lstIncidencias;
@@ -49,13 +57,16 @@ public class IncidenciaBean implements Serializable {
     private List<DetIncidencia> listaPrendas;
     private List<DetIncidencia> listaArticulos;
     private List<CatTipoSolicitud> lstTipoSol;
-    private final TipoSolicitudDAO tipoSolicitudDAO;
+    private List<DetSolicitudArticulo> listArticulos;
+    private List<DetSolicitudPermiso> listPermisos;
+    private List<DetSolicitudPrenda> listPrendas;
     private List<Date> lstRangoRegistro;
     private List<Integer> invalidDays;
     private Date minDate;
 
     private DetEmpleado empleadoSelected;
     private final HttpServletRequest httpServletRequest;
+    private ManageStatus status;
     private final EmpleadoDAO empleadoDAO;
     
     @SuppressWarnings("OverridableMethodCallInConstructor")
@@ -67,7 +78,11 @@ public class IncidenciaBean implements Serializable {
         empleadoDAO = new EmpleadoDAO();
         httpServletRequest = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         this.empleadoSelected = (DetEmpleado) httpServletRequest.getSession(true).getAttribute("empleado");
-
+        
+        solicitudArticulosDAO = new SolicitudArticuloDAO();
+        solicitudPermisoDAO = new SolicitudPermisoDAO();
+        solicitudPrendaDAO = new SolicitudPrendaDAO();
+        
         empleadoSelected = empleadoDAO.buscarPorId(empleadoSelected.getIdEmpleado());
         inicializarIncidencia();
     }
@@ -77,24 +92,25 @@ public class IncidenciaBean implements Serializable {
         consultaIncidencias();
         lstTipoSol = tipoSolicitudDAO.buscarActivos();
         invalidDays = Arrays.asList(0);
+        listArticulos = solicitudArticulosDAO.buscarPorIdEmpleado(empleadoSelected.getIdEmpleado());
+        listPermisos = solicitudPermisoDAO.buscarPorIdEmpleado(empleadoSelected.getIdEmpleado());
+        listPrendas = solicitudPrendaDAO.buscarPorIdEmpleado(empleadoSelected.getIdEmpleado());
+        status = new ManageStatus();
     }
 
     private void consultaIncidencias() {
         lstIncidencias = incidenciaDAO.buscarTodos();
 
         listaPermisos = lstIncidencias.stream()
-                .filter(objeto -> objeto.getIdTipo().getIdTipo().equals(1))
-                .map(objeto -> objeto)
+                .filter(objeto -> objeto.getIdTipo().getIdTipo().equals(1) ||  objeto.getIdTipo().getIdTipo().equals(2))
                 .collect(Collectors.toList());
         
         listaPrendas = lstIncidencias.stream()
                 .filter(objeto -> objeto.getIdTipo().getIdTipo().equals(3))
-                .map(objeto -> objeto)
                 .collect(Collectors.toList());
         
         listaArticulos = lstIncidencias.stream()
                 .filter(objeto -> objeto.getIdTipo().getIdTipo().equals(4))
-                .map(objeto -> objeto)
                 .collect(Collectors.toList());
     }
 
@@ -144,8 +160,25 @@ public class IncidenciaBean implements Serializable {
         incidenciaSelected.setIdEmpleadoRev(new DetEmpleado(empleadoSelected.getIdEmpleado()));
         try {
             incidenciaSelected.getIdEstatus().setIdEstatus(aprobada ? 2 : 3);
+            incidenciaSelected.setFechaMod(new Date());
+            
+            for(DetSolicitudPermiso auxPermiso: listPermisos)
+            {
+                if(auxPermiso.getIdSolicitud().equals(incidenciaSelected.getIdSolPermiso().getIdSolicitud()))
+                {
+                    auxPermiso.setAprobada(aprobada ? (short) 2 : (short) 3);
+                    auxPermiso.setFechaMod(new Date());
+                    auxPermiso.setIdEmpleadoRev(new DetEmpleado(empleadoSelected.getIdEmpleado()));
+                    solicitudPermisoDAO.actualizar(auxPermiso);
+                    incidenciaSelected.setIdSolPermiso(auxPermiso);
+                }
+            }
+            
+            incidenciaSelected.getIdSolPermiso().setFechaMod(new Date());
+            incidenciaSelected.getIdSolPermiso().setIdEmpleadoRev(new DetEmpleado(empleadoSelected.getIdEmpleado()));
+            
             incidenciaDAO.actualizar(incidenciaSelected);
-
+            
             String mensaje = "";
             if (incidenciaSelected.getIdEstatus().getIdEstatus() == 2) {
                 mensaje = "Solicitud aprobada correctamente";
@@ -160,12 +193,8 @@ public class IncidenciaBean implements Serializable {
         }
         consultaIncidencias();
         PrimeFaces.current().ajax().update("formIncidencias:messages", "formIncidencias:tabViewI:dtIncidencias");
-        if(incidenciaSelected.getIdSolPermiso() != null){
+        if(incidenciaSelected.getIdSolPermiso().getIdSolicitud() != null){
             PrimeFaces.current().executeScript("PF('dialogPermisos').hide()");
-        }else if(incidenciaSelected.getIdSolPrenda() != null){
-            PrimeFaces.current().executeScript("PF('dialogPrendas').hide()");
-        }else if(incidenciaSelected.getIdSolArticulo() != null){
-            PrimeFaces.current().executeScript("PF('dialogArticulos').hide()");
         }
     }
     
@@ -173,8 +202,22 @@ public class IncidenciaBean implements Serializable {
         incidenciaSelected.setIdEmpleadoRev(new DetEmpleado(empleadoSelected.getIdEmpleado()));
         try {
             incidenciaSelected.getIdEstatus().setIdEstatus(aprobada ? 2 : 3);
+            incidenciaSelected.setFechaMod(new Date());
+            
+            for(DetSolicitudArticulo auxArticulo: listArticulos)
+            {
+                if(auxArticulo.getIdSolicitud().equals(incidenciaSelected.getIdSolArticulo().getIdSolicitud()))
+                {
+                    auxArticulo.setAprobada(aprobada ? (short) 2 : (short) 3);
+                    auxArticulo.setFechaMod(new Date());
+                    auxArticulo.setIdEmpleadoRev(new DetEmpleado(empleadoSelected.getIdEmpleado()));
+                    solicitudArticulosDAO.actualizar(auxArticulo);
+                    incidenciaSelected.setIdSolArticulo(auxArticulo);
+                }
+            }
+            
             incidenciaDAO.actualizar(incidenciaSelected);
-
+            
             String mensaje = "";
             if (incidenciaSelected.getIdEstatus().getIdEstatus() == 2) {
                 mensaje = "Solicitud aprobada correctamente";
@@ -189,15 +232,31 @@ public class IncidenciaBean implements Serializable {
         }
         consultaIncidencias();
         PrimeFaces.current().ajax().update("formIncidencias:messages", "formIncidencias:tabViewI:dtArticulosSolicitados");
-        PrimeFaces.current().executeScript("PF('dialogArticulos').hide()");
+        if(incidenciaSelected.getIdSolArticulo().getIdSolicitud() != null){
+            PrimeFaces.current().executeScript("PF('dialogArticulos').hide()");
+        }
     }
     
     public void guardarEstatusPrenda(boolean aprobada) {
         incidenciaSelected.setIdEmpleadoRev(new DetEmpleado(empleadoSelected.getIdEmpleado()));
         try {
             incidenciaSelected.getIdEstatus().setIdEstatus(aprobada ? 2 : 3);
+            incidenciaSelected.setFechaMod(new Date());
+            
+            for(DetSolicitudPrenda auxPrenda : listPrendas)
+            {
+                if(auxPrenda.getIdSolicitud().equals(incidenciaSelected.getIdSolPrenda().getIdSolicitud()))
+                {
+                    auxPrenda.setAprobada(aprobada ? (short) 2 : (short) 3);
+                    auxPrenda.setFechaMod(new Date());
+                    auxPrenda.setIdEmpleadoRev(new DetEmpleado(empleadoSelected.getIdEmpleado()));
+                    solicitudPrendaDAO.actualizar(auxPrenda);
+                    incidenciaSelected.setIdSolPrenda(auxPrenda);
+                }
+            }
+            
             incidenciaDAO.actualizar(incidenciaSelected);
-
+            
             String mensaje = "";
             if (incidenciaSelected.getIdEstatus().getIdEstatus() == 2) {
                 mensaje = "Solicitud aprobada correctamente";
@@ -212,7 +271,9 @@ public class IncidenciaBean implements Serializable {
         }
         consultaIncidencias();
         PrimeFaces.current().ajax().update("formIncidencias:messages", "formIncidencias:tabViewI:dtPrendasSolicitados");
-        PrimeFaces.current().executeScript("PF('dialogPrendas').hide()");
+        if(incidenciaSelected.getIdSolPrenda().getIdSolicitud() != null){
+            PrimeFaces.current().executeScript("PF('dialogPrendas').hide()");
+        }
     }
     
     //<editor-fold defaultstate="collapsed" desc="Getters&Setters">
@@ -302,6 +363,10 @@ public class IncidenciaBean implements Serializable {
 
     public void setListaPrendas(List<DetIncidencia> listaPrendas) {
         this.listaPrendas = listaPrendas;
+    }
+    
+    public ManageStatus getStatus() {
+        return status;
     }
     //</editor-fold>
 }
