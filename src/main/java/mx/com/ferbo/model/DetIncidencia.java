@@ -2,8 +2,8 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -26,7 +26,10 @@ import javax.validation.constraints.NotNull;
 @Table(name = "det_incidencia")
 @NamedQueries({
     @NamedQuery(name = "DetIncidencia.findAll", query = "SELECT d FROM DetIncidencia d JOIN d.idEmpleado e JOIN d.idTipo ct JOIN d.idEstatus ce LEFT JOIN d.idSolPermiso sp LEFT JOIN d.idSolArticulo sa LEFT JOIN d.idSolPrenda spr LEFT JOIN sp.idTipoSolicitud tp LEFT JOIN sa.idArticulo a LEFT JOIN spr.idPrenda p LEFT JOIN spr.idTalla t ORDER BY d.fechaCap"),
-    @NamedQuery(name = "DetIncidencia.findByIdEmpleado", query = "SELECT d FROM DetIncidencia d JOIN d.idEmpleado e JOIN d.idTipo ct JOIN d.idEstatus ce LEFT JOIN d.idSolPermiso sp JOIN sp.idTipoSolicitud tp WHERE e.idEmpleado = :idEmpleado AND ce.idEstatus = 2")
+    @NamedQuery(name = "DetIncidencia.findByIdEmpleado", query = "SELECT d FROM DetIncidencia d JOIN d.idEmpleado e JOIN d.idTipo ct JOIN d.idEstatus ce LEFT JOIN d.idSolPermiso sp JOIN sp.idTipoSolicitud tp WHERE e.idEmpleado = :idEmpleado AND ce.idEstatus = 2"),
+    @NamedQuery(name = "DetIncidencia.findByIdEmpleadoPrenda", query = "SELECT d FROM DetIncidencia d JOIN d.idEmpleado e JOIN d.idTipo ct JOIN d.idEstatus ce INNER JOIN d.idSolPrenda sp WHERE e.idEmpleado = :idEmpleado"),
+    @NamedQuery(name = "DetIncidencia.findByIdEmpleadoArticulo", query = "SELECT d FROM DetIncidencia d JOIN d.idEmpleado e JOIN d.idTipo ct JOIN d.idEstatus ce INNER JOIN d.idSolArticulo sp WHERE e.idEmpleado = :idEmpleado"),
+    @NamedQuery(name = "DetIncidencia.findByIdEmpleadoPermiso", query = "SELECT d FROM DetIncidencia d JOIN d.idEmpleado e JOIN d.idTipo ct JOIN d.idEstatus ce INNER JOIN d.idSolPermiso sp WHERE e.idEmpleado = :idEmpleado")
 })
 public class DetIncidencia implements Serializable {
 
@@ -160,6 +163,33 @@ public class DetIncidencia implements Serializable {
 
     public void setFechaMod(Date fechaMod) {
         this.fechaMod = fechaMod;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + Objects.hashCode(this.idIncidencia);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final DetIncidencia other = (DetIncidencia) obj;
+        return Objects.equals(this.idIncidencia, other.idIncidencia);
+    }
+
+    @Override
+    public String toString() {
+        return "DetIncidencia{" + "idIncidencia=" + idIncidencia + ", idEmpleado=" + idEmpleado + ", idEmpleadoRev=" + idEmpleadoRev + ", visible=" + visible + ", idEstatus=" + idEstatus + ", idTipo=" + idTipo + ", idSolArticulo=" + idSolArticulo + ", idSolPermiso=" + idSolPermiso + ", idSolPrenda=" + idSolPrenda + ", fechaCap=" + fechaCap + ", fechaMod=" + fechaMod + '}';
     }
     
 }

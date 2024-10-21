@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package mx.com.ferbo.dao.n;
 
 import java.util.List;
@@ -54,6 +50,63 @@ public class IncidenciaDAO extends BaseDAO<DetIncidencia, Integer>
         try {
             emSGP = getEntityManager();
             modelList = emSGP.createNamedQuery("DetIncidencia.findByIdEmpleado", DetIncidencia.class)
+                .setParameter("idEmpleado", idEmpleado)
+                .getResultList();
+        } catch (Exception ex) {
+            log.error("Problema para obtener el listado de incidencias por id empleado...", ex);
+        } finally {
+            close(emSGP);
+        }
+
+        return modelList;
+    }
+    
+    public List<DetIncidencia> buscarPorIdEmpleadoPrenda(Integer idEmpleado)
+    {
+        List<DetIncidencia> modelList = null;
+        EntityManager emSGP = null;
+
+        try {
+            emSGP = getEntityManager();
+            modelList = emSGP.createNamedQuery("DetIncidencia.findByIdEmpleadoPrenda", DetIncidencia.class)
+                .setParameter("idEmpleado", idEmpleado)
+                .getResultList();
+        } catch (Exception ex) {
+            log.error("Problema para obtener el listado de incidencias por id empleado...", ex);
+        } finally {
+            close(emSGP);
+        }
+
+        return modelList;
+    }
+    
+    public List<DetIncidencia> buscarPorIdEmpleadoArticulo(Integer idEmpleado)
+    {
+        List<DetIncidencia> modelList = null;
+        EntityManager emSGP = null;
+
+        try {
+            emSGP = getEntityManager();
+            modelList = emSGP.createNamedQuery("DetIncidencia.findByIdEmpleadoArticulo", DetIncidencia.class)
+                .setParameter("idEmpleado", idEmpleado)
+                .getResultList();
+        } catch (Exception ex) {
+            log.error("Problema para obtener el listado de incidencias por id empleado...", ex);
+        } finally {
+            close(emSGP);
+        }
+
+        return modelList;
+    }
+    
+    public List<DetIncidencia> buscarPorIdEmpleadoPermiso(Integer idEmpleado)
+    {
+        List<DetIncidencia> modelList = null;
+        EntityManager emSGP = null;
+
+        try {
+            emSGP = getEntityManager();
+            modelList = emSGP.createNamedQuery("DetIncidencia.findByIdEmpleadoPermiso", DetIncidencia.class)
                 .setParameter("idEmpleado", idEmpleado)
                 .getResultList();
         } catch (Exception ex) {

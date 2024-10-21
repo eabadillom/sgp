@@ -31,6 +31,7 @@ import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetIncidencia;
 import mx.com.ferbo.model.DetSolicitudPrenda;
 import mx.com.ferbo.util.SGPException;
+import mx.com.ferbo.util.ManageStatus;
 
 @Named(value = "uniformesBean")
 @ViewScoped
@@ -45,8 +46,9 @@ public class UniformesBean implements Serializable {
     private List<CatTalla> lstTallasActivas;
     private List<DetSolicitudPrenda> lstSolicitudPrendas;
     private List<DetSolicitudPrenda> lstSolicitudPrendasRealizadas;
+    private List<DetIncidencia> incidenciasBuscada;
     private List<ResponsiveOption> responsiveOptions;
-
+    
     private DetEmpleado empleadoSelected;
     private DetSolicitudPrenda solicitud;
 
@@ -62,10 +64,11 @@ public class UniformesBean implements Serializable {
 
     private final FacesContext faceContext;
     private final HttpServletRequest httpServletRequest;
+    private ManageStatus status;
     
-    private final DetIncidencia incidencia;
-    private final CatTipoIncidencia catTipoIncidencia;
-    private final CatEstatusIncidencia catEstatusIncidencia;
+    private DetIncidencia incidencia;
+    private CatTipoIncidencia catTipoIncidencia;
+    private CatEstatusIncidencia catEstatusIncidencia;
 
     public UniformesBean() {
         lstPrendasActivas = new ArrayList<>();
@@ -85,18 +88,15 @@ public class UniformesBean implements Serializable {
         faceContext = FacesContext.getCurrentInstance();
         httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
         this.empleadoSelected = (DetEmpleado) httpServletRequest.getSession(true).getAttribute("empleado");
-
+        
         solicitud = new DetSolicitudPrenda();
-        incidencia = new DetIncidencia();
-        catTipoIncidencia = new CatTipoIncidencia();
-        catEstatusIncidencia = new CatEstatusIncidencia();
-    }
+        }
 
     @PostConstruct
     public void init() {
         lstSolicitudPrendas = new ArrayList<>();
         solicitud.setIdEmpleadoSol(empleadoSelected);
-        lstSolicitudPrendasRealizadas = solicitudPrendaDAO.buscarPorIdEmpleado(solicitud.getIdEmpleadoSol().getIdEmpleado());
+        actualizarListas();
         lstPrendasActivas = uniformesDAO.buscarTodosActivos();
         lstTallasActivas = tallaDAO.buscarTodosActivos();
 
@@ -104,6 +104,13 @@ public class UniformesBean implements Serializable {
         responsiveOptions.add(new ResponsiveOption("560px", 3, 3));
         responsiveOptions.add(new ResponsiveOption("280px", 2, 2));
         responsiveOptions.add(new ResponsiveOption("140px", 1, 1));
+        status = new ManageStatus();
+    }
+    
+    public void actualizarListas()
+    {
+        lstSolicitudPrendasRealizadas = solicitudPrendaDAO.buscarPorIdEmpleado(solicitud.getIdEmpleadoSol().getIdEmpleado());
+        incidenciasBuscada = incidenciaDAO.buscarPorIdEmpleadoPrenda(solicitud.getIdEmpleadoSol().getIdEmpleado());
     }
 
     public void seleccionarItem(CatPrenda item) {
@@ -138,12 +145,17 @@ public class UniformesBean implements Serializable {
     public void registro() throws IOException {
         for (DetSolicitudPrenda detSolicitudPrenda : lstSolicitudPrendas) {
             try {
+                detSolicitudPrenda.setAprobada((short) 1);
                 solicitudPrendaDAO.guardar(detSolicitudPrenda);
-                lstSolicitudPrendasRealizadas = solicitudPrendaDAO.buscarPorIdEmpleado(detSolicitudPrenda.getIdEmpleadoSol().getIdEmpleado());
+                actualizarListas();
+                
+                incidencia = new DetIncidencia();
+                catTipoIncidencia = new CatTipoIncidencia();
+                catEstatusIncidencia = new CatEstatusIncidencia();
                 
                 catTipoIncidencia.setIdTipo(3);
                 catEstatusIncidencia.setIdEstatus(1);
-
+                
                 incidencia.setIdTipo(catTipoIncidencia);
                 incidencia.setIdEmpleado(empleadoSelected);
                 incidencia.setIdEstatus(catEstatusIncidencia);
@@ -159,7 +171,70 @@ public class UniformesBean implements Serializable {
         FacesContext.getCurrentInstance().getExternalContext().redirect("uniformes.xhtml");
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Solicitud Registrada"));
     }
-
+    
+    public void actualizarRegistro()
+    {
+        actualizarListas();
+        FacesMessage message = null;
+        FacesMessage.Severity severity = null;
+        String mensaje = null;
+        String titulo = "Uniforme";
+        try
+        {
+            if(incidenciasBuscada == null)
+            {
+                throw new SGPException("Error con la conexión a la base de datos!!!");
+            }
+            
+            switch (solicitud.getAprobada().intValue()) 
+            {
+                case 2:
+                    throw new SGPException("No se puede modificar la prenda");
+                case 3:
+                    throw new SGPException("No se puede modificar la prenda");
+                case 4:
+                    throw new SGPException("No se puede modificar la prenda");
+            }
+            
+            for(DetIncidencia auxIncidenciaBuscada : incidenciasBuscada)
+            {
+                if(auxIncidenciaBuscada.getIdSolPrenda().getIdSolicitud().equals(solicitud.getIdSolicitud()))
+                {
+                    catEstatusIncidencia = new CatEstatusIncidencia();
+                    catEstatusIncidencia.setIdEstatus(4);
+            
+                    auxIncidenciaBuscada.setIdEstatus(catEstatusIncidencia);
+                    auxIncidenciaBuscada.setIdSolPrenda(solicitud);
+                    incidenciaDAO.actualizar(auxIncidenciaBuscada);                    
+                }
+            }
+            
+            solicitud.setAprobada((short) 4);
+            solicitudPrendaDAO.actualizar(solicitud);
+            actualizarListas();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Estatus Modificada"));
+            PrimeFaces.current().ajax().update("formActividadesUniformes:tabView:dt-uniformes-sol");
+            PrimeFaces.current().executeScript("PF('dialogCambiarEstatus').hide()");
+        }
+        catch(SGPException e)
+        {
+            mensaje = e.getMessage();
+            severity = FacesMessage.SEVERITY_INFO;
+        }catch(Exception e)
+        {
+            log.warn("EX-0032: " + e.getMessage() + ". Error al actualizar el registro de la prenda del empleado: " + empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
+        }finally
+        {
+            if(severity != null)
+            {
+                message = new FacesMessage(severity, titulo, mensaje);
+                FacesContext.getCurrentInstance().addMessage(null, message);
+                PrimeFaces.current().ajax().update(":formActividadesUniformes:messages");
+                PrimeFaces.current().executeScript("PF('dialogCambiarEstatus').hide()");
+            }
+        }
+    }
+    
     //<editor-fold defaultstate="collapsed" desc="Getters&Setters">
     public void inicializaPrenda() {
         prendaSelected = new CatPrenda();
@@ -267,6 +342,18 @@ public class UniformesBean implements Serializable {
 
     public void setResponsiveOptions(List<ResponsiveOption> responsiveOptions) {
         this.responsiveOptions = responsiveOptions;
+    }
+    
+    public List<DetIncidencia> getIncidenciasBuscada() {
+        return incidenciasBuscada;
+    }
+
+    public void setIncidenciasBuscada(List<DetIncidencia> incidenciasBuscada) {
+        this.incidenciasBuscada = incidenciasBuscada;
+    }
+    
+    public ManageStatus getStatus() {
+        return status;
     }
     //</editor-fold>
 }

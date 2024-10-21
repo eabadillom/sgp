@@ -19,25 +19,25 @@
             <p:outputLabel value="#{incidencia.idEmpleado.nombre} #{incidencia.idEmpleado.primerAp} #{incidencia.idEmpleado.segundoAp}"/>
         </p:column>
         <p:column headerText="Tipo Incidencia" width="5rem">
-            <p:outputLabel value="#{incidencia.idTipo.idTipo eq 1 ? incidencia.idSolPermiso.idTipoSolicitud.descripcion :''}"/>
+            <p:outputLabel value="#{(incidencia.idTipo.idTipo eq 1 || incidencia.idTipo.idTipo eq 2) ? incidencia.idSolPermiso.idTipoSolicitud.descripcion :'' }"/>
         </p:column>
         <p:column headerText="Inicio" width="5rem">
-            <p:outputLabel value="#{incidencia.idTipo.idTipo eq 1 ? incidencia.idSolPermiso.fechaInicio :''}">
+            <p:outputLabel value="#{(incidencia.idTipo.idTipo eq 1 || incidencia.idTipo.idTipo eq 2) ? incidencia.idSolPermiso.fechaInicio :''}">
                 <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
             </p:outputLabel>
         </p:column>
         <p:column headerText="Fin" width="5rem">
-            <p:outputLabel value="#{incidencia.idTipo.idTipo eq 1 ? incidencia.idSolPermiso.fechaFin :''}">
+            <p:outputLabel value="#{(incidencia.idTipo.idTipo eq 1 || incidencia.idTipo.idTipo eq 2) ? incidencia.idSolPermiso.fechaFin :''}">
                 <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
             </p:outputLabel>
         </p:column>
         <p:column headerText="Captura" width="5rem">
-            <p:outputLabel value="#{incidencia.idTipo.idTipo eq 1 ? incidencia.fechaCap :''}">
+            <p:outputLabel value="#{(incidencia.idTipo.idTipo eq 1 || incidencia.idTipo.idTipo eq 2) ? incidencia.fechaCap :''}">
                 <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
             </p:outputLabel>
         </p:column>
         <p:column headerText="Estatus" width="5rem">
-            <p:outputLabel class="customer-badge status-#{incidencia.idEstatus.idEstatus eq 1 ? 'proposal' : incidencia.idEstatus.idEstatus eq  2 ? 'qualified' : 'unqualified'}"
+            <p:outputLabel class="customer-badge status-#{incidenciaBean.status.getStatusClass(incidencia.idEstatus.idEstatus)}"
                            value="#{incidencia.idEstatus.descripcion}" style="display: block; width: 7rem"/>
         </p:column>
         <!-- 
@@ -96,9 +96,9 @@
         <f:facet name="footer">
             <p:commandButton value="Aprobar" icon="pi pi-check" class="ui-button-success" process="pnlDetalleSolicitudPermiso @this"
                              actionListener="#{incidenciaBean.guardarEstatusIncidencia(true)}" 
-                             disabled="#{incidenciaBean.incidenciaSelected.idSolPermiso.aprobada ne null}"/>
+                             disabled="#{incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 2 or incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 3 or incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 4}"/>
             <p:commandButton value="Rechazar" icon="pi pi-times" class="ui-button-danger" process="pnlDetalleSolicitudPermiso @this" 
-                             disabled="#{incidenciaBean.incidenciaSelected.idSolPermiso.aprobada ne null}"
+                             disabled="#{incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 2 or incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 3 or incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 4}"
                              oncomplete="PF('dialogRechazar').show()"/>
         </f:facet>
     </p:dialog>

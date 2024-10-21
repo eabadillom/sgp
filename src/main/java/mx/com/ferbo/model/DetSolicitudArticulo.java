@@ -3,8 +3,8 @@ package mx.com.ferbo.model;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -154,6 +154,33 @@ public class DetSolicitudArticulo implements Serializable {
 
     public void setDescripcionRechazo(String descripcionRechazo) {
         this.descripcionRechazo = descripcionRechazo;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 29 * hash + Objects.hashCode(this.idSolicitud);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final DetSolicitudArticulo other = (DetSolicitudArticulo) obj;
+        return Objects.equals(this.idSolicitud, other.idSolicitud);
+    }
+
+    @Override
+    public String toString() {
+        return "DetSolicitudArticulo{" + "idSolicitud=" + idSolicitud + ", cantidad=" + cantidad + ", aprobada=" + aprobada + ", fechaCap=" + fechaCap + ", fechaMod=" + fechaMod + ", detIncidenciaList=" + detIncidenciaList + ", idArticulo=" + idArticulo + ", idEmpleadoSol=" + idEmpleadoSol + ", idEmpleadoRev=" + idEmpleadoRev + ", descripcionRechazo=" + descripcionRechazo + '}';
     }
     
 }
