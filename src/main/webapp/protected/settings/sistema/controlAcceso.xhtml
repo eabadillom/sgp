@@ -24,16 +24,16 @@
                 </p:toolbarGroup>
             </p:toolbar>
             <div style="padding-top: 1rem">
-                <p:dataTable id="dtSistema" value="#{altasistemaBean.sistemas}" var="sistema">
-                    <p:column headerText="Usuario" style="text-align: center;">
+                <p:dataTable id="dtSistema" value="#{altasistemaBean.sistemas}" var="sistema" paginator="true" rows="5">
+                    <p:column headerText="Usuario" sortBy="#{sistema.client}" style="text-align: center;">
                         <p:outputLabel value="#{sistema.client}" />
                     </p:column>
 
-                    <p:column headerText="Rol" style="text-align: center;">
+                    <p:column headerText="Rol" sortBy="#{sistema.rol.descripcion}" style="text-align: center;">
                         <p:outputLabel value="#{sistema.rol.descripcion}"/>
                     </p:column>
 
-                    <p:column headerText="Planta" style="text-align: center;">
+                    <p:column headerText="Planta" sortBy="#{sistema.planta.descripcion}" style="text-align: center;">
                         <p:outputLabel value="#{sistema.planta.descripcion}"/>
                     </p:column>
 

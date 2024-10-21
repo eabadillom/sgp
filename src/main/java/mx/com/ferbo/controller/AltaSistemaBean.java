@@ -14,6 +14,7 @@ import mx.com.ferbo.model.CatPlanta;
 import mx.com.ferbo.model.DetFpClient;
 import mx.com.ferbo.model.DetRolSistema;
 import mx.com.ferbo.util.SGPException;
+import mx.com.ferbo.util.Seguridad;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.primefaces.PrimeFaces;
@@ -123,13 +124,26 @@ public class AltaSistemaBean implements Serializable {
     }
 
     public void actualizar() {
+        try{
         this.fpclientdao.actualizar(sistema);
         this.listar(true);
+        }
+        catch(SGPException ex){
+        }
+        catch(Exception ex){
+        }
     }
 
     public void eliminar() {
+        try{
         this.fpclientdao.eliminar(sistema);
         this.listar(true);
+        }
+        catch(SGPException ex){
+        }
+        catch(Exception ex){
+            
+        }
     }
 
     public void operar() {
@@ -195,14 +209,15 @@ public class AltaSistemaBean implements Serializable {
             if (!clave1.contains(clave2)) {
                 throw new SGPException("Los campos no coinciden. \nIntente de nuevo.");
             }
-
-            this.sistema.setPassword(clave1);
+            
+            clave2 = Seguridad.Cifrar(clave1);
+            this.sistema.setPassword(clave2);
             this.fpclientdao.actualizar(sistema);
-            log.info("El sistema: {}, se guardo con la clave: {}", sistema, clave1);
+            
             current.executeScript("PF('dlgSeguridad').hide()");
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Exito: Clave guardada correctamente", null));
-            clave1 = "";
-            clave2 = "";
+            clave1 = null;
+            clave2 = null;
             PrimeFaces.current().ajax().update("message");
 
         } catch (SGPException ex) {
@@ -221,7 +236,7 @@ public class AltaSistemaBean implements Serializable {
     }
 
     public void limpiar() {
-        clave1 = "";
-        clave2 = "";
+        clave1 = null;
+        clave2 = null;
     }
 }
