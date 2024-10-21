@@ -20,6 +20,10 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
 		super(modelClass);
 	}
 	
+	public RegistroDAO() {
+		super(DetRegistro.class);
+	}
+	
 	public DetRegistro buscarPorEmpleadoFechaEntrada(Integer idEmpleado, Date fechaEntradaInicio, Date fechaEntradaFin) {
 		DetRegistro model = null;
 		EntityManager emSGP = null;
@@ -55,8 +59,8 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
 	    			;
 			
 			for(DetRegistro r : modelList) {
-				log.info("Registro - idEmpleado: {}", r.getIdEmpleado().getIdEmpleado());
-				log.info("Status registro: {}", r.getIdEstatus().getIdEstatus());
+				log.debug("Registro - idEmpleado: {}", r.getIdEmpleado().getIdEmpleado());
+				log.debug("Status registro: {}", r.getIdEstatus().getIdEstatus());
 			}
 			
 		} catch(Exception ex) {

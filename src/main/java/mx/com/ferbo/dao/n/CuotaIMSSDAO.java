@@ -2,6 +2,7 @@ package mx.com.ferbo.dao.n;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 
@@ -44,5 +45,24 @@ public class CuotaIMSSDAO extends BaseDAO<CatCuotaIMSS, CatCuotaIMSSPK> {
 		}
 		
 		return tarifa;
+	}
+
+	public List<CatCuotaIMSS> buscarPorPeriodo(Date fechaInicio, Date fechaFin) {
+		List<CatCuotaIMSS> modelList = null;
+		EntityManager em = null;
+		try {
+			em = this.getEntityManager();
+			modelList = em.createNamedQuery("CatCuotaIMSS.findByPeriodo", CatCuotaIMSS.class)
+					.setParameter("fechaInicio", fechaInicio)
+					.setParameter("fechaFin", fechaFin)
+					.getResultList()
+					;
+		} catch(Exception ex) {
+			log.error("No es posible obtener las cuotas del IMSS vigentes...", ex);
+		} finally {
+			this.close(em);
+		}
+		//
+		return modelList;
 	}
 }

@@ -22,10 +22,13 @@ import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.business.NominaSemanalBL;
 import mx.com.ferbo.dao.n.ConceptoDAO;
+import mx.com.ferbo.dao.n.CuotaIMSSDAO;
+import mx.com.ferbo.dao.n.DiaNoLaboralDAO;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.EmpresaDAO;
 import mx.com.ferbo.dao.n.MetodoPagoDAO;
 import mx.com.ferbo.dao.n.NominaDAO;
+import mx.com.ferbo.dao.n.PercepcionEmpleadoDAO;
 import mx.com.ferbo.dao.n.PercepcionesDAO;
 import mx.com.ferbo.dao.n.PeriodicidadPagoDAO;
 import mx.com.ferbo.dao.n.RegimenFiscalDAO;
@@ -33,9 +36,12 @@ import mx.com.ferbo.dao.n.SubsidioDAO;
 import mx.com.ferbo.dao.n.TarifaISRDAO;
 import mx.com.ferbo.dao.n.TipoDeduccionDAO;
 import mx.com.ferbo.dao.n.TipoOtroPagoDAO;
+import mx.com.ferbo.dao.n.TipoPercepcionDAO;
 import mx.com.ferbo.dao.n.UnidadSATDAO;
 import mx.com.ferbo.dao.n.UsoCFDIDAO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
+import mx.com.ferbo.model.CatCuotaIMSS;
+import mx.com.ferbo.model.CatDiaNoLaboral;
 import mx.com.ferbo.model.CatEmpresa;
 import mx.com.ferbo.model.CatPercepciones;
 import mx.com.ferbo.model.CatPeriodicidadPago;
@@ -45,11 +51,13 @@ import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaEmisor;
 import mx.com.ferbo.model.DetNominaReceptor;
+import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.sat.CatConcepto;
 import mx.com.ferbo.model.sat.CatMetodoPago;
 import mx.com.ferbo.model.sat.CatRegimenFiscal;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.model.sat.CatTipoOtroPago;
+import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.model.sat.CatUnidadSAT;
 import mx.com.ferbo.model.sat.CatUsoCFDI;
 import mx.com.ferbo.util.DateUtils;
@@ -64,6 +72,7 @@ public class NominaBean implements Serializable {
 
     private EmpleadoDAO empleadoDAO;
     private EmpresaDAO empresaDAO;
+    private DiaNoLaboralDAO diaNLDAO = null;
     private PercepcionesDAO catPercepcionesDAO;
     private TarifaISRDAO tarifaISRDAO;
     private SubsidioDAO subsidioDAO;
@@ -74,15 +83,23 @@ public class NominaBean implements Serializable {
     private PeriodicidadPagoDAO periodicidadDAO;
     private RegimenFiscalDAO regimenFiscalDAO;
     private UsoCFDIDAO usoCfdiDAO;
+    private TipoPercepcionDAO tipoPercepcionDAO = null;
     private TipoDeduccionDAO tipoDeduccionDAO = null;
+    private CuotaIMSSDAO cuotasIMSSDAO = null;
     private TipoOtroPagoDAO tipoOtroPagoDAO = null;
+    private PercepcionEmpleadoDAO percepcionEmpleadoDAO = null;
     
     private List<DetEmpleadoDTO> lstEmpleadosTmp;
     private List<CatEmpresa> lstEmpresas;
+    private List<CatDiaNoLaboral> diasNoLaborales;
     private CatPercepciones parametrosPercepciones;
     private List<CatTarifaISR> tablaISRsemanal;
+    private List<CatTarifaISR> tablaISRmensual;
     private List<CatSubsidio> tablaSubsidioSemanal;
+    private List<CatSubsidio> tablaSubsidioMensual;
+    private List<CatTipoPercepcion> tiposPercepcion;
     private List<CatTipoDeduccion> tiposDeduccion;
+    private List<CatCuotaIMSS> cuotasIMSS;
     private List<CatTipoOtroPago> tiposOtroPago;
     private CatEmpresa empresaSelected;
     private DetNomina nomina;
@@ -101,6 +118,7 @@ public class NominaBean implements Serializable {
     private Date fechaInicioAnio;
     private Date fechafinAnio;
     private Integer semana;
+    private Boolean esUltimaSemanaMes;
 
     private List<DetNomina> listaNomina;
 
@@ -114,6 +132,7 @@ public class NominaBean implements Serializable {
 
 		empleadoDAO = new EmpleadoDAO(DetEmpleado.class);
 		empresaDAO = new EmpresaDAO(CatEmpresa.class);
+		diaNLDAO = new DiaNoLaboralDAO();
 		catPercepcionesDAO = new PercepcionesDAO(CatPercepciones.class);
 		tarifaISRDAO = new TarifaISRDAO(CatTarifaISR.class);
 		subsidioDAO = new SubsidioDAO(CatSubsidio.class);
@@ -124,8 +143,11 @@ public class NominaBean implements Serializable {
 		periodicidadDAO = new PeriodicidadPagoDAO(CatPeriodicidadPago.class);
 		regimenFiscalDAO = new RegimenFiscalDAO(CatRegimenFiscal.class);
 		usoCfdiDAO = new UsoCFDIDAO(CatUsoCFDI.class);
+		tipoPercepcionDAO = new TipoPercepcionDAO();
 		tipoDeduccionDAO = new TipoDeduccionDAO();
+		cuotasIMSSDAO = new CuotaIMSSDAO();
 		tipoOtroPagoDAO = new TipoOtroPagoDAO();
+		percepcionEmpleadoDAO = new PercepcionEmpleadoDAO();
 
 		log.info("====================== salida constructor nominaBean ======================");
 		log.info("Largo de Lista constructor {}", listaNomina.size());
@@ -163,6 +185,8 @@ public class NominaBean implements Serializable {
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
         periodoInicio = cal.getTime();
+        
+        
     }
 
     private DetNomina iniciaNominaDTOVacio() {
@@ -193,6 +217,8 @@ public class NominaBean implements Serializable {
 		
     	log.info("Fecha Inicio: {}", this.periodoInicio);
     	log.info("Fecha Fin: {}", this.periodoFin);
+    	
+    	esUltimaSemanaMes = NominaSemanalBL.esUltimaSemanaMes(periodoInicio, periodoFin);
     }
     
     public void calculaFechaInicio() {
@@ -255,6 +281,7 @@ public class NominaBean implements Serializable {
     private void procesaListaEmpleados(List<DetEmpleado> listaEmpleados) {
     	DetNomina nomina = null;
     	try {
+    		this.diasNoLaborales = diaNLDAO.buscarPorPeriodo("MX", periodoInicio, periodoFin);
     		this.parametrosPercepciones = catPercepcionesDAO.buscarActual(this.periodoInicio);
     		this.tablaISRsemanal = tarifaISRDAO.buscar(fechaInicioAnio, fechafinAnio, "s");
     		this.tablaSubsidioSemanal = subsidioDAO.buscar(fechaInicioAnio, fechafinAnio, "s");
@@ -264,8 +291,15 @@ public class NominaBean implements Serializable {
     		this.periodicidad = this.periodicidadDAO.buscarPorId("02");
     		this.regimenFiscalReceptor = this.regimenFiscalDAO.buscarPorId("605");
     		this.usoCFDI = this.usoCfdiDAO.buscarPorId("CN01");
+    		this.tiposPercepcion = this.tipoPercepcionDAO.buscarTodos();
     		this.tiposDeduccion = this.tipoDeduccionDAO.buscarTodos();
+    		this.cuotasIMSS = this.cuotasIMSSDAO.buscarPorPeriodo(fechaInicioAnio, fechafinAnio);
     		this.tiposOtroPago = this.tipoOtroPagoDAO.buscarTodos();
+    		
+    		if(esUltimaSemanaMes) {
+    			this.tablaISRmensual = tarifaISRDAO.buscar(fechaInicioAnio, fechafinAnio, "m");
+        		this.tablaSubsidioMensual = subsidioDAO.buscar(fechaInicioAnio, fechafinAnio, "m");
+    		}
     		
     		for (DetEmpleado empleado : listaEmpleados) {
     			nomina = this.procesaEmpleado(empleado);
@@ -280,11 +314,18 @@ public class NominaBean implements Serializable {
     public DetNomina procesaEmpleado(DetEmpleado empleado) {
     	DetNomina nomina = null;
     	NominaSemanalBL nominaSemanalBO = null;
+    	List<DetPercepcionEmpleado> percepcionesEmpleado = null;
     	log.info("Empleado: {} {} {}, Salario diario: {}", empleado.getNombre(), empleado.getPrimerAp(), empleado.getSegundoAp(), empleado.getSueldoDiario());
+    	percepcionesEmpleado = percepcionEmpleadoDAO.buscarPorEmpleado(empleado.getIdEmpleado());
+    	empleado.setPercepcionesEmpleado(percepcionesEmpleado);
+    	
 		nominaSemanalBO = new NominaSemanalBL(empleado, periodoInicio, periodoFin);
+		nominaSemanalBO.setDiasNoLaborales(this.diasNoLaborales);
 		nominaSemanalBO.setParametrosPercepciones(parametrosPercepciones);
 		nominaSemanalBO.setTablaISRSemanal(this.tablaISRsemanal);
+		nominaSemanalBO.setTablaISRMensual(tablaISRmensual);
 		nominaSemanalBO.setTablaSubsidioSemanal(this.tablaSubsidioSemanal);
+		nominaSemanalBO.setTablaSubsidioMensual(this.tablaSubsidioMensual);
 		nominaSemanalBO.setMetodoPago(this.metodoPago);
 		nominaSemanalBO.setConcepto(this.concepto);
 		nominaSemanalBO.setUnidadSAT(this.unidadSAT);
@@ -292,7 +333,9 @@ public class NominaBean implements Serializable {
 		nominaSemanalBO.setPeriodicidad(this.periodicidad);
 		nominaSemanalBO.setRegimenFiscalReceptor(this.regimenFiscalReceptor);
 		nominaSemanalBO.setUsoCFDI(this.usoCFDI);
+		nominaSemanalBO.setTiposPercepcion(this.tiposPercepcion);
 		nominaSemanalBO.setTiposDeduccion(this.tiposDeduccion);
+		nominaSemanalBO.setCuotasIMSS(this.cuotasIMSS);
 		nominaSemanalBO.setTiposOtroPago(this.tiposOtroPago);
 		nomina = nominaSemanalBO.calculoNomina();
 		return nomina;

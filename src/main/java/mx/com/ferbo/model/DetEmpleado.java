@@ -227,6 +227,12 @@ public class DetEmpleado implements Serializable {
     @OneToOne(cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
     @JoinColumn(name = "id_empleado_foto")
     private DetEmpleadoFoto empleadoFoto;
+    
+    @OneToMany(mappedBy = "empleado", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    private List<DetPercepcionEmpleado> percepcionesEmpleado;
+    
+    @OneToMany(mappedBy = "empleado", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    private List<DetPrestamo> prestamos;
 
     public DetEmpleado() {
     }
@@ -453,6 +459,22 @@ public class DetEmpleado implements Serializable {
 
 	public void setEmpleadoFoto(DetEmpleadoFoto empleadoFoto) {
 		this.empleadoFoto = empleadoFoto;
+	}
+
+	public List<DetPercepcionEmpleado> getPercepcionesEmpleado() {
+		return percepcionesEmpleado;
+	}
+
+	public void setPercepcionesEmpleado(List<DetPercepcionEmpleado> percepcionesEmpleado) {
+		this.percepcionesEmpleado = percepcionesEmpleado;
+	}
+
+	public List<DetPrestamo> getPrestamos() {
+		return prestamos;
+	}
+
+	public void setPrestamos(List<DetPrestamo> prestamos) {
+		this.prestamos = prestamos;
 	}
 
 }

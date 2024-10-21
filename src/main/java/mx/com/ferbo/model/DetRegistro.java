@@ -2,6 +2,8 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -163,4 +165,26 @@ public class DetRegistro implements Serializable {
         this.idEmpleado = idEmpleado;
     }
 
+	@Override
+	public int hashCode() {
+		return Objects.hash(idRegistro);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DetRegistro other = (DetRegistro) obj;
+		return Objects.equals(idRegistro, other.idRegistro);
+	}
+
+	@Override
+	public String toString() {
+		return "DetRegistro [idRegistro=" + idRegistro + ", fechaEntrada=" + fechaEntrada + ", fechaSalida="
+				+ fechaSalida + "]";
+	}
 }
