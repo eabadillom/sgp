@@ -41,16 +41,17 @@
                         <p:commandButton icon="pi pi-bars" update="frm:dlgSistema"
                                          actionListener="#{altasistemaBean.buscarId(sistema)}"
                                          oncomplete="PF('dlgSistema').show();" styleClass="edit-button"
-                                         process="@this"/>
+                                         process="@this" style="margin: 0.3rem;" />
                         <p:commandButton icon="pi pi-trash"  
                                          actionListener="#{altasistemaBean.buscarId(sistema)}"
                                          oncomplete="PF('borrarSistema').show();"
                                          styleClass="ui-button-raised ui-button-danger"
-                                         process="@this"/>
+                                         process="@this" style="margin: 0.3rem;" />
                         <p:commandButton icon="pi pi-lock" update="frm:dlgSeguridad"
                                          actionListener="#{altasistemaBean.statusSeguridad(sistema)}"
                                          oncomplete="PF('dlgSeguridad').show();" styleClass="ui-button-help"
-                                         process="@this"/>
+                                         process="@this" style="margin: 0.3rem;" />
+
                     </p:column>
                 </p:dataTable>
             </div>
