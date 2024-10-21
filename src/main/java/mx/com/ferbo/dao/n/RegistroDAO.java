@@ -13,87 +13,89 @@ import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.model.DetRegistro;
 
 public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
+	
+	private static Logger log = LogManager.getLogger(RegistroDAO.class);
 
-    private static Logger log = LogManager.getLogger(RegistroDAO.class);
-
-    public RegistroDAO(Class<DetRegistro> modelClass) {
-        super(modelClass);
-    }
-    
-    public RegistroDAO()
-    {
-        super(DetRegistro.class);
-    }
-
-    public DetRegistro buscarPorEmpleadoFechaEntrada(Integer idEmpleado, Date fechaEntradaInicio, Date fechaEntradaFin) {
-        DetRegistro model = null;
-        EntityManager emSGP = null;
-        try {
-            emSGP = this.getEntityManager();
-            model = emSGP.createNamedQuery("DetRegistro.findByIdEmpleadoAndFecha", DetRegistro.class)
-                    .setParameter("idEmpleado", idEmpleado)
-                    .setParameter("fechaEntradaInicio", fechaEntradaInicio)
-                    .setParameter("fechaEntradaFin", fechaEntradaFin)
-                    .getSingleResult();
-            log.debug("IdEmpleado: {}", model.getIdEmpleado().getIdEmpleado());
-            log.debug("Estatus: {}", model.getIdEstatus().getIdEstatus());
-        } catch (Exception ex) {
-            model = null;
-        } finally {
-            close(emSGP);
-        }
-
-        return model;
-    }
-
-    public List<DetRegistro> buscar(Integer idEmpleado, Date fechaEntrada, Date fechaSalida) {
-        List<DetRegistro> modelList = null;
-        EntityManager em = null;
-        try {
-            em = this.getEntityManager();
-            modelList = em.createNamedQuery("DetRegistro.findByEmpleadoPeriodo", modelClass)
-                    .setParameter("idEmpleado", idEmpleado)
-                    .setParameter("fechaEntrada", fechaEntrada)
-                    .setParameter("fechaSalida", fechaSalida)
-                    .getResultList();
-
-            for (DetRegistro r : modelList) {
-                log.info("Registro - idEmpleado: {}", r.getIdEmpleado().getIdEmpleado());
-                log.info("Status registro: {}", r.getIdEstatus().getIdEstatus());
-            }
-
-        } catch (Exception ex) {
-            log.error("Problema para obtener el registro de asistencia del empleado...", ex);
-        } finally {
-            this.close(em);
-        }
-
-        return modelList;
-    }
-
-    public List<DetRegistro> buscarPorPlantaPeriodo(Integer idPlanta, Date fechaInicio, Date fechaFin) {
-        List<DetRegistro> modelList = null;
-        EntityManager em = null;
-        try {
-            em = this.getEntityManager();
-            modelList = em.createNamedQuery("DetRegistro.findByPlantaPeriodo", DetRegistro.class)
-                    .setParameter("idPlanta", idPlanta)
-                    .setParameter("fechaInicio", fechaInicio)
-                    .setParameter("fechaFin", fechaFin)
-                    .getResultList();
-            for (DetRegistro model : modelList) {
-                log.debug("IdEmpleado: {}", model.getIdEmpleado().getIdEmpleado());
-                log.debug("Id Planta: {}", model.getIdEmpleado().getDatoEmpresa().getPlanta().getIdPlanta());
-            }
-        } catch (Exception ex) {
-            log.error("Problema para obtener el listado de registros...", ex);
-            modelList = new ArrayList<>();
-        } finally {
-            this.close(em);
-        }
-        return modelList;
-    }
-    
+	public RegistroDAO(Class<DetRegistro> modelClass) {
+		super(modelClass);
+	}
+	
+	public RegistroDAO() {
+		super(DetRegistro.class);
+	}
+	
+	public DetRegistro buscarPorEmpleadoFechaEntrada(Integer idEmpleado, Date fechaEntradaInicio, Date fechaEntradaFin) {
+		DetRegistro model = null;
+		EntityManager emSGP = null;
+    	try {
+    		emSGP = this.getEntityManager();
+    		model = emSGP.createNamedQuery("DetRegistro.findByIdEmpleadoAndFecha", DetRegistro.class)
+    				.setParameter("idEmpleado", idEmpleado)
+    				.setParameter("fechaEntradaInicio", fechaEntradaInicio)
+    				.setParameter("fechaEntradaFin", fechaEntradaFin)
+    				.getSingleResult()
+    				;
+    		log.debug("IdEmpleado: {}", model.getIdEmpleado().getIdEmpleado());
+    		log.debug("Estatus: {}", model.getIdEstatus().getIdEstatus());
+    	} catch(Exception ex) {
+    		model = null;
+    	} finally {
+    		close(emSGP);
+    	}
+    	
+    	return model;
+	}
+	
+	public List<DetRegistro> buscar(Integer idEmpleado, Date fechaEntrada, Date fechaSalida){
+		List<DetRegistro> modelList = null;
+		EntityManager em = null;
+		try {
+			em = this.getEntityManager();
+			modelList = em.createNamedQuery("DetRegistro.findByEmpleadoPeriodo", modelClass)
+					.setParameter("idEmpleado", idEmpleado)
+	    			.setParameter("fechaEntrada", fechaEntrada)
+	    			.setParameter("fechaSalida", fechaSalida)
+	    			.getResultList()
+	    			;
+			
+			for(DetRegistro r : modelList) {
+				log.debug("Registro - idEmpleado: {}", r.getIdEmpleado().getIdEmpleado());
+				log.debug("Status registro: {}", r.getIdEstatus().getIdEstatus());
+			}
+			
+		} catch(Exception ex) {
+			log.error("Problema para obtener el registro de asistencia del empleado...", ex);
+		} finally {
+			this.close(em);
+		}
+		
+		return modelList;
+	}
+	
+	public List<DetRegistro> buscarPorPlantaPeriodo(Integer idPlanta, Date fechaInicio, Date fechaFin) {
+		List<DetRegistro> modelList = null;
+		EntityManager em = null;
+		try {
+			em = this.getEntityManager();
+			modelList =  em.createNamedQuery("DetRegistro.findByPlantaPeriodo", DetRegistro.class)
+			.setParameter("idPlanta", idPlanta)
+			.setParameter("fechaInicio", fechaInicio)
+			.setParameter("fechaFin", fechaFin)
+			.getResultList()
+			;
+			for(DetRegistro model : modelList) {
+				log.debug("IdEmpleado: {}", model.getIdEmpleado().getIdEmpleado());
+				log.debug("Id Planta: {}", model.getIdEmpleado().getDatoEmpresa().getPlanta().getIdPlanta());
+			}
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de registros...", ex);
+			modelList = new ArrayList<>();
+		} finally {
+			this.close(em);
+		}
+		return modelList;
+	}
+	
     public List<DetRegistro> consultaRegistrosPorIdEmp(Integer idEmp)
     {
         List<DetRegistro> modelList = null;

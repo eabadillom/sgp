@@ -23,6 +23,10 @@ public class NominaDAO extends BaseDAO<DetNomina, Integer> {
 		super(modelClass);
 	}
 	
+	public NominaDAO() {
+		super(DetNomina.class);
+	}
+
 	public List<DetNomina> buscarPorPeriodo(LocalDate periodoInicio, LocalDate periodoFin) {
 		List<DetNomina> modelList = null;
 		EntityManager em = null;
@@ -34,6 +38,52 @@ public class NominaDAO extends BaseDAO<DetNomina, Integer> {
 					.setParameter("periodoFin", periodoFin)
 					.getResultList()
 					;
+			
+		} catch(Exception ex) {
+			log.error("Problema para obtener la lista de nomina del periodo solicitado...", ex);
+		} finally {
+			this.close(em);
+		}
+		
+		return modelList;
+	}
+	
+	public List<DetNomina> buscarPorPeriodoEmpleado(LocalDate periodoInicio, LocalDate periodoFin, String rfc) {
+		List<DetNomina> modelList = null;
+		EntityManager em = null;
+		
+		try {
+			em = this.getEntityManager();
+			modelList = em.createNamedQuery("DetNomina.findByPeriodoRfc", modelClass)
+					.setParameter("periodoInicio", periodoInicio)
+					.setParameter("periodoFin", periodoFin)
+					.setParameter("rfc", rfc)
+					.getResultList()
+					;
+			log.debug("periodo inicio {}, periodo fin {}, rfc {}");
+			
+		} catch(Exception ex) {
+			log.error("Problema para obtener la lista de nomina del periodo solicitado...", ex);
+		} finally {
+			this.close(em);
+		}
+		
+		return modelList;
+	}
+	
+	public List<DetNomina> buscarPorSemanaRfc(Integer semanaInicio, Integer semanaFin, String rfc) {
+		List<DetNomina> modelList = null;
+		EntityManager em = null;
+		
+		try {
+			em = this.getEntityManager();
+			modelList = em.createNamedQuery("DetNomina.findBySemanaRfc", modelClass)
+					.setParameter("semanaInicio", semanaInicio)
+					.setParameter("semanaFin", semanaFin)
+					.setParameter("rfc", rfc)
+					.getResultList()
+					;
+			log.debug("periodo inicio {}, periodo fin {}, rfc {}");
 			
 		} catch(Exception ex) {
 			log.error("Problema para obtener la lista de nomina del periodo solicitado...", ex);
