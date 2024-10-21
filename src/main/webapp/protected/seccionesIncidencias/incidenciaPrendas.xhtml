@@ -14,35 +14,32 @@
     </p:toolbar>
 
     <p:dataTable id="dtPrendasSolicitados" widgetVar="dtPrendasSolicitados" lazy="false" value="#{incidenciaBean.listaPrendas}" 
-                 var="prendas" rowKey="#{prendas.idIncidencia}" >
-        <p:column headerText="# Empleado">
-            <p:outputLabel value="#{prendas.detEmpleadoDTO.numEmpleado}"/>
+                 var="prendas" rowKey="#{prendas.idIncidencia}" paginator="true" rows="5" paginatorPosition="bottom" >
+        <p:column headerText="Nombre" width="8rem">
+            <p:outputLabel value="#{prendas.idEmpleado.nombre} #{prendas.idEmpleado.primerAp} #{prendas.idEmpleado.segundoAp}"/>
         </p:column>
-        <p:column headerText="Nombre">
-            <p:outputLabel value="#{prendas.detEmpleadoDTO.nombre} #{prendas.detEmpleadoDTO.primerAp} #{prendas.detEmpleadoDTO.segundoAp}"/>
+        <p:column headerText="Prendas" width="5rem">
+            <p:outputLabel value="#{prendas.idTipo.idTipo eq 3 ? prendas.idSolPrenda.idPrenda.descripcion :''}"/>
         </p:column>
-        <p:column headerText="Prendas">
-            <p:outputLabel value="#{prendas.catTipoIncidenciaDTO.idTipo eq 3 ? prendas.detSolicitudPrendaDTO.prenda.descripcion :''}"/>
+        <p:column headerText="Imagen" width="5rem">
+            <h:graphicImage name="images/prendas/#{prendas.idSolPrenda.idPrenda.descripcion}.jpg" library="recursos" width="57" />
         </p:column>
-        <p:column headerText="Imagen">
-            <h:graphicImage name="images/prendas/#{prendas.detSolicitudPrendaDTO.prenda.descripcion}.jpg" library="recursos" width="57" />
+        <p:column headerText="Cantidad" width="5rem">
+            <p:outputLabel value="#{prendas.idTipo.idTipo eq 3 ? prendas.idSolPrenda.cantidad :''}"/>
         </p:column>
-        <p:column headerText="Cantidad">
-            <p:outputLabel value="#{prendas.catTipoIncidenciaDTO.idTipo eq 3 ? prendas.detSolicitudPrendaDTO.cantidad :''}"/>
+        <p:column headerText="Talla" width="5rem">
+            <p:outputLabel value="#{prendas.idTipo.idTipo eq 3 ? prendas.idSolPrenda.idTalla.descripcion :''}"/>
         </p:column>
-        <p:column headerText="Talla">
-            <p:outputLabel value="#{prendas.catTipoIncidenciaDTO.idTipo eq 3 ? prendas.detSolicitudPrendaDTO.talla.descripcion :''}"/>
-        </p:column>
-        <p:column headerText="Fecha Captura">
-            <p:outputLabel value="#{prendas.catTipoIncidenciaDTO.idTipo eq 3 ? prendas.fechaCap :''}">
+        <p:column headerText="Captura" width="5rem">
+            <p:outputLabel value="#{prendas.idTipo.idTipo eq 3 ? prendas.fechaCap :''}">
                 <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
             </p:outputLabel>
         </p:column>
-        <p:column headerText="Estatus">
-            <p:outputLabel class="customer-badge status-#{prendas.catEstatusIncidenciaDTO.idEstatus eq 1 ? 'proposal' : prendas.catEstatusIncidenciaDTO.idEstatus eq  2 ? 'qualified' : 'unqualified'}"
-                           value="#{prendas.catEstatusIncidenciaDTO.descripcion}" style="display: block; width: 7rem"/>
+        <p:column headerText="Estatus" width="5rem">
+            <p:outputLabel class="customer-badge status-#{incidenciaBean.status.getStatusClass(prendas.idEstatus.idEstatus)}"
+                           value="#{prendas.idEstatus.descripcion}" style="display: block; width: 7rem"/>
         </p:column>
-        <p:column exportable="false" style="text-align: center" width="20px">
+        <p:column exportable="false" style="text-align: center" width="5rem">
             <p:commandButton icon="pi pi-search" styleClass="rounded-button ui-button-secondary mr-2 mb-2"  process="@this"
                              action="#{incidenciaBean.visualizaDialog()}" update="formIncidencias:tabViewI:dialogPrendas">
                 <f:setPropertyActionListener value="#{prendas}" target="#{incidenciaBean.incidenciaSelected}" for="@previous"/>
@@ -51,30 +48,30 @@
     </p:dataTable>
 
     <p:dialog id="dialogPrendas" widgetVar="dialogPrendas" header="Detalle solicitud uniforme" showEffect="fade" responsive="true" modal="true" 
-              styleClass="ferbo-dialog" dynamic="true" cache="false" >
+              styleClass="ferbo-dialog-complemento-articulo" dynamic="true" cache="false" >
         <p:outputPanel id="pnlPrendas" rendered="#{not empty incidenciaBean.incidenciaSelected}">
             <div class="formgrid grid">
                 <div class="field col">
-                    <p:outputLabel id="soPrenda" value="#{incidenciaBean.incidenciaSelected.detSolicitudPrendaDTO.prenda.descripcion}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
+                    <p:outputLabel id="soPrenda" value="#{incidenciaBean.incidenciaSelected.idSolPrenda.idPrenda.descripcion}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
                 </div>
             </div>
             <div class="formgrid grid">
                 <div class="field col">
-                    <h:graphicImage id="imgPrenda" name="images/prendas/#{incidenciaBean.incidenciaSelected.detSolicitudPrendaDTO.prenda.descripcion}.jpg" library="recursos" width="113" rendered="#{incidenciaBean.incidenciaSelected.detSolicitudPrendaDTO.prenda.descripcion ne null}" styleClass="product-image"/>
+                    <h:graphicImage id="imgPrenda" name="images/prendas/#{incidenciaBean.incidenciaSelected.idSolPrenda.idPrenda.descripcion}.jpg" library="recursos" width="113" rendered="#{incidenciaBean.incidenciaSelected.idSolPrenda.idPrenda.descripcion ne null}" styleClass="product-image"/>
                 </div>
             </div>
             <div class="formgrid grid">
                 <div class="field col">
-                    <p:outputLabel id="soCantidadTalla" value="Cantidad: #{incidenciaBean.incidenciaSelected.detSolicitudPrendaDTO.cantidad} #{incidenciaBean.incidenciaSelected.detSolicitudPrendaDTO.talla.descripcion}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
+                    <p:outputLabel id="soCantidadTalla" value="Cantidad: #{incidenciaBean.incidenciaSelected.idSolPrenda.cantidad} #{incidenciaBean.incidenciaSelected.idSolPrenda.idTalla.descripcion}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
                 </div>
             </div>
         </p:outputPanel>
         <f:facet name="footer">
             <p:commandButton value="Aprobar" icon="pi pi-check" class="ui-button-success" process="pnlPrendas @this"
                              actionListener="#{incidenciaBean.guardarEstatusPrenda(true)}" 
-                             disabled="#{incidenciaBean.incidenciaSelected.detSolicitudPrendaDTO.aprobada ne null}"/>
+                             disabled="#{incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 2 or incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 3 or incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 4}"/>
             <p:commandButton value="Rechazar" icon="pi pi-times" class="ui-button-danger" process="pnlPrendas @this"
-                             disabled="#{incidenciaBean.incidenciaSelected.detSolicitudPrendaDTO.aprobada ne null}"
+                             disabled="#{incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 2 or incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 3 or incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 4}"
                              oncomplete="PF('dialogRechazarPrendas').show()"/>
         </f:facet>
     </p:dialog>
@@ -85,13 +82,13 @@
             <div class="formgrid grid">
                 <div class="field col">
                     <p:outputLabel for="txtRechazoPrendas" value="Descripción de rechazo"/>
-                    <p:inputTextarea id="txtRechazoPrendas" value="#{incidenciaBean.incidenciaSelected.detSolicitudPrendaDTO.descripcionRechazo}"/>
+                    <p:inputTextarea id="txtRechazoPrendas" value="#{incidenciaBean.incidenciaSelected.idSolPrenda.descripcionRechazo}"/>
                 </div>
             </div>
         </p:outputPanel>
         <f:facet name="footer">
             <p:commandButton value="Aceptar" icon="pi pi-check" class="ui-button-success" process="pnlDetalleRechazoPrendas @this"
-                             actionListener="#{incidenciaBean.guardarEstatusIncidencia(false)}" oncomplete="PF('dialogRechazarPrendas').hide()" update="formIncidencias:tabViewI:dtPrendasSolicitados"/>
+                             actionListener="#{incidenciaBean.guardarEstatusPrenda(false)}" oncomplete="PF('dialogRechazarPrendas').hide()" update="formIncidencias:tabViewI:dtPrendasSolicitados"/>
             <p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-secondary" process="@this" 
                              oncomplete="PF('dialogRechazarPrendas').hide()"/>
         </f:facet>

@@ -1,0 +1,130 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/plantillas/template.xhtml">
+    <ui:define name="title">ISR</ui:define>
+    <ui:define name="content">
+        <h:form id="form">
+            <p:growl id="messages" showDetail="true" />
+            <p:toolbar>
+                <p:toolbarGroup>
+                    <p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{isrBean.openNew}"
+                        update=":dialogs:manage-isr-content" oncomplete="PF('manageISRDialog').show()"
+                        style="margin-right: .5rem" >
+                        <p:resetInput target=":dialogs:manage-isr-content" />
+                    </p:commandButton>
+                </p:toolbarGroup>
+            </p:toolbar>
+            <p:dataTable id="dt-isr" widgetVar="dtISR" var="isr" value="#{isrBean.listTarifaISR}" reflow="true" styleClass="products-table"
+                selection="#{isrBean.listTarifaISRSelected}" rowKey="#{isr.idIsr}" paginator="true" rows="10" paginatorPosition="bottom"
+                lazy="true">
+                <p:column headerText="Limite Inferior ($)" style="text-align: center;" width="4rem">
+                    <h:outputText value="#{isr.limiteInferior}" >
+                        <f:convertNumber type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="2" locale="es_MX"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Limite Superior ($)" style="text-align: center;" width="4rem">
+                    <h:outputText value="#{isr.limiteSuperior}" >
+                        <f:convertNumber type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="2" locale="es_MX"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Cuota Fija" style="text-align: center;" width="4rem">
+                    <h:outputText value="#{isr.cuotaFija}" >
+                        <f:convertNumber type="currency" currencySymbol="$" minFractionDigits="2" maxFractionDigits="2" locale="es_MX"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="% sobre excedente limite inferior" style="text-align: center;" width="4rem">
+                    <h:outputText value="#{isr.porcAplExceLimInf}" >
+                        <f:convertNumber minFractionDigits="2" maxFractionDigits="2" locale="es_MX"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Tipo" style="text-align: center;" width="4rem">
+                    <h:outputText value="#{isr.tipo}" />
+                </p:column>
+                <p:column headerText="Fecha" style="text-align: center;" width="4rem">
+                    <h:outputText value="#{isr.fecha}" >
+                        <f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
+                    </h:outputText>
+                </p:column>
+                <p:column exportable="false" ariaHeaderText="Actions" width="2rem">
+                    <p:commandButton icon="pi pi-bars" update=":dialogs:manage-isr-content"
+                        oncomplete="PF('manageISRDialog').show()"
+                        styleClass="edit-button m-1" process="@this">
+                        <f:setPropertyActionListener value="#{isr}" target="#{isrBean.tarifaISR}" />
+                        <p:resetInput target=":dialogs:manage-isr-content" />
+                    </p:commandButton>
+                    <p:commandButton class="ui-button-danger" icon="pi pi-trash"
+                        process="@this"
+                        oncomplete="PF('borrarISRDialog').show()">
+                        <f:setPropertyActionListener value="#{isr}" target="#{isrBean.tarifaISR}" />
+                </p:commandButton>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+        <h:form id="dialogs">
+            <p:dialog header="Detalles del ISR" showEffect="fade" modal="true" widgetVar="manageISRDialog"
+                responsive="true" draggable="true" resizable="false" dynamic="true" style="margin: auto">
+                <p:outputPanel id="manage-isr-content" class="ui-fluid" rendered="#{not empty isrBean.tarifaISR}">
+                    <div class="field">
+                        <p:outputLabel for="@next">Limite Inferior ($)</p:outputLabel>
+                        <p:inputText id="lInferior" value="#{isrBean.tarifaISR.limiteInferior}" required="true" >
+                            <p:ajax process="@this"/>
+                        </p:inputText>
+                    </div>
+                    <div class="field">
+                        <p:outputLabel for="@next">Limite Superior ($)</p:outputLabel>
+                        <p:inputText id="lSuperior" value="#{isrBean.tarifaISR.limiteSuperior}" required="true" >
+                            <p:ajax process="@this"/>
+                        </p:inputText>
+                    </div>
+                    <div class="field">
+                        <p:outputLabel for="@next">Cuota Fija</p:outputLabel>
+                        <p:inputText id="cuotaFija" value="#{isrBean.tarifaISR.cuotaFija}" required="true" >
+                            <p:ajax process="@this"/>
+                        </p:inputText>
+                    </div>
+                    <div class="field">
+                        <p:outputLabel for="@next">% sobre excedente limite inferior</p:outputLabel>
+                        <p:inputText id="exceLimInferior" value="#{isrBean.tarifaISR.porcAplExceLimInf}" required="true" >
+                            <p:ajax process="@this"/>
+                        </p:inputText>
+                    </div>
+                    <div class="field">
+                        <p:outputLabel for="@next">Tipo</p:outputLabel>
+                        <p:selectOneRadio id="line" value="#{isrBean.tarifaISR.tipo}" layout="lineDirection" required="true">
+                            <f:selectItem itemLabel="Diario" itemValue="di" />
+                            <f:selectItem itemLabel="Semanal" itemValue="s" />
+                            <f:selectItem itemLabel="Decenal" itemValue="de" />
+                            <f:selectItem itemLabel="Quincenal" itemValue="q" />
+                            <f:selectItem itemLabel="Mensual" itemValue="m" />
+                            <p:ajax process="@this"/>
+                        </p:selectOneRadio>
+                    </div>
+                    <div class="field">
+                        <p:outputLabel for="@next">Fecha</p:outputLabel>
+                        <p:calendar id="fecha" value="#{isrBean.tarifaISR.fecha}" required="true" pattern="dd/MM/yyyy" locale="es" >
+                            <p:ajax process="@this"/>
+                        </p:calendar>
+                    </div>
+                </p:outputPanel>
+                <f:facet name="footer">
+                    <p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{isrBean.crearISRNuevo()}"
+                                     update="manage-isr-content form:dt-isr" process="manage-isr-content @this">
+                    </p:commandButton>
+                    <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('manageISRDialog').hide()"
+                        class="ui-button-secondary" type="button" />
+                </f:facet>
+            </p:dialog>
+            <p:confirmDialog widgetVar="borrarISRDialog" showEffect="fade" width="300"
+                message="Borrar ISR?" header="Confirmar" severity="warn">
+                <p:commandButton value="Si" icon="pi pi-check" actionListener="#{isrBean.borrarISRRegistro()}"
+                    process="@this" oncomplete="PF('borrarISRDialog').hide()" />
+                <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+                    onclick="PF('borrarISRDialog').hide()" />
+            </p:confirmDialog>
+        </h:form>
+    </ui:define>
+</ui:composition>

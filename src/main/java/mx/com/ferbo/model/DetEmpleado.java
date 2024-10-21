@@ -27,94 +27,92 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "det_empleado")
 @NamedQueries({
-    @NamedQuery(name = "DetEmpleado.findByActive",query = "SELECT NEW mx.com.ferbo.dto.DetEmpleadoDTO("
-                        + " e.idEmpleado, e.numEmpleado, e.nombre, e.primerAp, e.segundoAp, e.fechaNacimiento,"
-                        + " e.fechaRegistro, e.fechaModificacion, e.curp, e.rfc, e.correo, e.fechaIngreso, e.nss, "
-                        + " e.activo, e.empleadoFoto.fotografia, a.idArea, a.descripcion, em.idEmpresa, em.descripcion, "
-                        + "p.idPerfil, p.descripcion, pl.idPlanta, pl.descripcion, pu.idPuesto, pu.descripcion"
-                        + ")"
-                        + " FROM DetEmpleado e"
-                        + " LEFT JOIN e.datoEmpresa de"
-                        + " LEFT JOIN de.area a"
-                        + " LEFT JOIN de.empresa em"
-                        + " LEFT JOIN de.perfil p"
-                        + " LEFT JOIN de.planta pl"
-                        + " LEFT JOIN de.puesto pu"
-                        + " WHERE e.activo = 1 ORDER BY e.activo, e.nombre, e.primerAp, e.segundoAp"),
+    @NamedQuery(name = "DetEmpleado.findByActive", query = "SELECT NEW mx.com.ferbo.dto.DetEmpleadoDTO("
+            + " e.idEmpleado, e.numEmpleado, e.nombre, e.primerAp, e.segundoAp, e.fechaNacimiento,"
+            + " e.fechaRegistro, e.fechaModificacion, e.curp, e.rfc, e.correo, e.fechaIngreso, e.nss, "
+            + " e.activo, e.empleadoFoto.fotografia, a.idArea, a.descripcion, em.idEmpresa, em.descripcion, "
+            + "p.idPerfil, p.descripcion, pl.idPlanta, pl.descripcion, pu.idPuesto, pu.descripcion"
+            + ")"
+            + " FROM DetEmpleado e"
+            + " LEFT JOIN e.datoEmpresa de"
+            + " LEFT JOIN de.area a"
+            + " LEFT JOIN de.empresa em"
+            + " LEFT JOIN de.perfil p"
+            + " LEFT JOIN de.planta pl"
+            + " LEFT JOIN de.puesto pu"
+            + " WHERE e.activo = 1 ORDER BY e.activo, e.nombre, e.primerAp, e.segundoAp"),
     @NamedQuery(name = "DetEmpleado.findByID",
-                query = "SELECT NEW mx.com.ferbo.dto.DetEmpleadoDTO("
-                        + " e.idEmpleado, e.numEmpleado, e.nombre, e.primerAp, e.segundoAp, e.fechaNacimiento,"
-                        + " e.fechaRegistro, e.fechaModificacion, e.curp, e.rfc, e.correo, e.fechaIngreso, e.nss, e.activo, e.empleadoFoto.fotografia, a.idArea, a.descripcion,"
-                        + " em.idEmpresa, em.descripcion, p.idPerfil, p.descripcion, pl.idPlanta, pl.descripcion, pu.idPuesto, pu.descripcion"
-                        + ")"
-                        + " FROM DetEmpleado e"
-                        + " LEFT JOIN e.datoEmpresa de"
-                        + " LEFT JOIN de.area a"
-                        + " LEFT JOIN de.empresa em"
-                        + " LEFT JOIN de.perfil p"
-                        + " LEFT JOIN de.planta pl"
-                        + " LEFT JOIN de.puesto pu"
-                        + " WHERE e.idEmpleado = :idEmp"),
+            query = "SELECT NEW mx.com.ferbo.dto.DetEmpleadoDTO("
+            + " e.idEmpleado, e.numEmpleado, e.nombre, e.primerAp, e.segundoAp, e.fechaNacimiento,"
+            + " e.fechaRegistro, e.fechaModificacion, e.curp, e.rfc, e.correo, e.fechaIngreso, e.nss, e.activo, e.empleadoFoto.fotografia, a.idArea, a.descripcion,"
+            + " em.idEmpresa, em.descripcion, p.idPerfil, p.descripcion, pl.idPlanta, pl.descripcion, pu.idPuesto, pu.descripcion"
+            + ")"
+            + " FROM DetEmpleado e"
+            + " LEFT JOIN e.datoEmpresa de"
+            + " LEFT JOIN de.area a"
+            + " LEFT JOIN de.empresa em"
+            + " LEFT JOIN de.perfil p"
+            + " LEFT JOIN de.planta pl"
+            + " LEFT JOIN de.puesto pu"
+            + " WHERE e.idEmpleado = :idEmp"),
     @NamedQuery(name = "DetEmpleado.findByNumEmpl", query = "SELECT NEW mx.com.ferbo.dto.DetEmpleadoDTO("
-                        + " e.idEmpleado, e.numEmpleado, e.nombre, e.primerAp, e.segundoAp, e.fechaNacimiento,"
-                        + " e.fechaRegistro, e.fechaModificacion, e.curp, e.rfc, e.correo, e.fechaIngreso, e.nss, e.activo, e.empleadoFoto.fotografia, a.idArea, a.descripcion,"
-                        + " em.idEmpresa, em.descripcion, p.idPerfil, p.descripcion, pl.idPlanta, pl.descripcion, pu.idPuesto, pu.descripcion"
-                        + ")"
-                        + " FROM DetEmpleado e"
-                        + " LEFT JOIN e.datoEmpresa de"
-                        + " LEFT JOIN de.area a"
-                        + " LEFT JOIN de.empresa em"
-                        + " LEFT JOIN de.perfil p"
-                        + " LEFT JOIN de.planta pl"
-                        + " LEFT JOIN de.puesto pu"
-    		+ " WHERE e.activo = 1 AND e.numEmpleado = :numEmpl"),
+            + " e.idEmpleado, e.numEmpleado, e.nombre, e.primerAp, e.segundoAp, e.fechaNacimiento,"
+            + " e.fechaRegistro, e.fechaModificacion, e.curp, e.rfc, e.correo, e.fechaIngreso, e.nss, e.activo, e.empleadoFoto.fotografia, a.idArea, a.descripcion,"
+            + " em.idEmpresa, em.descripcion, p.idPerfil, p.descripcion, pl.idPlanta, pl.descripcion, pu.idPuesto, pu.descripcion"
+            + ")"
+            + " FROM DetEmpleado e"
+            + " LEFT JOIN e.datoEmpresa de"
+            + " LEFT JOIN de.area a"
+            + " LEFT JOIN de.empresa em"
+            + " LEFT JOIN de.perfil p"
+            + " LEFT JOIN de.planta pl"
+            + " LEFT JOIN de.puesto pu"
+            + " WHERE e.activo = 1 AND e.numEmpleado = :numEmpl"),
     @NamedQuery(name = "DetEmpleado.findByNumEmplSD", query = "SELECT NEW mx.com.ferbo.dto.DetEmpleadoDTO("
-                        + " e.idEmpleado, e.numEmpleado, e.nombre, e.primerAp, e.segundoAp, e.fechaNacimiento,"
-                        + " e.fechaRegistro, e.fechaModificacion, e.curp, e.rfc, e.correo, e.fechaIngreso, e.nss, e.activo, e.empleadoFoto.fotografia, a.idArea, a.descripcion,"
-                        + " em.idEmpresa, em.descripcion, p.idPerfil, p.descripcion, pl.idPlanta, pl.descripcion, pu.idPuesto, pu.descripcion, e.sueldoDiario"
-                        + ")"
-                        + " FROM DetEmpleado e"
-                        + " LEFT JOIN e.datoEmpresa de"
-                        + " LEFT JOIN de.area a"
-                        + " LEFT JOIN de.empresa em"
-                        + " LEFT JOIN de.perfil p"
-                        + " LEFT JOIN de.planta pl"
-                        + " LEFT JOIN de.puesto pu"
-    		+ " WHERE e.activo = 1 AND e.idEmpleado = :idEmp"),
-    
+            + " e.idEmpleado, e.numEmpleado, e.nombre, e.primerAp, e.segundoAp, e.fechaNacimiento,"
+            + " e.fechaRegistro, e.fechaModificacion, e.curp, e.rfc, e.correo, e.fechaIngreso, e.nss, e.activo, e.empleadoFoto.fotografia, a.idArea, a.descripcion,"
+            + " em.idEmpresa, em.descripcion, p.idPerfil, p.descripcion, pl.idPlanta, pl.descripcion, pu.idPuesto, pu.descripcion, e.sueldoDiario"
+            + ")"
+            + " FROM DetEmpleado e"
+            + " LEFT JOIN e.datoEmpresa de"
+            + " LEFT JOIN de.area a"
+            + " LEFT JOIN de.empresa em"
+            + " LEFT JOIN de.perfil p"
+            + " LEFT JOIN de.planta pl"
+            + " LEFT JOIN de.puesto pu"
+            + " WHERE e.activo = 1 AND e.idEmpleado = :idEmp"),
+
     @NamedQuery(name = "DetEmpleado.findByActiveSDI",
-                query = "SELECT NEW mx.com.ferbo.dto.DetEmpleadoDTO("
-                        + " e.idEmpleado, e.numEmpleado, e.nombre, e.primerAp, e.segundoAp, e.fechaNacimiento,"
-                        + " e.fechaRegistro, e.fechaModificacion, e.curp, e.rfc, e.correo, e.fechaIngreso, e.nss, "
-                        + " e.activo, e.empleadoFoto.fotografia, a.idArea, a.descripcion, em.idEmpresa, em.descripcion, "
-                        + "p.idPerfil, p.descripcion, pl.idPlanta, pl.descripcion, pu.idPuesto, pu.descripcion, e.sueldoDiario"
-                        + ")"
-                        + " FROM DetEmpleado e"
-                        + " LEFT JOIN e.datoEmpresa de"
-                        + " LEFT JOIN de.area a"
-                        + " LEFT JOIN de.empresa em"
-                        + " LEFT JOIN de.perfil p"
-                        + " LEFT JOIN de.planta pl"
-                        + " LEFT JOIN de.puesto pu"
-                        + " WHERE e.activo = 1 ORDER BY e.primerAp, e.segundoAp, e.nombre"),
+            query = "SELECT NEW mx.com.ferbo.dto.DetEmpleadoDTO("
+            + " e.idEmpleado, e.numEmpleado, e.nombre, e.primerAp, e.segundoAp, e.fechaNacimiento,"
+            + " e.fechaRegistro, e.fechaModificacion, e.curp, e.rfc, e.correo, e.fechaIngreso, e.nss, "
+            + " e.activo, e.empleadoFoto.fotografia, a.idArea, a.descripcion, em.idEmpresa, em.descripcion, "
+            + "p.idPerfil, p.descripcion, pl.idPlanta, pl.descripcion, pu.idPuesto, pu.descripcion, e.sueldoDiario"
+            + ")"
+            + " FROM DetEmpleado e"
+            + " LEFT JOIN e.datoEmpresa de"
+            + " LEFT JOIN de.area a"
+            + " LEFT JOIN de.empresa em"
+            + " LEFT JOIN de.perfil p"
+            + " LEFT JOIN de.planta pl"
+            + " LEFT JOIN de.puesto pu"
+            + " WHERE e.activo = 1 ORDER BY e.primerAp, e.segundoAp, e.nombre"),
     @NamedQuery(name = "DetEmpleado.findByActiveAndIdEmpresa",
-    			query = "SELECT NEW mx.com.ferbo.dto.DetEmpleadoDTO("
-                        + " e.idEmpleado, e.numEmpleado, e.nombre, e.primerAp, e.segundoAp, e.fechaNacimiento,"
-                        + " e.fechaRegistro, e.fechaModificacion, e.curp, e.rfc, e.correo, e.fechaIngreso, e.nss, "
-                        + " e.activo, e.empleadoFoto.fotografia, a.idArea, a.descripcion, em.idEmpresa, em.descripcion, "
-                        + "p.idPerfil, p.descripcion, pl.idPlanta, pl.descripcion, pu.idPuesto, pu.descripcion, e.sueldoDiario"
-                        + ")"
-                        + " FROM DetEmpleado e"
-                        + " LEFT JOIN e.datoEmpresa de"
-                        + " LEFT JOIN de.area a"
-                        + " LEFT JOIN de.empresa em"
-                        + " LEFT JOIN de.perfil p"
-                        + " LEFT JOIN de.planta pl"
-                        + " LEFT JOIN de.puesto pu"
-                        + " WHERE e.activo = 1 AND de.empresa.idEmpresa = :idEmpresa ORDER BY e.primerAp, e.segundoAp, e.nombre"),
-    
-    
-    
+            query = "SELECT NEW mx.com.ferbo.dto.DetEmpleadoDTO("
+            + " e.idEmpleado, e.numEmpleado, e.nombre, e.primerAp, e.segundoAp, e.fechaNacimiento,"
+            + " e.fechaRegistro, e.fechaModificacion, e.curp, e.rfc, e.correo, e.fechaIngreso, e.nss, "
+            + " e.activo, e.empleadoFoto.fotografia, a.idArea, a.descripcion, em.idEmpresa, em.descripcion, "
+            + "p.idPerfil, p.descripcion, pl.idPlanta, pl.descripcion, pu.idPuesto, pu.descripcion, e.sueldoDiario"
+            + ")"
+            + " FROM DetEmpleado e"
+            + " LEFT JOIN e.datoEmpresa de"
+            + " LEFT JOIN de.area a"
+            + " LEFT JOIN de.empresa em"
+            + " LEFT JOIN de.perfil p"
+            + " LEFT JOIN de.planta pl"
+            + " LEFT JOIN de.puesto pu"
+            + " WHERE e.activo = 1 AND de.empresa.idEmpresa = :idEmpresa ORDER BY e.primerAp, e.segundoAp, e.nombre"),
+
     @NamedQuery(name = "DetEmpleado.findByNumero", query = "SELECT e FROM DetEmpleado e WHERE e.numEmpleado = :numero"),
     @NamedQuery(name = "DetEmpleado.getNumEmpleado", query = "SELECT COALESCE(MAX(e.idEmpleado),0) FROM DetEmpleado e"),
     @NamedQuery(name = "DetEmpleado.getAll", query = "SELECT e FROM DetEmpleado e"),
@@ -129,101 +127,101 @@ public class DetEmpleado implements Serializable {
     @Basic(optional = false)
     @Column(name = "id_empleado")
     private Integer idEmpleado;
-    
+
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 10)
     @Column(name = "num_empleado")
     private String numEmpleado;
-    
+
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 45)
     @Column(name = "nombre")
     private String nombre;
-    
+
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 45)
     @Column(name = "primer_ap")
     private String primerAp;
-    
+
     @Size(max = 45)
     @Column(name = "segundo_ap")
     private String segundoAp;
-    
+
     @Basic(optional = false)
     @NotNull
     @Column(name = "fecha_nacimiento")
     @Temporal(TemporalType.DATE)
     private Date fechaNacimiento;
-    
+
     @Basic(optional = false)
     @NotNull
     @Column(name = "fecha_registro")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaRegistro;
-    
+
     @Column(name = "fecha_modificacion")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaModificacion;
-    
+
     @Size(max = 18)
     @Column(name = "curp")
     private String curp;
-    
+
     @Basic(optional = true)
     @NotNull
     @Size(min = 1, max = 45)
     @Column(name = "rfc")
     private String rfc;
-    
+
     @Size(max = 45)
     @Column(name = "correo")
     private String correo;
-    
+
     @Basic(optional = true)
     @Column(name = "fecha_ingreso")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaIngreso;
-    
+
     @Size(max = 45)
     @Column(name = "nss")
     private String nss;
-    
+
     @Basic(optional = false)
     @NotNull
     @Column(name = "activo")
     private short activo;
-    
+
     @Column(name = "sueldo_diario")
     private BigDecimal sueldoDiario;
-    
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idEmpleado")
     private List<BitacoraInventario> bitacoraInventarioList;
-    
+
     @OneToMany(mappedBy = "idEmpleado")
     private List<BitacoraCatPerfil> bitacoraCatPerfilList;
-    
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idEmpleadoSol")
     private List<DetSolicitudPermiso> detSolicitudPermisoList;
-    
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idEmpleado")
     private List<DetBiometrico> detBiometricoList;
-    
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idEmpleado")
     private List<DetRegistro> detRegistroList;
-    
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idEmpleadoSol")
     private List<DetSolicitudArticulo> detSolicitudArticuloList;
-    
+
     @OneToMany(mappedBy = "idEmpleadoRev")
     private List<DetSolicitudPrenda> detSolicitudPrendaList;
-    
+
     @OneToOne(cascade = {CascadeType.ALL})
     @JoinColumn(name = "id_empleado_empresa")
     private InfDatoEmpresa datoEmpresa;
-    
+
     @OneToOne(cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
     @JoinColumn(name = "id_empleado_foto")
     private DetEmpleadoFoto empleadoFoto;
@@ -242,7 +240,7 @@ public class DetEmpleado implements Serializable {
     }
 
     public DetEmpleado(Integer idEmpleado, String numEmpleado, String nombre, String primerAp, Date fechaNacimiento, Date fechaRegistro, String rfc,
-                       Date fechaIngreso, short activo, BigDecimal sueldoDiario) {
+            Date fechaIngreso, short activo, BigDecimal sueldoDiario) {
         this.idEmpleado = idEmpleado;
         this.numEmpleado = numEmpleado;
         this.nombre = nombre;
@@ -254,9 +252,9 @@ public class DetEmpleado implements Serializable {
         this.activo = activo;
         this.sueldoDiario = sueldoDiario;
     }
-    
+
     public DetEmpleado(Integer idEmpleado, String numEmpleado, String nombre, String primerAp, Date fechaNacimiento, Date fechaRegistro, String rfc,
-                       Date fechaIngreso, short activo) {
+            Date fechaIngreso, short activo) {
         this.idEmpleado = idEmpleado;
         this.numEmpleado = numEmpleado;
         this.nombre = nombre;
@@ -266,7 +264,7 @@ public class DetEmpleado implements Serializable {
         this.rfc = rfc;
         this.fechaIngreso = fechaIngreso;
         this.activo = activo;
-        
+
     }
 
     public Integer getIdEmpleado() {
@@ -445,21 +443,21 @@ public class DetEmpleado implements Serializable {
         this.sueldoDiario = sueldoDiario;
     }
 
-	public InfDatoEmpresa getDatoEmpresa() {
-		return datoEmpresa;
-	}
+    public InfDatoEmpresa getDatoEmpresa() {
+        return datoEmpresa;
+    }
 
-	public void setDatoEmpresa(InfDatoEmpresa datoEmpresa) {
-		this.datoEmpresa = datoEmpresa;
-	}
+    public void setDatoEmpresa(InfDatoEmpresa datoEmpresa) {
+        this.datoEmpresa = datoEmpresa;
+    }
 
-	public DetEmpleadoFoto getEmpleadoFoto() {
-		return empleadoFoto;
-	}
+    public DetEmpleadoFoto getEmpleadoFoto() {
+        return empleadoFoto;
+    }
 
-	public void setEmpleadoFoto(DetEmpleadoFoto empleadoFoto) {
-		this.empleadoFoto = empleadoFoto;
-	}
+    public void setEmpleadoFoto(DetEmpleadoFoto empleadoFoto) {
+        this.empleadoFoto = empleadoFoto;
+    }
 
 	public List<DetPercepcionEmpleado> getPercepcionesEmpleado() {
 		return percepcionesEmpleado;

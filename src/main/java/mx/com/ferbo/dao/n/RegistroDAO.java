@@ -96,5 +96,27 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
 		return modelList;
 	}
 	
-
+    public List<DetRegistro> consultaRegistrosPorIdEmp(Integer idEmp)
+    {
+        List<DetRegistro> modelList = null;
+        EntityManager em = null;
+        
+        try
+        {
+            em = this.getEntityManager();
+            modelList = em.createNamedQuery("DetRegistro.findByIdEmpDesc", DetRegistro.class)
+                .setParameter("idEmp", idEmp)
+                .getResultList();
+        }catch (Exception ex) 
+        {
+            log.error("Problema para obtener el listado de registros...", ex);
+            modelList = new ArrayList<>();
+        } finally 
+        {
+            this.close(em);
+        }
+        
+        return modelList;
+    }
+    
 }

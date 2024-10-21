@@ -23,8 +23,8 @@ import javax.persistence.Table;
 @Table(name = "cat_prenda")
 @NamedQueries({
     @NamedQuery(name = "CatPrenda.findAll", query = "SELECT c FROM CatPrenda c"),
-    @NamedQuery(name = "CatPrenda.findAllActive", query = "SELECT NEW mx.com.ferbo.dto.CatPrendaDTO(c.idPrenda, c.descripcion, c.precio, c.cantidadMax, c.activo, c.detalle) FROM CatPrenda c WHERE c.activo = 1"),
-    @NamedQuery(name = "CatPrenda.findById", query = "SELECT NEW mx.com.ferbo.dto.CatPrendaDTO(c.idPrenda, c.descripcion, c.precio, c.cantidadMax, c.activo, c.detalle) FROM CatPrenda c WHERE c.activo = 1 AND c.idPrenda = :idPrenda")
+    @NamedQuery(name = "CatPrenda.findAllActive", query = "SELECT c FROM CatPrenda c WHERE c.activo = 1"),
+    @NamedQuery(name = "CatPrenda.findById", query = "SELECT c FROM CatPrenda c WHERE c.activo = 1 AND c.idPrenda = :idPrenda")
 })
 public class CatPrenda implements Serializable {
 

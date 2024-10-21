@@ -14,16 +14,35 @@ import mx.com.ferbo.model.CatCuotaIMSS;
 import mx.com.ferbo.model.CatCuotaIMSSPK;
 
 public class CuotaIMSSDAO extends BaseDAO<CatCuotaIMSS, CatCuotaIMSSPK> {
-	private static Logger log = LogManager.getLogger(CuotaIMSSDAO.class);
+    private static Logger log = LogManager.getLogger(CuotaIMSSDAO.class);
 
-	public CuotaIMSSDAO(Class<CatCuotaIMSS> modelClass) {
-		super(modelClass);
-	}
-	
-	public CuotaIMSSDAO() {
-		super(CatCuotaIMSS.class);
-	}
-	
+    public CuotaIMSSDAO(Class<CatCuotaIMSS> modelClass) {
+        super(modelClass);
+    }
+
+    public CuotaIMSSDAO() {
+        super(CatCuotaIMSS.class);
+    }
+
+    public List<CatCuotaIMSS> obtenerLista()
+    {
+        List<CatCuotaIMSS> modelList = null;
+        EntityManager em = null;
+        
+        try
+        {
+            em = this.getEntityManager();
+            modelList = em.createNamedQuery("CatCuotaIMSS.findAll", CatCuotaIMSS.class)
+                    .getResultList();
+        }catch(Exception ex) {
+            log.error("Problema para obtener la cuota del IMSS...", ex);
+        } finally {
+            this.close(em);
+        }
+        
+        return modelList;
+    }
+
 	public CatCuotaIMSS buscarPor(String tipoCuota, String clave, Date fechaInicio, Date fechaFin, BigDecimal base) {
 		CatCuotaIMSS tarifa = null;
 		EntityManager em = null;
@@ -65,4 +84,5 @@ public class CuotaIMSSDAO extends BaseDAO<CatCuotaIMSS, CatCuotaIMSSPK> {
 		//
 		return modelList;
 	}
+
 }

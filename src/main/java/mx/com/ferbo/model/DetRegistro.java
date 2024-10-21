@@ -27,6 +27,7 @@ import javax.persistence.TemporalType;
 @Table(name = "det_registro")
 @NamedQueries({
     @NamedQuery(name = "DetRegistro.findAll", query = "SELECT d FROM DetRegistro d"),
+    @NamedQuery(name = "DetRegistro.findByIdEmpDesc", query = "SELECT d FROM DetRegistro d INNER JOIN d.idEmpleado de INNER JOIN d.idEstatus cer WHERE de.idEmpleado = :idEmp"),
     @NamedQuery(name = "DetRegistro.findByIdEmp", query = "SELECT NEW mx.com.ferbo.dto.DetRegistroDTO("
                                                   + " d.idRegistro,"
                                                   + " e.idEmpleado,"

@@ -15,7 +15,7 @@
     }
 
     String numEmpleado = "";
-
+    Integer tamanioPermitido = 4;
 %>
 <!DOCTYPE html>
 <html>
@@ -54,8 +54,8 @@
 
                 <div align="center">
                     <input type="hidden" id="accion" value=""  style="display:none">
-                    <input type="button" id="inoutES" value="Entrada / Salida" name="" onclick="lectura('registro', '<%=basePath%>');" class=" btnfos btnfos-5" />
-                    <input type="button" id="inoutP" value="Mi Perfil" onclick="lectura('perfil', '<%=basePath%>');" class=" btnfos btnfos-5"  />
+                    <input type="button" id="inoutES" value="Entrada / Salida" name="" onclick="lectura('registro', '<%=basePath%>', '<%=tamanioPermitido%>');" class=" btnfos btnfos-5" />
+                    <input type="button" id="inoutP" value="Mi Perfil" onclick="lectura('perfil', '<%=basePath%>', '<%=tamanioPermitido%>');" class=" btnfos btnfos-5"  />
                 </div>
             </form>
         </div>
@@ -63,22 +63,21 @@
             <table id="tab-introduce">
                 <tr>
                     <td id="aviso" align="center" valign="center">
-                        <img id="reporte" src="<%= imagesPath %>/administrador.png">
-                        <img id="escanea" src="<%= imagesPath %>/finger_print_01s.png">
-                        <img id="valida" src="<%= imagesPath %>/finger_print_02s.png">
-                        <img id="invalida" src="<%= imagesPath %>/finger_print_03s.png">
-                        
+                        <img id="reporte" src="<%= imagesPath%>/administrador.png">
+                        <img id="escanea" src="<%= imagesPath%>/finger_print_01s.png">
+                        <img id="valida" src="<%= imagesPath%>/finger_print_02s.png">
+                        <img id="invalida" src="<%= imagesPath%>/finger_print_03s.png">
                     </td>
                 </tr>
                 <tr>
                     <td id="estado">
-                        <img id="coloca" src="<%= imagesPath %>/huella.gif">
-                        <img id="acepta" src="<%= imagesPath %>/pasa.png">
-                        <img id="niega" src="<%= imagesPath %>/nopasa.png">
+                        <img id="coloca" src="<%= imagesPath%>/huella.gif">
+                        <img id="acepta" src="<%= imagesPath%>/pasa.png">
+                        <img id="niega" src="<%= imagesPath%>/nopasa.png">
                         <label id="mensajeUsuario">unTexto</label>
                     </td>
                 </tr>
-                
+
             </table>
         </div>
         <div id="procesando" title="Procesando" style="display: none;">
@@ -87,9 +86,37 @@
                     <td id="espere" align="center" valing="center"> Espere un momento </td>
                 </tr>
                 <tr>
-                    <td><img src="<%= imagesPath %>/cargando.gif"></td>
+                    <td><img src="<%= imagesPath%>/cargando.gif"></td>
                 </tr>
             </table>
         </div>
+        <div id="registro" title="Registro" style="display: none;">
+            <table id="tab-Registro">
+                <tr>
+                    <td align="left" valign="center">
+                        <label id="LEmpleado">Empleado: </label>
+                        <label id="empleado">unTexto</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="left" valign="center">
+                        <label id="LEntrada">Hora de entrada: </label>
+                        <label id="entrada">unTexto</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="left" valign="center">
+                        <label id="LSalida">Hora de salida: </label>
+                        <label id="salida">unTexto</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <img id="acepta" src="<%= imagesPath%>/pasa.png">
+                        <label id="mensajeRegistro">unTexto</label>
+                    </td>
+                </tr>
+            </table>
+        </div>         
     </body>
 </html>
