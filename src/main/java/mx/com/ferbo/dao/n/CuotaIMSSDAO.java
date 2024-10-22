@@ -24,29 +24,6 @@ public class CuotaIMSSDAO extends BaseDAO<CatCuotaIMSS, CatCuotaIMSSPK> {
         super(CatCuotaIMSS.class);
     }
 
-    public CatCuotaIMSS buscarPor(String tipoCuota, String clave, Date fechaInicio, Date fechaFin, BigDecimal base) {
-        CatCuotaIMSS tarifa = null;
-        EntityManager em = null;
-
-        try {
-                em = this.getEntityManager();
-                tarifa = em.createNamedQuery("CatCuotaIMSS.findByClavePeriodoBase", CatCuotaIMSS.class)
-                                .setParameter("clave", clave)
-                                .setParameter("fechaInicio", fechaInicio)
-                                .setParameter("fechaFin", fechaFin)
-                                .setParameter("base", base)
-                                .setParameter("tipoCuota", tipoCuota)
-                                .getSingleResult()
-                                ;
-        } catch(Exception ex) {
-                log.error("Problema para obtener la cuota del IMSS...", ex);
-        } finally {
-                this.close(em);
-        }
-
-        return tarifa;
-    }
-    
     public List<CatCuotaIMSS> obtenerLista()
     {
         List<CatCuotaIMSS> modelList = null;
@@ -65,5 +42,47 @@ public class CuotaIMSSDAO extends BaseDAO<CatCuotaIMSS, CatCuotaIMSSPK> {
         
         return modelList;
     }
+
+	public CatCuotaIMSS buscarPor(String tipoCuota, String clave, Date fechaInicio, Date fechaFin, BigDecimal base) {
+		CatCuotaIMSS tarifa = null;
+		EntityManager em = null;
+		
+		try {
+			em = this.getEntityManager();
+			tarifa = em.createNamedQuery("CatCuotaIMSS.findByClavePeriodoBase", CatCuotaIMSS.class)
+					.setParameter("clave", clave)
+					.setParameter("fechaInicio", fechaInicio)
+					.setParameter("fechaFin", fechaFin)
+					.setParameter("base", base)
+					.setParameter("tipoCuota", tipoCuota)
+					.getSingleResult()
+					;
+		} catch(Exception ex) {
+			log.error("Problema para obtener la cuota del IMSS...", ex);
+		} finally {
+			this.close(em);
+		}
+		
+		return tarifa;
+	}
+
+	public List<CatCuotaIMSS> buscarPorPeriodo(Date fechaInicio, Date fechaFin) {
+		List<CatCuotaIMSS> modelList = null;
+		EntityManager em = null;
+		try {
+			em = this.getEntityManager();
+			modelList = em.createNamedQuery("CatCuotaIMSS.findByPeriodo", CatCuotaIMSS.class)
+					.setParameter("fechaInicio", fechaInicio)
+					.setParameter("fechaFin", fechaFin)
+					.getResultList()
+					;
+		} catch(Exception ex) {
+			log.error("No es posible obtener las cuotas del IMSS vigentes...", ex);
+		} finally {
+			this.close(em);
+		}
+		//
+		return modelList;
+	}
 
 }

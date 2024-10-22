@@ -18,6 +18,10 @@ public class PrestamoDAO extends BaseDAO<DetPrestamo, Integer> {
 		super(modelClass);
 	}
 	
+	public PrestamoDAO() {
+		super(DetPrestamo.class);
+	}
+	
 	public List<DetPrestamo> buscar(Integer idEmpleado) {
 		List<DetPrestamo> list = null;
 		EntityManager em = null;

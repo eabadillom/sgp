@@ -63,50 +63,111 @@
 			</p:toolbar>
 			<div style="padding-top: 1rem;">
 				<p:dataTable id="dtNomina" widgetVar="dt-Nomina" var="nomina" value="#{nominaBean.listaNomina}" lazy="true" reflow="true" styleClass="products-table" rowSelectMode="add" paginatorPosition="bottom" scrollable="true">
-					<p:column headerText="Num" width="3rem">
+					<p:column headerText="Num" width="4rem">
 						<h:outputText value="#{nomina.receptor.numeroEmpleado}" />
 					</p:column>
-					<p:column headerText="Empleado" width="10rem" >
+					<p:column headerText="Empleado">
 						<h:outputText value="#{nomina.receptor.nombre}" />
 					</p:column>
-					<p:column headerText="Percepciones" width="4rem" style="text-align: right;">
+					<p:column headerText="Percepciones" width="7rem" style="text-align: right;">
 						<h:outputText value="#{nomina.subtotal}">
-							<f:convertNumber pattern="$#,##0.00" />
+							<f:convertNumber pattern="$ #,##0.00" />
 						</h:outputText>
 					</p:column>
-					<p:column headerText="Deducciones" width="4rem" style="text-align: right;">
+					<p:column headerText="Deducciones" width="7rem" style="text-align: right;">
 						<p:outputLabel value="#{nomina.descuento}">
-							<f:convertNumber pattern="$#,##0.00" />
+							<f:convertNumber pattern="$ #,##0.00" />
 						</p:outputLabel>
 					</p:column>
-					<p:column headerText="Neto" width="4rem" style="text-align: right;">
+					<p:column headerText="Neto" width="7rem" style="text-align: right;">
 						<p:outputLabel value="#{nomina.total}">
-							<f:convertNumber pattern="$#,##0.00" />
+							<f:convertNumber pattern="$ #,##0.00" />
 						</p:outputLabel>
 					</p:column>
-					<p:column width="2rem" style="text-align: right;">
+					<p:column width="3rem" style="text-align: right;">
 						<!-- <span style="padding-left: 0.5rem; padding-right: 0.5rem;">
 							<p:commandButton icon="pi pi-save" process="@this">
 								<p:confirm header="Guardar" message="¿Está seguro que desea guardar la información de nómina?"  styleClass="mr-2" icon="pi pi-check"/>
 							</p:commandButton>
 						</span> -->
-						<span style="padding-left: 0.5rem; padding-right: 0.5rem;">
-							<p:commandButton icon="pi pi-bars" oncomplete="PF('dgEmpleado').show();" actionListener="#{nominaBean.cargaEmpleadoNomina}" process="@this" update="formNomina:dg-empleado">
-								<f:setPropertyActionListener value="#{nomina}" target="#{nominaBean.nomina}" />
-							</p:commandButton>
-						</span>
-					</p:column>
-					<f:facet name="footer" >
-						<p:commandButton value="Guardar" icon="pi pi-pencil" actionListener="#{nominaBean.guardarNominaEmpleado()}" disabled="#{empty nominaBean.listaNomina.size()}" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
-						<p:commandButton value="Exportar" icon="pi pi-upload" styleClass="ui-button-help" ajax="false">
-							<p:dataExporter type="csv" target="dtNomina" fileName="raya" preProcessor="#{nominaBean.exportNomina}"/>
+						<p:commandButton icon="pi pi-bars" oncomplete="PF('dgEmpleado').show();" actionListener="#{nominaBean.cargaEmpleadoNomina}" process="@this" update="formNomina:dg-empleado">
+							<f:setPropertyActionListener value="#{nomina}" target="#{nominaBean.nomina}" />
 						</p:commandButton>
-					</f:facet>
+					</p:column>
+					
+					<p:columnGroup type="footer">
+						<p:row>
+							<p:column style="text-align:right" colspan="2" width="auto"/>
+							<p:column style="text-align:right" width="6rem">
+								<f:facet name="footer">
+									<h:outputText value="Total percepciones" />
+								</f:facet>
+							</p:column>
+							<p:column style="text-align:right" width="6rem">
+								<f:facet name="footer">
+									<div align="right">
+										<h:outputText value="Total deducciones" />
+									</div>
+								</f:facet>
+							</p:column>
+							<p:column style="text-align: right;" width="6rem">
+								<div style="width: 6rem;">
+									<f:facet name="footer">
+										<p:outputLabel value="Total neto" />
+									</f:facet>
+								</div>
+							</p:column>
+							<p:column width="2rem" style="text-align: right;">
+								<div style="width: 2rem;">
+									<f:facet name="footer">
+									</f:facet>
+								</div>
+							</p:column>
+						</p:row>
+							<p:column style="text-align:right" colspan="2" width="auto"/>
+							<p:column style="text-align:right" width="6rem">
+								<f:facet name="footer">
+									<h:outputText value="#{nominaBean.listaNomina.stream().map(item -> item.subtotal).sum()}">
+										<f:convertNumber pattern="$ #,##0.00" />
+									</h:outputText>
+								</f:facet>
+							</p:column>
+							<p:column style="text-align:right" width="6rem">
+								<f:facet name="footer">
+									<div align="right">
+										<h:outputText value="#{nominaBean.listaNomina.stream().map(item -> item.descuento).sum()}">
+											<f:convertNumber pattern="$ #,##0.00" />
+										</h:outputText>
+									</div>
+								</f:facet>
+							</p:column>
+							<p:column style="text-align: right;" width="6rem">
+								<div style="width: 6rem;">
+									<f:facet name="footer">
+										<p:outputLabel value="#{nominaBean.listaNomina.stream().map(item -> item.total).sum()}">
+											<f:convertNumber pattern="$ #,##0.00" />
+										</p:outputLabel>
+									</f:facet>
+								</div>
+							</p:column>
+							<p:column width="2rem" style="text-align: right;">
+								<div style="width: 2rem;">
+									<f:facet name="footer">
+									</f:facet>
+								</div>
+							</p:column>
+						<p:row>
+							
+						</p:row>
+					</p:columnGroup>
 				</p:dataTable>
 				<!-- <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
 		            <p:commandButton value="NO" type="button" styleClass="ui-confirmdialog-no ui-button-flat"/>
 		            <p:commandButton value="SI" type="button" styleClass="ui-confirmdialog-yes" />
 		        </p:confirmDialog> -->
+			</div>
+			<div align="center">
+				<p:commandButton value="Guardar" icon="pi pi-pencil" actionListener="#{nominaBean.guardarNominaEmpleado()}" disabled="#{empty nominaBean.listaNomina.size()}" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
 			</div>
 		
 			<p:dialog header="Seleccionar Empresa" showEffect="fade" modal="true" widgetVar="empresaDialog" responsive="true" draggable="false">

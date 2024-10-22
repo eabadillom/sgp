@@ -14,10 +14,10 @@ import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.model.DetRegistro;
 
 public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
+	
+	private static Logger log = LogManager.getLogger(RegistroDAO.class);
 
-    private static Logger log = LogManager.getLogger(RegistroDAO.class);
-
-    public RegistroDAO(Class<DetRegistro> modelClass) {
+  public RegistroDAO(Class<DetRegistro> modelClass) {
         super(modelClass);
     }
     
@@ -81,8 +81,8 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
                     .getResultList();
 
             for (DetRegistro r : modelList) {
-                log.info("Registro - idEmpleado: {}", r.getIdEmpleado().getIdEmpleado());
-                log.info("Status registro: {}", r.getIdEstatus().getIdEstatus());
+                log.trace("Registro - idEmpleado: {}", r.getIdEmpleado().getIdEmpleado());
+                log.trace("Status registro: {}", r.getIdEstatus().getIdEstatus());
             }
 
         } catch (Exception ex) {
@@ -105,8 +105,8 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
                     .setParameter("fechaFin", fechaFin)
                     .getResultList();
             for (DetRegistro model : modelList) {
-                log.debug("IdEmpleado: {}", model.getIdEmpleado().getIdEmpleado());
-                log.debug("Id Planta: {}", model.getIdEmpleado().getDatoEmpresa().getPlanta().getIdPlanta());
+                log.trace("IdEmpleado: {}", model.getIdEmpleado().getIdEmpleado());
+                log.trace("Id Planta: {}", model.getIdEmpleado().getDatoEmpresa().getPlanta().getIdPlanta());
             }
         } catch (Exception ex) {
             log.error("Problema para obtener el listado de registros...", ex);
@@ -116,7 +116,6 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
         }
         return modelList;
     }
-    
     public List<DetRegistro> consultaRegistrosPorIdEmp(Integer idEmp)
     {
         List<DetRegistro> modelList = null;

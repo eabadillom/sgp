@@ -19,6 +19,10 @@ public class DiaNoLaboralDAO extends BaseDAO<CatDiaNoLaboral, Integer> {
 		super(modelClass);
 	}
 	
+	public DiaNoLaboralDAO() {
+		super(CatDiaNoLaboral.class);
+	}
+	
 	public List<CatDiaNoLaboral> buscarPorPeriodo(String clavePais, Date fechaInicio, Date fechaFin) {
 		List<CatDiaNoLaboral> list = null;
 		EntityManager em = null;

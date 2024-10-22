@@ -291,4 +291,16 @@ public class AjustesBean implements Serializable {
 
     }
     
+
+    public void controlacceso(){
+        String path = null;
+        try{
+            path = contextPath + "/protected/settings/sistema/controlAcceso.xhtml";
+            FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+        }
+        catch(Exception e) {
+            e.getMessage();
+        }
+    }
+
 }

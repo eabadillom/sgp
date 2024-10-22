@@ -14,6 +14,7 @@ import mx.com.ferbo.dto.TipoPrestamoDTO;
 import mx.com.ferbo.model.CatTipoPrestamo;
 import mx.com.ferbo.util.EntityManagerUtil;
 
+@Deprecated
 public class TipoPrestamoDAO extends DAO<TipoPrestamoDTO, CatTipoPrestamo, String> {
 	
 	private static Logger log = LogManager.getLogger(TipoPrestamoDAO.class);

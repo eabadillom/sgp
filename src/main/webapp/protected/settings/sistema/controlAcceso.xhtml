@@ -1,0 +1,134 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/plantillas/template.xhtml">
+    <ui:define name="title">Control de Acceso</ui:define>
+    <ui:define name="content">
+        <f:event type="preRenderView" listener="#{altasistemaBean.listar(false)}"/>
+        <h:form id="frm">
+            <p:growl id="message" showDetails="true" life="4000"/>
+            <p:dialog modal="true" widgetVar="statusDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
+                <div align="center">
+                    <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+                </div>
+            </p:dialog>
+            <p:toolbar>
+                <p:toolbarGroup>
+                    <p:commandButton value="Agregar" update="frm:dlgSistema" icon="pi pi-plus" 
+                                     actionListener="#{altasistemaBean.nuevoSistema}" 
+                                     oncomplete="PF('dlgSistema').show();" styleClass="edit-button" 
+                                     process="@this"/>
+                </p:toolbarGroup>
+            </p:toolbar>
+            <div style="padding-top: 1rem">
+                <p:dataTable id="dtSistema" value="#{altasistemaBean.sistemas}" var="sistema" paginator="true" rows="5">
+                    <p:column headerText="Usuario" sortBy="#{sistema.client}" style="text-align: center;">
+                        <p:outputLabel value="#{sistema.client}" />
+                    </p:column>
+
+                    <p:column headerText="Rol" sortBy="#{sistema.rol.descripcion}" style="text-align: center;">
+                        <p:outputLabel value="#{sistema.rol.descripcion}"/>
+                    </p:column>
+
+                    <p:column headerText="Planta" sortBy="#{sistema.planta.descripcion}" style="text-align: center;">
+                        <p:outputLabel value="#{sistema.planta.descripcion}"/>
+                    </p:column>
+
+                    <p:column headerText="" style="text-align: center;">
+                        <p:commandButton icon="pi pi-bars" update="frm:dlgSistema"
+                                         actionListener="#{altasistemaBean.buscarId(sistema)}"
+                                         oncomplete="PF('dlgSistema').show();" styleClass="edit-button"
+                                         process="@this" style="margin: 0.3rem;" />
+                        <p:commandButton icon="pi pi-trash"  
+                                         actionListener="#{altasistemaBean.buscarId(sistema)}"
+                                         oncomplete="PF('borrarSistema').show();"
+                                         styleClass="ui-button-raised ui-button-danger"
+                                         process="@this" style="margin: 0.3rem;" />
+                        <p:commandButton icon="pi pi-lock" update="frm:dlgSeguridad"
+                                         actionListener="#{altasistemaBean.statusSeguridad(sistema)}"
+                                         oncomplete="PF('dlgSeguridad').show();" styleClass="ui-button-help"
+                                         process="@this" style="margin: 0.3rem;" />
+
+                    </p:column>
+                </p:dataTable>
+            </div>
+
+            <p:dialog header="#{altasistemaBean.accion} Sistema" showEffect="fade" modal="true" widgetVar="dlgSistema" id="dlgSistema" 
+                      responsive="true" draggable="true" resizable="false" dynamic="true" style="margin: auto">
+                <p:outputPanel class="ui-fluid">
+                    <div class="p-field">
+                        <p:outputLabel for="@next" value="Usuario: "/>
+                        <p:inputText value="#{altasistemaBean.sistema.client}">
+                            <p:ajax process="@this"/>
+                        </p:inputText>
+                    </div>
+                    <div class="p-field">
+                        <p:outputLabel value="Rol: "/>
+                        <p:selectOneMenu value="#{altasistemaBean.sistema.rol}" converter="entityConverter">
+                            <f:selectItem itemLabel="Seleccione un rol" noSelectionOption="true" />
+                            <f:selectItems value="#{altasistemaBean.roles}" var="rol" itemLabel="#{rol.descripcion}" itemValue="#{rol}"/>
+                            <p:ajax process="@this"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="p-field">
+                        <p:outputLabel value="Planta: "/>
+                        <p:selectOneMenu value="#{altasistemaBean.sistema.planta}" converter="entityConverter">
+                            <f:selectItem itemLabel="Seleccione una planta" noSelectionOption="true" />
+                            <f:selectItems value="#{altasistemaBean.plantas}" var="planta" itemLabel="#{planta.descripcion}" itemValue="#{planta}"/>
+                            <p:ajax process="@this"/>
+                        </p:selectOneMenu>
+                    </div>
+                </p:outputPanel>
+                <f:facet name="footer">
+                    <p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{altasistemaBean.operar}" update="frm:dtSistema" oncomplete="PF('dlgSistema').hide();" process="@this"/>
+                    <p:commandButton value="Cancelar" icon="pi pi-times" immediate="true" oncomplete="PF('dlgSistema').hide();"/>
+                </f:facet>
+            </p:dialog>
+            <p:confirmDialog widgetVar="borrarSistema" showEffect="fade" width="300"
+                             message="Borrar Sistema?" header="Confirmar" severity="warn">
+                <p:commandButton value="Si" icon="pi pi-check" actionListener="#{altasistemaBean.eliminar}"
+                                 oncomplete="PF('borrarSistema').hide()" update="@form" process="@this"/>
+                <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+                                 onclick="PF('borrarSistema').hide();" />
+            </p:confirmDialog>
+            <p:dialog header="#{altasistemaBean.accion} Contraseña" showEffect="fade" modal="true" widgetVar="dlgSeguridad" id="dlgSeguridad" 
+                      responsive="true" draggable="true" resizable="false" style="margin: auto" dynamic="true">
+                <p:outputPanel>  
+
+                    <div class="field grid">
+                        <p:outputLabel for="cla1" styleClass="col-fixed" style="width:100px" value="Ingrese clave"/>
+                        <div class="col">
+                            <p:password id="cla1" value="#{altasistemaBean.clave1}" label="Clave 1"
+                                        toggleMask="true" redisplay="true"  feedback="true" promptLabel="Ingresa tu contraseña"
+                                        weakLabel="Débil" goodLabel="Buena" strongLabel="Fuerte">
+                                <p:ajax process="@this"/>
+                            </p:password>
+                        </div>
+                    </div>
+
+                    <div class="field grid">
+                        <p:outputLabel for="cla2" styleClass="col-fixed" style="width:100px" value="Confirme clave"/>
+                        <div class="col">
+                            <p:password id="cla2" value="#{altasistemaBean.clave2}" label="Clave 2" 
+                                        toggleMask="true" redisplay="true"  feedback="true" promptLabel="Ingresa tu contraseña"
+                                        weakLabel="Débil" goodLabel="Buena" strongLabel="Fuerte">
+                                <p:ajax process="@this"/>
+                            </p:password>
+                        </div>
+                    </div>
+                </p:outputPanel>
+                <f:facet name="footer">
+                    <p:commandButton update="@form" value="Guardar"
+                                     actionListener="#{altasistemaBean.guardarClave}"
+                                     process="@this"/>
+                    <p:commandButton value="Cancelar" icon="pi pi-times" actionListener="#{altasistemaBean.limpiar}" styleClass="ui-button-secondary" oncomplete="PF('dlgSeguridad').hide();" />
+                </f:facet>    
+            </p:dialog>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>
