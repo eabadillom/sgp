@@ -1,17 +1,16 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" template="/WEB-INF/plantillas/template.xhtml">
-	<ui:define name="title">Catálogo de países</ui:define>
-	<ui:define name="content">
-		<h:form>
-			<p:growl id="message" showDetail="true" life="5000"/>
-			<p:dataTable value="#{paisesBean.listaPaises}" var="pais">
-				<p:column headerText="Clave">
-					<p:outputLabel value="#{pais.clavePais}"></p:outputLabel>
-				</p:column>
-				<p:column headerText="Nombre">
-					<p:outputLabel value="#{pais.nombrePais}"></p:outputLabel>
-				</p:column>
-			</p:dataTable>
-			
-		</h:form>
-	</ui:define>
+    <ui:define name="title">Catálogo de países</ui:define>
+    <ui:define name="content">
+        <h:form>
+            <p:growl id="message" showDetail="true" life="5000"/>
+            <p:dataTable value="#{paisesBean.listaPaises}" var="pais">
+                <p:column headerText="Clave">
+                    <p:outputLabel value="#{pais.clavePais}"></p:outputLabel>
+                </p:column>
+                <p:column headerText="Nombre">
+                    <p:outputLabel value="#{pais.nombrePais}"></p:outputLabel>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </ui:define>
 </ui:composition>

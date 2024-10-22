@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TemporalType;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,6 +24,28 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
     public RegistroDAO()
     {
         super(DetRegistro.class);
+    }
+    
+    public List<DetRegistro> buscarTodos()
+    {
+        List<DetRegistro> modelList = null;
+        EntityManager em = null;
+        
+        try
+        {
+            em = this.getEntityManager();
+            modelList = em.createNamedQuery("DetRegistro.findAll", DetRegistro.class)
+                .getResultList();
+        }catch (Exception ex) 
+        {
+            log.error("Problema para obtener el listado de registros...", ex);
+            modelList = new ArrayList<>();
+        } finally 
+        {
+            this.close(em);
+        }
+        
+        return modelList;
     }
 
     public DetRegistro buscarPorEmpleadoFechaEntrada(Integer idEmpleado, Date fechaEntradaInicio, Date fechaEntradaFin) {
@@ -115,6 +138,53 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
         }
         
         return modelList;
+    }
+    
+    public List<DetRegistro> buscarPorIdEmpleadoActivo(Integer idEmp, Date fechaEntrada)
+    {
+        List<DetRegistro> modelList = null;
+        EntityManager em = null;
+        
+        try
+        {
+            em = this.getEntityManager();
+            modelList = em.createNamedQuery("DetRegistro.findByIdEmplActivo", DetRegistro.class)
+                .setParameter("idEmp", idEmp)
+                .setParameter("fechaEntrada", fechaEntrada)
+                .getResultList();
+        }catch (Exception ex) 
+        {
+            log.error("Problema para obtener el listado de registros...", ex);
+            modelList = new ArrayList<>();
+        } finally 
+        {
+            this.close(em);
+        }
+        
+        return modelList;
+    }
+    
+    public DetRegistro buscarPorDia(Integer idEmp, Date fechaDia)
+    {
+        DetRegistro model = null;
+        EntityManager em = null;
+        
+        try
+        {
+            em = this.getEntityManager();
+            model = em.createNamedQuery("DetRegistro.findToday", DetRegistro.class)
+                .setParameter("idEmp", idEmp)
+                .setParameter("today", fechaDia, TemporalType.TIMESTAMP)
+                .getSingleResult();
+        }catch (Exception ex) 
+        {
+            log.error("Problema para obtener el registro...", ex);
+        } finally 
+        {
+            this.close(em);
+        }
+        
+        return model;
     }
     
 }

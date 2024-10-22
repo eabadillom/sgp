@@ -280,4 +280,15 @@ public class AjustesBean implements Serializable {
 
     }
     
+    public void paises() {
+        String path = null;
+        try {
+            path = contextPath + "/protected/paises.xhtml";
+            FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+        } catch (Exception e) {
+            e.getMessage();
+        }
+
+    }
+    
 }
