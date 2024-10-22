@@ -28,63 +28,14 @@ import javax.persistence.TemporalType;
 @NamedQueries({
     @NamedQuery(name = "DetRegistro.findAll", query = "SELECT d FROM DetRegistro d"),
     @NamedQuery(name = "DetRegistro.findByIdEmpDesc", query = "SELECT d FROM DetRegistro d INNER JOIN d.idEmpleado de INNER JOIN d.idEstatus cer WHERE de.idEmpleado = :idEmp"),
-    @NamedQuery(name = "DetRegistro.findByIdEmp", query = "SELECT NEW mx.com.ferbo.dto.DetRegistroDTO("
-                                                  + " d.idRegistro,"
-                                                  + " e.idEmpleado,"
-                                                  + " d.fechaEntrada,"
-                                                  + " d.fechaSalida,"
-                                                  + " ce.idEstatus,"
-                                                  + " ce.descripcion, ce.codigo"
-                                                  + ")"
-                                                  + " FROM DetRegistro d"
-                                                  + " INNER JOIN d.idEmpleado e"
-                                                  + " INNER JOIN d.idEstatus ce"
-                                                  + " WHERE e.idEmpleado = :idEmp"),
-    @NamedQuery(name = "DetRegistro.findByYear", query = "SELECT NEW mx.com.ferbo.dto.DetRegistroDTO("
-                                                  + " d.idRegistro,"
-                                                  + " e.idEmpleado,"
-                                                  + " d.fechaEntrada,"
-                                                  + " d.fechaSalida,"
-                                                  + " ce.idEstatus,"
-                                                  + " ce.descripcion, ce.codigo"
-                                                  + ")"
-                                                  + " FROM DetRegistro d"
-                                                  + " INNER JOIN d.idEmpleado e"
-                                                  + " INNER JOIN d.idEstatus ce"
-                                                  + " WHERE d.fechaEntrada LIKE :fechaEntrada"),
-    @NamedQuery(name = "DetRegistro.findByNomina", query = "SELECT NEW mx.com.ferbo.dto.DetRegistroDTO( d.idRegistro, e.idEmpleado, d.fechaEntrada, d.fechaSalida, ce.idEstatus, ce.descripcion, ce.codigo) FROM DetRegistro d INNER JOIN d.idEmpleado e INNER JOIN d.idEstatus ce WHERE d.fechaEntrada BETWEEN :fechaEntrada AND :fechaSalida"),
-    
-    @NamedQuery(name = "DetRegistro.findByIdEmpleadoPeriodo", query = "SELECT NEW mx.com.ferbo.dto.DetRegistroDTO( d.idRegistro, e.idEmpleado, d.fechaEntrada, d.fechaSalida, ce.idEstatus, ce.descripcion, ce.codigo) FROM DetRegistro d INNER JOIN d.idEmpleado e INNER JOIN d.idEstatus ce WHERE d.idEmpleado.idEmpleado = :idEmpleado AND d.fechaEntrada BETWEEN :fechaEntrada AND :fechaSalida"),
-    
+    @NamedQuery(name = "DetRegistro.findByIdEmp", query = "SELECT d FROM DetRegistro d INNER JOIN d.idEmpleado e INNER JOIN d.idEstatus ce WHERE e.idEmpleado = :idEmp"),
+    @NamedQuery(name = "DetRegistro.findByYear", query = "SELECT d FROM DetRegistro d INNER JOIN d.idEmpleado e INNER JOIN d.idEstatus ce WHERE d.fechaEntrada LIKE :fechaEntrada"),
+    @NamedQuery(name = "DetRegistro.findByNomina", query = "SELECT d FROM DetRegistro d INNER JOIN d.idEmpleado e INNER JOIN d.idEstatus ce WHERE d.fechaEntrada BETWEEN :fechaEntrada AND :fechaSalida"),
+    @NamedQuery(name = "DetRegistro.findByIdEmpleadoPeriodo", query = "SELECT d FROM DetRegistro d INNER JOIN d.idEmpleado e INNER JOIN d.idEstatus ce WHERE d.idEmpleado.idEmpleado = :idEmpleado AND d.fechaEntrada BETWEEN :fechaEntrada AND :fechaSalida"),
     @NamedQuery(name = "DetRegistro.findByEmpleadoPeriodo", query = "SELECT d FROM DetRegistro d WHERE d.idEmpleado.idEmpleado = :idEmpleado AND d.fechaEntrada BETWEEN :fechaEntrada AND :fechaSalida"),
-    
-    @NamedQuery(name = "DetRegistro.findByIdEmplActivo", query = "SELECT NEW mx.com.ferbo.dto.DetRegistroDTO("
-                                                  + " d.idRegistro,"
-                                                  + " e.idEmpleado,"
-                                                  + " d.fechaEntrada,"
-                                                  + " d.fechaSalida,"
-                                                  + " ce.idEstatus,"
-                                                  + " ce.descripcion, ce.codigo"
-                                                  + ")"
-                                                  + " FROM DetRegistro d"
-                                                  + " INNER JOIN d.idEmpleado e"
-                                                  + " INNER JOIN d.idEstatus ce"
-                                                  + " WHERE e.idEmpleado = :idEmp AND e.activo = 1 AND d.fechaEntrada LIKE :fechaEntrada"),
+    @NamedQuery(name = "DetRegistro.findByIdEmplActivo", query = "SELECT d FROM DetRegistro d INNER JOIN d.idEmpleado e INNER JOIN d.idEstatus ce WHERE e.idEmpleado = :idEmp AND e.activo = 1 AND d.fechaEntrada LIKE :fechaEntrada"),
     @NamedQuery(name = "DetRegistro.findByIdEmpleadoAndFecha", query = "SELECT r FROM DetRegistro r WHERE r.idEmpleado.idEmpleado = :idEmpleado AND (r.fechaEntrada BETWEEN :fechaEntradaInicio AND :fechaEntradaFin)"),
-    @NamedQuery(name = "DetRegistro.findToday", query = "SELECT NEW mx.com.ferbo.dto.DetRegistroDTO("
-                                                  + " d.idRegistro,"
-                                                  + " e.idEmpleado,"
-                                                  + " d.fechaEntrada,"
-                                                  + " d.fechaSalida,"
-                                                  + " ce.idEstatus,"
-                                                  + " ce.descripcion, ce.codigo"
-                                                  + ")"
-                                                  + " FROM DetRegistro d"
-                                                  + " INNER JOIN d.idEmpleado e"
-                                                  + " INNER JOIN d.idEstatus ce"
-                                                  + " WHERE e.idEmpleado = :idEmp AND e.activo = 1"
-                                                  + " AND d.fechaEntrada >= :today"
-                                                  + " ORDER BY d.fechaEntrada"),
+    @NamedQuery(name = "DetRegistro.findToday", query = "SELECT d FROM DetRegistro d INNER JOIN d.idEmpleado e INNER JOIN d.idEstatus ce WHERE e.idEmpleado = :idEmp AND e.activo = 1 AND d.fechaEntrada >= :today ORDER BY d.fechaEntrada"),
     @NamedQuery(name = "DetRegistro.findByPlantaPeriodo", query = "SELECT r FROM DetRegistro r WHERE (r.idEmpleado.datoEmpresa.planta.idPlanta = :idPlanta OR :idPlanta IS NULL) AND r.fechaEntrada BETWEEN :fechaInicio AND :fechaFin ORDER BY r.idEmpleado.nombre, r.idEmpleado.primerAp, r.idEmpleado.segundoAp")
 })
 public class DetRegistro implements Serializable {
@@ -95,19 +46,19 @@ public class DetRegistro implements Serializable {
     @Basic(optional = false)
     @Column(name = "id_registro")
     private Integer idRegistro;
-    
+
     @Column(name = "fecha_entrada")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaEntrada;
-    
+
     @Column(name = "fecha_salida")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaSalida;
-    
+
     @JoinColumn(name = "id_estatus", referencedColumnName = "id_estatus")
     @ManyToOne
     private CatEstatusRegistro idEstatus;
-    
+
     @JoinColumn(name = "id_empleado", referencedColumnName = "id_empleado")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private DetEmpleado idEmpleado;
@@ -120,13 +71,13 @@ public class DetRegistro implements Serializable {
     }
 
     public DetRegistro(Integer idRegistro, Date fechaEntrada, Date fechaSalida, Integer idEstatus, String descripcionEstatus) {
-		this.idRegistro = idRegistro;
-		this.fechaEntrada = fechaEntrada;
-		this.fechaSalida = fechaSalida;
-		this.idEstatus = new CatEstatusRegistro(idEstatus, descripcionEstatus,(short)0);
-	}
+        this.idRegistro = idRegistro;
+        this.fechaEntrada = fechaEntrada;
+        this.fechaSalida = fechaSalida;
+        this.idEstatus = new CatEstatusRegistro(idEstatus, descripcionEstatus, (short) 0);
+    }
 
-	public Integer getIdRegistro() {
+    public Integer getIdRegistro() {
         return idRegistro;
     }
 

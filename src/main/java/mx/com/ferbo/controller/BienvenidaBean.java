@@ -21,18 +21,19 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.RegistroDAO;
-import mx.com.ferbo.dto.DetRegistroDTO;
+import mx.com.ferbo.dao.n.RegistroDAO;
+import mx.com.ferbo.model.DetRegistro;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetEmpleadoFoto;
 
 @Named(value = "bienvenidaBean")
 @ViewScoped
 public class BienvenidaBean implements Serializable {
+
     private static final long serialVersionUID = 1L;
     private static final Logger log = LogManager.getLogger(BienvenidaBean.class);
-    
-	private DetEmpleado empleadoSelected;
+
+    private DetEmpleado empleadoSelected;
     private String numeroEmpl;
     private String strCumpleanios;
     private DateFormat dateFormat;
@@ -45,8 +46,8 @@ public class BienvenidaBean implements Serializable {
     private FacesContext context;
     private HttpServletRequest request;
     private HttpSession session = null;
-    
-    private DetRegistroDTO registro;
+
+    private DetRegistro registro;
     private final RegistroDAO registroDAO;
     private DetEmpleadoFoto empleadoFoto;
 
@@ -61,26 +62,26 @@ public class BienvenidaBean implements Serializable {
 
     @PostConstruct
     public void init() {
-    	
-    	try {
-    		this.context = FacesContext.getCurrentInstance();
-    		this.request = (HttpServletRequest) this.context.getExternalContext().getRequest();
-    		this.session = this.request.getSession(false);
-    		this.empleadoSelected = (DetEmpleado) this.request.getSession(true).getAttribute("empleado");
-    		this.empleadoFoto = (DetEmpleadoFoto) session.getAttribute("fotografia");
-    		
-    		empleadoLogeado();
-    		consultaRegistro();
-    		
-    		PrimeFaces.current().executeScript("PF('bar').show()");
-    	} catch(Exception ex) {
-    		log.error("Problema en el registro de asistencia del empleado...");
-    	}
+
+        try {
+            this.context = FacesContext.getCurrentInstance();
+            this.request = (HttpServletRequest) this.context.getExternalContext().getRequest();
+            this.session = this.request.getSession(false);
+            this.empleadoSelected = (DetEmpleado) this.request.getSession(true).getAttribute("empleado");
+            this.empleadoFoto = (DetEmpleadoFoto) session.getAttribute("fotografia");
+
+            empleadoLogeado();
+            consultaRegistro();
+
+            PrimeFaces.current().executeScript("PF('bar').show()");
+        } catch (Exception ex) {
+            log.error("Problema en el registro de asistencia del empleado...");
+        }
     }
 
-    public String pasoDeEmpleado(DetEmpleado detEmpleadoDTO) {
+    public String pasoDeEmpleado(DetEmpleado detEmpleado) {
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Acceso correcto", null));
-        empleadoSelected = detEmpleadoDTO;
+        empleadoSelected = detEmpleado;
         return "protected/registroAsistencia.xhtml";
     }
 
@@ -96,14 +97,14 @@ public class BienvenidaBean implements Serializable {
         }
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Acceso correcto", null));
     }
-    
-    public void consultaRegistro(){
-       Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Mexico_City"));
+
+    public void consultaRegistro() {
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Mexico_City"));
         cal.setTime(Date.from(Instant.now()));
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
-        registro = registroDAO.buscarEntradaHoy(empleadoSelected.getIdEmpleado(), cal.getTime());         
+        registro = registroDAO.buscarPorDia(empleadoSelected.getIdEmpleado(), cal.getTime());
     }
 
     //<editor-fold defaultstate="collapsed" desc="Getters&Setters">
@@ -163,20 +164,20 @@ public class BienvenidaBean implements Serializable {
         this.strFechaActual = strFechaActual;
     }
 
-    public DetRegistroDTO getRegistro() {
+    public DetRegistro getRegistro() {
         return registro;
     }
 
-    public void setRegistro(DetRegistroDTO registro) {
+    public void setRegistro(DetRegistro registro) {
         this.registro = registro;
     }
+    
+    public DetEmpleadoFoto getEmpleadoFoto() {
+        return empleadoFoto;
+    }
+
+    public void setEmpleadoFoto(DetEmpleadoFoto empleadoFoto) {
+        this.empleadoFoto = empleadoFoto;
+    }
     //</editor-fold>
-
-	public DetEmpleadoFoto getEmpleadoFoto() {
-		return empleadoFoto;
-	}
-
-	public void setEmpleadoFoto(DetEmpleadoFoto empleadoFoto) {
-		this.empleadoFoto = empleadoFoto;
-	}
 }

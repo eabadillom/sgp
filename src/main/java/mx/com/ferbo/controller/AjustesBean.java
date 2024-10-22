@@ -280,6 +280,18 @@ public class AjustesBean implements Serializable {
 
     }
     
+    public void paises() {
+        String path = null;
+        try {
+            path = contextPath + "/protected/paises.xhtml";
+            FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+        } catch (Exception e) {
+            e.getMessage();
+        }
+
+    }
+    
+
     public void controlacceso(){
         String path = null;
         try{
@@ -290,4 +302,5 @@ public class AjustesBean implements Serializable {
             e.getMessage();
         }
     }
+
 }
