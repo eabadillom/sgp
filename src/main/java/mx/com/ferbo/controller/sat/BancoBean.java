@@ -15,8 +15,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.sat.CatBancoDAO;
-import mx.com.ferbo.dto.sat.BancoDTO;
+import mx.com.ferbo.dao.n.sat.BancoDAO;
+import mx.com.ferbo.model.sat.CatBanco;
 import mx.com.ferbo.util.SGPException;
 
 @Named(value = "bancoBean")
@@ -27,27 +27,28 @@ public class BancoBean implements Serializable {
 	private static final long serialVersionUID = -3103728579268351267L;
 	private static Logger log = LogManager.getLogger(BancoBean.class);
 
-    private List<BancoDTO> listBancoDTO;
-    private CatBancoDAO catBancoDAO;
+    private List<CatBanco> listBanco;
+    private BancoDAO bancoDAO;
 
-    private BancoDTO bancoDTO;
+    private CatBanco banco;
 
     private Boolean nuevo;
     private Boolean primaryKey;
     
-    public BancoBean(){        
-
-        listBancoDTO = new ArrayList<>();
-        catBancoDAO = new CatBancoDAO();
+    public BancoBean()
+    {        
+        bancoDAO = new BancoDAO();
+        listBanco = new ArrayList<>();
+        banco = new CatBanco();
     }
 
     @PostConstruct
     public void init(){
-        listBancoDTO = catBancoDAO.buscarTodos();
+        listBanco = bancoDAO.buscarTodos();
     }
 
     public void nuevo(){
-        bancoDTO = new BancoDTO();
+        banco = new CatBanco();
         nuevo = true;
         primaryKey = false;
     }
@@ -67,17 +68,17 @@ public class BancoBean implements Serializable {
         try {
 
             if(this.nuevo){
-                catBancoDAO.guardar(bancoDTO);
+                bancoDAO.guardar(banco);
                 mensaje = "Registrado con éxito";
                 severity = FacesMessage.SEVERITY_INFO;            
 
             }else{
-                catBancoDAO.actualizar(bancoDTO);
+                bancoDAO.actualizar(banco);
                 mensaje = "Editado con éxito";
                 severity = FacesMessage.SEVERITY_INFO;            
             }
 
-            listBancoDTO = catBancoDAO.buscarTodos();
+            listBanco = bancoDAO.buscarTodos();
             PrimeFaces.current().executeScript("PF('dlgBanco').hide();");
 
         } catch (SGPException e) {                
@@ -103,20 +104,20 @@ public class BancoBean implements Serializable {
 
     }
 
-    public BancoDTO getBancoDTO() {
-        return bancoDTO;
+    public CatBanco getBanco() {
+        return banco;
     }
 
-    public void setBancoDTO(BancoDTO bancoDTO) {
-        this.bancoDTO = bancoDTO;
+    public void setBanco(CatBanco banco) {
+        this.banco = banco;
     }
 
-    public List<BancoDTO> getListBancoDTO() {
-        return listBancoDTO;
+    public List<CatBanco> getListBanco() {
+        return listBanco;
     }
 
-    public void setListBancoDTO(List<BancoDTO> listBancoDTO) {
-        this.listBancoDTO = listBancoDTO;
+    public void setListBanco(List<CatBanco> listBanco) {
+        this.listBanco = listBanco;
     }
 
     public Boolean getPrimaryKey() {
@@ -126,7 +127,5 @@ public class BancoBean implements Serializable {
     public void setPrimaryKey(Boolean primaryKey) {
         this.primaryKey = primaryKey;
     }
-
     
-
 }

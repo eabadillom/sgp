@@ -24,7 +24,7 @@
             </p:toolbar>
 
             <div style="padding-top: 1rem">
-                <p:dataTable id="dt-bancos" widgetVar="dtBancos" value="#{bancoBean.listBancoDTO}" var="banco" >
+                <p:dataTable id="dt-bancos" widgetVar="dtBancos" value="#{bancoBean.listBanco}" var="banco" >
                     <p:column headerText="Código Banco">
                         <p:outputLabel value="#{banco.idBanco}" ></p:outputLabel>
                     </p:column>
@@ -35,18 +35,18 @@
                         <p:outputLabel value="#{banco.nombre}" ></p:outputLabel>
                     </p:column>
                     <p:column headerText="Fecha Inicio">
-                        <p:outputLabel value="#{banco.fechaInicio}" >
+                        <p:outputLabel value="#{banco.vigenciaInicio}" >
                             <f:convertDateTime pattern="dd/MMM/YYYY" locale="es" timeZone="GMT-6"/>
                         </p:outputLabel>
                     </p:column>
                     <p:column headerText="Fecha Fin">
-                        <p:outputLabel value="#{banco.fechaFin}" >
+                        <p:outputLabel value="#{banco.vigenciaFin}" >
                             <f:convertDateTime pattern="dd/MMM/YYYY" locale="es" timeZone="GMT-6"/>
                         </p:outputLabel>
                     </p:column>
                     <p:column width="3rem">
                         <p:commandButton icon="pi pi-bars" onclick="PF('dlgBanco').show();" oncomplete="PF('statusDialog').hide();PF('dlgBanco').show();" actionListener="#{bancoBean.editar()}" process="@this dt-bancos" update="form:dlg-Banco">
-                            <f:setPropertyActionListener value="#{banco}" target="#{bancoBean.bancoDTO}" ></f:setPropertyActionListener>
+                            <f:setPropertyActionListener value="#{banco}" target="#{bancoBean.banco}" ></f:setPropertyActionListener>
                         </p:commandButton>
                     </p:column>
 
@@ -58,28 +58,28 @@
 
                     <div class="p-field" >
                         <p:outputLabel value="Codigo Banco"></p:outputLabel>
-                        <p:inputText value="#{bancoBean.bancoDTO.idBanco}" required="true" requiredMessage="El campo codigo banco es obligatorio" readonly="#{bancoBean.primaryKey}" ></p:inputText>
+                        <p:inputText value="#{bancoBean.banco.idBanco}" required="true" requiredMessage="El campo codigo banco es obligatorio" readonly="#{bancoBean.primaryKey}" ></p:inputText>
                     </div>
 
                     <div class="p-field" >
                         <p:outputLabel value="descripcion"></p:outputLabel>
-                        <p:inputText value="#{bancoBean.bancoDTO.descripcion}" required="true" requiredMessage="El campo descripcion es obligatorio"></p:inputText>
+                        <p:inputText value="#{bancoBean.banco.descripcion}" required="true" requiredMessage="El campo descripcion es obligatorio"></p:inputText>
                     </div>
 
                     <div class="p-field" >
                         <p:outputLabel value="nombre"></p:outputLabel>
-                        <p:inputText value="#{bancoBean.bancoDTO.nombre}" required="true" requiredMessage="El campo nombre es obligatorio" ></p:inputText>
+                        <p:inputText value="#{bancoBean.banco.nombre}" required="true" requiredMessage="El campo nombre es obligatorio" ></p:inputText>
                     </div>
 
                     <div class="p-field" >
                         <p:outputLabel value="Fecha Inicio"></p:outputLabel>
-                        <p:datePicker value="#{bancoBean.bancoDTO.fechaInicio}" showIcon="true" yearNavigator="true" monthNavigator="true" required="true" requiredMessage="El campo fecha inicio es obligatorio" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">                            
+                        <p:datePicker value="#{bancoBean.banco.vigenciaInicio}" showIcon="true" yearNavigator="true" monthNavigator="true" required="true" requiredMessage="El campo fecha inicio es obligatorio" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">                            
                         </p:datePicker>                        
                     </div>
 
                     <div class="p-field" >
                         <p:outputLabel value="Fecha Fin"></p:outputLabel>
-                        <p:datePicker value="#{bancoBean.bancoDTO.fechaFin}" showIcon="true" yearNavigator="true" monthNavigator="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">                            
+                        <p:datePicker value="#{bancoBean.banco.vigenciaFin}" showIcon="true" yearNavigator="true" monthNavigator="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">                            
                         </p:datePicker>                        
                     </div>                    
 

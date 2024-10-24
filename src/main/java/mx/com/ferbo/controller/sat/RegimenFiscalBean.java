@@ -15,8 +15,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.sat.RegimenFiscalDAO;
-import mx.com.ferbo.dto.sat.RegimenFiscalDTO;
+import mx.com.ferbo.dao.n.sat.RegimenFiscalDAO;
+import mx.com.ferbo.model.sat.CatRegimenFiscal;
 
 @Named(value = "regimenFiscalBean")
 @ViewScoped
@@ -26,8 +26,8 @@ public class RegimenFiscalBean implements Serializable{
 	private static Logger log = LogManager.getLogger(RegimenFiscalBean.class);
 	private String contextPath = null;
 	private RegimenFiscalDAO regimenDAO;
-	private List<RegimenFiscalDTO> regimenes;
-	private RegimenFiscalDTO regimen;
+	private List<CatRegimenFiscal> regimenes;
+	private CatRegimenFiscal regimen;
 	private boolean nuevo = false;
 	
 	public RegimenFiscalBean() {
@@ -37,11 +37,11 @@ public class RegimenFiscalBean implements Serializable{
 	@PostConstruct
 	public void init() {
 		contextPath = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
-		regimenes = regimenDAO.buscarActivo(new Date());
+		regimenes = regimenDAO.buscarActivos(new Date());
 	}
 	
 	public void nuevo() {
-		this.regimen = new RegimenFiscalDTO();
+		this.regimen = new CatRegimenFiscal();
 		this.nuevo = true;
 	}
 	
@@ -64,7 +64,7 @@ public class RegimenFiscalBean implements Serializable{
 			else
 				regimenDAO.actualizar(this.regimen);
 			
-			regimenes = regimenDAO.buscarActivo(new Date());
+			regimenes = regimenDAO.buscarActivos(new Date());
 			
 			mensaje = "El régimen fiscal se guardó correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
@@ -79,19 +79,19 @@ public class RegimenFiscalBean implements Serializable{
 		}
 	}
 
-	public List<RegimenFiscalDTO> getRegimenes() {
+	public List<CatRegimenFiscal> getRegimenes() {
 		return regimenes;
 	}
 
-	public void setRegimenes(List<RegimenFiscalDTO> regimenes) {
+	public void setRegimenes(List<CatRegimenFiscal> regimenes) {
 		this.regimenes = regimenes;
 	}
 
-	public RegimenFiscalDTO getRegimen() {
+	public CatRegimenFiscal getRegimen() {
 		return regimen;
 	}
 
-	public void setRegimen(RegimenFiscalDTO regimen) {
+	public void setRegimen(CatRegimenFiscal regimen) {
 		this.regimen = regimen;
 	}
 

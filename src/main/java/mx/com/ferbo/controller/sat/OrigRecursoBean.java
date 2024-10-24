@@ -13,8 +13,8 @@ import javax.inject.Named;
 
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.sat.CatOrigRecursoDAO;
-import mx.com.ferbo.dto.sat.OrigRecursoDTO;
+import mx.com.ferbo.dao.n.sat.OrigenRecursosDAO;
+import mx.com.ferbo.model.sat.CatOrigRecurso;
 import mx.com.ferbo.util.SGPException;
 
 @Named(value = "origRecursoBean")
@@ -22,26 +22,26 @@ import mx.com.ferbo.util.SGPException;
 public class OrigRecursoBean implements Serializable{
     
     private static final long serialVersionUID = -3103728579268351267L;
-    private OrigRecursoDTO origRecursoDTO;
-    private List<OrigRecursoDTO> listOrigRecursos;
+    private CatOrigRecurso origRecurso;
+    private List<CatOrigRecurso> listOrigRecursos;
 
-    CatOrigRecursoDAO catOrigRecursoDAO;
+    private OrigenRecursosDAO origRecursoDAO;
 
     boolean guardar;
     boolean primaryEdit;
 
     public OrigRecursoBean(){
-        catOrigRecursoDAO = new CatOrigRecursoDAO();
+        origRecursoDAO = new OrigenRecursosDAO();
         listOrigRecursos = new ArrayList<>();
     }
 
     @PostConstruct
     public void init(){
-        listOrigRecursos = catOrigRecursoDAO.buscarTodos();
+        listOrigRecursos = origRecursoDAO.buscarTodos();
     }
 
     public void nuevo(){
-        origRecursoDTO = new OrigRecursoDTO();
+        origRecurso = new CatOrigRecurso();
         guardar = true;
         primaryEdit = false;
     }
@@ -58,27 +58,19 @@ public class OrigRecursoBean implements Serializable{
         String mensaje = null;
         String titulo = "Registro guardado";
 
-        try {
-            
+        try {            
             if (guardar) {
-
-                catOrigRecursoDAO.guardar(origRecursoDTO);
-
+                origRecursoDAO.guardar(origRecurso);
                 mensaje = "Exito al guardar";
-                severity = FacesMessage.SEVERITY_INFO;
-                
+                severity = FacesMessage.SEVERITY_INFO;                
             }else{
-
-                catOrigRecursoDAO.actualizar(origRecursoDTO);
-
+                origRecursoDAO.actualizar(origRecurso);
                 titulo = "Registro Editado";
                 mensaje = "Exito al editar";
                 severity = FacesMessage.SEVERITY_WARN;
             }
-
-            listOrigRecursos = catOrigRecursoDAO.buscarTodos();
+            listOrigRecursos = origRecursoDAO.buscarTodos();
             PrimeFaces.current().executeScript("PF('dlgOrigenRecursos').hide();");
-
         }catch(SGPException e ) {
             titulo = "Error";
             mensaje = "Error en registro consulta al administrador de sistemas";
@@ -88,28 +80,25 @@ public class OrigRecursoBean implements Serializable{
             mensaje = ex.getMessage();
             severity = FacesMessage.SEVERITY_ERROR;            
         }finally{
-
             message = new FacesMessage(severity, mensaje, titulo);
             FacesContext.getCurrentInstance().addMessage(null, message);            
             PrimeFaces.current().ajax().update("form:messages","form:dt-origRecurso");
         }
-
-
     }
 
-    public OrigRecursoDTO getOrigRecursoDTO() {
-        return origRecursoDTO;
+    public CatOrigRecurso getOrigRecurso() {
+        return origRecurso;
     }
 
-    public void setOrigRecursoDTO(OrigRecursoDTO origRecursoDTO) {
-        this.origRecursoDTO = origRecursoDTO;
+    public void setOrigRecurso(CatOrigRecurso origRecursoDTO) {
+        this.origRecurso = origRecursoDTO;
     }
 
-    public List<OrigRecursoDTO> getListOrigRecursos() {
+    public List<CatOrigRecurso> getListOrigRecursos() {
         return listOrigRecursos;
     }
 
-    public void setListOrigRecursos(List<OrigRecursoDTO> listOrigRecursos) {
+    public void setListOrigRecursos(List<CatOrigRecurso> listOrigRecursos) {
         this.listOrigRecursos = listOrigRecursos;
     }
 
@@ -120,10 +109,5 @@ public class OrigRecursoBean implements Serializable{
     public void setPrimaryEdit(boolean primaryEdit) {
         this.primaryEdit = primaryEdit;
     }
-
-
-    
-
-    
 
 }

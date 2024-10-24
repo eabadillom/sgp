@@ -15,8 +15,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.sat.TipoOtroPagoDAO;
-import mx.com.ferbo.dto.sat.TipoOtroPagoDTO;
+import mx.com.ferbo.dao.n.sat.TipoOtroPagoDAO;
+import mx.com.ferbo.model.sat.CatTipoOtroPago;
 import mx.com.ferbo.util.SGPException;
 
 @Named(value = "tipoOtroPagoBean")
@@ -26,10 +26,10 @@ public class TipoOtroPagoBean implements Serializable {
     private static final long serialVersionUID = -3103728579268351267L;
     private static Logger log = LogManager.getLogger(TipoOtroPagoBean.class);
     
-    private TipoOtroPagoDAO catTipoOtroPagoDAO;
+    private TipoOtroPagoDAO tipoOtroPagoDAO;
     
-    private TipoOtroPagoDTO tipoOtroPagoDTO;
-    private List<TipoOtroPagoDTO> listDTO;
+    private CatTipoOtroPago tipoOtroPago;
+    private List<CatTipoOtroPago> listTipoOtroPago;
 
     private boolean guardar;
     private boolean primaryEdit;
@@ -37,21 +37,21 @@ public class TipoOtroPagoBean implements Serializable {
 
     public TipoOtroPagoBean(){
         
-        listDTO = new ArrayList<>();
-        catTipoOtroPagoDAO = new TipoOtroPagoDAO();
+        listTipoOtroPago = new ArrayList<>();
+        tipoOtroPagoDAO = new TipoOtroPagoDAO();
 
     }
 
     @PostConstruct
     public void init(){
 
-        listDTO = catTipoOtroPagoDAO.buscarTodos();
+        listTipoOtroPago = tipoOtroPagoDAO.buscarTodos();
 
     }
 
     public void nuevo(){
 
-        tipoOtroPagoDTO = new TipoOtroPagoDTO();
+        tipoOtroPago = new CatTipoOtroPago();
         guardar = true;
         primaryEdit = false;
 
@@ -73,14 +73,14 @@ public class TipoOtroPagoBean implements Serializable {
 
             if (guardar) {
                 
-                catTipoOtroPagoDAO.guardar(tipoOtroPagoDTO);
+                tipoOtroPagoDAO.guardar(tipoOtroPago);
                 
                 mensaje = "Éxito al guardar registro";
                 severity = FacesMessage.SEVERITY_INFO;                
 
             }else{
 
-                catTipoOtroPagoDAO.actualizar(tipoOtroPagoDTO);
+                tipoOtroPagoDAO.actualizar(tipoOtroPago);
 
                 titulo = "Registro actualizado";
                 mensaje = "Éxito al guardar registro";
@@ -88,7 +88,7 @@ public class TipoOtroPagoBean implements Serializable {
 
             }
 
-            listDTO = catTipoOtroPagoDAO.buscarTodos();
+            listTipoOtroPago = tipoOtroPagoDAO.buscarTodos();
 
             PrimeFaces.current().executeScript("PF('dlgTipoOtroPa').hide();");
             
@@ -118,20 +118,20 @@ public class TipoOtroPagoBean implements Serializable {
 
     }
 
-    public TipoOtroPagoDTO getTipoOtroPagoDTO() {
-        return tipoOtroPagoDTO;
+    public CatTipoOtroPago getTipoOtroPago() {
+        return tipoOtroPago;
     }
 
-    public void setTipoOtroPagoDTO(TipoOtroPagoDTO tipoOtroPagoDTO) {
-        this.tipoOtroPagoDTO = tipoOtroPagoDTO;
+    public void setTipoOtroPago(CatTipoOtroPago tipoOtroPago) {
+        this.tipoOtroPago = tipoOtroPago;
     }
 
-    public List<TipoOtroPagoDTO> getListDTO() {
-        return listDTO;
+    public List<CatTipoOtroPago> getListTipoOtroPago() {
+        return listTipoOtroPago;
     }
 
-    public void setListDTO(List<TipoOtroPagoDTO> listDTO) {
-        this.listDTO = listDTO;
+    public void setListTipoOtroPago(List<CatTipoOtroPago> listTipoOtroPago) {
+        this.listTipoOtroPago = listTipoOtroPago;
     }
 
     public boolean isPrimaryEdit() {
@@ -141,7 +141,5 @@ public class TipoOtroPagoBean implements Serializable {
     public void setPrimaryEdit(boolean primaryEdit) {
         this.primaryEdit = primaryEdit;
     }
-
     
-
 }
