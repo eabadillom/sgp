@@ -25,7 +25,7 @@
             </p:toolbar>
 
             <div style="padding-top: 1rem;">
-                <p:dataTable id="dt-tipoPercepcion" widgetVar="dtTipoPercepcion" value="#{tipoPercepcionBean.listDto}" var="tipoPercepcion">
+                <p:dataTable id="dt-tipoPercepcion" widgetVar="dtTipoPercepcion" value="#{tipoPercepcionBean.listTipoPercepcion}" var="tipoPercepcion">
 
                     <p:column headerText="Clave">
                         <p:outputLabel value="#{tipoPercepcion.clave}" ></p:outputLabel>
@@ -49,7 +49,7 @@
 
                     <p:column>
                         <p:commandButton icon="pi pi-bars" actionListener="#{tipoPercepcionBean.editar()}" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dlgTipoPercepcion').show()" process="@this form:dt-tipoPercepcion" update="form:dlg-tipoPercepcion" >
-                            <f:setPropertyActionListener value="#{tipoPercepcion}" target="#{tipoPercepcionBean.tipoPercepcionDTO}"></f:setPropertyActionListener>
+                            <f:setPropertyActionListener value="#{tipoPercepcion}" target="#{tipoPercepcionBean.tipoPercepcion}"></f:setPropertyActionListener>
                         </p:commandButton>
                     </p:column>
 
@@ -60,22 +60,22 @@
                 <p:outputPanel styleClass="ui-fluid">
                     <div class="p-field">
                         <p:outputLabel value="Clave"></p:outputLabel>
-                        <p:inputText value="#{tipoPercepcionBean.tipoPercepcionDTO.clave}" readonly="#{tipoPercepcionBean.primaryEdit}" ></p:inputText>
+                        <p:inputText value="#{tipoPercepcionBean.tipoPercepcion.clave}" readonly="#{tipoPercepcionBean.primaryEdit}" ></p:inputText>
                     </div>
 
                     <div class="p-field">
                         <p:outputLabel value="Descripcion"></p:outputLabel>
-                        <p:inputText value="#{tipoPercepcionBean.tipoPercepcionDTO.descripcion}" ></p:inputText>
+                        <p:inputText value="#{tipoPercepcionBean.tipoPercepcion.descripcion}" ></p:inputText>
                     </div>
 
                     <div class="p-field">
                         <p:outputLabel value="Fecha Inicio" ></p:outputLabel>
-                        <p:datePicker value="#{tipoPercepcionBean.tipoPercepcionDTO.vigenciaInicio}" showIcon="true" yearNavigator="true" monthNavigator="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"></p:datePicker>                    
+                        <p:datePicker value="#{tipoPercepcionBean.tipoPercepcion.vigenciaInicio}" showIcon="true" yearNavigator="true" monthNavigator="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"></p:datePicker>                    
                     </div>
 
                     <div class="p-field">
                         <p:outputLabel value="Fecha Fin"></p:outputLabel>
-                        <p:datePicker value="#{tipoPercepcionBean.tipoPercepcionDTO.vigenciaFin}" showIcon="true" yearNavigator="true" monthNavigator="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"></p:datePicker>
+                        <p:datePicker value="#{tipoPercepcionBean.tipoPercepcion.vigenciaFin}" showIcon="true" yearNavigator="true" monthNavigator="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"></p:datePicker>
                     </div>
 
                 </p:outputPanel>

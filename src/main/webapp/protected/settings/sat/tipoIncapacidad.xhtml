@@ -24,7 +24,7 @@
             </p:toolbar>
 
             <div style="padding: 1rem;">
-                <p:dataTable id="dt-tipoInca" widgetVar="dtTipoInca" value="#{tipoIncapacidadBean.listDTO}" var="tipoIncapacidad" >
+                <p:dataTable id="dt-tipoInca" widgetVar="dtTipoInca" value="#{tipoIncapacidadBean.listTipoIncapacidad}" var="tipoIncapacidad" >
 
                     <p:column headerText="Clave">
                         <p:outputLabel value="#{tipoIncapacidad.clave}" ></p:outputLabel>
@@ -36,7 +36,7 @@
 
                     <p:column>
                         <p:commandButton icon="pi pi-bars" action="#{tipoIncapacidadBean.editar()}" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dlgTipoInca').show();" process="@this" update="form:dlg-tipoInca" >
-                            <f:setPropertyActionListener value="#{tipoIncapacidad}" target="#{tipoIncapacidadBean.tipoIncapacidadDTO}" ></f:setPropertyActionListener>
+                            <f:setPropertyActionListener value="#{tipoIncapacidad}" target="#{tipoIncapacidadBean.tipoIncapacidad}" ></f:setPropertyActionListener>
                         </p:commandButton>
                     </p:column>
 
@@ -48,12 +48,12 @@
 
                     <div class="p-field">
                         <p:outputLabel value="Clave" ></p:outputLabel>
-                        <p:inputText value="#{tipoIncapacidadBean.tipoIncapacidadDTO.clave}" readonly="#{tipoIncapacidadBean.primaryEdit}" ></p:inputText>
+                        <p:inputText value="#{tipoIncapacidadBean.tipoIncapacidad.clave}" readonly="#{tipoIncapacidadBean.primaryEdit}" ></p:inputText>
                     </div>
 
                     <div class="p-field" >
                         <p:outputLabel value="Descripcion" ></p:outputLabel>
-                        <p:inputText value="#{tipoIncapacidadBean.tipoIncapacidadDTO.descripcion}"  ></p:inputText>
+                        <p:inputText value="#{tipoIncapacidadBean.tipoIncapacidad.descripcion}"  ></p:inputText>
                     </div>
 
                 </p:outputPanel>

@@ -15,8 +15,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.sat.TipoDeduccionDAO;
-import mx.com.ferbo.dto.sat.TipoDeduccionDTO;
+import mx.com.ferbo.dao.n.sat.TipoDeduccionDAO;
+import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.util.SGPException;
 
 @Named(value = "tipoDeduccionBean")
@@ -26,8 +26,8 @@ public class TipoDeduccionBean implements Serializable{
     private static final long serialVersionUID = -3103728579268351267L;
     private static Logger log = LogManager.getLogger(TipoDeduccionBean.class);
 
-    private TipoDeduccionDTO tipoDeduccionDTO;
-    private List<TipoDeduccionDTO> listTipoDeduccion;
+    private CatTipoDeduccion tipoDeduccion;
+    private List<CatTipoDeduccion> listTipoDeduccion;
 
     private TipoDeduccionDAO catTipoDeduccionDAO;
 
@@ -35,10 +35,8 @@ public class TipoDeduccionBean implements Serializable{
     private boolean primaryEdit;
 
     public TipoDeduccionBean(){
-
         catTipoDeduccionDAO = new TipoDeduccionDAO();
         listTipoDeduccion = new ArrayList<>();
-
     }
 
     @PostConstruct
@@ -49,7 +47,7 @@ public class TipoDeduccionBean implements Serializable{
     }
 
     public void nuevo(){
-        tipoDeduccionDTO = new TipoDeduccionDTO();
+        tipoDeduccion = new CatTipoDeduccion();
         guardar = true;
         primaryEdit = false;
     }
@@ -67,66 +65,48 @@ public class TipoDeduccionBean implements Serializable{
         String titulo = "Registro Guardado";
 
         try {
-
             if(guardar){
-
-                catTipoDeduccionDAO.guardar(tipoDeduccionDTO);
-
+                catTipoDeduccionDAO.guardar(tipoDeduccion);
                 mensaje = "Se guardo con éxito";
                 severity = FacesMessage.SEVERITY_INFO;
-
             }else{
-
-                catTipoDeduccionDAO.actualizar(tipoDeduccionDTO);
-
+                catTipoDeduccionDAO.actualizar(tipoDeduccion);
                 titulo = "Registro Actualizar";
                 mensaje = "Se actualizo con éxito";
-                severity = FacesMessage.SEVERITY_INFO;
-                
+                severity = FacesMessage.SEVERITY_INFO;   
             }
-            
             listTipoDeduccion = catTipoDeduccionDAO.buscarTodos();
             PrimeFaces.current().executeScript("PF('dlgTipoDeduccion').hide();");
-
         } catch (SGPException e) {            
-
             titulo = "Error";
             mensaje = "Error en el registro consulta al administrador de sistemas";
             severity = FacesMessage.SEVERITY_ERROR;
-
             log.error(e.getMessage());
-
         }catch(Exception ex){
             titulo = "Error";
             mensaje = "Error en el registro consulta al administrador de sistemas";
             severity = FacesMessage.SEVERITY_ERROR;
-
             log.error(ex.getMessage());
-
         }finally{            
             message = new FacesMessage(severity,titulo,mensaje);
             FacesContext.getCurrentInstance().addMessage(null, message);
-
             PrimeFaces.current().ajax().update("form:messages","form:dt-tipoDeduccion");
-
         }
-
     }
 
-
-    public TipoDeduccionDTO getTipoDeduccionDTO() {
-        return tipoDeduccionDTO;
+    public CatTipoDeduccion getTipoDeduccion() {
+        return tipoDeduccion;
     }
 
-    public void setTipoDeduccionDTO(TipoDeduccionDTO tipoDeduccionDTO) {
-        this.tipoDeduccionDTO = tipoDeduccionDTO;
+    public void setTipoDeduccionDTO(CatTipoDeduccion tipoDeduccion) {
+        this.tipoDeduccion = tipoDeduccion;
     }
 
-    public List<TipoDeduccionDTO> getListTipoDeduccion() {
+    public List<CatTipoDeduccion> getListTipoDeduccion() {
         return listTipoDeduccion;
     }
 
-    public void setListTipoDeduccion(List<TipoDeduccionDTO> listTipoDeduccion) {
+    public void setListTipoDeduccion(List<CatTipoDeduccion> listTipoDeduccion) {
         this.listTipoDeduccion = listTipoDeduccion;
     }
 
@@ -137,8 +117,5 @@ public class TipoDeduccionBean implements Serializable{
     public void setPrimaryEdit(boolean primaryEdit) {
         this.primaryEdit = primaryEdit;
     }
-
-
-
     
 }

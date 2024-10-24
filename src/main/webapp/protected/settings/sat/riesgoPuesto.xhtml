@@ -10,13 +10,13 @@
 
     <ui:define name="content">
         <h:form id="form">
-            
+
             <p:growl id="messages" showDetail="true" life="4000"></p:growl>
 
             <p:dialog widgetVar="statusDialog" header="Cargando Informacion. . ." resizable="false" closable="false" draggable="false" >
                 <div align="center">
-		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
-				</div>
+                    <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+                </div>
             </p:dialog>
 
             <p:toolbar>
@@ -26,7 +26,7 @@
             </p:toolbar>
 
             <div style="padding-top: 3rem;" >
-                <p:dataTable id="dt-riesgoPuesto" widgetVar="dtRiesgoPuesto" value="#{riesgoPuestoBean.listDTO}" var="riesgoPuesto">
+                <p:dataTable id="dt-riesgoPuesto" widgetVar="dtRiesgoPuesto" value="#{riesgoPuestoBean.list}" var="riesgoPuesto">
 
                     <p:column headerText="Clave">
                         <p:outputLabel value="#{riesgoPuesto.clave}"></p:outputLabel>
@@ -50,7 +50,7 @@
 
                     <p:column>
                         <p:commandButton icon="pi pi-bars" actionListener="#{riesgoPuestoBean.editar()}" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dlgRiesgoPuesto').show();" process="@this form:dt-riesgoPuesto" update="form:dlg-riesgoPuesto">
-                            <f:setPropertyActionListener value="#{riesgoPuesto}" target="#{riesgoPuestoBean.riesgoPuestoDTO}"></f:setPropertyActionListener>
+                            <f:setPropertyActionListener value="#{riesgoPuesto}" target="#{riesgoPuestoBean.riesgoPuesto}"></f:setPropertyActionListener>
                         </p:commandButton>
                     </p:column>
 
@@ -62,22 +62,22 @@
 
                     <div class="p-field">
                         <p:outputLabel value="Clave"></p:outputLabel>
-                        <p:inputNumber value="#{riesgoPuestoBean.riesgoPuestoDTO.clave}" readonly="#{riesgoPuestoBean.primaryEdit}" ></p:inputNumber>
+                        <p:inputNumber value="#{riesgoPuestoBean.riesgoPuesto.clave}" readonly="#{riesgoPuestoBean.primaryEdit}" ></p:inputNumber>
                     </div>
 
                     <div class="p-field">
                         <p:outputLabel value="Descripcion"></p:outputLabel>
-                        <p:inputText value="#{riesgoPuestoBean.riesgoPuestoDTO.descripcion}"></p:inputText>
+                        <p:inputText value="#{riesgoPuestoBean.riesgoPuesto.descripcion}"></p:inputText>
                     </div>
 
                     <div class="p-field">
                         <p:outputLabel value="Fecha Inicio"></p:outputLabel>
-                        <p:datePicker value="#{riesgoPuestoBean.riesgoPuestoDTO.vigenciaInicio}" showIcon="true" yearNavigator="true" monthNavigator="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"></p:datePicker>
+                        <p:datePicker value="#{riesgoPuestoBean.riesgoPuesto.vigenciaInicio}" showIcon="true" yearNavigator="true" monthNavigator="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"></p:datePicker>
                     </div>
 
                     <div class="p-field">
                         <p:outputLabel value="Fecha Fin"></p:outputLabel>
-                        <p:datePicker value="#{riesgoPuestoBean.riesgoPuestoDTO.vigenciaFin}" showIcon="true" yearNavigator="true" monthNavigator="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"></p:datePicker>
+                        <p:datePicker value="#{riesgoPuestoBean.riesgoPuesto.vigenciaFin}" showIcon="true" yearNavigator="true" monthNavigator="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"></p:datePicker>
                     </div>
 
                 </p:outputPanel>

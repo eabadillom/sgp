@@ -15,8 +15,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.sat.CatTipoNominaDAO;
-import mx.com.ferbo.dto.sat.TipoNominaDTO;
+import mx.com.ferbo.dao.n.sat.TipoNominaDAO;
+import mx.com.ferbo.model.sat.CatTipoNomina;
 import mx.com.ferbo.util.SGPException;
 
 @Named(value = "tipoNominaBean")
@@ -26,28 +26,28 @@ public class TipoNominaBean implements Serializable{
     private static final long serialVersionUID = -3103728579268351267L;
 	private static Logger log = LogManager.getLogger(TipoNominaBean.class);
 
-    private TipoNominaDTO tipoNominaDTO;
-    private List<TipoNominaDTO> listDTO;
+    private CatTipoNomina tipoNominaDTO;
+    private List<CatTipoNomina> listTipoNomina;
 
-    private CatTipoNominaDAO catTipoNominaDAO;
+    private TipoNominaDAO tipoNominaDAO;
 
     private boolean guardar;
     private boolean primaryEdit;
     
     public TipoNominaBean(){
 
-        listDTO = new ArrayList<>();
-        catTipoNominaDAO = new CatTipoNominaDAO();
+        listTipoNomina = new ArrayList<>();
+        tipoNominaDAO = new TipoNominaDAO();
 
     }
 
     @PostConstruct
     public void init(){
-        listDTO = catTipoNominaDAO.buscarTodos();
+        listTipoNomina = tipoNominaDAO.buscarTodos();
     }
 
     public void nuevo(){
-        tipoNominaDTO = new TipoNominaDTO();
+        tipoNominaDTO = new CatTipoNomina();
         guardar = true;
         primaryEdit = false;
     }
@@ -68,14 +68,14 @@ public class TipoNominaBean implements Serializable{
             
             if(guardar){
 
-                catTipoNominaDAO.guardar(tipoNominaDTO);
+                tipoNominaDAO.guardar(tipoNominaDTO);
 
                 mensaje = "Exito al guardar registro";
                 severity = FacesMessage.SEVERITY_INFO;
 
             }else{
 
-                catTipoNominaDAO.actualizar(tipoNominaDTO);
+                tipoNominaDAO.actualizar(tipoNominaDTO);
 
                 mensaje = "Exito al actualizar registro";
                 severity = FacesMessage.SEVERITY_INFO;
@@ -83,7 +83,7 @@ public class TipoNominaBean implements Serializable{
 
             }
 
-            listDTO = catTipoNominaDAO.buscarTodos();
+            listTipoNomina = tipoNominaDAO.buscarTodos();
 
             PrimeFaces.current().executeScript("PF('dlgTipoNomina').hide();");
 
@@ -111,20 +111,20 @@ public class TipoNominaBean implements Serializable{
 
     }
 
-    public TipoNominaDTO getTipoNominaDTO() {
+    public CatTipoNomina getTipoNomina() {
         return tipoNominaDTO;
     }
 
-    public void setTipoNominaDTO(TipoNominaDTO tipoNominaDTO) {
-        this.tipoNominaDTO = tipoNominaDTO;
+    public void setTipoNomina(CatTipoNomina tipoNomina) {
+        this.tipoNominaDTO = tipoNomina;
     }
 
-    public List<TipoNominaDTO> getListDTO() {
-        return listDTO;
+    public List<CatTipoNomina> getListTipoNomina() {
+        return listTipoNomina;
     }
 
-    public void setListDTO(List<TipoNominaDTO> listDTO) {
-        this.listDTO = listDTO;
+    public void setListTipoNomina(List<CatTipoNomina> listTipoNomina) {
+        this.listTipoNomina = listTipoNomina;
     }
 
     public boolean isPrimaryEdit() {
@@ -134,8 +134,5 @@ public class TipoNominaBean implements Serializable{
     public void setPrimaryEdit(boolean primaryEdit) {
         this.primaryEdit = primaryEdit;
     }
-
     
-
-
 }
