@@ -290,4 +290,37 @@ public class AjustesBean implements Serializable {
             e.getMessage();
         }
     }
+    
+    public void articulos(){
+        String path = null;
+        try{
+            path = contextPath + "/protected/settings/sistema/articulos.xhtml";
+            FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+        }
+        catch(Exception e) {
+            e.getMessage();
+        }
+    }
+    
+    public void prendas(){
+        String path = null;
+        try{
+            path = contextPath + "/protected/settings/sistema/prendas.xhtml";
+            FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+        }
+        catch(Exception e) {
+            e.getMessage();
+        }
+    }
+    
+    public void tallas(){
+        String path = null;
+        try{
+            path = contextPath + "/protected/settings/sistema/tallas.xhtml";
+            FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+        }
+        catch(Exception e) {
+            e.getMessage();
+        }
+    }
 }

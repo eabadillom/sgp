@@ -7,143 +7,144 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import mx.com.ferbo.dao.n.ArticuloDAO;
-import mx.com.ferbo.model.CatArticulo;
+import mx.com.ferbo.dao.n.PrendaDAO;
+import mx.com.ferbo.model.CatPrenda;
 import mx.com.ferbo.util.SGPException;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.primefaces.PrimeFaces;
-import org.primefaces.event.FileUploadEvent;
-import org.primefaces.model.file.UploadedFile;
-import java.io.InputStream;
-import javax.servlet.ServletContext;
-import mx.com.ferbo.util.IOUtil;
 
-@Named(value = "articulosBean")
+@Named(value = "prendasBean")
 @ViewScoped
-public class ArticulosBean implements Serializable {
+public class PrendasBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private static final Logger log = LogManager.getLogger(ArticulosBean.class);
+    private static final Logger log = LogManager.getLogger(PrendasBean.class);
 
-    private List<CatArticulo> articulos;
-    private CatArticulo articulo;
-    private ArticuloDAO articulodao;
+    private CatPrenda prenda;
+    private PrendaDAO prendadao;
+    private List<CatPrenda> prendas;
     private FacesContext fc;
     private PrimeFaces pf;
 
     private String accion;
 
-    public ArticulosBean() {
-        this.articulodao = new ArticuloDAO();
+    public PrendasBean() {
+        this.prendadao = new PrendaDAO();
     }
-
+    
     @PostConstruct
-    public void init() {
+    public void init(){
         fc = FacesContext.getCurrentInstance();
         pf = PrimeFaces.current();
     }
-    
-    public CatArticulo getArticulo() {
-        return articulo;
+
+    public List<CatPrenda> getPrendas() {
+        return prendas;
     }
 
-    public void setArticulo(CatArticulo articulo) {
-        this.articulo = articulo;
-    }
-
-    public List<CatArticulo> getArticulos() {
-        return articulos;
-    }
-    
     public String getAccion() {
         return accion;
     }
 
-    private void setAccion(String accion) {
+    public void setAccion(String accion) {
         this.accion = accion;
     }
-
-    public void nuevoArticulo() {
-        this.articulo = new CatArticulo();
+    
+    public void nuevaPrenda(){
+        this.prenda = new CatPrenda();
         this.setAccion("Registrar");
     }
-
-    public void pasarArticulo(CatArticulo articulotmp) {
-        try {
-            this.articulo = articulotmp;
+    
+    public void pasarPrenda(CatPrenda prendatmp){
+        try{
+            this.prenda = prendatmp;
             this.setAccion("Modificar");
-        } catch (Exception ex) {
-            log.debug("Problema en asignar el articulo...", ex);
+        }
+        catch(Exception ex){
+            log.debug("Problema en asignar la prenda...", ex);
         }
     }
 
-    public void listar(boolean bandera) {
-        try {
-            if (!bandera) {
-                if (this.isPostBack() == false) {
-                    this.articulos = this.articulodao.buscarTodos();
+    private boolean isPostBack(){
+        boolean respuesta = false;
+        
+        respuesta = fc.isPostback();
+        
+        return respuesta;
+    }
+    
+    public void listar(boolean bandera){
+        try{
+            if(!bandera){
+                if(this.isPostBack() == false){
+                    this.prendas = this.prendadao.buscarTodos();
                 }
-            } else {
-                this.articulos = this.articulodao.buscarTodos();
             }
-        } catch (Exception ex) {
+            else{
+                this.prendas = this.prendadao.buscarTodos();
+            }
+        }
+        catch(Exception ex){
             fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: no se cargaron los elementos", null));
             pf.ajax().update("message");
             log.debug(ex);
         }
     }
-
-    private boolean isPostBack() {
-        boolean respuesta = false;
-
-        respuesta = FacesContext.getCurrentInstance().isPostback();
-
-        return respuesta;
-
-    }
-
-    public void registrar() {
-        try {
-            this.articulodao.guardar(articulo);
+    
+    public void registrar(){
+        try{
+            this.prendadao.guardar(prenda);
             this.listar(true);
-        } catch (SGPException ex) {
+        }
+        catch(SGPException ex){
             fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error: " + ex.getMessage(), null));
             pf.ajax().update("message");
-        } catch (Exception ex) {
+            log.debug(ex);
+        }
+        catch(Exception ex){
             fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: " + ex.getMessage(), null));
             pf.ajax().update("message");
+            log.debug(ex);
         }
     }
-
-    public void actualizar() {
-        try {
-            this.articulodao.actualizar(articulo);
+    
+    public void actualizar(){
+        try{
+            this.prendadao.actualizar(prenda);
             this.listar(true);
-        } catch (SGPException ex) {
+        }
+        catch(SGPException ex){
             fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error: " + ex.getMessage(), null));
             pf.ajax().update("message");
-        } catch (Exception ex) {
+            log.debug(ex);
+        }
+        catch(Exception ex){
             fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: " + ex.getMessage(), null));
             pf.ajax().update("message");
+            log.debug(ex);
         }
     }
-
-    public void eliminar() {
-        try {
-            this.articulodao.eliminar(articulo);
+    
+    public void eliminar(){
+        try{
+            this.prendadao.eliminar(prenda);
             this.listar(true);
-        } catch (SGPException ex) {
+        }
+        catch(SGPException ex){
             fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error: " + ex.getMessage(), null));
             pf.ajax().update("message");
-        } catch (Exception ex) {
+            log.debug(ex);
+        }
+        catch(Exception ex){
             fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: " + ex.getMessage(), null));
             pf.ajax().update("message");
+            log.debug(ex);
         }
     }
-
+    
     public void operar() {
-        switch (this.getAccion()) {
+        switch (accion) {
             case "Registrar":
                 this.registrar();
                 break;
@@ -151,11 +152,5 @@ public class ArticulosBean implements Serializable {
                 this.actualizar();
                 break;
         }
-    }
-    
-    public String disponibilidad(CatArticulo articulotmp) {
-
-        return (articulotmp.getActivo() == 1) ? "Existencia" : "Sin Existencia";
-
     }
 }
