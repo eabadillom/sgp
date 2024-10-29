@@ -22,7 +22,7 @@ import javax.persistence.Table;
 @Table(name = "cat_articulo")
 @NamedQueries({
     @NamedQuery(name = "CatArticulo.findAll", query = "SELECT c FROM CatArticulo c"),
-    @NamedQuery(name = "CatArticulo.findAllActive", query = "SELECT NEW mx.com.ferbo.dto.CatArticuloDTO(c.idArticulo, c.descripcion, c.cantidadMax, c.unidad, c.activo) FROM CatArticulo c WHERE c.activo = 1")
+    @NamedQuery(name = "CatArticulo.findAllActive", query = "SELECT c FROM CatArticulo c WHERE c.activo = 1")
 })
 
 public class CatArticulo implements Serializable {

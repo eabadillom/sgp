@@ -24,13 +24,7 @@ import javax.validation.constraints.Size;
 @Table(name = "cat_tipo_solicitud")
 @NamedQueries({
     @NamedQuery(name = "CatTipoSolicitud.findAll", query = "SELECT c FROM CatTipoSolicitud c"),
-    @NamedQuery(name = "CatTipoSolicitud.findByActive", query = "SELECT NEW mx.com.ferbo.dto.CatTipoSolicitudDTO("
-            + " c.idTipoSolicitud,"
-            + " c.descripcion"
-            + ")"
-            + " FROM CatTipoSolicitud c"
-            + " WHERE c.activo = 1")
-    
+    @NamedQuery(name = "CatTipoSolicitud.findByActive", query = "SELECT c FROM CatTipoSolicitud c WHERE c.activo = 1")
 })
 public class CatTipoSolicitud implements Serializable {
 
@@ -46,7 +40,7 @@ public class CatTipoSolicitud implements Serializable {
     @Column(name = "descripcion")
     private String descripcion;
     @Column(name = "activo")
-    private Short activo;
+    private Integer activo;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idTipoSolicitud")
     private List<DetSolicitudPermiso> detSolicitudPermisoList;
 
@@ -78,11 +72,11 @@ public class CatTipoSolicitud implements Serializable {
         this.descripcion = descripcion;
     }
 
-    public Short getActivo() {
+    public Integer getActivo() {
         return activo;
     }
 
-    public void setActivo(Short activo) {
+    public void setActivo(Integer activo) {
         this.activo = activo;
     }
 

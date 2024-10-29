@@ -3,6 +3,7 @@ package mx.com.ferbo.model;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,22 +28,7 @@ import javax.validation.constraints.NotNull;
 @Table(name = "det_solicitud_permiso")
 @NamedQueries({
     @NamedQuery(name = "DetSolicitudPermiso.findAll", query = "SELECT d FROM DetSolicitudPermiso d"),
-    @NamedQuery(name = "DetSolicitudPermiso.findByIdEmp", query = "SELECT NEW mx.com.ferbo.dto.DetSolicitudPermisoDTO("
-            + " d.idSolicitud,"
-            + " d.fechaCap,"
-            + " d.fechaMod,"
-            + " d.fechaInicio,"
-            + " d.fechaFin,"
-            + " d.aprobada,"
-            + " d.descripcionRechazo,"
-            + " ts.idTipoSolicitud,"
-            + " ts.descripcion"
-            + ")"
-            + " FROM DetSolicitudPermiso d"
-            + " INNER JOIN d.idEmpleadoSol es"
-            + " INNER JOIN d.idTipoSolicitud ts"
-            + " WHERE es.idEmpleado = :idEmp"
-            + " ORDER BY d.fechaCap"),
+    @NamedQuery(name = "DetSolicitudPermiso.findByIdEmp", query = "SELECT dsp FROM DetSolicitudPermiso dsp INNER JOIN dsp.idEmpleadoSol de INNER JOIN dsp.idTipoSolicitud cts WHERE de.idEmpleado = :idEmp ORDER BY dsp.fechaCap")
 })
 public class DetSolicitudPermiso implements Serializable {
 
@@ -186,6 +172,33 @@ public class DetSolicitudPermiso implements Serializable {
 
     public void setDescripcionRechazo(String descripcionRechazo) {
         this.descripcionRechazo = descripcionRechazo;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 89 * hash + Objects.hashCode(this.idSolicitud);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final DetSolicitudPermiso other = (DetSolicitudPermiso) obj;
+        return Objects.equals(this.idSolicitud, other.idSolicitud);
+    }
+
+    @Override
+    public String toString() {
+        return "DetSolicitudPermiso{" + "idSolicitud=" + idSolicitud + ", fechaCap=" + fechaCap + ", fechaMod=" + fechaMod + ", fechaInicio=" + fechaInicio + ", fechaFin=" + fechaFin + ", aprobada=" + aprobada + ", descripcionRechazo=" + descripcionRechazo + ", detIncidenciaList=" + detIncidenciaList + ", idTipoSolicitud=" + idTipoSolicitud + ", idEmpleadoSol=" + idEmpleadoSol + ", idEmpleadoRev=" + idEmpleadoRev + '}';
     }
     
 }

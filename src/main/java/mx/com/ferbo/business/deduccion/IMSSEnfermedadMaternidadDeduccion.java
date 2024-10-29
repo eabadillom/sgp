@@ -6,7 +6,6 @@ import java.util.Date;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.dao.n.CuotaIMSSDAO;
 import mx.com.ferbo.model.CatCuotaIMSS;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
@@ -14,7 +13,7 @@ import mx.com.ferbo.model.DetNominaDeduccionPK;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.util.SGPException;
 
-public class IMSSEnfermedadMaternidadDeduccion extends AbstractDeduccion implements IDeduccion {
+public class IMSSEnfermedadMaternidadDeduccion extends AbstractIMSSDeduccion implements IDeduccion {
 	
 	private static Logger log = LogManager.getLogger(IMSSEnfermedadMaternidadDeduccion.class);
 	
@@ -23,7 +22,6 @@ public class IMSSEnfermedadMaternidadDeduccion extends AbstractDeduccion impleme
 	private BigDecimal totalDiasPeriodo = null;
 	private BigDecimal uma = null;
 	private BigDecimal sdi = null;
-	private CuotaIMSSDAO tarifaIMSSDAO = null;
 	
 	/**
 	 * @param fechaInicioAnio Fecha de inicio del año en curso (correspondiente al cálculo del periodo).
@@ -52,11 +50,18 @@ public class IMSSEnfermedadMaternidadDeduccion extends AbstractDeduccion impleme
 		CatCuotaIMSS tarifaIMSS = null;
 		CatTipoDeduccion tdIMSS = null;
 		try {
-			if(this.tarifaIMSSDAO == null)
-				this.tarifaIMSSDAO = new CuotaIMSSDAO();
+			if(this.cuotasIMSS == null)
+				throw new SGPException("No se establecio la lista de cuotas del IMSS.");
+			
+			if(this.cuotasIMSS.size() <= 0)
+				throw new SGPException("No se establecio la lista de cuotas del IMSS.");
 			
 			if(this.tiposDeduccion == null)
 				throw new SGPException("No se establecio la lista de tipos de deduccion.");
+			
+			if(this.tiposDeduccion.size() <= 0)
+				throw new SGPException("No se establecio la lista de tipos de deduccion.");
+			
 			tdIMSS = this.getTipoDeduccion("001");
 			
 			//Constantes necesarias para el cálculo de Enfermedad y Maternidad.
@@ -69,7 +74,7 @@ public class IMSSEnfermedadMaternidadDeduccion extends AbstractDeduccion impleme
 			
 			if(this.sdi.compareTo(limiteUMAs) >= 0) {
 				
-				tarifaIMSS = tarifaIMSSDAO.buscarPor("O", "EM1", this.fechaInicioAnio, this.fechaFinAnio, tres);
+				tarifaIMSS = this.getCuotaIMSS("O", "EM1", this.fechaInicioAnio, this.fechaFinAnio, tres);
 				tarifa = tarifaIMSS.getCuota();
 				cuota = excedente
 						.multiply(tarifa).setScale(2, BigDecimal.ROUND_HALF_UP)

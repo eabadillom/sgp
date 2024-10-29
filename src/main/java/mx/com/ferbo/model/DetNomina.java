@@ -21,7 +21,6 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.LazyCollection;
@@ -33,7 +32,9 @@ import mx.com.ferbo.model.sat.CatMetodoPago;
 @Table(name = "det_nomina")
 @NamedQueries({
     @NamedQuery(name = "DetNomina.findAll", query = "SELECT n FROM DetNomina n"),
-    @NamedQuery(name = "DetNomina.findByPeriodo", query = "SELECT n FROM DetNomina n WHERE n.periodoInicio = :periodoInicio AND n.periodoFin = :periodoFin")
+    @NamedQuery(name = "DetNomina.findByPeriodo", query = "SELECT n FROM DetNomina n WHERE n.periodoInicio = :periodoInicio AND n.periodoFin = :periodoFin"),
+    @NamedQuery(name = "DetNomina.findByPeriodoRfc", query = "SELECT n FROM DetNomina n WHERE n.periodoInicio = :periodoInicio AND n.periodoFin = :periodoFin AND n.receptor.rfc = :rfc"),
+    @NamedQuery(name = "DetNomina.findBySemanaRfc", query = "SELECT n FROM DetNomina n WHERE n.periodo between :semanaInicio AND :semanaFin AND n.receptor.rfc = :rfc")
 })
 public class DetNomina implements Serializable {
 
@@ -114,6 +115,30 @@ public class DetNomina implements Serializable {
     @Basic(optional = false)
     private LocalDate periodoFin;
     
+    @Column(name = "nu_ejercicio")
+    @Basic(optional = true)
+    private Integer ejercicio;
+    
+    @Column(name = "nu_periodo")
+    @Basic(optional = true)
+  	private Integer periodo;
+    
+    @Column(name = "nu_dias_laborados")
+    @Basic(optional = true)
+  	private Integer diasLaborados;
+    
+    @Column(name = "nu_dias_pagados")
+    @Basic(optional = true)
+  	private Integer diasPagados;
+    
+    @Column(name = "nu_dias_asueto")
+    @Basic(optional = true)
+  	private Integer diasAsueto;
+    
+    @Column(name = "nu_dias_no_laborados")
+    @Basic(optional = true)
+  	private Integer diasNoLaborados;
+    
     @OneToOne(mappedBy = "nomina", cascade = CascadeType.PERSIST)
     private DetNominaEmisor emisor;
     
@@ -137,27 +162,6 @@ public class DetNomina implements Serializable {
     private List<DetNominaDeduccion> deducciones;
     
     
-    
-    
-    //TODO Revisar si los siguientes datos NO son parte del CFDI.
-    @Transient
-  	private Integer ejercicio;
-    
-    @Transient
-  	private Integer periodo;
-    
-    @Transient
-  	private Integer diasLaborados;
-    
-    @Transient
-  	private Integer diasPagados;
-    
-    @Transient
-  	private Integer diasAsueto;
-    
-    @Transient
-  	private Integer diasNoLaborados;
-
     public DetNomina() {
     }
 

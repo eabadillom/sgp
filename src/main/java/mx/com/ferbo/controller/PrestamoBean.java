@@ -16,14 +16,14 @@ import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.TabChangeEvent;
 
-import mx.com.ferbo.dao.EmpleadoDAO;
-import mx.com.ferbo.dao.PeriodicidadPagoDAO;
-import mx.com.ferbo.dao.PrestamoDAO;
-import mx.com.ferbo.dao.TipoPrestamoDAO;
-import mx.com.ferbo.dto.DetEmpleadoDTO;
-import mx.com.ferbo.dto.PeriodicidadPagoDTO;
-import mx.com.ferbo.dto.PrestamoDTO;
-import mx.com.ferbo.dto.TipoPrestamoDTO;
+import mx.com.ferbo.dao.n.EmpleadoDAO;
+import mx.com.ferbo.dao.n.PeriodicidadPagoDAO;
+import mx.com.ferbo.dao.n.PrestamoDAO;
+import mx.com.ferbo.dao.n.TipoPrestamoDAO;
+import mx.com.ferbo.model.DetEmpleado;
+import mx.com.ferbo.model.CatPeriodicidadPago;
+import mx.com.ferbo.model.DetPrestamo;
+import mx.com.ferbo.model.CatTipoPrestamo;
 
 @Named(value = "prestamoBean")
 @ViewScoped
@@ -32,21 +32,21 @@ public class PrestamoBean implements Serializable {
 	private static final long serialVersionUID = -8738629687850811003L;
 	private static Logger log = LogManager.getLogger(PrestamoBean.class);
 	
-	private List<DetEmpleadoDTO> empleados;
-	private List<DetEmpleadoDTO> empleadosSelection;
+	private List<DetEmpleado> empleados;
+	private List<DetEmpleado> empleadosSelection;
 	private EmpleadoDAO empleadoDAO;
-	private DetEmpleadoDTO empleado;
+	private DetEmpleado empleado;
 	
-	private List<TipoPrestamoDTO> tiposPrestamo;
-	private TipoPrestamoDTO tipoPrestamo;
+	private List<CatTipoPrestamo> tiposPrestamo;
+	private CatTipoPrestamo tipoPrestamo;
 	private TipoPrestamoDAO tipoPrestamoDAO;
 	
-	private List<PeriodicidadPagoDTO> periodicidadesPago;
+	private List<CatPeriodicidadPago> periodicidadesPago;
 	private PeriodicidadPagoDAO periodicidadPagoDAO;
 	
-	private PrestamoDTO prestamo = null;
+	private DetPrestamo prestamo = null;
 	private PrestamoDAO prestamoDAO = null;
-	private List<PrestamoDTO> prestamos = null;
+	private List<DetPrestamo> prestamos = null;
 	
 	private String accion = null;
 	
@@ -59,18 +59,18 @@ public class PrestamoBean implements Serializable {
 	
 	@PostConstruct
 	public void init() {
-		this.empleados = empleadoDAO.buscarActivo();
+		this.empleados = empleadoDAO.buscarTodos(false);
 		this.tiposPrestamo = tipoPrestamoDAO.buscarTodos();
 		this.cargaLista();
 	}
 	
 	public void cargaLista() {
-		this.periodicidadesPago = periodicidadPagoDAO.buscarTodos(new Date());
+		this.periodicidadesPago = periodicidadPagoDAO.buscarTodosActivos(new Date());
 		this.accion = null;
 	}
 	
 	public void nuevoPrestamo() {
-		this.prestamo = new PrestamoDTO();
+		this.prestamo = new DetPrestamo();
 		this.accion = "N";
 	}
 	
@@ -79,9 +79,9 @@ public class PrestamoBean implements Serializable {
 		log.info("Fecha Fin   : {}", this.prestamo.getFechaFin());
 	}
 	
-	public void editarPrestamo(DetEmpleadoDTO empleado) {
+	public void editarPrestamo(DetEmpleado empleado) {
 		this.empleado = empleado;
-		this.prestamo = new PrestamoDTO();
+		this.prestamo = new DetPrestamo();
 		this.prestamo.setEmpleado(empleado);
 		log.info("Cargando información de préstamo INFONAVIT del empleado {}, prestamo: {}", this.empleado, this.prestamo);
 		this.accion = "N";
@@ -154,51 +154,51 @@ public class PrestamoBean implements Serializable {
 		}
 	}
 
-	public List<DetEmpleadoDTO> getEmpleados() {
+	public List<DetEmpleado> getEmpleados() {
 		return empleados;
 	}
 
-	public void setEmpleados(List<DetEmpleadoDTO> empleados) {
+	public void setEmpleados(List<DetEmpleado> empleados) {
 		this.empleados = empleados;
 	}
 
-	public DetEmpleadoDTO getEmpleado() {
+	public DetEmpleado getEmpleado() {
 		return empleado;
 	}
 
-	public void setEmpleado(DetEmpleadoDTO empleado) {
+	public void setEmpleado(DetEmpleado empleado) {
 		this.empleado = empleado;
 	}
 	
-	public List<TipoPrestamoDTO> getTiposPrestamo() {
+	public List<CatTipoPrestamo> getTiposPrestamo() {
 		return tiposPrestamo;
 	}
 
-	public void setTiposPrestamo(List<TipoPrestamoDTO> tiposPrestamo) {
+	public void setTiposPrestamo(List<CatTipoPrestamo> tiposPrestamo) {
 		this.tiposPrestamo = tiposPrestamo;
 	}
 
-	public TipoPrestamoDTO getTipoPrestamo() {
+	public CatTipoPrestamo getTipoPrestamo() {
 		return tipoPrestamo;
 	}
 
-	public void setTipoPrestamo(TipoPrestamoDTO tipoPrestamo) {
+	public void setTipoPrestamo(CatTipoPrestamo tipoPrestamo) {
 		this.tipoPrestamo = tipoPrestamo;
 	}
 
-	public PrestamoDTO getPrestamo() {
+	public DetPrestamo getPrestamo() {
 		return prestamo;
 	}
 
-	public void setPrestamo(PrestamoDTO prestamo) {
+	public void setPrestamo(DetPrestamo prestamo) {
 		this.prestamo = prestamo;
 	}
 
-	public List<PeriodicidadPagoDTO> getPeriodicidadesPago() {
+	public List<CatPeriodicidadPago> getPeriodicidadesPago() {
 		return periodicidadesPago;
 	}
 
-	public void setPeriodicidadesPago(List<PeriodicidadPagoDTO> periodicidadesPago) {
+	public void setPeriodicidadesPago(List<CatPeriodicidadPago> periodicidadesPago) {
 		this.periodicidadesPago = periodicidadesPago;
 	}
 
@@ -210,19 +210,19 @@ public class PrestamoBean implements Serializable {
 		this.accion = accion;
 	}
 
-	public List<DetEmpleadoDTO> getEmpleadosSelection() {
+	public List<DetEmpleado> getEmpleadosSelection() {
 		return empleadosSelection;
 	}
 
-	public void setEmpleadosSelection(List<DetEmpleadoDTO> empleadosSelection) {
+	public void setEmpleadosSelection(List<DetEmpleado> empleadosSelection) {
 		this.empleadosSelection = empleadosSelection;
 	}
 
-	public List<PrestamoDTO> getPrestamos() {
+	public List<DetPrestamo> getPrestamos() {
 		return prestamos;
 	}
 
-	public void setPrestamos(List<PrestamoDTO> prestamos) {
+	public void setPrestamos(List<DetPrestamo> prestamos) {
 		this.prestamos = prestamos;
 	}
 

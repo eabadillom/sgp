@@ -1,6 +1,7 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.Basic;
@@ -11,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -45,6 +47,9 @@ public class CatPlanta implements Serializable {
     @Basic(optional = false)
     @Column(name = "activo")
     private short activo;
+    
+    @OneToMany(mappedBy = "planta")
+    List<DetFpClient> clientesFp;
     
     public CatPlanta() {
     }
@@ -104,5 +109,13 @@ public class CatPlanta implements Serializable {
 		CatPlanta other = (CatPlanta) obj;
 		return Objects.equals(idPlanta, other.idPlanta);
 	}
+
+    public List<DetFpClient> getClientesFp() {
+        return clientesFp;
+    }
+
+    public void setClientesFp(List<DetFpClient> clientesFp) {
+        this.clientesFp = clientesFp;
+    }
     
 }

@@ -15,8 +15,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.sat.RiesgoPuestoDAO;
-import mx.com.ferbo.dto.sat.RiesgoPuestoDTO;
+import mx.com.ferbo.dao.n.sat.RiesgoPuestoDAO;
+import mx.com.ferbo.model.sat.CatRiesgoPuesto;
 import mx.com.ferbo.util.SGPException;
 
 @Named(value = "riesgoPuestoBean")
@@ -26,8 +26,8 @@ public class RiesgoPuestoBean implements Serializable {
     private static final long serialVersionUID = -3103728579268351267L;
     private static Logger log = LogManager.getLogger(RiesgoPuestoBean.class);
 
-    private RiesgoPuestoDTO riesgoPuestoDTO;
-    private List<RiesgoPuestoDTO> listDTO;
+    private CatRiesgoPuesto riesgoPuesto;
+    private List<CatRiesgoPuesto> listRiesgoPuesto;
 
     private RiesgoPuestoDAO catRiesgoPuestoDAO;
 
@@ -35,30 +35,24 @@ public class RiesgoPuestoBean implements Serializable {
     private boolean primaryEdit;
 
     public RiesgoPuestoBean(){
-
         catRiesgoPuestoDAO = new RiesgoPuestoDAO();
-        listDTO = new ArrayList<>();
+        listRiesgoPuesto = new ArrayList<>();
     }
 
     @PostConstruct
     public void init(){
-        listDTO = catRiesgoPuestoDAO.buscarTodos();
+        listRiesgoPuesto = catRiesgoPuestoDAO.buscarTodos();
     }
 
     public void nuevo(){
-
-        riesgoPuestoDTO = new RiesgoPuestoDTO();
-
+        riesgoPuesto = new CatRiesgoPuesto();
         guardar = true;
         primaryEdit = false;
-
     }
 
     public void editar(){
-       
         guardar = false;
         primaryEdit = true;
-
     }
 
     public void guardar(){
@@ -67,43 +61,30 @@ public class RiesgoPuestoBean implements Serializable {
         Severity severity = null;
         String mensaje = null;
         String titulo = "Registro guardado";
-
+        
         try {
-            
             if(guardar){
-
-                catRiesgoPuestoDAO.guardar(riesgoPuestoDTO);
-
+                catRiesgoPuestoDAO.guardar(riesgoPuesto);
                 mensaje = "Éxito al guardar el registro";
                 severity = FacesMessage.SEVERITY_INFO;
 
             }else{
-
-                catRiesgoPuestoDAO.actualizar(riesgoPuestoDTO);
-
+                catRiesgoPuestoDAO.actualizar(riesgoPuesto);
                 mensaje = "Éxito al actualizar registro";
                 titulo = "REgistro actualizado";
                 severity = FacesMessage.SEVERITY_INFO;
-
             }
-
-            listDTO = catRiesgoPuestoDAO.buscarTodos();
-
+            listRiesgoPuesto = catRiesgoPuestoDAO.buscarTodos();
             PrimeFaces.current().executeScript("PF('dlgRiesgoPuesto').hide();");
-
         }catch(SGPException ex){
-            
             titulo = "Error";
             mensaje = "Consulta al administrador de sistemas";
             severity = FacesMessage.SEVERITY_ERROR;
-
             log.error("Error" + ex.getMessage());
         }catch (Exception e) {
-
             titulo = "Error";
             mensaje = "Consulta al administrador de sistemas";
             severity = FacesMessage.SEVERITY_ERROR;
-
             log.error("ERROR" + e.getMessage());
         }finally{
             messages = new FacesMessage(severity, titulo, mensaje);
@@ -113,20 +94,20 @@ public class RiesgoPuestoBean implements Serializable {
 
     }
 
-    public RiesgoPuestoDTO getRiesgoPuestoDTO() {
-        return riesgoPuestoDTO;
+    public CatRiesgoPuesto getRiesgoPuesto() {
+        return riesgoPuesto;
     }
 
-    public void setRiesgoPuestoDTO(RiesgoPuestoDTO riesgoPuestoDTO) {
-        this.riesgoPuestoDTO = riesgoPuestoDTO;
+    public void setRiesgoPuesto(CatRiesgoPuesto riesgoPuesto) {
+        this.riesgoPuesto = riesgoPuesto;
     }
 
-    public List<RiesgoPuestoDTO> getListDTO() {
-        return listDTO;
+    public List<CatRiesgoPuesto> getList() {
+        return listRiesgoPuesto;
     }
 
-    public void setListDTO(List<RiesgoPuestoDTO> listDTO) {
-        this.listDTO = listDTO;
+    public void setListDTO(List<CatRiesgoPuesto> listRiesgo) {
+        this.listRiesgoPuesto = listRiesgo;
     }
 
     public boolean isPrimaryEdit() {

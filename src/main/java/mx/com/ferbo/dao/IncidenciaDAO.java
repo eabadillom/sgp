@@ -11,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.IBaseDAO;
+import mx.com.ferbo.dao.n.SolicitudPermisoDAO;
 import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.dto.DetIncidenciaDTO;
 import mx.com.ferbo.model.CatEstatusIncidencia;
@@ -74,7 +75,7 @@ public class IncidenciaDAO extends IBaseDAO<DetIncidenciaDTO, Integer>  implemen
                 e.getDetSolicitudPermisoDTO().setEmpleadoRev(new DetEmpleadoDTO(e.getDetEmpleadoRevDTO().getIdEmpleado()));
                 e.getDetSolicitudPermisoDTO().setAprobada(e.getCatEstatusIncidenciaDTO().getIdEstatus() == 2 ? (short) 1 : (short) 0);
                 
-                solicitud.actualizar(e.getDetSolicitudPermisoDTO());
+                //solicitud.actualizar(e.getDetSolicitudPermisoDTO());
             }else if(e.getDetSolicitudPrendaDTO().getIdSolicitud() != null){
                 incidencia.setIdSolPrenda(e.getDetSolicitudPrendaDTO() != null
                     ? emSGP.getReference(DetSolicitudPrenda.class, e.getDetSolicitudPrendaDTO().getIdSolicitud())

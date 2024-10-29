@@ -18,6 +18,10 @@ public class PrestamoDAO extends BaseDAO<DetPrestamo, Integer> {
 		super(modelClass);
 	}
 	
+	public PrestamoDAO() {
+		super(DetPrestamo.class);
+	}
+	
 	public List<DetPrestamo> buscar(Integer idEmpleado) {
 		List<DetPrestamo> list = null;
 		EntityManager em = null;
@@ -42,5 +46,29 @@ public class PrestamoDAO extends BaseDAO<DetPrestamo, Integer> {
 		
 		return list;
 	}
+        
+    public List<DetPrestamo> buscarPorIdEmpleadoTipoPrestamo(String tipoPrestamo, Integer idEmpleado) 
+    {
+        List<DetPrestamo> list = null;
+        EntityManager em = null;
+
+        try 
+        {
+            em = this.getEntityManager();
+            list = em.createNamedQuery("DetPrestamo.findByEmpleado", modelClass)
+                .setParameter("tipoPrestamo", tipoPrestamo)
+                .setParameter("idEmpleado", idEmpleado)
+                .getResultList();
+
+        }catch(Exception ex) 
+        {
+            log.error("Problema para obtener el listado de préstamos...", ex);
+        }finally 
+        {
+            this.close(em);
+        }
+
+        return list;
+    }
 
 }

@@ -8,13 +8,14 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import mx.com.ferbo.model.CatCuotaIMSS;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
 import mx.com.ferbo.model.DetNominaDeduccionPK;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.util.SGPException;
 
-public class IMSSDeduccion extends AbstractDeduccion implements IDeducciones {
+public class IMSSDeduccion extends AbstractIMSSDeduccion implements IDeducciones {
 	
 	private static Logger log = LogManager.getLogger(IMSSDeduccion.class);
 	
@@ -31,7 +32,8 @@ public class IMSSDeduccion extends AbstractDeduccion implements IDeducciones {
 	private IMSSInvalidezVida imssInvalidezVidaBO = null;
 	private IMSSCesantiaEdadAvanzadaVejezDeduccion imssCesantiaVejezBO = null;
 	
-	public IMSSDeduccion(List<CatTipoDeduccion> tiposDeduccion, Date fechaInicioAnio, Date fechaFinAnio, BigDecimal diasPorPeriodo, BigDecimal uma, BigDecimal sdi) {
+	public IMSSDeduccion(List<CatTipoDeduccion> tiposDeduccion, List<CatCuotaIMSS> cuotasIMSS, Date fechaInicioAnio, Date fechaFinAnio, BigDecimal diasPorPeriodo, BigDecimal uma, BigDecimal sdi) {
+		this.cuotasIMSS = cuotasIMSS;
 		this.tiposDeduccion = tiposDeduccion;
 		this.fechaInicioAnio = fechaInicioAnio;
 		this.fechaFinAnio = fechaFinAnio;
@@ -55,6 +57,8 @@ public class IMSSDeduccion extends AbstractDeduccion implements IDeducciones {
 		
 		BigDecimal imss = null;
 		
+		Integer idx = null;
+		
 		try {
 			if(this.tiposDeduccion == null)
 				throw new SGPException("No hay una lista de tipos de deducción establecida.");
@@ -66,27 +70,33 @@ public class IMSSDeduccion extends AbstractDeduccion implements IDeducciones {
 			
 			imssEnfMatBO = new IMSSEnfermedadMaternidadDeduccion(this.fechaInicioAnio, this.fechaFinAnio, this.diasPorPeriodo, this.uma, this.sdi);
 			imssEnfMatBO.setTiposDeduccion(tiposDeduccion);
-			dEnfermedadMaternidad = imssEnfMatBO.calcular(nomina, index++);
+			imssEnfMatBO.setCuotasIMSS(cuotasIMSS);
+			idx = imssEnfMatBO.nuevoIndiceDe(nomina.getDeducciones());
+			dEnfermedadMaternidad = imssEnfMatBO.calcular(nomina, idx++);
 			aportacionesIMSS.add(dEnfermedadMaternidad);
 			
 			imssGastosMedicosBO = new IMSSGastosMedicosPensionadosBeneficiariosDeduccion(this.fechaInicioAnio, this.fechaFinAnio, this.diasPorPeriodo, this.sdi);
 			imssGastosMedicosBO.setTiposDeduccion(tiposDeduccion);
-			dGastosMedicos = imssGastosMedicosBO.calcular(nomina, index++);
+			imssGastosMedicosBO.setCuotasIMSS(cuotasIMSS);
+			dGastosMedicos = imssGastosMedicosBO.calcular(nomina, idx++);
 			aportacionesIMSS.add(dGastosMedicos);
 			
 			imssEnDineroBO = new IMSSEnDineroDeduccion(this.fechaInicioAnio, this.fechaFinAnio, this.diasPorPeriodo, this.sdi);
 			imssEnDineroBO.setTiposDeduccion(tiposDeduccion);
-			dEnDinero = imssEnDineroBO.calcular(nomina, index++);
+			imssEnDineroBO.setCuotasIMSS(cuotasIMSS);
+			dEnDinero = imssEnDineroBO.calcular(nomina, idx++);
 			aportacionesIMSS.add(dEnDinero);
 			
 			imssInvalidezVidaBO = new IMSSInvalidezVida(fechaInicioAnio, fechaFinAnio, this.diasPorPeriodo, this.sdi);
 			imssInvalidezVidaBO.setTiposDeduccion(tiposDeduccion);
-			dInvalidezVida = imssInvalidezVidaBO.calcular(nomina, index++);
+			imssInvalidezVidaBO.setCuotasIMSS(cuotasIMSS);
+			dInvalidezVida = imssInvalidezVidaBO.calcular(nomina, idx++);
 			aportacionesIMSS.add(dInvalidezVida);
 			
 			imssCesantiaVejezBO = new IMSSCesantiaEdadAvanzadaVejezDeduccion(this.fechaInicioAnio, this.fechaFinAnio, diasPorPeriodo, this.sdi);
 			imssCesantiaVejezBO.setTiposDeduccion(tiposDeduccion);
-			dCesantiaVejez = imssCesantiaVejezBO.calcular(nomina, index++);
+			imssCesantiaVejezBO.setCuotasIMSS(cuotasIMSS);
+			dCesantiaVejez = imssCesantiaVejezBO.calcular(nomina, idx++);
 			aportacionesIMSS.add(dCesantiaVejez);
 			
 			imss = dEnfermedadMaternidad.getImporte()
@@ -97,7 +107,7 @@ public class IMSSDeduccion extends AbstractDeduccion implements IDeducciones {
 					;
 			
 			dIMSS = new DetNominaDeduccion();
-			dIMSS.setKey(new DetNominaDeduccionPK(nomina, index++));
+			dIMSS.setKey(new DetNominaDeduccionPK(nomina, idx++));
 			tdIMSS = this.getTipoDeduccion("001");
 			dIMSS.setTipoDeduccion(tdIMSS);
 			dIMSS.setClave("FRB-052");
