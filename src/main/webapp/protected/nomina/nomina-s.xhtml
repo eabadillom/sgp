@@ -167,7 +167,7 @@
 		        </p:confirmDialog> -->
 			</div>
 			<div align="center">
-				<p:commandButton value="Guardar" icon="pi pi-pencil" actionListener="#{nominaBean.guardarNominaEmpleado()}" disabled="#{empty nominaBean.listaNomina.size()}" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
+				<p:commandButton value="Guardar" icon="pi pi-pencil" actionListener="#{nominaBean.guardarNominaEmpleado()}" disabled="#{nominaBean.listaNomina.size() lt 0}" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
 			</div>
 		
 			<p:dialog header="Seleccionar Empresa" showEffect="fade" modal="true" widgetVar="empresaDialog" responsive="true" draggable="false">
@@ -300,12 +300,12 @@
 								<p:outputLabel value="#{percepcion.nombre}" />
 							</p:column>
 							<p:column headerText="Importe excento" width="10rem">
-								<p:inputNumber value="#{percepcion.importeExcento}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," readonly="#{not empty nominaBean.nomina.id}">
+								<p:inputNumber value="#{percepcion.importeExcento}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," readonly="#{nominaBean.nomina.id ne null}">
 									<p:ajax process="@this" update="formNomina:tv-nomina" event="change" listener="#{nominaBean.actualizar()}"/>
 								</p:inputNumber>
 							</p:column>
 							<p:column headerText="Importe gravado" width="10rem">
-								<p:inputNumber value="#{percepcion.importeGravado}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," readonly="#{not empty nominaBean.nomina.id}">
+								<p:inputNumber value="#{percepcion.importeGravado}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," readonly="#{nominaBean.nomina.id ne null}">
 									<p:ajax process="@this" update="formNomina:tv-nomina" event="change" listener="#{nominaBean.actualizar()}"/>
 								</p:inputNumber>
 							</p:column>
@@ -330,7 +330,7 @@
 								<p:outputLabel value="#{otroPago.nombre}" />
 							</p:column>
 							<p:column headerText="Importe" width="10rem">
-								<p:inputNumber value="#{otroPago.importe}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," readonly="#{not empty nominaBean.nomina.id}">
+								<p:inputNumber value="#{otroPago.importe}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," readonly="#{nominaBean.nomina.id ne null}">
 									<p:ajax process="@this" update="formNomina:tv-nomina" event="blur" listener="#{nominaBean.actualizar()}"/>
 								</p:inputNumber>
 							</p:column>
@@ -355,7 +355,7 @@
 								<p:outputLabel value="#{deduccion.nombre}"/>
 							</p:column>
 							<p:column headerText="Importe" width="10rem">
-								<p:inputNumber value="#{deduccion.importe}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," readonly="#{not empty nominaBean.nomina.id}">
+								<p:inputNumber value="#{deduccion.importe}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," readonly="#{nominaBean.nomina.id ne null}">
 									<p:ajax process="@this" update="formNomina:tv-nomina" event="blur" listener="#{nominaBean.actualizar()}"/>
 								</p:inputNumber>
 							</p:column>
