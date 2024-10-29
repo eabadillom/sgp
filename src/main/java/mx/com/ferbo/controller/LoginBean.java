@@ -2,6 +2,7 @@ package mx.com.ferbo.controller;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -23,13 +24,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.DetBiometricoDAO;
-import mx.com.ferbo.dao.EmpleadoDAO;
-import mx.com.ferbo.dao.RegistroDAO;
-import mx.com.ferbo.dto.CatEstatusRegistroDTO;
-import mx.com.ferbo.dto.DetBiometricoDTO;
-import mx.com.ferbo.dto.DetEmpleadoDTO;
-import mx.com.ferbo.dto.DetRegistroDTO;
+import mx.com.ferbo.dao.n.BiometricoDAO;
+import mx.com.ferbo.dao.n.EmpleadoDAO;
+import mx.com.ferbo.dao.n.RegistroDAO;
+import mx.com.ferbo.model.CatEstatusRegistro;
+import mx.com.ferbo.model.DetBiometrico;
+import mx.com.ferbo.model.DetEmpleado;
+import mx.com.ferbo.model.DetRegistro;
 import mx.com.ferbo.util.SGPException;
 
 @Named(value = "loginBean")
@@ -39,18 +40,18 @@ public class LoginBean implements Serializable {
     private static final long serialVersionUID = 1L;
     private static Logger log = LogManager.getLogger(LoginBean.class);
 
-    private DetEmpleadoDTO empleadoSelected;
-    private DetEmpleadoDTO detEmpleadoDTO;
-    private List<DetEmpleadoDTO> lstEmpleados;
+    private DetEmpleado empleadoSelected;
+    private DetEmpleado detEmpleadoDTO;
+    private List<DetEmpleado> lstEmpleados;
 
-    private List<DetRegistroDTO> lstregistroEmpleados;
-    private DetRegistroDTO registroEmpleado;
+    private List<DetRegistro> lstregistroEmpleados;
+    private DetRegistro registroEmpleado;
 
-    private CatEstatusRegistroDTO catEstatusRegistro;
+    private CatEstatusRegistro catEstatusRegistro;
 
     private String numEmpleado;
     private String idEmpleado;
-    private final String strDiaHoy;
+    private Date strDiaHoy;
     private Integer contador;
     private Date diaHoy;
     private boolean navegacion;
@@ -66,7 +67,7 @@ public class LoginBean implements Serializable {
 
     private final EmpleadoDAO empleadoDAO;
     private final RegistroDAO registroDAO;
-    private final DetBiometricoDAO biometricoDAO;
+    private final BiometricoDAO biometricoDAO;
 
     private LocalDate hoy;
     private DayOfWeek diaSemana;
@@ -74,19 +75,25 @@ public class LoginBean implements Serializable {
     public LoginBean() {
         empleadoDAO = new EmpleadoDAO();
         registroDAO = new RegistroDAO();
-        biometricoDAO = new DetBiometricoDAO();
-        empleadoSelected = new DetEmpleadoDTO();
+        biometricoDAO = new BiometricoDAO();
+        empleadoSelected = new DetEmpleado();
         lstEmpleados = new ArrayList<>();
-        detEmpleadoDTO = new DetEmpleadoDTO();
+        detEmpleadoDTO = new DetEmpleado();
         lstregistroEmpleados = new ArrayList<>();
-        registroEmpleado = new DetRegistroDTO();
-        catEstatusRegistro = new CatEstatusRegistroDTO();
+        registroEmpleado = new DetRegistro();
+        catEstatusRegistro = new CatEstatusRegistro();
         diaHoy = new Date();
         cDiaHoy = Calendar.getInstance(TimeZone.getTimeZone("America/Mexico_City"));
         cDiaSistema = Calendar.getInstance(TimeZone.getTimeZone("America/Mexico_City"));
         sDFormat = new SimpleDateFormat("yyyy-MM-dd");
         sDFormatHMS = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        strDiaHoy = sDFormat.format(diaHoy) + "%";
+        try
+        {
+            strDiaHoy = sDFormat.parse(sDFormat.format(diaHoy));
+        }catch(ParseException ex)
+        {
+            log.info("Error al convertir fechas: {}", ex.getMessage());
+        }
         diaSistema = new Date();
         listadoBiometricos = new ArrayList<>();
 
@@ -109,11 +116,11 @@ public class LoginBean implements Serializable {
      */
     public void login(String numEmpleado) throws IOException {
     	log.info("Entrando a login");
-        empleadoSelected = empleadoDAO.buscarPorNumEmpl(numEmpleado);
+        empleadoSelected = empleadoDAO.buscarPorId(Integer.valueOf(numEmpleado));
 
         if (contador <= 3) {
             if (empleadoSelected != null) {
-                lstregistroEmpleados = registroDAO.buscarPorIdFechaEntrada(empleadoSelected.getIdEmpleado(), strDiaHoy);
+                lstregistroEmpleados = registroDAO.buscarPorIdEmpleadoActivo(empleadoSelected.getIdEmpleado(), strDiaHoy);
                 String registro = (lstregistroEmpleados.isEmpty()) ? "Entrada" : "Salida";
                 cDiaHoy.setTime(diaHoy);
                 diaHoy = cDiaHoy.getTime();
@@ -135,7 +142,7 @@ public class LoginBean implements Serializable {
 
                 switch (registro) {
                     case "Entrada":
-                        registroEmpleado.setDetEmpleadoDTO(empleadoSelected);
+                        registroEmpleado.setIdEmpleado(empleadoSelected);
                         registroEmpleado.setFechaEntrada(new Date());
                         registroEmpleado.setFechaSalida(null);
                         if (result > 0) {
@@ -143,7 +150,7 @@ public class LoginBean implements Serializable {
                         } else {
                             catEstatusRegistro.setIdEstatus(1);
                         }
-                        registroEmpleado.setCatEstatusRegistroDTO(catEstatusRegistro);
+                        registroEmpleado.setIdEstatus(catEstatusRegistro);
                         try {
                             registroDAO.guardar(registroEmpleado);
 
@@ -163,7 +170,7 @@ public class LoginBean implements Serializable {
                     case "Salida":
                         try {
                         registroEmpleado = lstregistroEmpleados.get(lstregistroEmpleados.size() - 1);
-                        registroEmpleado.setDetEmpleadoDTO(lstregistroEmpleados.get(lstregistroEmpleados.size() - 1).getDetEmpleadoDTO());
+                        registroEmpleado.setIdEmpleado(lstregistroEmpleados.get(lstregistroEmpleados.size() - 1).getIdEmpleado());
                         lstregistroEmpleados.get(lstregistroEmpleados.size() - 1);
                         registroEmpleado.setFechaSalida(new Date());
                         registroDAO.actualizar(registroEmpleado);
@@ -183,7 +190,7 @@ public class LoginBean implements Serializable {
                         break;
                 }
             } else {
-                empleadoSelected = new DetEmpleadoDTO();
+                empleadoSelected = new DetEmpleado();
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Advertencia", "Verifique su usuario."));
                 contador++;
             }
@@ -196,7 +203,7 @@ public class LoginBean implements Serializable {
     public void consultaBiometrico(String numEmpleado, boolean byNavegacion) {
     	log.info("Solicitando biometricos...");
         listadoBiometricos.clear();
-        DetBiometricoDTO biometrico = biometricoDAO.consultaBiometricoByNumEmpleado(numEmpleado);
+        DetBiometrico biometrico = biometricoDAO.consultaBiometricoByNumEmpleado(numEmpleado);
         listadoBiometricos.add(biometrico != null ? biometrico.getHuella() : "");
         if (biometrico != null && biometrico.getHuella2() != null) {
             listadoBiometricos.add(biometrico.getHuella2());
@@ -238,19 +245,19 @@ public class LoginBean implements Serializable {
     }
     
     //<editor-fold defaultstate="collapsed" desc="Getters&Setters">
-    public DetEmpleadoDTO getEmpleadoSelected() {
+    public DetEmpleado getEmpleadoSelected() {
         return empleadoSelected;
     }
 
-    public void setEmpleadoSelected(DetEmpleadoDTO empleadoSelected) {
+    public void setEmpleadoSelected(DetEmpleado empleadoSelected) {
         this.empleadoSelected = empleadoSelected;
     }
 
-    public DetEmpleadoDTO getDetEmpleadoDTO() {
+    public DetEmpleado getDetEmpleadoDTO() {
         return detEmpleadoDTO;
     }
 
-    public void setDetEmpleadoDTO(DetEmpleadoDTO detEmpleadoDTO) {
+    public void setDetEmpleadoDTO(DetEmpleado detEmpleadoDTO) {
         this.detEmpleadoDTO = detEmpleadoDTO;
     }
 
@@ -262,11 +269,11 @@ public class LoginBean implements Serializable {
         this.numEmpleado = numEmpleado;
     }
 
-    public List<DetEmpleadoDTO> getLstEmpleados() {
+    public List<DetEmpleado> getLstEmpleados() {
         return lstEmpleados;
     }
 
-    public void setLstEmpleados(List<DetEmpleadoDTO> lstEmpleados) {
+    public void setLstEmpleados(List<DetEmpleado> lstEmpleados) {
         this.lstEmpleados = lstEmpleados;
     }
 
@@ -274,11 +281,11 @@ public class LoginBean implements Serializable {
         return empleadoDAO;
     }
 
-    public CatEstatusRegistroDTO getCatEstatusRegistro() {
+    public CatEstatusRegistro getCatEstatusRegistro() {
         return catEstatusRegistro;
     }
 
-    public void setCatEstatusRegistro(CatEstatusRegistroDTO catEstatusRegistro) {
+    public void setCatEstatusRegistro(CatEstatusRegistro catEstatusRegistro) {
         this.catEstatusRegistro = catEstatusRegistro;
     }
 
@@ -306,19 +313,19 @@ public class LoginBean implements Serializable {
         this.diaHoy = diaHoy;
     }
 
-    public List<DetRegistroDTO> getLstregistroEmpleados() {
+    public List<DetRegistro> getLstregistroEmpleados() {
         return lstregistroEmpleados;
     }
 
-    public void setLstregistroEmpleados(List<DetRegistroDTO> lstregistroEmpleados) {
+    public void setLstregistroEmpleados(List<DetRegistro> lstregistroEmpleados) {
         this.lstregistroEmpleados = lstregistroEmpleados;
     }
 
-    public DetRegistroDTO getRegistroEmpleado() {
+    public DetRegistro getRegistroEmpleado() {
         return registroEmpleado;
     }
 
-    public void setRegistroEmpleado(DetRegistroDTO registroEmpleado) {
+    public void setRegistroEmpleado(DetRegistro registroEmpleado) {
         this.registroEmpleado = registroEmpleado;
     }
 

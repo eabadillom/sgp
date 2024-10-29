@@ -15,8 +15,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.sat.CatTipoIncapacidadDAO;
-import mx.com.ferbo.dto.sat.TipoIncapacidadDTO;
+import mx.com.ferbo.dao.n.sat.TipoIncapacidadDAO;
+import mx.com.ferbo.model.sat.CatTipoIncapacidad;
 import mx.com.ferbo.util.SGPException;
 
 @Named(value = "tipoIncapacidadBean")
@@ -26,28 +26,28 @@ public class TipoIncapacidadBean implements Serializable {
     private static final long serialVersionUID = -3103728579268351267L;
 	private static Logger log = LogManager.getLogger(TipoIncapacidadBean.class);
     
-    private TipoIncapacidadDTO tipoIncapacidadDTO;
-    private List<TipoIncapacidadDTO> listDTO;
+    private CatTipoIncapacidad tipoIncapacidad;
+    private List<CatTipoIncapacidad> listTipoIncapacidad;
 
-    private CatTipoIncapacidadDAO catTipoIncapacidadDAO;
+    private TipoIncapacidadDAO tipoIncapacidadDAO;
 
     private boolean guardar;
     private boolean primaryEdit;
 
     public TipoIncapacidadBean(){
 
-        listDTO = new ArrayList<>();
-        catTipoIncapacidadDAO = new CatTipoIncapacidadDAO();
+        listTipoIncapacidad = new ArrayList<>();
+        tipoIncapacidadDAO = new TipoIncapacidadDAO();
 
     }
 
     @PostConstruct
     public void init(){
-        listDTO = catTipoIncapacidadDAO.buscarTodos();
+        listTipoIncapacidad = tipoIncapacidadDAO.buscarTodos();
     }
 
     public void nuevo(){
-        tipoIncapacidadDTO = new TipoIncapacidadDTO();
+        tipoIncapacidad = new CatTipoIncapacidad();
         guardar = true;
         primaryEdit = false;
     }
@@ -69,14 +69,14 @@ public class TipoIncapacidadBean implements Serializable {
 
             if(guardar){
 
-                catTipoIncapacidadDAO.guardar(tipoIncapacidadDTO);
+                tipoIncapacidadDAO.guardar(tipoIncapacidad);
 
                 mensaje = "Exito al guardar el registro";
                 severity = FacesMessage.SEVERITY_INFO;
 
             }else{
                 
-                catTipoIncapacidadDAO.actualizar(tipoIncapacidadDTO);
+                tipoIncapacidadDAO.actualizar(tipoIncapacidad);
 
                 titulo = "Registro actualizado";
                 mensaje = "Exito al actualizar el registro";
@@ -84,7 +84,7 @@ public class TipoIncapacidadBean implements Serializable {
 
             }
 
-            listDTO = catTipoIncapacidadDAO.buscarTodos();
+            listTipoIncapacidad = tipoIncapacidadDAO.buscarTodos();
 
             PrimeFaces.current().executeScript("PF('dlgTipoInca').hide();");
 
@@ -107,26 +107,26 @@ public class TipoIncapacidadBean implements Serializable {
 
             message = new FacesMessage(severity, titulo, mensaje);
             FacesContext.getCurrentInstance().addMessage(null, message);
-            PrimeFaces.current().ajax().update("form:messages","form:dt-tipoIncapacidad");
+            PrimeFaces.current().ajax().update("form:messages","form:dt-tipoInca");
 
         }
 
     }
 
-    public TipoIncapacidadDTO getTipoIncapacidadDTO() {
-        return tipoIncapacidadDTO;
+    public CatTipoIncapacidad getTipoIncapacidad() {
+        return tipoIncapacidad;
     }
 
-    public void setTipoIncapacidadDTO(TipoIncapacidadDTO tipoIncapacidadDTO) {
-        this.tipoIncapacidadDTO = tipoIncapacidadDTO;
+    public void setTipoIncapacidad(CatTipoIncapacidad tipoIncapacidad) {
+        this.tipoIncapacidad = tipoIncapacidad;
     }
 
-    public List<TipoIncapacidadDTO> getListDTO() {
-        return listDTO;
+    public List<CatTipoIncapacidad> getListTipoIncapacidad() {
+        return listTipoIncapacidad;
     }
 
-    public void setListDTO(List<TipoIncapacidadDTO> listDTO) {
-        this.listDTO = listDTO;
+    public void setLisTipoIncapacidad(List<CatTipoIncapacidad> listTipoIncapacidad) {
+        this.listTipoIncapacidad = listTipoIncapacidad;
     }
 
     public boolean isPrimaryEdit() {
@@ -136,7 +136,5 @@ public class TipoIncapacidadBean implements Serializable {
     public void setPrimaryEdit(boolean primaryEdit) {
         this.primaryEdit = primaryEdit;
     }
-
-
-
+    
 }

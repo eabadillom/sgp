@@ -15,8 +15,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.sat.CatTipoPercepcionDAO;
-import mx.com.ferbo.dto.sat.TipoPercepcionDTO;
+import mx.com.ferbo.dao.n.sat.TipoPercepcionDAO;
+import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.util.SGPException;
 
 @Named(value = "tipoPercepcionBean")
@@ -26,26 +26,26 @@ public class TipoPercepcionBean implements Serializable{
     private static final long  serialVersionUID = -3103728579268351267L;
     private static Logger log = LogManager.getLogger(TipoPercepcionBean.class);
     
-    private TipoPercepcionDTO tipoPercepcionDTO;
-    private List<TipoPercepcionDTO> listDto;
+    private CatTipoPercepcion tipoPercepcion;
+    private List<CatTipoPercepcion> listTipoPercepcion;
 
-    private CatTipoPercepcionDAO catTipoPercepcionDAO;
+    private TipoPercepcionDAO tipoPercepcionDAO;
 
     private boolean guardar;
     private boolean primaryEdit;
 
     public TipoPercepcionBean(){
-        listDto = new ArrayList<>();
-        catTipoPercepcionDAO = new CatTipoPercepcionDAO();
+        listTipoPercepcion = new ArrayList<>();
+        tipoPercepcionDAO = new TipoPercepcionDAO();
     }
 
     @PostConstruct
     public void init(){
-        listDto = catTipoPercepcionDAO.buscarTodos();
+        listTipoPercepcion = tipoPercepcionDAO.buscarTodos();
     }
 
     public void nuevo(){
-        tipoPercepcionDTO = new TipoPercepcionDTO();
+        tipoPercepcion = new CatTipoPercepcion();
         guardar = true;
         primaryEdit = false;
     }
@@ -65,14 +65,14 @@ public class TipoPercepcionBean implements Serializable{
         try {
 
             if(guardar){
-                catTipoPercepcionDAO.guardar(tipoPercepcionDTO);   
+                tipoPercepcionDAO.guardar(tipoPercepcion);   
                 
                 mensaje = "Éxito al guardar registro";
                 severity = FacesMessage.SEVERITY_INFO;
                 
             }else{
 
-                catTipoPercepcionDAO.actualizar(tipoPercepcionDTO);
+                tipoPercepcionDAO.actualizar(tipoPercepcion);
 
                 mensaje = "Éxito al guardar registro";
                 severity = FacesMessage.SEVERITY_INFO;
@@ -80,7 +80,7 @@ public class TipoPercepcionBean implements Serializable{
 
             }
 
-            listDto = catTipoPercepcionDAO.buscarTodos();
+            listTipoPercepcion = tipoPercepcionDAO.buscarTodos();
 
             PrimeFaces.current().executeScript("PF('dlgTipoPercepcion').hide();");  
             
@@ -108,20 +108,20 @@ public class TipoPercepcionBean implements Serializable{
 
     }
 
-    public TipoPercepcionDTO getTipoPercepcionDTO() {
-        return tipoPercepcionDTO;
+    public CatTipoPercepcion getTipoPercepcion() {
+        return tipoPercepcion;
     }
 
-    public void setTipoPercepcionDTO(TipoPercepcionDTO tipoPercepcionDTO) {
-        this.tipoPercepcionDTO = tipoPercepcionDTO;
+    public void setTipoPercepcion(CatTipoPercepcion tipoPercepcion) {
+        this.tipoPercepcion = tipoPercepcion;
     }
 
-    public List<TipoPercepcionDTO> getListDto() {
-        return listDto;
+    public List<CatTipoPercepcion> getListTipoPercepcion() {
+        return listTipoPercepcion;
     }
 
-    public void setListDto(List<TipoPercepcionDTO> listDto) {
-        this.listDto = listDto;
+    public void setListDto(List<CatTipoPercepcion> listTipoPercepcion) {
+        this.listTipoPercepcion = listTipoPercepcion;
     }
 
     public boolean isPrimaryEdit() {
@@ -131,8 +131,5 @@ public class TipoPercepcionBean implements Serializable{
     public void setPrimaryEdit(boolean primaryEdit) {
         this.primaryEdit = primaryEdit;
     }
-
     
-
-
 }
