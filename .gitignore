@@ -26,6 +26,7 @@ replay_pid*
 # Eclipse files
 .classpath
 .project
+.metadata/
 
 #Visual studio code files
 .vscode/

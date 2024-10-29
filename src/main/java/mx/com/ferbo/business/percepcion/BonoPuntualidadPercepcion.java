@@ -1,20 +1,22 @@
 package mx.com.ferbo.business.percepcion;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.dao.n.TipoPercepcionDAO;
+import mx.com.ferbo.business.deduccion.AbstractPercepcion;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.DetNominaPercepcionPK;
+import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.DetRegistro;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.util.SGPException;
 
-public class BonoPuntualidadPercepcion implements IPercepcion {
+public class BonoPuntualidadPercepcion extends AbstractPercepcion implements IPercepcion {
 	
 	private static Logger log = LogManager.getLogger(BonoPuntualidadPercepcion.class);
 	
@@ -25,18 +27,16 @@ public class BonoPuntualidadPercepcion implements IPercepcion {
 	private BigDecimal proporcionalSeptimoDia = null;
 	private Map<String, DetRegistro> mapAsistencias = null;
 	
-	private TipoPercepcionDAO tipoPercepcionDAO = null;
-	
-	public BonoPuntualidadPercepcion(BigDecimal tasaBono, BigDecimal diasTrabajados, 
+	public BonoPuntualidadPercepcion(List<CatTipoPercepcion> tiposPercepcion, BigDecimal tasaBono, BigDecimal diasTrabajados, 
 			Map<String, DetRegistro> mapAsistencias, int diasPorPeriodo,
 			BigDecimal salarioDiarioIntegrado, BigDecimal proporcionalSeptimoDia) {
+		this.tiposPercepcion = tiposPercepcion;
 		this.mapAsistencias = mapAsistencias;
 		this.tasaBono = tasaBono;
 		this.diasTrabajados = diasTrabajados;
 		this.diasPorPeriodo = diasPorPeriodo;
 		this.salarioDiarioIntegrado = salarioDiarioIntegrado;
 		this.proporcionalSeptimoDia = proporcionalSeptimoDia;
-		
 	}
 
 	@Override
@@ -46,11 +46,10 @@ public class BonoPuntualidadPercepcion implements IPercepcion {
     	BigDecimal diasPeriodo = null;
     	
     	CatTipoPercepcion tpBonoPuntualidad = null;
+    	DetPercepcionEmpleado percepcionEmpleado = null;
     	
     	try {
-    		if(this.tipoPercepcionDAO == null)
-    			this.tipoPercepcionDAO = new TipoPercepcionDAO();
-    		tpBonoPuntualidad = tipoPercepcionDAO.buscarPorId("010");
+    		tpBonoPuntualidad = this.getTipoPercepcion(P_BONO_PUNTUALIDAD);
     		
     		//TODO VALIDAR PRIMERO SI NO HAY RETARDOS.
     		//En caso de existir retardos en el periodo de calculo, el bono de puntualidad es CERO.
@@ -67,52 +66,50 @@ public class BonoPuntualidadPercepcion implements IPercepcion {
     		
     		bono = salarioDiarioIntegrado.multiply(this.tasaBono).setScale(2, BigDecimal.ROUND_HALF_UP);
     		bono = bono.multiply(diasPeriodo).setScale(2, BigDecimal.ROUND_HALF_UP);
+    		
+    		percepcionEmpleado = this.buscaPercepcionEmpleado(P_BONO_PUNTUALIDAD);
+    		
+    		if(    (percepcionEmpleado != null) 
+				&& (percepcionEmpleado.getImporteMaximo() != null)
+				&& (bono.compareTo(percepcionEmpleado.getImporteMaximo()) > 0) ) {
+    			
+    			bono = percepcionEmpleado.getImporteMaximo();
+    		}
+    		
     	} catch(Exception ex) {
+    		log.warn("No es posible calcular el bono de puntualidad: {}", ex.getMessage());
     		bono = BigDecimal.ZERO;
     	} finally {
     		percepcion = new DetNominaPercepcion();
     		percepcion.setKey(new DetNominaPercepcionPK(nomina, index));
-    		percepcion.setClave("015");
+    		percepcion.setClave(P_BONO_PUNTUALIDAD);
     		percepcion.setNombre("Bono puntualidad");
     		percepcion.setTipoPercepcion(tpBonoPuntualidad);
     		percepcion.setImporteGravado(bono);
     		percepcion.setImporteExcento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
     		percepcion.setClave("FRB-" + tpBonoPuntualidad.getClave());
+    		
+    		this.tiposPercepcion = null;
+    		this.percepcionesEmpleado = null;
+    		this.mapAsistencias = null;
+    		this.tasaBono = null;
+    		this.diasTrabajados = null;
+    		this.salarioDiarioIntegrado = null;
+    		this.proporcionalSeptimoDia = null;
     	}
     	
 		return percepcion;
-	}
-
-	public int getDiasPorPeriodo() {
-		return diasPorPeriodo;
 	}
 
 	public void setDiasPorPeriodo(int diasPorPeriodo) {
 		this.diasPorPeriodo = diasPorPeriodo;
 	}
 
-	public BigDecimal getSalarioDiarioIntegrado() {
-		return salarioDiarioIntegrado;
-	}
-
 	public void setSalarioDiarioIntegrado(BigDecimal salarioDiarioIntegrado) {
 		this.salarioDiarioIntegrado = salarioDiarioIntegrado;
-	}
-
-	public BigDecimal getProporcionalSeptimoDia() {
-		return proporcionalSeptimoDia;
 	}
 
 	public void setProporcionalSeptimoDia(BigDecimal proporcionalSeptimoDia) {
 		this.proporcionalSeptimoDia = proporcionalSeptimoDia;
 	}
-
-	public TipoPercepcionDAO getTipoPercepcionDAO() {
-		return tipoPercepcionDAO;
-	}
-
-	public void setTipoPercepcionDAO(TipoPercepcionDAO tipoPercepcionDAO) {
-		this.tipoPercepcionDAO = tipoPercepcionDAO;
-	}
-
 }

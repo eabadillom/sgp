@@ -17,7 +17,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.CaptureEvent;
-import org.primefaces.event.TabChangeEvent;
 
 import mx.com.ferbo.dao.n.AreaDAO;
 import mx.com.ferbo.dao.n.BiometricoDAO;
@@ -26,13 +25,17 @@ import mx.com.ferbo.dao.n.EmpleadoFotoDAO;
 import mx.com.ferbo.dao.n.EmpresaDAO;
 import mx.com.ferbo.dao.n.EntidadFederativaDAO;
 import mx.com.ferbo.dao.n.ParametroDAO;
+import mx.com.ferbo.dao.n.PercepcionEmpleadoDAO;
 import mx.com.ferbo.dao.n.PerfilDAO;
 import mx.com.ferbo.dao.n.PeriodicidadPagoDAO;
 import mx.com.ferbo.dao.n.PlantaDAO;
+import mx.com.ferbo.dao.n.PrestamoDAO;
 import mx.com.ferbo.dao.n.PuestoDAO;
 import mx.com.ferbo.dao.n.RiesgoPuestoDAO;
 import mx.com.ferbo.dao.n.TipoContratoDAO;
 import mx.com.ferbo.dao.n.TipoJornadaDAO;
+import mx.com.ferbo.dao.n.TipoPercepcionDAO;
+import mx.com.ferbo.dao.n.TipoPrestamoDAO;
 import mx.com.ferbo.dao.n.TipoRegimenDAO;
 import mx.com.ferbo.model.CatArea;
 import mx.com.ferbo.model.CatEmpresa;
@@ -41,14 +44,18 @@ import mx.com.ferbo.model.CatPerfil;
 import mx.com.ferbo.model.CatPeriodicidadPago;
 import mx.com.ferbo.model.CatPlanta;
 import mx.com.ferbo.model.CatPuesto;
+import mx.com.ferbo.model.CatTipoPrestamo;
 import mx.com.ferbo.model.DetBiometrico;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetEmpleadoFoto;
+import mx.com.ferbo.model.DetPercepcionEmpleado;
+import mx.com.ferbo.model.DetPrestamo;
 import mx.com.ferbo.model.InfDatoEmpresa;
 import mx.com.ferbo.model.sat.CatEntidadFederativa;
 import mx.com.ferbo.model.sat.CatRiesgoPuesto;
 import mx.com.ferbo.model.sat.CatTipoContrato;
 import mx.com.ferbo.model.sat.CatTipoJornada;
+import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.model.sat.CatTipoRegimen;
 import mx.com.ferbo.util.SGPException;
 
@@ -61,12 +68,15 @@ public class RegistroEmpleadosBean implements Serializable {
 
     private EmpresaDAO empresaDAO;
     private EmpleadoFotoDAO empleadoFotoDAO;
+    private PrestamoDAO prestamoDAO;
+    private TipoPrestamoDAO tipoPrestamoDAO;
     private PerfilDAO perfilDAO;
     private PlantaDAO plantaDAO;
     private PuestoDAO puestoDAO;
     private AreaDAO areaDAO;
     private EmpleadoDAO empleadoDAO;
-    
+    private PercepcionEmpleadoDAO percepcionEmpleadoDAO;
+    private List<DetPercepcionEmpleado> percepcionesEmpleado;
     private InfDatoEmpresa datoEmpresa;
     private BiometricoDAO biometricoDAO;
     private List<CatTipoContrato> tiposContrato;
@@ -79,6 +89,7 @@ public class RegistroEmpleadosBean implements Serializable {
     private EntidadFederativaDAO entidadDAO;
     private RiesgoPuestoDAO riesgoDAO;
     private PeriodicidadPagoDAO periodicidadDAO;
+    private TipoPercepcionDAO tipoPercepcionDAO;
 
     private List<DetEmpleado> lstEmpleados;
     private List<DetEmpleado> lstEmpleadosSelected;
@@ -90,12 +101,16 @@ public class RegistroEmpleadosBean implements Serializable {
     private List<CatEntidadFederativa> entidadesFederativas;
     private List<CatRiesgoPuesto> riesgosPuesto;
     private List<CatPeriodicidadPago> periodicidadesPago;
+    private List<CatTipoPercepcion> tiposPercepcion;
+    private List<CatTipoPrestamo> tiposPrestamo;
 
     private DetEmpleado empleadoSelected;
     private DetBiometrico detBiometrico;
     private DetEmpleadoFoto empleadoFoto;
+    private DetPercepcionEmpleado percepcionEmpleado;
     private String biometrico;
     private int numBiometrico;
+    private DetPrestamo prestamo;
     
     private String curp;
     private String rfc;
@@ -103,6 +118,8 @@ public class RegistroEmpleadosBean implements Serializable {
     
     public RegistroEmpleadosBean() {
     	empleadoFotoDAO = new EmpleadoFotoDAO(DetEmpleadoFoto.class);
+    	prestamoDAO = new PrestamoDAO();
+    	percepcionEmpleadoDAO = new PercepcionEmpleadoDAO();
         empresaDAO = new EmpresaDAO(CatEmpresa.class);
         perfilDAO = new PerfilDAO(CatPerfil.class);
         plantaDAO = new PlantaDAO(CatPlanta.class);
@@ -117,6 +134,8 @@ public class RegistroEmpleadosBean implements Serializable {
         entidadDAO = new EntidadFederativaDAO(CatEntidadFederativa.class);
         riesgoDAO = new RiesgoPuestoDAO(CatRiesgoPuesto.class);
         periodicidadDAO = new PeriodicidadPagoDAO(CatPeriodicidadPago.class);
+        tipoPercepcionDAO = new TipoPercepcionDAO();
+        tipoPrestamoDAO = new TipoPrestamoDAO();
         
         empleadoSelected = new DetEmpleado();
         lstEmpleados = new ArrayList<>();
@@ -137,6 +156,8 @@ public class RegistroEmpleadosBean implements Serializable {
             entidadesFederativas = entidadDAO.buscarTodos();
             riesgosPuesto = riesgoDAO.buscarTodos();
             periodicidadesPago = periodicidadDAO.buscarActivos(new Date());
+            tiposPercepcion = tipoPercepcionDAO.buscarTodos();
+            tiposPrestamo = tipoPrestamoDAO.buscarTodos();
             
             consultaEmpleados();
         } catch (Exception ex) {
@@ -180,9 +201,11 @@ public class RegistroEmpleadosBean implements Serializable {
     }
     
     public void editar() {
+    	List<DetPrestamo> prestamos = null;
     	log.info("Cargando información del empleado: {}", this.empleadoSelected);
     	InfDatoEmpresa datoEmpresa = this.empleadoSelected.getDatoEmpresa();
     	this.empleadoFoto = empleadoFotoDAO.buscar(this.empleadoSelected.getNumEmpleado());
+    	
     	if(datoEmpresa == null) {
     		this.datoEmpresa = new InfDatoEmpresa();
     		this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
@@ -193,6 +216,11 @@ public class RegistroEmpleadosBean implements Serializable {
     		this.curp = this.empleadoSelected.getCurp();
     	}
     	
+    	percepcionesEmpleado = percepcionEmpleadoDAO.buscarPorEmpleado(this.empleadoSelected.getIdEmpleado());
+    	prestamos = prestamoDAO.buscar(this.empleadoSelected.getIdEmpleado());
+    	this.empleadoSelected.setPrestamos(prestamos); 
+    	this.prestamo = new DetPrestamo();
+    	
     	log.info("Empleado seleccionado: {}", this.empleadoSelected.getIdEmpleado());
     	if(empleadoFoto != null)
     		log.debug("Foto: {}", empleadoFoto.getFotografia());
@@ -200,17 +228,145 @@ public class RegistroEmpleadosBean implements Serializable {
     	this.detBiometrico = biometricoDAO.consultaBiometricoByIdEmpleado(this.empleadoSelected.getIdEmpleado());
     	
 		log.info("Biometrico: {}", this.detBiometrico);
+		
+		this.nuevaPercepcionEmpleado();
     	
     	PrimeFaces.current().ajax().update("formRegistroEmpleado:panelDialogFoto");
     }
     
-    public void tabChange(TabChangeEvent event) {
-    	log.info("Detalle biometrico: {}", this.detBiometrico);
-    	FacesMessage msg = new FacesMessage("Información...", event.getTab().getTitle());
-        FacesContext.getCurrentInstance().addMessage(null, msg);
-        PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogEmpleado:previewFotografia");
+    public void nuevaPercepcionEmpleado() {
+    	this.percepcionEmpleado = new DetPercepcionEmpleado();
+		this.percepcionEmpleado.setEmpleado(this.empleadoSelected);
+		this.percepcionEmpleado.setActivo(true);
     }
-
+    
+    public void agregarPercepcionEmpleado() {
+    	log.info("Agregando percepcion del empleado...");
+    	if(this.percepcionesEmpleado == null)
+    		this.percepcionesEmpleado = new ArrayList<>();
+    	
+    	this.percepcionEmpleado.setEmpleado(this.empleadoSelected);
+    	this.percepcionesEmpleado.add(percepcionEmpleado);
+    	this.nuevaPercepcionEmpleado();
+    }
+    
+    public void eliminarPercepcionEmpleado() {
+    	FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Percepción del empleado";
+		
+		try {
+			if(this.percepcionEmpleado == null)
+				throw new SGPException("Debe indicar una percepción");
+			
+			this.percepcionesEmpleado.remove(this.percepcionEmpleado);
+			this.percepcionEmpleado = new DetPercepcionEmpleado();
+			
+			mensaje = "Percepción eliminada correctamente.";
+    		severity = FacesMessage.SEVERITY_INFO;
+		} catch(SGPException ex) {
+    		mensaje = ex.getMessage();
+    		severity = FacesMessage.SEVERITY_WARN;
+    	} catch(Exception ex) {
+    		log.error("Problema para guardar información del empleado...", ex);
+    		mensaje = "Problema para guardar al empleado.";
+    		severity = FacesMessage.SEVERITY_ERROR;
+    	} finally {
+    		message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+	        PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogEmpleado:dt-percepcion-empleado");
+    	}
+    }
+    
+    public void agregarPrestamo() {
+    	FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Préstamo";
+		
+		try {
+			if(this.prestamo == null)
+				throw new SGPException("Debe indicar un préstamo");
+			
+			if(this.prestamo.getTipoPrestamo() == null)
+				throw new SGPException("Debe indicar el tipo de préstamo");
+			
+			if(this.prestamo.getFechaInicio() == null)
+				throw new SGPException("Debe indicar la fecha de inicio del préstamo.");
+			
+			if(this.prestamo.getFechaFin() == null)
+				throw new SGPException("Debe indicar la fecha de fin del préstamo.");
+			
+			if(this.prestamo.getAcumulado() == null)
+				throw new SGPException("Debe indicar el acumulado del préstamo.");
+			
+			if(this.prestamo.getImporte() == null)
+				throw new SGPException("Debe indicar el importe del préstamo.");
+			
+			if(this.prestamo.getTotal() == null)
+				throw new SGPException("Debe indicar el total del préstamo.");
+			
+			if(this.prestamo.getPeriodicidadPago() == null)
+				throw new SGPException("Debe indicar la periodicidad de pago.");
+			
+			if(this.empleadoSelected.getPrestamos() == null)
+				this.empleadoSelected.setPrestamos(new ArrayList<>());
+			
+			prestamo.setEmpleado(this.empleadoSelected);
+			
+			this.empleadoSelected.getPrestamos().add(prestamo);
+			
+			prestamo = new DetPrestamo();
+			PrimeFaces.current().executeScript("PF('dgPrestamo').hide()");
+			
+			mensaje = "Préstamo agregado correctamente.";
+    		severity = FacesMessage.SEVERITY_INFO;
+		} catch(SGPException ex) {
+    		mensaje = ex.getMessage();
+    		severity = FacesMessage.SEVERITY_WARN;
+    	} catch(Exception ex) {
+    		log.error("Problema para guardar información del empleado...", ex);
+    		mensaje = "Problema para guardar al empleado.";
+    		severity = FacesMessage.SEVERITY_ERROR;
+    	} finally {
+    		message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+	        PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogEmpleado:dt-prestamos");
+    	}
+    }
+    
+    public void eliminarPrestamo(DetPrestamo prestamo) {
+    	FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Préstamo";
+		
+		try {
+			if(this.prestamo == null)
+				throw new SGPException("Debe indicar un préstamo");
+			
+			this.empleadoSelected.getPrestamos().remove(this.prestamo);
+			
+			prestamo = new DetPrestamo();
+			PrimeFaces.current().executeScript("PF('dgPrestamo').hide()");
+			
+			mensaje = "Préstamo eliminado correctamente.";
+    		severity = FacesMessage.SEVERITY_INFO;
+		} catch(SGPException ex) {
+    		mensaje = ex.getMessage();
+    		severity = FacesMessage.SEVERITY_WARN;
+    	} catch(Exception ex) {
+    		log.error("Problema para guardar información del empleado...", ex);
+    		mensaje = "Problema para guardar al empleado.";
+    		severity = FacesMessage.SEVERITY_ERROR;
+    	} finally {
+    		message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+	        PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogEmpleado:dt-prestamos");
+    	}
+    }
+    
     /*
      * Método para guardar empleado
      */
@@ -223,6 +379,7 @@ public class RegistroEmpleadosBean implements Serializable {
 		String sNumeroEmpleado = null;
 		int numeroEmpleado = -1;
     	try {
+    		this.empleadoSelected.setPercepcionesEmpleado(this.percepcionesEmpleado);
     		
     		if (this.empleadoSelected.getIdEmpleado() == null) {
     			
@@ -243,23 +400,16 @@ public class RegistroEmpleadosBean implements Serializable {
     		}
     		
     		if (biometrico != null) {
-                try {
-                    detBiometrico.setIdEmpleado(empleadoSelected);
-                    if (detBiometrico.getIdBiometrico() == null) {
-                        biometricoDAO.guardar(detBiometrico);
-                    } else {
-                        biometricoDAO.actualizar(detBiometrico);
-                    }
-                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Biométrico registrado"));
-                } catch (SGPException ex) {
-                    FacesContext.getCurrentInstance()
-                            .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Error al registrar biométrico"));
-                    log.warn("EX-0015: " + ex.getMessage() + ". Error al guardar la huella del empleado " + empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
-                }
+    			detBiometrico.setIdEmpleado(empleadoSelected);
+    			if (detBiometrico.getIdBiometrico() == null) {
+    				biometricoDAO.guardar(detBiometrico);
+    			} else {
+    				biometricoDAO.actualizar(detBiometrico);
+    			}
                 biometrico = null;
             }
-    		
     		detBiometrico = new DetBiometrico();
+    		
 	        consultaEmpleados();
 	        PrimeFaces.current().executeScript("PF('dialogEmpleado').hide()");
     		 
@@ -269,6 +419,7 @@ public class RegistroEmpleadosBean implements Serializable {
     		mensaje = ex.getMessage();
     		severity = FacesMessage.SEVERITY_WARN;
     	} catch(Exception ex) {
+    		log.error("Problema para guardar información del empleado...", ex);
     		mensaje = "Problema para guardar al empleado.";
     		severity = FacesMessage.SEVERITY_ERROR;
     	} finally {
@@ -310,7 +461,9 @@ public class RegistroEmpleadosBean implements Serializable {
      */
     public void eliminaEmpleado() {
         try {
-            empleadoDAO.eliminar(empleadoSelected);
+        	this.empleadoSelected.setActivo((short)0);
+        	this.empleadoSelected.setFechaModificacion(new Date());
+        	empleadoDAO.actualizar(empleadoSelected);
             consultaEmpleados();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Empleado Eliminado"));
         } catch (SGPException ex) {
@@ -356,7 +509,6 @@ public class RegistroEmpleadosBean implements Serializable {
         }
         PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogBiometrico");
     }
-    //<editor-fold defaultstate="collapsed" desc="Getters&Setters">
 
     public List<CatEmpresa> getLstCatEmpresa() {
         return lstCatEmpresa;
@@ -533,6 +685,44 @@ public class RegistroEmpleadosBean implements Serializable {
 	public void setPeriodicidadesPago(List<CatPeriodicidadPago> periodicidadesPago) {
 		this.periodicidadesPago = periodicidadesPago;
 	}
-    
-//</editor-fold> 
+
+	public List<DetPercepcionEmpleado> getPercepcionesEmpleado() {
+		return percepcionesEmpleado;
+	}
+
+	public void setPercepcionesEmpleado(List<DetPercepcionEmpleado> percepcionesEmpleado) {
+		this.percepcionesEmpleado = percepcionesEmpleado;
+	}
+
+	public List<CatTipoPercepcion> getTiposPercepcion() {
+		return tiposPercepcion;
+	}
+
+	public void setTiposPercepcion(List<CatTipoPercepcion> tiposPercepcion) {
+		this.tiposPercepcion = tiposPercepcion;
+	}
+
+	public DetPercepcionEmpleado getPercepcionEmpleado() {
+		return percepcionEmpleado;
+	}
+
+	public void setPercepcionEmpleado(DetPercepcionEmpleado percepcionEmpleado) {
+		this.percepcionEmpleado = percepcionEmpleado;
+	}
+
+	public List<CatTipoPrestamo> getTiposPrestamo() {
+		return tiposPrestamo;
+	}
+
+	public void setTiposPrestamo(List<CatTipoPrestamo> tiposPrestamo) {
+		this.tiposPrestamo = tiposPrestamo;
+	}
+
+	public DetPrestamo getPrestamo() {
+		return prestamo;
+	}
+
+	public void setPrestamo(DetPrestamo prestamo) {
+		this.prestamo = prestamo;
+	}
 }

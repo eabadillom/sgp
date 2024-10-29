@@ -6,14 +6,14 @@ import java.util.Date;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.dao.n.CuotaIMSSDAO;
 import mx.com.ferbo.model.CatCuotaIMSS;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
 import mx.com.ferbo.model.DetNominaDeduccionPK;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
+import mx.com.ferbo.util.SGPException;
 
-public class IMSSGastosMedicosPensionadosBeneficiariosDeduccion extends AbstractDeduccion implements IDeduccion {
+public class IMSSGastosMedicosPensionadosBeneficiariosDeduccion extends AbstractIMSSDeduccion implements IDeduccion {
 	
 	private static Logger log = LogManager.getLogger(IMSSGastosMedicosPensionadosBeneficiariosDeduccion.class);
 	
@@ -21,7 +21,6 @@ public class IMSSGastosMedicosPensionadosBeneficiariosDeduccion extends Abstract
 	private Date fechaFinAnio = null;
 	private BigDecimal totalDiasPeriodo = null;
 	private BigDecimal sdi = null;
-	private CuotaIMSSDAO tarifaIMSSDAO = null;
 	
 	public IMSSGastosMedicosPensionadosBeneficiariosDeduccion(Date fechaInicioAnio, Date fechaFinAnio, BigDecimal totalDiasPeriodo, BigDecimal sdi) {
 		this.fechaInicioAnio = fechaInicioAnio;
@@ -38,15 +37,25 @@ public class IMSSGastosMedicosPensionadosBeneficiariosDeduccion extends Abstract
 		CatTipoDeduccion tdIMSS = null;
 		
 		try {
-			if(this.tarifaIMSSDAO == null)
-				this.tarifaIMSSDAO = new CuotaIMSSDAO();
+			if(this.cuotasIMSS == null)
+				throw new SGPException("No se establecio la lista de cuotas del IMSS.");
+			
+			if(this.cuotasIMSS.size() <= 0)
+				throw new SGPException("No se establecio la lista de cuotas del IMSS.");
+			
+			if(this.tiposDeduccion == null)
+				throw new SGPException("No se establecio la lista de tipos de deduccion.");
+			
+			if(this.tiposDeduccion.size() <= 0)
+				throw new SGPException("No se establecio la lista de tipos de deduccion.");
 			
 			tdIMSS = this.getTipoDeduccion("001");
 						
-			tarifaIMSS = this.tarifaIMSSDAO.buscarPor("O", "EM2", this.fechaInicioAnio, this.fechaFinAnio, this.sdi); 
+			tarifaIMSS = this.getCuotaIMSS("O", "EM2", this.fechaInicioAnio, this.fechaFinAnio, this.sdi);
 			cuota = this.sdi
 					.multiply(tarifaIMSS.getCuota()).setScale(2, BigDecimal.ROUND_HALF_UP)
 					.multiply(totalDiasPeriodo.setScale(2, BigDecimal.ROUND_HALF_UP))
+					.setScale(2, BigDecimal.ROUND_HALF_UP)
 					;
 			
 		} catch(Exception ex) {
@@ -63,9 +72,5 @@ public class IMSSGastosMedicosPensionadosBeneficiariosDeduccion extends Abstract
 		}
 		
 		return deduccion;
-	}
-
-	public void setTarifaIMSSDAO(CuotaIMSSDAO tarifaIMSSDAO) {
-		this.tarifaIMSSDAO = tarifaIMSSDAO;
 	}
 }

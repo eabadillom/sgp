@@ -8,20 +8,20 @@
     <p:dataTable id="dt-uniformes-sol" widgetVar="dtUniformes"
                  var="uniforme" value="#{uniformesBean.lstSolicitudPrendasRealizadas}"
                  reflow="true" styleClass="products-table" rowKey="uniforme.idSolicitud" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
-        <p:column headerText="Prenda" sortBy="#{uniforme.getPrenda().idPrenda}" width="100px">
-            <h:outputText value="#{uniforme.getPrenda().descripcion}" />
+        <p:column headerText="Prenda" sortBy="#{uniforme.idPrenda.idPrenda}" width="100px">
+            <h:outputText value="#{uniforme.idPrenda.descripcion}" />
         </p:column>
         <p:column headerText="Imagen" width="100px">
-            <h:graphicImage name="images/prendas/#{uniforme.getPrenda().descripcion}.jpg" library="recursos" width="57" />
+            <h:graphicImage name="images/prendas/#{uniforme.idPrenda.descripcion}.jpg" library="recursos" width="57" />
         </p:column>
         <p:column headerText="Precio" sortBy="#{uniforme.cantidad}" width="100px">
-            <h:outputText value="Precio Individual: $#{uniforme.getPrenda().precio} / Precio Total: $#{uniforme.getPrenda().precio * uniforme.cantidad}" />
+            <h:outputText value="Precio Individual: $#{uniforme.idPrenda.precio} / Precio Total: $#{uniforme.idPrenda.precio * uniforme.cantidad}" />
         </p:column>
         <p:column headerText="Cantidad" sortBy="#{uniforme.cantidad}" width="100px">
             <h:outputText value="#{uniforme.cantidad}" />
         </p:column>
-        <p:column headerText="Talla" sortBy="#{uniforme.getTalla().idTalla}" width="100px">
-            <h:outputText value="#{uniforme.getTalla().descripcion}" />
+        <p:column headerText="Talla" sortBy="#{uniforme.idTalla.idTalla}" width="100px">
+            <h:outputText value="#{uniforme.idTalla.descripcion}" />
         </p:column>
         <p:column headerText="Fecha" sortBy="#{uniforme.getFechaCap()}" sortOrder="descending" width="100px">
             <h:outputText value="#{uniforme.getFechaCap()}" >
@@ -29,10 +29,40 @@
             </h:outputText>
         </p:column>
         <p:column headerText="Estatus" sortBy="#{uniforme.getAprobada()}" width="100px">
-            <span class="customer-badge status-#{uniforme.aprobada eq null ? 'proposal' : uniforme.aprobada eq  1 ? 'qualified' : 'unqualified'}" style="display: block; width: 7rem">
-                #{solicitud.aprobada eq null ? 'ENVIADA' : uniforme.aprobada eq  1 ? 'APROBADA' : 'RECHAZADA'}</span>
+            <span class="customer-badge status-#{uniformesBean.status.getStatusClass(uniforme.aprobada) }" style="display: block; width: 7rem">
+                #{uniformesBean.status.getStatusText(uniforme.aprobada)}
+            </span>
+        </p:column>
+        <p:column width="100px">
+            <p:commandButton styleClass="rounded-button ui-button-warning" process="@this" icon="pi pi-bars"
+                             oncomplete="PF('dialogCambiarEstatus').show()" >
+                <f:setPropertyActionListener value="#{uniforme}" target="#{uniformesBean.solicitud}" />
+            </p:commandButton>
         </p:column>
     </p:dataTable>
-
+    <p:dialog header="Detalle Estatus" id="dialogCambiarEstatus" showEffect="fade" modal="true" draggable="false" resizable="false"
+        widgetVar="dialogCambiarEstatus" responsive="true" dynamic="true" cache="false" closable="false" 
+        closeOnEscape="false" styleClass="ferbo-dialog-complemento-prenda">
+        <p:outputPanel id="pnlCancelar" rendered="#{not empty uniformesBean.solicitud}">
+            <div class="formgrid grid">
+                <div class="field col">
+                    <p:outputLabel id="soPrenda" value="#{uniformesBean.solicitud.idPrenda.descripcion}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
+                </div>
+            </div>
+            <div class="formgrid grid">
+                <div class="field col">
+                    <h:graphicImage id="imgPrenda" name="images/prendas/#{uniformesBean.solicitud.idPrenda.descripcion}.jpg" library="recursos" width="113" rendered="#{uniformesBean.solicitud.idPrenda.descripcion ne null}" styleClass="product-image"/>
+                </div>
+            </div>
+        </p:outputPanel>
+        <f:facet name="footer">
+            <p:commandButton value="Cancelar" icon="pi pi-check" actionListener="#{uniformesBean.actualizarRegistro()}"
+                             update="formActividadesUniformes:tabView:dt-uniformes-sol" process="pnlCancelar @this"
+                             class="ui-button-warning" >
+            </p:commandButton>
+            <p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dialogCambiarEstatus').hide()"
+                class="ui-button-secondary" type="button" />
+        </f:facet>
+    </p:dialog>
 
 </ui:composition>

@@ -49,7 +49,7 @@
 
                     <p:column headerText="">
                         <p:commandButton icon="pi pi-bars" actionListener="#{origRecursoBean.editar()}" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dlgOrigenRecursos').show();" process="@this dt-origRecurso" update="form:dlg-OrigenRecursos">
-                            <f:setPropertyActionListener value="#{origRecurso}" target="#{origRecursoBean.origRecursoDTO}" ></f:setPropertyActionListener>
+                            <f:setPropertyActionListener value="#{origRecurso}" target="#{origRecursoBean.origRecurso}" ></f:setPropertyActionListener>
                         </p:commandButton>
                     </p:column>                        
 
@@ -60,22 +60,22 @@
             <p:outputPanel class="ui-fluid" >
                 <div class="p-field">
                     <p:outputLabel>Clave</p:outputLabel>
-                    <p:inputText value="#{origRecursoBean.origRecursoDTO.clave}" readonly="#{origRecursoBean.primaryEdit}" required="true" requiredMessage="El campo clave es obligatorio"></p:inputText>
+                    <p:inputText value="#{origRecursoBean.origRecurso.clave}" readonly="#{origRecursoBean.primaryEdit}" required="true" requiredMessage="El campo clave es obligatorio"></p:inputText>
                 </div>
 
                 <div class="p-field">
                     <p:outputLabel>Descripción</p:outputLabel>
-                    <p:inputText value="#{origRecursoBean.origRecursoDTO.descripcion}" required="true" requiredMessage="El campo descripcion es obligatorio"></p:inputText>
+                    <p:inputText value="#{origRecursoBean.origRecurso.descripcion}" required="true" requiredMessage="El campo descripcion es obligatorio"></p:inputText>
                 </div>
 
                 <div class="p-field">
                     <p:outputLabel>Vigencia Inicio</p:outputLabel>
-                    <p:datePicker value="#{origRecursoBean.origRecursoDTO.vigenciaInicio}" showIcon="true" monthNavigator="true" yearNavigator="true" required="true" requiredMessage="El campo fecha inicio es obligatorio" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"></p:datePicker>
+                    <p:datePicker value="#{origRecursoBean.origRecurso.vigenciaInicio}" showIcon="true" monthNavigator="true" yearNavigator="true" required="true" requiredMessage="El campo fecha inicio es obligatorio" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"></p:datePicker>
                 </div>
 
                 <div class="p-field">
                     <p:outputLabel>Vigencia Fin</p:outputLabel>
-                    <p:datePicker value="#{origRecursoBean.origRecursoDTO.vigenciaFin}" showIcon="true" monthNavigator="true" yearNavigator="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"></p:datePicker>
+                    <p:datePicker value="#{origRecursoBean.origRecurso.vigenciaFin}" showIcon="true" monthNavigator="true" yearNavigator="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"></p:datePicker>
                 </div>
 
             </p:outputPanel>

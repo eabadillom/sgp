@@ -24,8 +24,8 @@ import javax.validation.constraints.Size;
 @Table(name = "cat_talla")
 @NamedQueries({
     @NamedQuery(name = "CatTalla.findAll", query = "SELECT c FROM CatTalla c"),
-    @NamedQuery(name = "CatTalla.findAllActive", query = "SELECT NEW mx.com.ferbo.dto.CatTallaDTO(c.idTalla, c.descripcion, c.activo) FROM CatTalla c WHERE c.activo = 1"),
-    @NamedQuery(name = "CatTalla.findForId", query = "SELECT NEW mx.com.ferbo.dto.CatTallaDTO(c.idTalla, c.descripcion, c.activo) FROM CatTalla c WHERE c.activo = 1 AND c.idTalla = :idTalla")
+    @NamedQuery(name = "CatTalla.findAllActive", query = "SELECT c FROM CatTalla c WHERE c.activo = 1"),
+    @NamedQuery(name = "CatTalla.findForId", query = "SELECT c FROM CatTalla c WHERE c.activo = 1 AND c.idTalla = :idTalla")
 })
 public class CatTalla implements Serializable {
 

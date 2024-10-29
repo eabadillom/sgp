@@ -1,20 +1,21 @@
 package mx.com.ferbo.business.percepcion;
 
 import java.math.BigDecimal;
+import java.util.List;
 
-import mx.com.ferbo.dao.n.TipoPercepcionDAO;
+import mx.com.ferbo.business.deduccion.AbstractPercepcion;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.DetNominaPercepcionPK;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
 
-public class SueldoPercepcion implements IPercepcion {
+public class SueldoPercepcion extends AbstractPercepcion implements IPercepcion {
 	
 	private BigDecimal salarioDiario = null;
 	private BigDecimal diasTrabajados = null;
-	private TipoPercepcionDAO tipoPercepcionDAO = null;
 	
-	public SueldoPercepcion(BigDecimal salarioDiario, BigDecimal diasTrabajados) {
+	public SueldoPercepcion(List<CatTipoPercepcion> tiposPercepcion, BigDecimal salarioDiario, BigDecimal diasTrabajados) {
+		this.tiposPercepcion = tiposPercepcion;
 		this.salarioDiario = salarioDiario;
 		this.diasTrabajados = diasTrabajados;
 	}
@@ -25,10 +26,7 @@ public class SueldoPercepcion implements IPercepcion {
 		BigDecimal salarioSemanal = null;
 		CatTipoPercepcion tpSueldo = null;
 		try {
-			if(tipoPercepcionDAO == null)
-				tipoPercepcionDAO = new TipoPercepcionDAO();
-			
-			tpSueldo = tipoPercepcionDAO.buscarPorId("001");
+			tpSueldo = this.getTipoPercepcion("001");
 			
 			salarioSemanal = this.salarioDiario
 					.multiply(diasTrabajados)
@@ -45,32 +43,20 @@ public class SueldoPercepcion implements IPercepcion {
 			percepcion.setImporteGravado(salarioSemanal);
 			percepcion.setImporteExcento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
 			percepcion.setClave("FRB-" + tpSueldo.getClave());
+			
+			this.tiposPercepcion = null;
+			this.tiposPercepcion = null;
+			this.salarioDiario = null;
+			this.diasTrabajados = null;
 		}
 		return percepcion;
-	}
-
-	public BigDecimal getSalarioDiario() {
-		return salarioDiario;
 	}
 
 	public void setSalarioDiario(BigDecimal salarioDiario) {
 		this.salarioDiario = salarioDiario;
 	}
 	
-	public BigDecimal getDiasTrabajados() {
-		return diasTrabajados;
-	}
-
 	public void setDiasTrabajados(BigDecimal diasTrabajados) {
 		this.diasTrabajados = diasTrabajados;
 	}
-
-	public TipoPercepcionDAO getTipoPercepcionDAO() {
-		return tipoPercepcionDAO;
-	}
-
-	public void setTipoPercepcionDAO(TipoPercepcionDAO tipoPercepcionDAO) {
-		this.tipoPercepcionDAO = tipoPercepcionDAO;
-	}
-
 }

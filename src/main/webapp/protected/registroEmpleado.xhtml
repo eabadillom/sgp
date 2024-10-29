@@ -4,30 +4,10 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/plantillas/template.xhtml">
-	<style>
-	.employee-status {
-		border-radius:2px !important;
-		padding:.25em .5rem !important;
-		text-transform:uppercase !important;
-		font-weight:700 !important;
-		font-size:12px !important;
-		letter-spacing:.3px !important
-	}
-	.status-1 {
-		background:#c8e6c9 !important;
-		color:#256029 !important
-	}
-	.status-0 {
-		background:#ffcdd2;
-		color:#c63737
-	}
-	</style>
     <ui:define name="title">Registro de empleados</ui:define>
-
     <ui:define name="head">
         <h:outputScript library="recursos" name="js/primefaces_locale.js" />
     </ui:define>
-
     <ui:define name="content">
         <h:form id="formRegistroEmpleado">
 			<p:growl id="messages" showDetail="true" life="2500"/>
@@ -43,12 +23,7 @@
                          <p:remoteCommand name="verificaEstado" onstart="PF('bui').hide();" actionListener="#{registroEmpleadosBean.validaHuella()}"/>
                         <p:toolbar styleClass="mb-4">
                             <p:toolbarGroup>
-                                <p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{registroEmpleadosBean.agregarEmpleado()}" update="panelDialogEmpleado" oncomplete="PF('dialogEmpleado').show()" 
-                                                 styleClass="ui-button-success" style="margin-right: .5rem" process="@this"/>
-                                <p:commandButton id="btnEliminarEmp" value="#{registroEmpleadosBean.mensajeBotonEliminar}" icon="pi pi-trash" actionListener="#{registroEmpleadosBean.eliminaEmpleadosSeleccionados()}" 
-                                                 styleClass="ui-button-danger" disabled="#{!registroEmpleadosBean.empleadoSeleccionado}" update="@this">
-                                    <p:confirm header="Confimación" message="Está seguro que desea eliminar los registros seleccionados?" icon="pi pi-exclamation-triangle" />
-                                </p:commandButton>
+                                <p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{registroEmpleadosBean.agregarEmpleado()}" update="panelDialogEmpleado" oncomplete="PF('dialogEmpleado').show()" style="margin-right: .5rem" process="@this"/>
                             </p:toolbarGroup>
                             <p:toolbarGroup align="right">
                                 <p:commandButton value="Descargar" icon="pi pi-download" styleClass="ui-button-secondary" ajax="false">
@@ -60,27 +35,9 @@
                         <p:dataTable id="dtEmpleados" widgetVar="dtEmpleados" var="empleado" value="#{registroEmpleadosBean.lstEmpleados}" reflow="true" styleClass="products-table"
                                      selection="#{registroEmpleadosBean.lstEmpleadosSelected}" rowKey="#{empleado.idEmpleado}" paginator="true" rows="10" rowSelectMode="add" 
                                      paginatorPosition="bottom" lazy="true">
-                            <f:facet name="header">
-                                <div class="customers-table-header">
-                                    <span style="font-weight: bold">Empleados</span>
 
-                                    <span class="ui-input-icon-left filter-container">
-                                        <i class="pi pi-search"/>
-                                        <p:inputText id="globalFilter" onkeyup="PF('dtEmpleados').filter()" placeholder="Buscar"/>
-                                    </span>
-                                </div>
-                            </f:facet>
-
-                            <p:ajax event="rowSelect" update=":formRegistroEmpleado:btnEliminarEmp"/>
-                            <p:ajax event="rowUnselect" update=":formRegistroEmpleado:btnEliminarEmp" />
-                            <p:ajax event="rowSelectCheckbox" update=":formRegistroEmpleado:btnEliminarEmp"/>
-                            <p:ajax event="rowUnselectCheckbox" update=":formRegistroEmpleado:btnEliminarEmp" />
-                            <p:ajax event="toggleSelect" update=":formRegistroEmpleado:btnEliminarEmp" />
-
-                            <p:column selectionMode="multiple" exportable="false"></p:column>
-
-                            <p:column headerText="# Empleado" sortBy="#{empleado.numEmpleado}" filterBy="#{empleado.numEmpleado}">
-                                <h:outputText value="#{empleado.numEmpleado}"/>
+                            <p:column headerText="Número" sortBy="#{empleado.numEmpleado}" filterBy="#{empleado.numEmpleado}" width="4rem">
+                                <h:outputText value="#{empleado.numEmpleado}" styleClass="customer-badge status-#{empleado.activo eq 1 ? 'qualified': 'unqualified'}"/>
                             </p:column>
                             <p:column headerText="Primer Apellido" sortBy="#{empleado.primerAp}" filterBy="#{empleado.primerAp}">
                             	<h:outputText style="vertical-alin: middle; margin-left: .5rem" value="#{empleado.primerAp}" />
@@ -91,27 +48,20 @@
                             <p:column headerText="Nombre" sortBy="#{empleado.nombre}" filterBy="#{empleado.nombre}">
                                 <h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{empleado.nombre}" />
                             </p:column>
-                            <p:column headerText="Activo" styleClass="employee-status status-#{empleado.activo}">
-                            	<h:outputText value="#{empleado.activo}"></h:outputText>
-                            </p:column>
-                            <p:column exportable="false">
-                                <p:commandButton action="#{registroEmpleadosBean.editar}" process="@this" update=":formRegistroEmpleado:panelDialogEmpleado formRegistroEmpleado:panelDialogEmpleado:previewFingerprint1" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dialogEmpleado').show();" icon="pi pi-pencil" styleClass="edit-button rounded-button ui-button-warning m-1">
+                            <p:column width="6rem">
+                                <p:commandButton styleClass="edit-button m-1" action="#{registroEmpleadosBean.editar}" process="@this" update=":formRegistroEmpleado:panelDialogEmpleado formRegistroEmpleado:panelDialogEmpleado:previewFingerprint1" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dialogEmpleado').show();" icon="pi pi-pencil">
                                     <f:setPropertyActionListener value="#{empleado}" target="#{registroEmpleadosBean.empleadoSelected}" />
                                 </p:commandButton>
-                                <p:commandButton class="ui-button-danger rounded-button m-1" icon="pi pi-trash" process="@this" oncomplete="PF('dialogEliminarEmpleado').show()" >
-                                    <f:setPropertyActionListener value="#{empleado}" target="#{registroEmpleadosBean.empleadoSelected}" />
-                                </p:commandButton>
-                                <p:commandButton class="ui-button-success rounded-button m-1" icon="pi pi-search" process="@this" action="#{registroEmpleadosBean.redirectKardex()}">
+                                <p:commandButton class="ui-button-danger m-1" icon="pi pi-trash" process="@this" oncomplete="PF('dialogEliminarEmpleado').show()" >
                                     <f:setPropertyActionListener value="#{empleado}" target="#{registroEmpleadosBean.empleadoSelected}" />
                                 </p:commandButton>
                             </p:column>
                         </p:dataTable>
                         
-                        <p:dialog header="Información del empleado..."
-                        showEffect="fade" modal="true" widgetVar="dialogEmpleado" responsive="true" draggable="true" resizable="false" width="100%" height="90%" position="center center">
-							<p:tabView id="panelDialogEmpleado" title="Información del empleado" class="ui-fluid" dynamic="true" cache="true">
-								<p:ajax event="tabChange" update="formRegistroEmpleado:panelDialogEmpleado formRegistroEmpleado:panelDialogEmpleado:previewFotografia" listener="#{registroEmpleadosBean.tabChange}" oncomplete="PF('dialogEmpleado').initPosition();"/>
-								<p:tab title="Datos Personales">
+                        <p:dialog header="Información..." showEffect="fade" modal="true" widgetVar="dialogEmpleado" responsive="true" resizable="false" width="100%" height="100%" position="center top">
+							<p:tabView id="panelDialogEmpleado" title="Información del empleado" class="ui-fluid" dynamic="true" cache="true" effect="drop">
+								<p:ajax event="tabChange" update="formRegistroEmpleado:panelDialogEmpleado formRegistroEmpleado:panelDialogEmpleado:previewFotografia" oncomplete="PF('dialogEmpleado').initPosition();"/>
+								<p:tab title="Personal">
 							        <div class="formgrid grid">
 							            <div class="field col-4">
 							                <p:outputLabel for="@next" value="Número de empleado"/>
@@ -159,7 +109,7 @@
 									     </div>
 							 		</div>
 								</p:tab>
-								<p:tab title="Datos empresariales">
+								<p:tab title="Empresarial">
 									<div class="card">
 										<div class="ui-fluid formgrid grid">
 											<div class="field col-12 md:col-3">
@@ -290,7 +240,7 @@
 										</div>
 									</div>
 								</p:tab>
-								<p:tab title="Datos Biometricos">
+								<p:tab title="Biométrica">
 									<div align="center">
 										<p:panelGrid columns="2">
 											<p:card>
@@ -320,11 +270,95 @@
 										</p:panelGrid>
 									</div>
 								</p:tab>
+								<p:tab title="Percepciones">
+									<div class="ui-fluid formgrid grid">
+										<div class="field col-12 md:col-3">
+											<p:selectOneMenu id="selTipoPercepcion" value="#{registroEmpleadosBean.percepcionEmpleado.tipoPercepcion}" autoWidth="false" converter="entityConverter" filter="true" filterMatchMode="contains">
+												<f:selectItem itemLabel="---SELECCIONE UNA PERCEPCION---"/>
+												<f:selectItems value="#{registroEmpleadosBean.tiposPercepcion}" var="tipoPercepcion" itemLabel="#{tipoPercepcion.clave} - #{tipoPercepcion.descripcion}" itemValue="#{tipoPercepcion}"/>
+											</p:selectOneMenu>
+										</div>
+										<div class="field col-12 md:col-3">
+											<p:inputNumber id="txtImportePercepcion" value="#{registroEmpleadosBean.percepcionEmpleado.importeMaximo}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," placeholder="Importe máximo">
+												<p:ajax process="@this" />
+											</p:inputNumber>
+										</div>
+										<div class="field col-12 md:col-3">
+											<p:selectBooleanButton id="selPercepcionActivo" value="#{registroEmpleadosBean.percepcionEmpleado.activo}" onLabel="Activo" offLabel="Inactivo" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem" disabled="false" />
+										</div>
+										<div class="field col-12 md:col-3">
+											<p:commandButton value="Agregar" actionListener="#{registroEmpleadosBean.agregarPercepcionEmpleado}" icon="pi pi-plus" update="dt-percepcion-empleado selTipoPercepcion txtImportePercepcion selPercepcionActivo"></p:commandButton>
+										</div>
+									</div>
+									<p:dataTable id="dt-percepcion-empleado" value="#{registroEmpleadosBean.percepcionesEmpleado}" var="percepcion" paginator="true" rows="5" paginatorPosition="bottom" lazy="true">
+										<p:column headerText="Percepcion">
+											<p:outputLabel value="#{percepcion.tipoPercepcion.clave} - #{percepcion.tipoPercepcion.descripcion}" />
+										</p:column>
+										<p:column headerText="Importe máximo" width="6rem">
+											<p:inputNumber value="#{percepcion.importeMaximo}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator=",">
+												<p:ajax process="@this" />
+											</p:inputNumber>
+										</p:column>
+										<p:column headerText="Activo" width="4rem">
+											<p:selectBooleanButton value="#{percepcion.activo}" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem"/>
+										</p:column>
+										<p:column width="2rem">
+											<p:commandButton icon="pi pi-trash" onclick="PF('dlgEliminarPercepcionEmpleado').show();" styleClass="ui-button-danger">
+												<f:setPropertyActionListener value="#{percepcion}" target="#{registroEmpleadosBean.percepcionEmpleado}"></f:setPropertyActionListener>
+											</p:commandButton>
+										</p:column>
+									</p:dataTable>
+								</p:tab>
+								<p:tab title="Préstamos">
+									<p:toolbar>
+										<p:toolbarGroup>
+											<p:commandButton value="Agregar" icon="pi pi-plus" oncomplete="PF('dgPrestamo').show();"></p:commandButton>
+										</p:toolbarGroup>
+									</p:toolbar>
+									<p:dataTable id="dt-prestamos" widgetVar="dtPrestamos" value="#{registroEmpleadosBean.empleadoSelected.prestamos}" var="prestamo" allowUnsorting="true" sortMode="single" reflow="true" lazy="true">
+										<p:column headerText="Fecha inicio" sortBy="#{prestamo.fechaInicio}">
+											<p:datePicker value="#{prestamo.fechaInicio}" monthNavigator="true" yearNavigator="true" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
+												<p:ajax process="@this"></p:ajax>
+											</p:datePicker>
+										</p:column>
+										<p:column headerText="Fecha fin" sortBy="#{prestamo.fechaFin}">
+											<p:datePicker value="#{prestamo.fechaFin}" monthNavigator="true" yearNavigator="true" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
+												<p:ajax process="@this"></p:ajax>
+											</p:datePicker>
+										</p:column>
+										<p:column headerText="Periodicidad de pago" width="auto">
+											<p:selectOneMenu value="#{prestamo.periodicidadPago}" converter="entityConverter" autoWidth="false">
+												<f:selectItem itemLabel="Seleccione la periodicidad de pago" noSelectionOption="true" />
+												<f:selectItems value="#{registroEmpleadosBean.periodicidadesPago}" var="periodicidad" itemLabel="#{periodicidad.descripcion}"></f:selectItems>
+											</p:selectOneMenu>
+										</p:column>
+										<p:column headerText="Tipo Préstamo">
+											<p:selectOneMenu value="#{prestamo.tipoPrestamo}" converter="entityConverter" autoWidth="false">
+												<f:selectItem itemLabel="Seleccione un tipo de préstamo" noSelectionOption="true" />
+												<f:selectItems value="#{registroEmpleadosBean.tiposPrestamo}" var="tipoPrestamo" itemLabel="#{tipoPrestamo.descripcion}" itemValue="#{tipoPrestamo}" />
+											</p:selectOneMenu>
+										</p:column>
+										<p:column headerText="Acumulado" width="5rem">
+											<p:inputNumber value="#{prestamo.acumulado}" decimalSeparator="2" symbol="$" symbolPosition="p" emptyValue="empty" />
+										</p:column>
+										<p:column headerText="Importe" width="5rem;">
+											<p:inputNumber value="#{prestamo.importe}" decimalSeparator="2" symbol="$" symbolPosition="p" emptyValue="empty" />
+										</p:column>
+										<p:column headerText="Total" width="5rem">
+											<p:inputNumber value="#{prestamo.total}" decimalSeparator="2" symbol="$" symbolPosition="p" emptyValue="empty" />
+										</p:column>
+										<p:column width="3rem;">
+											<p:commandButton icon="pi pi-trash" styleClass="ui-button-danger" oncomplete="PF('dlgEliminarPrestamo').show();">
+												<f:setPropertyActionListener value="#{prestamo}" target="#{registroEmpleadosBean.prestamo}"></f:setPropertyActionListener>
+											</p:commandButton>
+										</p:column>
+									</p:dataTable>
+								</p:tab>
 							</p:tabView>
 							
                             <f:facet name="footer">
                                 <p:commandButton value="Guardar" icon="pi pi-save" actionListener="#{registroEmpleadosBean.guardarEmpleado()}" process="panelDialogEmpleado @this" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
-                                <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogEmpleado').hide()" class="ui-button-secondary" resetValues="true"/>
+                                <p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dialogEmpleado').hide()" class="ui-button-secondary" resetValues="true"/>
                             </f:facet>
                         </p:dialog> 
 
@@ -371,11 +405,81 @@
                                 <p:commandButton value="Cancelar" class="ui-button-secondary" icon="pi pi-times" oncomplete="PF('dialogBiometrico').hide();" process="@this"/>
                             </f:facet>
                         </p:dialog> 
-                        <p:confirmDialog widgetVar="dialogEliminarEmpleado" showEffect="fade" width="300" message="Eliminar el empleado?" header="Confirmar" severity="warn">
+                        <p:dialog id="dg-prestamo" widgetVar="dgPrestamo" header="Préstamo" showEffect="hide" modal="true" responsive="true">
+							<div class="ui-fluid">
+	                        	<div class="p-field">
+									<p:outputLabel value="Tipo de préstamo"></p:outputLabel>
+									<p:selectOneMenu id="tipoPrestamo" value="#{registroEmpleadosBean.prestamo.tipoPrestamo}" converter="entityConverter">
+										<f:selectItem itemLabel="Seleccione un tipo de préstamo" noSelectionOption="true" />
+										<f:selectItems value="#{registroEmpleadosBean.tiposPrestamo}" var="tipoPrestamo" itemLabel="#{tipoPrestamo.descripcion}" itemValue="#{tipoPrestamo}">
+										</f:selectItems>
+										<p:ajax process="@this"></p:ajax>
+									</p:selectOneMenu>
+								</div>
+								<div class="p-field">
+									<p:outputLabel value="Fecha inicio"></p:outputLabel>
+									<p:datePicker value="#{registroEmpleadosBean.prestamo.fechaInicio}" showIcon="true" yearNavigator="true" monthNavigator="true" weekCalculator="true" pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es">
+										<p:ajax process="@this"></p:ajax>
+									</p:datePicker>
+								</div>
+								<div class="p-field">
+									<p:outputLabel value="Fecha Fin"></p:outputLabel>
+									<p:datePicker value="#{registroEmpleadosBean.prestamo.fechaFin}" showIcon="true" yearNavigator="true" monthNavigator="true" weekCalculator="true" pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es">
+										<p:ajax process="@this"></p:ajax>
+									</p:datePicker>
+								</div>
+								<div class="p-field">
+									<p:outputLabel value="Acumulado"></p:outputLabel>
+									<p:inputNumber value="#{registroEmpleadosBean.prestamo.acumulado}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," minValue="0.00" emptyValue="zero">
+										<p:ajax process="@this"></p:ajax>
+									</p:inputNumber>
+								</div>
+								<div class="p-field">
+									<p:outputLabel value="Importe"></p:outputLabel>
+									<p:inputNumber value="#{registroEmpleadosBean.prestamo.importe}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," minValue="0.00" emptyValue="zero">
+										<p:ajax process="@this"></p:ajax>
+									</p:inputNumber>
+								</div>
+								<div class="p-field">
+									<p:outputLabel value="Total"></p:outputLabel>
+									<p:inputNumber value="#{registroEmpleadosBean.prestamo.total}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," minValue="0.00" emptyValue="zero">
+										<p:ajax process="@this"></p:ajax>
+									</p:inputNumber>
+								</div>
+								<div class="p-field">
+									<p:outputLabel value="Periodicidad de pago"></p:outputLabel>
+									<p:selectOneMenu value="#{registroEmpleadosBean.prestamo.periodicidadPago}" converter="entityConverter">
+										<f:selectItem itemLabel="Seleccione la periodicidad de pago" noSelectionOption="true" />
+										<f:selectItems value="#{registroEmpleadosBean.periodicidadesPago}" var="periodicidad" itemLabel="#{periodicidad.descripcion}">
+										</f:selectItems>
+										<p:ajax process="@this"></p:ajax>
+									</p:selectOneMenu>
+								</div>
+							</div>
+							<f:facet name="footer">
+								<p:commandButton value="Agregar" process="@this" actionListener="#{registroEmpleadosBean.agregarPrestamo()}">
+									<p:confirm header="Confirmación" message="¿Está seguro que desea eliminar el préstamo?" icon="pi pi-exclamation-triangle"/>
+								</p:commandButton>
+							</f:facet>
+                        </p:dialog>
+                        
+                        
+                        <p:confirmDialog widgetVar="dlgEliminarPrestamo" showEffect="fade" width="30rem" message="¿Está seguro que desea eliminar el préstamo seleccionado?" header="Confirmar" severity="warn">
+                            <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{registroEmpleadosBean.eliminarPrestamo(prestamo)}" process="@this" oncomplete="PF('dlgEliminarPrestamo').hide();"/>
+                            <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('dlgEliminarPrestamo').hide()" />
+                        </p:confirmDialog>
+                        
+                        <p:confirmDialog widgetVar="dlgEliminarPercepcionEmpleado" showEffect="fade" width="30rem" message="¿Está seguro que desea eliminar la percepción seleccionada?" header="Confirmar" severity="warn">
+                            <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{registroEmpleadosBean.eliminarPercepcionEmpleado}" process="@this" oncomplete="PF('dlgEliminarPercepcionEmpleado').hide();"/>
+                            <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('dlgEliminarPercepcionEmpleado').hide()" />
+                        </p:confirmDialog>
+                        
+                        <p:confirmDialog widgetVar="dialogEliminarEmpleado" showEffect="fade" width="300" message="¿Está seguro que desea dar de baja al empleado?" header="Confirmar" severity="warn">
                             <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{registroEmpleadosBean.eliminaEmpleado()}" process="@this" oncomplete="PF('dialogEliminarEmpleado').hide()"/>
                             <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('dialogEliminarEmpleado').hide()" />
                         </p:confirmDialog>
-                        <p:confirmDialog global="true" showEffect="fade" width="300">
+                        
+                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="300">
                             <p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
                             <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary" icon="pi pi-times" />
                         </p:confirmDialog>

@@ -69,6 +69,10 @@ public class SideBarBean implements Serializable {
 		default:
 			isValid = new Boolean(false);
 		}
+		
+		if(this.empleadoSelected.getDatoEmpresa().getPerfil().getIdPerfil() == 1 || this.empleadoSelected.getDatoEmpresa().getPerfil().getIdPerfil() == 4)
+			isValid = new Boolean(true);
+		
 		return isValid;
 	}
 	
@@ -86,6 +90,9 @@ public class SideBarBean implements Serializable {
 		default:
 			isValid = new Boolean(false);
 		}
+		
+		if(this.empleadoSelected.getDatoEmpresa().getPerfil().getIdPerfil() == 1 || this.empleadoSelected.getDatoEmpresa().getPerfil().getIdPerfil() == 4)
+			isValid = new Boolean(true);
 		return isValid;
 	}
 

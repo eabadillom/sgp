@@ -3,6 +3,8 @@ package mx.com.ferbo.util;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -567,15 +569,18 @@ public class DateUtils {
 	 * @param fecha Objeto {@link Date}
 	 * @return Objeto {@link String} con la representación en texto del objeto {@link Date}
 	 */
-	public static String getString(Date fecha, String formato)
-	throws DateUtilsException {
+	public static String getString(Date fecha, String formato) {
 		String           strFecha   = null;
 		SimpleDateFormat dateFormat = null;
 		
-		dateFormat = new SimpleDateFormat(formato);
-		if(fecha == null)
-			throw new DateUtilsException("El parámetro fecha no debe ser nulo");
-		strFecha = dateFormat.format(fecha);
+		try {
+			dateFormat = new SimpleDateFormat(formato);
+			if(fecha == null)
+				throw new DateUtilsException("El parámetro fecha no debe ser nulo");
+			strFecha = dateFormat.format(fecha);
+		} catch(DateUtilsException ex) {
+			log.warn("Fecha nula...", ex.getMessage());
+		}
 		
 		return strFecha;
 	}
@@ -680,6 +685,19 @@ public class DateUtils {
 		if(lFecha >= lFechaIni && lFecha <= lFechaFin)
 			resultado = true;
 		
+		return resultado;
+	}
+	
+	public static LocalDate toLocalDate(Date fecha) {
+		LocalDate resultado = null;
+		ZoneId systemDefault = null;
+		try {
+			systemDefault = ZoneId.of("GMT-6");
+			resultado = fecha.toInstant().atZone(systemDefault).toLocalDate();
+		} catch(Exception ex) {
+			log.warn("Problema para convertir a LocalDate: " + fecha, ex.getMessage());
+			resultado = null;
+		}
 		return resultado;
 	}
 }

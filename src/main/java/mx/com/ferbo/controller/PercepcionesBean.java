@@ -14,8 +14,8 @@ import javax.inject.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.dao.CatPercepcionesDAO;
-import mx.com.ferbo.dto.CatPercepcionesDTO;
+import mx.com.ferbo.dao.n.PercepcionesDAO;
+import mx.com.ferbo.model.CatPercepciones;
 import mx.com.ferbo.util.SGPException; 
 
 /**
@@ -30,32 +30,37 @@ public class PercepcionesBean implements Serializable {
     private static Logger log = LogManager.getLogger(PercepcionesBean.class); 
     
     private Date fechaCap;
-    private CatPercepcionesDTO percepcionSeleccionada;
-    private CatPercepcionesDTO percepcionNueva;
-    private CatPercepcionesDAO catPercepcionesDAO;
-    private List<CatPercepcionesDTO> percepcionBuscada;
-    private List<CatPercepcionesDTO> percepcionActual;
-    private List<CatPercepcionesDTO> percepciones;
+    private CatPercepciones percepcionSeleccionada;
+    private CatPercepciones percepcionNueva;
+    private PercepcionesDAO percepcionesDAO;
+    private List<CatPercepciones> percepcionBuscada;
+    private List<CatPercepciones> percepcionActual;
+    private List<CatPercepciones> percepciones;
 
     public PercepcionesBean() {
         percepcionBuscada = new ArrayList<>();
         percepcionActual = new ArrayList<>();
-        catPercepcionesDAO = new CatPercepcionesDAO();
-        percepcionNueva = new CatPercepcionesDTO();
-        percepciones = catPercepcionesDAO.buscarTodos();
+        percepcionesDAO = new PercepcionesDAO();
+        percepcionNueva = new CatPercepciones();
     }
     
     @PostConstruct
     public void init() {
-        percepciones = catPercepcionesDAO.buscarTodos();
-        percepcionNueva = new CatPercepcionesDTO();
-        percepcionActual = catPercepcionesDAO.buscarActivo();
+        percepciones = percepcionesDAO.buscarTodos();
+        percepcionNueva = new CatPercepciones();
+        percepcionNueva.setActivo((short)1);
+        percepcionActual = percepcionesDAO.buscarTodosActivos();
+    }
+    
+    public void actualizar()
+    {
+        percepcionActual = percepcionesDAO.buscarTodosActivos();
     }
     
     // Caluclo de Percepcion del empleado
     public void crearPercepcionNueva(){
         try {
-            catPercepcionesDAO.guardar(percepcionNueva);
+            percepcionesDAO.guardar(percepcionNueva);
             FacesContext.getCurrentInstance().getExternalContext().redirect("/sgp/protected/percepciones.xhtml");
         } catch (SGPException | IOException ex) { 
             log.warn("EX-0036: " + ex.getMessage() + ". Error al guardar la percepción. " + percepcionNueva.getUma() != null ? percepcionNueva.getUma() : null); 
@@ -71,43 +76,43 @@ public class PercepcionesBean implements Serializable {
         this.fechaCap = fechaCap;
     }
 
-    public CatPercepcionesDTO getPercepcionSeleccionada() {
+    public CatPercepciones getPercepcionSeleccionada() {
         return percepcionSeleccionada;
     }
 
-    public void setPercepcionSeleccionada(CatPercepcionesDTO percepcionSeleccionada) {
+    public void setPercepcionSeleccionada(CatPercepciones percepcionSeleccionada) {
         this.percepcionSeleccionada = percepcionSeleccionada;
     }
 
-    public CatPercepcionesDAO getCatPercepcionesDAO() {
-        return catPercepcionesDAO;
+    public PercepcionesDAO getCatPercepcionesDAO() {
+        return percepcionesDAO;
     }
 
-    public void setCatPercepcionesDAO(CatPercepcionesDAO catPercepcionesDAO) {
-        this.catPercepcionesDAO = catPercepcionesDAO;
+    public void setPercepcionesDAO(PercepcionesDAO percepcionesDAO) {
+        this.percepcionesDAO = percepcionesDAO;
     }
 
-    public List<CatPercepcionesDTO> getPercepcionBuscada() {
+    public List<CatPercepciones> getPercepcionBuscada() {
         return percepcionBuscada;
     }
 
-    public void setPercepcionBuscada(List<CatPercepcionesDTO> percepcionBuscada) {
+    public void setPercepcionBuscada(List<CatPercepciones> percepcionBuscada) {
         this.percepcionBuscada = percepcionBuscada;
     }
 
-    public List<CatPercepcionesDTO> getPercepcionActual() {
+    public List<CatPercepciones> getPercepcionActual() {
         return percepcionActual;
     }
 
-    public void setPercepcionActual(List<CatPercepcionesDTO> percepcionActual) {
+    public void setPercepcionActual(List<CatPercepciones> percepcionActual) {
         this.percepcionActual = percepcionActual;
     }
 
-    public CatPercepcionesDTO getPercepcionNueva() {
+    public CatPercepciones getPercepcionNueva() {
         return percepcionNueva;
     }
 
-    public void setPercepcionNueva(CatPercepcionesDTO percepcionNueva) {
+    public void setPercepcionNueva(CatPercepciones percepcionNueva) {
         this.percepcionNueva = percepcionNueva;
     }
     //</editor-fold>    

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -18,117 +19,127 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.CatArticulosDAO;
-import mx.com.ferbo.dao.DetSolicitudArticulosDAO;
-import mx.com.ferbo.dao.EmpleadoDAO;
-import mx.com.ferbo.dao.IncidenciaDAO;
-import mx.com.ferbo.dto.CatArticuloDTO;
-import mx.com.ferbo.dto.CatEstatusIncidenciaDTO;
-import mx.com.ferbo.dto.CatTipoIncidenciaDTO;
-import mx.com.ferbo.dto.DetEmpleadoDTO;
-import mx.com.ferbo.dto.DetIncidenciaDTO;
-import mx.com.ferbo.dto.DetSolicitudArticuloDTO;
+import mx.com.ferbo.dao.n.ArticuloDAO;
+import mx.com.ferbo.dao.n.SolicitudArticuloDAO;
+import mx.com.ferbo.dao.n.EmpleadoDAO;
+import mx.com.ferbo.dao.n.IncidenciaDAO;
+import mx.com.ferbo.model.CatArticulo;
+import mx.com.ferbo.model.CatEstatusIncidencia;
+import mx.com.ferbo.model.CatTipoIncidencia;
+import mx.com.ferbo.model.DetEmpleado;
+import mx.com.ferbo.model.DetIncidencia;
+import mx.com.ferbo.model.DetSolicitudArticulo;
 import mx.com.ferbo.util.SGPException;
+import mx.com.ferbo.util.ManageStatus;
 
 @Named(value = "articuloOficinasBean")
 @ViewScoped
 public class ArticulosOficinaBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
-
     private static Logger log = LogManager.getLogger(ArticulosOficinaBean.class);
 
     private String numeroEmpl;
 
-    private List<CatArticuloDTO> lstArticulosActivas;
+    private List<CatArticulo> lstArticulosActivas;
     private List<Integer> lstCantidad;
-    private List<DetSolicitudArticuloDTO> lstSolicitudArticulos;
-    private List<DetSolicitudArticuloDTO> lstSolicitudArticulosRealizadas;
+    private List<DetSolicitudArticulo> lstSolicitudArticulos;
+    private List<DetSolicitudArticulo> lstSolicitudArticulosRealizadas;
+    private List<DetIncidencia> incidenciasBuscada;
 
-    private DetEmpleadoDTO empleadoSelected;
-    private DetSolicitudArticuloDTO solicitud;
+    private DetEmpleado empleadoSelected;
+    private DetSolicitudArticulo solicitud;
 
-    private CatArticulosDAO articulosDAO;
+    private ArticuloDAO articulosDAO;
     private final EmpleadoDAO empleadoDAO;
-    private DetSolicitudArticulosDAO detSolicitudArticulosDAO;
+    private SolicitudArticuloDAO solicitudArticulosDAO;
     private final IncidenciaDAO incidenciaDAO;
 
-    private CatArticuloDTO articuloSelected;
+    private CatArticulo articuloSelected;
     private Integer cantidadSelected;
 
     private final FacesContext faceContext;
     private final HttpServletRequest httpServletRequest;
+    private ManageStatus status;
 
-    private final DetIncidenciaDTO incidenciaDTO;
-    private final CatTipoIncidenciaDTO catTipoIncidenciaDTO;
-    private final CatEstatusIncidenciaDTO catEstatusIncidenciaDTO;
+    private DetIncidencia incidencia;
+    private CatTipoIncidencia catTipoIncidencia;
+    private CatEstatusIncidencia catEstatusIncidencia;
 
     public ArticulosOficinaBean() {
         lstArticulosActivas = new ArrayList<>();
         lstCantidad = new ArrayList<>(
                 Arrays.asList(1, 2, 3));
 
-        empleadoSelected = new DetEmpleadoDTO();
-        articuloSelected = new CatArticuloDTO();
+        empleadoSelected = new DetEmpleado();
+        articuloSelected = new CatArticulo();
         cantidadSelected = 0;
 
-        articulosDAO = new CatArticulosDAO();
+        articulosDAO = new ArticuloDAO();
         empleadoDAO = new EmpleadoDAO();
-        detSolicitudArticulosDAO = new DetSolicitudArticulosDAO();
+        solicitudArticulosDAO = new SolicitudArticuloDAO();
         incidenciaDAO = new IncidenciaDAO();
 
         faceContext = FacesContext.getCurrentInstance();
         httpServletRequest = (HttpServletRequest) faceContext.getExternalContext().getRequest();
-        this.empleadoSelected = (DetEmpleadoDTO) httpServletRequest.getSession(true).getAttribute("empleado");
+        this.empleadoSelected = (DetEmpleado) httpServletRequest.getSession(true).getAttribute("empleado");
 
-        solicitud = new DetSolicitudArticuloDTO();
-        incidenciaDTO = new DetIncidenciaDTO();
-        catTipoIncidenciaDTO = new CatTipoIncidenciaDTO();
-        catEstatusIncidenciaDTO = new CatEstatusIncidenciaDTO();
+        solicitud = new DetSolicitudArticulo();
     }
 
     @PostConstruct
     public void init() {
         lstSolicitudArticulos = new ArrayList<>();
-        solicitud.setEmpleadoSol(empleadoSelected);
-        lstSolicitudArticulosRealizadas = detSolicitudArticulosDAO.buscarPorCriterios(solicitud);
-        lstArticulosActivas = articulosDAO.buscarActivo();
+        solicitud.setIdEmpleadoSol(empleadoSelected);
+        actualizarListas();
+        lstArticulosActivas = articulosDAO.buscarTodosActivos();
+        status = new ManageStatus();
+    }
+    
+    public void actualizarListas()
+    {
+        lstSolicitudArticulosRealizadas = solicitudArticulosDAO.buscarPorIdEmpleado(solicitud.getIdEmpleadoSol().getIdEmpleado());
+        incidenciasBuscada = incidenciaDAO.buscarPorIdEmpleadoArticulo(solicitud.getIdEmpleadoSol().getIdEmpleado());
     }
 
-    public void seleccionarItem(CatArticuloDTO item) {
+    public void seleccionarItem(CatArticulo item) {
         articuloSelected = item;
-        solicitud = new DetSolicitudArticuloDTO();
+        solicitud = new DetSolicitudArticulo();
         PrimeFaces.current().executeScript("PF('dialogComplementoArtiulo').show();");
     }
 
     public void preRegistro() {
         solicitud.setFechaCap(new Date());
-        solicitud.setEmpleadoSol(empleadoSelected);
-        solicitud.setArticulo(articuloSelected);
+        solicitud.setIdEmpleadoSol(empleadoSelected);
+        solicitud.setIdArticulo(articuloSelected);
         lstSolicitudArticulos.add(solicitud);
         PrimeFaces.current().executeInitScript("PF('dialogComplementoArtiulo').hide()");
         PrimeFaces.current().executeInitScript("PF('articuloOficinaDialog').hide()");
-        PrimeFaces.current().ajax().update("formActividadesArticulos:messages", "formActividadesArticulos:tabViewA:dt-articuloOficinas", "formActividadesArticulos:tabViewA:btnRegistro");
+        PrimeFaces.current().ajax().update("formActividadesArticulos:messages", "formActividadesArticulos:tabView:dt-articuloOficinas", "formActividadesArticulos:tabView:btnRegistro");
     }
 
     public void registro() throws IOException {
-        for (DetSolicitudArticuloDTO detSolicitudArticuloDTO : lstSolicitudArticulos) {
+        for (DetSolicitudArticulo solicitudArticulo : lstSolicitudArticulos) {
             try {
-                detSolicitudArticulosDAO.guardar(detSolicitudArticuloDTO);
-                lstSolicitudArticulosRealizadas = detSolicitudArticulosDAO.buscarPorCriterios(detSolicitudArticuloDTO);
+                solicitudArticulo.setAprobada((short) 1);
+                solicitudArticulosDAO.guardar(solicitudArticulo);
+                actualizarListas();
+                
+                incidencia = new DetIncidencia();
+                catTipoIncidencia = new CatTipoIncidencia();
+                catEstatusIncidencia = new CatEstatusIncidencia();
 
-                catTipoIncidenciaDTO.setIdTipo(4);
-                catEstatusIncidenciaDTO.setIdEstatus(1);
+                catTipoIncidencia.setIdTipo(4);
+                catEstatusIncidencia.setIdEstatus(1);
 
-                incidenciaDTO.setCatTipoIncidenciaDTO(catTipoIncidenciaDTO);
-                incidenciaDTO.setDetEmpleadoDTO(empleadoSelected);
-                incidenciaDTO.setCatEstatusIncidenciaDTO(catEstatusIncidenciaDTO);
-                incidenciaDTO.setVisible((short) 1);
-                incidenciaDTO.setDetSolicitudArticuloDTO(detSolicitudArticuloDTO);
-                incidenciaDTO.setFechaCap(new Date());
+                incidencia.setIdTipo(catTipoIncidencia);
+                incidencia.setIdEmpleado(empleadoSelected);
+                incidencia.setIdEstatus(catEstatusIncidencia);
+                incidencia.setVisible((short) 1);
+                incidencia.setIdSolArticulo(solicitudArticulo);
+                incidencia.setFechaCap(new Date());
 
-                incidenciaDAO.guardar(incidenciaDTO);
+                incidenciaDAO.guardar(incidencia);
 
             } catch (SGPException e) {
                 log.warn("EX-0034: " + e.getMessage() + ". Error al guardar el registro de articulos del empleado: " + empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
@@ -137,10 +148,73 @@ public class ArticulosOficinaBean implements Serializable {
         FacesContext.getCurrentInstance().getExternalContext().redirect("articulosTrabajo.xhtml");
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Solicitud Registrada"));
     }
+    
+    public void actualizarRegistro()
+    {
+        actualizarListas();
+        FacesMessage message = null;
+        FacesMessage.Severity severity = null;
+        String mensaje = null;
+        String titulo = "Articulo";
+        try
+        {
+            if(incidenciasBuscada == null)
+            {
+                throw new SGPException("Error con la conexión a la base de datos!!!");
+            }
+            
+            switch (solicitud.getAprobada().intValue()) 
+            {
+                case 2:
+                    throw new SGPException("No se puede modificar el artículo");
+                case 3:
+                    throw new SGPException("No se puede modificar el artículo");
+                case 4:
+                    throw new SGPException("No se puede modificar el artículo");
+            }
+            
+            for(DetIncidencia auxIncidenciaBuscada : incidenciasBuscada)
+            {
+                if(Objects.equals(auxIncidenciaBuscada.getIdSolArticulo().getIdSolicitud(), solicitud.getIdSolicitud()))
+                {
+                    catEstatusIncidencia = new CatEstatusIncidencia();
+                    catEstatusIncidencia.setIdEstatus(4);
+                    
+                    auxIncidenciaBuscada.setIdEstatus(catEstatusIncidencia);
+                    auxIncidenciaBuscada.setIdSolArticulo(solicitud);
+                    incidenciaDAO.actualizar(auxIncidenciaBuscada);                    
+                }
+            }
+            
+            solicitud.setAprobada((short) 4);
+            solicitudArticulosDAO.actualizar(solicitud);
+            
+            actualizarListas();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Estatus Modificada"));
+            PrimeFaces.current().ajax().update("formActividadesArticulos:tabView:dt-uniformes-sol");
+            PrimeFaces.current().executeScript("PF('dialogCambiarEstatus').hide()");
+        }catch(SGPException e)
+        {
+            mensaje = e.getMessage();
+            severity = FacesMessage.SEVERITY_INFO;
+        }catch(Exception e)
+        {
+            log.warn("EX-0032: " + e.getMessage() + ". Error al actualizar el registro del articulo del empleado: " + empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
+        }finally
+        {
+            if(severity != null)
+            {
+                message = new FacesMessage(severity, titulo, mensaje);
+                FacesContext.getCurrentInstance().addMessage(null, message);
+                PrimeFaces.current().ajax().update(":formActividadesArticulos:messages");
+                PrimeFaces.current().executeScript("PF('dialogCambiarEstatus').hide()");
+            }
+        }
+    }
 
     //<editor-fold defaultstate="collapsed" desc="Getters&Setters">
     public void inicializaArticulo() {
-        articuloSelected = new CatArticuloDTO();
+        articuloSelected = new CatArticulo();
     }
 
     public void eliminaSolicitud() {
@@ -155,11 +229,11 @@ public class ArticulosOficinaBean implements Serializable {
         this.numeroEmpl = numeroEmpl;
     }
 
-    public List<CatArticuloDTO> getLstArticulosActivas() {
+    public List<CatArticulo> getLstArticulosActivas() {
         return lstArticulosActivas;
     }
 
-    public void setLstArticulosActivas(List<CatArticuloDTO> lstArticulosActivas) {
+    public void setLstArticulosActivas(List<CatArticulo> lstArticulosActivas) {
         this.lstArticulosActivas = lstArticulosActivas;
     }
 
@@ -171,59 +245,59 @@ public class ArticulosOficinaBean implements Serializable {
         this.lstCantidad = lstCantidad;
     }
 
-    public List<DetSolicitudArticuloDTO> getLstSolicitudArticulos() {
+    public List<DetSolicitudArticulo> getLstSolicitudArticulos() {
         return lstSolicitudArticulos;
     }
 
-    public void setLstSolicitudArticulos(List<DetSolicitudArticuloDTO> lstSolicitudArticulos) {
+    public void setLstSolicitudArticulos(List<DetSolicitudArticulo> lstSolicitudArticulos) {
         this.lstSolicitudArticulos = lstSolicitudArticulos;
     }
 
-    public List<DetSolicitudArticuloDTO> getLstSolicitudArticulosRealizadas() {
+    public List<DetSolicitudArticulo> getLstSolicitudArticulosRealizadas() {
         return lstSolicitudArticulosRealizadas;
     }
 
-    public void setLstSolicitudArticulosRealizadas(List<DetSolicitudArticuloDTO> lstSolicitudArticulosRealizadas) {
+    public void setLstSolicitudArticulosRealizadas(List<DetSolicitudArticulo> lstSolicitudArticulosRealizadas) {
         this.lstSolicitudArticulosRealizadas = lstSolicitudArticulosRealizadas;
     }
 
-    public DetEmpleadoDTO getEmpleadoSelected() {
+    public DetEmpleado getEmpleadoSelected() {
         return empleadoSelected;
     }
 
-    public void setEmpleadoSelected(DetEmpleadoDTO empleadoSelected) {
+    public void setEmpleadoSelected(DetEmpleado empleadoSelected) {
         this.empleadoSelected = empleadoSelected;
     }
 
-    public DetSolicitudArticuloDTO getSolicitud() {
+    public DetSolicitudArticulo getSolicitud() {
         return solicitud;
     }
 
-    public void setSolicitud(DetSolicitudArticuloDTO solicitud) {
+    public void setSolicitud(DetSolicitudArticulo solicitud) {
         this.solicitud = solicitud;
     }
 
-    public CatArticulosDAO getArticulosDAO() {
+    public ArticuloDAO getArticulosDAO() {
         return articulosDAO;
     }
 
-    public void setArticulosDAO(CatArticulosDAO articulosDAO) {
+    public void setArticulosDAO(ArticuloDAO articulosDAO) {
         this.articulosDAO = articulosDAO;
     }
 
-    public DetSolicitudArticulosDAO getDetSolicitudArticulosDAO() {
-        return detSolicitudArticulosDAO;
+    public SolicitudArticuloDAO getSolicitudArticulosDAO() {
+        return solicitudArticulosDAO;
     }
 
-    public void setDetSolicitudArticulosDAO(DetSolicitudArticulosDAO detSolicitudArticulosDAO) {
-        this.detSolicitudArticulosDAO = detSolicitudArticulosDAO;
+    public void setDetSolicitudArticulosDAO(SolicitudArticuloDAO solicitudArticulosDAO) {
+        this.solicitudArticulosDAO = solicitudArticulosDAO;
     }
 
-    public CatArticuloDTO getArticuloSelected() {
+    public CatArticulo getArticuloSelected() {
         return articuloSelected;
     }
 
-    public void setArticuloSelected(CatArticuloDTO articuloSelected) {
+    public void setArticuloSelected(CatArticulo articuloSelected) {
         this.articuloSelected = articuloSelected;
     }
 
@@ -233,6 +307,18 @@ public class ArticulosOficinaBean implements Serializable {
 
     public void setCantidadSelected(Integer cantidadSelected) {
         this.cantidadSelected = cantidadSelected;
+    }
+
+    public List<DetIncidencia> getIncidenciasBuscada() {
+        return incidenciasBuscada;
+    }
+
+    public void setIncidenciasBuscada(List<DetIncidencia> incidenciasBuscada) {
+        this.incidenciasBuscada = incidenciasBuscada;
+    }
+    
+    public ManageStatus getStatus() {
+        return status;
     }
 //</editor-fold>
 }

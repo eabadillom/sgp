@@ -10,19 +10,19 @@
                  reflow="true" styleClass="products-table"
                  rowKey="articuloOficina.idSolicitud">
         <p:column headerText="Articulo"
-                  sortBy="#{articuloOficina.getArticulo().idArticulo}" width="100px">
-            <h:outputText value="#{articuloOficina.getArticulo().descripcion}" />
+                  sortBy="#{articuloOficina.idArticulo.idArticulo}" width="100px">
+            <h:outputText value="#{articuloOficina.idArticulo.descripcion}" />
         </p:column>
         <p:column headerText="Imagen" width="100px">
-            <h:graphicImage name="images/articulos/#{articuloOficina.getArticulo().descripcion}.jpg" library="recursos" width="57" />
+            <h:graphicImage name="images/articulos/#{articuloOficina.idArticulo.descripcion}.jpg" library="recursos" width="57" />
         </p:column>
         <p:column headerText="Cantidad" sortBy="#{articuloOficina.cantidad}"
                   width="100px">
             <h:outputText value="#{articuloOficina.cantidad}" />
         </p:column>
-        <p:column headerText="Unidad" sortBy="#{articuloOficina.getArticulo().unidad}"
+        <p:column headerText="Unidad" sortBy="#{articuloOficina.idArticulo.unidad}"
                   width="100px">
-            <h:outputText value="#{articuloOficina.getArticulo().unidad}" />
+            <h:outputText value="#{articuloOficina.idArticulo.unidad}" />
         </p:column>
         <p:column headerText="Fecha" sortBy="#{articuloOficina.getFechaCap()}" sortOrder="descending" width="100px">
             <h:outputText value="#{articuloOficina.getFechaCap()}" >
@@ -30,9 +30,39 @@
             </h:outputText>
         </p:column>
         <p:column headerText="Estatus" sortBy="#{articuloOficina.aprobada}" width="100px">
-            <span class="customer-badge status-#{articuloOficina.aprobada eq null ? 'proposal' : articuloOficina.aprobada eq  1 ? 'qualified' : 'unqualified'}" style="display: block; width: 7rem">
-                #{articuloOficina.aprobada eq null ? 'ENVIADA' : articuloOficina.aprobada eq  1 ? 'APROBADA' : 'RECHAZADA'}</span>
+            <span class="customer-badge status-#{articuloOficinasBean.status.getStatusClass(articuloOficina.aprobada)}" style="display: block; width: 7rem">
+                #{articuloOficinasBean.status.getStatusText(articuloOficina.aprobada)}</span>
+        </p:column>
+        <p:column width="100px">
+            <p:commandButton styleClass="rounded-button ui-button-warning" process="@this" icon="pi pi-bars"
+                             oncomplete="PF('dialogCambiarEstatus').show()" >
+                <f:setPropertyActionListener value="#{articuloOficina}" target="#{articuloOficinasBean.solicitud}" />
+            </p:commandButton>
         </p:column>
     </p:dataTable>
+    <p:dialog header="Detalle Estatus" id="dialogCambiarEstatus" showEffect="fade" modal="true" draggable="false" resizable="false"
+        widgetVar="dialogCambiarEstatus" responsive="true" dynamic="true" cache="false" closable="false" 
+        closeOnEscape="false" styleClass="ferbo-dialog-complemento-articulo">
+        <p:outputPanel id="pnlCancelar" rendered="#{not empty articuloOficinasBean.solicitud}">
+            <div class="formgrid grid">
+                <div class="field col">
+                    <p:outputLabel id="soArticulo" value="#{articuloOficinasBean.solicitud.idArticulo.descripcion}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
+                </div>
+            </div>
+            <div class="formgrid grid">
+                <div class="field col">
+                    <h:graphicImage id="imgArticulo" name="images/articulos/#{articuloOficinasBean.solicitud.idArticulo.descripcion}.jpg" library="recursos" width="113" rendered="#{articuloOficinasBean.solicitud.idArticulo.descripcion ne null}" styleClass="product-image"/>
+                </div>
+            </div>
+        </p:outputPanel>
+        <f:facet name="footer">
+            <p:commandButton value="Cancelar" icon="pi pi-check" actionListener="#{articuloOficinasBean.actualizarRegistro()}"
+                             update="formActividadesArticulos:tabView:dt-articuloOficinas-sol" process="pnlCancelar @this"
+                             class="ui-button-warning" >
+            </p:commandButton>
+            <p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dialogCambiarEstatus').hide()"
+                class="ui-button-secondary" type="button" />
+        </f:facet>
+    </p:dialog>
 
 </ui:composition>
