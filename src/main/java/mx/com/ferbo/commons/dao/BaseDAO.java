@@ -32,7 +32,7 @@ public abstract class BaseDAO<MODEL, PK> {
 	public EntityManager getEntityManager() {
 		EntityManager em = null;
 		try {
-			emf = Persistence.createEntityManagerFactory(PERSIST_UNIT);
+			emf = getEntityManagerFactory();
 			em = emf.createEntityManager();
 		} catch(Exception ex) {
 			log.error("Problema para obtener el entity manager...", ex);
