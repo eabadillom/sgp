@@ -12,99 +12,101 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
-
 @NamedQueries({
-	@NamedQuery(name = "CatPeriodicidadPago.buscarActivo", query = "SELECT p FROM CatPeriodicidadPago p WHERE (p.vigenciaInicio IS NOT NULL AND p.vigenciaInicio <= :fecha) AND (p.vigenciaFin IS NULL OR p.vigenciaFin >= :fecha)"),
-	@NamedQuery(name = "CatPeriodicidadPago.buscarTodos", query = "SELECT p FROM CatPeriodicidadPago p ORDER BY p.periodicidad"),
-	@NamedQuery(name = "CatPeriodicidadPago.buscarTodosActivos", query = "SELECT p FROM CatPeriodicidadPago p WHERE (p.vigenciaFin IS NULL OR p.vigenciaFin <= :vigenciaFin)")
+    @NamedQuery(name = "CatPeriodicidadPago.buscarActivo", query = "SELECT p FROM CatPeriodicidadPago p WHERE (p.vigenciaInicio IS NOT NULL AND p.vigenciaInicio <= :fecha) AND (p.vigenciaFin IS NULL OR p.vigenciaFin >= :fecha)"),
+    @NamedQuery(name = "CatPeriodicidadPago.buscarTodos", query = "SELECT p FROM CatPeriodicidadPago p ORDER BY p.periodicidad"),
+    @NamedQuery(name = "CatPeriodicidadPago.buscarTodosActivos", query = "SELECT p FROM CatPeriodicidadPago p WHERE (p.vigenciaFin IS NULL OR p.vigenciaFin <= :vigenciaFin)")
 })
 @Entity
 @Table(name = "cat_periodicidad_pago")
 public class CatPeriodicidadPago implements Serializable {
 
-	private static final long serialVersionUID = 1890135287600496909L;
-	
-	@Id
-	@Basic(optional = false)
-	@Column(name = "periodicidad")
-	private String periodicidad;
-	
-	@Basic(optional = false)
-	@Column(name = "descripcion")
-	private String descripcion;
-	
-	@Basic(optional = false)
-	@Column(name = "vigencia_ini")
-	private Date vigenciaInicio;
-	
-	@Basic(optional = true)
-	@Column(name = "vigencia_fin")
-	private Date vigenciaFin;
-	
-	public CatPeriodicidadPago() {
-	}
+    private static final long serialVersionUID = 1890135287600496909L;
 
-	public CatPeriodicidadPago(String periodicidad, String descripcion, Date vigenciaInicio,
-			Date vigenciaFin) {
-		super();
-		this.periodicidad = periodicidad;
-		this.descripcion = descripcion;
-		this.vigenciaInicio = vigenciaInicio;
-		this.vigenciaFin = vigenciaFin;
-	}
-	
-	public String getPeriodicidad() {
-		return periodicidad;
-	}
+    @Id
+    @Basic(optional = false)
+    @Column(name = "periodicidad")
+    private String periodicidad;
 
-	public void setPeriodicidad(String periodicidad) {
-		this.periodicidad = periodicidad;
-	}
+    @Basic(optional = false)
+    @Column(name = "descripcion")
+    private String descripcion;
 
-	public String getDescripcion() {
-		return descripcion;
-	}
+    @Basic(optional = false)
+    @Column(name = "vigencia_ini")
+    private Date vigenciaInicio;
 
-	public void setDescripcion(String descripcion) {
-		this.descripcion = descripcion;
-	}
+    @Basic(optional = true)
+    @Column(name = "vigencia_fin")
+    private Date vigenciaFin;
 
-	public Date getVigenciaInicio() {
-		return vigenciaInicio;
-	}
+    public CatPeriodicidadPago() {
+    }
 
-	public void setVigenciaInicio(Date vigenciaInicio) {
-		this.vigenciaInicio = vigenciaInicio;
-	}
+    public CatPeriodicidadPago(String periodicidad, String descripcion, Date vigenciaInicio,
+            Date vigenciaFin) {
+        super();
+        this.periodicidad = periodicidad;
+        this.descripcion = descripcion;
+        this.vigenciaInicio = vigenciaInicio;
+        this.vigenciaFin = vigenciaFin;
+    }
 
-	public Date getVigenciaFin() {
-		return vigenciaFin;
-	}
+    public String getPeriodicidad() {
+        return periodicidad;
+    }
 
-	public void setVigenciaFin(Date vigenciaFin) {
-		this.vigenciaFin = vigenciaFin;
-	}
+    public void setPeriodicidad(String periodicidad) {
+        this.periodicidad = periodicidad;
+    }
 
-	@Override
-	public String toString() {
-		return "CatPeriodicidadPago [periodicidad=" + periodicidad + ", descripcion=" + descripcion
-				+ ", vigenciaInicio=" + vigenciaInicio + ", vigenciaFin=" + vigenciaFin + "]";
-	}
-	
-	@Override
-	public int hashCode() {
-		return Objects.hash(periodicidad);
-	}
+    public String getDescripcion() {
+        return descripcion;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		CatPeriodicidadPago other = (CatPeriodicidadPago) obj;
-		return Objects.equals(periodicidad, other.periodicidad);
-	}
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public Date getVigenciaInicio() {
+        return vigenciaInicio;
+    }
+
+    public void setVigenciaInicio(Date vigenciaInicio) {
+        this.vigenciaInicio = vigenciaInicio;
+    }
+
+    public Date getVigenciaFin() {
+        return vigenciaFin;
+    }
+
+    public void setVigenciaFin(Date vigenciaFin) {
+        this.vigenciaFin = vigenciaFin;
+    }
+
+    @Override
+    public String toString() {
+        return "CatPeriodicidadPago [periodicidad=" + periodicidad + ", descripcion=" + descripcion
+                + ", vigenciaInicio=" + vigenciaInicio + ", vigenciaFin=" + vigenciaFin + "]";
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(periodicidad);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        CatPeriodicidadPago other = (CatPeriodicidadPago) obj;
+        return Objects.equals(periodicidad, other.periodicidad);
+    }
 }

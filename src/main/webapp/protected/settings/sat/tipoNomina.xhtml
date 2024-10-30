@@ -25,7 +25,7 @@
         </p:toolbar>
 
         <div style="padding:1rem">
-            <p:dataTable id="dt-tipoNomina" widgetVar="dtTipoNomina" value="#{tipoNominaBean.listDTO}" var="nomina" >
+            <p:dataTable id="dt-tipoNomina" widgetVar="dtTipoNomina" value="#{tipoNominaBean.listTipoNomina}" var="nomina" >
 
                 <p:column headerText="Clave">
                     <p:outputLabel value="#{nomina.clave}" ></p:outputLabel>
@@ -37,7 +37,7 @@
 
                 <p:column>
                     <p:commandButton icon="pi pi-bars" actionListener="#{tipoNominaBean.editar()}" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dlgTipoNomina').show();" process="@this" update="@this form:dlg-tipoNomina" >
-                        <f:setPropertyActionListener value="#{nomina}" target="#{tipoNominaBean.tipoNominaDTO}" ></f:setPropertyActionListener>
+                        <f:setPropertyActionListener value="#{nomina}" target="#{tipoNominaBean.tipoNomina}" ></f:setPropertyActionListener>
                     </p:commandButton>
                 </p:column>
 
@@ -49,12 +49,12 @@
 
                 <div class="p-field">
                     <p:outputLabel value="Clave" ></p:outputLabel>
-                    <p:inputText value="#{tipoNominaBean.tipoNominaDTO.clave}" readonly="#{tipoNominaBean.primaryEdit}" ></p:inputText>
+                    <p:inputText value="#{tipoNominaBean.tipoNomina.clave}" readonly="#{tipoNominaBean.primaryEdit}" ></p:inputText>
                 </div>
 
                 <div class="p-field">
                     <p:outputLabel value="Descrpcion"></p:outputLabel>
-                    <p:inputText value="#{tipoNominaBean.tipoNominaDTO.descripcion}" ></p:inputText>
+                    <p:inputText value="#{tipoNominaBean.tipoNomina.descripcion}" ></p:inputText>
                 </div>
 
             </p:outputPanel>

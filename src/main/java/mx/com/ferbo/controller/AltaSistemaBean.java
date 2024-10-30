@@ -36,6 +36,8 @@ public class AltaSistemaBean implements Serializable {
     private List<DetRolSistema> roles;
     private String clave1;
     private String clave2;
+    private FacesContext fc;
+    private PrimeFaces pf;
 
     private String accion = "";
 
@@ -49,6 +51,8 @@ public class AltaSistemaBean implements Serializable {
     public void init() {
         this.plantas = this.plantadao.buscarTodos();
         this.roles = this.rolsistemadao.obtenerTodos();
+        fc = FacesContext.getCurrentInstance();
+        pf = PrimeFaces.current();
     }
 
     public List<DetFpClient> getSistemas() {
@@ -102,11 +106,12 @@ public class AltaSistemaBean implements Serializable {
 
     public void buscarId(DetFpClient sistematemp) {
         try {
-            //this.sistema = this.fpclientdao.buscarPorId(sistematemp.getIdFpClient());
             this.sistema = sistematemp;
             this.accion = "Modificar";
         } catch (Exception ex) {
             log.info("Problema en obtener elemento no encontrado...", ex);
+            fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error: " + ex.getMessage(), null));
+            pf.ajax().update("message");
         }
     }
 
@@ -116,10 +121,12 @@ public class AltaSistemaBean implements Serializable {
         this.listar(true);
         }
         catch(SGPException ex){
-            
+            fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error: " + ex.getMessage(), null));
+            pf.ajax().update("message");
         }
         catch(Exception ex){
-            
+            fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: " + ex.getMessage(), null));
+            pf.ajax().update("message");
         }
     }
 
@@ -129,8 +136,12 @@ public class AltaSistemaBean implements Serializable {
         this.listar(true);
         }
         catch(SGPException ex){
+            fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error: " + ex.getMessage(), null));
+            pf.ajax().update("message");
         }
         catch(Exception ex){
+            fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: " + ex.getMessage(), null));
+            pf.ajax().update("message");
         }
     }
 
@@ -140,9 +151,12 @@ public class AltaSistemaBean implements Serializable {
         this.listar(true);
         }
         catch(SGPException ex){
+            fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error: " + ex.getMessage(), null));
+            pf.ajax().update("message");
         }
         catch(Exception ex){
-            
+            fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: " + ex.getMessage(), null));
+            pf.ajax().update("message");
         }
     }
 
@@ -169,6 +183,8 @@ public class AltaSistemaBean implements Serializable {
 
         } catch (Exception ex) {
             log.info(ex);
+            fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: no se pudieron cargar los elementos", null));
+            pf.ajax().update("message");
         }
     }
 

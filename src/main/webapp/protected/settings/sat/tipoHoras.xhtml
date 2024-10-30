@@ -50,7 +50,7 @@
 
                     <p:column width="3rem">
                         <p:commandButton icon="pi pi-bars" actionListener="#{tipoHorasBean.editar()}" onclick="PF('statusDialog').show()" oncomplete="PF('statusDialog').hide();PF('dlgTipoHora').show();" process="@this form:dt-tipoHora" update="form:dlg-tipoHora">
-                            <f:setPropertyActionListener value="#{tipoHora}" target="#{tipoHorasBean.tipoHorasDTO}" ></f:setPropertyActionListener>
+                            <f:setPropertyActionListener value="#{tipoHora}" target="#{tipoHorasBean.tipoHoras}" ></f:setPropertyActionListener>
                         </p:commandButton>
                     </p:column>
 
@@ -63,22 +63,22 @@
 
                     <div class="p-field" >
                         <p:outputLabel value="Codigo" ></p:outputLabel>
-                        <p:inputText value="#{tipoHorasBean.tipoHorasDTO.clave}" readonly="#{tipoHorasBean.primaryEdit}" required="true" requiredMessage="el campo clave es obligatorio"></p:inputText>                        
+                        <p:inputText value="#{tipoHorasBean.tipoHoras.clave}" readonly="#{tipoHorasBean.primaryEdit}" required="true" requiredMessage="el campo clave es obligatorio"></p:inputText>                        
                     </div>
 
                     <div class="p-field">
                         <p:outputLabel value="Descripcion"></p:outputLabel>
-                        <p:inputText value="#{tipoHorasBean.tipoHorasDTO.descripcion}" required="true" requiredMessage="el campo descripcion es obligatorio"></p:inputText>
+                        <p:inputText value="#{tipoHorasBean.tipoHoras.descripcion}" required="true" requiredMessage="el campo descripcion es obligatorio"></p:inputText>
                     </div>
 
                     <div class="p-field">
                         <p:outputLabel value="Fecha Inicio" ></p:outputLabel>
-                        <p:datePicker value="#{tipoHorasBean.tipoHorasDTO.vigenciaInicio}" showIcon="true" yearNavigator="true" monthNavigator="true" required="true" requiredMessage="el campo fecha Inicio es obligatorio" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"></p:datePicker>
+                        <p:datePicker value="#{tipoHorasBean.tipoHoras.vigenciaInicio}" showIcon="true" yearNavigator="true" monthNavigator="true" required="true" requiredMessage="el campo fecha Inicio es obligatorio" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"></p:datePicker>
                     </div>
 
                     <div class="p-field">
                         <p:outputLabel value="Fecha Fin" ></p:outputLabel>
-                        <p:datePicker value="#{tipoHorasBean.tipoHorasDTO.vigenciaFin}" showIcon="true" yearNavigator="true" monthNavigator="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"></p:datePicker>
+                        <p:datePicker value="#{tipoHorasBean.tipoHoras.vigenciaFin}" showIcon="true" yearNavigator="true" monthNavigator="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"></p:datePicker>
                     </div>                    
 
                 </p:outputPanel>

@@ -14,8 +14,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.sat.TipoJornadaDAO;
-import mx.com.ferbo.dto.sat.TipoJornadaDTO;
+import mx.com.ferbo.dao.n.sat.TipoJornadaDAO;
+import mx.com.ferbo.model.sat.CatTipoJornada;
 
 @Named(value = "tipoJornadaBean")
 @ViewScoped
@@ -25,8 +25,8 @@ public class TipoJornadaBean implements Serializable {
 	private static Logger log = LogManager.getLogger(TipoJornadaBean.class);
 	private String contextPath = null;
 	
-	private List<TipoJornadaDTO> tiposJornada;
-	private TipoJornadaDTO tipoJornada;
+	private List<CatTipoJornada> tiposJornada;
+	private CatTipoJornada tipoJornada;
 	private TipoJornadaDAO tipoJornadaDAO;
 	
 	private boolean nuevo = false;
@@ -41,24 +41,24 @@ public class TipoJornadaBean implements Serializable {
 		this.tiposJornada = tipoJornadaDAO.buscarTodos();
 	}
 
-	public List<TipoJornadaDTO> getTiposJornada() {
+	public List<CatTipoJornada> getTiposJornada() {
 		return tiposJornada;
 	}
 
-	public void setTiposJornada(List<TipoJornadaDTO> tiposJornada) {
+	public void setTiposJornada(List<CatTipoJornada> tiposJornada) {
 		this.tiposJornada = tiposJornada;
 	}
 
-	public TipoJornadaDTO getTipoJornada() {
+	public CatTipoJornada getTipoJornada() {
 		return tipoJornada;
 	}
 
-	public void setTipoJornada(TipoJornadaDTO tipoJornada) {
+	public void setTipoJornada(CatTipoJornada tipoJornada) {
 		this.tipoJornada = tipoJornada;
 	}
 	
 	public void nuevo() {
-		this.tipoJornada = new TipoJornadaDTO();
+		this.tipoJornada = new CatTipoJornada();
 		this.nuevo = true;
 	}
 	
