@@ -2,6 +2,7 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -91,5 +92,33 @@ public class CatTalla implements Serializable {
     public void setDetSolicitudPrendaList(List<DetSolicitudPrenda> detSolicitudPrendaList) {
         this.detSolicitudPrendaList = detSolicitudPrendaList;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 41 * hash + Objects.hashCode(this.idTalla);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final CatTalla other = (CatTalla) obj;
+        return Objects.equals(this.idTalla, other.idTalla);
+    }
+
+    @Override
+    public String toString() {
+        return "CatTalla{" + "idTalla=" + idTalla + ", descripcion=" + descripcion + '}';
+    }
+    
     
 }
