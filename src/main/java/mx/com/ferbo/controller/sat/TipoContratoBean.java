@@ -14,8 +14,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.sat.TipoContratoDAO;
-import mx.com.ferbo.dto.sat.TipoContratoDTO;
+import mx.com.ferbo.dao.n.sat.TipoContratoDAO;
+import mx.com.ferbo.model.sat.CatTipoContrato;
 
 @Named(value = "tipoContratoBean")
 @ViewScoped
@@ -25,8 +25,8 @@ public class TipoContratoBean implements Serializable {
 	private static Logger log = LogManager.getLogger(TipoContratoBean.class);
 	private String contextPath = null;
 	
-	private List<TipoContratoDTO> tiposContrato;
-	private TipoContratoDTO tipoContrato;
+	private List<CatTipoContrato> tiposContrato;
+	private CatTipoContrato tipoContrato;
 	private TipoContratoDAO tipoContratoDAO;
 	
 	private boolean nuevo = false;
@@ -42,7 +42,7 @@ public class TipoContratoBean implements Serializable {
 	}
 	
 	public void nuevo() {
-		this.tipoContrato = new TipoContratoDTO();
+		this.tipoContrato = new CatTipoContrato();
 		this.nuevo = true;
 	}
 	
@@ -79,19 +79,19 @@ public class TipoContratoBean implements Serializable {
 		}
 	}
 
-	public List<TipoContratoDTO> getTiposContrato() {
+	public List<CatTipoContrato> getTiposContrato() {
 		return tiposContrato;
 	}
 
-	public void setTiposContrato(List<TipoContratoDTO> tiposContrato) {
+	public void setTiposContrato(List<CatTipoContrato> tiposContrato) {
 		this.tiposContrato = tiposContrato;
 	}
 
-	public TipoContratoDTO getTipoContrato() {
+	public CatTipoContrato getTipoContrato() {
 		return tipoContrato;
 	}
 
-	public void setTipoContrato(TipoContratoDTO tipoContrato) {
+	public void setTipoContrato(CatTipoContrato tipoContrato) {
 		this.tipoContrato = tipoContrato;
 	}
 }

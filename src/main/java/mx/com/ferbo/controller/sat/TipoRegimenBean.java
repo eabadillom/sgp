@@ -14,8 +14,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.sat.TipoRegimenDAO;
-import mx.com.ferbo.dto.sat.TipoRegimenDTO;
+import mx.com.ferbo.dao.n.sat.TipoRegimenDAO;
+import mx.com.ferbo.model.sat.CatTipoRegimen;
 
 @Named(value = "tipoRegimenBean")
 @ViewScoped
@@ -25,8 +25,8 @@ public class TipoRegimenBean implements Serializable {
 	private static Logger log = LogManager.getLogger(TipoRegimenBean.class);
 	private String contextPath = null;
 	private TipoRegimenDAO tipoRegimenDAO;
-	private List<TipoRegimenDTO> regimenes;
-	private TipoRegimenDTO regimen;
+	private List<CatTipoRegimen> regimenes;
+	private CatTipoRegimen regimen;
 	private boolean nuevo = false;
 	
 	public TipoRegimenBean() {
@@ -40,7 +40,7 @@ public class TipoRegimenBean implements Serializable {
 	}
 	
 	public void nuevo() {
-		this.regimen = new TipoRegimenDTO();
+		this.regimen = new CatTipoRegimen();
 		this.nuevo = true;
 	}
 	
@@ -78,19 +78,19 @@ public class TipoRegimenBean implements Serializable {
 		}
 	}
 
-	public List<TipoRegimenDTO> getRegimenes() {
+	public List<CatTipoRegimen> getRegimenes() {
 		return regimenes;
 	}
 
-	public void setRegimenes(List<TipoRegimenDTO> regimenes) {
+	public void setRegimenes(List<CatTipoRegimen> regimenes) {
 		this.regimenes = regimenes;
 	}
 
-	public TipoRegimenDTO getRegimen() {
+	public CatTipoRegimen getRegimen() {
 		return regimen;
 	}
 
-	public void setRegimen(TipoRegimenDTO regimen) {
+	public void setRegimen(CatTipoRegimen regimen) {
 		this.regimen = regimen;
 	}
 

@@ -15,8 +15,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.sat.CatTipoHorasDAO;
-import mx.com.ferbo.dto.sat.TipoHorasDTO;
+import mx.com.ferbo.dao.n.sat.TipoHorasDAO;
+import mx.com.ferbo.model.sat.CatTipoHoras;
 import mx.com.ferbo.util.SGPException;
 
 @Named(value = "tipoHorasBean")
@@ -26,17 +26,17 @@ public class TipoHorasBean implements Serializable{
     private static final long serialVersionUID = -3103728579268351267L;
     private static Logger log = LogManager.getLogger(TipoHorasBean.class);
 
-    private TipoHorasDTO tipoHorasDTO;
-    private List<TipoHorasDTO> listTipoHoras;
+    private CatTipoHoras tipoHoras;
+    private List<CatTipoHoras> listTipoHoras;
 
-    private CatTipoHorasDAO catTipoHorasDAO;
+    private TipoHorasDAO catTipoHorasDAO;
 
     private boolean guardar;
     private boolean primaryEdit;
 
     public TipoHorasBean(){
 
-        catTipoHorasDAO = new CatTipoHorasDAO();
+        catTipoHorasDAO = new TipoHorasDAO();
         listTipoHoras = new ArrayList<>();
 
     }
@@ -49,7 +49,7 @@ public class TipoHorasBean implements Serializable{
     }
 
     public void nuevo(){
-        tipoHorasDTO = new TipoHorasDTO();        
+        tipoHoras = new CatTipoHoras();        
         guardar = true;
         primaryEdit = false;
     }
@@ -67,44 +67,29 @@ public class TipoHorasBean implements Serializable{
         String titulo = "Registro guardado";
 
         try {
-            
             if(guardar){
-
-                catTipoHorasDAO.guardar(tipoHorasDTO);
-
+                catTipoHorasDAO.guardar(tipoHoras);
                 mensaje = "Se guardo con éxito";
                 severity = FacesMessage.SEVERITY_INFO;
-
             }else{
-
-                catTipoHorasDAO.actualizar(tipoHorasDTO);
-
+                catTipoHorasDAO.actualizar(tipoHoras);
                 titulo = "Registro editado";
                 mensaje = "Se actualizo con éxito";
                 severity = FacesMessage.SEVERITY_INFO;
             }
-
             listTipoHoras = catTipoHorasDAO.buscarTodos();
             PrimeFaces.current().executeScript("PF('dlgTipoHora').hide();");
-
         }catch(SGPException ex){
-
             titulo = "Error";
             mensaje = "Existe un error en el registro" + " consulta al administrador del sistema";
             severity = FacesMessage.SEVERITY_ERROR;
-
             log.error("Error " + ex.getMessage());
-
         }catch (Exception e) {
-
             titulo = "Error";
             mensaje = "Existe un error en el registro" + " consulta al administrador del sistema";
             severity = FacesMessage.SEVERITY_ERROR;
-
             log.error("Error en registro tipo Hora",e.getMessage());
-
         }finally{
-
             message = new FacesMessage(severity, titulo, mensaje);
             FacesContext.getCurrentInstance().addMessage(null, message);
             PrimeFaces.current().ajax().update("form:messages","form:dt-tipoHora");
@@ -113,19 +98,19 @@ public class TipoHorasBean implements Serializable{
     }
 
 
-    public TipoHorasDTO getTipoHorasDTO() {
-        return tipoHorasDTO;
+    public CatTipoHoras getTipoHoras() {
+        return tipoHoras;
     }
 
-    public void setTipoHorasDTO(TipoHorasDTO tipoHorasDTO) {
-        this.tipoHorasDTO = tipoHorasDTO;
+    public void setTipoHorasDTO(CatTipoHoras tipoHoras) {
+        this.tipoHoras = tipoHoras;
     }
 
-    public List<TipoHorasDTO> getListTipoHoras() {
+    public List<CatTipoHoras> getListTipoHoras() {
         return listTipoHoras;
     }
 
-    public void setListTipoHoras(List<TipoHorasDTO> listTipoHoras) {
+    public void setListTipoHoras(List<CatTipoHoras> listTipoHoras) {
         this.listTipoHoras = listTipoHoras;
     }
 
@@ -136,7 +121,5 @@ public class TipoHorasBean implements Serializable{
     public void setPrimaryEdit(boolean primaryEdit) {
         this.primaryEdit = primaryEdit;
     }
-
-    
     
 }
