@@ -14,7 +14,8 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "cat_pais")
 @NamedQueries({
-    @NamedQuery(name = "Pais.findById", query = "SELECT d FROM Pais d WHERE d.clavePais = :clavePais"),
+    @NamedQuery(name = "Pais.findById", query = "SELECT d FROM Pais d WHERE d.cd_pais = :cdPais"),
+    @NamedQuery(name = "Pais.findByClave", query = "SELECT d FROM Pais d WHERE d.clavePais = :clavePais"),
     @NamedQuery(name = "Pais.findAll", query = "SELECT d FROM Pais d ORDER BY d.nombrePais")
 })
 public class Pais implements Serializable {
@@ -24,6 +25,9 @@ public class Pais implements Serializable {
     @Id
     @Basic(optional = false)
     @Column(name = "cd_pais")
+    private Integer cd_pais;
+    
+    @Column(name = "nb_clave")
     private String clavePais;
 
     @Column(name = "nb_pais")
@@ -32,10 +36,19 @@ public class Pais implements Serializable {
     public Pais() {
     }
 
-    public Pais(String clavePais, String nombrePais) {
+    public Pais(Integer cd_pais, String clavePais, String nombrePais) {
         super();
+        this.cd_pais = cd_pais;
         this.clavePais = clavePais;
         this.nombrePais = nombrePais;
+    }
+
+    public Integer getCd_pais() {
+        return cd_pais;
+    }
+
+    public void setCd_pais(Integer cd_pais) {
+        this.cd_pais = cd_pais;
     }
 
     public String getClavePais() {

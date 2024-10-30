@@ -15,12 +15,12 @@ public class DiaNoLaboralDTO {
 		this.descripcion = descripcion;
 		this.pais = pais;
 	}
-	public DiaNoLaboralDTO(Integer id, Date fecha, String descripcion, String clavePais, String nombrePais) {
+	public DiaNoLaboralDTO(Integer id, Date fecha, String descripcion, Integer idPais, String clavePais, String nombrePais) {
 		super();
 		this.id = id;
 		this.fecha = fecha;
 		this.descripcion = descripcion;
-		this.pais = new PaisDTO(clavePais, nombrePais);
+		this.pais = new PaisDTO(idPais, clavePais, nombrePais);
 	} 
 	
 	public Integer getId() {
