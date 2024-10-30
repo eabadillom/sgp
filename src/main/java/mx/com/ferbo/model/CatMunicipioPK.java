@@ -14,26 +14,29 @@ import javax.validation.constraints.NotNull;
  * @author alberto
  */
 @Embeddable
-public class CatEstadoPK implements Serializable
+public class CatMunicipioPK implements Serializable
 {
     private static final long serialVersionUID = -4501534761783764337L;
     
     @ManyToOne
     @JoinColumn(name = "cd_pais")
     private Pais pais;
+    @ManyToOne
+    @JoinColumn(name = "cd_estado")
+    private CatEstado estado;
     @Basic(optional = false)
     @NotNull
-    @Column(name = "cd_estado")
+    @Column(name = "cd_municipio")
     private Integer id;
 
-    public CatEstadoPK() 
+    public CatMunicipioPK() 
     {
-        
     }
 
-    public CatEstadoPK(Pais pais, Integer id) 
+    public CatMunicipioPK(Pais pais, CatEstado estado, int id) 
     {
         this.pais = pais;
+        this.estado = estado;
         this.id = id;
     }
 
@@ -42,12 +45,22 @@ public class CatEstadoPK implements Serializable
         return pais;
     }
 
-    public void setPaisCve(Pais pais) 
+    public void setPais(Pais pais) 
     {
         this.pais = pais;
     }
 
-    public int getId() 
+    public CatEstado getEstado() 
+    {
+        return estado;
+    }
+
+    public void setEstado(CatEstado estado) 
+    {
+        this.estado = estado;
+    }
+
+    public Integer getId() 
     {
         return id;
     }
@@ -60,9 +73,10 @@ public class CatEstadoPK implements Serializable
     @Override
     public int hashCode() 
     {
-        int hash = 3;
-        hash = 23 * hash + Objects.hashCode(this.pais);
-        hash = 23 * hash + Objects.hashCode(this.id);
+        int hash = 7;
+        hash = 79 * hash + Objects.hashCode(this.pais);
+        hash = 79 * hash + Objects.hashCode(this.estado);
+        hash = 79 * hash + Objects.hashCode(this.id);
         return hash;
     }
 
@@ -78,17 +92,20 @@ public class CatEstadoPK implements Serializable
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final CatEstadoPK other = (CatEstadoPK) obj;
+        final CatMunicipioPK other = (CatMunicipioPK) obj;
         if (!Objects.equals(this.pais, other.pais)) {
+            return false;
+        }
+        if (!Objects.equals(this.estado, other.estado)) {
             return false;
         }
         return Objects.equals(this.id, other.id);
     }
-    
+
     @Override
-    public String toString() 
-    {
-        return "CatEstadoPK[" + "paisCve=" + pais + ", estadoCve=" + id + ']';
+    public String toString() {
+        return "CatMunicipioPK[" + "paisCve=" + pais + ", estadoCve=" + estado + ", municipioCve=" + id + ']';
     }
+    
     
 }

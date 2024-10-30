@@ -1,14 +1,17 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -25,38 +28,42 @@ public class Pais implements Serializable {
     @Id
     @Basic(optional = false)
     @Column(name = "cd_pais")
-    private Integer cd_pais;
+    private Integer id;
     
     @Column(name = "nb_clave")
-    private String clavePais;
+    private String clave;
 
     @Column(name = "nb_pais")
+    @JoinColumn(name = "cd_estado")
     private String nombrePais;
+    
+    @OneToMany
+    private List<CatEstado> estados;
 
     public Pais() {
     }
 
-    public Pais(Integer cd_pais, String clavePais, String nombrePais) {
+    public Pais(Integer id, String clave, String nombrePais) {
         super();
-        this.cd_pais = cd_pais;
-        this.clavePais = clavePais;
+        this.id = id;
+        this.clave = clave;
         this.nombrePais = nombrePais;
     }
 
     public Integer getCd_pais() {
-        return cd_pais;
+        return id;
     }
 
-    public void setCd_pais(Integer cd_pais) {
-        this.cd_pais = cd_pais;
+    public void setCd_pais(Integer id) {
+        this.id = id;
     }
 
     public String getClavePais() {
-        return clavePais;
+        return clave;
     }
 
     public void setClavePais(String clavePais) {
-        this.clavePais = clavePais;
+        this.clave = clavePais;
     }
 
     public String getNombrePais() {
@@ -69,7 +76,7 @@ public class Pais implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(clavePais, nombrePais);
+        return Objects.hash(clave, nombrePais);
     }
 
     @Override
@@ -84,11 +91,11 @@ public class Pais implements Serializable {
             return false;
         }
         Pais other = (Pais) obj;
-        return Objects.equals(clavePais, other.clavePais) && Objects.equals(nombrePais, other.nombrePais);
+        return Objects.equals(clave, other.clave) && Objects.equals(nombrePais, other.nombrePais);
     }
 
     @Override
     public String toString() {
-        return "Pais [clavePais=" + clavePais + ", nombrePais=" + nombrePais + "]";
+        return "Pais [clavePais=" + clave + ", nombrePais=" + nombrePais + "]";
     }
 }
