@@ -145,8 +145,4 @@
         <param-name>com.sun.faces.enableRestoreView11Compatibility</param-name>
         <param-value>true</param-value>
     </context-param>
-    <multipart-config>
-        <max-file-size>10485760</max-file-size> <!-- 10 MB -->
-        <max-request-size>20971520</max-request-size> <!-- 20 MB -->
-    </multipart-config>
 </web-app>

@@ -1,29 +1,34 @@
 package mx.com.ferbo.controller;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.Serializable;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
-import java.util.logging.Level;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import javax.servlet.ServletContext;
 import mx.com.ferbo.dao.n.PrendaDAO;
 import mx.com.ferbo.model.CatPrenda;
-import mx.com.ferbo.util.DataSourceManager;
-import mx.com.ferbo.util.IOUtil;
 import mx.com.ferbo.util.SGPException;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.primefaces.PrimeFaces;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.file.UploadedFile;
+import java.io.InputStream;
+import javax.servlet.ServletContext;
+import mx.com.ferbo.util.IOUtil;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.logging.Level;
+import mx.com.ferbo.util.DataSourceManager;
+import static org.omnifaces.util.Faces.getServletContext;
 
 @Named(value = "prendasBean")
 @ViewScoped
@@ -32,14 +37,14 @@ public class PrendasBean implements Serializable {
     private static final long serialVersionUID = 1L;
     private static final Logger log = LogManager.getLogger(PrendasBean.class);
 
+    private List<CatPrenda> prendas;
     private CatPrenda prenda;
     private PrendaDAO prendadao;
-    private List<CatPrenda> prendas;
-    
+
     private FacesContext fc;
     private PrimeFaces pf;
     private ServletContext sc;
-    
+
     private UploadedFile imagen;
     private String direccion;
 
@@ -48,9 +53,9 @@ public class PrendasBean implements Serializable {
     public PrendasBean() {
         this.prendadao = new PrendaDAO();
     }
-    
+
     @PostConstruct
-    public void init(){
+    public void init() {
         fc = FacesContext.getCurrentInstance();
         pf = PrimeFaces.current();
         this.setDireccion(DataSourceManager.getJndiParameter("sgp/imagenes"));
@@ -72,8 +77,16 @@ public class PrendasBean implements Serializable {
         return accion;
     }
 
-    public void setAccion(String accion) {
+    private void setAccion(String accion) {
         this.accion = accion;
+    }
+
+    private String getDireccion() {
+        return direccion;
+    }
+
+    private void setDireccion(String direccion) {
+        this.direccion = direccion;
     }
 
     public UploadedFile getImagen() {
@@ -84,109 +97,91 @@ public class PrendasBean implements Serializable {
         this.imagen = imagen;
     }
 
-    public String getDireccion() {
-        return direccion;
-    }
-
-    public void setDireccion(String direccion) {
-        this.direccion = direccion;
-    }
-    
-    public void nuevaPrenda(){
+    public void nuevaPrenda() {
         this.prenda = new CatPrenda();
         this.setAccion("Registrar");
     }
-    
-    public void pasarPrenda(CatPrenda prendatmp){
-        try{
+
+    public void pasarPrenda(CatPrenda prendatmp) {
+        try {
             this.prenda = prendatmp;
             this.setAccion("Modificar");
-        }
-        catch(Exception ex){
-            log.debug("Problema en asignar la prenda...", ex);
+        } catch (Exception ex) {
+            log.error("Problema en asignar la prenda...", ex);
         }
     }
 
-    private boolean isPostBack(){
-        boolean respuesta = false;
-        
-        respuesta = fc.isPostback();
-        
-        return respuesta;
-    }
-    
-    public void listar(boolean bandera){
-        try{
-            if(!bandera){
-                if(this.isPostBack() == false){
+    public void listar(boolean bandera) {
+        try {
+            if (!bandera) {
+                if (this.isPostBack() == false) {
                     this.prendas = this.prendadao.buscarTodos();
                 }
-            }
-            else{
+            } else {
                 this.prendas = this.prendadao.buscarTodos();
             }
-        }
-        catch(Exception ex){
+        } catch (Exception ex) {
             fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: no se cargaron los elementos", null));
             pf.ajax().update("message");
-            log.debug(ex);
+            log.error(ex);
         }
     }
-    
-    public void registrar(){
-        try{
+
+    private boolean isPostBack() {
+        boolean respuesta = false;
+
+        respuesta = FacesContext.getCurrentInstance().isPostback();
+
+        return respuesta;
+
+    }
+
+    public void registrar() {
+        try {
             this.prendadao.guardar(prenda);
-            this.listar(true);
-        }
-        catch(SGPException ex){
+        } catch (SGPException ex) {
             fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error: " + ex.getMessage(), null));
             pf.ajax().update("message");
-            log.debug(ex);
-        }
-        catch(Exception ex){
+            log.error(ex);
+        } catch (Exception ex) {
             fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: " + ex.getMessage(), null));
             pf.ajax().update("message");
-            log.debug(ex);
+            log.error(ex);
         }
     }
-    
-    public void actualizar(){
-        try{
+
+    public void actualizar() {
+        try {
             this.prendadao.actualizar(prenda);
-            this.listar(true);
-        }
-        catch(SGPException ex){
+        } catch (SGPException ex) {
             fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error: " + ex.getMessage(), null));
             pf.ajax().update("message");
-            log.debug(ex);
-        }
-        catch(Exception ex){
+            log.error(ex);
+        } catch (Exception ex) {
             fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: " + ex.getMessage(), null));
             pf.ajax().update("message");
-            log.debug(ex);
+            log.error(ex);
         }
     }
-    
-    public void eliminar(){
-        try{
+
+    public void eliminar() {
+        try {
             this.prendadao.eliminar(prenda);
             this.borrarImagen();
             this.listar(true);
-        }
-        catch(SGPException ex){
+        } catch (SGPException ex) {
             fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error: " + ex.getMessage(), null));
             pf.ajax().update("message");
-            log.debug(ex);
-        }
-        catch(Exception ex){
+            log.error(ex);
+        } catch (Exception ex) {
             fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: " + ex.getMessage(), null));
             pf.ajax().update("message");
-            log.debug(ex);
+            log.error(ex);
         }
     }
-    
+
     public void operar() {
-        switch (accion) {
+        switch (this.getAccion()) {
             case "Registrar":
                 this.registrar();
                 this.guardarImagen();
@@ -197,14 +192,14 @@ public class PrendasBean implements Serializable {
                 break;
         }
     }
-    
+
     public String disponibilidad(CatPrenda prendatmp) {
 
         return (prendatmp.getActivo() == 1) ? "Existencia" : "Sin Existencia";
 
     }
-    
-     private File buscaImagen(File directorio, String imagen) {
+
+    private File buscaImagen(File directorio, String imagen) {
 
         String imegencompleta = imagen + ".jpg";
         File[] archivos = directorio.listFiles();
@@ -242,18 +237,16 @@ public class PrendasBean implements Serializable {
                 }
 
             } else {
-                log.debug("Problema al encontrar el directorio.");
+                log.error("Problema al encontrar el directorio.");
                 return;
             }
 
-            log.info("Direccion: {}", ruta);
-
             try {
-                contenidoimagen = this.imagen.getContent();
                 log.info("Longitud del archivo: {}", this.imagen.getSize());
+                contenidoimagen = this.imagen.getContent();
                 contenidoimagen = IOUtil.read(this.imagen.getInputStream());
             } catch (IOException ex) {
-                log.debug("Hubo algun problema al momento de convertir la imagen a un arreglo de bytes", ex);
+                log.error("Hubo algun problema al momento de convertir la imagen a un arreglo de bytes", ex);
                 fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error: problema al momento de guardar la imagen", null));
                 pf.ajax().update("message");
             }
@@ -264,7 +257,7 @@ public class PrendasBean implements Serializable {
                 fos.write(contenidoimagen);
                 fos.flush();
             } catch (IOException ex) {
-                log.debug("Hubo algun problema al momento de guardar la imagen en el servidor", ex);
+                log.error("Hubo algun problema al momento de guardar la imagen en el servidor", ex);
                 fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error: problema al momento de guardar la imagen", null));
                 pf.ajax().update("message");
             }
@@ -282,7 +275,11 @@ public class PrendasBean implements Serializable {
                 Path destination = Paths.get(destinationPath);
                 Files.copy(source, destination);
             } catch (IOException ex) {
-                java.util.logging.Logger.getLogger(ArticulosBean.class.getName()).log(Level.SEVERE, null, ex);
+
+                log.error("Problema al guardar la imagen por defecto en el servidor", ex);
+                fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error: problema al momento de guardar la imagen", null));
+                pf.ajax().update("message");
+
             }
         }
         this.listar(true);
@@ -303,7 +300,7 @@ public class PrendasBean implements Serializable {
                 }
 
             } else {
-                log.debug("Problema al encontrar el directorio.");
+                log.error("Problema al encontrar el directorio.");
 
             }
         } catch (Exception ex) {

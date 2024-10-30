@@ -113,7 +113,7 @@
                 </f:facet>
             </p:dialog>
 
-             <p:confirmDialog widgetVar="borrarArticulo" showEffect="fade" width="300"
+            <p:confirmDialog widgetVar="borrarArticulo" showEffect="fade" width="300"
                              message="Borrar Articulo?" header="Confirmar" severity="warn">
                 <p:commandButton value="Si" icon="pi pi-check" actionListener="#{articulosBean.eliminar}"
                                  oncomplete="PF('borrarArticulo').hide()" update="@form" process="@this"/>
