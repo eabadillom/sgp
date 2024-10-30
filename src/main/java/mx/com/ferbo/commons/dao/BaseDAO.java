@@ -1,10 +1,8 @@
 package mx.com.ferbo.commons.dao;
 
-import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import javax.persistence.TypedQuery;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,17 +13,24 @@ import mx.com.ferbo.util.SGPException;
 public abstract class BaseDAO<MODEL, PK> {
 	
 	private static Logger log = LogManager.getLogger(BaseDAO.class);
+	private static final String PERSIST_UNIT = "sgpPU";
 	
 	protected Class<MODEL> modelClass;
+	protected static EntityManagerFactory emf = null;
 	
 	public BaseDAO(Class<MODEL> modelClass) {
 		this.modelClass = modelClass;
 	}
 	
+	public static EntityManagerFactory getEntityManagerFactory() {
+		if (emf == null) {
+			emf = Persistence.createEntityManagerFactory(PERSIST_UNIT);
+		}
+		return emf;
+	}
+	
 	public EntityManager getEntityManager() {
 		EntityManager em = null;
-		EntityManagerFactory emf = null;
-		String PERSIST_UNIT = "sgpPU";
 		try {
 			emf = Persistence.createEntityManagerFactory(PERSIST_UNIT);
 			em = emf.createEntityManager();
