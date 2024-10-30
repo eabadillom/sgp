@@ -7,6 +7,8 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -36,6 +38,9 @@ public class CatLocalidad implements Serializable
     private String descripcion;
     @OneToMany(mappedBy = "cd_asentamiento")
     private List<CatAsentamiento> asentamientos;
+    @JoinColumn(name = "cd_municipio", referencedColumnName = "cd_municipio", insertable = false, updatable = false)
+    @ManyToOne(optional = false)
+    private CatMunicipio municipio;
 
     public CatLocalidad() 
     {
@@ -87,6 +92,16 @@ public class CatLocalidad implements Serializable
         this.asentamientos = asentamientos;
     }
 
+    public CatMunicipio getMunicipio() 
+    {
+        return municipio;
+    }
+
+    public void setMunicipio(CatMunicipio municipio) 
+    {
+        this.municipio = municipio;
+    }
+    
     @Override
     public int hashCode() 
     {

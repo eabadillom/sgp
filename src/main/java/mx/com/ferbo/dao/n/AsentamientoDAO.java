@@ -26,7 +26,7 @@ public class AsentamientoDAO extends BaseDAO<CatAsentamiento, CatAsentamientoPK>
         super(CatAsentamiento.class);
     }
     
-    public List<CatAsentamiento> buscarActivo() 
+    public List<CatAsentamiento> buscarTodos() 
     {
         List<CatAsentamiento> modelList = null;
         EntityManager em = null;
@@ -45,4 +45,27 @@ public class AsentamientoDAO extends BaseDAO<CatAsentamiento, CatAsentamientoPK>
 
         return modelList;
     }
+    
+    public List<CatAsentamiento> buscarPorCodigoPostal(String codigoPostal) 
+    {
+        List<CatAsentamiento> modelList = null;
+        EntityManager em = null;
+
+        try 
+        {
+            em = this.getEntityManager();
+            modelList = em.createNamedQuery("CatAsentamiento.findByCodigoPostal", CatAsentamiento.class)
+                .setParameter("codigoPostal", codigoPostal)
+                .getResultList();
+        } catch(Exception ex) 
+        {
+            log.error("Problema para obtener la lista de asentamientos...",  ex);
+        } finally 
+        {
+            this.close(em);
+        }
+
+        return modelList;
+    }
+    
 }

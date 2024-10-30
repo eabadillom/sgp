@@ -37,7 +37,7 @@ public class CatTipoAsentamiento implements Serializable
     @Column(name = "nb_tipoasntmnto")
     private String descripcion;
     @Size(max = 4)
-    @Column(name = "nb_tipoasntmnto")
+    @Column(name = "nb_clave")
     private String clave;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cd_tipoasntmnto")
     private List<CatAsentamiento> asentamientos;

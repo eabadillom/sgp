@@ -34,6 +34,15 @@ public class CatAsentamiento implements Serializable
     @Size(max = 5)
     @Column(name = "cd_codPostal")
     private String cp;
+    @JoinColumn(name = "cd_localidad", referencedColumnName = "cd_localidad", insertable = false, updatable = false)
+    @ManyToOne(optional = false)
+    private CatLocalidad localidad;
+    @JoinColumn(name = "cd_tipoasntmnto", referencedColumnName = "cd_tipoasntmnto", insertable = false, updatable = false)
+    @ManyToOne(optional = false)
+    private CatTipoAsentamiento tipoAsentamiento;
+    @JoinColumn(name = "cd_entidadPostal", referencedColumnName = "cd_entidadPostal", insertable = false, updatable = false)
+    @ManyToOne(optional = false)
+    private CatEntidadPostal entidadPostal;
 
     public CatAsentamiento() 
     {
@@ -79,6 +88,36 @@ public class CatAsentamiento implements Serializable
         this.cp = cp;
     }
 
+    public CatLocalidad getLocalidad() 
+    {
+        return localidad;
+    }
+
+    public void setLocalidad(CatLocalidad localidad) 
+    {
+        this.localidad = localidad;
+    }
+
+    public CatTipoAsentamiento getTipoAsentamiento() 
+    {
+        return tipoAsentamiento;
+    }
+
+    public void setTipoAsentamiento(CatTipoAsentamiento tipoAsentamiento) 
+    {
+        this.tipoAsentamiento = tipoAsentamiento;
+    }
+
+    public CatEntidadPostal getEntidadPostal() 
+    {
+        return entidadPostal;
+    }
+
+    public void setEntidadPostal(CatEntidadPostal entidadPostal) 
+    {
+        this.entidadPostal = entidadPostal;
+    }
+    
     @Override
     public int hashCode() 
     {

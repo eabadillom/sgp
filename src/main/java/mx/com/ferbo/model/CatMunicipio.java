@@ -8,6 +8,8 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -37,7 +39,10 @@ public class CatMunicipio implements Serializable
     private String descripcion;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cd_municipio")
     private List<CatLocalidad> localidades;
-
+    @JoinColumn(name = "cd_estado", referencedColumnName = "cd_estado", insertable = false, updatable = false)
+    @ManyToOne(optional = false)
+    private CatEstado estado;
+    
     public CatMunicipio() 
     {
     }
@@ -88,6 +93,16 @@ public class CatMunicipio implements Serializable
         this.localidades = localidades;
     }
 
+    public CatEstado getEstado() 
+    {
+        return estado;
+    }
+
+    public void setEstado(CatEstado estado) 
+    {
+        this.estado = estado;
+    }
+    
     @Override
     public int hashCode() 
     {
