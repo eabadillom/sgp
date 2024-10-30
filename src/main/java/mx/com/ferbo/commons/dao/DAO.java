@@ -16,7 +16,10 @@ import mx.com.ferbo.util.SGPException;
 public abstract class DAO<DTO, MODEL, PK> {
 	private static Logger log = LogManager.getLogger(DAO.class);
 	
+	protected static EntityManagerFactory emf = null;
 	protected Class<MODEL> modelClass;
+	
+	public static final String PERSIST_UNIT = "sgpPU";
 	
 	public DAO() {
 		super();
@@ -28,10 +31,11 @@ public abstract class DAO<DTO, MODEL, PK> {
 	
 	public EntityManager getEntityManager() {
 		EntityManager em = null;
-		EntityManagerFactory emf = null;
-		String PERSIST_UNIT = "sgpPU";
+		
 		try {
-			emf = Persistence.createEntityManagerFactory(PERSIST_UNIT);
+			if(emf == null)
+				emf = Persistence.createEntityManagerFactory(PERSIST_UNIT);
+			
 			em = emf.createEntityManager();
 		} catch(Exception ex) {
 			log.error("Problema para obtener el entity manager...", ex);
