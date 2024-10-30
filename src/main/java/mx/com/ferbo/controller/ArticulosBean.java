@@ -46,7 +46,6 @@ public class ArticulosBean implements Serializable {
     private ServletContext sc;
 
     private UploadedFile imagen;
-    private File sinimagen;
     private String direccion;
 
     private String accion;
@@ -108,7 +107,7 @@ public class ArticulosBean implements Serializable {
             this.articulo = articulotmp;
             this.setAccion("Modificar");
         } catch (Exception ex) {
-            log.debug("Problema en asignar el articulo...", ex);
+            log.error("Problema en asignar el articulo...", ex);
         }
     }
 
@@ -124,7 +123,7 @@ public class ArticulosBean implements Serializable {
         } catch (Exception ex) {
             fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: no se cargaron los elementos", null));
             pf.ajax().update("message");
-            log.debug(ex);
+            log.error(ex);
         }
     }
 
@@ -143,9 +142,11 @@ public class ArticulosBean implements Serializable {
         } catch (SGPException ex) {
             fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error: " + ex.getMessage(), null));
             pf.ajax().update("message");
+            log.error(ex);
         } catch (Exception ex) {
             fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: " + ex.getMessage(), null));
             pf.ajax().update("message");
+            log.error(ex);
         }
     }
 
@@ -155,9 +156,11 @@ public class ArticulosBean implements Serializable {
         } catch (SGPException ex) {
             fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error: " + ex.getMessage(), null));
             pf.ajax().update("message");
+            log.error(ex);
         } catch (Exception ex) {
             fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: " + ex.getMessage(), null));
             pf.ajax().update("message");
+            log.error(ex);
         }
     }
 
@@ -169,9 +172,11 @@ public class ArticulosBean implements Serializable {
         } catch (SGPException ex) {
             fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error: " + ex.getMessage(), null));
             pf.ajax().update("message");
+            log.error(ex);
         } catch (Exception ex) {
             fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: " + ex.getMessage(), null));
             pf.ajax().update("message");
+            log.error(ex);
         }
     }
 
@@ -232,18 +237,16 @@ public class ArticulosBean implements Serializable {
                 }
 
             } else {
-                log.debug("Problema al encontrar el directorio.");
+                log.error("Problema al encontrar el directorio.");
                 return;
             }
 
-            log.info("Direccion: {}", ruta);
-
             try {
-                contenidoimagen = this.imagen.getContent();
                 log.info("Longitud del archivo: {}", this.imagen.getSize());
+                contenidoimagen = this.imagen.getContent();
                 contenidoimagen = IOUtil.read(this.imagen.getInputStream());
             } catch (IOException ex) {
-                log.debug("Hubo algun problema al momento de convertir la imagen a un arreglo de bytes", ex);
+                log.error("Hubo algun problema al momento de convertir la imagen a un arreglo de bytes", ex);
                 fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error: problema al momento de guardar la imagen", null));
                 pf.ajax().update("message");
             }
@@ -254,7 +257,7 @@ public class ArticulosBean implements Serializable {
                 fos.write(contenidoimagen);
                 fos.flush();
             } catch (IOException ex) {
-                log.debug("Hubo algun problema al momento de guardar la imagen en el servidor", ex);
+                log.error("Hubo algun problema al momento de guardar la imagen en el servidor", ex);
                 fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error: problema al momento de guardar la imagen", null));
                 pf.ajax().update("message");
             }
@@ -272,7 +275,9 @@ public class ArticulosBean implements Serializable {
                 Path destination = Paths.get(destinationPath);
                 Files.copy(source, destination);
             } catch (IOException ex) {
-                java.util.logging.Logger.getLogger(ArticulosBean.class.getName()).log(Level.SEVERE, null, ex);
+                log.error("Problema al guardar la imagen por defecto en el servidor", ex);
+                fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error: problema al momento de guardar la imagen", null));
+                pf.ajax().update("message");
             }
         }
         this.listar(true);
@@ -293,7 +298,7 @@ public class ArticulosBean implements Serializable {
                 }
 
             } else {
-                log.debug("Problema al encontrar el directorio.");
+                log.error("Problema al encontrar el directorio.");
 
             }
         } catch (Exception ex) {

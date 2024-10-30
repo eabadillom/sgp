@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<ui:composition xxmlns="http://www.w3.org/1999/xhtml"
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
@@ -20,7 +20,7 @@
             </p:dialog>
             <p:toolbar>
                 <p:toolbarGroup>
-                    <p:commandButton value="Agregar" update="" icon="pi pi-plus" 
+                    <p:commandButton value="Agregar" update="frm:dlgPrenda" icon="pi pi-plus" 
                                      actionListener="#{prendasBean.nuevaPrenda}" 
                                      oncomplete="PF('dlgPrenda').show();" styleClass="edit-button" 
                                      process="@this"/>
@@ -122,7 +122,7 @@
                                  onclick="PF('borrarPrenda').hide();" />
             </p:confirmDialog>
         </h:form>
-        
+
     </ui:define>
 
 </ui:composition>
