@@ -52,12 +52,12 @@ public class CatDiaNoLaboral implements Serializable {
 		this.pais = pais;
 	}
 	
-	public CatDiaNoLaboral(Integer id, Date fecha, String descripcion, String clavePais, String nombrePais) {
+	public CatDiaNoLaboral(Integer id, Date fecha, String descripcion, Integer idPais, String clavePais, String nombrePais) {
 		super();
 		this.id = id;
 		this.fecha = fecha;
 		this.descripcion = descripcion;
-		this.pais = new Pais(clavePais, nombrePais);
+		this.pais = new Pais(idPais, clavePais, nombrePais);
 	}
 
 	public Integer getId() {

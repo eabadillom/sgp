@@ -16,10 +16,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.DiaNoLaboralDAO;
-import mx.com.ferbo.dao.PaisDAO;
-import mx.com.ferbo.dto.DiaNoLaboralDTO;
-import mx.com.ferbo.dto.PaisDTO;
+import mx.com.ferbo.dao.n.DiaNoLaboralDAO;
+import mx.com.ferbo.dao.n.PaisDAO;
+import mx.com.ferbo.model.CatDiaNoLaboral;
+import mx.com.ferbo.model.Pais;
 import mx.com.ferbo.util.DateUtils;
 
 @Named(value = "diasNLBean")
@@ -31,10 +31,10 @@ public class DiasNoLaboralesBean implements Serializable {
 	
 	private List<Integer> aniosList = null;
 	private Integer anioSelected = null;
-	private List<PaisDTO> paisesList = null;
-	private PaisDTO paisSelected = null;
-	List<DiaNoLaboralDTO> listaDiasNL = null;
-	DiaNoLaboralDTO diaNLSelected = null;
+	private List<Pais> paisesList = null;
+	private Pais paisSelected = null;
+	List<CatDiaNoLaboral> listaDiasNL = null;
+	CatDiaNoLaboral diaNLSelected = null;
 	
 	
 	private DiaNoLaboralDAO diaNLDAO = null;
@@ -99,7 +99,7 @@ public class DiasNoLaboralesBean implements Serializable {
 		log.info("Año seleccionado: {}", this.anioSelected);
 		log.info("Pais seleccionado: {}", this.paisSelected);
 		
-		this.diaNLSelected = new DiaNoLaboralDTO(null, null, null, this.paisSelected);
+		this.diaNLSelected = new CatDiaNoLaboral(null, null, null, this.paisSelected);
 		
 		
 	}
@@ -129,7 +129,7 @@ public class DiasNoLaboralesBean implements Serializable {
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, titulo, mensaje));
-			PrimeFaces.current().ajax().update("messages");
+			PrimeFaces.current().ajax().update("form:messages");
 		}
 	}
 	
@@ -178,35 +178,35 @@ public class DiasNoLaboralesBean implements Serializable {
 		this.anioSelected = anioSelected;
 	}
 
-	public List<DiaNoLaboralDTO> getListaDiasNL() {
+	public List<CatDiaNoLaboral> getListaDiasNL() {
 		return listaDiasNL;
 	}
 
-	public void setListaDiasNL(List<DiaNoLaboralDTO> listaDiasNL) {
+	public void setListaDiasNL(List<CatDiaNoLaboral> listaDiasNL) {
 		this.listaDiasNL = listaDiasNL;
 	}
 
-	public PaisDTO getPaisSelected() {
+	public Pais getPaisSelected() {
 		return paisSelected;
 	}
 
-	public void setPaisSelected(PaisDTO paisSelected) {
+	public void setPaisSelected(Pais paisSelected) {
 		this.paisSelected = paisSelected;
 	}
 
-	public List<PaisDTO> getPaisesList() {
+	public List<Pais> getPaisesList() {
 		return paisesList;
 	}
 
-	public void setPaisesList(List<PaisDTO> paisesList) {
+	public void setPaisesList(List<Pais> paisesList) {
 		this.paisesList = paisesList;
 	}
 
-	public DiaNoLaboralDTO getDiaNLSelected() {
+	public CatDiaNoLaboral getDiaNLSelected() {
 		return diaNLSelected;
 	}
 
-	public void setDiaNLSelected(DiaNoLaboralDTO diaNLSelected) {
+	public void setDiaNLSelected(CatDiaNoLaboral diaNLSelected) {
 		this.diaNLSelected = diaNLSelected;
 	}
 

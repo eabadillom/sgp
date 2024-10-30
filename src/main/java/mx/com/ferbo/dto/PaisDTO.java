@@ -3,15 +3,23 @@ package mx.com.ferbo.dto;
 import java.util.Objects;
 
 public class PaisDTO {
+        private Integer idPais;
 	private String clavePais;
 	private String nombrePais;
 	
-	public PaisDTO(String clavePais, String nombrePais) {
+	public PaisDTO(Integer idPais, String clavePais, String nombrePais) {
 		super();
+                this.idPais = idPais;
 		this.clavePais = clavePais;
 		this.nombrePais = nombrePais;
 	}
-	
+        public Integer getIdPais() {
+            return idPais;
+        }
+
+        public void setIdPais(Integer idPais) {
+            this.idPais = idPais;
+        }
 	public String getClavePais() {
 		return clavePais;
 	}
