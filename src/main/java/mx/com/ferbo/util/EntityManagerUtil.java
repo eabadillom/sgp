@@ -12,17 +12,15 @@ import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.internal.SessionImpl;
 
-/**
- *
- * @author Gabriel Moreno <gabrielmos0309@gmail.com>
- */
 public class EntityManagerUtil {
 	private static Logger log = LogManager.getLogger(EntityManagerUtil.class);
 
 	protected static String PERSIST_UNIT = "sgpPU";
-    protected static EntityManagerFactory emf = Persistence.createEntityManagerFactory(PERSIST_UNIT);
+    protected static EntityManagerFactory emf = null;
 
     public static EntityManager getEntityManager() {
+    	if(emf == null)
+    		emf = Persistence.createEntityManagerFactory(PERSIST_UNIT);
         return emf.createEntityManager();
     }
     public static Connection getConnection() {
