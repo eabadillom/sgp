@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -31,17 +32,16 @@ public class CatLocalidad implements Serializable
     
     @EmbeddedId
     private CatLocalidadPK key;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 50)
     @Column(name = "nb_localidad")
     private String descripcion;
-    @OneToMany(mappedBy = "cd_asentamiento")
+    
+    @OneToMany(mappedBy = "key.localidad")
     private List<CatAsentamiento> asentamientos;
-    @JoinColumn(name = "cd_municipio", referencedColumnName = "cd_municipio", insertable = false, updatable = false)
-    @ManyToOne(optional = false)
-    private CatMunicipio municipio;
-
+    
     public CatLocalidad() 
     {
     }
@@ -57,9 +57,9 @@ public class CatLocalidad implements Serializable
         this.descripcion = descripcion;
     }
     
-    public CatLocalidad(Pais pais, CatEstado estado, CatMunicipio municipio, Integer id) 
+    public CatLocalidad(CatMunicipio municipio, Integer id) 
     {
-        this.key = new CatLocalidadPK(pais, estado, municipio, id);
+        this.key = new CatLocalidadPK(municipio, id);
     }
 
     public CatLocalidadPK getKey() 
@@ -92,16 +92,6 @@ public class CatLocalidad implements Serializable
         this.asentamientos = asentamientos;
     }
 
-    public CatMunicipio getMunicipio() 
-    {
-        return municipio;
-    }
-
-    public void setMunicipio(CatMunicipio municipio) 
-    {
-        this.municipio = municipio;
-    }
-    
     @Override
     public int hashCode() 
     {

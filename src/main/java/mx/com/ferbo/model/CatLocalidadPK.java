@@ -5,7 +5,6 @@ import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
@@ -19,14 +18,9 @@ public class CatLocalidadPK implements Serializable
     private static final long serialVersionUID = 3833888070514352421L;
     
     @ManyToOne
-    @JoinColumn(name = "cd_pais")
-    private Pais pais;
-    @ManyToOne
-    @Column(name = "cd_estado")
-    private CatEstado estado;
-    @ManyToOne
-    @Column(name = "cd_municipio")
+    @NotNull
     private CatMunicipio municipio;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "cd_localidad")
@@ -36,32 +30,10 @@ public class CatLocalidadPK implements Serializable
     {
     }
 
-    public CatLocalidadPK(Pais pais, CatEstado estado, CatMunicipio municipio, Integer id) 
+    public CatLocalidadPK(CatMunicipio municipio, Integer id) 
     {
-        this.pais = pais;
-        this.estado = estado;
         this.municipio = municipio;
         this.id = id;
-    }
-
-    public Pais getPais() 
-    {
-        return pais;
-    }
-
-    public void setPais(Pais pais) 
-    {
-        this.pais = pais;
-    }
-
-    public CatEstado getEstado() 
-    {
-        return estado;
-    }
-
-    public void setEstado(CatEstado estado) 
-    {
-        this.estado = estado;
     }
 
     public CatMunicipio getMunicipio() 
@@ -88,8 +60,6 @@ public class CatLocalidadPK implements Serializable
     public int hashCode() 
     {
         int hash = 7;
-        hash = 89 * hash + Objects.hashCode(this.pais);
-        hash = 89 * hash + Objects.hashCode(this.estado);
         hash = 89 * hash + Objects.hashCode(this.municipio);
         hash = 89 * hash + this.id;
         return hash;
@@ -107,12 +77,6 @@ public class CatLocalidadPK implements Serializable
             return false;
         }
         final CatLocalidadPK other = (CatLocalidadPK) obj;
-        if (!Objects.equals(this.pais, other.pais)) {
-            return false;
-        }
-        if (!Objects.equals(this.estado, other.estado)) {
-            return false;
-        }
         if (!Objects.equals(this.municipio, other.municipio)) {
             return false;
         }
@@ -122,7 +86,7 @@ public class CatLocalidadPK implements Serializable
     @Override
     public String toString() 
     {
-        return "CatLocalidadPK[" + "pais=" + pais + ", estado=" + estado + ", municipio=" + municipio + ", id=" + id + ']';
+        return "CatLocalidadPK[" + "municipio=" + municipio + ", id=" + id + ']';
     }
     
 }

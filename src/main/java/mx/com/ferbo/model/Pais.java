@@ -17,8 +17,8 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "cat_pais")
 @NamedQueries({
-    @NamedQuery(name = "Pais.findById", query = "SELECT d FROM Pais d WHERE d.cd_pais = :cdPais"),
-    @NamedQuery(name = "Pais.findByClave", query = "SELECT d FROM Pais d WHERE d.clavePais = :clavePais"),
+    @NamedQuery(name = "Pais.findById", query = "SELECT d FROM Pais d WHERE d.id = :cdPais"),
+    @NamedQuery(name = "Pais.findByClave", query = "SELECT d FROM Pais d WHERE d.clave = :clavePais"),
     @NamedQuery(name = "Pais.findAll", query = "SELECT d FROM Pais d ORDER BY d.nombrePais")
 })
 public class Pais implements Serializable {
@@ -34,9 +34,9 @@ public class Pais implements Serializable {
     private String clave;
 
     @Column(name = "nb_pais")
-    @JoinColumn(name = "cd_estado")
     private String nombrePais;
     
+    @JoinColumn(name = "cd_estado")
     @OneToMany
     private List<CatEstado> estados;
 
@@ -62,8 +62,8 @@ public class Pais implements Serializable {
         return clave;
     }
 
-    public void setClavePais(String clavePais) {
-        this.clave = clavePais;
+    public void setClavePais(String clave) {
+        this.clave = clave;
     }
 
     public String getNombrePais() {
@@ -73,10 +73,18 @@ public class Pais implements Serializable {
     public void setNombrePais(String nombrePais) {
         this.nombrePais = nombrePais;
     }
-
+    
     @Override
     public int hashCode() {
         return Objects.hash(clave, nombrePais);
+    }
+
+    public List<CatEstado> getEstados() {
+        return estados;
+    }
+
+    public void setEstados(List<CatEstado> estados) {
+        this.estados = estados;
     }
 
     @Override

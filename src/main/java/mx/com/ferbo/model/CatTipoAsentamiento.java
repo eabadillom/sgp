@@ -33,13 +33,16 @@ public class CatTipoAsentamiento implements Serializable
     @NotNull
     @Column(name = "cd_tipoasntmnto")
     private Short id;
+    
     @Size(max = 100)
     @Column(name = "nb_tipoasntmnto")
     private String descripcion;
+    
     @Size(max = 4)
     @Column(name = "nb_clave")
     private String clave;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cd_tipoasntmnto")
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "key.tipoAsentamiento")
     private List<CatAsentamiento> asentamientos;
 
     public CatTipoAsentamiento() 
