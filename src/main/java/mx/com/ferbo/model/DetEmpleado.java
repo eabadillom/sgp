@@ -231,6 +231,9 @@ public class DetEmpleado implements Serializable {
     
     @OneToMany(mappedBy = "empleado", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<DetPrestamo> prestamos;
+    
+    @OneToOne(mappedBy = "empleado", fetch= FetchType.LAZY)
+    private DetDomicilioEmpleado domicilio;
 
     public DetEmpleado() {
     }

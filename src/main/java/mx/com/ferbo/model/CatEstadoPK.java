@@ -19,8 +19,10 @@ public class CatEstadoPK implements Serializable
     private static final long serialVersionUID = -4501534761783764337L;
     
     @ManyToOne
+    @NotNull
     @JoinColumn(name = "cd_pais")
     private Pais pais;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "cd_estado")

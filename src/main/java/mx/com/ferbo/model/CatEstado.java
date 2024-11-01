@@ -31,23 +31,23 @@ public class CatEstado implements Serializable
     private static final long serialVersionUID = 1L;
     
     @EmbeddedId
-    CatEstadoPK key;
+    private CatEstadoPK key;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 4)
     @Column(name = "nb_clave")
     private String clave;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 30)
     @Column(name = "nb_estado")
     private String descripcion;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cat_estado")
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "key.estado")
     private List<CatMunicipio> municipios;
-    @JoinColumn(name = "cd_pais", referencedColumnName = "cd_pais", insertable = false, updatable = false)
-    @ManyToOne(optional = false)
-    private Pais pais;
-
+    
     public CatEstado() 
     {
     }
@@ -102,16 +102,6 @@ public class CatEstado implements Serializable
     public void setMunicipios(List<CatMunicipio> municipios) 
     {
         this.municipios = municipios;
-    }
-
-    public Pais getPais() 
-    {
-        return pais;
-    }
-
-    public void setPais(Pais pais) 
-    {
-        this.pais = pais;
     }
 
     @Override

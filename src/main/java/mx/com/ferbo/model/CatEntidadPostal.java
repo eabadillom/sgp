@@ -33,10 +33,12 @@ public class CatEntidadPostal implements Serializable
     @NotNull
     @Column(name = "cd_entidadpostal")
     private Integer id;
+    
     @Size(max = 100)
     @Column(name = "nb_entidadpostal")
     private String descripcion;
-    @OneToMany(cascade = CascadeType.DETACH, mappedBy = "cd_entidadPostal")
+    
+    @OneToMany(cascade = CascadeType.DETACH, mappedBy = "key.entidadPostal")
     private List<CatAsentamiento> asentamientos;
 
     public CatEntidadPostal() 

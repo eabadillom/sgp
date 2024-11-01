@@ -19,7 +19,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "cat_dia_no_laboral")
 @NamedQueries({
-	@NamedQuery(name = "CatDiaNoLaboral.buscaPorPeriodo", query = "SELECT d FROM CatDiaNoLaboral d WHERE d.pais.clavePais = :clavePais AND (d.fecha >= :fechaInicio AND d.fecha <= :fechaFin) ORDER BY d.fecha ASC")
+	@NamedQuery(name = "CatDiaNoLaboral.buscaPorPeriodo", query = "SELECT d FROM CatDiaNoLaboral d WHERE d.pais.clave = :clavePais AND (d.fecha >= :fechaInicio AND d.fecha <= :fechaFin) ORDER BY d.fecha ASC")
 })
 public class CatDiaNoLaboral implements Serializable {
 

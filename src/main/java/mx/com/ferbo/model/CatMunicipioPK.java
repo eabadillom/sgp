@@ -5,7 +5,6 @@ import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
@@ -19,11 +18,9 @@ public class CatMunicipioPK implements Serializable
     private static final long serialVersionUID = -4501534761783764337L;
     
     @ManyToOne
-    @JoinColumn(name = "cd_pais")
-    private Pais pais;
-    @ManyToOne
-    @JoinColumn(name = "cd_estado")
+    @NotNull
     private CatEstado estado;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "cd_municipio")
@@ -33,23 +30,12 @@ public class CatMunicipioPK implements Serializable
     {
     }
 
-    public CatMunicipioPK(Pais pais, CatEstado estado, int id) 
+    public CatMunicipioPK(CatEstado estado, Integer id) 
     {
-        this.pais = pais;
         this.estado = estado;
         this.id = id;
     }
-
-    public Pais getPais() 
-    {
-        return pais;
-    }
-
-    public void setPais(Pais pais) 
-    {
-        this.pais = pais;
-    }
-
+    
     public CatEstado getEstado() 
     {
         return estado;
@@ -74,7 +60,6 @@ public class CatMunicipioPK implements Serializable
     public int hashCode() 
     {
         int hash = 7;
-        hash = 79 * hash + Objects.hashCode(this.pais);
         hash = 79 * hash + Objects.hashCode(this.estado);
         hash = 79 * hash + Objects.hashCode(this.id);
         return hash;
@@ -93,9 +78,6 @@ public class CatMunicipioPK implements Serializable
             return false;
         }
         final CatMunicipioPK other = (CatMunicipioPK) obj;
-        if (!Objects.equals(this.pais, other.pais)) {
-            return false;
-        }
         if (!Objects.equals(this.estado, other.estado)) {
             return false;
         }
@@ -104,7 +86,7 @@ public class CatMunicipioPK implements Serializable
 
     @Override
     public String toString() {
-        return "CatMunicipioPK[" + "paisCve=" + pais + ", estadoCve=" + estado + ", municipioCve=" + id + ']';
+        return "CatMunicipioPK[" + "estadoCve=" + estado + ", municipioCve=" + id + ']';
     }
     
     

@@ -5,10 +5,10 @@ import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.FetchType;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
@@ -28,21 +28,17 @@ public class CatAsentamiento implements Serializable
     
     @EmbeddedId
     private CatAsentamientoPK key;
+    
     @Size(max = 150)
     @Column(name = "nb_asentamiento")
     private String descripcion;
+    
     @Size(max = 5)
     @Column(name = "cd_codPostal")
     private String cp;
-    @JoinColumn(name = "cd_localidad", referencedColumnName = "cd_localidad", insertable = false, updatable = false)
-    @ManyToOne(optional = false)
-    private CatLocalidad localidad;
-    @JoinColumn(name = "cd_tipoasntmnto", referencedColumnName = "cd_tipoasntmnto", insertable = false, updatable = false)
-    @ManyToOne(optional = false)
-    private CatTipoAsentamiento tipoAsentamiento;
-    @JoinColumn(name = "cd_entidadPostal", referencedColumnName = "cd_entidadPostal", insertable = false, updatable = false)
-    @ManyToOne(optional = false)
-    private CatEntidadPostal entidadPostal;
+    
+    //@OneToOne(mappedBy = "asentamiento", fetch= FetchType.LAZY)
+    //private DetDomicilioEmpleado domicilioEmpleado;
 
     public CatAsentamiento() 
     {
@@ -53,9 +49,9 @@ public class CatAsentamiento implements Serializable
         this.key = key;
     }
     
-    public CatAsentamiento(Pais pais, CatEstado estado, CatMunicipio municipio, CatLocalidad localidad, CatTipoAsentamiento tipoasntmnto, CatEntidadPostal entidadpostal, Integer id) 
+    public CatAsentamiento(CatLocalidad localidad, Integer id) 
     {
-        this.key = new CatAsentamientoPK(pais, estado, municipio, localidad, tipoasntmnto, entidadpostal, id);
+        this.key = new CatAsentamientoPK(localidad, id);
     }
 
     public CatAsentamientoPK getKey() 
@@ -88,36 +84,6 @@ public class CatAsentamiento implements Serializable
         this.cp = cp;
     }
 
-    public CatLocalidad getLocalidad() 
-    {
-        return localidad;
-    }
-
-    public void setLocalidad(CatLocalidad localidad) 
-    {
-        this.localidad = localidad;
-    }
-
-    public CatTipoAsentamiento getTipoAsentamiento() 
-    {
-        return tipoAsentamiento;
-    }
-
-    public void setTipoAsentamiento(CatTipoAsentamiento tipoAsentamiento) 
-    {
-        this.tipoAsentamiento = tipoAsentamiento;
-    }
-
-    public CatEntidadPostal getEntidadPostal() 
-    {
-        return entidadPostal;
-    }
-
-    public void setEntidadPostal(CatEntidadPostal entidadPostal) 
-    {
-        this.entidadPostal = entidadPostal;
-    }
-    
     @Override
     public int hashCode() 
     {
