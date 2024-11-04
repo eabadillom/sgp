@@ -260,6 +260,8 @@ public class NominaSemanalBL {
 				isrBO = new ISRSemanalDeduccion(this.tiposDeduccion, this.tiposOtroPago, percepciones, this.tablaISRSemanal, this.tablaSubsidioSemanal);
 				isrBO.setPeriodo(this.periodoFin, this.periodoFin);
 				isrBO.setListaNominaMes( this.ultimaSemanaMes ? procesaNominaDelMes() : null);
+				isrBO.setTablaISRMensual(this.ultimaSemanaMes ? this.tablaISRMensual : null);
+				isrBO.setTablaSubsidioMensual(this.ultimaSemanaMes ? this.tablaSubsidioMensual : null);
 				List<DetNominaDeduccion> deduccionesISR = isrBO.calcular(nomina, idxD);
 				deducciones.addAll(deduccionesISR);
 
@@ -551,7 +553,7 @@ public class NominaSemanalBL {
 		
 		dPeriodoAnteriorFin = DateUtils.addDay(dPeriodoInicio, -1);
 		
-		log.info("Primera semana del mes: {} - {}", 
+		log.info("Buscando pagos semanales de nómina del {} al {}", 
 				DateUtils.getString(dPeriodoAnteriorInicio, DateUtils.FORMATO_DD_MM_YYYY),
 				DateUtils.getString(dPeriodoAnteriorFin, DateUtils.FORMATO_DD_MM_YYYY));
 		

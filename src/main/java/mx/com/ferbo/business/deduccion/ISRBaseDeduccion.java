@@ -62,7 +62,7 @@ public class ISRBaseDeduccion extends AbstractDeduccion implements IDeduccion {
 		
 		return deduccion;
 	}
-
+	
 	public TipoDeduccionDAO getTipoDeduccionDAO() {
 		return tipoDeduccionDAO;
 	}
