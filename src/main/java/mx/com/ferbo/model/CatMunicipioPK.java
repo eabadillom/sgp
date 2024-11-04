@@ -5,6 +5,8 @@ import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
@@ -19,6 +21,10 @@ public class CatMunicipioPK implements Serializable
     
     @ManyToOne
     @NotNull
+    @JoinColumns({
+        @JoinColumn(name = "cd_estado", referencedColumnName = "cd_estado"),
+        @JoinColumn(name = "cd_pais", referencedColumnName = "cd_pais")
+    })
     private CatEstado estado;
     
     @Basic(optional = false)

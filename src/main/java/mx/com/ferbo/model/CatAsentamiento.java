@@ -6,6 +6,8 @@ import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
@@ -37,8 +39,16 @@ public class CatAsentamiento implements Serializable
     @Column(name = "cd_codPostal")
     private String cp;
     
-    //@OneToOne(mappedBy = "asentamiento", fetch= FetchType.LAZY)
-    //private DetDomicilioEmpleado domicilioEmpleado;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "cd_tipoasntmnto", referencedColumnName = "cd_tipoasntmnto")
+    private CatTipoAsentamiento tipoAsentamiento;
+    
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "cd_entidadPostal", referencedColumnName = "cd_entidadPostal")
+    private CatEntidadPostal entidadPostal;
+    
+    @OneToOne(mappedBy = "asentamiento", fetch= FetchType.LAZY)
+    private DetDomicilioEmpleado domicilioEmpleado;
 
     public CatAsentamiento() 
     {
@@ -83,12 +93,32 @@ public class CatAsentamiento implements Serializable
     {
         this.cp = cp;
     }
+    
+    public CatTipoAsentamiento getTipoAsentamiento() 
+    {
+        return tipoAsentamiento;
+    }
+
+    public void setTipoAsentamiento(CatTipoAsentamiento tipoAsentamiento) 
+    {
+        this.tipoAsentamiento = tipoAsentamiento;
+    }
+
+    public CatEntidadPostal getEntidadPostal() 
+    {
+        return entidadPostal;
+    }
+
+    public void setEntidadPostal(CatEntidadPostal entidadPostal) 
+    {
+        this.entidadPostal = entidadPostal;
+    }
 
     @Override
     public int hashCode() 
     {
         int hash = 3;
-        hash = 41 * hash + Objects.hashCode(this.key);
+        hash = 41 * hash + Objects.hashCode(this.key.getAsentamiento());
         return hash;
     }
 
@@ -105,7 +135,7 @@ public class CatAsentamiento implements Serializable
             return false;
         }
         final CatAsentamiento other = (CatAsentamiento) obj;
-        return Objects.equals(this.key, other.key);
+        return Objects.equals(this.key.getAsentamiento(), other.key.getAsentamiento());
     }
 
     @Override

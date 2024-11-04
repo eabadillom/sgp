@@ -6,6 +6,7 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
@@ -20,6 +21,12 @@ public class CatAsentamientoPK implements Serializable
     
     @ManyToOne
     @NotNull
+    @JoinColumns({
+        @JoinColumn(name = "cd_localidad", referencedColumnName = "cd_localidad"),
+        @JoinColumn(name = "cd_municipio", referencedColumnName = "cd_municipio"),
+        @JoinColumn(name = "cd_estado", referencedColumnName = "cd_estado"),
+        @JoinColumn(name = "cd_pais", referencedColumnName = "cd_pais")
+    })
     private CatLocalidad localidad;
     
     @Basic(optional = false)
@@ -27,14 +34,6 @@ public class CatAsentamientoPK implements Serializable
     @Column(name = "cd_asentamiento")
     private Integer id;
     
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "cd_tipoasntmnto", referencedColumnName = "cd_tipoasntmnto")
-    private CatTipoAsentamiento tipoAsentamiento;
-    
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "cd_entidadPostal", referencedColumnName = "cd_entidadPostal")
-    private CatEntidadPostal entidadPostal;
-
     public CatAsentamientoPK() 
     {
     }
@@ -63,26 +62,6 @@ public class CatAsentamientoPK implements Serializable
     public void setAsentamiento(Integer id) 
     {
         this.id = id;
-    }
-    
-    public CatTipoAsentamiento getTipoAsentamiento() 
-    {
-        return tipoAsentamiento;
-    }
-
-    public void setTipoAsentamiento(CatTipoAsentamiento tipoAsentamiento) 
-    {
-        this.tipoAsentamiento = tipoAsentamiento;
-    }
-
-    public CatEntidadPostal getEntidadPostal() 
-    {
-        return entidadPostal;
-    }
-
-    public void setEntidadPostal(CatEntidadPostal entidadPostal) 
-    {
-        this.entidadPostal = entidadPostal;
     }
     
     @Override

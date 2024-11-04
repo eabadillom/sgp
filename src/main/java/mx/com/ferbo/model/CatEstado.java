@@ -108,7 +108,7 @@ public class CatEstado implements Serializable
     public int hashCode() 
     {
         int hash = 7;
-        hash = 31 * hash + Objects.hashCode(this.key);
+        hash = 31 * hash + Objects.hashCode(this.key.getId());
         return hash;
     }
 
@@ -125,7 +125,7 @@ public class CatEstado implements Serializable
             return false;
         }
         final CatEstado other = (CatEstado) obj;
-        return Objects.equals(this.key, other.key);
+        return Objects.equals(this.key.getId(), other.key.getId());
     }
 
     @Override

@@ -35,10 +35,10 @@ public class CatEntidadPostal implements Serializable
     private Integer id;
     
     @Size(max = 100)
-    @Column(name = "nb_entidadpostal")
+    @Column(name = "nu_entidadpostal")
     private String descripcion;
     
-    @OneToMany(cascade = CascadeType.DETACH, mappedBy = "key.entidadPostal")
+    @OneToMany(cascade = CascadeType.DETACH, mappedBy = "entidadPostal")
     private List<CatAsentamiento> asentamientos;
 
     public CatEntidadPostal() 

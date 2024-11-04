@@ -74,11 +74,6 @@ public class Pais implements Serializable {
         this.nombrePais = nombrePais;
     }
     
-    @Override
-    public int hashCode() {
-        return Objects.hash(clave, nombrePais);
-    }
-
     public List<CatEstado> getEstados() {
         return estados;
     }
@@ -88,7 +83,16 @@ public class Pais implements Serializable {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public int hashCode() 
+    {
+        int hash = 3;
+        hash = 89 * hash + Objects.hashCode(this.id);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) 
+    {
         if (this == obj) {
             return true;
         }
@@ -98,10 +102,10 @@ public class Pais implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        Pais other = (Pais) obj;
-        return Objects.equals(clave, other.clave) && Objects.equals(nombrePais, other.nombrePais);
+        final Pais other = (Pais) obj;
+        return Objects.equals(this.id, other.id);
     }
-
+    
     @Override
     public String toString() {
         return "Pais [clavePais=" + clave + ", nombrePais=" + nombrePais + "]";
