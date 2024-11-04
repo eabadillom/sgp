@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -19,7 +20,9 @@ import org.primefaces.PrimeFaces;
 import org.primefaces.event.CaptureEvent;
 
 import mx.com.ferbo.dao.n.AreaDAO;
+import mx.com.ferbo.dao.n.AsentamientoDAO;
 import mx.com.ferbo.dao.n.BiometricoDAO;
+import mx.com.ferbo.dao.n.DomicilioEmpleadoDAO;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.EmpleadoFotoDAO;
 import mx.com.ferbo.dao.n.EmpresaDAO;
@@ -38,7 +41,15 @@ import mx.com.ferbo.dao.n.TipoPercepcionDAO;
 import mx.com.ferbo.dao.n.TipoPrestamoDAO;
 import mx.com.ferbo.dao.n.TipoRegimenDAO;
 import mx.com.ferbo.model.CatArea;
+import mx.com.ferbo.model.CatAsentamiento;
+import mx.com.ferbo.model.CatAsentamientoPK;
 import mx.com.ferbo.model.CatEmpresa;
+import mx.com.ferbo.model.CatEstado;
+import mx.com.ferbo.model.CatEstadoPK;
+import mx.com.ferbo.model.CatLocalidad;
+import mx.com.ferbo.model.CatLocalidadPK;
+import mx.com.ferbo.model.CatMunicipio;
+import mx.com.ferbo.model.CatMunicipioPK;
 import mx.com.ferbo.model.CatParametro;
 import mx.com.ferbo.model.CatPerfil;
 import mx.com.ferbo.model.CatPeriodicidadPago;
@@ -46,11 +57,13 @@ import mx.com.ferbo.model.CatPlanta;
 import mx.com.ferbo.model.CatPuesto;
 import mx.com.ferbo.model.CatTipoPrestamo;
 import mx.com.ferbo.model.DetBiometrico;
+import mx.com.ferbo.model.DetDomicilioEmpleado;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetEmpleadoFoto;
 import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.DetPrestamo;
 import mx.com.ferbo.model.InfDatoEmpresa;
+import mx.com.ferbo.model.Pais;
 import mx.com.ferbo.model.sat.CatEntidadFederativa;
 import mx.com.ferbo.model.sat.CatRiesgoPuesto;
 import mx.com.ferbo.model.sat.CatTipoContrato;
@@ -90,6 +103,8 @@ public class RegistroEmpleadosBean implements Serializable {
     private RiesgoPuestoDAO riesgoDAO;
     private PeriodicidadPagoDAO periodicidadDAO;
     private TipoPercepcionDAO tipoPercepcionDAO;
+    private DomicilioEmpleadoDAO domicilioEmpleadoDAO;
+    private AsentamientoDAO asentamientoDAO;
 
     private List<DetEmpleado> lstEmpleados;
     private List<DetEmpleado> lstEmpleadosSelected;
@@ -103,6 +118,7 @@ public class RegistroEmpleadosBean implements Serializable {
     private List<CatPeriodicidadPago> periodicidadesPago;
     private List<CatTipoPercepcion> tiposPercepcion;
     private List<CatTipoPrestamo> tiposPrestamo;
+    private List<CatAsentamiento> opcionesAsentamiento;
 
     private DetEmpleado empleadoSelected;
     private DetBiometrico detBiometrico;
@@ -111,10 +127,12 @@ public class RegistroEmpleadosBean implements Serializable {
     private String biometrico;
     private int numBiometrico;
     private DetPrestamo prestamo;
+    private CatAsentamiento asentamientoSeleccionado;
     
     private String curp;
     private String rfc;
     private String nss;
+    private String codigoPostal;
     
     public RegistroEmpleadosBean() {
     	empleadoFotoDAO = new EmpleadoFotoDAO(DetEmpleadoFoto.class);
@@ -136,6 +154,18 @@ public class RegistroEmpleadosBean implements Serializable {
         periodicidadDAO = new PeriodicidadPagoDAO(CatPeriodicidadPago.class);
         tipoPercepcionDAO = new TipoPercepcionDAO();
         tipoPrestamoDAO = new TipoPrestamoDAO();
+        domicilioEmpleadoDAO = new DomicilioEmpleadoDAO();
+        asentamientoDAO = new AsentamientoDAO();
+        opcionesAsentamiento = asentamientoDAO.buscarTodos();
+        asentamientoSeleccionado = new CatAsentamiento();
+        asentamientoSeleccionado.setKey(new CatAsentamientoPK());
+        asentamientoSeleccionado.getKey().setLocalidad(new CatLocalidad());
+        asentamientoSeleccionado.getKey().getLocalidad().setKey(new CatLocalidadPK());
+        asentamientoSeleccionado.getKey().getLocalidad().getKey().setMunicipio(new CatMunicipio());
+        asentamientoSeleccionado.getKey().getLocalidad().getKey().getMunicipio().setKey(new CatMunicipioPK());
+        asentamientoSeleccionado.getKey().getLocalidad().getKey().getMunicipio().getKey().setEstado(new CatEstado());
+        asentamientoSeleccionado.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().setEstadoPK(new CatEstadoPK());
+        asentamientoSeleccionado.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getEstadoPK().setPaisCve(new Pais());
         
         empleadoSelected = new DetEmpleado();
         lstEmpleados = new ArrayList<>();
@@ -391,6 +421,9 @@ public class RegistroEmpleadosBean implements Serializable {
         		this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
         		this.empleadoSelected.setFechaRegistro(new Date());
     			empleadoDAO.guardar(empleadoSelected);
+                        //*aqui va el guardado del domicilio del empleado*
+                        
+                        
     		} else {
     			empleadoDAO.actualizar(empleadoSelected);
     		}
@@ -508,6 +541,15 @@ public class RegistroEmpleadosBean implements Serializable {
             log.warn("EX-0019: Error al consultar por huella al empleado " + detBiometrico.getIdEmpleado().getNumEmpleado() != null ? detBiometrico.getIdEmpleado().getNumEmpleado() : null);
         }
         PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogBiometrico");
+    }
+    
+    public List<CatAsentamiento> sugerenciasCodigoPostal(String consulta) 
+    {
+        List<CatAsentamiento> asentamientoPorCP = null;
+        asentamientoPorCP = this.opcionesAsentamiento.stream()
+                .filter(CatAsentamiento -> CatAsentamiento.getCp().equals(consulta))
+                .collect(Collectors.toList());
+        return asentamientoPorCP;
     }
 
     public List<CatEmpresa> getLstCatEmpresa() {
@@ -725,4 +767,29 @@ public class RegistroEmpleadosBean implements Serializable {
 	public void setPrestamo(DetPrestamo prestamo) {
 		this.prestamo = prestamo;
 	}
+
+    public List<CatAsentamiento> getOpcionesAsentamiento() {
+        return opcionesAsentamiento;
+    }
+
+    public void setOpcionesAsentamiento(List<CatAsentamiento> opcionesAsentamiento) {
+        this.opcionesAsentamiento = opcionesAsentamiento;
+    }
+
+    public CatAsentamiento getAsentamientoSeleccionado() {
+        return asentamientoSeleccionado;
+    }
+
+    public void setAsentamientoSeleccionado(CatAsentamiento asentamientoSeleccionado) {
+        this.asentamientoSeleccionado = asentamientoSeleccionado;
+    }
+    
+    public String getCodigoPostal() {
+        return codigoPostal;
+    }
+
+    public void setCodigoPostal(String codigoPostal) {
+        this.codigoPostal = codigoPostal;
+    }
+    
 }

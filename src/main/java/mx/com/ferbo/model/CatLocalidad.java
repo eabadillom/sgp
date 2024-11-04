@@ -96,7 +96,7 @@ public class CatLocalidad implements Serializable
     public int hashCode() 
     {
         int hash = 5;
-        hash = 97 * hash + Objects.hashCode(this.key);
+        hash = 97 * hash + Objects.hashCode(this.key.getId());
         return hash;
     }
 
@@ -113,7 +113,7 @@ public class CatLocalidad implements Serializable
             return false;
         }
         final CatLocalidad other = (CatLocalidad) obj;
-        return Objects.equals(this.key, other.key);
+        return Objects.equals(this.key.getId(), other.key.getId());
     }
 
     @Override
