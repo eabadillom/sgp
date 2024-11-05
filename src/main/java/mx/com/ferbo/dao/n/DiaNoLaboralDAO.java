@@ -37,7 +37,7 @@ public class DiaNoLaboralDAO extends BaseDAO<CatDiaNoLaboral, Integer> {
 					;
 			
 			for(CatDiaNoLaboral d : list) {
-				log.info("Pais: {}", d.getPais().getClavePais());
+				log.info("Pais: {}", d.getPais().getId());
 			}
 			
 		} catch(Exception ex) {

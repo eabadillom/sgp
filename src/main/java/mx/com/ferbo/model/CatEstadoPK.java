@@ -18,7 +18,7 @@ public class CatEstadoPK implements Serializable
 {
     private static final long serialVersionUID = -4501534761783764337L;
     
-    @ManyToOne
+    @ManyToOne(optional = false)
     @NotNull
     @JoinColumn(name = "cd_pais")
     private Pais pais;
@@ -44,7 +44,7 @@ public class CatEstadoPK implements Serializable
         return pais;
     }
 
-    public void setPaisCve(Pais pais) 
+    public void setPais(Pais pais) 
     {
         this.pais = pais;
     }
@@ -63,7 +63,7 @@ public class CatEstadoPK implements Serializable
     public int hashCode() 
     {
         int hash = 3;
-        hash = 23 * hash + Objects.hashCode(this.pais);
+        hash = 23 * hash + Objects.hashCode(this.pais.getId());
         hash = 23 * hash + Objects.hashCode(this.id);
         return hash;
     }
@@ -81,7 +81,7 @@ public class CatEstadoPK implements Serializable
             return false;
         }
         final CatEstadoPK other = (CatEstadoPK) obj;
-        if (!Objects.equals(this.pais, other.pais)) {
+        if (!Objects.equals(this.pais.getId(), other.pais.getId())) {
             return false;
         }
         return Objects.equals(this.id, other.id);
@@ -90,7 +90,7 @@ public class CatEstadoPK implements Serializable
     @Override
     public String toString() 
     {
-        return "CatEstadoPK[" + "paisCve=" + pais + ", estadoCve=" + id + ']';
+        return "CatEstadoPK[" + "paisCve=" + pais.getId() + ", estadoCve=" + id + ']';
     }
     
 }

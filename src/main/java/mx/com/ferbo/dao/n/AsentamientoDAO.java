@@ -57,6 +57,20 @@ public class AsentamientoDAO extends BaseDAO<CatAsentamiento, CatAsentamientoPK>
             modelList = em.createNamedQuery("CatAsentamiento.findByCodigoPostal", CatAsentamiento.class)
                 .setParameter("codigoPostal", codigoPostal)
                 .getResultList();
+            
+            log.info("Info Asentamiento: {}", modelList.toString());
+            
+            for(CatAsentamiento aux : modelList)
+            {
+                log.debug("Id Asentamiento: {}", aux.getKey().getId());
+                log.debug("Id Tipo Asentamiento: {}", aux.getTipoAsentamiento().getId());
+                log.debug("Id Entidad Postal: {}", aux.getEntidadPostal().getId());
+                log.debug("Id Localidad: {}", aux.getKey().getLocalidad().getKey().getId());
+                log.debug("Id Municipio: {}", aux.getKey().getLocalidad().getKey().getMunicipio().getKey().getId());
+                log.debug("Id Estado: {}", aux.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getId());
+                log.debug("Id Pais: {}", aux.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getPais().getId());
+            }
+            
         } catch(Exception ex) 
         {
             log.error("Problema para obtener la lista de asentamientos...",  ex);
