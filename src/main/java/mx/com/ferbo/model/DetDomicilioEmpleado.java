@@ -167,7 +167,7 @@ public class DetDomicilioEmpleado implements Serializable
     
     @Override
     public String toString() {
-        return "DetDomicilioEmpleado{" + "id=" + id + ", calle=" + calle + ", numeroExterior=" + numeroExterior + ", numeroInterior=" + numeroInterior + ", empleadoId=" + empleado.getNumEmpleado() + ", asentamientoId=" + asentamiento.getKey().getAsentamiento() + '}';
+        return "DetDomicilioEmpleado{" + "id=" + id + ", calle=" + calle + ", numeroExterior=" + numeroExterior + ", numeroInterior=" + numeroInterior + ", empleadoId=" + empleado.getNumEmpleado() + ", asentamientoId=" + asentamiento.getKey().getId() + '}';
     }
     
     

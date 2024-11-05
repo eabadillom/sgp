@@ -19,7 +19,7 @@ public class CatAsentamientoPK implements Serializable
 {
     private static final long serialVersionUID = 1L;
     
-    @ManyToOne
+    @ManyToOne(optional = false)
     @NotNull
     @JoinColumns({
         @JoinColumn(name = "cd_localidad", referencedColumnName = "cd_localidad"),
@@ -43,7 +43,7 @@ public class CatAsentamientoPK implements Serializable
         this.localidad = localidad;
         this.id = id;
     }
-    
+
     public CatLocalidad getLocalidad() 
     {
         return localidad;
@@ -54,21 +54,21 @@ public class CatAsentamientoPK implements Serializable
         this.localidad = localidad;
     }
 
-    public Integer getAsentamiento() 
+    public Integer getId() 
     {
         return id;
     }
 
-    public void setAsentamiento(Integer id) 
+    public void setId(Integer id) 
     {
         this.id = id;
     }
-    
+           
     @Override
     public int hashCode() 
     {
         int hash = 7;
-        hash = 89 * hash + Objects.hashCode(this.localidad);
+        hash = 89 * hash + Objects.hashCode(this.localidad.getKey().getId());
         hash = 89 * hash + Objects.hashCode(this.id);
         return hash;
     }
@@ -86,7 +86,7 @@ public class CatAsentamientoPK implements Serializable
             return false;
         }
         final CatAsentamientoPK other = (CatAsentamientoPK) obj;
-        if (!Objects.equals(this.localidad, other.localidad)) {
+        if (!Objects.equals(this.localidad.getKey().getId(), other.localidad.getKey().getId())) {
             return false;
         }
         return Objects.equals(this.id, other.id);
@@ -94,7 +94,7 @@ public class CatAsentamientoPK implements Serializable
 
     @Override
     public String toString() {
-        return "CatAsentamientoPK[" + "localidad=" + localidad + ", asentamiento=" + id + ']';
+        return "CatAsentamientoPK[" + "localidad=" + localidad.getKey().getId() + ", asentamiento=" + id + ']';
     }
     
 }

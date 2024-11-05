@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -127,7 +126,8 @@ public class RegistroEmpleadosBean implements Serializable {
     private String biometrico;
     private int numBiometrico;
     private DetPrestamo prestamo;
-    private CatAsentamiento asentamientoSeleccionado;
+    private CatAsentamiento asentamientoSelected;
+    private DetDomicilioEmpleado domicilioEmpleado;
     
     private String curp;
     private String rfc;
@@ -156,16 +156,6 @@ public class RegistroEmpleadosBean implements Serializable {
         tipoPrestamoDAO = new TipoPrestamoDAO();
         domicilioEmpleadoDAO = new DomicilioEmpleadoDAO();
         asentamientoDAO = new AsentamientoDAO();
-        opcionesAsentamiento = asentamientoDAO.buscarTodos();
-        asentamientoSeleccionado = new CatAsentamiento();
-        asentamientoSeleccionado.setKey(new CatAsentamientoPK());
-        asentamientoSeleccionado.getKey().setLocalidad(new CatLocalidad());
-        asentamientoSeleccionado.getKey().getLocalidad().setKey(new CatLocalidadPK());
-        asentamientoSeleccionado.getKey().getLocalidad().getKey().setMunicipio(new CatMunicipio());
-        asentamientoSeleccionado.getKey().getLocalidad().getKey().getMunicipio().setKey(new CatMunicipioPK());
-        asentamientoSeleccionado.getKey().getLocalidad().getKey().getMunicipio().getKey().setEstado(new CatEstado());
-        asentamientoSeleccionado.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().setEstadoPK(new CatEstadoPK());
-        asentamientoSeleccionado.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getEstadoPK().setPaisCve(new Pais());
         
         empleadoSelected = new DetEmpleado();
         lstEmpleados = new ArrayList<>();
@@ -426,6 +416,7 @@ public class RegistroEmpleadosBean implements Serializable {
                         
     		} else {
     			empleadoDAO.actualizar(empleadoSelected);
+                        
     		}
     		
     		if(this.empleadoFoto != null) {
@@ -545,11 +536,14 @@ public class RegistroEmpleadosBean implements Serializable {
     
     public List<CatAsentamiento> sugerenciasCodigoPostal(String consulta) 
     {
-        List<CatAsentamiento> asentamientoPorCP = null;
-        asentamientoPorCP = this.opcionesAsentamiento.stream()
-                .filter(CatAsentamiento -> CatAsentamiento.getCp().equals(consulta))
-                .collect(Collectors.toList());
-        return asentamientoPorCP;
+        List<CatAsentamiento> listaSugerencias = asentamientoDAO.buscarPorCodigoPostal(consulta);
+        
+        PrimeFaces.current().ajax().update("Asentamiento");
+        return listaSugerencias;
+    }
+    
+    public void verAsentamientoSeleccionado() {
+        log.info("Asentamiento seleccionado: {}", this.asentamientoSelected);
     }
 
     public List<CatEmpresa> getLstCatEmpresa() {
@@ -776,12 +770,12 @@ public class RegistroEmpleadosBean implements Serializable {
         this.opcionesAsentamiento = opcionesAsentamiento;
     }
 
-    public CatAsentamiento getAsentamientoSeleccionado() {
-        return asentamientoSeleccionado;
+    public CatAsentamiento getAsentamientoSelected() {
+        return asentamientoSelected;
     }
 
-    public void setAsentamientoSeleccionado(CatAsentamiento asentamientoSeleccionado) {
-        this.asentamientoSeleccionado = asentamientoSeleccionado;
+    public void setAsentamientoSelected(CatAsentamiento asentamientoSeleccionado) {
+        this.asentamientoSelected = asentamientoSeleccionado;
     }
     
     public String getCodigoPostal() {
@@ -790,6 +784,14 @@ public class RegistroEmpleadosBean implements Serializable {
 
     public void setCodigoPostal(String codigoPostal) {
         this.codigoPostal = codigoPostal;
+    }
+
+    public DetDomicilioEmpleado getDomicilioEmpleado() {
+        return domicilioEmpleado;
+    }
+
+    public void setDomicilioEmpleado(DetDomicilioEmpleado domicilioEmpleado) {
+        this.domicilioEmpleado = domicilioEmpleado;
     }
     
 }

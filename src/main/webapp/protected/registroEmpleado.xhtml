@@ -111,56 +111,63 @@
                                                                     <div class="formgrid grid">
                                                                         <div class="field col">
                                                                             <p:outputLabel for="@next" value="Codigo Postal"/>
-                                                                            <p:autoComplete id="autocomplete" value="#{registroEmpleadosBean.asentamientoSeleccionado}" completeMethod="#{registroEmpleadosBean.sugerenciasCodigoPostal}" 
-                                                                                placeholder="Escribe el codigo postal..." dropdown="true" var="sugerencia" itemLabel="#{sugerencia}" itemValue="#{sugerencia}" 
-                                                                                forceSelection="true" >
+                                                                            <p:autoComplete id="autocomplete" value="#{registroEmpleadosBean.asentamientoSelected}" completeMethod="#{registroEmpleadosBean.sugerenciasCodigoPostal}" 
+                                                                                placeholder="Escribe el codigo postal..." var="sugerencia" itemLabel="#{sugerencia.cp}" itemValue="#{sugerencia}" 
+                                                                                forceSelection="true"  minQueryLength="5" maxlength="5" converter="entityConverter">
+                                                                                <p:ajax process="@this" event="itemSelect" listener="#{registroEmpleadosBean.verAsentamientoSeleccionado()}" update="Pais Estado Municipio Localidad Asentamiento"/>
+                                                                                <p:column>
+                                                                                    <p:outputLabel value="#{sugerencia.cp}"/>
+                                                                                </p:column>
+                                                                                <p:column>
+                                                                                    <p:outputLabel value="#{sugerencia.descripcion}" />
+                                                                                </p:column>
                                                                             </p:autoComplete> 
                                                                         </div>
                                                                         <div class="field col">
                                                                             <p:outputLabel for="@next" value="Pais" />
-                                                                            <p:inputText id="Pais" value="#{asentamientoSeleccionado.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getEstadoPK().getPais().getNombrePais()}" >
-                                                                                   <p:ajax process="@this" />
+                                                                            <p:inputText id="Pais" value="#{registroEmpleadosBean.asentamientoSelected.key.localidad.key.municipio.key.estado.key.pais.nombrePais}" >
+                                                                                   <p:ajax process="@this"  />
                                                                             </p:inputText>
                                                                         </div>
                                                                         <div class="field col">
                                                                             <p:outputLabel for="@next" value="Estado" />
-                                                                            <p:inputText id="Estado" value="#{asentamientoSeleccionado.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getDescripcion()}" >
+                                                                            <p:inputText id="Estado" value="#{registroEmpleadosBean.asentamientoSelected.key.localidad.key.municipio.key.estado.descripcion}" >
                                                                                    <p:ajax process="@this" />
                                                                             </p:inputText>
                                                                         </div>
                                                                         <div class="field col">
                                                                             <p:outputLabel for="@next" value="Municipio" />
-                                                                            <p:inputText id="Municipio" value="#{asentamientoSeleccionado.getKey().getLocalidad().getKey().getMunicipio().getDescripcion()}" >
+                                                                            <p:inputText id="Municipio" value="#{registroEmpleadosBean.asentamientoSelected.key.localidad.key.municipio.descripcion}" >
                                                                                    <p:ajax process="@this" />
                                                                             </p:inputText>
                                                                         </div>
                                                                         <div class="field col">
-                                                                            <p:outputLabel for="@next" value="Ciudad" />
-                                                                            <p:inputText id="Ciudad" value="#{asentamientoSeleccionado.getKey().getLocalidad().getDescripcion()}" >
+                                                                            <p:outputLabel for="@next" value="Localidad" />
+                                                                            <p:inputText id="Localidad" value="#{registroEmpleadosBean.asentamientoSelected.key.localidad.descripcion}" >
                                                                                    <p:ajax process="@this" />
                                                                             </p:inputText>
                                                                         </div>
                                                                         <div class="field col">
                                                                             <p:outputLabel for="@next" value="Asentamiento" />
-                                                                            <p:inputText id="Asentamiento" value="#{registroEmpleadosBean.asentamientoSeleccionado.descripcion}" >
-                                                                                   <p:ajax process="@this" />
+                                                                            <p:inputText id="Asentamiento" value="#{registroEmpleadosBean.asentamientoSelected.descripcion}" >
+                                                                                <p:ajax process="@this" />
                                                                             </p:inputText>
                                                                         </div>
                                                                         <div class="field col">
                                                                             <p:outputLabel for="@next" value="Calle" />
-                                                                            <p:inputText id="Calle" value="" >
+                                                                            <p:inputText id="Calle" value="#{registroEmpleadosBean.domicilioEmpleado.calle}" >
                                                                                    <p:ajax process="@this" />
                                                                             </p:inputText>
                                                                         </div>
                                                                         <div class="field col">
                                                                             <p:outputLabel for="@next" value="Num. Ext." />
-                                                                            <p:inputText id="numExt" value="" >
+                                                                            <p:inputText id="numExt" value="#{registroEmpleadosBean.domicilioEmpleado.numeroExterior}" >
                                                                                    <p:ajax process="@this" />
                                                                             </p:inputText>
                                                                         </div>
                                                                         <div class="field col">
                                                                             <p:outputLabel for="@next" value="Num. Int" />
-                                                                            <p:inputText id="numInt" value="" >
+                                                                            <p:inputText id="numInt" value="#{registroEmpleadosBean.domicilioEmpleado.numeroInterior}" >
                                                                                    <p:ajax process="@this" />
                                                                             </p:inputText>
                                                                         </div>
