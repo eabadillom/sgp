@@ -22,6 +22,30 @@ public class EstadoDAO extends BaseDAO {
         super(CatEstado.class);
     }
     
+    public synchronized List<CatEstado> obtenerTodosPorPais(Integer id) throws SGPException{
+        EntityManager em = null;
+        List<CatEstado> estados = null;
+        try{
+            log.info("Inicia proceso de obtener todos los estados.");
+            em = super.getEntityManager();
+            
+            TypedQuery<CatEstado> resultado = em.createQuery("select e from  CatEstado e where e.key.pais.id = :id", CatEstado.class);
+            resultado.setParameter("id", id);
+            estados = resultado.getResultList();
+            
+        }
+        catch(Exception ex){
+            super.rollback(em);
+            log.error("Hubo algun problema al obtener todos los registros de la tabla CatEstado");
+            throw new SGPException("Problema al obtener los registros" + ex);
+        }
+        finally{
+            log.info("Finaliza proceso de obtener todos los estados");
+            super.close(em);
+        }
+        return estados;
+    }
+    
     public synchronized List<CatEstado> obtenerTodos() throws SGPException{
         EntityManager em = null;
         List<CatEstado> estados = null;

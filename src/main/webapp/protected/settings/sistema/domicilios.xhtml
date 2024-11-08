@@ -1,0 +1,139 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/plantillas/template.xhtml">
+
+    <ui:define name="title">Domicilios</ui:define>
+    <ui:define name="content">
+
+        <h:form id="frm">
+            <p:growl id="messages" showDetail="true" life="4000"/>
+            <p:dialog modal="true" widgetVar="statusDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
+                <div align="center">
+                    <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+                </div>
+            </p:dialog>
+
+            <p:outputPanel>
+                <div>
+                    <p:outputLabel value="Codigo postal"/>
+                </div>
+                <div>
+                    <p:inputText/>
+                    <p:commandButton value="Buscar" icon="pi pi-search" />
+                </div>                  
+            </p:outputPanel>
+
+            <div class="divider" style="height: 2px; background-color: #ccc; margin: 10px 0;"></div>
+
+            <div class="ui-fluid formgrid grid">
+                <div class="field col-12 md:col-6">
+                    <p:outputLabel value="Pais: " />
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <p:selectOneMenu value="#{domiciliosBean.pais}" converter="entityConverter">
+                            <f:selectItem itemLabel="Seleccione un pais" noSelectionOption="true" />
+                            <f:selectItems value="#{domiciliosBean.paises}" var="pais" itemLabel="#{pais.nombrePais}" itemValue="#{pais}"/>
+                            <p:ajax event="change" listener="#{domiciliosBean.estadosDisponibles}" 
+                update="menuEstado" process="@this" />
+                        </p:selectOneMenu>
+                        <p:commandButton icon="pi pi-pencil" />
+                        <p:commandButton icon="pi pi-plus" />
+                        <p:commandButton icon="pi pi-times" />
+                    </div>
+                </div>
+
+                <div class="field col-12 md:col-6">
+                    <p:outputLabel value="Estado: " />
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <p:selectOneMenu id="menuEstado" value="#{domiciliosBean.estado}" converter="entityConverter">
+                            <f:selectItem itemLabel="Seleccione un Estado" noSelectionOption="true" />
+                            <f:selectItems value="#{domiciliosBean.estados}" var="estado" itemLabel="#{estado.descripcion}" itemValue="#{estado}"/>
+                            <p:ajax event="change" listener="#{domiciliosBean.municipiosDisponibles}" update="menuMunicipio" process="@this" />
+                        </p:selectOneMenu>
+                        <p:commandButton icon="pi pi-pencil" />
+                        <p:commandButton icon="pi pi-plus" />
+                        <p:commandButton icon="pi pi-times" />
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="ui-fluid formgrid grid">
+                <div class="field col-12 md:col-6">
+                    <p:outputLabel value="Municipio: " />
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <p:selectOneMenu id="menuMunicipio" value="#{domiciliosBean.municipio}" converter="entityConverter">
+                            <f:selectItem itemLabel="Seleccione un Municipio" noSelectionOption="true" />
+                            <f:selectItems value="#{domiciliosBean.municipios}" var="municipio" itemLabel="#{municipio.descripcion}" itemValue="#{municipio}"/>
+                            <p:ajax event="change" listener="#{domiciliosBean.localidadesDisponibles}" update="menuLocalidad" process="@this" />
+                        </p:selectOneMenu>
+                        <p:commandButton icon="pi pi-pencil" />
+                        <p:commandButton icon="pi pi-plus" />
+                        <p:commandButton icon="pi pi-times" />
+                    </div>
+                </div>
+
+                <div class="field col-12 md:col-6">
+                    <p:outputLabel value="Localidad: " />
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <p:selectOneMenu id="menuLocalidad" value="#{domiciliosBean.localidad}" converter="entityConverter">
+                            <f:selectItem itemLabel="Seleccione una Localidad" noSelectionOption="true" />
+                            <f:selectItems value="#{domiciliosBean.localidades}" var="localidad" itemLabel="#{localidad.descripcion}" itemValue="#{localidad}"/>
+                            <p:ajax event="change" listener="#{domiciliosBean.tiposAsentamientoDisponibles}" update="menuTipoAsentamiento" process="@this" />
+                        </p:selectOneMenu>
+                        <p:commandButton icon="pi pi-pencil" />
+                        <p:commandButton icon="pi pi-plus" />
+                        <p:commandButton icon="pi pi-times" />
+                    </div>
+                </div>
+            </div>
+            
+            <div class="ui-fluid formgrid grid">
+                <div class="field col-12 md:col-6">
+                    <p:outputLabel value="Tipo de Asentamiento: " />
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <p:selectOneMenu id="menuTipoAsentamiento" value="#{domiciliosBean.tipoasentamiento}" converter="entityConverter">
+                            <f:selectItem itemLabel="Seleccione un tipo de Asentamiento" noSelectionOption="true" />
+                            <f:selectItems value="#{domiciliosBean.tiposasentamiento}" var="tipoasentamiento" itemLabel="#{tipoasentamiento.descripcion}" itemValue="#{tipoasentamiento}"/>
+                            <p:ajax event="change" listener="#{domiciliosBean.asentamientosDisponibles}" update="menuAsentamiento" process="@this" />
+                        </p:selectOneMenu>
+                        <p:commandButton icon="pi pi-pencil" />
+                        <p:commandButton icon="pi pi-plus" />
+                        <p:commandButton icon="pi pi-times" />
+                    </div>
+                </div>
+                
+                <div class="field col-12 md:col-6">
+                    <p:outputLabel value="Asentamiento: " />
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <p:selectOneMenu id="menuAsentamiento" value="#{domiciliosBean.asentamiento}" converter="entityConverter">
+                            <f:selectItem itemLabel="Seleccione un Asentamiento" noSelectionOption="true" />
+                            <f:selectItems value="#{domiciliosBean.asentamientos}" var="asentamiento" itemLabel="#{asentamiento.descripcion}" itemValue="#{asentamiento}"/>
+                            <p:ajax event="change" listener="#{domiciliosBean.entidadPostalDisponible}" update="lbEntidadPostal" process="@this"/>
+                        </p:selectOneMenu>
+                        <p:commandButton icon="pi pi-pencil" />
+                        <p:commandButton icon="pi pi-plus" />
+                        <p:commandButton icon="pi pi-times" />
+                    </div>
+                </div>
+            </div>
+            
+            <div class="ui-fluid formgrid grid">
+                <div class="field col-12 md:col-6">
+                    <p:outputLabel value="Entidad postal: " />
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <p:inputText id="lbEntidadPostal" value="#{domiciliosBean.entidadpostal.descripcion}" readonly="true">
+                        <p:ajax process="@this" />
+                        </p:inputText>
+                    </div>
+                </div>
+            </div>
+            
+        </h:form>
+    </ui:define>
+
+</ui:composition>

@@ -2,9 +2,11 @@ package mx.com.ferbo.dao.n;
 
 import java.util.List;
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.model.CatAsentamiento;
 import mx.com.ferbo.model.CatAsentamientoPK;
+import mx.com.ferbo.util.SGPException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -80,6 +82,33 @@ public class AsentamientoDAO extends BaseDAO<CatAsentamiento, CatAsentamientoPK>
         }
 
         return modelList;
+    }
+    
+    public synchronized List<CatAsentamiento> obtenerTodosPorTipo(Integer idPais, Integer idEstado, Integer idMunicipio, Integer idLocalidad, short idTipo) throws SGPException{
+        EntityManager em = null;
+        List<CatAsentamiento> asentamientos = null;
+        try{
+            log.info("Inicia proceso de obtener todos los asentamientos.");
+            em = super.getEntityManager();
+            TypedQuery<CatAsentamiento> resultado = em.createQuery("select e from  CatAsentamiento e where e.key.localidad.key.municipio.key.estado.key.pais.id = :idPais and e.key.localidad.key.municipio.key.estado.key.id = :idEstado and e.key.localidad.key.municipio.key.id = :idMunicipio and e.key.localidad.key.id = :idLocalidad and e.tipoAsentamiento.id = :idTipo", CatAsentamiento.class);
+            resultado.setParameter("idPais", idPais);
+            resultado.setParameter("idEstado", idEstado);
+            resultado.setParameter("idMunicipio", idMunicipio);
+            resultado.setParameter("idLocalidad", idLocalidad);
+            resultado.setParameter("idTipo", idTipo);
+            asentamientos = resultado.getResultList();
+            
+        }
+        catch(Exception ex){
+            super.rollback(em);
+            log.error("Hubo algun problema al obtener todos los registros de la tabla CatLAsentamiento");
+            throw new SGPException("Problema al obtener los registros" + ex);
+        }
+        finally{
+            log.info("Finaliza proceso de obtener todos los asentamientos");
+            super.close(em);
+        }
+        return asentamientos;
     }
     
 }
