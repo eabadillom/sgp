@@ -7,6 +7,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -22,7 +23,7 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "cat_entidad_postal")
 @NamedQueries({
-    @NamedQuery(name = "CatEntidadPostal.findAll", query = "SELECT cep FROM CatEntidadPostal cep")
+    @NamedQuery(name = "CatEntidadPostal.findAll", query = "SELECT ep FROM CatEntidadPostal ep")
 })
 public class CatEntidadPostal implements Serializable
 {
@@ -38,7 +39,7 @@ public class CatEntidadPostal implements Serializable
     @Column(name = "nu_entidadpostal")
     private String descripcion;
     
-    @OneToMany(cascade = CascadeType.DETACH, mappedBy = "entidadPostal")
+    @OneToMany(mappedBy = "entidadPostal", fetch= FetchType.LAZY)
     private List<CatAsentamiento> asentamientos;
 
     public CatEntidadPostal() 
@@ -106,7 +107,7 @@ public class CatEntidadPostal implements Serializable
 
     @Override
     public String toString() {
-        return "CatEntidadPostal[" + "id=" + id + ", descripcion=" + descripcion + ", asentamientos=" + asentamientos + ']';
+        return "CatEntidadPostal[" + "id=" + id + ", descripcion=" + descripcion + ']';
     }
     
 }

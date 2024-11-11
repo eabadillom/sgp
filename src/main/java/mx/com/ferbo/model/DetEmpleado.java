@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -477,5 +478,40 @@ public class DetEmpleado implements Serializable {
 	public void setPrestamos(List<DetPrestamo> prestamos) {
 		this.prestamos = prestamos;
 	}
+
+    public DetDomicilioEmpleado getDomicilio() {
+        return domicilio;
+    }
+
+    public void setDomicilio(DetDomicilioEmpleado domicilio) {
+        this.domicilio = domicilio;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 17 * hash + Objects.hashCode(this.idEmpleado);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final DetEmpleado other = (DetEmpleado) obj;
+        return Objects.equals(this.idEmpleado, other.idEmpleado);
+    }
+    
+    @Override
+    public String toString() {
+        return "DetEmpleado[" + "idEmpleado=" + idEmpleado + ", nombre=" + nombre + ", primerAp=" + primerAp + ", segundoAp=" + segundoAp + ']';
+    }
 
 }

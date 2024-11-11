@@ -129,7 +129,7 @@ public class CatEstado implements Serializable
     @Override
     public String toString() 
     {
-        return "CatEstado[" + "IdEstado=" + key.getId() + ", estadoClave=" + clave + ", estadoDesc=" + descripcion + ']';
+        return "CatEstado[" + "id=" + key.getId() + ", clave=" + clave + ", descripcion=" + descripcion + ']';
     }
     
 }

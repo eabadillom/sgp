@@ -7,6 +7,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -22,7 +23,7 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "cat_tipo_asentamiento")
 @NamedQueries({
-    @NamedQuery(name = "CatTipoAsentamiento.findAll", query = "SELECT cl FROM CatLocalidad cl")
+    @NamedQuery(name = "CatTipoAsentamiento.findAll", query = "SELECT ta FROM CatTipoAsentamiento ta")
 })
 public class CatTipoAsentamiento implements Serializable
 {
@@ -42,7 +43,7 @@ public class CatTipoAsentamiento implements Serializable
     @Column(name = "nb_clave")
     private String clave;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "tipoAsentamiento")
+    @OneToMany(mappedBy = "tipoAsentamiento", fetch= FetchType.LAZY)
     private List<CatAsentamiento> asentamientos;
 
     public CatTipoAsentamiento() 
@@ -121,7 +122,7 @@ public class CatTipoAsentamiento implements Serializable
     @Override
     public String toString() 
     {
-        return "CatTipoAsentamiento[" + "id=" + id + ", descripcion=" + descripcion + ", clave=" + clave + ", asentamientos=" + asentamientos + ']';
+        return "CatTipoAsentamiento[" + "id=" + id + ", descripcion=" + descripcion + ", clave=" + clave + ']';
     }
     
 }
