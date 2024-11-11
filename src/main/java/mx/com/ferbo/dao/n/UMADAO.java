@@ -4,6 +4,7 @@
  */
 package mx.com.ferbo.dao.n;
 
+import java.time.LocalDate;
 import java.util.List;
 import javax.persistence.EntityManager;
 import mx.com.ferbo.commons.dao.BaseDAO;
@@ -30,47 +31,57 @@ public class UMADAO extends BaseDAO<CatUMA, Integer>
     }
     
     @Override
-    public CatUMA buscarPorId(Integer codigoAnio)
-    {
+    public CatUMA buscarPorId(Integer codigoAnio) {
         CatUMA uma = null;
         EntityManager em = null;
         
-        try
-        {
+        try {
             em = this.getEntityManager();
             uma = em.createNamedQuery("CatUMA.findById", CatUMA.class)
                     .setParameter("cd_anio", codigoAnio)
                     .getSingleResult();
-        }catch(Exception ex) 
-        {
+        } catch(Exception ex) {
             log.error("Problema para obtener la UMA...", ex);
-        } finally 
-        {
+        } finally {
             this.close(em);
         }
         
         return uma;
     }
     
-    public List<CatUMA> obtenerLista()
-    {
+    public List<CatUMA> obtenerLista() {
         List<CatUMA> modelList = null;
         EntityManager em = null;
         
-        try
-        {
+        try {
             em = this.getEntityManager();
             modelList = em.createNamedQuery("CatUMA.findAll", CatUMA.class)
                     .getResultList();
-        }catch(Exception ex)
-        {
+        } catch(Exception ex) {
             log.error("Problema al obtener la lista de las UMA'S...", ex);
-        }finally
-        {
+        } finally {
             this.close(em);
         }
         
         return modelList;
     }
     
+    public CatUMA buscarVigente(LocalDate fecha) {
+    	CatUMA model = null;
+    	EntityManager em = null;
+    	
+    	try {
+    		em = this.getEntityManager();
+    		model = em.createNamedQuery("CatUMA.buscarVigente", this.modelClass)
+    				.setParameter("fecha", fecha)
+    				.getSingleResult()
+    				;
+    	} catch(Exception ex) {
+    		
+    	} finally {
+    		this.close(em);
+    	}
+    	
+    	return model;
+    }
 }

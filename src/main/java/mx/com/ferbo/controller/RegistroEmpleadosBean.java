@@ -57,7 +57,6 @@ import mx.com.ferbo.model.CatPlanta;
 import mx.com.ferbo.model.CatPuesto;
 import mx.com.ferbo.model.CatTipoPrestamo;
 import mx.com.ferbo.model.DetBiometrico;
-import mx.com.ferbo.model.DetDomicilioEmpleado;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetEmpleadoFoto;
 import mx.com.ferbo.model.DetPercepcionEmpleado;
@@ -156,7 +155,7 @@ public class RegistroEmpleadosBean implements Serializable {
         tipoPrestamoDAO = new TipoPrestamoDAO();
         domicilioEmpleadoDAO = new DomicilioEmpleadoDAO();
         asentamientoDAO = new AsentamientoDAO();
-        opcionesAsentamiento = asentamientoDAO.buscarTodos();
+//        opcionesAsentamiento = asentamientoDAO.buscarTodos();
         asentamientoSeleccionado = new CatAsentamiento();
         asentamientoSeleccionado.setKey(new CatAsentamientoPK());
         asentamientoSeleccionado.getKey().setLocalidad(new CatLocalidad());

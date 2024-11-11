@@ -1,33 +1,38 @@
-package mx.com.ferbo.business.deduccion;
+package mx.com.ferbo.business.deduccion.subsidio;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import mx.com.ferbo.dao.n.SubsidioDAO;
 import mx.com.ferbo.model.CatSubsidio;
 import mx.com.ferbo.util.SGPException;
 
-public class TarifaSubsidioDeduccion {
+public class TarifaSubsidioDeduccion1 implements ISubsidioEmpleo {
 	
-	private static Logger log = LogManager.getLogger(TarifaSubsidioDeduccion.class);
+	private static Logger log = LogManager.getLogger(TarifaSubsidioDeduccion1.class);
 	
+	private SubsidioDAO subsidioDAO = null;
 	private List<CatSubsidio> tablaSubsidio = null;
-	private BigDecimal baseISR = null;
+	private LocalDate fecha = null;
 	
-	public TarifaSubsidioDeduccion(List<CatSubsidio> tablaSubsidio, BigDecimal baseISR) {
-		this.tablaSubsidio = tablaSubsidio;
-		this.baseISR = baseISR;
+	public TarifaSubsidioDeduccion1(LocalDate fecha) {
+		subsidioDAO = new SubsidioDAO();
+		this.fecha = fecha;
 	}
 	
-	public CatSubsidio calcular() throws SGPException {
+	public BigDecimal calcular(String periodo, BigDecimal baseISR) throws SGPException {
 		CatSubsidio tarifaSubsidio = null;
 		List<CatSubsidio> resultList = null;
 		
-		if(this.baseISR == null)
+		if(baseISR == null)
 			throw new SGPException("No se proporcionó la base para el ISR.");
+		
+		this.tablaSubsidio = subsidioDAO.buscarPorPeriodo(periodo);
 		
 		if(this.tablaSubsidio == null)
 			throw new SGPException("No se proporcionó la tabla de subsidio al salario.");
@@ -47,10 +52,11 @@ public class TarifaSubsidioDeduccion {
 			} else {
 				throw new SGPException(String.format("No se encontró una tarifa de subsidio para la base calculada: Base ISR = %s", baseISR.toString()));
 			}
+			log.info("Fecha: {}, Base ISR: {}, Subsidio acreditado: {}", this.fecha, baseISR, tarifaSubsidio);
 		} catch(Exception ex) {
 			log.warn(ex);
 			throw new SGPException("No es posible determinar el subsidio al empleo...", ex);
 		}
-		return tarifaSubsidio;
+		return tarifaSubsidio.getCantidadSubsidio();
 	}
 }
