@@ -1,6 +1,7 @@
 package mx.com.ferbo.controller;
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -68,6 +69,9 @@ public class DomiciliosBean implements Serializable {
     private CatEntidadPostal entidadpostal;
     private List<CatEntidadPostal> entidadespostales;
     private EntidadPostalDAO entidadpostaldao;
+
+    // Codigo postal
+    private String codigopostal;
 
     private FacesContext fc;
     private PrimeFaces pf;
@@ -229,7 +233,6 @@ public class DomiciliosBean implements Serializable {
     }
 
     // implementacion entidad postal 
-
     public CatEntidadPostal getEntidadpostal() {
         return entidadpostal;
     }
@@ -240,6 +243,71 @@ public class DomiciliosBean implements Serializable {
 
     public List<CatEntidadPostal> getEntidadespostales() {
         return entidadespostales;
+    }
+
+    // Implementacion codigo postal
+    public String getCodigopostal() {
+        return codigopostal;
+    }
+
+    public void setCodigopostal(String codigopostal) {
+        this.codigopostal = codigopostal;
+    }
+
+    private String validarCodigoPostal() throws SGPException {
+        
+        char[] permitidos = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+        String cd = this.codigopostal;
+        cd = cd.trim();
+
+        if (cd == null) {
+            throw new SGPException("El codigo postal es nulo");
+        }
+
+        if (cd.equals("")) {
+            throw new SGPException("El codigo postal esta vacio");
+        }
+
+        for (int i = 0; i < cd.length(); i++) {
+            char digito = cd.charAt(i);
+            for (int j = 0; j < permitidos.length; j++) {
+                if (permitidos[j] != digito) {
+                    throw new SGPException("El codigo postal solo debe contener digitos de 0 a 9");
+                }
+            }
+        }
+
+        if (cd.length() != 4) {
+            throw new SGPException("El codigo postal solo debe ser de ocho digitos");
+        }
+
+        return cd;
+    }
+    
+    public void bucarCodigoPostal(){
+        
+        try {
+            this.paises = null;
+            this.estados = null;
+            this.municipios = null;
+            this.localidades = null;
+            
+            this.asentamientos = this.asentamientodao.buscarPorCodigoPostal(this.validarCodigoPostal());
+            
+            for(CatAsentamiento tmp : this.asentamientos){
+                this.paises.add(tmp.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getPais());
+                this.estados.add(tmp.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado());
+                this.municipios.add(tmp.getKey().getLocalidad().getKey().getMunicipio());
+                this.localidades.add(tmp.getKey().getLocalidad());
+            }
+            
+        }
+        catch(SGPException ex){
+            
+        }
+        catch(Exception ex){
+        
+        }
     }
 
     // generales
@@ -295,10 +363,9 @@ public class DomiciliosBean implements Serializable {
     }
 
     public void tiposAsentamientoDisponibles() {
-        if(this.localidad != null){
+        if (this.localidad != null) {
             this.obtenerTiposAsentamiento();
-        }
-        else{
+        } else {
             this.tiposasentamiento = null;
         }
     }
@@ -326,22 +393,20 @@ public class DomiciliosBean implements Serializable {
             log.info(ex);
         }
     }
-    
-    public void entidadPostalDisponible(){
-        if(this.asentamiento != null){
+
+    public void entidadPostalDisponible() {
+        if (this.asentamiento != null) {
             this.obtenerEntidadPostal();
-        }
-        else {
+        } else {
             this.entidadpostal = null;
         }
     }
-    
-    private void obtenerEntidadPostal(){
 
-        try{
+    private void obtenerEntidadPostal() {
+
+        try {
             this.entidadpostal = this.entidadpostaldao.buscarPorId(this.asentamiento.getEntidadPostal().getId());
-        }
-        catch(Exception ex){
+        } catch (Exception ex) {
             log.info(ex);
         }
     }
