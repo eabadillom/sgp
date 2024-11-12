@@ -117,7 +117,7 @@ public class CatLocalidad implements Serializable
 
     @Override
     public String toString() {
-        return "CatLocalidad[" + "IdLocalidad=" + key.getId() + ", descripcion=" + descripcion + ", asentamientos=" + asentamientos + ']';
+        return "CatLocalidad[" + "IdLocalidad=" + key.getId() + ", descripcion=" + descripcion + ']';
     }
     
 }

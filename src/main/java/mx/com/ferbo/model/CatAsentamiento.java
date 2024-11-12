@@ -49,7 +49,7 @@ public class CatAsentamiento implements Serializable
     
     @OneToOne(mappedBy = "asentamiento", fetch= FetchType.LAZY)
     private DetDomicilioEmpleado domicilioEmpleado;
-
+    
     public CatAsentamiento() 
     {
     }
@@ -113,7 +113,7 @@ public class CatAsentamiento implements Serializable
     {
         this.entidadPostal = entidadPostal;
     }
-
+    
     public DetDomicilioEmpleado getDomicilioEmpleado() 
     {
         return domicilioEmpleado;
@@ -147,7 +147,7 @@ public class CatAsentamiento implements Serializable
         final CatAsentamiento other = (CatAsentamiento) obj;
         return Objects.equals(this.key.getId(), other.key.getId());
     }
-
+    
     @Override
     public String toString() {
         return "CatAsentamiento[" + "IdAsentamiento=" + key.getId() + ", descripcion=" + descripcion + ", cp=" + cp + ']';

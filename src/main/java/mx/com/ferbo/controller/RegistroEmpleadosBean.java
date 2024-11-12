@@ -127,7 +127,7 @@ public class RegistroEmpleadosBean implements Serializable {
     private int numBiometrico;
     private DetPrestamo prestamo;
     private CatAsentamiento asentamientoSelected;
-    private DetDomicilioEmpleado domicilioEmpleado;
+    private DetDomicilioEmpleado domicilioEmpleadoSelected;
     
     private String curp;
     private String rfc;
@@ -180,11 +180,13 @@ public class RegistroEmpleadosBean implements Serializable {
             tiposPrestamo = tipoPrestamoDAO.buscarTodos();
             
             consultaEmpleados();
+            prestamo = new DetPrestamo();
+            domicilioEmpleadoSelected = new DetDomicilioEmpleado();
         } catch (Exception ex) {
             log.warn("EX-0008: " + ex.getMessage() + ". Error al cargar init()");
         }
     }
-
+    
     /*
      * Método para consultar a los empleados
      */
@@ -223,7 +225,7 @@ public class RegistroEmpleadosBean implements Serializable {
     public void editar() {
     	List<DetPrestamo> prestamos = null;
     	log.info("Cargando información del empleado: {}", this.empleadoSelected);
-    	InfDatoEmpresa datoEmpresa = this.empleadoSelected.getDatoEmpresa();
+        InfDatoEmpresa datoEmpresa = this.empleadoSelected.getDatoEmpresa();
     	this.empleadoFoto = empleadoFotoDAO.buscar(this.empleadoSelected.getNumEmpleado());
     	
     	if(datoEmpresa == null) {
@@ -245,13 +247,24 @@ public class RegistroEmpleadosBean implements Serializable {
     	if(empleadoFoto != null)
     		log.debug("Foto: {}", empleadoFoto.getFotografia());
     	
+        this.domicilioEmpleadoSelected = domicilioEmpleadoDAO.buscarPorId(this.empleadoSelected.getIdEmpleado());
+        
+        if(this.domicilioEmpleadoSelected != null)
+        {
+            this.asentamientoSelected = domicilioEmpleadoSelected.getAsentamiento();
+            log.info("Cargando información del no. domicilio {} y del no. asentamiento {} del empleado {}", this.domicilioEmpleadoSelected.getId(), this.asentamientoSelected.getKey().getId(), this.empleadoSelected.getIdEmpleado());
+        }else
+        {
+            this.domicilioEmpleadoSelected = new DetDomicilioEmpleado();
+        }
+        
     	this.detBiometrico = biometricoDAO.consultaBiometricoByIdEmpleado(this.empleadoSelected.getIdEmpleado());
     	
 		log.info("Biometrico: {}", this.detBiometrico);
 		
 		this.nuevaPercepcionEmpleado();
     	
-    	PrimeFaces.current().ajax().update("formRegistroEmpleado:panelDialogFoto");
+    	PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogFoto", "formRegistroEmpleado:panelDialogEmpleado");
     }
     
     public void nuevaPercepcionEmpleado() {
@@ -401,7 +414,12 @@ public class RegistroEmpleadosBean implements Serializable {
     	try {
     		this.empleadoSelected.setPercepcionesEmpleado(this.percepcionesEmpleado);
     		
-    		if (this.empleadoSelected.getIdEmpleado() == null) {
+                if(domicilioEmpleadoSelected.getCalle() == null && domicilioEmpleadoSelected.getNumeroExterior() == null && domicilioEmpleadoSelected.getNumeroInterior() == null)
+                {
+                    throw new SGPException("Faltan datos de calle, número exterior e interior");
+                }
+    		
+                if (this.empleadoSelected.getIdEmpleado() == null) {
     			
     			pNumeroEmpleado = this.parametroDAO.buscarPorClave("NBEMP");
     			sNumeroEmpleado = pNumeroEmpleado.getValor();
@@ -412,11 +430,20 @@ public class RegistroEmpleadosBean implements Serializable {
         		this.empleadoSelected.setFechaRegistro(new Date());
     			empleadoDAO.guardar(empleadoSelected);
                         //*aqui va el guardado del domicilio del empleado*
-                        
-                        
+                        domicilioEmpleadoDAO.guardar(domicilioEmpleadoSelected);
     		} else {
     			empleadoDAO.actualizar(empleadoSelected);
                         
+                        DetDomicilioEmpleado auxDomicilio = domicilioEmpleadoDAO.buscarPorId(this.empleadoSelected.getIdEmpleado());
+                        
+                        if(auxDomicilio != null)
+                        {
+                            domicilioEmpleadoDAO.actualizar(auxDomicilio);
+                        }else
+                        {
+                            auxDomicilio = domicilioEmpleadoSelected;
+                            domicilioEmpleadoDAO.guardar(auxDomicilio);
+                        }
     		}
     		
     		if(this.empleadoFoto != null) {
@@ -447,10 +474,9 @@ public class RegistroEmpleadosBean implements Serializable {
     		mensaje = "Problema para guardar al empleado.";
     		severity = FacesMessage.SEVERITY_ERROR;
     	} finally {
-    		message = new FacesMessage(severity, titulo, mensaje);
-			FacesContext.getCurrentInstance().addMessage(null, message);
-	        PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:dtEmpleados");
-			
+            message = new FacesMessage(severity, titulo, mensaje);
+            FacesContext.getCurrentInstance().addMessage(null, message);
+            PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:dtEmpleados");	
     	}
     }
 
@@ -536,14 +562,54 @@ public class RegistroEmpleadosBean implements Serializable {
     
     public List<CatAsentamiento> sugerenciasCodigoPostal(String consulta) 
     {
+        this.domicilioEmpleadoSelected = new DetDomicilioEmpleado();
         List<CatAsentamiento> listaSugerencias = asentamientoDAO.buscarPorCodigoPostal(consulta);
-        
-        PrimeFaces.current().ajax().update("Asentamiento");
         return listaSugerencias;
     }
     
-    public void verAsentamientoSeleccionado() {
-        log.info("Asentamiento seleccionado: {}", this.asentamientoSelected);
+    public void domicilioEmpleado() 
+    {
+        log.info("Entrando a la sección de domicilio empleado");
+        FacesMessage message = null;
+        Severity severity = null;
+        String mensaje = null;
+        String titulo = "Domicilio Empleado";
+        try{
+            if(this.domicilioEmpleadoSelected.getEmpleado() == null)
+            {
+                log.info("Añadiendo informacion del empleado");
+                if(this.empleadoSelected != null)
+                {    
+                    this.domicilioEmpleadoSelected.setEmpleado(empleadoSelected);
+                }else
+                {
+                    throw new SGPException("Debe haber información del empleado");
+                }
+                
+                log.info("Añadiendo informacion del asentamiento");
+                if(this.asentamientoSelected != null)
+                {
+                    log.info("Asentamiento seleccionado: {}", this.asentamientoSelected.toString());
+                    this.domicilioEmpleadoSelected.setAsentamiento(this.asentamientoSelected);
+                }else
+                {
+                    throw new SGPException("Debe haber información del asentamiento");
+                }
+                
+                severity = FacesMessage.SEVERITY_INFO;
+                mensaje = "Guardando asentamiento en domicilio empleado";
+            }
+        }catch(SGPException ex) 
+        {
+            log.error("Problema para añadir información del domicilio empleado...", ex);
+            mensaje = "Problema para añadir información del domicilio del empleado.";
+            severity = FacesMessage.SEVERITY_ERROR;
+    	} finally 
+        {
+            message = new FacesMessage(severity, titulo, mensaje);
+            FacesContext.getCurrentInstance().addMessage(null, message);
+            PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:dtEmpleados");
+        }
     }
 
     public List<CatEmpresa> getLstCatEmpresa() {
@@ -786,12 +852,14 @@ public class RegistroEmpleadosBean implements Serializable {
         this.codigoPostal = codigoPostal;
     }
 
-    public DetDomicilioEmpleado getDomicilioEmpleado() {
-        return domicilioEmpleado;
+    public DetDomicilioEmpleado getDomicilioEmpleadoSelected() 
+    {
+        return domicilioEmpleadoSelected;
     }
 
-    public void setDomicilioEmpleado(DetDomicilioEmpleado domicilioEmpleado) {
-        this.domicilioEmpleado = domicilioEmpleado;
+    public void setDomicilioEmpleadoSelected(DetDomicilioEmpleado domicilioEmpleadoSelected) 
+    {
+        this.domicilioEmpleadoSelected = domicilioEmpleadoSelected;
     }
-    
+
 }
