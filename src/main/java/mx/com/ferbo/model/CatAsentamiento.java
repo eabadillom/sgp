@@ -113,7 +113,7 @@ public class CatAsentamiento implements Serializable
     {
         this.entidadPostal = entidadPostal;
     }
-
+    
     public DetDomicilioEmpleado getDomicilioEmpleado() 
     {
         return domicilioEmpleado;
@@ -123,7 +123,7 @@ public class CatAsentamiento implements Serializable
     {
         this.domicilioEmpleado = domicilioEmpleado;
     }
-
+    
     @Override
     public int hashCode() 
     {

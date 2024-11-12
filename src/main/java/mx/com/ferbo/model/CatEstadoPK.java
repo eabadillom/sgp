@@ -63,6 +63,7 @@ public class CatEstadoPK implements Serializable
     public int hashCode() 
     {
         int hash = 3;
+        hash = 23 * hash + Objects.hashCode(this.pais.getId());
         hash = 23 * hash + Objects.hashCode(this.id);
         return hash;
     }
@@ -80,6 +81,9 @@ public class CatEstadoPK implements Serializable
             return false;
         }
         final CatEstadoPK other = (CatEstadoPK) obj;
+        if (!Objects.equals(this.pais.getId(), other.pais.getId())) {
+            return false;
+        }
         return Objects.equals(this.id, other.id);
     }
     

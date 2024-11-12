@@ -64,7 +64,7 @@ public class DetDomicilioEmpleado implements Serializable
     @JoinColumn(name = "id_empleado")
     private DetEmpleado empleado;
     
-    @OneToOne(optional = false)
+    @OneToOne(cascade = CascadeType.ALL, optional = false)
     @NotNull
     @JoinColumns({
         @JoinColumn(name = "cd_asentamiento", referencedColumnName = "cd_asentamiento"),
@@ -141,7 +141,7 @@ public class DetDomicilioEmpleado implements Serializable
     {
         this.empleado = empleado;
     }
-
+    
     public CatAsentamiento getAsentamiento() 
     {
         return asentamiento;
