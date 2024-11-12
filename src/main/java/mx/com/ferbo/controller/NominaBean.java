@@ -328,8 +328,6 @@ public class NominaBean implements Serializable {
 		nominaSemanalBO.setParametrosPercepciones(parametrosPercepciones);
 		nominaSemanalBO.setTablaISRSemanal(this.tablaISRsemanal);
 		nominaSemanalBO.setTablaISRMensual(this.tablaISRmensual);
-		nominaSemanalBO.setTablaSubsidioSemanal(this.tablaSubsidioSemanal);
-		nominaSemanalBO.setTablaSubsidioMensual(this.tablaSubsidioMensual);
 		nominaSemanalBO.setMetodoPago(this.metodoPago);
 		nominaSemanalBO.setConcepto(this.concepto);
 		nominaSemanalBO.setUnidadSAT(this.unidadSAT);

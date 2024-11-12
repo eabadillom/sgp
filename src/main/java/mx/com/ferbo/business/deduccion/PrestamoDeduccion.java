@@ -28,18 +28,18 @@ public class PrestamoDeduccion extends AbstractDeduccion implements IDeducciones
 	}
 
 	@Override
-	public List<DetNominaDeduccion> calcular(DetNomina nomina, Integer index) {
+	public List<DetNominaDeduccion> procesar(DetNomina nomina, Integer index) {
 		BigDecimal totalPrestamos = null;
 		List<DetPrestamo> prestamos = null;
 		DetNominaDeduccion deduccion = null;
-		List<DetNominaDeduccion> deducciones = null;
+		List<DetNominaDeduccion> prestamosDeduccion = null;
 		
 		Integer idx = null;
 		
 		try {
 			idx = this.nuevoIndiceDe(nomina.getDeducciones());
 			
-			deducciones = new ArrayList<DetNominaDeduccion>();
+			prestamosDeduccion = new ArrayList<DetNominaDeduccion>();
 			prestamos = prestamoDAO.buscar(empleado.getIdEmpleado());
 			
 			if(prestamos.size() <= 0)
@@ -57,14 +57,16 @@ public class PrestamoDeduccion extends AbstractDeduccion implements IDeducciones
 				deduccion.setProcesar(true);
 				totalPrestamos = totalPrestamos.add(prestamo.getImporte());
 				
-				deducciones.add(deduccion);
+				prestamosDeduccion.add(deduccion);
 			}
 			
+			
+			nomina.getDeducciones().addAll(prestamosDeduccion);
 		} catch(Exception ex) {
 			log.error("Problema para procesar los préstamos del empleado");
 			totalPrestamos = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 		}
-		return deducciones;
+		return prestamosDeduccion;
 	}
 
 	public void setEmpleado(DetEmpleado empleado) {

@@ -70,4 +70,23 @@ public class SubsidioDAO extends BaseDAO<CatSubsidio, Integer> {
         return modelList;
     }
     
+    public List<CatSubsidio> buscarPorPeriodo(String periodo) {
+    	List<CatSubsidio> modelList = null;
+    	EntityManager em = null;
+    	
+    	try {
+    		em = this.getEntityManager();
+    		modelList = em.createNamedQuery("CatSubsidio.findByPeriodo", this.modelClass)
+    				.setParameter("periodo", periodo)
+    				.getResultList()
+    				;
+    	} catch(Exception ex) {
+    		log.error("Problema para obtener la lista de subsidio por periodo " + periodo, ex);
+    	} finally {
+    		this.close(em);
+    	}
+    	
+    	return modelList;
+    }
+    
 }
