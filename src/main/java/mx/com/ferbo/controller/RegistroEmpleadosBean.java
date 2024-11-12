@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -42,14 +41,7 @@ import mx.com.ferbo.dao.n.TipoPrestamoDAO;
 import mx.com.ferbo.dao.n.TipoRegimenDAO;
 import mx.com.ferbo.model.CatArea;
 import mx.com.ferbo.model.CatAsentamiento;
-import mx.com.ferbo.model.CatAsentamientoPK;
 import mx.com.ferbo.model.CatEmpresa;
-import mx.com.ferbo.model.CatEstado;
-import mx.com.ferbo.model.CatEstadoPK;
-import mx.com.ferbo.model.CatLocalidad;
-import mx.com.ferbo.model.CatLocalidadPK;
-import mx.com.ferbo.model.CatMunicipio;
-import mx.com.ferbo.model.CatMunicipioPK;
 import mx.com.ferbo.model.CatParametro;
 import mx.com.ferbo.model.CatPerfil;
 import mx.com.ferbo.model.CatPeriodicidadPago;
@@ -57,12 +49,12 @@ import mx.com.ferbo.model.CatPlanta;
 import mx.com.ferbo.model.CatPuesto;
 import mx.com.ferbo.model.CatTipoPrestamo;
 import mx.com.ferbo.model.DetBiometrico;
+import mx.com.ferbo.model.DetDomicilioEmpleado;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetEmpleadoFoto;
 import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.DetPrestamo;
 import mx.com.ferbo.model.InfDatoEmpresa;
-import mx.com.ferbo.model.Pais;
 import mx.com.ferbo.model.sat.CatEntidadFederativa;
 import mx.com.ferbo.model.sat.CatRiesgoPuesto;
 import mx.com.ferbo.model.sat.CatTipoContrato;
@@ -126,7 +118,8 @@ public class RegistroEmpleadosBean implements Serializable {
     private String biometrico;
     private int numBiometrico;
     private DetPrestamo prestamo;
-    private CatAsentamiento asentamientoSeleccionado;
+    private CatAsentamiento asentamientoSelected;
+    private DetDomicilioEmpleado domicilioEmpleadoSelected;
     
     private String curp;
     private String rfc;
@@ -155,16 +148,6 @@ public class RegistroEmpleadosBean implements Serializable {
         tipoPrestamoDAO = new TipoPrestamoDAO();
         domicilioEmpleadoDAO = new DomicilioEmpleadoDAO();
         asentamientoDAO = new AsentamientoDAO();
-//        opcionesAsentamiento = asentamientoDAO.buscarTodos();
-        asentamientoSeleccionado = new CatAsentamiento();
-        asentamientoSeleccionado.setKey(new CatAsentamientoPK());
-        asentamientoSeleccionado.getKey().setLocalidad(new CatLocalidad());
-        asentamientoSeleccionado.getKey().getLocalidad().setKey(new CatLocalidadPK());
-        asentamientoSeleccionado.getKey().getLocalidad().getKey().setMunicipio(new CatMunicipio());
-        asentamientoSeleccionado.getKey().getLocalidad().getKey().getMunicipio().setKey(new CatMunicipioPK());
-        asentamientoSeleccionado.getKey().getLocalidad().getKey().getMunicipio().getKey().setEstado(new CatEstado());
-        asentamientoSeleccionado.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().setEstadoPK(new CatEstadoPK());
-        asentamientoSeleccionado.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getEstadoPK().setPaisCve(new Pais());
         
         empleadoSelected = new DetEmpleado();
         lstEmpleados = new ArrayList<>();
@@ -189,11 +172,13 @@ public class RegistroEmpleadosBean implements Serializable {
             tiposPrestamo = tipoPrestamoDAO.buscarTodos();
             
             consultaEmpleados();
+            prestamo = new DetPrestamo();
+            domicilioEmpleadoSelected = new DetDomicilioEmpleado();
         } catch (Exception ex) {
             log.warn("EX-0008: " + ex.getMessage() + ". Error al cargar init()");
         }
     }
-
+    
     /*
      * Método para consultar a los empleados
      */
@@ -232,7 +217,7 @@ public class RegistroEmpleadosBean implements Serializable {
     public void editar() {
     	List<DetPrestamo> prestamos = null;
     	log.info("Cargando información del empleado: {}", this.empleadoSelected);
-    	InfDatoEmpresa datoEmpresa = this.empleadoSelected.getDatoEmpresa();
+        InfDatoEmpresa datoEmpresa = this.empleadoSelected.getDatoEmpresa();
     	this.empleadoFoto = empleadoFotoDAO.buscar(this.empleadoSelected.getNumEmpleado());
     	
     	if(datoEmpresa == null) {
@@ -254,13 +239,24 @@ public class RegistroEmpleadosBean implements Serializable {
     	if(empleadoFoto != null)
     		log.debug("Foto: {}", empleadoFoto.getFotografia());
     	
+        this.domicilioEmpleadoSelected = domicilioEmpleadoDAO.buscarPorId(this.empleadoSelected.getIdEmpleado());
+        
+        if(this.domicilioEmpleadoSelected != null)
+        {
+            this.asentamientoSelected = domicilioEmpleadoSelected.getAsentamiento();
+            log.info("Cargando información del no. domicilio {} y del no. asentamiento {} del empleado {}", this.domicilioEmpleadoSelected.getId(), this.asentamientoSelected.getKey().getId(), this.empleadoSelected.getIdEmpleado());
+        }else
+        {
+            this.domicilioEmpleadoSelected = new DetDomicilioEmpleado();
+        }
+        
     	this.detBiometrico = biometricoDAO.consultaBiometricoByIdEmpleado(this.empleadoSelected.getIdEmpleado());
     	
 		log.info("Biometrico: {}", this.detBiometrico);
 		
 		this.nuevaPercepcionEmpleado();
     	
-    	PrimeFaces.current().ajax().update("formRegistroEmpleado:panelDialogFoto");
+    	PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogFoto", "formRegistroEmpleado:panelDialogEmpleado");
     }
     
     public void nuevaPercepcionEmpleado() {
@@ -410,7 +406,12 @@ public class RegistroEmpleadosBean implements Serializable {
     	try {
     		this.empleadoSelected.setPercepcionesEmpleado(this.percepcionesEmpleado);
     		
-    		if (this.empleadoSelected.getIdEmpleado() == null) {
+                if(domicilioEmpleadoSelected.getCalle() == null && domicilioEmpleadoSelected.getNumeroExterior() == null && domicilioEmpleadoSelected.getNumeroInterior() == null)
+                {
+                    throw new SGPException("Faltan datos de calle, número exterior e interior");
+                }
+    		
+                if (this.empleadoSelected.getIdEmpleado() == null) {
     			
     			pNumeroEmpleado = this.parametroDAO.buscarPorClave("NBEMP");
     			sNumeroEmpleado = pNumeroEmpleado.getValor();
@@ -421,10 +422,20 @@ public class RegistroEmpleadosBean implements Serializable {
         		this.empleadoSelected.setFechaRegistro(new Date());
     			empleadoDAO.guardar(empleadoSelected);
                         //*aqui va el guardado del domicilio del empleado*
-                        
-                        
+                        domicilioEmpleadoDAO.guardar(domicilioEmpleadoSelected);
     		} else {
     			empleadoDAO.actualizar(empleadoSelected);
+                        
+                        DetDomicilioEmpleado auxDomicilio = domicilioEmpleadoDAO.buscarPorId(this.empleadoSelected.getIdEmpleado());
+                        
+                        if(auxDomicilio != null)
+                        {
+                            domicilioEmpleadoDAO.actualizar(auxDomicilio);
+                        }else
+                        {
+                            auxDomicilio = domicilioEmpleadoSelected;
+                            domicilioEmpleadoDAO.guardar(auxDomicilio);
+                        }
     		}
     		
     		if(this.empleadoFoto != null) {
@@ -455,10 +466,9 @@ public class RegistroEmpleadosBean implements Serializable {
     		mensaje = "Problema para guardar al empleado.";
     		severity = FacesMessage.SEVERITY_ERROR;
     	} finally {
-    		message = new FacesMessage(severity, titulo, mensaje);
-			FacesContext.getCurrentInstance().addMessage(null, message);
-	        PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:dtEmpleados");
-			
+            message = new FacesMessage(severity, titulo, mensaje);
+            FacesContext.getCurrentInstance().addMessage(null, message);
+            PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:dtEmpleados");	
     	}
     }
 
@@ -544,11 +554,54 @@ public class RegistroEmpleadosBean implements Serializable {
     
     public List<CatAsentamiento> sugerenciasCodigoPostal(String consulta) 
     {
-        List<CatAsentamiento> asentamientoPorCP = null;
-        asentamientoPorCP = this.opcionesAsentamiento.stream()
-                .filter(CatAsentamiento -> CatAsentamiento.getCp().equals(consulta))
-                .collect(Collectors.toList());
-        return asentamientoPorCP;
+        this.domicilioEmpleadoSelected = new DetDomicilioEmpleado();
+        List<CatAsentamiento> listaSugerencias = asentamientoDAO.buscarPorCodigoPostal(consulta);
+        return listaSugerencias;
+    }
+    
+    public void domicilioEmpleado() 
+    {
+        log.info("Entrando a la sección de domicilio empleado");
+        FacesMessage message = null;
+        Severity severity = null;
+        String mensaje = null;
+        String titulo = "Domicilio Empleado";
+        try{
+            if(this.domicilioEmpleadoSelected.getEmpleado() == null)
+            {
+                log.info("Añadiendo informacion del empleado");
+                if(this.empleadoSelected != null)
+                {    
+                    this.domicilioEmpleadoSelected.setEmpleado(empleadoSelected);
+                }else
+                {
+                    throw new SGPException("Debe haber información del empleado");
+                }
+                
+                log.info("Añadiendo informacion del asentamiento");
+                if(this.asentamientoSelected != null)
+                {
+                    log.info("Asentamiento seleccionado: {}", this.asentamientoSelected.toString());
+                    this.domicilioEmpleadoSelected.setAsentamiento(this.asentamientoSelected);
+                }else
+                {
+                    throw new SGPException("Debe haber información del asentamiento");
+                }
+                
+                severity = FacesMessage.SEVERITY_INFO;
+                mensaje = "Guardando asentamiento en domicilio empleado";
+            }
+        }catch(SGPException ex) 
+        {
+            log.error("Problema para añadir información del domicilio empleado...", ex);
+            mensaje = "Problema para añadir información del domicilio del empleado.";
+            severity = FacesMessage.SEVERITY_ERROR;
+    	} finally 
+        {
+            message = new FacesMessage(severity, titulo, mensaje);
+            FacesContext.getCurrentInstance().addMessage(null, message);
+            PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:dtEmpleados");
+        }
     }
 
     public List<CatEmpresa> getLstCatEmpresa() {
@@ -775,12 +828,12 @@ public class RegistroEmpleadosBean implements Serializable {
         this.opcionesAsentamiento = opcionesAsentamiento;
     }
 
-    public CatAsentamiento getAsentamientoSeleccionado() {
-        return asentamientoSeleccionado;
+    public CatAsentamiento getAsentamientoSelected() {
+        return asentamientoSelected;
     }
 
-    public void setAsentamientoSeleccionado(CatAsentamiento asentamientoSeleccionado) {
-        this.asentamientoSeleccionado = asentamientoSeleccionado;
+    public void setAsentamientoSelected(CatAsentamiento asentamientoSeleccionado) {
+        this.asentamientoSelected = asentamientoSeleccionado;
     }
     
     public String getCodigoPostal() {
@@ -790,5 +843,15 @@ public class RegistroEmpleadosBean implements Serializable {
     public void setCodigoPostal(String codigoPostal) {
         this.codigoPostal = codigoPostal;
     }
-    
+
+    public DetDomicilioEmpleado getDomicilioEmpleadoSelected() 
+    {
+        return domicilioEmpleadoSelected;
+    }
+
+    public void setDomicilioEmpleadoSelected(DetDomicilioEmpleado domicilioEmpleadoSelected) 
+    {
+        this.domicilioEmpleadoSelected = domicilioEmpleadoSelected;
+    }
+
 }

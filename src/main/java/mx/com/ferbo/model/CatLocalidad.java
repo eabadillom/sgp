@@ -4,12 +4,11 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
+import javax.persistence.FetchType;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -39,7 +38,7 @@ public class CatLocalidad implements Serializable
     @Column(name = "nb_localidad")
     private String descripcion;
     
-    @OneToMany(mappedBy = "key.localidad")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "key.localidad", fetch= FetchType.LAZY)
     private List<CatAsentamiento> asentamientos;
     
     public CatLocalidad() 
@@ -81,7 +80,7 @@ public class CatLocalidad implements Serializable
     {
         this.descripcion = descripcion;
     }
-
+    
     public List<CatAsentamiento> getAsentamientos() 
     {
         return asentamientos;
@@ -118,7 +117,7 @@ public class CatLocalidad implements Serializable
 
     @Override
     public String toString() {
-        return "CatLocalidad[" + "key=" + key + ", descripcion=" + descripcion + ", asentamientos=" + asentamientos + ']';
+        return "CatLocalidad[" + "IdLocalidad=" + key.getId() + ", descripcion=" + descripcion + ']';
     }
     
 }

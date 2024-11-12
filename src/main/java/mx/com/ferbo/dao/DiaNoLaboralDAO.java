@@ -56,7 +56,7 @@ public class DiaNoLaboralDAO extends IBaseDAO<DiaNoLaboralDTO, Integer> {
 			list = new ArrayList<DiaNoLaboralDTO>();
 			
 			for(CatDiaNoLaboral d : listTmp) {
-				pais = new PaisDTO(d.getPais().getCd_pais(), d.getPais().getClavePais(), d.getPais().getNombrePais());
+				pais = new PaisDTO(d.getPais().getId(), d.getPais().getClave(), d.getPais().getNombrePais());
 				dia = new DiaNoLaboralDTO(d.getId(), d.getFecha(), d.getDescripcion(), pais);
 				list.add(dia);
 			}

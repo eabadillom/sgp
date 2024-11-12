@@ -8,8 +8,6 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -64,24 +62,24 @@ public class CatEstado implements Serializable
         this.descripcion = descripcion;
     }
 
-    public CatEstadoPK getEstadoPK() 
+    public CatEstadoPK getKey() 
     {
         return key;
     }
 
-    public void setEstadoPK(CatEstadoPK key) 
+    public void setKey(CatEstadoPK key) 
     {
         this.key = key;
     }
 
-    public String getEstadoClave() 
+    public String getClave() 
     {
         return clave;
     }
 
-    public void setEstadoClave(String estadoClave) 
+    public void setClave(String clave) 
     {
-        this.clave = estadoClave;
+        this.clave = clave;
     }
 
     public String getDescripcion() 
@@ -93,7 +91,7 @@ public class CatEstado implements Serializable
     {
         this.descripcion = descripcion;
     }
-
+    
     public List<CatMunicipio> getMunicipios() 
     {
         return municipios;
@@ -131,7 +129,7 @@ public class CatEstado implements Serializable
     @Override
     public String toString() 
     {
-        return "CatEstado[" + "estadoPK=" + key + ", estadoClave=" + clave + ", estadoDesc=" + descripcion + ']';
+        return "CatEstado[" + "id=" + key.getId() + ", clave=" + clave + ", descripcion=" + descripcion + ']';
     }
     
 }

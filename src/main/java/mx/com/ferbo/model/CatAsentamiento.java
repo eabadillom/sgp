@@ -39,17 +39,17 @@ public class CatAsentamiento implements Serializable
     @Column(name = "cd_codPostal")
     private String cp;
     
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch= FetchType.EAGER)
     @JoinColumn(name = "cd_tipoasntmnto", referencedColumnName = "cd_tipoasntmnto")
     private CatTipoAsentamiento tipoAsentamiento;
     
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch= FetchType.EAGER)
     @JoinColumn(name = "cd_entidadPostal", referencedColumnName = "cd_entidadPostal")
     private CatEntidadPostal entidadPostal;
     
     @OneToOne(mappedBy = "asentamiento", fetch= FetchType.LAZY)
     private DetDomicilioEmpleado domicilioEmpleado;
-
+    
     public CatAsentamiento() 
     {
     }
@@ -93,7 +93,7 @@ public class CatAsentamiento implements Serializable
     {
         this.cp = cp;
     }
-    
+
     public CatTipoAsentamiento getTipoAsentamiento() 
     {
         return tipoAsentamiento;
@@ -113,12 +113,22 @@ public class CatAsentamiento implements Serializable
     {
         this.entidadPostal = entidadPostal;
     }
+    
+    public DetDomicilioEmpleado getDomicilioEmpleado() 
+    {
+        return domicilioEmpleado;
+    }
 
+    public void setDomicilioEmpleado(DetDomicilioEmpleado domicilioEmpleado) 
+    {
+        this.domicilioEmpleado = domicilioEmpleado;
+    }
+    
     @Override
     public int hashCode() 
     {
         int hash = 3;
-        hash = 41 * hash + Objects.hashCode(this.key.getAsentamiento());
+        hash = 41 * hash + Objects.hashCode(this.key.getId());
         return hash;
     }
 
@@ -135,12 +145,12 @@ public class CatAsentamiento implements Serializable
             return false;
         }
         final CatAsentamiento other = (CatAsentamiento) obj;
-        return Objects.equals(this.key.getAsentamiento(), other.key.getAsentamiento());
+        return Objects.equals(this.key.getId(), other.key.getId());
     }
-
+    
     @Override
     public String toString() {
-        return "CatAsentamiento[" + "key=" + key + ", descripcion=" + descripcion + ", cp=" + cp + ']';
+        return "CatAsentamiento[" + "IdAsentamiento=" + key.getId() + ", descripcion=" + descripcion + ", cp=" + cp + ']';
     }
     
 }

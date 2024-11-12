@@ -85,7 +85,7 @@ public class DiasNoLaboralesBean implements Serializable {
 			
 			log.info("Periodo de busqueda: {} al {}", fechaInicio, fechaFin);
 			if(paisSelected != null)
-				listaDiasNL = diaNLDAO.buscarPorPeriodo(this.paisSelected.getClavePais(), fechaInicio, fechaFin);
+				listaDiasNL = diaNLDAO.buscarPorPeriodo(this.paisSelected.getClave(), fechaInicio, fechaFin);
 			
 			log.info("Dias cargados: {}", this.listaDiasNL);
 			

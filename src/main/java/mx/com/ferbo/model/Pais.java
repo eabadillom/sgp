@@ -50,19 +50,19 @@ public class Pais implements Serializable {
         this.nombrePais = nombrePais;
     }
 
-    public Integer getCd_pais() {
+    public Integer getId() {
         return id;
     }
 
-    public void setCd_pais(Integer id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public String getClavePais() {
+    public String getClave() {
         return clave;
     }
 
-    public void setClavePais(String clave) {
+    public void setClave(String clave) {
         this.clave = clave;
     }
 

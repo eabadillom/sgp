@@ -8,9 +8,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
+import javax.persistence.FetchType;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -40,7 +38,7 @@ public class CatMunicipio implements Serializable
     @Column(name = "nb_municipio")
     private String descripcion;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "key.municipio")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "key.municipio", fetch= FetchType.LAZY)
     private List<CatLocalidad> localidades;
     
     public CatMunicipio() 
@@ -82,7 +80,7 @@ public class CatMunicipio implements Serializable
     {
         this.descripcion = descripcion;
     }
-
+    
     public List<CatLocalidad> getLocalidades() 
     {
         return localidades;
@@ -119,7 +117,7 @@ public class CatMunicipio implements Serializable
 
     @Override
     public String toString() {
-        return "CatMunicipio[" + "key=" + key + ", descripcion=" + descripcion + ", localidades=" + localidades + ']';
+        return "CatMunicipio[" + "IdMunicipio=" + key.getId() + ", descripcion=" + descripcion + ']';
     }
     
 }
