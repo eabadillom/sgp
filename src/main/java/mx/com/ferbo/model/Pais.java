@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -36,8 +37,7 @@ public class Pais implements Serializable {
     @Column(name = "nb_pais")
     private String nombrePais;
     
-    @JoinColumn(name = "cd_estado")
-    @OneToMany
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "key.pais")
     private List<CatEstado> estados;
 
     public Pais() {

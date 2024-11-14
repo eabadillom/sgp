@@ -6,6 +6,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -28,7 +29,8 @@ import javax.validation.constraints.Size;
 @Table(name = "det_domicilio_empleado")
 @NamedQueries({
     @NamedQuery(name = "DetDomicilioEmpleado.findAll", query = "SELECT cde FROM DetDomicilioEmpleado cde"),
-    @NamedQuery(name = "DetDomicilioEmpleado.findIdEmpleado", query = "SELECT cde FROM DetDomicilioEmpleado cde INNER JOIN cde.empleado e WHERE e.idEmpleado = :idEmpleado")
+    @NamedQuery(name = "DetDomicilioEmpleado.findIdEmpleado", query = "SELECT cde FROM DetDomicilioEmpleado cde INNER JOIN cde.empleado e INNER JOIN cde.asentamiento a WHERE e.idEmpleado = :idEmpleado"),
+    @NamedQuery(name = "DetDomicilioEmpleado.findParametros", query = "SELECT cde FROM DetDomicilioEmpleado cde INNER JOIN cde.empleado e INNER JOIN cde.asentamiento a WHERE e.idEmpleado = :idEmpleado and a.key.id = :idAsentamiento and a.key.localidad.key.id = :idLocalidad and a.key.localidad.key.municipio.key.id = :idMunicipio and a.key.localidad.key.municipio.key.estado.key.id = :idEstado and a.key.localidad.key.municipio.key.estado.key.pais.id = :idPais")
 })
 public class DetDomicilioEmpleado implements Serializable
 {
@@ -64,15 +66,16 @@ public class DetDomicilioEmpleado implements Serializable
     @JoinColumn(name = "id_empleado")
     private DetEmpleado empleado;
     
-    @OneToOne(cascade = CascadeType.ALL, optional = false)
+    @OneToOne(optional = false)
     @NotNull
-    @JoinColumns({
+    @JoinColumns(value = {
         @JoinColumn(name = "cd_asentamiento", referencedColumnName = "cd_asentamiento"),
         @JoinColumn(name = "cd_localidad", referencedColumnName = "cd_localidad"),
         @JoinColumn(name = "cd_municipio", referencedColumnName = "cd_municipio"),
         @JoinColumn(name = "cd_estado", referencedColumnName = "cd_estado"),
         @JoinColumn(name = "cd_pais", referencedColumnName = "cd_pais")
-    })
+    },
+        foreignKey = @ForeignKey(name="FK_Domicilio_Empleado_Asentamiento"))
     private CatAsentamiento asentamiento;
     
     public DetDomicilioEmpleado() 
@@ -175,11 +178,10 @@ public class DetDomicilioEmpleado implements Serializable
         final DetDomicilioEmpleado other = (DetDomicilioEmpleado) obj;
         return Objects.equals(this.id, other.id);
     }
-    
+
     @Override
     public String toString() {
         return "DetDomicilioEmpleado[" + "id=" + id + ", calle=" + calle + ", numeroExterior=" + numeroExterior + ", numeroInterior=" + numeroInterior + ']';
     }
-    
     
 }

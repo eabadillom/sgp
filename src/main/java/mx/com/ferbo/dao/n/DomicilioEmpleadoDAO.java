@@ -3,7 +3,9 @@ package mx.com.ferbo.dao.n;
 import java.util.List;
 import javax.persistence.EntityManager;
 import mx.com.ferbo.commons.dao.BaseDAO;
+import mx.com.ferbo.model.CatAsentamiento;
 import mx.com.ferbo.model.DetDomicilioEmpleado;
+import mx.com.ferbo.model.DetEmpleado;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -49,13 +51,13 @@ public class DomicilioEmpleadoDAO extends BaseDAO<DetDomicilioEmpleado, Integer>
     @Override
     public DetDomicilioEmpleado buscarPorId(Integer idEmpleado)
     {
-        DetDomicilioEmpleado modelList = null;
+        DetDomicilioEmpleado model = null;
         EntityManager em = null;
 
         try 
         {
             em = this.getEntityManager();
-            modelList = em.createNamedQuery("DetDomicilioEmpleado.findIdEmpleado", DetDomicilioEmpleado.class)
+            model = em.createNamedQuery("DetDomicilioEmpleado.findIdEmpleado", DetDomicilioEmpleado.class)
                 .setParameter("idEmpleado", idEmpleado)
                 .getSingleResult();
             
@@ -67,7 +69,34 @@ public class DomicilioEmpleadoDAO extends BaseDAO<DetDomicilioEmpleado, Integer>
             this.close(em);
         }
 
-        return modelList;
+        return model;
     }
     
+    public DetDomicilioEmpleado buscarPorParametros(DetEmpleado auxEmpleado, CatAsentamiento auxAsentamiento)
+    {
+        DetDomicilioEmpleado model = null;
+        EntityManager em = null;
+
+        try 
+        {
+            em = this.getEntityManager();
+            model = em.createNamedQuery("DetDomicilioEmpleado.findParametros", DetDomicilioEmpleado.class)
+                .setParameter("idEmpleado", auxEmpleado.getIdEmpleado())
+                .setParameter("idAsentamiento", auxAsentamiento.getKey().getId())
+                .setParameter("idLocalidad", auxAsentamiento.getKey().getLocalidad().getKey().getId())
+                .setParameter("idMunicipio", auxAsentamiento.getKey().getLocalidad().getKey().getMunicipio().getKey().getId())
+                .setParameter("idEstado", auxAsentamiento.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getId())
+                .setParameter("idPais", auxAsentamiento.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getPais().getId())
+                .getSingleResult();
+            
+        } catch(Exception ex) 
+        {
+            log.warn("No hay domicilio para el empleado {} : {}",  auxEmpleado.getIdEmpleado(), ex.getMessage());
+        } finally 
+        {
+            this.close(em);
+        }
+        
+        return model;
+    }
 }

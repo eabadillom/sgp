@@ -38,25 +38,14 @@ public class CatMunicipio implements Serializable
     @Column(name = "nb_municipio")
     private String descripcion;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "key.municipio", fetch= FetchType.LAZY)
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "key.municipio", fetch= FetchType.LAZY)
     private List<CatLocalidad> localidades;
     
     public CatMunicipio() 
     {
     }
-
-    public CatMunicipio(CatMunicipioPK key) 
-    {
-        this.key = key;
-    }
-
-    public CatMunicipio(CatMunicipioPK key, String descripcion) 
-    {
-        this.key = key;
-        this.descripcion = descripcion;
-    }
     
-    public CatMunicipio(CatEstado estado, Integer id) 
+    public CatMunicipio(CatEstado estado, Integer id)
     {
         this.key = new CatMunicipioPK(estado, id);
     }
