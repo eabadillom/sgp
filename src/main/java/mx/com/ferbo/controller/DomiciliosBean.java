@@ -2,6 +2,7 @@ package mx.com.ferbo.controller;
 
 import java.io.Serializable;
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -37,41 +38,58 @@ public class DomiciliosBean implements Serializable {
 
     // Variables de pais
     private Pais pais;
+    private Pais nuevopais;
+    private Pais editablepais;
     private List<Pais> paises;
     private PaisDAO paisdao;
+    private boolean paisStatus;
 
     // Variables de estado
     private CatEstado estado;
+    private CatEstado nuevoestado;
+    private CatEstado editableestado;
     private List<CatEstado> estados;
     private EstadoDAO estadodao;
+    private boolean estadoestatus;
 
     // Variables de municipio
     private CatMunicipio municipio;
+    private CatMunicipio nuevomunicipio;
+    private CatMunicipio editablemunicipio;
     private List<CatMunicipio> municipios;
     private MunicipioDAO municipiodao;
+    private boolean municipioestatus;
 
     // Variables de localidad
     private CatLocalidad localidad;
     private List<CatLocalidad> localidades;
     private LocalidadDAO localidaddao;
+    private boolean localidadestatus;
 
     // Variables de asentamiento
     private CatAsentamiento asentamiento;
     private List<CatAsentamiento> asentamientos;
     private AsentamientoDAO asentamientodao;
+    private boolean asentamientoestatus;
 
     // Variables tipo de asentamiento
     private CatTipoAsentamiento tipoasentamiento;
     private List<CatTipoAsentamiento> tiposasentamiento;
     private TipoAsentamientoDAO tipoasentamientodao;
+    private boolean tipoasentamientoestatus;
 
     //Variables codigo postal
     private CatEntidadPostal entidadpostal;
     private List<CatEntidadPostal> entidadespostales;
     private EntidadPostalDAO entidadpostaldao;
+    private boolean entidadpostalestatus;
 
     // Codigo postal
     private String codigopostal;
+
+    private String operacion;
+    private String ubicacion;
+    private String seleccion;
 
     private FacesContext fc;
     private PrimeFaces pf;
@@ -85,6 +103,7 @@ public class DomiciliosBean implements Serializable {
         this.asentamientodao = new AsentamientoDAO();
         this.tipoasentamientodao = new TipoAsentamientoDAO();
         this.entidadpostaldao = new EntidadPostalDAO();
+
     }
 
     @PostConstruct
@@ -92,6 +111,13 @@ public class DomiciliosBean implements Serializable {
         this.paises = this.paisdao.buscarTodos();
         fc = FacesContext.getCurrentInstance();
         pf = PrimeFaces.current();
+        this.setPaisStatus(false);
+        this.setEstadoestatus(false);
+        this.setMunicipioestatus(false);
+        this.setLocalidadestatus(false);
+        this.setTipoasentamientoestatus(false);
+        this.setAsentamientoestatus(false);
+        this.setEntidadpostalestatus(false);
     }
 
     // Implementacion de Pais
@@ -103,20 +129,24 @@ public class DomiciliosBean implements Serializable {
         this.pais = pais;
     }
 
+    public Pais getNuevopais() {
+        return nuevopais;
+    }
+
+    public void setNuevopais(Pais nuevopais) {
+        this.nuevopais = nuevopais;
+    }
+
+    public Pais getEditablepais() {
+        return editablepais;
+    }
+
+    public void setEditablepais(Pais editablepais) {
+        this.editablepais = editablepais;
+    }
+
     public List<Pais> getPaises() {
         return paises;
-    }
-
-    public void nuevoPais() {
-        this.pais = new Pais();
-    }
-
-    public void pasarPais(Pais paistmp) {
-        try {
-            this.pais = paistmp;
-        } catch (Exception ex) {
-            log.error("Problema en asignar el pais...", ex);
-        }
     }
 
     // implementacion de estado
@@ -128,20 +158,25 @@ public class DomiciliosBean implements Serializable {
         this.estado = estado;
     }
 
+    public CatEstado getNuevoestado() {
+        return nuevoestado;
+    }
+
+    public void setNuevoestado(CatEstado nuevoestado) {
+        this.nuevoestado = nuevoestado;
+    }
+
+    public CatEstado getEditableestado() {
+        return editableestado;
+    }
+
+    public void setEditableestado(CatEstado editableestado) {
+        this.editableestado = editableestado;
+    }
+    
+
     public List<CatEstado> getEstados() {
         return estados;
-    }
-
-    public void nuevoEstado() {
-        this.estado = new CatEstado();
-    }
-
-    public void pasarEstado(CatEstado estadotmp) {
-        try {
-            this.estado = estadotmp;
-        } catch (Exception ex) {
-            log.error("Problema en asignar el pais...", ex);
-        }
     }
 
     // Implementacion de municipio
@@ -149,24 +184,28 @@ public class DomiciliosBean implements Serializable {
         return municipio;
     }
 
+    public CatMunicipio getNuevomunicipio() {
+        return nuevomunicipio;
+    }
+
+    public void setNuevomunicipio(CatMunicipio nuevomunicipio) {
+        this.nuevomunicipio = nuevomunicipio;
+    }
+
+    public CatMunicipio getEditablemunicipio() {
+        return editablemunicipio;
+    }
+
+    public void setEditablemunicipio(CatMunicipio editablemunicipio) {
+        this.editablemunicipio = editablemunicipio;
+    }
+    
     public void setMunicipio(CatMunicipio municipio) {
         this.municipio = municipio;
     }
 
     public List<CatMunicipio> getMunicipios() {
         return municipios;
-    }
-
-    public void nuevoMunicipio() {
-        this.municipio = new CatMunicipio();
-    }
-
-    public void pasarMunicipio(CatMunicipio municipiotmp) {
-        try {
-            this.municipio = municipiotmp;
-        } catch (Exception ex) {
-            log.error("Problema en asignar el municipio...", ex);
-        }
     }
 
     // Implementacion de localidad
@@ -182,18 +221,6 @@ public class DomiciliosBean implements Serializable {
         return localidades;
     }
 
-    public void nuevaLocalidad() {
-        this.localidad = new CatLocalidad();
-    }
-
-    public void pasarLocalidad(CatLocalidad localidadtmp) {
-        try {
-            this.localidad = localidadtmp;
-        } catch (Exception ex) {
-            log.error("Problema en asignar la localidad...", ex);
-        }
-    }
-
     // Implementacion de asentamiento
     public CatAsentamiento getAsentamiento() {
         return asentamiento;
@@ -205,18 +232,6 @@ public class DomiciliosBean implements Serializable {
 
     public List<CatAsentamiento> getAsentamientos() {
         return asentamientos;
-    }
-
-    public void nuevoAsentamiento() {
-        this.asentamiento = new CatAsentamiento();
-    }
-
-    public void pasarAsentamiento(CatAsentamiento asentamientotmp) {
-        try {
-            this.asentamiento = asentamientotmp;
-        } catch (Exception ex) {
-            log.error("Problema en asignar la localidad...", ex);
-        }
     }
 
     // Implementacion tipo asentamiento
@@ -255,7 +270,7 @@ public class DomiciliosBean implements Serializable {
     }
 
     private String validarCodigoPostal() throws SGPException {
-        
+
         char[] permitidos = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
         String cd = this.codigopostal;
         cd = cd.trim();
@@ -269,48 +284,177 @@ public class DomiciliosBean implements Serializable {
         }
 
         for (int i = 0; i < cd.length(); i++) {
+            boolean bandera = false;
             char digito = cd.charAt(i);
             for (int j = 0; j < permitidos.length; j++) {
-                if (permitidos[j] != digito) {
-                    throw new SGPException("El codigo postal solo debe contener digitos de 0 a 9");
+                if (permitidos[j] == digito) {
+                    bandera = true;
+                    break;
                 }
+            }
+            if (bandera == false) {
+                throw new SGPException("El codigo postal solo debe contener digitos de 0 a 9");
             }
         }
 
-        if (cd.length() != 4) {
+        if (cd.length() != 5) {
             throw new SGPException("El codigo postal solo debe ser de ocho digitos");
         }
 
         return cd;
     }
-    
-    public void bucarCodigoPostal(){
-        
+
+    public void buscarCodigoPostal() {
+
         try {
-            this.paises = null;
-            this.estados = null;
-            this.municipios = null;
-            this.localidades = null;
-            
+            this.paises = new ArrayList<Pais>();
+            this.estados = new ArrayList<CatEstado>();
+            this.municipios = new ArrayList<CatMunicipio>();
+            this.localidades = new ArrayList<CatLocalidad>();
+            this.tiposasentamiento = new ArrayList<CatTipoAsentamiento>();
+            List<CatAsentamiento> asentamientostmp = new ArrayList<CatAsentamiento>();
             this.asentamientos = this.asentamientodao.buscarPorCodigoPostal(this.validarCodigoPostal());
-            
-            for(CatAsentamiento tmp : this.asentamientos){
-                this.paises.add(tmp.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getPais());
-                this.estados.add(tmp.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado());
-                this.municipios.add(tmp.getKey().getLocalidad().getKey().getMunicipio());
-                this.localidades.add(tmp.getKey().getLocalidad());
+
+            for (CatAsentamiento tmp : this.asentamientos) {
+
+                if (this.paises.isEmpty()) {
+                    if (!tmp.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getPais().getNombrePais().equals("")) {
+                        this.pais = tmp.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getPais();
+                        this.paises = this.paisdao.buscarTodos();
+                    }
+                }
+
+                if (this.estados.isEmpty()) {
+                    if (!tmp.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getDescripcion().equals("")) {
+                        this.estado = tmp.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado();
+                        this.obtenerEstadosPais();
+                    }
+                }
+
+                if (this.municipios.isEmpty()) {
+                    if (!tmp.getKey().getLocalidad().getKey().getMunicipio().getDescripcion().equals("")) {
+                        this.municipio = tmp.getKey().getLocalidad().getKey().getMunicipio();
+                        this.obtenerMunicipiosEstado();
+                    }
+                }
+
+                if (!tmp.getKey().getLocalidad().getDescripcion().equals("")) {
+                    this.localidad = tmp.getKey().getLocalidad();
+                    if (!this.localidades.contains(this.localidad)) {
+                        this.localidades.add(this.localidad);
+                    }
+                }
+
+                if (!tmp.getTipoAsentamiento().getDescripcion().equals("")) {
+                    this.tipoasentamiento = tmp.getTipoAsentamiento();
+                    if (!this.tiposasentamiento.contains(this.tipoasentamiento)) {
+                        this.tiposasentamiento.add(this.tipoasentamiento);
+                    }
+                }
+
+                if (!tmp.getDescripcion().equals("")) {
+                    if (!asentamientostmp.contains(tmp)) {
+                        asentamientostmp.add(tmp);
+                    }
+                }
+
+                this.asentamiento = tmp;
+
+                this.entidadpostal = tmp.getEntidadPostal();
             }
-            
-        }
-        catch(SGPException ex){
-            
-        }
-        catch(Exception ex){
-        
+
+            this.asentamientos = null;
+
+            this.asentamientos = asentamientostmp;
+
+        } catch (SGPException ex) {
+
+        } catch (Exception ex) {
+
         }
     }
 
     // generales
+    private String getOperacion() {
+        return operacion;
+    }
+
+    private void setOperacion(String operacion) {
+        this.operacion = operacion;
+    }
+
+    public String getUbicacion() {
+        return ubicacion;
+    }
+
+    private void setUbicacion(String ubicacion) {
+        this.ubicacion = ubicacion;
+    }
+
+    public String getSeleccion() {
+        return seleccion;
+    }
+
+    public void setSeleccion(String seleccion) {
+        this.seleccion = seleccion;
+    }
+
+    public boolean isPaisStatus() {
+        return paisStatus;
+    }
+
+    public void setPaisStatus(boolean paisStatus) {
+        this.paisStatus = paisStatus;
+    }
+
+    public boolean isEstadoestatus() {
+        return estadoestatus;
+    }
+
+    public void setEstadoestatus(boolean estadoestatus) {
+        this.estadoestatus = estadoestatus;
+    }
+
+    public boolean isMunicipioestatus() {
+        return municipioestatus;
+    }
+
+    public void setMunicipioestatus(boolean municipioestatus) {
+        this.municipioestatus = municipioestatus;
+    }
+
+    public boolean isLocalidadestatus() {
+        return localidadestatus;
+    }
+
+    public void setLocalidadestatus(boolean localidadestatus) {
+        this.localidadestatus = localidadestatus;
+    }
+
+    public boolean isAsentamientoestatus() {
+        return asentamientoestatus;
+    }
+
+    public void setAsentamientoestatus(boolean asentamientoestatus) {
+        this.asentamientoestatus = asentamientoestatus;
+    }
+
+    public boolean isTipoasentamientoestatus() {
+        return tipoasentamientoestatus;
+    }
+
+    public void setTipoasentamientoestatus(boolean tipoasentamientoestatus) {
+        this.tipoasentamientoestatus = tipoasentamientoestatus;
+    }
+
+    public boolean isEntidadpostalestatus() {
+        return entidadpostalestatus;
+    }
+
+    public void setEntidadpostalestatus(boolean entidadpostalestatus) {
+        this.entidadpostalestatus = entidadpostalestatus;
+    }
+
     public void estadosDisponibles() {
 
         if (this.pais != null) {
@@ -411,4 +555,144 @@ public class DomiciliosBean implements Serializable {
         }
     }
 
+    public void editar(String ubicacion) {
+
+        this.seleccion = new String();
+        this.seleccion = "Editar " + ubicacion;
+        
+        switch (ubicacion) {
+            case "Pais":
+                this.editablepais = this.pais;
+                this.paisStatus = true;
+                break;
+
+            case "Estado":
+                this.editableestado = this.estado;
+                this.estadoestatus = true;
+                break;
+
+            case "Municipio":
+                this.editablemunicipio = this.municipio;
+                this.municipioestatus = true;
+                break;
+
+            /*case "Localidad":
+                this.setPaisStatus(true);
+                this.setEstadoestatus(true);
+                this.setMunicipioestatus(true);
+                this.setLocalidadestatus(true);
+                break;
+
+            case "Tipo Asentamiento":
+                this.setPaisStatus(true);
+                this.setEstadoestatus(true);
+                this.setMunicipioestatus(true);
+                this.setLocalidadestatus(true);
+                this.setTipoasentamientoestatus(true);
+                break;
+
+            case "Asentamiento":
+                this.setPaisStatus(true);
+                this.setEstadoestatus(true);
+                this.setMunicipioestatus(true);
+                this.setLocalidadestatus(true);
+                this.setTipoasentamientoestatus(true);
+                this.setAsentamientoestatus(true);
+                break;
+
+            case "Entidad Postal":
+                this.setPaisStatus(true);
+                this.setEstadoestatus(true);
+                this.setMunicipioestatus(true);
+                this.setLocalidadestatus(true);
+                this.setTipoasentamientoestatus(true);
+                this.setAsentamientoestatus(true);
+                this.setEntidadpostalestatus(true);
+                break;*/
+        }
+    }
+
+    public void crear(String ubicacion){
+        this.seleccion = new String();
+        this.seleccion = "Agregar " + ubicacion;
+        
+        switch (ubicacion) {
+            case "Pais":
+                this.nuevopais = new Pais();
+                this.editablepais = this.nuevopais;
+                this.paisStatus = true;
+                break;
+
+            case "Estado":
+                this.nuevoestado = new CatEstado();
+                this.editableestado = this.nuevoestado;
+                this.estadoestatus = true;
+                break;
+
+            case "Municipio":
+                this.nuevomunicipio = new CatMunicipio();
+                this.editablemunicipio = this.nuevomunicipio;
+                this.municipioestatus = true;
+                break;
+
+            /*case "Localidad":
+                this.setPaisStatus(true);
+                this.setEstadoestatus(true);
+                this.setMunicipioestatus(true);
+                this.setLocalidadestatus(true);
+                break;
+
+            case "Tipo Asentamiento":
+                this.setPaisStatus(true);
+                this.setEstadoestatus(true);
+                this.setMunicipioestatus(true);
+                this.setLocalidadestatus(true);
+                this.setTipoasentamientoestatus(true);
+                break;
+
+            case "Asentamiento":
+                this.setPaisStatus(true);
+                this.setEstadoestatus(true);
+                this.setMunicipioestatus(true);
+                this.setLocalidadestatus(true);
+                this.setTipoasentamientoestatus(true);
+                this.setAsentamientoestatus(true);
+                break;
+
+            case "Entidad Postal":
+                this.setPaisStatus(true);
+                this.setEstadoestatus(true);
+                this.setMunicipioestatus(true);
+                this.setLocalidadestatus(true);
+                this.setTipoasentamientoestatus(true);
+                this.setAsentamientoestatus(true);
+                this.setEntidadpostalestatus(true);
+                break;*/
+        }
+    }
+    
+    // falta por terminar esta funcion
+    public void operar() {
+        switch (this.getUbicacion()) {
+            case "Pais":
+
+                break;
+
+            case "Estado":
+                break;
+
+            case "Municipio":
+                break;
+
+            case "Localidad":
+                break;
+
+            case "Tipo Asentamiento":
+                break;
+
+            case "Asentamiento":
+                break;
+        }
+    }
 }
+

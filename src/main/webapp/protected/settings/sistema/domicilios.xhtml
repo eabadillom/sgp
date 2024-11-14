@@ -19,12 +19,13 @@
             </p:dialog>
 
             <p:outputPanel>
-                <div>
-                    <p:outputLabel value="Codigo postal"/>
-                </div>
-                <div>
-                    <p:inputText/>
-                    <p:commandButton value="Buscar" icon="pi pi-search" actionListener="#{domiciliosBean.buscarCodigoPostal}" update="frm"/>
+                <div class="field">
+                    <p:outputLabel for="@next" value="Codigo postal: "/>
+                    <p:inputText value="#{domiciliosBean.codigopostal}">
+                        <p:ajax process="@this"/>
+                    </p:inputText>
+                    <p:commandButton value="Buscar" icon="pi pi-search" actionListener="#{domiciliosBean.buscarCodigoPostal}" update="frm" process="@this"/>
+
                 </div>                  
             </p:outputPanel>
 
@@ -34,29 +35,29 @@
                 <div class="field col-12 md:col-6">
                     <p:outputLabel value="Pais: " />
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <p:selectOneMenu value="#{domiciliosBean.pais}" converter="entityConverter">
+                        <p:selectOneMenu value="#{domiciliosBean.pais}" converter="entityConverter" filter="true" filterMatchMode="contains">
                             <f:selectItem itemLabel="Seleccione un pais" noSelectionOption="true" />
                             <f:selectItems value="#{domiciliosBean.paises}" var="pais" itemLabel="#{pais.nombrePais}" itemValue="#{pais}"/>
                             <p:ajax event="change" listener="#{domiciliosBean.estadosDisponibles}" 
-                update="menuEstado" process="@this" />
+                                    update="menuEstado" process="@this" />
                         </p:selectOneMenu>
-                        <p:commandButton icon="pi pi-pencil" />
-                        <p:commandButton icon="pi pi-plus" />
-                        <p:commandButton icon="pi pi-times" />
+                        <p:commandButton icon="pi pi-plus" action="#{domiciliosBean.crear('Pais')}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();" process="@this"/>
+                        <p:commandButton icon="pi pi-pencil" action="#{domiciliosBean.editar('Pais')}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();" process="@this"/>
+                        <p:commandButton icon="pi pi-times" actionListener="#{domiciliosBean.seleccionar('Pais', 'Eliminar')}" ajax="true" oncomplete="PF('dlgBorrar').show();"/>
                     </div>
                 </div>
 
                 <div class="field col-12 md:col-6">
                     <p:outputLabel value="Estado: " />
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <p:selectOneMenu id="menuEstado" value="#{domiciliosBean.estado}" converter="entityConverter">
+                        <p:selectOneMenu id="menuEstado" value="#{domiciliosBean.estado}" converter="entityConverter" filter="true" filterMatchMode="contains">
                             <f:selectItem itemLabel="Seleccione un Estado" noSelectionOption="true" />
                             <f:selectItems value="#{domiciliosBean.estados}" var="estado" itemLabel="#{estado.descripcion}" itemValue="#{estado}"/>
                             <p:ajax event="change" listener="#{domiciliosBean.municipiosDisponibles}" update="menuMunicipio" process="@this" />
                         </p:selectOneMenu>
-                        <p:commandButton icon="pi pi-pencil" />
-                        <p:commandButton icon="pi pi-plus" />
-                        <p:commandButton icon="pi pi-times" />
+                        <p:commandButton icon="pi pi-plus" action="#{domiciliosBean.crear('Estado')}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();" process="@this"/>
+                        <p:commandButton icon="pi pi-pencil" action="#{domiciliosBean.editar('Estado')}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();" process="@this"/>
+                        <p:commandButton icon="pi pi-times" actionListener="#{domiciliosBean.seleccionar('Estado')}" ajax="true" oncomplete="PF('dlgBorrar').show();"/>
                     </div>
                 </div>
 
@@ -66,14 +67,14 @@
                 <div class="field col-12 md:col-6">
                     <p:outputLabel value="Municipio: " />
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <p:selectOneMenu id="menuMunicipio" value="#{domiciliosBean.municipio}" converter="entityConverter">
+                        <p:selectOneMenu id="menuMunicipio" value="#{domiciliosBean.municipio}" converter="entityConverter" filter="true" filterMatchMode="contains">
                             <f:selectItem itemLabel="Seleccione un Municipio" noSelectionOption="true" />
                             <f:selectItems value="#{domiciliosBean.municipios}" var="municipio" itemLabel="#{municipio.descripcion}" itemValue="#{municipio}"/>
                             <p:ajax event="change" listener="#{domiciliosBean.localidadesDisponibles}" update="menuLocalidad" process="@this" />
                         </p:selectOneMenu>
-                        <p:commandButton icon="pi pi-pencil" />
-                        <p:commandButton icon="pi pi-plus" />
-                        <p:commandButton icon="pi pi-times" />
+                        <p:commandButton icon="pi pi-plus" action="#{domiciliosBean.crear('Municipio')}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();" process="@this"/>
+                        <p:commandButton icon="pi pi-pencil" action="#{domiciliosBean.editar('Municipio')}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();" process="@this"/>
+                        <p:commandButton icon="pi pi-times" action="#{domiciliosBean.seleccionar('Municipio', 'Eliminar')}" ajax="true" oncomplete="PF('dlgBorrar').show();"/>
                     </div>
                 </div>
 
@@ -85,13 +86,13 @@
                             <f:selectItems value="#{domiciliosBean.localidades}" var="localidad" itemLabel="#{localidad.descripcion}" itemValue="#{localidad}"/>
                             <p:ajax event="change" listener="#{domiciliosBean.tiposAsentamientoDisponibles}" update="menuTipoAsentamiento" process="@this" />
                         </p:selectOneMenu>
-                        <p:commandButton icon="pi pi-pencil" />
-                        <p:commandButton icon="pi pi-plus" />
-                        <p:commandButton icon="pi pi-times" />
+                        <p:commandButton icon="pi pi-plus" actionListener="#{domiciliosBean.seleccionar('Localidad', 'Agregar')}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();"/>
+                        <p:commandButton icon="pi pi-pencil" actionListener="#{domiciliosBean.seleccionar('Localidad', 'Editar')}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();"/>
+                        <p:commandButton icon="pi pi-times" actionListener="#{domiciliosBean.seleccionar('Localidad', 'Eliminar')}" ajax="true" oncomplete="PF('dlgBorrar').show();"/>
                     </div>
                 </div>
             </div>
-            
+
             <div class="ui-fluid formgrid grid">
                 <div class="field col-12 md:col-6">
                     <p:outputLabel value="Tipo de Asentamiento: " />
@@ -101,12 +102,12 @@
                             <f:selectItems value="#{domiciliosBean.tiposasentamiento}" var="tipoasentamiento" itemLabel="#{tipoasentamiento.descripcion}" itemValue="#{tipoasentamiento}"/>
                             <p:ajax event="change" listener="#{domiciliosBean.asentamientosDisponibles}" update="menuAsentamiento" process="@this" />
                         </p:selectOneMenu>
-                        <p:commandButton icon="pi pi-pencil" />
-                        <p:commandButton icon="pi pi-plus" />
-                        <p:commandButton icon="pi pi-times" />
+                        <p:commandButton icon="pi pi-plus" actionListener="#{domiciliosBean.seleccionar('Tipo Asentamiento', 'Agregar')}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();"/>
+                        <p:commandButton icon="pi pi-pencil" actionListener="#{domiciliosBean.seleccionar('Tipo Asentamiento', 'Editar')}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();"/>
+                        <p:commandButton icon="pi pi-times" actionListener="#{domiciliosBean.seleccionar('Tipo Asentamiento', 'Eliminar')}" ajax="true" oncomplete="PF('dlgBorrar').show();"/>
                     </div>
                 </div>
-                
+
                 <div class="field col-12 md:col-6">
                     <p:outputLabel value="Asentamiento: " />
                     <div style="display: flex; align-items: center; gap: 10px;">
@@ -115,24 +116,100 @@
                             <f:selectItems value="#{domiciliosBean.asentamientos}" var="asentamiento" itemLabel="#{asentamiento.descripcion}" itemValue="#{asentamiento}"/>
                             <p:ajax event="change" listener="#{domiciliosBean.entidadPostalDisponible}" update="lbEntidadPostal" process="@this"/>
                         </p:selectOneMenu>
-                        <p:commandButton icon="pi pi-pencil" />
-                        <p:commandButton icon="pi pi-plus" />
-                        <p:commandButton icon="pi pi-times" />
+                        <p:commandButton icon="pi pi-pencil" action="#{domiciliosBean.seleccionar('Asentamiento', 'Agregar')}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();"/>
+                        <p:commandButton icon="pi pi-plus" action="#{domiciliosBean.seleccionar('Asentamiento', 'Editar')}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();"/>
+                        <p:commandButton icon="pi pi-times" action="#{domiciliosBean.seleccionar('Asentamiento', 'Eliminar')}" ajax="true" oncomplete="PF('dlgBorrar').show();"/>
                     </div>
                 </div>
             </div>
-            
+
             <div class="ui-fluid formgrid grid">
                 <div class="field col-12 md:col-6">
                     <p:outputLabel value="Entidad postal: " />
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <p:inputText id="lbEntidadPostal" value="#{domiciliosBean.entidadpostal.descripcion}" readonly="true">
-                        <p:ajax process="@this" />
+                            <p:ajax process="@this" />
                         </p:inputText>
                     </div>
                 </div>
             </div>
-            
+
+            <p:dialog header="#{domiciliosBean.seleccion}" showEffect="fade" modal="true" widgetVar="dlgDomicilio" id="dlgDomicilio" 
+                      responsive="true" draggable="true" resizable="false" dynamic="true" style="margin: auto">
+                <p:outputPanel id="datos" class="ui-fluid">
+
+                    <div class="p-field">
+                        <p:outputLabel for="@next" value="ID de Pais: "/>
+                        <p:inputText value="#{domiciliosBean.editablepais.id}">
+                            <p:ajax process="@this"/>
+                        </p:inputText>
+                        <p:outputLabel for="@next" value="Clave de Pais: "/>
+                        <p:inputText value="#{domiciliosBean.editablepais.clave}">
+                            <p:ajax process="@this"/>
+                        </p:inputText>
+                        <p:outputLabel for="@next" value="Nombre de Pais: "/>
+                        <p:inputText value="#{domiciliosBean.editablepais.nombrePais}">
+                            <p:ajax process="@this"/>
+                        </p:inputText>
+                    </div>
+                    <div class="p-field" >
+                        <p:outputLabel for="@next" value="Estado: "/>
+                        <p:inputText value="#{domiciliosBean.editableestado}" >
+                            <p:ajax process="@this"/>
+                        </p:inputText>
+                    </div>
+                    <div class="p-field" >
+                        <p:outputLabel for="@next" value="Municipio: "/>
+                        <p:inputText value="#{domiciliosBean.editablemunicipio}" >
+                            <p:ajax process="@this"/>
+                        </p:inputText>
+                    </div>
+                    <div class="p-field" >
+                        <p:outputLabel for="@next" value="Localidad: "/>
+                        <p:inputText value="#{domiciliosBean.localidad}">
+                            <p:ajax process="@this"/>
+                        </p:inputText>
+                    </div>
+                    <div class="p-field" >
+                        <p:outputLabel for="@next" value="Tipo de asentamiento: "/>
+                        <p:inputText value="#{domiciliosBean.asentamiento}">
+                            <p:ajax process="@this"/>
+                        </p:inputText>
+                    </div>
+                    <!-- Tipo de asentamiento en editar posiblemente sea un selectonemenu -->
+                    <div class="p-field" >
+                        <p:outputLabel for="@next" value="Asentamiento: "/>
+                        <p:inputText value="#{domiciliosBean.tipoasentamiento}">
+                            <p:ajax process="@this"/>
+                        </p:inputText>
+                    </div>
+                    <!-- Entidad postal en editar posiblemente sea un selectonemenu -->
+                    <div class="p-field" >
+                        <p:outputLabel for="@next" value="Entidad postal: "/>
+                        <p:inputText value="#{domiciliosBean.entidadpostal}">
+                            <p:ajax process="@this"/>
+                        </p:inputText>
+                    </div>
+
+
+                </p:outputPanel>
+
+
+                <f:facet name="footer">
+                    <p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{domiciliosBean.operar}" update="frm" oncomplete="PF('dlgDomicilio').hide();" process="@this datos"/>
+
+                    <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dlgDomicilio').hide();"/>
+                </f:facet>
+            </p:dialog> 
+
+            <p:confirmDialog widgetVar="dlgBorrar" showEffect="fade" width="300"
+                             message="#{domiciliosBean.seleccion}" header="Confirmar" severity="warn">
+                <p:commandButton value="Si" icon="pi pi-check" actionListener="#{domiciliosBean.operar}"
+                                 oncomplete="PF('dlgBorrar').hide()" update="@form" process="@this"/>
+                <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+                                 onclick="PF('dlgBorrar').hide();" update="@form" />
+            </p:confirmDialog>
+
         </h:form>
     </ui:define>
 
