@@ -39,7 +39,7 @@ public class CatEntidadPostal implements Serializable
     @Column(name = "nu_entidadpostal")
     private String descripcion;
     
-    @OneToMany(cascade = CascadeType.DETACH, mappedBy = "entidadPostal")
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "entidadPostal")
     private List<CatAsentamiento> asentamientos;
 
     public CatEntidadPostal() 

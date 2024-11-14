@@ -22,7 +22,8 @@ import javax.validation.constraints.Size;
 @Table(name = "cat_asentamiento")
 @NamedQueries({
     @NamedQuery(name = "CatAsentamiento.findAll", query = "SELECT ca FROM CatAsentamiento ca"),
-    @NamedQuery(name = "CatAsentamiento.findByCodigoPostal", query = "SELECT ca FROM CatAsentamiento ca WHERE ca.cp = :codigoPostal")
+    @NamedQuery(name = "CatAsentamiento.findByCodigoPostal", query = "SELECT ca FROM CatAsentamiento ca WHERE ca.cp = :codigoPostal"),
+    @NamedQuery(name = "CatAsentamiento.findByParametros", query = "SELECT ca FROM CatAsentamiento ca WHERE ca.key.id = :idAsentamiento and ca.key.localidad.key.id = :idLocalidad and ca.key.localidad.key.municipio.key.id = :idMunicipio and ca.key.localidad.key.municipio.key.estado.key.id = :idEstado and ca.key.localidad.key.municipio.key.estado.key.pais.id = :idPais")
 })
 public class CatAsentamiento implements Serializable
 {
@@ -39,24 +40,19 @@ public class CatAsentamiento implements Serializable
     @Column(name = "cd_codPostal")
     private String cp;
     
-    @ManyToOne(optional = false, fetch= FetchType.EAGER)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "cd_tipoasntmnto", referencedColumnName = "cd_tipoasntmnto")
     private CatTipoAsentamiento tipoAsentamiento;
     
-    @ManyToOne(optional = false, fetch= FetchType.EAGER)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "cd_entidadPostal", referencedColumnName = "cd_entidadPostal")
     private CatEntidadPostal entidadPostal;
     
-    @OneToOne(mappedBy = "asentamiento", fetch= FetchType.LAZY)
-    private DetDomicilioEmpleado domicilioEmpleado;
+    //@OneToOne(mappedBy = "asentamiento", fetch= FetchType.LAZY)
+    //private DetDomicilioEmpleado domicilioEmpleado;
     
     public CatAsentamiento() 
     {
-    }
-
-    public CatAsentamiento(CatAsentamientoPK key) 
-    {
-        this.key = key;
     }
     
     public CatAsentamiento(CatLocalidad localidad, Integer id) 
@@ -114,7 +110,7 @@ public class CatAsentamiento implements Serializable
         this.entidadPostal = entidadPostal;
     }
     
-    public DetDomicilioEmpleado getDomicilioEmpleado() 
+    /*public DetDomicilioEmpleado getDomicilioEmpleado() 
     {
         return domicilioEmpleado;
     }
@@ -122,7 +118,7 @@ public class CatAsentamiento implements Serializable
     public void setDomicilioEmpleado(DetDomicilioEmpleado domicilioEmpleado) 
     {
         this.domicilioEmpleado = domicilioEmpleado;
-    }
+    }*/
     
     @Override
     public int hashCode() 

@@ -5,6 +5,7 @@ import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
@@ -21,12 +22,13 @@ public class CatAsentamientoPK implements Serializable
     
     @ManyToOne(optional = false)
     @NotNull
-    @JoinColumns({
-        @JoinColumn(name = "cd_localidad", referencedColumnName = "cd_localidad"),
-        @JoinColumn(name = "cd_municipio", referencedColumnName = "cd_municipio"),
-        @JoinColumn(name = "cd_estado", referencedColumnName = "cd_estado"),
-        @JoinColumn(name = "cd_pais", referencedColumnName = "cd_pais")
-    })
+    @JoinColumns(value = {
+        @JoinColumn(name = "cd_localidad", referencedColumnName = "cd_localidad", updatable = false),
+        @JoinColumn(name = "cd_municipio", referencedColumnName = "cd_municipio", updatable = false),
+        @JoinColumn(name = "cd_estado", referencedColumnName = "cd_estado", updatable = false),
+        @JoinColumn(name = "cd_pais", referencedColumnName = "cd_pais", updatable = false)
+    },
+        foreignKey = @ForeignKey(name="FK_Asentamiento_Loc_Mun_Est_Pais"))
     private CatLocalidad localidad;
     
     @Basic(optional = false)
@@ -68,7 +70,6 @@ public class CatAsentamientoPK implements Serializable
     public int hashCode() 
     {
         int hash = 7;
-        hash = 89 * hash + Objects.hashCode(this.localidad.getKey().getId());
         hash = 89 * hash + Objects.hashCode(this.id);
         return hash;
     }
@@ -86,15 +87,12 @@ public class CatAsentamientoPK implements Serializable
             return false;
         }
         final CatAsentamientoPK other = (CatAsentamientoPK) obj;
-        if (!Objects.equals(this.localidad.getKey().getId(), other.localidad.getKey().getId())) {
-            return false;
-        }
         return Objects.equals(this.id, other.id);
     }
 
     @Override
     public String toString() {
-        return "CatAsentamientoPK[" + "localidad=" + localidad.getKey().getId() + ", asentamiento=" + id + ']';
+        return "CatAsentamientoPK[" + "asentamiento=" + id + ']';
     }
     
 }

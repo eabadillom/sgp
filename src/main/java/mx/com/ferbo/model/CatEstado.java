@@ -8,6 +8,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -43,23 +44,16 @@ public class CatEstado implements Serializable
     @Column(name = "nb_estado")
     private String descripcion;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "key.estado")
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "key.estado", fetch= FetchType.LAZY)
     private List<CatMunicipio> municipios;
     
     public CatEstado() 
     {
     }
-
-    public CatEstado(CatEstadoPK key) 
+    
+    public CatEstado(Pais pais, Integer id)
     {
-        this.key = key;
-    }
-
-    public CatEstado(CatEstadoPK key, String clave, String descripcion) 
-    {
-        this.key = key;
-        this.clave = clave;
-        this.descripcion = descripcion;
+        this.key = new CatEstadoPK(pais, id);
     }
 
     public CatEstadoPK getKey() 

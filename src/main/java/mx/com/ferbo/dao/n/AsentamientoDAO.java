@@ -58,7 +58,7 @@ public class AsentamientoDAO extends BaseDAO<CatAsentamiento, CatAsentamientoPK>
                 .setParameter("codigoPostal", codigoPostal)
                 .getResultList();
             
-            log.info("Info Asentamiento: {}", modelList.toString());
+            log.trace("Info Asentamiento: {}", modelList.toString());
             
             for(CatAsentamiento aux : modelList)
             {
@@ -80,6 +80,46 @@ public class AsentamientoDAO extends BaseDAO<CatAsentamiento, CatAsentamientoPK>
         }
 
         return modelList;
+    }
+    
+    public CatAsentamiento buscarPorParametros(Integer idAsentamiento, Integer idLocalidad, Integer idMunicipio, Integer idEstado, Integer idPais) 
+    {
+        CatAsentamiento model = null;
+        EntityManager em = null;
+
+        try 
+        {
+            em = this.getEntityManager();
+            model = em.createNamedQuery("CatAsentamiento.findByParametros", CatAsentamiento.class)
+                .setParameter("idAsentamiento", idAsentamiento)
+                .setParameter("idLocalidad", idLocalidad)
+                .setParameter("idMunicipio", idMunicipio)
+                .setParameter("idEstado", idEstado)
+                .setParameter("idPais", idPais)
+                .getSingleResult();
+            
+            log.trace("Info Asentamiento: {}", model.toString());
+            
+            if(model != null)
+            {
+                log.debug("Id Asentamiento: {}", model.getKey().getId());
+                log.debug("Id Tipo Asentamiento: {}", model.getTipoAsentamiento().getId());
+                log.debug("Id Entidad Postal: {}", model.getEntidadPostal().getId());
+                log.debug("Id Localidad: {}", model.getKey().getLocalidad().getKey().getId());
+                log.debug("Id Municipio: {}", model.getKey().getLocalidad().getKey().getMunicipio().getKey().getId());
+                log.debug("Id Estado: {}", model.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getId());
+                log.debug("Id Pais: {}", model.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getPais().getId());
+            }
+            
+        } catch(Exception ex) 
+        {
+            log.error("Problema para obtener el asentamiento...",  ex);
+        } finally 
+        {
+            this.close(em);
+        }
+
+        return model;
     }
     
 }
