@@ -81,13 +81,13 @@
                 <div class="field col-12 md:col-6">
                     <p:outputLabel value="Localidad: " />
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <p:selectOneMenu id="menuLocalidad" value="#{domiciliosBean.localidad}" converter="entityConverter">
+                        <p:selectOneMenu id="menuLocalidad" value="#{domiciliosBean.localidad}" converter="entityConverter" filter="true" filterMatchMode="contains">
                             <f:selectItem itemLabel="Seleccione una Localidad" noSelectionOption="true" />
                             <f:selectItems value="#{domiciliosBean.localidades}" var="localidad" itemLabel="#{localidad.descripcion}" itemValue="#{localidad}"/>
                             <p:ajax event="change" listener="#{domiciliosBean.tiposAsentamientoDisponibles}" update="menuTipoAsentamiento" process="@this" />
                         </p:selectOneMenu>
-                        <p:commandButton icon="pi pi-plus" actionListener="#{domiciliosBean.seleccionar('Localidad', 'Agregar')}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();"/>
-                        <p:commandButton icon="pi pi-pencil" actionListener="#{domiciliosBean.seleccionar('Localidad', 'Editar')}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();"/>
+                        <p:commandButton icon="pi pi-plus" actionListener="#{domiciliosBean.crear('Localidad')}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();" process="@this"/>
+                        <p:commandButton icon="pi pi-pencil" actionListener="#{domiciliosBean.editar('Localidad')}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();" process="@this"/>
                         <p:commandButton icon="pi pi-times" actionListener="#{domiciliosBean.seleccionar('Localidad', 'Eliminar')}" ajax="true" oncomplete="PF('dlgBorrar').show();"/>
                     </div>
                 </div>
@@ -97,13 +97,13 @@
                 <div class="field col-12 md:col-6">
                     <p:outputLabel value="Tipo de Asentamiento: " />
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <p:selectOneMenu id="menuTipoAsentamiento" value="#{domiciliosBean.tipoasentamiento}" converter="entityConverter">
+                        <p:selectOneMenu id="menuTipoAsentamiento" value="#{domiciliosBean.tipoasentamiento}" converter="entityConverter" filter="true" filterMatchMode="contains">
                             <f:selectItem itemLabel="Seleccione un tipo de Asentamiento" noSelectionOption="true" />
                             <f:selectItems value="#{domiciliosBean.tiposasentamiento}" var="tipoasentamiento" itemLabel="#{tipoasentamiento.descripcion}" itemValue="#{tipoasentamiento}"/>
                             <p:ajax event="change" listener="#{domiciliosBean.asentamientosDisponibles}" update="menuAsentamiento" process="@this" />
                         </p:selectOneMenu>
-                        <p:commandButton icon="pi pi-plus" actionListener="#{domiciliosBean.seleccionar('Tipo Asentamiento', 'Agregar')}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();"/>
-                        <p:commandButton icon="pi pi-pencil" actionListener="#{domiciliosBean.seleccionar('Tipo Asentamiento', 'Editar')}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();"/>
+                        <p:commandButton icon="pi pi-plus" actionListener="#{domiciliosBean.crear('Tipo Asentamiento')}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();" process="@this"/>
+                        <p:commandButton icon="pi pi-pencil" actionListener="#{domiciliosBean.editar('Tipo Asentamiento')}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();" process="@this"/>
                         <p:commandButton icon="pi pi-times" actionListener="#{domiciliosBean.seleccionar('Tipo Asentamiento', 'Eliminar')}" ajax="true" oncomplete="PF('dlgBorrar').show();"/>
                     </div>
                 </div>
@@ -111,13 +111,13 @@
                 <div class="field col-12 md:col-6">
                     <p:outputLabel value="Asentamiento: " />
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <p:selectOneMenu id="menuAsentamiento" value="#{domiciliosBean.asentamiento}" converter="entityConverter">
+                        <p:selectOneMenu id="menuAsentamiento" value="#{domiciliosBean.asentamiento}" converter="entityConverter" filter="true" filterMatchMode="contains">
                             <f:selectItem itemLabel="Seleccione un Asentamiento" noSelectionOption="true" />
                             <f:selectItems value="#{domiciliosBean.asentamientos}" var="asentamiento" itemLabel="#{asentamiento.descripcion}" itemValue="#{asentamiento}"/>
                             <p:ajax event="change" listener="#{domiciliosBean.entidadPostalDisponible}" update="lbEntidadPostal" process="@this"/>
                         </p:selectOneMenu>
-                        <p:commandButton icon="pi pi-pencil" action="#{domiciliosBean.seleccionar('Asentamiento', 'Agregar')}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();"/>
-                        <p:commandButton icon="pi pi-plus" action="#{domiciliosBean.seleccionar('Asentamiento', 'Editar')}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();"/>
+                        <p:commandButton icon="pi pi-pencil" action="#{domiciliosBean.crear('Asentamiento')}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();" process="@this"/>
+                        <p:commandButton icon="pi pi-plus" action="#{domiciliosBean.editar('Asentamiento')}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();" process="@this"/>
                         <p:commandButton icon="pi pi-times" action="#{domiciliosBean.seleccionar('Asentamiento', 'Eliminar')}" ajax="true" oncomplete="PF('dlgBorrar').show();"/>
                     </div>
                 </div>

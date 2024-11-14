@@ -62,24 +62,32 @@ public class DomiciliosBean implements Serializable {
 
     // Variables de localidad
     private CatLocalidad localidad;
+    private CatLocalidad nuevalocalidad;
+    private CatLocalidad editablelocalidad;
     private List<CatLocalidad> localidades;
     private LocalidadDAO localidaddao;
     private boolean localidadestatus;
 
     // Variables de asentamiento
     private CatAsentamiento asentamiento;
+    private CatAsentamiento nuevoasentamiento;
+    private CatAsentamiento editableasentamiento;
     private List<CatAsentamiento> asentamientos;
     private AsentamientoDAO asentamientodao;
     private boolean asentamientoestatus;
 
     // Variables tipo de asentamiento
     private CatTipoAsentamiento tipoasentamiento;
+    private CatTipoAsentamiento nuevotipoasentamiento;
+    private CatTipoAsentamiento editabletipoasentamiento;
     private List<CatTipoAsentamiento> tiposasentamiento;
     private TipoAsentamientoDAO tipoasentamientodao;
     private boolean tipoasentamientoestatus;
 
     //Variables codigo postal
     private CatEntidadPostal entidadpostal;
+    private CatEntidadPostal nuevaentidadpostal;
+    private CatEntidadPostal editableentidadpostal;
     private List<CatEntidadPostal> entidadespostales;
     private EntidadPostalDAO entidadpostaldao;
     private boolean entidadpostalestatus;
@@ -145,6 +153,14 @@ public class DomiciliosBean implements Serializable {
         this.editablepais = editablepais;
     }
 
+    public boolean isPaisStatus() {
+        return paisStatus;
+    }
+
+    public void setPaisStatus(boolean paisStatus) {
+        this.paisStatus = paisStatus;
+    }
+
     public List<Pais> getPaises() {
         return paises;
     }
@@ -173,7 +189,14 @@ public class DomiciliosBean implements Serializable {
     public void setEditableestado(CatEstado editableestado) {
         this.editableestado = editableestado;
     }
-    
+
+    public boolean isEstadoestatus() {
+        return estadoestatus;
+    }
+
+    public void setEstadoestatus(boolean estadoestatus) {
+        this.estadoestatus = estadoestatus;
+    }
 
     public List<CatEstado> getEstados() {
         return estados;
@@ -199,9 +222,17 @@ public class DomiciliosBean implements Serializable {
     public void setEditablemunicipio(CatMunicipio editablemunicipio) {
         this.editablemunicipio = editablemunicipio;
     }
-    
+
     public void setMunicipio(CatMunicipio municipio) {
         this.municipio = municipio;
+    }
+
+    public boolean isMunicipioestatus() {
+        return municipioestatus;
+    }
+
+    public void setMunicipioestatus(boolean municipioestatus) {
+        this.municipioestatus = municipioestatus;
     }
 
     public List<CatMunicipio> getMunicipios() {
@@ -217,6 +248,30 @@ public class DomiciliosBean implements Serializable {
         this.localidad = localidad;
     }
 
+    public CatLocalidad getNuevalocalidad() {
+        return nuevalocalidad;
+    }
+
+    public void setNuevalocalidad(CatLocalidad nuevalocalidad) {
+        this.nuevalocalidad = nuevalocalidad;
+    }
+
+    public CatLocalidad getEditablelocalidad() {
+        return editablelocalidad;
+    }
+
+    public void setEditablelocalidad(CatLocalidad editablelocalidad) {
+        this.editablelocalidad = editablelocalidad;
+    }
+
+    public boolean isLocalidadestatus() {
+        return localidadestatus;
+    }
+
+    public void setLocalidadestatus(boolean localidadestatus) {
+        this.localidadestatus = localidadestatus;
+    }
+
     public List<CatLocalidad> getLocalidades() {
         return localidades;
     }
@@ -228,6 +283,30 @@ public class DomiciliosBean implements Serializable {
 
     public void setAsentamiento(CatAsentamiento asentamiento) {
         this.asentamiento = asentamiento;
+    }
+
+    public CatAsentamiento getNuevoasentamiento() {
+        return nuevoasentamiento;
+    }
+
+    public void setNuevoasentamiento(CatAsentamiento nuevoasentamiento) {
+        this.nuevoasentamiento = nuevoasentamiento;
+    }
+
+    public CatAsentamiento getEditableasentamiento() {
+        return editableasentamiento;
+    }
+
+    public void setEditableasentamiento(CatAsentamiento editableasentamiento) {
+        this.editableasentamiento = editableasentamiento;
+    }
+
+    public boolean isAsentamientoestatus() {
+        return asentamientoestatus;
+    }
+
+    public void setAsentamientoestatus(boolean asentamientoestatus) {
+        this.asentamientoestatus = asentamientoestatus;
     }
 
     public List<CatAsentamiento> getAsentamientos() {
@@ -243,6 +322,30 @@ public class DomiciliosBean implements Serializable {
         this.tipoasentamiento = tipoasentamiento;
     }
 
+    public CatTipoAsentamiento getNuevotipoasentamiento() {
+        return nuevotipoasentamiento;
+    }
+
+    public void setNuevotipoasentamiento(CatTipoAsentamiento nuevotipoasentamiento) {
+        this.nuevotipoasentamiento = nuevotipoasentamiento;
+    }
+
+    public CatTipoAsentamiento getEditabletipoasentamiento() {
+        return editabletipoasentamiento;
+    }
+
+    public void setEditabletipoasentamiento(CatTipoAsentamiento editabletipoasentamiento) {
+        this.editabletipoasentamiento = editabletipoasentamiento;
+    }
+
+    public boolean isTipoasentamientoestatus() {
+        return tipoasentamientoestatus;
+    }
+
+    public void setTipoasentamientoestatus(boolean tipoasentamientoestatus) {
+        this.tipoasentamientoestatus = tipoasentamientoestatus;
+    }
+
     public List<CatTipoAsentamiento> getTiposasentamiento() {
         return tiposasentamiento;
     }
@@ -254,6 +357,30 @@ public class DomiciliosBean implements Serializable {
 
     public void setEntidadpostal(CatEntidadPostal entidadpostal) {
         this.entidadpostal = entidadpostal;
+    }
+
+    public CatEntidadPostal getNuevaentidadpostal() {
+        return nuevaentidadpostal;
+    }
+
+    public void setNuevaentidadpostal(CatEntidadPostal nuevaentidadpostal) {
+        this.nuevaentidadpostal = nuevaentidadpostal;
+    }
+
+    public CatEntidadPostal getEditableentidadpostal() {
+        return editableentidadpostal;
+    }
+
+    public void setEditableentidadpostal(CatEntidadPostal editableentidadpostal) {
+        this.editableentidadpostal = editableentidadpostal;
+    }
+
+    public boolean isEntidadpostalestatus() {
+        return entidadpostalestatus;
+    }
+
+    public void setEntidadpostalestatus(boolean entidadpostalestatus) {
+        this.entidadpostalestatus = entidadpostalestatus;
     }
 
     public List<CatEntidadPostal> getEntidadespostales() {
@@ -399,62 +526,6 @@ public class DomiciliosBean implements Serializable {
         this.seleccion = seleccion;
     }
 
-    public boolean isPaisStatus() {
-        return paisStatus;
-    }
-
-    public void setPaisStatus(boolean paisStatus) {
-        this.paisStatus = paisStatus;
-    }
-
-    public boolean isEstadoestatus() {
-        return estadoestatus;
-    }
-
-    public void setEstadoestatus(boolean estadoestatus) {
-        this.estadoestatus = estadoestatus;
-    }
-
-    public boolean isMunicipioestatus() {
-        return municipioestatus;
-    }
-
-    public void setMunicipioestatus(boolean municipioestatus) {
-        this.municipioestatus = municipioestatus;
-    }
-
-    public boolean isLocalidadestatus() {
-        return localidadestatus;
-    }
-
-    public void setLocalidadestatus(boolean localidadestatus) {
-        this.localidadestatus = localidadestatus;
-    }
-
-    public boolean isAsentamientoestatus() {
-        return asentamientoestatus;
-    }
-
-    public void setAsentamientoestatus(boolean asentamientoestatus) {
-        this.asentamientoestatus = asentamientoestatus;
-    }
-
-    public boolean isTipoasentamientoestatus() {
-        return tipoasentamientoestatus;
-    }
-
-    public void setTipoasentamientoestatus(boolean tipoasentamientoestatus) {
-        this.tipoasentamientoestatus = tipoasentamientoestatus;
-    }
-
-    public boolean isEntidadpostalestatus() {
-        return entidadpostalestatus;
-    }
-
-    public void setEntidadpostalestatus(boolean entidadpostalestatus) {
-        this.entidadpostalestatus = entidadpostalestatus;
-    }
-
     public void estadosDisponibles() {
 
         if (this.pais != null) {
@@ -556,10 +627,9 @@ public class DomiciliosBean implements Serializable {
     }
 
     public void editar(String ubicacion) {
-
         this.seleccion = new String();
         this.seleccion = "Editar " + ubicacion;
-        
+
         switch (ubicacion) {
             case "Pais":
                 this.editablepais = this.pais;
@@ -576,46 +646,32 @@ public class DomiciliosBean implements Serializable {
                 this.municipioestatus = true;
                 break;
 
-            /*case "Localidad":
-                this.setPaisStatus(true);
-                this.setEstadoestatus(true);
-                this.setMunicipioestatus(true);
-                this.setLocalidadestatus(true);
+            case "Localidad":
+                this.editablelocalidad = this.localidad;
+                this.localidadestatus = true;
                 break;
 
             case "Tipo Asentamiento":
-                this.setPaisStatus(true);
-                this.setEstadoestatus(true);
-                this.setMunicipioestatus(true);
-                this.setLocalidadestatus(true);
-                this.setTipoasentamientoestatus(true);
+                this.editabletipoasentamiento = this.tipoasentamiento;
+                this.tipoasentamientoestatus = true;
                 break;
 
             case "Asentamiento":
-                this.setPaisStatus(true);
-                this.setEstadoestatus(true);
-                this.setMunicipioestatus(true);
-                this.setLocalidadestatus(true);
-                this.setTipoasentamientoestatus(true);
-                this.setAsentamientoestatus(true);
+                this.editableasentamiento = this.asentamiento;
+                this.tipoasentamientoestatus = true;
                 break;
 
             case "Entidad Postal":
-                this.setPaisStatus(true);
-                this.setEstadoestatus(true);
-                this.setMunicipioestatus(true);
-                this.setLocalidadestatus(true);
-                this.setTipoasentamientoestatus(true);
-                this.setAsentamientoestatus(true);
-                this.setEntidadpostalestatus(true);
-                break;*/
+                this.editableentidadpostal = this.entidadpostal;
+                this.entidadpostalestatus = true;
+                break;
         }
     }
 
-    public void crear(String ubicacion){
+    public void crear(String ubicacion) {
         this.seleccion = new String();
         this.seleccion = "Agregar " + ubicacion;
-        
+
         switch (ubicacion) {
             case "Pais":
                 this.nuevopais = new Pais();
@@ -635,42 +691,32 @@ public class DomiciliosBean implements Serializable {
                 this.municipioestatus = true;
                 break;
 
-            /*case "Localidad":
-                this.setPaisStatus(true);
-                this.setEstadoestatus(true);
-                this.setMunicipioestatus(true);
-                this.setLocalidadestatus(true);
+            case "Localidad":
+                this.nuevalocalidad = new CatLocalidad();
+                this.editablelocalidad = this.nuevalocalidad;
+                this.localidadestatus = true;
                 break;
 
             case "Tipo Asentamiento":
-                this.setPaisStatus(true);
-                this.setEstadoestatus(true);
-                this.setMunicipioestatus(true);
-                this.setLocalidadestatus(true);
-                this.setTipoasentamientoestatus(true);
+                this.nuevotipoasentamiento = new CatTipoAsentamiento();
+                this.editabletipoasentamiento = this.nuevotipoasentamiento;
+                this.asentamientoestatus = true;
                 break;
 
             case "Asentamiento":
-                this.setPaisStatus(true);
-                this.setEstadoestatus(true);
-                this.setMunicipioestatus(true);
-                this.setLocalidadestatus(true);
-                this.setTipoasentamientoestatus(true);
-                this.setAsentamientoestatus(true);
+                this.nuevoasentamiento = new CatAsentamiento();
+                this.editableasentamiento = this.nuevoasentamiento;
+                this.asentamientoestatus = true;
                 break;
 
             case "Entidad Postal":
-                this.setPaisStatus(true);
-                this.setEstadoestatus(true);
-                this.setMunicipioestatus(true);
-                this.setLocalidadestatus(true);
-                this.setTipoasentamientoestatus(true);
-                this.setAsentamientoestatus(true);
-                this.setEntidadpostalestatus(true);
-                break;*/
+                this.nuevaentidadpostal = new CatEntidadPostal();
+                this.editableentidadpostal = this.nuevaentidadpostal;
+                this.entidadpostalestatus = true;
+                break;
         }
     }
-    
+
     // falta por terminar esta funcion
     public void operar() {
         switch (this.getUbicacion()) {
@@ -695,4 +741,3 @@ public class DomiciliosBean implements Serializable {
         }
     }
 }
-
