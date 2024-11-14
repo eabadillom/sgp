@@ -1,14 +1,10 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,21 +12,18 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
 
-/**
- *
- * @author alberto
- */
 @Entity
 @Table(name = "cat_uma")
 @NamedQueries({
-    @NamedQuery(name = "CatUMA.findById", query = "SELECT c FROM CatUMA c where c.anio = :anio"),
-    @NamedQuery(name = "CatUMA.findAll", query = "SELECT c FROM CatUMA c")
+    @NamedQuery(name = "CatUMA.findById", query = "SELECT c FROM CatUMA c WHERE c.anio = :anio"),
+    @NamedQuery(name = "CatUMA.findAll", query = "SELECT c FROM CatUMA c"),
+    @NamedQuery(name = "CatUMA.buscarVigente", query = "SELECT c FROM CatUMA c WHERE c.fechaAplicacion <= :fecha ")
 })
-public class CatUMA implements Serializable
-{
-    @Id
+public class CatUMA implements Serializable {
+    private static final long serialVersionUID = 4255266288379749638L;
+
+	@Id
     @Basic(optional = false)
     @Column(name = "cd_anio")
     private Integer anio;

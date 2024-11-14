@@ -37,7 +37,31 @@ public class DomicilioEmpleadoDAO extends BaseDAO<DetDomicilioEmpleado, Integer>
                 .getResultList();
         } catch(Exception ex) 
         {
-            log.error("Problema para obtener la lista de asentamientos...",  ex);
+            log.error("Problema para obtener la lista de domicilios...",  ex);
+        } finally 
+        {
+            this.close(em);
+        }
+
+        return modelList;
+    }
+    
+    @Override
+    public DetDomicilioEmpleado buscarPorId(Integer idEmpleado)
+    {
+        DetDomicilioEmpleado modelList = null;
+        EntityManager em = null;
+
+        try 
+        {
+            em = this.getEntityManager();
+            modelList = em.createNamedQuery("DetDomicilioEmpleado.findIdEmpleado", DetDomicilioEmpleado.class)
+                .setParameter("idEmpleado", idEmpleado)
+                .getSingleResult();
+            
+        } catch(Exception ex) 
+        {
+            log.warn("No hay domicilio para el empleado {} : {}",  idEmpleado, ex.getMessage());
         } finally 
         {
             this.close(em);

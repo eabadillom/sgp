@@ -6,9 +6,13 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
+import javax.persistence.JoinTable;
+import javax.persistence.MapsId;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
@@ -23,13 +27,15 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "det_domicilio_empleado")
 @NamedQueries({
-    @NamedQuery(name = "CatDomicilioEmpleado.findAll", query = "SELECT cde FROM DetDomicilioEmpleado cde")
+    @NamedQuery(name = "DetDomicilioEmpleado.findAll", query = "SELECT cde FROM DetDomicilioEmpleado cde"),
+    @NamedQuery(name = "DetDomicilioEmpleado.findIdEmpleado", query = "SELECT cde FROM DetDomicilioEmpleado cde INNER JOIN cde.empleado e WHERE e.idEmpleado = :idEmpleado")
 })
 public class DetDomicilioEmpleado implements Serializable
 {
     private static final long serialVersionUID = 1L;
     
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @NotNull
     @Column(name = "cd_domicilioEmp")
@@ -53,7 +59,7 @@ public class DetDomicilioEmpleado implements Serializable
     @Column(name = "nu_numInt")
     private String numeroInterior;
     
-    @OneToOne(cascade = CascadeType.ALL, optional = false)
+    @OneToOne(optional = false)
     @NotNull
     @JoinColumn(name = "id_empleado")
     private DetEmpleado empleado;
@@ -71,6 +77,11 @@ public class DetDomicilioEmpleado implements Serializable
     
     public DetDomicilioEmpleado() 
     {
+    }
+
+    public DetDomicilioEmpleado(Integer id) 
+    {
+        this.id = id;
     }
 
     public DetDomicilioEmpleado(Integer id, String calle, String numeroExterior, String numeroInterior) 
@@ -130,7 +141,7 @@ public class DetDomicilioEmpleado implements Serializable
     {
         this.empleado = empleado;
     }
-
+    
     public CatAsentamiento getAsentamiento() 
     {
         return asentamiento;
@@ -167,7 +178,7 @@ public class DetDomicilioEmpleado implements Serializable
     
     @Override
     public String toString() {
-        return "DetDomicilioEmpleado{" + "id=" + id + ", calle=" + calle + ", numeroExterior=" + numeroExterior + ", numeroInterior=" + numeroInterior + ", empleadoId=" + empleado.getNumEmpleado() + ", asentamientoId=" + asentamiento.getKey().getId() + '}';
+        return "DetDomicilioEmpleado[" + "id=" + id + ", calle=" + calle + ", numeroExterior=" + numeroExterior + ", numeroInterior=" + numeroInterior + ']';
     }
     
     

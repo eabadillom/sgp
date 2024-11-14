@@ -6,5 +6,5 @@ import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
 
 public interface IDeducciones {
-	public List<DetNominaDeduccion> calcular(DetNomina nomina, Integer index);
+	public List<DetNominaDeduccion> procesar(DetNomina nomina, Integer index);
 }
