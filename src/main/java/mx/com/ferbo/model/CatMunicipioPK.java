@@ -5,6 +5,7 @@ import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
@@ -21,10 +22,11 @@ public class CatMunicipioPK implements Serializable
     
     @ManyToOne(optional = false)
     @NotNull
-    @JoinColumns({
+    @JoinColumns(value = {
         @JoinColumn(name = "cd_estado", referencedColumnName = "cd_estado"),
         @JoinColumn(name = "cd_pais", referencedColumnName = "cd_pais")
-    })
+    },
+        foreignKey = @ForeignKey(name="FK_Municipio_Estado"))
     private CatEstado estado;
     
     @Basic(optional = false)
@@ -66,7 +68,6 @@ public class CatMunicipioPK implements Serializable
     public int hashCode() 
     {
         int hash = 7;
-        hash = 79 * hash + Objects.hashCode(this.estado.getKey().getId());
         hash = 79 * hash + Objects.hashCode(this.id);
         return hash;
     }
@@ -84,15 +85,12 @@ public class CatMunicipioPK implements Serializable
             return false;
         }
         final CatMunicipioPK other = (CatMunicipioPK) obj;
-        if (!Objects.equals(this.estado.getKey().getId(), other.estado.getKey().getId())) {
-            return false;
-        }
         return Objects.equals(this.id, other.id);
     }
 
     @Override
     public String toString() {
-        return "CatMunicipioPK[" + "estadoCve=" + estado.getKey().getId() + ", municipioCve=" + id + ']';
+        return "CatMunicipioPK[" + "id=" + id + ']';
     }
     
     
