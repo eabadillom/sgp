@@ -1,10 +1,11 @@
-package mx.com.ferbo.business.deduccion;
+package mx.com.ferbo.business.deduccion.isr;
 
 import java.math.BigDecimal;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import mx.com.ferbo.business.deduccion.IDeduccion;
 import mx.com.ferbo.dao.n.TipoDeduccionDAO;
 import mx.com.ferbo.model.CatTarifaISR;
 import mx.com.ferbo.model.DetNomina;

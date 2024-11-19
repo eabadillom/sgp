@@ -1,4 +1,4 @@
-package mx.com.ferbo.business.deduccion;
+package mx.com.ferbo.business.deduccion.isr;
 
 import java.math.BigDecimal;
 import java.util.List;
