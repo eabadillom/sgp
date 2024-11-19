@@ -60,6 +60,15 @@ public class CatAsentamiento implements Serializable
         this.key = new CatAsentamientoPK(localidad, id);
     }
 
+    public CatAsentamiento(CatLocalidad localidad, Integer id, String descripcion, String cp, CatTipoAsentamiento tipoAsentamiento, CatEntidadPostal entidadPostal) 
+    {
+        this.key = new CatAsentamientoPK(localidad, id);
+        this.descripcion = descripcion;
+        this.cp = cp;
+        this.tipoAsentamiento = tipoAsentamiento;
+        this.entidadPostal = entidadPostal;
+    }
+    
     public CatAsentamientoPK getKey() 
     {
         return key;

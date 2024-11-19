@@ -55,6 +55,13 @@ public class CatEstado implements Serializable
     {
         this.key = new CatEstadoPK(pais, id);
     }
+    
+    public CatEstado(Integer id, Pais pais, String clave, String descripcion) 
+    {
+        this.key = new CatEstadoPK(pais, id);
+        this.clave = clave;
+        this.descripcion = descripcion;
+    }
 
     public CatEstadoPK getKey() 
     {
