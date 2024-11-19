@@ -43,7 +43,7 @@ public class CatTipoAsentamiento implements Serializable
     @Column(name = "nb_clave")
     private String clave;
     
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "tipoAsentamiento")
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "tipoAsentamiento", fetch= FetchType.LAZY)
     private List<CatAsentamiento> asentamientos;
 
     public CatTipoAsentamiento() 

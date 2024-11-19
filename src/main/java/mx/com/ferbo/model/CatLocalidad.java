@@ -50,6 +50,12 @@ public class CatLocalidad implements Serializable
         this.key = new CatLocalidadPK(municipio, id);
     }
 
+    public CatLocalidad(CatMunicipio municipio, Integer id, String descripcion) 
+    {
+        this.key = new CatLocalidadPK(municipio, id);
+        this.descripcion = descripcion;
+    }
+    
     public CatLocalidadPK getKey() 
     {
         return key;
