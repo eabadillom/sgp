@@ -161,10 +161,6 @@
 						</p:row>
 					</p:columnGroup>
 				</p:dataTable>
-				<!-- <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
-		            <p:commandButton value="NO" type="button" styleClass="ui-confirmdialog-no ui-button-flat"/>
-		            <p:commandButton value="SI" type="button" styleClass="ui-confirmdialog-yes" />
-		        </p:confirmDialog> -->
 			</div>
 			<div align="center">
 				<p:commandButton value="Guardar" icon="pi pi-pencil" actionListener="#{nominaBean.guardarNominaEmpleado()}" disabled="#{nominaBean.listaNomina.size() lt 0}" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
@@ -322,7 +318,7 @@
 						</p:dataTable>
 					</p:tab>
 					<p:tab title="Otros pagos">
-						<p:dataTable value="#{nominaBean.nomina.otrosPagos}" var="otroPago" paginator="true" paginatorPosition="bottom" rows="5" lazy="true">
+						<p:dataTable value="#{nominaBean.filtraOtroPagos()}" var="otroPago" paginator="true" paginatorPosition="bottom" rows="5" lazy="true">
 							<p:column headerText="SAT" width="4rem">
 								<p:outputLabel value="#{otroPago.tipoOtroPago.clave}" />
 							</p:column>
@@ -347,7 +343,7 @@
 						</p:dataTable>
 					</p:tab>
 					<p:tab title="Deducciones">
-						<p:dataTable value="#{nominaBean.nomina.deducciones}" var="deduccion" paginator="true" paginatorPosition="bottom" rows="5" lazy="true">
+						<p:dataTable value="#{nominaBean.filtrarDeducciones()}" var="deduccion" paginator="true" paginatorPosition="bottom" rows="5" lazy="true">
 							<p:column headerText="SAT" width="4rem">
 								<p:outputLabel value="#{deduccion.tipoDeduccion.clave}" />
 							</p:column>
@@ -373,8 +369,17 @@
 					</p:tab>
 				</p:tabView>
 				<f:facet name="footer">
-					<p:commandButton value="Guardar" icon="pi pi-save" actionListener="#{nominaBean.actualizarNomina}" process="@this" disabled="true" />
-					<p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dgEmpleado').hide();" styleClass="ui-button-outlined ui-button-secondary" />
+					<span style="padding-left: 0.5rem; padding-right: 0.5rem;">
+						<p:selectBooleanButton onLabel="Con detalle" offLabel="Sin detalle" onIcon="pi pi-check" offIcon="pi pi-times" value="#{nominaBean.detalle}">
+							<p:ajax process="@this" update="formNomina:tv-nomina" />
+						</p:selectBooleanButton>
+					</span>
+					<span style="padding-left: 0.5rem; padding-right: 0.5rem;">
+						<p:commandButton value="Guardar" icon="pi pi-save" actionListener="#{nominaBean.actualizarNomina}" process="@this" disabled="true" />
+					</span>
+					<span style="padding-left: 0.5rem; padding-right: 0.5rem;">
+						<p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dgEmpleado').hide();" styleClass="ui-button-outlined ui-button-secondary" />
+					</span>
 				</f:facet>
 			</p:dialog>
         </h:form>

@@ -1,4 +1,4 @@
-package mx.com.ferbo.business.deduccion;
+package mx.com.ferbo.business.otropago;
 
 import java.util.Collections;
 import java.util.Comparator;
