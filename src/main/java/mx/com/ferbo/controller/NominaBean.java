@@ -8,6 +8,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -32,7 +33,6 @@ import mx.com.ferbo.dao.n.PercepcionEmpleadoDAO;
 import mx.com.ferbo.dao.n.PercepcionesDAO;
 import mx.com.ferbo.dao.n.PeriodicidadPagoDAO;
 import mx.com.ferbo.dao.n.RegimenFiscalDAO;
-import mx.com.ferbo.dao.n.SubsidioDAO;
 import mx.com.ferbo.dao.n.TarifaISRDAO;
 import mx.com.ferbo.dao.n.TipoDeduccionDAO;
 import mx.com.ferbo.dao.n.TipoOtroPagoDAO;
@@ -45,11 +45,13 @@ import mx.com.ferbo.model.CatDiaNoLaboral;
 import mx.com.ferbo.model.CatEmpresa;
 import mx.com.ferbo.model.CatPercepciones;
 import mx.com.ferbo.model.CatPeriodicidadPago;
-import mx.com.ferbo.model.CatSubsidio;
 import mx.com.ferbo.model.CatTarifaISR;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetNomina;
+import mx.com.ferbo.model.DetNominaDeduccion;
 import mx.com.ferbo.model.DetNominaEmisor;
+import mx.com.ferbo.model.DetNominaOtroPago;
+import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.DetNominaReceptor;
 import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.sat.CatConcepto;
@@ -75,7 +77,6 @@ public class NominaBean implements Serializable {
     private DiaNoLaboralDAO diaNLDAO = null;
     private PercepcionesDAO catPercepcionesDAO;
     private TarifaISRDAO tarifaISRDAO;
-    private SubsidioDAO subsidioDAO;
     private NominaDAO nominaDAO;
     private MetodoPagoDAO metodoPagoDAO;
     private ConceptoDAO conceptoDAO;
@@ -93,10 +94,7 @@ public class NominaBean implements Serializable {
     private List<CatEmpresa> lstEmpresas;
     private List<CatDiaNoLaboral> diasNoLaborales;
     private CatPercepciones parametrosPercepciones;
-    private List<CatTarifaISR> tablaISRsemanal;
-    private List<CatTarifaISR> tablaISRmensual;
-    private List<CatSubsidio> tablaSubsidioSemanal;
-    private List<CatSubsidio> tablaSubsidioMensual;
+    private List<CatTarifaISR> tablaISR;
     private List<CatTipoPercepcion> tiposPercepcion;
     private List<CatTipoDeduccion> tiposDeduccion;
     private List<CatCuotaIMSS> cuotasIMSS;
@@ -118,9 +116,11 @@ public class NominaBean implements Serializable {
     private Date fechaInicioAnio;
     private Date fechafinAnio;
     private Integer semana;
-    private Boolean esUltimaSemanaMes;
+    
 
     private List<DetNomina> listaNomina;
+    
+    private Boolean detalle = true;
 
 	public NominaBean() {
 		log.info("====================== entrada constructor nominaBean ======================");
@@ -135,7 +135,6 @@ public class NominaBean implements Serializable {
 		diaNLDAO = new DiaNoLaboralDAO();
 		catPercepcionesDAO = new PercepcionesDAO(CatPercepciones.class);
 		tarifaISRDAO = new TarifaISRDAO(CatTarifaISR.class);
-		subsidioDAO = new SubsidioDAO(CatSubsidio.class);
 		nominaDAO = new NominaDAO(DetNomina.class);
 		metodoPagoDAO = new MetodoPagoDAO(CatMetodoPago.class);
 		conceptoDAO = new ConceptoDAO(CatConcepto.class);
@@ -217,8 +216,6 @@ public class NominaBean implements Serializable {
 		
     	log.info("Fecha Inicio: {}", this.periodoInicio);
     	log.info("Fecha Fin: {}", this.periodoFin);
-    	
-    	esUltimaSemanaMes = NominaSemanalBL.esUltimaSemanaMes(periodoInicio, periodoFin);
     }
     
     public void calculaFechaInicio() {
@@ -283,8 +280,7 @@ public class NominaBean implements Serializable {
     	try {
     		this.diasNoLaborales = diaNLDAO.buscarPorPeriodo("MX", periodoInicio, periodoFin);
     		this.parametrosPercepciones = catPercepcionesDAO.buscarActual(this.periodoInicio);
-    		this.tablaISRsemanal = tarifaISRDAO.buscar(fechaInicioAnio, fechafinAnio, "s");
-    		this.tablaSubsidioSemanal = subsidioDAO.buscar(fechaInicioAnio, fechafinAnio, "s");
+    		this.tablaISR = tarifaISRDAO.buscar(fechaInicioAnio, fechafinAnio);
     		this.metodoPago = this.metodoPagoDAO.buscarPorId("PUE");
     		this.concepto = this.conceptoDAO.buscarPorId("84111505");
     		this.unidadSAT = this.unidadSATDAO.buscarPorId("ACT");
@@ -295,11 +291,6 @@ public class NominaBean implements Serializable {
     		this.tiposDeduccion = this.tipoDeduccionDAO.buscarTodos();
     		this.cuotasIMSS = this.cuotasIMSSDAO.buscarPorPeriodo(fechaInicioAnio, fechafinAnio);
     		this.tiposOtroPago = this.tipoOtroPagoDAO.buscarTodos();
-    		
-    		if(esUltimaSemanaMes) {
-    			this.tablaISRmensual = tarifaISRDAO.buscar(fechaInicioAnio, fechafinAnio, "m");
-        		this.tablaSubsidioMensual = subsidioDAO.buscar(fechaInicioAnio, fechafinAnio, "m");
-    		}
     		
     		for (DetEmpleado empleado : listaEmpleados) {
     			nomina = this.procesaEmpleado(empleado);
@@ -322,10 +313,7 @@ public class NominaBean implements Serializable {
 		nominaSemanalBO = new NominaSemanalBL(empleado, periodoInicio, periodoFin);
 		nominaSemanalBO.setDiasNoLaborales(this.diasNoLaborales);
 		nominaSemanalBO.setParametrosPercepciones(parametrosPercepciones);
-		nominaSemanalBO.setTablaISRSemanal(this.tablaISRsemanal);
-		nominaSemanalBO.setTablaISRMensual(tablaISRmensual);
-		nominaSemanalBO.setTablaSubsidioSemanal(this.tablaSubsidioSemanal);
-		nominaSemanalBO.setTablaSubsidioMensual(this.tablaSubsidioMensual);
+		nominaSemanalBO.setTablaISR(this.tablaISR);
 		nominaSemanalBO.setMetodoPago(this.metodoPago);
 		nominaSemanalBO.setConcepto(this.concepto);
 		nominaSemanalBO.setUnidadSAT(this.unidadSAT);
@@ -383,8 +371,8 @@ public class NominaBean implements Serializable {
     				.map(item -> item.getImporte())
     				.reduce(BigDecimal.ZERO, BigDecimal :: add);
     		
-    		subtotal = totalPercepciones.add(BigDecimal.ZERO);
-    		descuentos = totalDeducciones.subtract(totalOtrosPagos);
+    		subtotal = BigDecimal.ZERO.add(totalPercepciones).add(totalOtrosPagos);
+    		descuentos = BigDecimal.ZERO.add(totalDeducciones);
     		total = subtotal.subtract(descuentos);
     		
     		log.info("Subtotal recalculado: {}", subtotal);
@@ -476,6 +464,18 @@ public class NominaBean implements Serializable {
     	
     }
     
+    public List<DetNominaOtroPago> filtraOtroPagos() {
+    	return this.nomina.getOtrosPagos().stream()
+    			.filter(d -> this.detalle || Boolean.TRUE.equals(d.getProcesar()))
+    			.collect(Collectors.toList());
+    }
+    
+    public List<DetNominaDeduccion> filtrarDeducciones() {
+    	return this.nomina.getDeducciones().stream()
+                .filter(d -> this.detalle || Boolean.TRUE.equals(d.getProcesar()))
+                .collect(Collectors.toList());
+    }
+    
     public List<DetEmpleadoDTO> getLstEmpleadosTmp() {
         return lstEmpleadosTmp;
     }
@@ -554,6 +554,14 @@ public class NominaBean implements Serializable {
 
 	public void setSemana(Integer semana) {
 		this.semana = semana;
+	}
+
+	public Boolean getDetalle() {
+		return detalle;
+	}
+
+	public void setDetalle(Boolean detalle) {
+		this.detalle = detalle;
 	}
 
 }

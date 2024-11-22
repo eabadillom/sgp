@@ -1,20 +1,25 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "cat_pais")
 @NamedQueries({
-    @NamedQuery(name = "Pais.findById", query = "SELECT d FROM Pais d WHERE d.clavePais = :clavePais"),
+    @NamedQuery(name = "Pais.findById", query = "SELECT d FROM Pais d WHERE d.id = :cdPais"),
+    @NamedQuery(name = "Pais.findByClave", query = "SELECT d FROM Pais d WHERE d.clave = :clavePais"),
     @NamedQuery(name = "Pais.findAll", query = "SELECT d FROM Pais d ORDER BY d.nombrePais")
 })
 public class Pais implements Serializable {
@@ -24,26 +29,41 @@ public class Pais implements Serializable {
     @Id
     @Basic(optional = false)
     @Column(name = "cd_pais")
-    private String clavePais;
+    private Integer id;
+    
+    @Column(name = "nb_clave")
+    private String clave;
 
     @Column(name = "nb_pais")
     private String nombrePais;
+    
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "key.pais")
+    private List<CatEstado> estados;
 
     public Pais() {
     }
 
-    public Pais(String clavePais, String nombrePais) {
+    public Pais(Integer id, String clave, String nombrePais) {
         super();
-        this.clavePais = clavePais;
+        this.id = id;
+        this.clave = clave;
         this.nombrePais = nombrePais;
     }
 
-    public String getClavePais() {
-        return clavePais;
+    public Integer getId() {
+        return id;
     }
 
-    public void setClavePais(String clavePais) {
-        this.clavePais = clavePais;
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getClave() {
+        return clave;
+    }
+
+    public void setClave(String clave) {
+        this.clave = clave;
     }
 
     public String getNombrePais() {
@@ -53,14 +73,26 @@ public class Pais implements Serializable {
     public void setNombrePais(String nombrePais) {
         this.nombrePais = nombrePais;
     }
+    
+    public List<CatEstado> getEstados() {
+        return estados;
+    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(clavePais, nombrePais);
+    public void setEstados(List<CatEstado> estados) {
+        this.estados = estados;
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public int hashCode() 
+    {
+        int hash = 3;
+        hash = 89 * hash + Objects.hashCode(this.id);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) 
+    {
         if (this == obj) {
             return true;
         }
@@ -70,12 +102,12 @@ public class Pais implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        Pais other = (Pais) obj;
-        return Objects.equals(clavePais, other.clavePais) && Objects.equals(nombrePais, other.nombrePais);
+        final Pais other = (Pais) obj;
+        return Objects.equals(this.id, other.id);
     }
-
+    
     @Override
     public String toString() {
-        return "Pais [clavePais=" + clavePais + ", nombrePais=" + nombrePais + "]";
+        return "Pais [clavePais=" + clave + ", nombrePais=" + nombrePais + "]";
     }
 }

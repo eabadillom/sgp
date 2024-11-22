@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -231,14 +232,17 @@ public class DetEmpleado implements Serializable {
     
     @OneToMany(mappedBy = "empleado", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<DetPrestamo> prestamos;
-
+    
     public DetEmpleado() {
     }
 
     public DetEmpleado(Integer idEmpleado) {
         this.idEmpleado = idEmpleado;
     }
-
+    
+    //@OneToOne(mappedBy = "empleado", fetch= FetchType.LAZY)
+    //private DetDomicilioEmpleado domicilio;
+    
     public DetEmpleado(Integer idEmpleado, String numEmpleado, String nombre, String primerAp, Date fechaNacimiento, Date fechaRegistro, String rfc,
             Date fechaIngreso, short activo, BigDecimal sueldoDiario) {
         this.idEmpleado = idEmpleado;
@@ -474,5 +478,40 @@ public class DetEmpleado implements Serializable {
 	public void setPrestamos(List<DetPrestamo> prestamos) {
 		this.prestamos = prestamos;
 	}
+
+    /*public DetDomicilioEmpleado getDomicilio() {
+        return domicilio;
+    }
+
+    public void setDomicilio(DetDomicilioEmpleado domicilio) {
+        this.domicilio = domicilio;
+    }*/
+    
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 17 * hash + Objects.hashCode(this.idEmpleado);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final DetEmpleado other = (DetEmpleado) obj;
+        return Objects.equals(this.idEmpleado, other.idEmpleado);
+    }
+    
+    @Override
+    public String toString() {
+        return "DetEmpleado[" + "idEmpleado=" + idEmpleado + ", nombre=" + nombre + " " + primerAp + " " + segundoAp + ']';
+    }
 
 }

@@ -1,0 +1,127 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition    xmlns="http://www.w3.org/1999/xhtml"
+                   xmlns:h="http://java.sun.com/jsf/html"
+                   xmlns:f="http://java.sun.com/jsf/core"
+                   xmlns:ui="http://java.sun.com/jsf/facelets"
+                   xmlns:p="http://primefaces.org/ui"
+                   template="/WEB-INF/plantillas/template.xhtml">
+
+    <ui:define name="title">Articulos</ui:define>
+    <ui:define name="content">
+        <f:event type="preRenderView" listener="#{articulosBean.listar(false)}"/>
+
+        <h:form id="frm" enctype="multipart/form-data">
+            <p:growl id="message" showDetails="true" life="4000"/>
+            <p:dialog modal="true" widgetVar="statusDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
+                <div align="center">
+                    <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+                </div>
+            </p:dialog>
+            <p:toolbar>
+                <p:toolbarGroup>
+                    <p:commandButton value="Agregar" update="frm:dlgArticulo" icon="pi pi-plus" 
+                                     actionListener="#{articulosBean.nuevoArticulo}" 
+                                     oncomplete="PF('dlgArticulo').show();" styleClass="edit-button" 
+                                     process="@this"/>
+                </p:toolbarGroup>
+            </p:toolbar>
+
+            <div style="padding-top: 1rem">
+                <p:dataTable id="dtArticulos" value="#{articulosBean.articulos}" var="articulo" paginator="true" rows="8">
+                    <p:column headerText="Articulo" sortBy="#{articulo.descripcion}" style="text-align: center;">
+                        <p:outputLabel value="#{articulo.descripcion}" />
+                    </p:column>
+
+                    <p:column headerText="" width="18%" style="text-align: center;" >
+                        <h:graphicImage name="images/articulos/#{articulo.descripcion}.jpg" library="recursos" width="57" />
+                    </p:column>
+
+                    <p:column headerText="Cantidad Maxima por pedido" sortBy="#{articulo.cantidadMax}" style="text-align: center;">
+                        <p:outputLabel value="#{articulo.cantidadMax}"/>
+                    </p:column>
+
+                    <p:column headerText="Unidad" sortBy="#{articulo.unidad}" style="text-align: center;">
+                        <p:outputLabel value="#{articulo.unidad}"/>
+                    </p:column>
+
+                    <p:column headerText="Disponibilidad" sortBy="#{articulosBean.disponibilidad(articulo)}" style="text-align: center;">
+                        <p:outputLabel value="#{articulosBean.disponibilidad(articulo)}"/>
+                    </p:column>
+
+                    <p:column headerText="" style="text-align: center;">
+                        <p:commandButton icon="pi pi-bars" update="frm:dlgArticulo"
+                                         actionListener="#{articulosBean.pasarArticulo(articulo)}"
+                                         oncomplete="PF('dlgArticulo').show();" styleClass="edit-button"
+                                         process="@this" style="margin: 0.3rem;" />
+                        <p:commandButton icon="pi pi-trash"  
+                                         actionListener="#{articulosBean.pasarArticulo(articulo)}"
+                                         oncomplete="PF('borrarArticulo').show();"
+                                         styleClass="ui-button-raised ui-button-danger"
+                                         process="@this" style="margin: 0.3rem;" />
+
+                    </p:column>
+                </p:dataTable>
+            </div>
+
+            <p:dialog header="#{articulosBean.getAccion()} Articulo" showEffect="fade" modal="true" widgetVar="dlgArticulo" id="dlgArticulo" 
+                      responsive="true" draggable="true" resizable="false" dynamic="true" style="margin: auto">
+                <p:outputPanel id="datos" class="ui-fluid">
+
+                    <div class="p-field">
+                        <p:outputLabel for="@next" value="Articulo: "/>
+                        <p:inputText value="#{articulosBean.articulo.descripcion}" required="true">
+                            <p:ajax process="@this"/>
+                        </p:inputText>
+                    </div>
+                    <div class="p-field">
+                        <p:outputLabel for="@next" value="Cantidad maxima por solicitud: "/>
+                        <p:inputText value="#{articulosBean.articulo.cantidadMax}" required="true">
+                            <p:ajax process="@this"/>
+                        </p:inputText>
+                    </div>
+                    <div class="p-field">
+                        <p:outputLabel for="@next" value="Unidad: "/>
+                        <p:inputText value="#{articulosBean.articulo.unidad}">
+                            <p:ajax process="@this"/>
+                        </p:inputText>
+                    </div>
+
+                    <div class="p-field">
+                        <p:outputLabel for="@next" value="Disponibilidad: "/>
+                        <p:selectOneRadio value="#{articulosBean.articulo.activo}">
+                            <f:selectItem itemValue="1" itemLabel="Existencia" />
+                            <f:selectItem itemValue="0" itemLabel="Sin Existencia" />
+                            <p:ajax process="@this"/>
+                        </p:selectOneRadio>
+                    </div>
+
+                    <p:fileUpload value="#{articulosBean.imagen}"
+                                  accept=".jpeg,.jpg" 
+                                  allowTypes="/(\.|\/)(jpeg|jpg)$/"
+                                  mode="simple" 
+                                  skinSimple="true">
+                    </p:fileUpload>
+
+                </p:outputPanel>
+
+
+                <f:facet name="footer">
+                    <p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{articulosBean.operar}" update="frm:dtArticulos" oncomplete="PF('dlgArticulo').hide();" process="@this datos"/>
+
+                    <p:commandButton value="Cancelar" icon="pi pi-times" immediate="true" oncomplete="PF('dlgArticulo').hide();"/>
+                </f:facet>
+            </p:dialog>
+
+            <p:confirmDialog widgetVar="borrarArticulo" showEffect="fade" width="300"
+                             message="Borrar Articulo?" header="Confirmar" severity="warn">
+                <p:commandButton value="Si" icon="pi pi-check" actionListener="#{articulosBean.eliminar}"
+                                 oncomplete="PF('borrarArticulo').hide()" update="@form" process="@this"/>
+                <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+                                 onclick="PF('borrarArticulo').hide();" />
+            </p:confirmDialog>
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>

@@ -58,12 +58,12 @@
         <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
     </servlet>
     <servlet>
-    	<servlet-name>Registry Servlet</servlet-name>
-    	<servlet-class>mx.com.ferbo.servlet.RegistryServlet</servlet-class>
+        <servlet-name>Registry Servlet</servlet-name>
+        <servlet-class>mx.com.ferbo.servlet.RegistryServlet</servlet-class>
     </servlet>
-     <servlet>
-    	<servlet-name>Challenge Servlet</servlet-name>
-    	<servlet-class>mx.com.ferbo.servlet.ChallengeServlet</servlet-class>
+    <servlet>
+        <servlet-name>Challenge Servlet</servlet-name>
+        <servlet-class>mx.com.ferbo.servlet.ChallengeServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>Faces Servlet</servlet-name>
@@ -74,12 +74,12 @@
         <url-pattern>*.xhtml</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-    	<servlet-name>Registry Servlet</servlet-name>
-    	<url-pattern>/registry</url-pattern>
+        <servlet-name>Registry Servlet</servlet-name>
+        <url-pattern>/registry</url-pattern>
     </servlet-mapping>
-     <servlet-mapping>
-    	<servlet-name>Challenge Servlet</servlet-name>
-    	<url-pattern>/challenge</url-pattern>
+    <servlet-mapping>
+        <servlet-name>Challenge Servlet</servlet-name>
+        <url-pattern>/challenge</url-pattern>
     </servlet-mapping>
     <mime-mapping>
         <extension>ttf</extension>
@@ -145,5 +145,4 @@
         <param-name>com.sun.faces.enableRestoreView11Compatibility</param-name>
         <param-value>true</param-value>
     </context-param>
-
 </web-app>

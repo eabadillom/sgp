@@ -3,6 +3,7 @@ package mx.com.ferbo.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -125,5 +126,33 @@ public class CatPrenda implements Serializable {
     public void setDetalle(String detalle) {
         this.detalle = detalle;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + Objects.hashCode(this.idPrenda);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final CatPrenda other = (CatPrenda) obj;
+        return Objects.equals(this.idPrenda, other.idPrenda);
+    }
+
+    @Override
+    public String toString() {
+        return "CatPrenda{" + "idPrenda=" + idPrenda + ", descripcion=" + descripcion + ", precio=" + precio + ", cantidadMax=" + cantidadMax + ", activo=" + activo + ", detalle=" + detalle + '}';
+    }
+    
     
 }

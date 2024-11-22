@@ -1,4 +1,4 @@
-package mx.com.ferbo.business.deduccion;
+package mx.com.ferbo.business.deduccion.imss;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -8,6 +8,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import mx.com.ferbo.business.deduccion.IDeducciones;
 import mx.com.ferbo.model.CatCuotaIMSS;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
@@ -43,7 +44,7 @@ public class IMSSDeduccion extends AbstractIMSSDeduccion implements IDeducciones
 	}
 	
 	@Override
-	public List<DetNominaDeduccion> calcular(DetNomina nomina, Integer index) {
+	public void procesar(DetNomina nomina, Integer index) {
 		List<DetNominaDeduccion> aportacionesIMSS = null;
 		
 		DetNominaDeduccion dEnfermedadMaternidad = null;
@@ -116,14 +117,12 @@ public class IMSSDeduccion extends AbstractIMSSDeduccion implements IDeducciones
 			dIMSS.setProcesar(true);
 			aportacionesIMSS.add(dIMSS);
 			
-			
+			nomina.getDeducciones().addAll(aportacionesIMSS);
 		} catch(Exception ex) {
 			log.error("Problema para obtener las aportaciones del IMSS...", ex);
 		} finally {
 			this.tiposDeduccion = null;
 		}
-		
-		return aportacionesIMSS;
 	}
 
 	public void setTiposDeduccion(List<CatTipoDeduccion> tiposDeduccion) {
