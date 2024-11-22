@@ -48,6 +48,27 @@ public class TarifaISRDAO extends BaseDAO<CatTarifaISR, Integer> {
     	
     	return modelList;
     }
+	
+	public List<CatTarifaISR> buscar(Date fechaInicio, Date fechaFin) {
+		List<CatTarifaISR> modelList = null;
+		EntityManager em = null;
+		
+		try {
+			em = this.getEntityManager();
+			
+			modelList = em.createNamedQuery("CatTarifaISR.findByPeriodo", modelClass)
+					.setParameter("fechaInicio", fechaInicio)
+					.setParameter("fechaFin", fechaFin)
+					.getResultList()
+					;
+		} catch(Exception ex) {
+			log.error("Problema para obtener la lista de tarifas de ISR...", ex);
+		} finally {
+			this.close(em);
+		}
+		
+		return modelList;
+	}
     
     public List<CatTarifaISR> buscarTodos()
     {

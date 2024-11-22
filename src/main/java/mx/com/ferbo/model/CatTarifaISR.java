@@ -22,7 +22,9 @@ import javax.persistence.Table;
 @Table(name = "cat_tarifa_isr")
 @NamedQueries({
     @NamedQuery(name = "CatTarifaISR.findAll", query = "SELECT i FROM CatTarifaISR i"),
-    @NamedQuery(name = "CatTarifaISR.findByTipoAnioBaseISR", query = "SELECT i FROM CatTarifaISR i WHERE i.tipo = :tipo AND i.fecha BETWEEN :fechaInicio AND :fechaFin")})
+    @NamedQuery(name = "CatTarifaISR.findByTipoAnioBaseISR", query = "SELECT i FROM CatTarifaISR i WHERE i.tipo = :tipo AND i.fecha BETWEEN :fechaInicio AND :fechaFin"),
+    @NamedQuery(name = "CatTarifaISR.findByPeriodo", query = "SELECT i FROM CatTarifaISR i WHERE i.fecha between :fechaInicio AND :fechaFin")
+})
 public class CatTarifaISR implements Serializable {
 
     private static final long serialVersionUID = 1L;

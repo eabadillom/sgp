@@ -44,7 +44,7 @@ public class IMSSDeduccion extends AbstractIMSSDeduccion implements IDeducciones
 	}
 	
 	@Override
-	public List<DetNominaDeduccion> procesar(DetNomina nomina, Integer index) {
+	public void procesar(DetNomina nomina, Integer index) {
 		List<DetNominaDeduccion> aportacionesIMSS = null;
 		
 		DetNominaDeduccion dEnfermedadMaternidad = null;
@@ -123,8 +123,6 @@ public class IMSSDeduccion extends AbstractIMSSDeduccion implements IDeducciones
 		} finally {
 			this.tiposDeduccion = null;
 		}
-		
-		return null;
 	}
 
 	public void setTiposDeduccion(List<CatTipoDeduccion> tiposDeduccion) {

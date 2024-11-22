@@ -27,6 +27,7 @@
         <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.js"></script>
         <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.0/jquery-ui.min.js"></script>
+        <link rel="icon" type="image/x-icon" href="<%=basePath %>/favicon.ico" />
         <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.0/jquery-ui.css">
         <link rel="stylesheet" href="<%= basePath%>/styleLogin.css">
         <script src="<%= basePath%>/scriptLogin.js"></script>
