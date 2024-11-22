@@ -27,6 +27,8 @@ import mx.com.ferbo.model.sat.CatTipoOtroPago;
 import mx.com.ferbo.util.DateUtils;
 import mx.com.ferbo.util.SGPException;
 
+/**Cálculo del ISR, conforme a la reforma de diciembre de 2013.
+ */
 public class ISRSemanalDeduccion1 extends AbstractDeduccion implements IDeducciones {
 	
 	private static Logger log = LogManager.getLogger(ISRSemanalDeduccion1.class);
@@ -111,7 +113,7 @@ public class ISRSemanalDeduccion1 extends AbstractDeduccion implements IDeduccio
 		CatTipoDeduccion tdISR = null;
 		
 		BigDecimal isrAntesDeSubsidio = null;
-		BigDecimal isr = null;
+		BigDecimal isrDespuesDeSubsidio = null;
 		
 		BigDecimal baseISRMensual = null;
 		BigDecimal isrRetenidoSemanasAnteriores = null;
@@ -148,14 +150,14 @@ public class ISRSemanalDeduccion1 extends AbstractDeduccion implements IDeduccio
 			importeSubsidio = this.tarifaSubsidioBO.calcular(ISubsidioEmpleo.PERIODO_SEMANAL, dBaseISR.getImporte());
 			
 			//ISR Semanal despues de subsidio al salario.
-			isr = isrAntesDeSubsidio.subtract(importeSubsidio);
+			isrDespuesDeSubsidio = isrAntesDeSubsidio.subtract(importeSubsidio);
 			
 			
 			//CALCULO DE ISR MENSUAL
 			if(this.ultimaSemanaMes) {
 				log.info("Percepciones: {}", percepciones);
 				
-				baseISRMensual = this.calcularBaseISRAcumulado(dBaseISR.getImporte(), isr);
+				baseISRMensual = this.calcularBaseISRAcumulado(dBaseISR.getImporte(), isrDespuesDeSubsidio);
 				log.info("Base ISR (mensual): {}", baseISRMensual);
 				
 				tarifaISRBO = new TarifaISRDeduccion(tablaISRMensual, baseISRMensual);
@@ -175,11 +177,11 @@ public class ISRSemanalDeduccion1 extends AbstractDeduccion implements IDeduccio
 				isrRetenidoSemanasAnteriores = this.calcularISRSemanasAnteriores(this.listaNominaMes);
 				log.info("ISR Retenido en las semanas anteriores: {}", isrRetenidoSemanasAnteriores);
 				
-				isr = isrMensualDespuesDeSubsidio.subtract(isrRetenidoSemanasAnteriores);
+				isrDespuesDeSubsidio = isrMensualDespuesDeSubsidio.subtract(isrRetenidoSemanasAnteriores);
 			}
 			
-			log.info("ISR NETO Semanal: {}", isr);
-			if(isr.compareTo(BigDecimal.ZERO) > 0) {
+			log.info("ISR NETO Semanal: {}", isrDespuesDeSubsidio);
+			if(isrDespuesDeSubsidio.compareTo(BigDecimal.ZERO) > 0) {
 				log.info("Agregando ISR como Deduccion...");
 				dISR = new DetNominaDeduccion();
 				dISR.setKey(new DetNominaDeduccionPK(nomina, idxDeduccion++));
@@ -187,14 +189,14 @@ public class ISRSemanalDeduccion1 extends AbstractDeduccion implements IDeduccio
 				dISR.setTipoDeduccion(tdISR);
 				dISR.setClave("FRB-" + D_ISR);
 				dISR.setNombre("I.S.R.");
-				dISR.setImporte(isr);
+				dISR.setImporte(isrDespuesDeSubsidio);
 				dISR.setProcesar(true);
 				
 				deduccionesISR.add(dISRAntesSubsidio);
 				deduccionesISR.add(dISR);
 			} else {
 				log.info("Agregando ISR como Otro pago...");
-				ReintegroISROtroPago reintegroISROtroPago = new ReintegroISROtroPago(isr.abs());
+				ReintegroISROtroPago reintegroISROtroPago = new ReintegroISROtroPago(isrDespuesDeSubsidio.abs());
 				reintegroISROtroPago.setTiposOtroPago(this.tiposOtroPago);
 				opISR = reintegroISROtroPago.calcular(nomina, null);
 				nomina.getOtrosPagos().add(opISR);
