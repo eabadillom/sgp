@@ -2,6 +2,7 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -127,27 +128,29 @@ public class CatArticulo implements Serializable {
 
     @Override
     public int hashCode() {
-        int hash = 0;
-        hash += (idArticulo != null ? idArticulo.hashCode() : 0);
+        int hash = 3;
+        hash = 59 * hash + Objects.hashCode(this.idArticulo);
         return hash;
     }
 
     @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof CatArticulo)) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
             return false;
         }
-        CatArticulo other = (CatArticulo) object;
-        if ((this.idArticulo == null && other.idArticulo != null) || (this.idArticulo != null && !this.idArticulo.equals(other.idArticulo))) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-        return true;
+        final CatArticulo other = (CatArticulo) obj;
+        return Objects.equals(this.idArticulo, other.idArticulo);
     }
 
     @Override
     public String toString() {
-        return "mx.com.ferbo.model.CatArticulo[ idArticulo=" + idArticulo + " ]";
+        return "CatArticulo{" + "idArticulo=" + idArticulo + ", descripcion=" + descripcion + ", cantidadMax=" + cantidadMax + ", unidad=" + unidad + ", activo=" + activo + ", detalle=" + detalle + '}';
     }
     
 }

@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,10 +31,7 @@ public abstract class DAO<DTO, MODEL, PK> {
 		EntityManager em = null;
 		
 		try {
-			if(emf == null)
-				emf = Persistence.createEntityManagerFactory(PERSIST_UNIT);
-			
-			em = emf.createEntityManager();
+			em = EntityManagerUtil.getEntityManager();
 		} catch(Exception ex) {
 			log.error("Problema para obtener el entity manager...", ex);
 		}

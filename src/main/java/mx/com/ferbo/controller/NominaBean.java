@@ -284,7 +284,11 @@ public class NominaBean implements Serializable {
     		this.diasNoLaborales = diaNLDAO.buscarPorPeriodo("MX", periodoInicio, periodoFin);
     		this.parametrosPercepciones = catPercepcionesDAO.buscarActual(this.periodoInicio);
     		this.tablaISRsemanal = tarifaISRDAO.buscar(fechaInicioAnio, fechafinAnio, "s");
+    		if(this.esUltimaSemanaMes)
+    			this.tablaISRmensual = tarifaISRDAO.buscar(fechaInicioAnio, fechafinAnio, "m");
     		this.tablaSubsidioSemanal = subsidioDAO.buscar(fechaInicioAnio, fechafinAnio, "s");
+    		if(this.esUltimaSemanaMes)
+    			this.tablaSubsidioMensual = subsidioDAO.buscar(fechaInicioAnio, fechafinAnio, "m");
     		this.metodoPago = this.metodoPagoDAO.buscarPorId("PUE");
     		this.concepto = this.conceptoDAO.buscarPorId("84111505");
     		this.unidadSAT = this.unidadSATDAO.buscarPorId("ACT");
@@ -323,9 +327,7 @@ public class NominaBean implements Serializable {
 		nominaSemanalBO.setDiasNoLaborales(this.diasNoLaborales);
 		nominaSemanalBO.setParametrosPercepciones(parametrosPercepciones);
 		nominaSemanalBO.setTablaISRSemanal(this.tablaISRsemanal);
-		nominaSemanalBO.setTablaISRMensual(tablaISRmensual);
-		nominaSemanalBO.setTablaSubsidioSemanal(this.tablaSubsidioSemanal);
-		nominaSemanalBO.setTablaSubsidioMensual(this.tablaSubsidioMensual);
+		nominaSemanalBO.setTablaISRMensual(this.tablaISRmensual);
 		nominaSemanalBO.setMetodoPago(this.metodoPago);
 		nominaSemanalBO.setConcepto(this.concepto);
 		nominaSemanalBO.setUnidadSAT(this.unidadSAT);

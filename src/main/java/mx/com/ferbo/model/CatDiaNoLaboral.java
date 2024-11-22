@@ -19,7 +19,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "cat_dia_no_laboral")
 @NamedQueries({
-	@NamedQuery(name = "CatDiaNoLaboral.buscaPorPeriodo", query = "SELECT d FROM CatDiaNoLaboral d WHERE d.pais.clavePais = :clavePais AND (d.fecha >= :fechaInicio AND d.fecha <= :fechaFin) ORDER BY d.fecha ASC")
+	@NamedQuery(name = "CatDiaNoLaboral.buscaPorPeriodo", query = "SELECT d FROM CatDiaNoLaboral d WHERE d.pais.clave = :clavePais AND (d.fecha >= :fechaInicio AND d.fecha <= :fechaFin) ORDER BY d.fecha ASC")
 })
 public class CatDiaNoLaboral implements Serializable {
 
@@ -52,12 +52,12 @@ public class CatDiaNoLaboral implements Serializable {
 		this.pais = pais;
 	}
 	
-	public CatDiaNoLaboral(Integer id, Date fecha, String descripcion, String clavePais, String nombrePais) {
+	public CatDiaNoLaboral(Integer id, Date fecha, String descripcion, Integer idPais, String clavePais, String nombrePais) {
 		super();
 		this.id = id;
 		this.fecha = fecha;
 		this.descripcion = descripcion;
-		this.pais = new Pais(clavePais, nombrePais);
+		this.pais = new Pais(idPais, clavePais, nombrePais);
 	}
 
 	public Integer getId() {

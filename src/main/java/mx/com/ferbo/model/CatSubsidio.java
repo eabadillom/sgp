@@ -26,7 +26,9 @@ import javax.validation.constraints.NotNull;
     @NamedQuery(name = "CatSubsidio.findAllBeforeDate", query = "SELECT s FROM CatSubsidio s where s.fecha < :fecha"),
     @NamedQuery(name = "CatSubsidio.findByPeriodoTipo", query = "SELECT s FROM CatSubsidio s WHERE s.fecha BETWEEN :fechaInicio AND :fechaFin AND s.periodo = :periodo"),
     @NamedQuery(name = "CatSubsidio.findByPeriodoTipoIngreso", query = "SELECT new mx.com.ferbo.dto.CatSubsidioDTO(s.idSubsidio, s.paraIngresosDe, s.hastaIngresosDe, s.cantidadSubsidio, s.fecha) FROM CatSubsidio s WHERE s.fecha BETWEEN :fechaInicio AND :fechaFin AND s.periodo = :periodo AND :ingreso BETWEEN s.paraIngresosDe AND s.hastaIngresosDe"),
-    @NamedQuery(name = "CatSubsidio.findActual", query = "SELECT NEW mx.com.ferbo.dto.CatSubsidioDTO(s.idSubsidio, s.paraIngresosDe, s.hastaIngresosDe, s.cantidadSubsidio, s.fecha) FROM CatSubsidio s WHERE s.fecha LIKE :fecha")})
+    @NamedQuery(name = "CatSubsidio.findActual", query = "SELECT NEW mx.com.ferbo.dto.CatSubsidioDTO(s.idSubsidio, s.paraIngresosDe, s.hastaIngresosDe, s.cantidadSubsidio, s.fecha) FROM CatSubsidio s WHERE s.fecha LIKE :fecha"),
+    @NamedQuery(name = "CatSubsidio.findByPeriodo", query = "SELECT s FROM CatSubsidio s WHERE s.periodo = :periodo")
+})
 public class CatSubsidio implements Serializable {
     
     private static final long serialVersionUID = 1L;
@@ -71,7 +73,14 @@ public class CatSubsidio implements Serializable {
         this.fecha = fecha;
     }
 
-    public Integer getIdSubsidio() {
+    @Override
+	public String toString() {
+		return "CatSubsidio [idSubsidio=" + idSubsidio + ", paraIngresosDe=" + paraIngresosDe + ", hastaIngresosDe="
+				+ hastaIngresosDe + ", cantidadSubsidio=" + cantidadSubsidio + ", periodo=" + periodo + ", fecha="
+				+ fecha + "]";
+	}
+
+	public Integer getIdSubsidio() {
         return idSubsidio;
     }
 

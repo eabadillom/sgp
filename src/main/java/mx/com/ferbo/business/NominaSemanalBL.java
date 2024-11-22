@@ -16,22 +16,22 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.deduccion.AjusteAlNetoDeduccion;
-import mx.com.ferbo.business.deduccion.IMSSDeduccion;
-import mx.com.ferbo.business.deduccion.ISRSemanalDeduccion;
 import mx.com.ferbo.business.deduccion.PrestamoDeduccion;
+import mx.com.ferbo.business.deduccion.imss.IMSSDeduccion;
+import mx.com.ferbo.business.deduccion.isr.IISR;
+import mx.com.ferbo.business.deduccion.isr.ISRSemanalDeduccion;
 import mx.com.ferbo.business.otropago.AjusteAlNetoOtroPago;
 import mx.com.ferbo.business.percepcion.BonoPuntualidadPercepcion;
 import mx.com.ferbo.business.percepcion.SeptimoDiaPercepcion;
 import mx.com.ferbo.business.percepcion.SueldoPercepcion;
 import mx.com.ferbo.business.percepcion.ValesDespensaPercepcion;
 import mx.com.ferbo.dao.n.NominaDAO;
-import mx.com.ferbo.dao.n.PrestamoDAO;
+//import mx.com.ferbo.dao.n.PrestamoDAO;
 import mx.com.ferbo.dao.n.RegistroDAO;
 import mx.com.ferbo.model.CatCuotaIMSS;
 import mx.com.ferbo.model.CatDiaNoLaboral;
 import mx.com.ferbo.model.CatPercepciones;
 import mx.com.ferbo.model.CatPeriodicidadPago;
-import mx.com.ferbo.model.CatSubsidio;
 import mx.com.ferbo.model.CatTarifaISR;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetNomina;
@@ -52,7 +52,6 @@ import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.model.sat.CatUnidadSAT;
 import mx.com.ferbo.model.sat.CatUsoCFDI;
 import mx.com.ferbo.util.DateUtils;
-import mx.com.ferbo.util.DateUtilsException;
 import mx.com.ferbo.util.SGPException;
 
 public class NominaSemanalBL {
@@ -88,15 +87,13 @@ public class NominaSemanalBL {
     private List<CatDiaNoLaboral> diasNoLaborales = null;
     private List<CatTarifaISR> tablaISRSemanal = null;
     private List<CatTarifaISR> tablaISRMensual = null;
-    private List<CatSubsidio> tablaSubsidioSemanal = null;
-    private List<CatSubsidio> tablaSubsidioMensual = null;
     private List<CatTipoPercepcion> tiposPercepcion = null;
     private List<CatTipoDeduccion> tiposDeduccion = null;
     private List<CatCuotaIMSS> cuotasIMSS = null;
     private List<CatTipoOtroPago> tiposOtroPago = null;
 	private BigDecimal uma = null;
 	
-	private PrestamoDAO prestamoDAO = null;
+//	private PrestamoDAO prestamoDAO = null;
 	private CatMetodoPago metodoPago = null;
 	private CatConcepto concepto = null;
 	private CatUnidadSAT unidadSAT = null;
@@ -115,7 +112,7 @@ public class NominaSemanalBL {
 		this.empleado = empleado;
 		this.periodoInicio = periodoInicio;
 		this.periodoFin = periodoFin;
-		this.prestamoDAO = new PrestamoDAO();
+//		this.prestamoDAO = new PrestamoDAO();
 		this.nominaDAO = new NominaDAO();
 		
 		anioActual = DateUtils.getAnio(periodoInicio);
@@ -191,7 +188,6 @@ public class NominaSemanalBL {
 		BonoPuntualidadPercepcion bonoPuntualidadBO = null;
 		ValesDespensaPercepcion valesDespensaBO = null;
 		
-		
 		ISRSemanalDeduccion isrBO = null;
 		IMSSDeduccion imssBO = null;
 		PrestamoDeduccion prestamosBO = null;
@@ -257,18 +253,21 @@ public class NominaSemanalBL {
 			/*-------------------------DEDUCCIONES-----------------------*/
 			if(salarioSemanal.compareTo(BigDecimal.ZERO) > 0) {
 				
-				isrBO = new ISRSemanalDeduccion(this.tiposDeduccion, this.tiposOtroPago, percepciones, this.tablaISRSemanal, this.tablaSubsidioSemanal);
+				
+				
+				isrBO = new ISRSemanalDeduccion(this.tiposDeduccion, this.tiposOtroPago, percepciones, this.tablaISRSemanal);
 				isrBO.setPeriodo(this.periodoFin, this.periodoFin);
 				isrBO.setListaNominaMes( this.ultimaSemanaMes ? procesaNominaDelMes() : null);
-				List<DetNominaDeduccion> deduccionesISR = isrBO.calcular(nomina, idxD);
+				isrBO.setTablaISRMensual(this.ultimaSemanaMes ? this.tablaISRMensual : null);
+				List<DetNominaDeduccion> deduccionesISR = isrBO.procesar(nomina, idxD);
 				deducciones.addAll(deduccionesISR);
 
 				imssBO = new IMSSDeduccion(this.tiposDeduccion, this.cuotasIMSS, this.fechaInicioAnio, this.fechafinAnio, new BigDecimal(DIAS_POR_PERIODO + SEPTIMO_DIA), this.uma, salarioDiarioIntegrado);
-				List<DetNominaDeduccion> aportacionesIMSS = imssBO.calcular(nomina, idxD);
+				List<DetNominaDeduccion> aportacionesIMSS = imssBO.procesar(nomina, idxD);
 				deducciones.addAll(aportacionesIMSS) ;
 				
 				prestamosBO = new PrestamoDeduccion(this.empleado);
-				prestamos = prestamosBO.calcular(nomina, idxD);
+				prestamos = prestamosBO.procesar(nomina, idxD);
 				deducciones.addAll(prestamos);
 			}
 			
@@ -551,7 +550,7 @@ public class NominaSemanalBL {
 		
 		dPeriodoAnteriorFin = DateUtils.addDay(dPeriodoInicio, -1);
 		
-		log.info("Primera semana del mes: {} - {}", 
+		log.info("Buscando pagos semanales de nómina del {} al {}", 
 				DateUtils.getString(dPeriodoAnteriorInicio, DateUtils.FORMATO_DD_MM_YYYY),
 				DateUtils.getString(dPeriodoAnteriorFin, DateUtils.FORMATO_DD_MM_YYYY));
 		
@@ -771,14 +770,6 @@ public class NominaSemanalBL {
 		this.tablaISRSemanal = tablaISRSemanal;
 	}
 
-	public List<CatSubsidio> getTablaSubsidioSemanal() {
-		return this.tablaSubsidioSemanal;
-	}
-	
-	public void setTablaSubsidioSemanal(List<CatSubsidio> tablaSubsidioSemanal) {
-		this.tablaSubsidioSemanal = tablaSubsidioSemanal;
-	}
-
 	public CatMetodoPago getMetodoPago() {
 		return metodoPago;
 	}
@@ -857,9 +848,5 @@ public class NominaSemanalBL {
 
 	public void setTablaISRMensual(List<CatTarifaISR> tablaISRMensual) {
 		this.tablaISRMensual = tablaISRMensual;
-	}
-
-	public void setTablaSubsidioMensual(List<CatSubsidio> tablaSubsidioMensual) {
-		this.tablaSubsidioMensual = tablaSubsidioMensual;
 	}
 }
