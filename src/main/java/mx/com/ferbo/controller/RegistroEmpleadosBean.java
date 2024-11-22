@@ -41,7 +41,6 @@ import mx.com.ferbo.dao.n.TipoPrestamoDAO;
 import mx.com.ferbo.dao.n.TipoRegimenDAO;
 import mx.com.ferbo.model.CatArea;
 import mx.com.ferbo.model.CatAsentamiento;
-/*Agregando import de CatAsentamientoPK*/
 import mx.com.ferbo.model.CatAsentamientoPK;
 import mx.com.ferbo.model.CatEmpresa;
 import mx.com.ferbo.model.CatEstado;
@@ -498,7 +497,7 @@ public class RegistroEmpleadosBean implements Serializable {
                         if(this.datoEmpresa.getFechaIngreso() == null)
                         {
                             log.error("Falta fecha de ingreso");
-                            throw new SGPException("Falta ingresar fecha de ingreso");
+                            throw new SGPException("Debe indicar una fecha de ingreso");
                         }
                         
                         this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
