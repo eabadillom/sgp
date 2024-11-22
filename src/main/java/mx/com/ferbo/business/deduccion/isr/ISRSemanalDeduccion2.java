@@ -10,10 +10,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.deduccion.AbstractDeduccion;
-import mx.com.ferbo.business.deduccion.AbstractOtroPago;
 import mx.com.ferbo.business.deduccion.IDeducciones;
 import mx.com.ferbo.business.deduccion.subsidio.ISubsidioEmpleo;
 import mx.com.ferbo.business.deduccion.subsidio.SubsidioEmpleoExecutor;
+import mx.com.ferbo.business.otropago.AbstractOtroPago;
 import mx.com.ferbo.model.CatTarifaISR;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
@@ -24,16 +24,18 @@ import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.model.sat.CatTipoOtroPago;
 import mx.com.ferbo.util.DateUtils;
+import mx.com.ferbo.util.SGPException;
 
-public class ISRSemanalDeduccion extends AbstractDeduccion implements IDeducciones {
+/**Cálculo del ISR, conforme al Decreto del DOF 1 de mayo 2024.
+ */
+public class ISRSemanalDeduccion2 extends AbstractDeduccion implements IDeducciones {
 	
-	private static Logger log = LogManager.getLogger(ISRSemanalDeduccion.class);
+	private static Logger log = LogManager.getLogger(ISRSemanalDeduccion2.class);
 	
 	private SubsidioEmpleoExecutor subsidioExecutor = null;
 	private ISubsidioEmpleo tarifaSubsidioBO = null;
 	
 	private List<CatTarifaISR> tablaISR = null;
-	private List<DetNominaPercepcion> percepciones = null;
 	
 	private DetNominaOtroPago opSubsidioEmpleo = null;
 	private List<CatTipoOtroPago> tiposOtroPago = null;
@@ -43,16 +45,33 @@ public class ISRSemanalDeduccion extends AbstractDeduccion implements IDeduccion
 	private Boolean ultimaSemanaMes = null;
 	
 	private List<DetNomina> listaNominaMes = null;
+	private List<CatTarifaISR> tablaISRSemanal = null;
 	private List<CatTarifaISR> tablaISRMensual = null;
 	
-	public ISRSemanalDeduccion(List<CatTipoDeduccion> tiposDeduccion, List<CatTipoOtroPago> tiposOtroPago, List<DetNominaPercepcion> percepciones, List<CatTarifaISR> tablaISR) {
-		this.tiposDeduccion = tiposDeduccion;
-		this.tiposOtroPago = tiposOtroPago;
-		this.percepciones = percepciones;
-		this.tablaISR = tablaISR;
+	public ISRSemanalDeduccion2(Date periodoInicio, Date periodoFin, List<CatTipoDeduccion> tiposDeduccion, List<CatTipoOtroPago> tiposOtroPago, List<CatTarifaISR> tablaISR, List<DetNomina> nominaMensual)
+	throws SGPException {
+		try {
+			this.setPeriodo(periodoInicio, periodoFin);
+			this.tiposDeduccion = tiposDeduccion;
+			this.tiposOtroPago = tiposOtroPago;
+			this.tablaISR = tablaISR;
+			this.listaNominaMes = nominaMensual;
+			
+			this.tablaISRSemanal = this.tablaISR.stream()
+					.filter(t -> "s".equalsIgnoreCase(t.getTipo()))
+					.collect(Collectors.toList())
+					;
+			
+			this.tablaISRMensual = this.tablaISR.stream()
+					.filter(t -> "m".equalsIgnoreCase(t.getTipo()))
+					.collect(Collectors.toList())
+					;
+		} catch(Exception ex) {
+			throw new SGPException("Problema al iniciar el objeto de cálculo de ISR semanal...", ex);
+		}
 	}
 	
-	public void setPeriodo(Date periodoInicio, Date periodoFin) {
+	private void setPeriodo(Date periodoInicio, Date periodoFin) {
 		Date periodoSiguienteFin = null;
 		
 		this.periodoInicio = periodoInicio;
@@ -72,8 +91,9 @@ public class ISRSemanalDeduccion extends AbstractDeduccion implements IDeduccion
 	}
 	
 	@Override
-	public List<DetNominaDeduccion> procesar(DetNomina nomina, Integer index) {
+	public void procesar(DetNomina nomina, Integer index) {
 		List<DetNominaDeduccion> deduccionesISR = null;
+		List<DetNominaPercepcion> percepciones = null;
 		ISRBaseDeduccion baseISRBO = null;
 		TarifaISRDeduccion tarifaISRBO = null;
 		
@@ -91,7 +111,7 @@ public class ISRSemanalDeduccion extends AbstractDeduccion implements IDeduccion
 		CatTipoDeduccion tdISR = null;
 		
 		BigDecimal isrAntesDeSubsidio = null;
-		BigDecimal isr = null;
+		BigDecimal isrDespuesDeSubsidio = null;
 		
 		BigDecimal baseISRMensual = null;
 		BigDecimal isrRetenidoSemanasAnteriores = null;
@@ -101,17 +121,17 @@ public class ISRSemanalDeduccion extends AbstractDeduccion implements IDeduccion
 		
 		try {
 			idx = this.nuevoIndiceDe(nomina.getDeducciones());
+			percepciones = nomina.getPercepciones();
 			
 			deduccionesISR = new ArrayList<>();
 			
 			//1. Obtener la base para el ISR (semanal)
 			//Para el cálculo del ISR a retener al empleado se deben sumar las percepciones que gravan para ISR
 			baseISRBO = new ISRBaseDeduccion(percepciones);
-			baseISRBO.setTiposDeduccion(tiposDeduccion);
+			baseISRBO.setTiposDeduccion(this.tiposDeduccion);
 			dBaseISR = baseISRBO.calcular(nomina, idx++);
 			
-			
-			tarifaISRBO = new TarifaISRDeduccion(tablaISR, dBaseISR.getImporte());
+			tarifaISRBO = new TarifaISRDeduccion(this.tablaISRSemanal, dBaseISR.getImporte());
 			tarifaISR = tarifaISRBO.calcular();
 			
 			isrPreSubsidioBO = new ISRAntesSubsidioDeduccion(dBaseISR.getImporte(), tarifaISR);
@@ -127,14 +147,14 @@ public class ISRSemanalDeduccion extends AbstractDeduccion implements IDeduccion
 			importeSubsidio = this.tarifaSubsidioBO.calcular(ISubsidioEmpleo.PERIODO_SEMANAL, dBaseISR.getImporte());
 			
 			//ISR Semanal despues de subsidio al salario.
-			isr = isrAntesDeSubsidio.subtract(importeSubsidio);
+			isrDespuesDeSubsidio = isrAntesDeSubsidio.subtract(importeSubsidio);
 			
 			
 			//CALCULO DE ISR MENSUAL
 			if(this.ultimaSemanaMes) {
-				log.info("Percepciones: {}", this.percepciones);
+				log.info("Percepciones: {}", percepciones);
 				
-				baseISRMensual = this.calcularBaseISRAcumulado(dBaseISR.getImporte(), isr);
+				baseISRMensual = this.calcularBaseISRAcumulado(dBaseISR.getImporte(), isrDespuesDeSubsidio);
 				log.info("Base ISR (mensual): {}", baseISRMensual);
 				
 				tarifaISRBO = new TarifaISRDeduccion(tablaISRMensual, baseISRMensual);
@@ -153,21 +173,29 @@ public class ISRSemanalDeduccion extends AbstractDeduccion implements IDeduccion
 				isrRetenidoSemanasAnteriores = this.calcularISRSemanasAnteriores(this.listaNominaMes);
 				log.info("ISR Retenido en las semanas anteriores: {}", isrRetenidoSemanasAnteriores);
 				
-				isr = baseISRMensual.subtract(isrRetenidoSemanasAnteriores);
+				isrDespuesDeSubsidio = baseISRMensual.subtract(isrRetenidoSemanasAnteriores);
 			}
 			
-			log.info("ISR NETO Semanal: {}", isr);
+			log.info("ISR NETO Semanal: {}", isrDespuesDeSubsidio);
+			
 			dISR = new DetNominaDeduccion();
 			dISR.setKey(new DetNominaDeduccionPK(nomina, idx++));
 			tdISR = this.getTipoDeduccion(D_ISR);
 			dISR.setTipoDeduccion(tdISR);
 			dISR.setClave("FRB-" + D_ISR);
 			dISR.setNombre("I.S.R.");
-			dISR.setImporte(isr);
 			dISR.setProcesar(true);
 			
-			deduccionesISR.add(dISRAntesSubsidio);
+			if(isrDespuesDeSubsidio.compareTo(BigDecimal.ZERO) < 0) {
+				dISR.setImporte(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
+			} else {
+				dISR.setImporte(isrDespuesDeSubsidio);
+			}
+			
 			deduccionesISR.add(dISR);
+			deduccionesISR.add(dISRAntesSubsidio);
+			
+			
 			
 			this.procesaSubsidioAlEmpleo(nomina, importeSubsidio);
 			
@@ -177,11 +205,11 @@ public class ISRSemanalDeduccion extends AbstractDeduccion implements IDeduccion
 			log.error("Problema para calcular el ISR...", ex);
 		} finally {
 			this.tiposDeduccion = null;
+			this.tiposOtroPago = null;
+			this.tablaISRSemanal = null;
+			this.tablaISRMensual = null;
 			this.tablaISR = null;
-			this.percepciones = null;
 		}
-		
-		return null;
 	}
 	
 	private BigDecimal calcularISRSemanasAnteriores(List<DetNomina> listaNominaMes) {

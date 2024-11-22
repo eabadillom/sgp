@@ -17,7 +17,7 @@ import mx.com.ferbo.model.sat.CatTipoOtroPago;
 
 @Entity
 @Table(name = "det_nom_otro_pago")
-public class DetNominaOtroPago implements Serializable {
+public class DetNominaOtroPago implements Serializable, Identificable<DetNominaOtroPagoPK> {
 
 	private static final long serialVersionUID = -3073795346585740482L;
 	

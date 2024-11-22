@@ -161,7 +161,28 @@ public class DetNomina implements Serializable {
     @OneToMany(mappedBy = "key.nomina", cascade = CascadeType.ALL)
     private List<DetNominaDeduccion> deducciones;
     
-    
+    @Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DetNomina other = (DetNomina) obj;
+		return Objects.equals(id, other.id);
+	}
+
+	@Override
+	public String toString() {
+		return "DetNomina [idNomina=" + id + "]";
+	}
+	
     public DetNomina() {
     }
 
@@ -391,28 +412,6 @@ public class DetNomina implements Serializable {
 
 	public void setLugarExpedicion(String lugarExpedicion) {
 		this.lugarExpedicion = lugarExpedicion;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(id);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		DetNomina other = (DetNomina) obj;
-		return Objects.equals(id, other.id);
-	}
-
-	@Override
-	public String toString() {
-		return "DetNomina [idNomina=" + id + "]";
 	}
 
 	public LocalDate getPeriodoInicio() {
