@@ -488,16 +488,22 @@ public class RegistroEmpleadosBean implements Serializable {
                 }
                 
                 if (this.empleadoSelected.getIdEmpleado() == null) {
-    			
     			pNumeroEmpleado = this.parametroDAO.buscarPorClave("NBEMP");
     			sNumeroEmpleado = pNumeroEmpleado.getValor();
         		numeroEmpleado = Integer.parseInt(sNumeroEmpleado);
         		sNumeroEmpleado = String.format("%04d", ++numeroEmpleado);
                         transformarAMayusculas();
         		this.empleadoSelected.setNumEmpleado(sNumeroEmpleado);
-        		this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
-        		this.empleadoSelected.setFechaRegistro(new Date());
-    			empleadoDAO.guardar(empleadoSelected);
+                        
+                        if(this.datoEmpresa.getFechaIngreso() == null)
+                        {
+                            log.error("Falta fecha de ingreso");
+                            throw new SGPException("Falta ingresar fecha de ingreso");
+                        }
+                        
+                        this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
+                        this.empleadoSelected.setFechaRegistro(new Date());
+                        empleadoDAO.guardar(empleadoSelected);
                         this.domicilioEmpleadoSelected.setEmpleado(this.empleadoSelected);
                         this.domicilioEmpleadoDAO.guardar(domicilioEmpleadoSelected);
                         pNumeroEmpleado.setValor(sNumeroEmpleado);
@@ -543,7 +549,6 @@ public class RegistroEmpleadosBean implements Serializable {
     		severity = FacesMessage.SEVERITY_ERROR;
     	} finally {
             message = new FacesMessage(severity, titulo, mensaje);
-            limpiarVariables();
             FacesContext.getCurrentInstance().addMessage(null, message);
             PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogEmpleado");	
     	}
