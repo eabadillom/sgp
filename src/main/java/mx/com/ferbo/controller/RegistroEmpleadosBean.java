@@ -41,8 +41,14 @@ import mx.com.ferbo.dao.n.TipoPrestamoDAO;
 import mx.com.ferbo.dao.n.TipoRegimenDAO;
 import mx.com.ferbo.model.CatArea;
 import mx.com.ferbo.model.CatAsentamiento;
-import mx.com.ferbo.model.n.CatAsentamientoPK;
+import mx.com.ferbo.model.CatAsentamientoPK;
 import mx.com.ferbo.model.CatEmpresa;
+import mx.com.ferbo.model.CatEstado;
+import mx.com.ferbo.model.CatEstadoPK;
+import mx.com.ferbo.model.CatLocalidad;
+import mx.com.ferbo.model.CatLocalidadPK;
+import mx.com.ferbo.model.CatMunicipio;
+import mx.com.ferbo.model.CatMunicipioPK;
 import mx.com.ferbo.model.CatParametro;
 import mx.com.ferbo.model.CatPerfil;
 import mx.com.ferbo.model.CatPeriodicidadPago;
@@ -56,6 +62,7 @@ import mx.com.ferbo.model.DetEmpleadoFoto;
 import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.DetPrestamo;
 import mx.com.ferbo.model.InfDatoEmpresa;
+import mx.com.ferbo.model.Pais;
 import mx.com.ferbo.model.sat.CatEntidadFederativa;
 import mx.com.ferbo.model.sat.CatRiesgoPuesto;
 import mx.com.ferbo.model.sat.CatTipoContrato;
@@ -67,6 +74,7 @@ import mx.com.ferbo.util.SGPException;
 @Named(value = "registroEmpleadosBean")
 @ViewScoped
 public class RegistroEmpleadosBean implements Serializable {
+    
     
     private static final long serialVersionUID = 1L;
     private static final Logger log = LogManager.getLogger(RegistroEmpleadosBean.class);
@@ -230,6 +238,8 @@ public class RegistroEmpleadosBean implements Serializable {
         this.empleadoSelected.setActivo((short)1);
         this.datoEmpresa = new InfDatoEmpresa();
         this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
+        this.domicilioEmpleadoSelected = new DetDomicilioEmpleado();
+        this.asentamientoSelected = this.inicializarAsentamiento();
     }
     
     public CatAsentamiento obtenerAsentamiento(DetDomicilioEmpleado domicilioEmpleado)
@@ -238,19 +248,41 @@ public class RegistroEmpleadosBean implements Serializable {
         
         if(domicilioEmpleado != null)
         {
-            asentamiento = this.asentamientoDAO.buscarPorParametros(domicilioEmpleado.getAsentamiento().getKey().getId(), 
-                domicilioEmpleado.getAsentamiento().getKey().getLocalidad().getKey().getId(), 
-                domicilioEmpleado.getAsentamiento().getKey().getLocalidad().getKey().getMunicipio().getKey().getId(), 
-                domicilioEmpleado.getAsentamiento().getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getId(), 
-                domicilioEmpleado.getAsentamiento().getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getPais().getId());
-            log.info("Asentamiento Buscado {}", asentamiento.toString());
+            asentamiento = this.asentamientoDAO.buscarPorParametros(domicilioEmpleado.getAsentamiento(), 
+                domicilioEmpleado.getLocalidad(), 
+                domicilioEmpleado.getMunicipio(), 
+                domicilioEmpleado.getEstado(), 
+                domicilioEmpleado.getPais());
+            log.trace("Asentamiento obtenido {}", asentamiento.toString());
+        }else
+        {
+            log.info("No se encontro asentamiento del empleado {}", this.empleadoSelected.getIdEmpleado());
         }
+        
         return asentamiento;
+    }
+    
+    public void agregarAsentamientoADomicilio(CatAsentamiento auxAsentamiento)
+    {
+        log.debug("Agregando/Actualizando asentamiento en domicilio");
+        if(auxAsentamiento != null)
+        {
+            this.domicilioEmpleadoSelected.setAsentamiento(auxAsentamiento.getKey().getId());
+            this.domicilioEmpleadoSelected.setLocalidad(auxAsentamiento.getKey().getLocalidad().getKey().getId());
+            this.domicilioEmpleadoSelected.setMunicipio(auxAsentamiento.getKey().getLocalidad().getKey().getMunicipio().getKey().getId());
+            this.domicilioEmpleadoSelected.setEstado(auxAsentamiento.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getId());
+            this.domicilioEmpleadoSelected.setPais(auxAsentamiento.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getPais().getId());
+        }
+        
     }
     
     public void editar() 
     {
-        limpiarVariables();
+        if(this.empleadoSelected.getIdEmpleado() != null)
+        {
+            limpiarVariables();
+        }
+        
     	List<DetPrestamo> prestamos = null;
     	log.info("Cargando información del empleado: {}", this.empleadoSelected);
         InfDatoEmpresa datoEmpresa = this.empleadoSelected.getDatoEmpresa();
@@ -442,23 +474,39 @@ public class RegistroEmpleadosBean implements Serializable {
     	try {
     		this.empleadoSelected.setPercepcionesEmpleado(this.percepcionesEmpleado);
     		
-                if(this.domicilioEmpleadoSelected.getCalle() == null || this.domicilioEmpleadoSelected.getNumeroExterior() == null || this.domicilioEmpleadoSelected.getNumeroInterior() == null)
+                if(this.domicilioEmpleadoSelected.getCalle() == null)
                 {
-                    log.error("No se capturo la calle, el numero exterior y el interior");
+                    log.error("No se capturo la calle");
+                    throw new SGPException("Debe indicar una calle");
+                }
+                
+                if(this.domicilioEmpleadoSelected.getNumeroExterior() == null)
+                {
+                    log.error("No se capturo el numero exterior");
+                    throw new SGPException("Debe indicar un numero de calle exterior");
                 }
                 
                 if (this.empleadoSelected.getIdEmpleado() == null) {
-    			
     			pNumeroEmpleado = this.parametroDAO.buscarPorClave("NBEMP");
     			sNumeroEmpleado = pNumeroEmpleado.getValor();
         		numeroEmpleado = Integer.parseInt(sNumeroEmpleado);
         		sNumeroEmpleado = String.format("%04d", ++numeroEmpleado);
+                        transformarAMayusculas();
         		this.empleadoSelected.setNumEmpleado(sNumeroEmpleado);
-        		this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
-        		this.empleadoSelected.setFechaRegistro(new Date());
-    			empleadoDAO.guardar(empleadoSelected);
+                        
+                        if(this.datoEmpresa.getFechaIngreso() == null)
+                        {
+                            log.error("Falta fecha de ingreso");
+                            throw new SGPException("Debe indicar una fecha de ingreso");
+                        }
+                        
+                        this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
+                        this.empleadoSelected.setFechaRegistro(new Date());
+                        empleadoDAO.guardar(empleadoSelected);
                         this.domicilioEmpleadoSelected.setEmpleado(this.empleadoSelected);
                         this.domicilioEmpleadoDAO.guardar(domicilioEmpleadoSelected);
+                        pNumeroEmpleado.setValor(sNumeroEmpleado);
+                        this.parametroDAO.actualizar(pNumeroEmpleado);
     		} else {
     			empleadoDAO.actualizar(empleadoSelected);
                         if(domicilioEmpleadoSelected.getEmpleado() == null)
@@ -466,9 +514,8 @@ public class RegistroEmpleadosBean implements Serializable {
                             this.domicilioEmpleadoSelected.setEmpleado(empleadoSelected);
                             this.domicilioEmpleadoDAO.guardar(this.domicilioEmpleadoSelected);
                         }else{
-                            log.info("Información del domicilio {}", this.domicilioEmpleadoSelected.toString());
+                            log.trace("Información del domicilio {}", this.domicilioEmpleadoSelected.toString());
                             this.domicilioEmpleadoDAO.actualizar(domicilioEmpleadoSelected);
-                            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Informacion", "Se actualizo el domicilio"));
                         }
                 }
     		
@@ -500,13 +547,7 @@ public class RegistroEmpleadosBean implements Serializable {
     		mensaje = "Problema para guardar al empleado.";
     		severity = FacesMessage.SEVERITY_ERROR;
     	} finally {
-            if(severity == null)
-            {
-                mensaje = "Hubo un problema al guardar/actualizar";
-    		severity = FacesMessage.SEVERITY_INFO;
-            }
             message = new FacesMessage(severity, titulo, mensaje);
-            limpiarVariables();
             FacesContext.getCurrentInstance().addMessage(null, message);
             PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogEmpleado");	
     	}
@@ -599,17 +640,12 @@ public class RegistroEmpleadosBean implements Serializable {
     }
     
     public void domicilioEmpleado() 
-    {
-        FacesMessage message = null;
-        Severity severity = null;
-        String mensaje = null;
-        String titulo = "Domicilio Empleado";
+    {   
+        log.info("Agregando/Actualizando información al domicilio");    
+        this.agregarAsentamientoADomicilio(this.asentamientoSelected);
         
-        log.info("Agregando/Actualizando información al domicilio");
-        log.info("Asentamiento seleccionado: {}", this.asentamientoSelected.toString());
-            
-        this.domicilioEmpleadoSelected.setAsentamiento(this.asentamientoSelected);
-        mensaje = "Agregando/Actualizando asentamiento en domicilio empleado";
+        log.trace("Domicilio seleccionado: {}", this.domicilioEmpleadoSelected.toString());
+        log.trace("Asentamiento seleccionado: {}", this.asentamientoSelected.toString());
         
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Informacion", "Se actualizo el asentamiento"));
         PrimeFaces.current().ajax().update("formRegistroEmpleado:messages");
@@ -633,6 +669,19 @@ public class RegistroEmpleadosBean implements Serializable {
         aux.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().setKey(new CatEstadoPK());
         aux.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().setPais(new Pais());
         return aux;
+    }
+    
+    public void transformarAMayusculas()
+    {
+        String nombre = this.empleadoSelected.getNombre().toUpperCase();
+        String apellidoPa = this.empleadoSelected.getPrimerAp().toUpperCase();
+        String apellidoMa = this.empleadoSelected.getSegundoAp().toUpperCase();
+        String curp = this.empleadoSelected.getCurp().toUpperCase();
+        
+        this.empleadoSelected.setNombre(nombre);
+        this.empleadoSelected.setPrimerAp(apellidoPa);
+        this.empleadoSelected.setSegundoAp(apellidoMa);
+        this.empleadoSelected.setCurp(curp);
     }
 
     public List<CatEmpresa> getLstCatEmpresa() {

@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.business.deduccion.AbstractOtroPago;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaOtroPago;
 import mx.com.ferbo.model.DetNominaOtroPagoPK;
