@@ -30,6 +30,7 @@ public class TipoAsentamientoDAO extends BaseDAO{
             em = super.getEntityManager();
             TypedQuery<CatTipoAsentamiento> resultado = em.createQuery("select e from  CatTipoAsentamiento e", CatTipoAsentamiento.class);
             tiposasentamiento = resultado.getResultList();
+            log.info("Finaliza proceso de obtener todos los tipos de asentamiento");
             
         }
         catch(Exception ex){
@@ -38,7 +39,6 @@ public class TipoAsentamientoDAO extends BaseDAO{
             throw new SGPException("Problema al obtener los registros" + ex);
         }
         finally{
-            log.info("Finaliza proceso de obtener todos los tipos de asentamiento");
             super.close(em);
         }
         return tiposasentamiento;
@@ -55,6 +55,7 @@ public class TipoAsentamientoDAO extends BaseDAO{
           em.getTransaction().begin();
           tipoasentamiento = em.find(CatTipoAsentamiento.class, id);
           em.getTransaction().commit();
+          log.info("Finaliza proceso de obtener elemento con id: {}", id);  
         }
         catch(Exception ex){
             super.rollback(em);
@@ -62,8 +63,7 @@ public class TipoAsentamientoDAO extends BaseDAO{
             throw new SGPException("Problema al obtener el elemento por id " + ex);
         }
         finally{
-            super.close(em);
-           log.info("Finaliza proceso de obtener elemento con id: {}", id);           
+            super.close(em);         
         }
         return tipoasentamiento;
     }
@@ -78,6 +78,7 @@ public class TipoAsentamientoDAO extends BaseDAO{
             em.getTransaction().begin();
             em.persist(tipoasentamiento);
             em.getTransaction().commit();
+            log.info("Finaliza prodceo de guardar el registro en la tabla CatTipoAsentamiento");
         }
         catch(Exception ex){
             super.rollback(em);
@@ -86,7 +87,6 @@ public class TipoAsentamientoDAO extends BaseDAO{
         }
         finally{
             super.close(em);
-            log.info("Finaliza prodceo de guardar el registro en la tabla CatTipoAsentamiento");
         }
     }
     
@@ -100,6 +100,7 @@ public class TipoAsentamientoDAO extends BaseDAO{
             em.getTransaction().begin();
             em.merge(tipoasentamiento);
             em.getTransaction().commit();
+            log.info("Finaliza prodceo de actualizar el registro de la tabla CatTipoAsentamiento");
         }
         catch(Exception ex){
             super.rollback(em);
@@ -108,7 +109,6 @@ public class TipoAsentamientoDAO extends BaseDAO{
         }
         finally{
             super.close(em);
-            log.info("Finaliza prodceo de actualizar el registro de la tabla CatTipoAsentamiento");
         }
     }
     
@@ -122,6 +122,7 @@ public class TipoAsentamientoDAO extends BaseDAO{
             em.getTransaction().begin();
             em.remove(em.contains(tipoasentamiento) ? tipoasentamiento : em.merge(tipoasentamiento));
             em.getTransaction().commit();
+            log.info("Finaliza prodceo de actualizar el registro de la tabla CatTipoAsentamiento");
         }
         catch(Exception ex){
             super.rollback(em);
@@ -130,7 +131,31 @@ public class TipoAsentamientoDAO extends BaseDAO{
         }
         finally{
             super.close(em);
-            log.info("Finaliza prodceo de actualizar el registro de la tabla CatTipoAsentamiento");
         }
+    }
+    
+    public synchronized List<CatTipoAsentamiento> obtenerPorAsentamiento(short idAsent)throws SGPException{
+        List<CatTipoAsentamiento> resultado = null;
+        EntityManager em = null;
+        
+        try{
+            log.info("Inicia proceso de obtener tododos los tipos de asentamiento en base al asentamiento.");
+            em = super.getEntityManager();
+            TypedQuery <CatTipoAsentamiento> consulta = em.createQuery("select e from CatTipoAsentamiento e where e.id = :idAsent", CatTipoAsentamiento.class);
+            consulta.setParameter("idAsent", idAsent);
+            resultado = consulta.getResultList();
+            log.info("Finaliza proceso de obtener tododos los tipos de asentamiento en base al asentamiento.");
+        }
+        catch(Exception ex){
+            log.error("Error al obtener todos los tipos de asentamiento en base al asentamiento de la tabla CatTipoAsentamiento.");
+            super.rollback(em);
+            throw new SGPException("Hubo un problema al obtener todos los tipos de asentamiento" + ex);
+        }
+        finally{
+            super.close(em);
+        }
+        
+        return resultado;
+        
     }
 }

@@ -85,20 +85,19 @@ public class AsentamientoDAO extends BaseDAO<CatAsentamiento, CatAsentamientoPK>
     }
     
 
-    public synchronized List<CatAsentamiento> obtenerTodosPorTipo(Integer idPais, Integer idEstado, Integer idMunicipio, Integer idLocalidad, short idTipo) throws SGPException{
+    public synchronized List<CatAsentamiento> obtenerTodosPorLocalidad(Integer idPais, Integer idEstado, Integer idMunicipio, Integer idLocalidad) throws SGPException{
         EntityManager em = null;
         List<CatAsentamiento> asentamientos = null;
         try{
             log.info("Inicia proceso de obtener todos los asentamientos.");
             em = super.getEntityManager();
-            TypedQuery<CatAsentamiento> resultado = em.createQuery("select e from  CatAsentamiento e where e.key.localidad.key.municipio.key.estado.key.pais.id = :idPais and e.key.localidad.key.municipio.key.estado.key.id = :idEstado and e.key.localidad.key.municipio.key.id = :idMunicipio and e.key.localidad.key.id = :idLocalidad and e.tipoAsentamiento.id = :idTipo", CatAsentamiento.class);
+            TypedQuery<CatAsentamiento> resultado = em.createQuery("select e from CatAsentamiento e where e.key.localidad.key.municipio.key.estado.key.pais.id = :idPais and e.key.localidad.key.municipio.key.estado.key.id = :idEstado and e.key.localidad.key.municipio.key.id = :idMunicipio and e.key.localidad.key.id = :idLocalidad", CatAsentamiento.class);
             resultado.setParameter("idPais", idPais);
             resultado.setParameter("idEstado", idEstado);
             resultado.setParameter("idMunicipio", idMunicipio);
             resultado.setParameter("idLocalidad", idLocalidad);
-            resultado.setParameter("idTipo", idTipo);
             asentamientos = resultado.getResultList();
-            
+            log.info("Finaliza proceso de obtener todos los asentamientos");
         }
         catch(Exception ex){
             super.rollback(em);
@@ -106,7 +105,6 @@ public class AsentamientoDAO extends BaseDAO<CatAsentamiento, CatAsentamientoPK>
             throw new SGPException("Problema al obtener los registros" + ex);
         }
         finally{
-            log.info("Finaliza proceso de obtener todos los asentamientos");
             super.close(em);
         }
         return asentamientos;
@@ -152,4 +150,71 @@ public class AsentamientoDAO extends BaseDAO<CatAsentamiento, CatAsentamientoPK>
         return model;
     }
     
+    public synchronized List<CatAsentamiento> obtenerPorTipoAsentamiento(Integer idpais, Integer idestado, Integer idmunicipio, Integer idlocalidad, short idTipo) throws SGPException{
+        List<CatAsentamiento> resultado = null;
+        EntityManager em = null;
+        String query = "";
+        
+        try{
+            log.info("Inicia proceso de obtener todos los asentamientos en base al tipo.");
+            em = super.getEntityManager();
+            query += "select e from CatAsentamiento e where e.key.localidad.key.municipio.key.estado.key.pais.id = :idpais ";
+            query += "and e.key.localidad.key.municipio.key.estado.key.id = :idestado ";
+            query += "and e.key.localidad.key.municipio.key.id = :idmunicipio ";
+            query += "and e.key.localidad.key.id = :idlocalidad ";
+            query += "and e.tipoAsentamiento.id = :idTipo";
+            TypedQuery <CatAsentamiento> consulta = em.createQuery(query, CatAsentamiento.class);
+            consulta.setParameter("idpais", idpais);
+            consulta.setParameter("idestado", idestado);
+            consulta.setParameter("idmunicipio", idmunicipio);
+            consulta.setParameter("idlocalidad", idlocalidad);
+            consulta.setParameter("idTipo", idTipo);
+            resultado = consulta.getResultList();
+            log.info("finaliza proceso de obtener todos los asentamientos en base al tipo.");
+        }
+        catch(Exception ex){
+            super.rollback(em);
+            log.error("Hubo algun problema obtener todos los asentamientos por el tipo");
+            throw new SGPException("Problema al obtener todos los registros" + ex);
+        }
+        finally{
+            super.close(em);
+        }
+        
+        return resultado;
+    }
+    
+    public synchronized List<CatAsentamiento> obtenerPorEntidadPostal(Integer idpais, Integer idestado, Integer idmunicipio, Integer idlocalidad, Integer idEntidad) throws SGPException{
+        List<CatAsentamiento> resultado = null;
+        EntityManager em = null;
+        String query = "";
+        
+        try{
+            log.info("Inicia proceso de obtener todos los asentamientos en base a la entidad.");
+            em = super.getEntityManager();
+            query += "select e from CatAsentamiento e where e.key.localidad.key.municipio.key.estado.key.pais.id = :idpais ";
+            query += "and e.key.localidad.key.municipio.key.estado.key.id = :idestado ";
+            query += "and e.key.localidad.key.municipio.key.id = :idmunicipio ";
+            query += "and e.key.localidad.key.id = :idlocalidad ";
+            query += "and e.entidadPostal.id = :idEntidad";
+            TypedQuery <CatAsentamiento> consulta = em.createQuery(query, CatAsentamiento.class);
+            consulta.setParameter("idpais", idpais);
+            consulta.setParameter("idestado", idestado);
+            consulta.setParameter("idmunicipio", idmunicipio);
+            consulta.setParameter("idlocalidad", idlocalidad);
+            consulta.setParameter("idEntidad", idEntidad);
+            resultado = consulta.getResultList();
+            log.info("finaliza proceso de obtener todos los asentamientos en base a la entidad.");
+        }
+        catch(Exception ex){
+            super.rollback(em);
+            log.error("Hubo algun problema obtener todos los asentamientos por la entidad postal");
+            throw new SGPException("Problema al obtener todos los registros" + ex);
+        }
+        finally{
+            super.close(em);
+        }
+        
+        return resultado;
+    }
 }

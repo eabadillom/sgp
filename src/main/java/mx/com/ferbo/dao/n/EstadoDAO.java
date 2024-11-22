@@ -32,6 +32,7 @@ public class EstadoDAO extends BaseDAO {
             TypedQuery<CatEstado> resultado = em.createQuery("select e from  CatEstado e where e.key.pais.id = :id", CatEstado.class);
             resultado.setParameter("id", id);
             estados = resultado.getResultList();
+            log.info("Finaliza proceso de obtener todos los estados");
             
         }
         catch(Exception ex){
@@ -40,7 +41,6 @@ public class EstadoDAO extends BaseDAO {
             throw new SGPException("Problema al obtener los registros" + ex);
         }
         finally{
-            log.info("Finaliza proceso de obtener todos los estados");
             super.close(em);
         }
         return estados;
@@ -54,7 +54,7 @@ public class EstadoDAO extends BaseDAO {
             em = super.getEntityManager();
             TypedQuery<CatEstado> resultado = em.createQuery("select e from  CatEstado e", CatEstado.class);
             estados = resultado.getResultList();
-            
+            log.info("Finaliza proceso de obtener todos los estados");
         }
         catch(Exception ex){
             super.rollback(em);
@@ -62,7 +62,6 @@ public class EstadoDAO extends BaseDAO {
             throw new SGPException("Problema al obtener los registros" + ex);
         }
         finally{
-            log.info("Finaliza proceso de obtener todos los estados");
             super.close(em);
         }
         return estados;
@@ -79,6 +78,7 @@ public class EstadoDAO extends BaseDAO {
           em.getTransaction().begin();
           estado = em.find(CatEstado.class, id);
           em.getTransaction().commit();
+          log.info("Finaliza proceso de obtener elemento con id: {}", id);
         }
         catch(Exception ex){
             super.rollback(em);
@@ -86,8 +86,7 @@ public class EstadoDAO extends BaseDAO {
             throw new SGPException("Problema al obtener el elemento por id " + ex);
         }
         finally{
-            super.close(em);
-           log.info("Finaliza proceso de obtener elemento con id: {}", id);           
+            super.close(em);           
         }
         return estado;
     }
@@ -102,6 +101,7 @@ public class EstadoDAO extends BaseDAO {
             em.getTransaction().begin();
             em.persist(estado);
             em.getTransaction().commit();
+            log.info("Finaliza prodceo de guardar el registro en la tabla CatEstados");
         }
         catch(Exception ex){
             super.rollback(em);
@@ -110,7 +110,6 @@ public class EstadoDAO extends BaseDAO {
         }
         finally{
             super.close(em);
-            log.info("Finaliza prodceo de guardar el registro en la tabla CatEstados");
         }
     }
     
@@ -124,6 +123,7 @@ public class EstadoDAO extends BaseDAO {
             em.getTransaction().begin();
             em.merge(estado);
             em.getTransaction().commit();
+            log.info("Finaliza proceso de actualizar el registro de la tabla CatEstados");
         }
         catch(Exception ex){
             super.rollback(em);
@@ -132,7 +132,6 @@ public class EstadoDAO extends BaseDAO {
         }
         finally{
             super.close(em);
-            log.info("Finaliza prodceo de actualizar el registro de la tabla CatEstados");
         }
     }
     
@@ -145,6 +144,7 @@ public class EstadoDAO extends BaseDAO {
             em.getTransaction().begin();
             em.remove(em.contains(estado) ? estado : em.merge(estado));
             em.getTransaction().commit();
+            log.info("Finaliza proceso de eliminar el registro de la tabla CatEstados");
         }
         catch(Exception ex){
             super.rollback(em);
@@ -153,7 +153,6 @@ public class EstadoDAO extends BaseDAO {
         }
         finally{
             super.close(em);
-            log.info("Finaliza prodceo de actualizar el registro de la tabla CatEstados");
         }
     }
 }
