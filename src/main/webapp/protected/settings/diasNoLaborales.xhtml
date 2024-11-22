@@ -33,7 +33,7 @@
 				<p:dataTable id="dt-diasNL" widgetVar="dtDiasNL" value="#{diasNLBean.listaDiasNL}" var="dia">
 					<p:column headerText="Fecha" style="text-align: center;" width="7rem">
 						<p:outputLabel value="#{dia.fecha}">
-							<f:convertDateTime pattern="dd/MMM/yyyy" />
+							<f:convertDateTime pattern="dd / MMM / yyyy" locale="es" timeZone="GMT-6" />
 						</p:outputLabel>
 					</p:column>
 					<p:column headerText="Descripción" width="auto">
