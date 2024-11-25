@@ -62,7 +62,7 @@ public class DiasNoLaboralesBean implements Serializable {
 			this.paisDAO = new PaisDAO();
 			
 			this.paisesList =  paisDAO.buscarTodos();
-			this.paisSelected = paisDAO.buscarPorId("MX");
+			this.paisSelected = paisDAO.buscarPorClave("MX");
 			
 			this.muestraDiasNoLaborales();
 		} catch(Exception ex) {
