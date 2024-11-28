@@ -55,11 +55,11 @@ public class TarifaSubsidioDeduccion2 implements ISubsidioEmpleo {
 		
 		try {
 			if(ISubsidioEmpleo.PERIODO_SEMANAL.equalsIgnoreCase(periodo)) {
-				importeSubsidio = this.calcular(periodo, baseISR);
+				importeSubsidio = this.calcularSemanal(tarifaSubsidio, uma);
 			}
 			
 			if(ISubsidioEmpleo.PERIODO_MENSUAL.equalsIgnoreCase(periodo)) {
-				
+				importeSubsidio = this.calcularMensual(tarifaSubsidio, uma);
 			}
 			
 			log.info("Fecha: {}, Base ISR: {}, Subsidio acreditado: {}", this.fecha, baseISR, "(Falta indicar la clase BL que genera el subsidio.)");
@@ -73,15 +73,34 @@ public class TarifaSubsidioDeduccion2 implements ISubsidioEmpleo {
 	
 	private BigDecimal calcularSemanal(CatSubsidio2 tarifa, CatUMA uma) {
 		BigDecimal importeSubsidio = null;
-		BigDecimal diasSemana = new BigDecimal(7).setScale(0, BigDecimal.ROUND_HALF_UP);
+		BigDecimal diasPeriodo = new BigDecimal(7).setScale(0, BigDecimal.ROUND_HALF_UP);
 		BigDecimal tasaSubsidio = null;
-		BigDecimal umaDiario = null;
+		BigDecimal importeUMA = null;
 		
 		tasaSubsidio = tarifa.getTasa();
+		importeUMA = uma.getImporteDiario();
 		
-		importeSubsidio = uma.getImporteDiario().multiply(diasSemana);
-		importeSubsidio = importeSubsidio.multiply(tarifa.getTasa());
+		importeSubsidio = tasaSubsidio
+				.multiply(importeUMA).setScale(2, BigDecimal.ROUND_HALF_UP)
+				.multiply(diasPeriodo).setScale(2, BigDecimal.ROUND_HALF_UP)
+				;
 		
+		return importeSubsidio;
+	}
+	
+	private BigDecimal calcularMensual(CatSubsidio2 tarifa, CatUMA uma) {
+		BigDecimal importeSubsidio = null;
+		BigDecimal diasPeriodo = new BigDecimal(30.4).setScale(1, BigDecimal.ROUND_HALF_UP);
+		BigDecimal tasaSubsidio = null;
+		BigDecimal importeUMA = null;
+		
+		tasaSubsidio = tarifa.getTasa();
+		importeUMA = uma.getImporteMensual();
+		
+		importeSubsidio = tasaSubsidio
+				.multiply(importeUMA).setScale(2, BigDecimal.ROUND_HALF_UP)
+				.divide(diasPeriodo, BigDecimal.ROUND_HALF_UP)
+				;
 		
 		return importeSubsidio;
 	}

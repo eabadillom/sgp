@@ -13,7 +13,6 @@ import mx.com.ferbo.util.SGPException;
 
 public abstract class DAO<DTO, MODEL, PK> {
 	private static Logger log = LogManager.getLogger(DAO.class);
-	
 	protected Class<MODEL> modelClass;
 	
 	public DAO() {

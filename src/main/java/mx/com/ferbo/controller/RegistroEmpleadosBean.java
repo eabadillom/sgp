@@ -41,7 +41,6 @@ import mx.com.ferbo.dao.n.TipoPrestamoDAO;
 import mx.com.ferbo.dao.n.TipoRegimenDAO;
 import mx.com.ferbo.model.CatArea;
 import mx.com.ferbo.model.CatAsentamiento;
-/*Agregando import de CatAsentamientoPK*/
 import mx.com.ferbo.model.CatAsentamientoPK;
 import mx.com.ferbo.model.CatEmpresa;
 import mx.com.ferbo.model.CatEstado;
@@ -494,7 +493,6 @@ public class RegistroEmpleadosBean implements Serializable {
                 }
                 
                 if (this.empleadoSelected.getIdEmpleado() == null) {
-    			
     			pNumeroEmpleado = this.parametroDAO.buscarPorClave("NBEMP");
     			sNumeroEmpleado = pNumeroEmpleado.getValor();
         		numeroEmpleado = Integer.parseInt(sNumeroEmpleado);
@@ -504,13 +502,13 @@ public class RegistroEmpleadosBean implements Serializable {
                         
                         if(this.datoEmpresa.getFechaIngreso() == null)
                         {
-                            log.error("Falta fecha de ingreso en dato empresa");
-                            throw new SGPException("Debe indicar la fecha de ingreso");
+                            log.error("Falta fecha de ingreso");
+                            throw new SGPException("Debe indicar una fecha de ingreso");
                         }
                         
-        		this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
-        		this.empleadoSelected.setFechaRegistro(new Date());
-    			empleadoDAO.guardar(empleadoSelected);
+                        this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
+                        this.empleadoSelected.setFechaRegistro(new Date());
+                        empleadoDAO.guardar(empleadoSelected);
                         this.domicilioEmpleadoSelected.setEmpleado(this.empleadoSelected);
                         this.domicilioEmpleadoDAO.guardar(domicilioEmpleadoSelected);
                         pNumeroEmpleado.setValor(sNumeroEmpleado);
@@ -555,7 +553,6 @@ public class RegistroEmpleadosBean implements Serializable {
     		severity = FacesMessage.SEVERITY_ERROR;
     	} finally {
             message = new FacesMessage(severity, titulo, mensaje);
-            limpiarVariables();
             FacesContext.getCurrentInstance().addMessage(null, message);
             PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogEmpleado");	
     	}

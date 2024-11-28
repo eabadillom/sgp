@@ -28,7 +28,7 @@ public class PrestamoDeduccion extends AbstractDeduccion implements IDeducciones
 	}
 
 	@Override
-	public List<DetNominaDeduccion> procesar(DetNomina nomina, Integer index) {
+	public void procesar(DetNomina nomina, Integer index) {
 		BigDecimal totalPrestamos = null;
 		List<DetPrestamo> prestamos = null;
 		DetNominaDeduccion deduccion = null;
@@ -66,14 +66,9 @@ public class PrestamoDeduccion extends AbstractDeduccion implements IDeducciones
 			log.error("Problema para procesar los préstamos del empleado");
 			totalPrestamos = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 		}
-		return prestamosDeduccion;
 	}
 
 	public void setEmpleado(DetEmpleado empleado) {
 		this.empleado = empleado;
 	}
-
-
-
-
 }
