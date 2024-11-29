@@ -28,6 +28,8 @@ public class TarifaSubsidioDeduccion2 implements ISubsidioEmpleo {
 	private LocalDate fecha = null;
 	private Subsidio2DAO subsidioDAO = null;
 	private UMADAO umaDAO = null;
+	private BigDecimal factorMes = new BigDecimal("30.4").setScale(2, BigDecimal.ROUND_HALF_UP);
+	private BigDecimal diasSemana = new BigDecimal("7").setScale(0, BigDecimal.ROUND_HALF_UP);
 	
 	public TarifaSubsidioDeduccion2(LocalDate fecha) {
 		this.fecha = fecha;
@@ -76,14 +78,22 @@ public class TarifaSubsidioDeduccion2 implements ISubsidioEmpleo {
 		BigDecimal diasPeriodo = new BigDecimal(7).setScale(0, BigDecimal.ROUND_HALF_UP);
 		BigDecimal tasaSubsidio = null;
 		BigDecimal importeUMA = null;
+		BigDecimal importeMaximo = null;
 		
 		tasaSubsidio = tarifa.getTasa();
 		importeUMA = uma.getImporteDiario();
+		importeMaximo = tarifa.getImporteMaximo()
+				.divide(this.factorMes, BigDecimal.ROUND_HALF_UP)
+				.multiply(this.diasSemana)
+				;
 		
 		importeSubsidio = tasaSubsidio
 				.multiply(importeUMA).setScale(2, BigDecimal.ROUND_HALF_UP)
 				.multiply(diasPeriodo).setScale(2, BigDecimal.ROUND_HALF_UP)
 				;
+		
+		if(importeSubsidio.compareTo(importeMaximo) < 0)
+			importeSubsidio = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 		
 		return importeSubsidio;
 	}

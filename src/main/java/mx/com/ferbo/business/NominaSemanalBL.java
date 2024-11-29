@@ -49,7 +49,7 @@ import mx.com.ferbo.model.sat.CatTipoOtroPago;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.model.sat.CatUnidadSAT;
 import mx.com.ferbo.model.sat.CatUsoCFDI;
-import mx.com.ferbo.util.DateUtils;
+import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.SGPException;
 
 public class NominaSemanalBL {
@@ -114,17 +114,16 @@ public class NominaSemanalBL {
 //		this.prestamoDAO = new PrestamoDAO();
 		this.nominaDAO = new NominaDAO();
 		
-		anioActual = DateUtils.getAnio(periodoInicio);
-		this.fechaInicioAnio = DateUtils.getDate(anioActual, DateUtils.ENERO, 1);
-		DateUtils.setTime(this.fechaInicioAnio, 0, 0, 0, 0);
+		anioActual = DateUtil.getAnio(periodoInicio);
+		this.fechaInicioAnio = DateUtil.getDate(anioActual, DateUtil.ENERO, 1);
+		DateUtil.setTime(this.fechaInicioAnio, 0, 0, 0, 0);
 		
-		this.fechafinAnio = DateUtils.getDate(anioActual, DateUtils.DICIEMBRE, 31);
-		DateUtils.setTime(this.fechafinAnio, 23, 59, 59, 000);
+		this.fechafinAnio = DateUtil.getDate(anioActual, DateUtil.DICIEMBRE, 31);
+		DateUtil.setTime(this.fechafinAnio, 23, 59, 59, 000);
 		
-		this.semanaAnio = DateUtils.getSemanaAnio(this.periodoInicio);
+		this.semanaAnio = DateUtil.getSemanaAnio(this.periodoInicio);
 		
-//		this.periodoSiguienteInicio = DateUtils.addDay(this.periodoInicio, 7);
-		this.periodoSiguienteFin = DateUtils.addDay(this.periodoFin, 7);
+		this.periodoSiguienteFin = DateUtil.addDay(this.periodoFin, 7);
 	}
 	
 	private DetNomina newNomina() {
@@ -211,7 +210,7 @@ public class NominaSemanalBL {
 			log.debug("Buscando información empresarial del empleado.");
 			
 			mapAsistencias = this.getAsistencias(this.empleado, this.periodoInicio, this.periodoFin);
-			diasPeriodo = new BigDecimal(DateUtils.daysDiff(periodoInicio, periodoFin)).setScale(2, BigDecimal.ROUND_HALF_UP);
+			diasPeriodo = new BigDecimal(DateUtil.daysDiff(periodoInicio, periodoFin)).setScale(2, BigDecimal.ROUND_HALF_UP);
 			
 			//Para los días trabajados, se debe considerar el periodo inicio y fin de cálculo de la nómina y validar si de los 6 días que
 			//al trabajador le corresponde laborar, tuvo alguna falta.
@@ -256,7 +255,7 @@ public class NominaSemanalBL {
 				nominaSemanal = this.ultimaSemanaMes ? procesaNominaDelMes() : null;
 				
 				isrExecutor = new ISRExecutor(this.periodoInicio, this.periodoFin, this.tiposDeduccion, this.tiposOtroPago, this.tablaISR, this.nominaSemanal);
-				isrBO = isrExecutor.loadClass("ISRS", DateUtils.toLocalDate(this.periodoFin));
+				isrBO = isrExecutor.loadClass("ISRS", DateUtil.toLocalDate(this.periodoFin));
 				isrBO.procesar(nomina, idxD);
 				
 
@@ -264,6 +263,7 @@ public class NominaSemanalBL {
 				imssBO.procesar(nomina, idxD);
 				
 				prestamosBO = new PrestamoDeduccion(this.empleado);
+				prestamosBO.setFecha(this.periodoFin);
 				prestamosBO.procesar(nomina, idxD);
 			}
 			
@@ -290,7 +290,7 @@ public class NominaSemanalBL {
 			nomina.setSerie(String.format("%d", this.anio));
 			nomina.setFolio(String.format("%d", this.semanaAnio));
 			nomina.setLugarExpedicion(this.empleado.getDatoEmpresa().getEmpresa().getCodigoPostal());
-			nomina.setEjercicio(DateUtils.getAnio(this.fechaInicioAnio));
+			nomina.setEjercicio(DateUtil.getAnio(this.fechaInicioAnio));
 			nomina.setDiasLaborados(diasTrabajados.intValue());
 			nomina.setDiasNoLaborados(diasLaboralesPeriodo.subtract(diasTrabajados).intValue());
 			nomina.setSubtotal(BigDecimal.ZERO.add(this.totalPercepciones).add(this.totalOtrosPagos));
@@ -483,8 +483,8 @@ public class NominaSemanalBL {
 	private Boolean esUltimaSemanaMes() {
 		Boolean ultimaSemanaMes = null;
 		
-		Integer mesActual = DateUtils.getMes(this.periodoFin);
-		Integer mesSiguiente = DateUtils.getMes(this.periodoSiguienteFin);
+		Integer mesActual = DateUtil.getMes(this.periodoFin);
+		Integer mesSiguiente = DateUtil.getMes(this.periodoSiguienteFin);
 		
 		if(mesSiguiente > mesActual) {
 			ultimaSemanaMes = new Boolean(true);
@@ -508,25 +508,25 @@ public class NominaSemanalBL {
 		
 		try {
 			//PRIMERO SE VERIFICA SI EL INICIO DE LA SEMANA COINCIDE CON EL PRIMER DIA DEL MES. 
-			diaInicioMes = DateUtils.getDia(periodoInicio);
+			diaInicioMes = DateUtil.getDia(periodoInicio);
 			
 			if(diaInicioMes.compareTo(new Integer(1)) == 0)
 				throw new SGPException("La semana en curso es la primera del mes.");
 			
 			//SI NO, SE VERIFICA SI EL MES DEL PRIMER DIA DE LA SEMANA EN CURSO ES DIFERENTE AL MES DEL ÚLTIMO DIA DE LA SEMANA EN CURSO.
 			//SI EL PRIMER DIA DEL PERIODO ES DE UN MES DIFERENTE AL ÚLTIMO DIA DEL PERIODO, ENTONCES, LA SEMANA NO ES LA ÚLTIMA.
-			mesActualInicio = DateUtils.getMes(periodoInicio);
-			mesActualFin = DateUtils.getMes(periodoFin);
+			mesActualInicio = DateUtil.getMes(periodoInicio);
+			mesActualFin = DateUtil.getMes(periodoFin);
 			
 			if(mesActualInicio.compareTo(mesActualFin) != 0)
 				throw new SGPException("La semana actual termina en un mes diferente al inicial.");
 			
 			//SI NO, CALCULAMOS LAS FECHAS DE INICIO Y FIN DE LA SIGUIENTE SEMANA Y REPETIMOS LA EVALUACIÓN ANTERIOR. 
-			periodoSiguienteInicio = DateUtils.addDay(periodoInicio, 7);
-			periodoSiguienteFin = DateUtils.addDay(periodoFin, 7);
+			periodoSiguienteInicio = DateUtil.addDay(periodoInicio, 7);
+			periodoSiguienteFin = DateUtil.addDay(periodoFin, 7);
 			
-			mesSiguienteInicio = DateUtils.getMes(periodoSiguienteInicio);
-			mesSiguienteFin = DateUtils.getMes(periodoSiguienteFin);
+			mesSiguienteInicio = DateUtil.getMes(periodoSiguienteInicio);
+			mesSiguienteFin = DateUtil.getMes(periodoSiguienteFin);
 			
 			if(mesSiguienteInicio.compareTo(mesSiguienteFin) != 0) {
 				ultimaSemanaMes = new Boolean(true);
@@ -545,49 +545,45 @@ public class NominaSemanalBL {
 	private List<DetNomina> procesaNominaDelMes() {
 		List<DetNomina> listaNominaDelMes = null;
 		Date dPeriodoInicio = new Date(this.periodoInicio.getTime());
-//		Date dPeriodoFin = new Date(this.periodoFin.getTime());
 		Date dPeriodoAnteriorFin = null;
 		Date dPeriodoAnteriorInicio = null;
 		
 		Integer mesActual = null;
 		Integer mesAnterior = null;
 		
-//		LocalDate periodoAnteriorInicio = null;
-//		LocalDate periodoAnteriorFin = null;
-		
 		Integer semanaInicio = null;
 		Integer semanaFin = null;
 		
 		//Obtener la fecha inicio de la primera semana del mes
 		for(int i = 0; i < 6; i++) {
-			dPeriodoAnteriorInicio = DateUtils.addDay(dPeriodoInicio, (-7 * i));
+			dPeriodoAnteriorInicio = DateUtil.addDay(dPeriodoInicio, (-7 * i));
 			
-			if(DateUtils.getDia(dPeriodoAnteriorInicio) == 1)
+			if(DateUtil.getDia(dPeriodoAnteriorInicio) == 1)
 				break;
 			
-			mesActual = DateUtils.getMes(dPeriodoInicio);
-			mesAnterior = DateUtils.getMes(dPeriodoAnteriorInicio);
+			mesActual = DateUtil.getMes(dPeriodoInicio);
+			mesAnterior = DateUtil.getMes(dPeriodoAnteriorInicio);
 			
 			if(mesAnterior.equals(mesActual) == false)
 				break;
 		}
 		
-		dPeriodoAnteriorFin = DateUtils.addDay(dPeriodoInicio, -1);
+		dPeriodoAnteriorFin = DateUtil.addDay(dPeriodoInicio, -1);
 		
-		log.info("Buscando pagos semanales de nómina del {} al {}", 
-				DateUtils.getString(dPeriodoAnteriorInicio, DateUtils.FORMATO_DD_MM_YYYY),
-				DateUtils.getString(dPeriodoAnteriorFin, DateUtils.FORMATO_DD_MM_YYYY));
+		try {
+			log.info("Buscando pagos semanales de nómina del {} al {}", 
+					DateUtil.getString(dPeriodoAnteriorInicio, DateUtil.FORMATO_DD_MM_YYYY),
+					DateUtil.getString(dPeriodoAnteriorFin, DateUtil.FORMATO_DD_MM_YYYY));
+		} catch (SGPException e) {
+			log.warn(e.getMessage());
+		}
 		
-		semanaInicio = DateUtils.getSemanaAnio(dPeriodoAnteriorInicio);
-		semanaFin = DateUtils.getSemanaAnio(dPeriodoAnteriorFin);
+		semanaInicio = DateUtil.getSemanaAnio(dPeriodoAnteriorInicio);
+		semanaFin = DateUtil.getSemanaAnio(dPeriodoAnteriorFin);
 		
 		log.info("Búsqueda de la semana {} a {}", semanaInicio, semanaFin);
 		
-//		periodoAnteriorInicio = DateUtils.toLocalDate(dPeriodoAnteriorInicio);
-//		periodoAnteriorFin = DateUtils.toLocalDate(dPeriodoFin );
-		
 		listaNominaDelMes = nominaDAO.buscarPorSemanaRfc(semanaInicio, semanaFin, this.empleado.getDatoEmpresa().getRfc());
-//		listaNominaDelMes = nominaDAO.buscarPorPeriodoEmpleado(periodoAnteriorInicio, periodoAnteriorFin, this.empleado.getDatoEmpresa().getRfc());
 		
 		return listaNominaDelMes;
 	}
@@ -632,7 +628,7 @@ public class NominaSemanalBL {
 		registroDAO = new RegistroDAO();
 		listaAsistencias = registroDAO.buscar(empleado.getIdEmpleado(), periodoInicio, periodoFin);
 		for(DetRegistro registro : listaAsistencias) {
-			diaSemana = DateUtils.getDiaSemana(registro.getFechaEntrada());
+			diaSemana = DateUtil.getDiaSemana(registro.getFechaEntrada());
 			if(mapAsistencias.containsKey(diaSemana))
 				continue;
 			mapAsistencias.put(diaSemana, registro);
@@ -640,7 +636,7 @@ public class NominaSemanalBL {
 		
 		for(CatDiaNoLaboral dia : this.diasNoLaborales) {
 			log.info("Dia no laboral encontrado: {}", dia);
-			diaSemana = DateUtils.getDiaSemana(dia.getFecha());
+			diaSemana = DateUtil.getDiaSemana(dia.getFecha());
 			if(mapAsistencias.containsKey(diaSemana)) {
 				//TODO EL TRABAJADOR TIENE ASISTENCIA EN UN DIA NO LABORABLE. SE DEBEN AGREGAR HORAS EXTRAS AL DOBLE O TRIPLE.
 				continue;

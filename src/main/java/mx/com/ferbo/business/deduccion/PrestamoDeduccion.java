@@ -2,6 +2,7 @@ package mx.com.ferbo.business.deduccion;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -21,6 +22,7 @@ public class PrestamoDeduccion extends AbstractDeduccion implements IDeducciones
 	
 	private DetEmpleado empleado = null;
 	private PrestamoDAO prestamoDAO = null;
+	private Date fecha = null;
 	
 	public PrestamoDeduccion(DetEmpleado empleado) {
 		this.empleado = empleado;
@@ -40,7 +42,7 @@ public class PrestamoDeduccion extends AbstractDeduccion implements IDeducciones
 			idx = this.nuevoIndiceDe(nomina.getDeducciones());
 			
 			prestamosDeduccion = new ArrayList<DetNominaDeduccion>();
-			prestamos = prestamoDAO.buscar(empleado.getIdEmpleado());
+			prestamos = prestamoDAO.buscarPorEmpleadoVigente(empleado.getIdEmpleado(), fecha);
 			
 			if(prestamos.size() <= 0)
 				throw new SGPException("No hay préstamos para el empleado.");
@@ -70,5 +72,13 @@ public class PrestamoDeduccion extends AbstractDeduccion implements IDeducciones
 
 	public void setEmpleado(DetEmpleado empleado) {
 		this.empleado = empleado;
+	}
+
+	public Date getFecha() {
+		return fecha;
+	}
+
+	public void setFecha(Date fecha) {
+		this.fecha = fecha;
 	}
 }

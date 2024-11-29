@@ -23,7 +23,7 @@ import mx.com.ferbo.model.DetNominaOtroPagoPK;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.model.sat.CatTipoOtroPago;
-import mx.com.ferbo.util.DateUtils;
+import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.SGPException;
 
 /**Cálculo del ISR, conforme al Decreto del DOF 1 de mayo 2024.
@@ -77,10 +77,10 @@ public class ISRSemanalDeduccion2 extends AbstractDeduccion implements IDeduccio
 		this.periodoInicio = periodoInicio;
 		this.periodoFin = periodoFin;
 		
-		periodoSiguienteFin = DateUtils.addDay(periodoInicio, 7);
+		periodoSiguienteFin = DateUtil.addDay(periodoInicio, 7);
 		
-		Integer mesActual = DateUtils.getMes(this.periodoFin);
-		Integer mesSiguiente = DateUtils.getMes(periodoSiguienteFin);
+		Integer mesActual = DateUtil.getMes(this.periodoFin);
+		Integer mesSiguiente = DateUtil.getMes(periodoSiguienteFin);
 		
 		if(mesSiguiente > mesActual) {
 			this.ultimaSemanaMes = new Boolean(true);
@@ -142,7 +142,7 @@ public class ISRSemanalDeduccion2 extends AbstractDeduccion implements IDeduccio
 				this.subsidioExecutor = new SubsidioEmpleoExecutor();
 			
 			if(this.tarifaSubsidioBO == null)
-				this.tarifaSubsidioBO = subsidioExecutor.loadClass("SUBEM", DateUtils.toLocalDate(periodoFin));
+				this.tarifaSubsidioBO = subsidioExecutor.loadClass("SUBEM", DateUtil.toLocalDate(periodoFin));
 			
 			importeSubsidio = this.tarifaSubsidioBO.calcular(ISubsidioEmpleo.PERIODO_SEMANAL, dBaseISR.getImporte());
 			

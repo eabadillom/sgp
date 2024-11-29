@@ -1,5 +1,6 @@
 package mx.com.ferbo.dao.n;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -69,6 +70,37 @@ public class PrestamoDAO extends BaseDAO<DetPrestamo, Integer> {
         }
 
         return list;
+    }
+    
+    public List<DetPrestamo> buscarPorEmpleadoVigente(Integer idEmpleado, Date fecha) {
+    	
+    	List<DetPrestamo> list = null;
+		EntityManager em = null;
+		
+		try {
+			em = this.getEntityManager();
+			list = em.createNamedQuery("DetPrestamo.findByEmpleadoPeriodo", modelClass)
+					.setParameter("idEmpleado", idEmpleado)
+					.setParameter("fecha", fecha)
+					.getResultList()
+					;
+			
+			for(DetPrestamo model : list) {
+				log.debug("Tipo prestamo: {}", model.getTipoPrestamo().getTipoPrestamo());
+				log.debug("Periodicidad: {}", model.getPeriodicidadPago().getPeriodicidad());
+				log.debug("Tipo deduccion{}", model.getTipoPrestamo().getTipoDeduccion().getClave());
+			}
+		} catch(Exception ex) {
+			log.error("Problema para obtener el listado de préstamos...", ex);
+		} finally {
+			this.close(em);
+		}
+		
+		return list;
+    	
+    	
+    	
+    	
     }
 
 }
