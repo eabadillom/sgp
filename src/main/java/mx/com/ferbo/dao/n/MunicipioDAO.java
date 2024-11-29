@@ -11,7 +11,7 @@ import org.apache.logging.log4j.Logger;
 
 public class MunicipioDAO extends BaseDAO {
 
-    private static Logger log = LogManager.getLogger(FpClientDAO.class);
+    private static Logger log = LogManager.getLogger(CatMunicipio.class);
 
     public MunicipioDAO(Class<CatMunicipio> modelClass) {
         super(modelClass);

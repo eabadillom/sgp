@@ -93,6 +93,8 @@ public class DomiciliosBean implements Serializable {
     private short sid;
     private String clave;
     private String descripcion;
+    private boolean statusid;
+    private boolean statuspostal; 
 
     private FacesContext fc;
     private PrimeFaces pf;
@@ -121,6 +123,8 @@ public class DomiciliosBean implements Serializable {
         this.tipoasentamientoestatus = false;
         this.asentamientoestatus = false;
         this.entidadpostalestatus = false;
+        this.statusid = false;
+        this.statuspostal = false;
     }
 
     // Implementacion de Pais
@@ -271,6 +275,15 @@ public class DomiciliosBean implements Serializable {
     }
 
     // Implementacion codigo postal
+
+    private boolean isStatuspostal() {
+        return statuspostal;
+    }
+
+    private void setStatuspostal(boolean statuspostal) {
+        this.statuspostal = statuspostal;
+    }
+
     public String getCodigopostal() {
         return codigopostal;
     }
@@ -317,66 +330,47 @@ public class DomiciliosBean implements Serializable {
     public void buscarCodigoPostal() {
 
         try {
-            this.paises = new ArrayList<Pais>();
-            this.estados = new ArrayList<CatEstado>();
-            this.municipios = new ArrayList<CatMunicipio>();
+            String cp = this.validarCodigoPostal();
+            this.statuspostal = true;
             this.localidades = new ArrayList<CatLocalidad>();
-            this.tiposasentamiento = new ArrayList<CatTipoAsentamiento>();
-            List<CatAsentamiento> asentamientostmp = new ArrayList<CatAsentamiento>();
-            this.asentamientos = this.asentamientodao.buscarPorCodigoPostal(this.validarCodigoPostal());
+            this.asentamientos = new ArrayList<CatAsentamiento>();
+            List<CatAsentamiento> asentamientostmp = this.asentamientodao.buscarPorCodigoPostal(cp);
 
-            for (CatAsentamiento tmp : this.asentamientos) {
+            Pais pais = null;
+            CatEstado estado = null;
+            CatMunicipio municipio = null;
+            CatLocalidad localidad = null;
 
-                if (this.paises.isEmpty()) {
-                    if (!tmp.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getPais().getNombrePais().equals("")) {
-                        this.pais = tmp.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getPais();
-                        this.paises = this.paisdao.buscarTodos();
-                    }
+            for (CatAsentamiento tmp : asentamientostmp) {
+
+                pais = tmp.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getPais();
+                if (pais != null) {
+                    this.pais = pais;
                 }
 
-                if (this.estados.isEmpty()) {
-                    if (!tmp.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getDescripcion().equals("")) {
-                        this.estado = tmp.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado();
-                        this.obtenerLista("Estado");
-                    }
+                estado = tmp.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado();
+                if (estado != null) {
+                    this.estado = estado;
                 }
 
-                if (this.municipios.isEmpty()) {
-                    if (!tmp.getKey().getLocalidad().getKey().getMunicipio().getDescripcion().equals("")) {
-                        this.municipio = tmp.getKey().getLocalidad().getKey().getMunicipio();
-                        this.obtenerLista("Municipio");
-                    }
+                municipio = tmp.getKey().getLocalidad().getKey().getMunicipio();
+                if (municipio != null) {
+                    this.municipio = null;
                 }
 
-                if (!tmp.getKey().getLocalidad().getDescripcion().equals("")) {
-                    this.localidad = tmp.getKey().getLocalidad();
-                    if (!this.localidades.contains(this.localidad)) {
-                        this.localidades.add(this.localidad);
-                    }
+                localidad = tmp.getKey().getLocalidad();
+                if (!this.localidades.contains(localidad)) {
+                    this.localidades.add(localidad);
                 }
-
-                if (!tmp.getTipoAsentamiento().getDescripcion().equals("")) {
-                    this.tipoasentamiento = tmp.getTipoAsentamiento();
-                    if (!this.tiposasentamiento.contains(this.tipoasentamiento)) {
-                        this.tiposasentamiento.add(this.tipoasentamiento);
-                    }
+                
+                if(tmp != null && !this.asentamientos.contains(tmp)){
+                    this.asentamientos.add(tmp);
                 }
-
-                if (!tmp.getDescripcion().equals("")) {
-                    if (!asentamientostmp.contains(tmp)) {
-                        asentamientostmp.add(tmp);
-                    }
-                }
-
-                this.asentamiento = tmp;
-
-                this.entidadpostal = tmp.getEntidadPostal();
             }
 
-            this.asentamientos = null;
-
-            this.asentamientos = asentamientostmp;
-
+            this.tiposasentamiento = this.tipoasentamientodao.obtenerTodos();
+            this.entidadespostales = this.entidadpostaldao.obtenerTodos();
+            
         } catch (SGPException ex) {
 
         } catch (Exception ex) {
@@ -441,6 +435,14 @@ public class DomiciliosBean implements Serializable {
         this.operacion = operacion;
     }
 
+    public boolean isStatusid() {
+        return statusid;
+    }
+
+    public void setStatusid(boolean statusid) {
+        this.statusid = statusid;
+    }
+
     public void limpiarEstatus() {
         this.paisstatus = false;
         this.estadoestatus = false;
@@ -449,189 +451,187 @@ public class DomiciliosBean implements Serializable {
         this.tipoasentamientoestatus = false;
         this.asentamientoestatus = false;
         this.entidadpostalestatus = false;
+        this.statusid = false;
     }
 
     public void obtenerLista(String ubicacion) {
         try {
-            switch (ubicacion) {
+            if (this.statuspostal == false) {
+                switch (ubicacion) {
 
-                case "Estado":
-                    if (this.pais != null && this.estados == null) {
-                        this.estados = this.estadodao.obtenerTodosPorPais(pais.getId());
-                    }
+                    case "Pais":
+                        this.paises = this.paisdao.buscarTodos();
+                        break;
 
-                    if (this.pais == null && this.estados != null) {
-                        this.estados = null;
-                        this.municipios = null;
-                        this.localidades = null;
-                        this.tiposasentamiento = null;
-                        this.asentamientos = null;
-                        this.entidadespostales = null;
+                    case "Estado":
+                        if (this.pais != null && this.estados == null) {
+                            this.estados = this.estadodao.obtenerTodosPorPais(pais.getId());
+                        }
 
-                        this.estado = null;
-                        this.municipio = null;
-                        this.localidad = null;
-                        this.tipoasentamiento = null;
+                        if (this.pais == null && this.estados != null) {
+                            this.estados = null;
+                            this.municipios = null;
+                            this.localidades = null;
+                            this.tiposasentamiento = null;
+                            this.asentamientos = null;
+                            this.entidadespostales = null;
+
+                            this.estado = null;
+                            this.municipio = null;
+                            this.localidad = null;
+                            this.tipoasentamiento = null;
+                            this.asentamiento = null;
+                            this.entidadpostal = null;
+                        }
+
+                        if (this.pais != null && this.estados != null) {
+                            this.estados = null;
+                            this.municipios = null;
+                            this.localidades = null;
+                            this.tiposasentamiento = null;
+                            this.asentamientos = null;
+                            this.entidadespostales = null;
+
+                            this.estado = null;
+                            this.municipio = null;
+                            this.localidad = null;
+                            this.tipoasentamiento = null;
+                            this.asentamiento = null;
+                            this.entidadpostal = null;
+                            this.estados = this.estadodao.obtenerTodosPorPais(pais.getId());
+                        }
+
+                        break;
+
+                    case "Municipio":
+                        if (this.estado != null && this.municipios == null) {
+                            this.municipios = this.municipiodao.obtenerTodosPorEstado(this.pais.getId(), this.estado.getKey().getId());
+                        }
+
+                        if (this.estado == null && this.municipios != null) {
+                            this.municipios = null;
+                            this.localidades = null;
+                            this.tiposasentamiento = null;
+                            this.asentamientos = null;
+                            this.entidadespostales = null;
+
+                            this.municipio = null;
+                            this.localidad = null;
+                            this.tipoasentamiento = null;
+                            this.asentamiento = null;
+                            this.entidadpostal = null;
+                        }
+
+                        if (this.estado != null && this.municipios != null) {
+                            this.municipios = null;
+                            this.localidades = null;
+                            this.tiposasentamiento = null;
+                            this.asentamientos = null;
+                            this.entidadespostales = null;
+
+                            this.municipio = null;
+                            this.localidad = null;
+                            this.tipoasentamiento = null;
+                            this.asentamiento = null;
+                            this.entidadpostal = null;
+                            this.municipios = this.municipiodao.obtenerTodosPorEstado(this.pais.getId(), this.estado.getKey().getId());
+
+                        }
+                        break;
+
+                    case "Localidad":
+                        if (this.municipio != null && this.localidades == null) {
+                            this.localidades = this.localidaddao.obtenerTodosPorMuncipio(this.pais.getId(), this.estado.getKey().getId(), this.municipio.getKey().getId());
+                        }
+
+                        if (this.municipio == null && this.localidades != null) {
+                            this.localidades = null;
+                            this.tiposasentamiento = null;
+                            this.asentamientos = null;
+                            this.entidadespostales = null;
+
+                            this.localidad = null;
+                            this.tipoasentamiento = null;
+                            this.asentamiento = null;
+                            this.entidadpostal = null;
+                        }
+
+                        if (this.municipio != null && this.localidades != null) {
+
+                            this.localidades = null;
+                            this.tiposasentamiento = null;
+                            this.asentamientos = null;
+                            this.entidadespostales = null;
+
+                            this.localidad = null;
+                            this.tipoasentamiento = null;
+                            this.asentamiento = null;
+                            this.entidadpostal = null;
+
+                            this.localidades = this.localidaddao.obtenerTodosPorMuncipio(this.pais.getId(), this.estado.getKey().getId(), this.municipio.getKey().getId());
+
+                        }
+                        break;
+
+                    case "Asentamiento":
+                        if (this.localidad != null) {
+                            this.asentamientos = this.asentamientodao.obtenerTodosPorLocalidad(this.pais.getId(), this.estado.getKey().getId(), this.municipio.getKey().getId(), this.localidad.getKey().getId());
+                            this.tiposasentamiento = this.tipoasentamientodao.obtenerTodos();
+                            this.entidadespostales = this.entidadpostaldao.obtenerTodos();
+                        }
+
+                        if (this.localidad == null) {
+                            this.asentamientos = null;
+                            this.tiposasentamiento = null;
+                            this.entidadespostales = null;
+
+                            this.asentamiento = null;
+                            this.tipoasentamiento = null;
+                            this.entidadpostal = null;
+                        }
+                        break;
+
+                    case "Filtrar Asentamiento Tipo":
+
                         this.asentamiento = null;
-                        this.entidadpostal = null;
-                    }
 
-                    if (this.pais != null && this.estados != null) {
-                        this.estados = null;
-                        this.municipios = null;
-                        this.localidades = null;
-                        this.tiposasentamiento = null;
-                        this.asentamientos = null;
-                        this.entidadespostales = null;
+                        if (this.entidadpostal != null) {
+                            this.entidadpostal = null;
+                            this.asentamientos = null;
+                        }
 
-                        this.estado = null;
-                        this.municipio = null;
-                        this.localidad = null;
-                        this.tipoasentamiento = null;
-                        this.asentamiento = null;
-                        this.entidadpostal = null;
-                        this.estados = this.estadodao.obtenerTodosPorPais(pais.getId());
-                    }
+                        if (this.tipoasentamiento != null) {
 
-                    break;
+                            this.asentamientos = this.asentamientodao.obtenerPorTipoAsentamiento(this.pais.getId(), this.estado.getKey().getId(), this.municipio.getKey().getId(), this.localidad.getKey().getId(), this.tipoasentamiento.getId());
+                        }
 
-                case "Municipio":
-                    if (this.estado != null && this.municipios == null) {
-                        this.municipios = this.municipiodao.obtenerTodosPorEstado(this.pais.getId(), this.estado.getKey().getId());
-                    }
+                        if (this.tipoasentamiento == null) {
 
-                    if (this.estado == null && this.municipios != null) {
-                        this.municipios = null;
-                        this.localidades = null;
-                        this.tiposasentamiento = null;
-                        this.asentamientos = null;
-                        this.entidadespostales = null;
+                            this.asentamientos = this.asentamientodao.buscarTodos();
 
-                        this.municipio = null;
-                        this.localidad = null;
-                        this.tipoasentamiento = null;
-                        this.asentamiento = null;
-                        this.entidadpostal = null;
-                    }
+                        }
 
-                    if (this.estado != null && this.municipios != null) {
-                        this.municipios = null;
-                        this.localidades = null;
-                        this.tiposasentamiento = null;
-                        this.asentamientos = null;
-                        this.entidadespostales = null;
+                        break;
 
-                        this.municipio = null;
-                        this.localidad = null;
-                        this.tipoasentamiento = null;
-                        this.asentamiento = null;
-                        this.entidadpostal = null;
-                        this.municipios = this.municipiodao.obtenerTodosPorEstado(this.pais.getId(), this.estado.getKey().getId());
-
-                    }
-                    break;
-
-                case "Localidad":
-                    if (this.municipio != null && this.localidades == null) {
-                        this.localidades = this.localidaddao.obtenerTodosPorMuncipio(this.pais.getId(), this.estado.getKey().getId(), this.municipio.getKey().getId());
-                    }
-
-                    if (this.municipio == null && this.localidades != null) {
-                        this.localidades = null;
-                        this.tiposasentamiento = null;
-                        this.asentamientos = null;
-                        this.entidadespostales = null;
-
-                        this.localidad = null;
-                        this.tipoasentamiento = null;
-                        this.asentamiento = null;
-                        this.entidadpostal = null;
-                    }
-
-                    if (this.municipio != null && this.localidades != null) {
-
-                        this.localidades = null;
-                        this.tiposasentamiento = null;
-                        this.asentamientos = null;
-                        this.entidadespostales = null;
-
-                        this.localidad = null;
-                        this.tipoasentamiento = null;
-                        this.asentamiento = null;
-                        this.entidadpostal = null;
-
-                        this.localidades = this.localidaddao.obtenerTodosPorMuncipio(this.pais.getId(), this.estado.getKey().getId(), this.municipio.getKey().getId());
-
-                    }
-                    break;
-
-                case "Asentamiento":
-                    if (this.localidad != null) {
-                        this.asentamientos = this.asentamientodao.obtenerTodosPorLocalidad(this.pais.getId(), this.estado.getKey().getId(), this.municipio.getKey().getId(), this.localidad.getKey().getId());
-                        this.tiposasentamiento = this.tipoasentamientodao.obtenerTodos();
-                        this.entidadespostales = this.entidadpostaldao.obtenerTodos();
-                    }
-
-                    if (this.localidad == null) {
-                        this.asentamientos = null;
-                        this.tiposasentamiento = null;
-                        this.entidadespostales = null;
+                    case "Filtrar Asentamiento Entidad":
 
                         this.asentamiento = null;
-                        this.tipoasentamiento = null;
-                        this.entidadpostal = null;
-                    }
-                    break;
 
-                case "Filtrar Asentamiento Tipo":
+                        if (this.tipoasentamiento != null) {
+                            this.tipoasentamiento = null;
+                            this.asentamientos = null;
+                        }
 
-                    this.asentamiento = null;
+                        if (this.entidadpostal != null) {
+                            this.asentamientos = this.asentamientodao.obtenerPorEntidadPostal(this.pais.getId(), this.estado.getKey().getId(), this.municipio.getKey().getId(), this.localidad.getKey().getId(), this.entidadpostal.getId());
+                        }
 
-                    if (this.entidadpostal != null) {
-                        this.entidadpostal = null;
-                        this.asentamientos = null;
-                    }
+                        if (this.entidadpostal == null) {
+                            this.asentamientos = this.asentamientodao.buscarTodos();
+                        }
 
-                    if (this.tipoasentamiento != null) {
-
-                        this.asentamientos = this.asentamientodao.obtenerPorTipoAsentamiento(this.pais.getId(), this.estado.getKey().getId(), this.municipio.getKey().getId(), this.localidad.getKey().getId() ,this.tipoasentamiento.getId());
-                    }
-
-                    if (this.tipoasentamiento == null) {
-
-                        this.asentamientos = this.asentamientodao.buscarTodos();
-
-                    }
-
-                    /*if (this.tipoasentamiento != null && this.tiposasentamiento != null) {
-
-                        this.asentamientos = this.asentamientodao.obtenerPorTipoAsentamiento(this.pais.getId(), this.estado.getKey().getId(), this.municipio.getKey().getId(), this.localidad.getKey().getId(), this.tipoasentamiento.getId());
-                    }*/
-
-                    break;
-
-                case "Filtrar Asentamiento Entidad":
-
-                    this.asentamiento = null;
-
-                    if (this.tipoasentamiento != null) {
-                        this.tipoasentamiento = null;
-                        this.asentamientos = null;
-                    }
-
-                    if (this.entidadpostal != null) {
-                        this.asentamientos = this.asentamientodao.obtenerPorEntidadPostal(this.pais.getId(), this.estado.getKey().getId(), this.municipio.getKey().getId(), this.localidad.getKey().getId(), this.entidadpostal.getId());
-                    }
-
-                    if (this.entidadpostal == null) {
-                        this.asentamientos = this.asentamientodao.buscarTodos();
-                    }
-
-                    /*if (this.entidadpostal != null && this.entidadespostales != null) {
-                        this.asentamientos = this.asentamientodao.obtenerPorEntidadPostal(this.pais.getId(), this.estado.getKey().getId(), this.municipio.getKey().getId(), this.localidad.getKey().getId(), this.entidadpostal.getId());
-                    }*/
-
-                    break;
+                        break;
+                }
 
             }
         } catch (SGPException ex) {
@@ -650,6 +650,7 @@ public class DomiciliosBean implements Serializable {
         this.clave = "";
         this.descripcion = "";
         this.sid = 0;
+        this.codigopostal = "";
 
         switch (ubicacion) {
             case "Pais":
@@ -683,9 +684,10 @@ public class DomiciliosBean implements Serializable {
         }
     }
 
-    public void editar(String ubicacion) {
+    public void editar(String ubicacion) throws SGPException {
         this.operacion = new String();
         this.operacion = "Editar " + ubicacion;
+        this.statusid = true;
 
         switch (ubicacion) {
             case "Pais":
@@ -715,8 +717,13 @@ public class DomiciliosBean implements Serializable {
                 break;
 
             case "Asentamiento":
+                this.asentamiento = this.asentamientodao.buscarPorId(this.asentamiento.getKey());
+                log.info("Tipo asentamiento del asentamiento: {}", this.asentamiento.getTipoAsentamiento().getId());
+                log.info("Entidad postal del asentamiento {}", this.asentamiento.getEntidadPostal().getId());
+                this.tipoasentamiento = (CatTipoAsentamiento) this.tipoasentamientodao.buscarPorId(this.asentamiento.getTipoAsentamiento().getId());
+                this.entidadpostal = this.entidadpostaldao.buscarPorId(this.asentamiento.getEntidadPostal().getId());
                 this.iid = this.asentamiento.getKey().getId();
-                this.clave = this.asentamiento.getCp();
+                this.codigopostal = this.asentamiento.getCp();
                 this.descripcion = this.asentamiento.getDescripcion();
                 this.asentamientoestatus = true;
                 break;
@@ -738,6 +745,8 @@ public class DomiciliosBean implements Serializable {
 
     public void eliminar(String ubicacion) {
 
+        this.operacion = new String();
+
         this.operacion = "Eliminar " + ubicacion;
 
     }
@@ -745,10 +754,11 @@ public class DomiciliosBean implements Serializable {
     // falta por terminar esta funcion
     public void operar() {
         try {
+
             switch (this.operacion) {
 
                 case "Agregar Pais":
-
+                    this.validarDatos(1, true);
                     this.pais = new Pais();
                     this.pais.setId(this.iid);
                     this.pais.setClave(this.clave);
@@ -759,8 +769,7 @@ public class DomiciliosBean implements Serializable {
                     break;
 
                 case "Editar Pais":
-
-                    this.pais.setId(this.iid);
+                    this.validarDatos(1, true);
                     this.pais.setClave(this.clave);
                     this.pais.setNombrePais(this.descripcion);
 
@@ -775,7 +784,7 @@ public class DomiciliosBean implements Serializable {
                     break;
 
                 case "Agregar Estado":
-
+                    this.validarDatos(1, true);
                     this.estado = new CatEstado();
 
                     this.estado.setKey(new CatEstadoPK());
@@ -789,8 +798,7 @@ public class DomiciliosBean implements Serializable {
                     break;
 
                 case "Editar Estado":
-
-                    this.estado.getKey().setId(this.iid);
+                    this.validarDatos(1, true);
                     this.estado.setClave(this.clave);
                     this.estado.setDescripcion(this.descripcion);
 
@@ -805,7 +813,7 @@ public class DomiciliosBean implements Serializable {
                     break;
 
                 case "Agregar Municipio":
-
+                    this.validarDatos(1, false);
                     this.municipio = new CatMunicipio();
 
                     this.municipio.setKey(new CatMunicipioPK());
@@ -818,8 +826,7 @@ public class DomiciliosBean implements Serializable {
                     break;
 
                 case "Editar Municipio":
-
-                    this.municipio.getKey().setId(this.iid);
+                    this.validarDatos(1, false);
                     this.municipio.setDescripcion(this.descripcion);
 
                     this.municipiodao.actualizar(this.municipio);
@@ -833,7 +840,7 @@ public class DomiciliosBean implements Serializable {
                     break;
 
                 case "Agregar Localidad":
-
+                    this.validarDatos(1, false);
                     this.localidad = new CatLocalidad();
 
                     this.localidad.setKey(new CatLocalidadPK());
@@ -846,8 +853,7 @@ public class DomiciliosBean implements Serializable {
                     break;
 
                 case "Editar Localidad":
-
-                    this.localidad.getKey().setId(this.iid);
+                    this.validarDatos(1, false);
                     this.localidad.setDescripcion(this.descripcion);
 
                     this.localidaddao.actualizar(this.localidad);
@@ -861,13 +867,14 @@ public class DomiciliosBean implements Serializable {
                     break;
 
                 case "Agregar Asentamiento":
-
+                    this.validarDatos(1, false);
+                    this.clave = this.validarCodigoPostal();
                     this.asentamiento.setKey(new CatAsentamientoPK());
                     this.asentamiento.getKey().setLocalidad(this.localidad);
                     this.asentamiento.getKey().setId(this.iid);
                     this.asentamiento.setTipoAsentamiento(this.tipotemporal);
                     this.asentamiento.setEntidadPostal(this.entidadtemporal);
-                    this.asentamiento.setCp(this.clave);
+                    this.asentamiento.setCp(this.codigopostal);
                     this.asentamiento.setDescripcion(this.descripcion);
 
                     this.asentamientodao.guardar(this.asentamiento);
@@ -875,11 +882,11 @@ public class DomiciliosBean implements Serializable {
                     break;
 
                 case "Editar Asentamiento":
-
-                    this.asentamiento.getKey().setId(this.iid);
-                    this.asentamiento.setTipoAsentamiento(this.tipotemporal);
-                    this.asentamiento.setEntidadPostal(this.entidadtemporal);
-                    this.asentamiento.setCp(this.clave);
+                    this.validarDatos(1, false);
+                    this.clave = this.validarCodigoPostal();
+                    this.asentamiento.setTipoAsentamiento(this.tipoasentamiento);
+                    this.asentamiento.setEntidadPostal(this.entidadpostal);
+                    this.asentamiento.setCp(this.codigopostal);
                     this.asentamiento.setDescripcion(this.descripcion);
 
                     this.asentamientodao.actualizar(this.asentamiento);
@@ -888,12 +895,12 @@ public class DomiciliosBean implements Serializable {
 
                 case "Eliminar Asentamiento":
 
-                    this.asentamientodao.eliminar(this.asentamiento);
+                    this.asentamientodao.eliminar(this.pais.getId(), this.estado.getKey().getId(), this.municipio.getKey().getId(), this.localidad.getKey().getId(), this.asentamiento.getKey().getId(), this.asentamiento.getTipoAsentamiento().getId(), this.asentamiento.getEntidadPostal().getId());
 
                     break;
 
                 case "Agregar Tipo Asentamiento":
-
+                    this.validarDatos(2, true);
                     this.tipoasentamiento = new CatTipoAsentamiento();
 
                     this.tipoasentamiento.setId(this.sid);
@@ -905,8 +912,7 @@ public class DomiciliosBean implements Serializable {
                     break;
 
                 case "Editar Tipo Asentamiento":
-
-                    this.tipoasentamiento.setId(this.sid);
+                    this.validarDatos(2, true);
                     this.tipoasentamiento.setClave(this.clave);
                     this.tipoasentamiento.setDescripcion(this.descripcion);
 
@@ -921,7 +927,7 @@ public class DomiciliosBean implements Serializable {
                     break;
 
                 case "Agregar Entidad Postal":
-
+                    this.validarDatos(1, false);
                     this.entidadpostal = new CatEntidadPostal();
 
                     this.entidadpostal.setId(this.iid);
@@ -932,8 +938,7 @@ public class DomiciliosBean implements Serializable {
                     break;
 
                 case "Editar Entidad Postal":
-
-                    this.entidadpostal.setId(this.iid);
+                    this.validarDatos(1, false);
                     this.entidadpostal.setDescripcion(this.descripcion);
 
                     this.entidadpostaldao.actualizar(this.entidadpostal);
@@ -946,14 +951,135 @@ public class DomiciliosBean implements Serializable {
 
                     break;
             }
+
+            this.iid = 0;
+            this.sid = 0;
+            this.clave = "";
+            this.descripcion = "";
+            String fin = "";
+
+            if (this.operacion.contains("Agregar ")) {
+                fin = this.operacion.replace("Agregar ", "");
+            }
+
+            if (this.operacion.contains("Editar ")) {
+                fin = this.operacion.replace("Editar ", "");
+            }
+
+            if (this.operacion.contains("Eliminar ")) {
+                fin = this.operacion.replace("Eliminar ", "");
+            }
+
+            this.obtenerLista(fin);
+            this.limpiarObjeto(fin);
+
         } catch (SGPException ex) {
 
         } catch (Exception ex) {
 
         } finally {
-
             this.limpiarEstatus();
         }
 
+    }
+
+    private void limpiarObjeto(String ubicacion) {
+
+        switch (ubicacion) {
+            case "Pais":
+                this.pais = null;
+                break;
+
+            case "Estado":
+                this.estado = null;
+                break;
+
+            case "Municipio":
+                this.municipio = null;
+                break;
+
+            case "Localidad":
+                this.localidad = null;
+                break;
+
+            case "Asentamiento":
+                this.asentamiento = null;
+                break;
+
+            case "Tipo Asentamiento":
+                this.tipoasentamiento = null;
+                break;
+
+            case "Entidad Postal":
+                this.entidadpostal = null;
+                break;
+        }
+    }
+
+    private String validarCadena(String cadena, Integer tamaniominimo, Integer tamaniomaximo) throws Exception {
+
+        cadena = cadena.trim();
+        char[] permitidos = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
+            'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+            'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
+            'Y', 'Z',
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
+            'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p',
+            'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
+            'y', 'z',
+            'Á', 'É', 'Í', 'Ó', 'Ú',
+            'á', 'é', 'í', 'ó', 'ú',
+            ' ', 'Ü', 'ü', 'Ñ', 'ñ',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+
+        if (cadena == null) {
+            throw new Exception();
+        }
+
+        if (cadena.equals("")) {
+            throw new Exception();
+        }
+
+        for (int i = 0; i < cadena.length(); i++) {
+            boolean bandera = false;
+            char letra = cadena.charAt(i);
+            for (int j = 0; j < permitidos.length; j++) {
+                if (permitidos[j] == letra) {
+                    bandera = true;
+                    break;
+                }
+            }
+            if (bandera == false) {
+                throw new Exception("La cadena introducida tiene un caracter no permitido");
+            }
+        }
+
+        if (cadena.length() < tamaniominimo || cadena.length() > tamaniomaximo) {
+            throw new Exception("La cadena introducida no tiene el numero de catacteres permitidos");
+        }
+        return cadena;
+    }
+
+    private void validarDatos(Integer tipoentero, boolean tieneclave) throws Exception {
+
+        this.descripcion = this.validarCadena(this.descripcion, 1, 150);
+
+        if (tieneclave) {
+            this.clave = this.validarCadena(this.clave, 2, 3);
+        }
+
+        switch (tipoentero) {
+            case 1:
+                if (this.iid < 1) {
+                    throw new SGPException();
+                }
+                break;
+
+            case 2:
+                if (this.sid < 1) {
+                    throw new SGPException();
+                }
+                break;
+        }
     }
 }

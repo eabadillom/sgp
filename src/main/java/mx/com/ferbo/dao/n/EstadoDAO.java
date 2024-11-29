@@ -12,7 +12,7 @@ import org.apache.logging.log4j.Logger;
 
 public class EstadoDAO extends BaseDAO {
     
-    private static Logger log = LogManager.getLogger(FpClientDAO.class);
+    private static Logger log = LogManager.getLogger(CatEstado.class);
     
     public EstadoDAO(Class<CatEstado> modelClass) {
         super(modelClass);
