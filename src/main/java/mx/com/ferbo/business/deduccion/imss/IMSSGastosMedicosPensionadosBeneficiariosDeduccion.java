@@ -69,6 +69,7 @@ public class IMSSGastosMedicosPensionadosBeneficiariosDeduccion extends Abstract
 			deduccion.setClave("FRB-052");
 			deduccion.setNombre("I.M.S.S. (Gastos médicos pensionados y beneficiarios)");
 			deduccion.setImporte(cuota);
+			deduccion.setInformar(false);
 			deduccion.setProcesar(false);
 		}
 		

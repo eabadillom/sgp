@@ -43,6 +43,10 @@ public class DetNominaOtroPago implements Serializable, Identificable<DetNominaO
 	@Basic(optional = false)
 	private BigDecimal importe;
 	
+	@Column(name = "st_informar")
+	@Basic(optional = false)
+	private Boolean informar;
+	
 	@Column(name = "st_procesar")
 	@Basic(optional = false)
 	private Boolean procesar;
@@ -117,5 +121,13 @@ public class DetNominaOtroPago implements Serializable, Identificable<DetNominaO
 
 	public void setProcesar(Boolean procesar) {
 		this.procesar = procesar;
+	}
+
+	public Boolean getInformar() {
+		return informar;
+	}
+
+	public void setInformar(Boolean informar) {
+		this.informar = informar;
 	}
 }

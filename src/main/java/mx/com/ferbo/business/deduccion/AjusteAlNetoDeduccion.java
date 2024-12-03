@@ -37,6 +37,7 @@ public class AjusteAlNetoDeduccion extends AbstractDeduccion implements IDeducci
 			deduccion.setClave("FRB-004");
 			deduccion.setNombre("Ajuste al neto");
 			deduccion.setImporte(ajusteAlNeto);
+			deduccion.setInformar(true);
 			deduccion.setProcesar(true);
 		}
 		

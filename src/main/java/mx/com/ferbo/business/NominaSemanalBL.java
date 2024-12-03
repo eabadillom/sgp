@@ -58,7 +58,6 @@ public class NominaSemanalBL {
 	private DetEmpleado empleado = null;
 	private Date periodoInicio = null;
 	private Date periodoFin = null;
-//	private Date periodoSiguienteInicio = null;
 	private Date periodoSiguienteFin = null;
 	private Date fechaInicioAnio = null;
 	private Date fechafinAnio = null;
@@ -111,7 +110,6 @@ public class NominaSemanalBL {
 		this.empleado = empleado;
 		this.periodoInicio = periodoInicio;
 		this.periodoFin = periodoFin;
-//		this.prestamoDAO = new PrestamoDAO();
 		this.nominaDAO = new NominaDAO();
 		
 		anioActual = DateUtil.getAnio(periodoInicio);
@@ -360,6 +358,7 @@ public class NominaSemanalBL {
 			this.totalPercepciones = totalPercepciones;
 			
 			totalOtrosPagos = otrosPagos.stream()
+					.filter(o -> o.getProcesar())
 					.map(item -> item.getImporte())
 					.reduce(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP), BigDecimal :: add)
 					;
@@ -404,6 +403,7 @@ public class NominaSemanalBL {
 			;
 			
 			this.totalOtrosPagos = otrosPagos.stream()
+					.filter(o -> o.getProcesar())
 					.map(item -> item.getImporte())
 					.reduce(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP), BigDecimal :: add)
 					;

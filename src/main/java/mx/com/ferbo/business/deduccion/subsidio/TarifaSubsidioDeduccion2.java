@@ -57,11 +57,11 @@ public class TarifaSubsidioDeduccion2 implements ISubsidioEmpleo {
 		
 		try {
 			if(ISubsidioEmpleo.PERIODO_SEMANAL.equalsIgnoreCase(periodo)) {
-				importeSubsidio = this.calcularSemanal(tarifaSubsidio, uma);
+				importeSubsidio = this.calcularSemanal(tarifaSubsidio, uma, baseISR);
 			}
 			
 			if(ISubsidioEmpleo.PERIODO_MENSUAL.equalsIgnoreCase(periodo)) {
-				importeSubsidio = this.calcularMensual(tarifaSubsidio, uma);
+				importeSubsidio = this.calcularMensual(tarifaSubsidio, uma, baseISR);
 			}
 			
 			log.info("Fecha: {}, Base ISR: {}, Subsidio acreditado: {}", this.fecha, baseISR, "(Falta indicar la clase BL que genera el subsidio.)");
@@ -73,16 +73,16 @@ public class TarifaSubsidioDeduccion2 implements ISubsidioEmpleo {
 		return importeSubsidio;
 	}
 	
-	private BigDecimal calcularSemanal(CatSubsidio2 tarifa, CatUMA uma) {
+	private BigDecimal calcularSemanal(CatSubsidio2 tarifa, CatUMA uma, BigDecimal baseISR) {
 		BigDecimal importeSubsidio = null;
 		BigDecimal diasPeriodo = new BigDecimal(7).setScale(0, BigDecimal.ROUND_HALF_UP);
 		BigDecimal tasaSubsidio = null;
 		BigDecimal importeUMA = null;
-		BigDecimal importeMaximo = null;
+		BigDecimal importeMaximoSemanal = null;
 		
 		tasaSubsidio = tarifa.getTasa();
 		importeUMA = uma.getImporteDiario();
-		importeMaximo = tarifa.getImporteMaximo()
+		importeMaximoSemanal = tarifa.getImporteMaximo()
 				.divide(this.factorMes, BigDecimal.ROUND_HALF_UP)
 				.multiply(this.diasSemana)
 				;
@@ -92,13 +92,16 @@ public class TarifaSubsidioDeduccion2 implements ISubsidioEmpleo {
 				.multiply(diasPeriodo).setScale(2, BigDecimal.ROUND_HALF_UP)
 				;
 		
-		if(importeSubsidio.compareTo(importeMaximo) < 0)
+		if(baseISR.compareTo(importeMaximoSemanal) > 0) {
 			importeSubsidio = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+		}
+		
+		log.info("Subsidio: {}", importeSubsidio);
 		
 		return importeSubsidio;
 	}
 	
-	private BigDecimal calcularMensual(CatSubsidio2 tarifa, CatUMA uma) {
+	private BigDecimal calcularMensual(CatSubsidio2 tarifa, CatUMA uma, BigDecimal baseISR) {
 		BigDecimal importeSubsidio = null;
 		BigDecimal diasPeriodo = new BigDecimal(30.4).setScale(1, BigDecimal.ROUND_HALF_UP);
 		BigDecimal tasaSubsidio = null;

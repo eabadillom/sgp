@@ -56,6 +56,7 @@ public class PrestamoDeduccion extends AbstractDeduccion implements IDeducciones
 				deduccion.setNombre(prestamo.getTipoPrestamo().getDescripcion());
 				deduccion.setClave(prestamo.getTipoPrestamo().getTipoPrestamo());
 				deduccion.setImporte(prestamo.getImporte());
+				deduccion.setInformar(true);
 				deduccion.setProcesar(true);
 				totalPrestamos = totalPrestamos.add(prestamo.getImporte());
 				

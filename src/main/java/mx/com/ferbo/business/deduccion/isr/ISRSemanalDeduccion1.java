@@ -191,6 +191,7 @@ public class ISRSemanalDeduccion1 extends AbstractDeduccion implements IDeduccio
 				dISR.setNombre("I.S.R.");
 				dISR.setImporte(isrDespuesDeSubsidio);
 				dISR.setProcesar(true);
+				dISR.setInformar(true);
 				
 				deduccionesISR.add(dISRAntesSubsidio);
 				deduccionesISR.add(dISR);
@@ -258,10 +259,14 @@ public class ISRSemanalDeduccion1 extends AbstractDeduccion implements IDeduccio
 		opSubsidioEmpleo.setNombre("Subs. al empleo mes");
 		opSubsidioEmpleo.setImporte(importeSubsidio);
 		
-		if(importeSubsidio.compareTo(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP)) > 0)
+		if(importeSubsidio.compareTo(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP)) > 0) {
 			opSubsidioEmpleo.setProcesar(true);
-		else
+			opSubsidioEmpleo.setInformar(true);
+		}
+		else {
 			opSubsidioEmpleo.setProcesar(false);
+			opSubsidioEmpleo.setInformar(false);
+		}
 		nomina.getOtrosPagos().add(opSubsidioEmpleo);
 	}
 	

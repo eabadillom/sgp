@@ -185,6 +185,7 @@ public class ISRSemanalDeduccion2 extends AbstractDeduccion implements IDeduccio
 			dISR.setClave("FRB-" + D_ISR);
 			dISR.setNombre("I.S.R.");
 			dISR.setProcesar(true);
+			dISR.setInformar(true);
 			
 			if(isrDespuesDeSubsidio.compareTo(BigDecimal.ZERO) < 0) {
 				dISR.setImporte(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
@@ -252,6 +253,7 @@ public class ISRSemanalDeduccion2 extends AbstractDeduccion implements IDeduccio
 		opSubsidioEmpleo.setClave("FRB-035");
 		opSubsidioEmpleo.setNombre("Subs. al empleo mes");
 		opSubsidioEmpleo.setImporte(importeSubsidio);
+		opSubsidioEmpleo.setInformar(true);
 		opSubsidioEmpleo.setProcesar(false);
 		nomina.getOtrosPagos().add(opSubsidioEmpleo);
 	}

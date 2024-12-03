@@ -2,7 +2,6 @@ package mx.com.ferbo.controller;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -248,13 +247,10 @@ public class NominaBean implements Serializable {
     	List<DetEmpleado> listaEmpleados = null;
     	try {
     		this.listaNomina.clear();
-    		this.listaNomina = nominaDAO.buscarPorPeriodo(
-    				this.periodoInicio.toInstant().atZone(ZoneId.of("GMT-6")).toLocalDate(),
-    				this.periodoFin.toInstant().atZone(ZoneId.of("GMT-6")).toLocalDate()
-    		);
+    		this.listaNomina = nominaDAO.buscarPorPeriodo(DateUtil.toLocalDate(this.periodoInicio), DateUtil.toLocalDate(this.periodoFin));
     		
     		if(this.listaNomina.size() <= 0) {
-    			listaEmpleados = empleadoDAO.buscarActivoEmpresaIngreso(empresaSelected.getIdEmpresa(), this.periodoInicio);
+    			listaEmpleados = empleadoDAO.buscarActivoEmpresaIngreso(empresaSelected.getIdEmpresa(), this.periodoInicio, this.periodoFin);
     			procesaListaEmpleados(listaEmpleados);
     		}
     		
@@ -305,7 +301,7 @@ public class NominaBean implements Serializable {
     	DetNomina nomina = null;
     	NominaSemanalBL nominaSemanalBO = null;
     	List<DetPercepcionEmpleado> percepcionesEmpleado = null;
-    	log.info("Empleado: {} {} {}, Salario diario: {}", empleado.getNombre(), empleado.getPrimerAp(), empleado.getSegundoAp(), empleado.getSueldoDiario());
+    	log.info("Empleado: {} {} {}, Salario diario: {}", empleado.getNombre(), empleado.getPrimerAp(), empleado.getSegundoAp(), empleado.getDatoEmpresa().getSalarioDiario());
     	percepcionesEmpleado = percepcionEmpleadoDAO.buscarPorEmpleado(empleado.getIdEmpleado());
     	empleado.setPercepcionesEmpleado(percepcionesEmpleado);
     	
@@ -362,6 +358,7 @@ public class NominaBean implements Serializable {
     				.reduce(BigDecimal.ZERO, BigDecimal :: add);
     		
     		totalOtrosPagos = this.nomina.getOtrosPagos().stream()
+    				.filter(o -> o.getProcesar())
     				.map(item -> item.getImporte())
     				.reduce(BigDecimal.ZERO, BigDecimal :: add);
     		
@@ -465,13 +462,13 @@ public class NominaBean implements Serializable {
     
     public List<DetNominaOtroPago> filtraOtroPagos() {
     	return this.nomina.getOtrosPagos().stream()
-    			.filter(d -> this.detalle || Boolean.TRUE.equals(d.getProcesar()))
+    			.filter(d -> this.detalle || Boolean.TRUE.equals(d.getInformar()))
     			.collect(Collectors.toList());
     }
     
     public List<DetNominaDeduccion> filtrarDeducciones() {
     	return this.nomina.getDeducciones().stream()
-                .filter(d -> this.detalle || Boolean.TRUE.equals(d.getProcesar()))
+                .filter(d -> this.detalle || Boolean.TRUE.equals(d.getInformar()))
                 .collect(Collectors.toList());
     }
     

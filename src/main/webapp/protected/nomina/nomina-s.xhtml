@@ -49,10 +49,10 @@
 			</p:dialog>
 			<p:toolbar>
 				<p:toolbarGroup>
-					<p:datePicker id="dp-periodo-inicio" value="#{nominaBean.periodoInicio}" placeholder="Periodo Inicio" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
+					<p:datePicker id="dp-periodo-inicio" value="#{nominaBean.periodoInicio}" placeholder="Periodo Inicio" showIcon="true" pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6">
 						<p:ajax process="@this" listener="#{nominaBean.calculaFechaFin}" update="dp-periodo-fin semana" />
 					</p:datePicker>
-					<p:datePicker id="dp-periodo-fin" value="#{nominaBean.periodoFin}" placeholder="Periodo Fin" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
+					<p:datePicker id="dp-periodo-fin" value="#{nominaBean.periodoFin}" placeholder="Periodo Fin" showIcon="true" pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6">
 						<p:ajax process="@this" listener="#{nominaBean.calculaFechaInicio}" update="dp-periodo-inicio semana" />
 					</p:datePicker>
 					<p:inputText id="semana" value="Semana: #{nominaBean.semana}" readonly="true"></p:inputText>
