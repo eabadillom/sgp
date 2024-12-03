@@ -13,6 +13,9 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import mx.com.ferbo.util.PeriodoISR;
 
 /**
  *
@@ -53,6 +56,9 @@ public class CatTarifaISR implements Serializable {
     
     @Column(name = "fecha")
     private Date fecha;
+    
+    @Transient
+    private PeriodoISR periodoISR;
 
     public CatTarifaISR() {
     }
@@ -127,4 +133,11 @@ public class CatTarifaISR implements Serializable {
         this.fecha = fecha;
     }
 
+	public PeriodoISR getPeriodoISR() {
+		return periodoISR;
+	}
+
+	public void setPeriodoISR(PeriodoISR periodoISR) {
+		this.periodoISR = periodoISR;
+	}
 }

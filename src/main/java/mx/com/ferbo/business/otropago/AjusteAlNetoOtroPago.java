@@ -36,6 +36,7 @@ public class AjusteAlNetoOtroPago extends AbstractOtroPago implements IOtroPago 
 			opAjusteAlNeto.setClave("FRB-999");
 			opAjusteAlNeto.setNombre("Ajuste al neto");
 			opAjusteAlNeto.setImporte(ajusteAlNeto);
+			opAjusteAlNeto.setInformar(true);
 			opAjusteAlNeto.setProcesar(true);
 		}
 		return opAjusteAlNeto;

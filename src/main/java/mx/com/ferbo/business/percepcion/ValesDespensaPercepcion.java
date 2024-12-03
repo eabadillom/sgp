@@ -51,6 +51,7 @@ public class ValesDespensaPercepcion extends AbstractPercepcion implements IPerc
 			percepcionEmpleado = this.buscaPercepcionEmpleado(P_VALES_DESPENSA);
     		
     		if(    (percepcionEmpleado != null) 
+    			&& (percepcionEmpleado.getActivo())
 				&& (percepcionEmpleado.getImporteMaximo() != null)
 				&& (vales.compareTo(percepcionEmpleado.getImporteMaximo()) > 0) ) {
     			

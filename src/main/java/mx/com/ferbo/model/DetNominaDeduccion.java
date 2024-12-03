@@ -43,9 +43,36 @@ public class DetNominaDeduccion implements Serializable {
 	@Basic(optional = false)
 	private BigDecimal importe;
 	
+	@Column(name = "st_informar")
+	@Basic(optional = true)
+	private Boolean informar;
+	
 	@Column(name = "st_procesar")
 	@Basic(optional = true)
 	private Boolean procesar;
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(key);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DetNominaDeduccion other = (DetNominaDeduccion) obj;
+		return Objects.equals(key, other.key);
+	}
+
+	@Override
+	public String toString() {
+		return "DetNominaDeduccion [key=" + key + ", claveDeduccion=" + clave + ", nombreDeduccion="
+				+ nombre + ", importe=" + importe + "]";
+	}
 
 	public DetNominaDeduccionPK getKey() {
 		return key;
@@ -87,34 +114,19 @@ public class DetNominaDeduccion implements Serializable {
 		this.importe = importe;
 	}
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(key);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		DetNominaDeduccion other = (DetNominaDeduccion) obj;
-		return Objects.equals(key, other.key);
-	}
-
-	@Override
-	public String toString() {
-		return "DetNominaDeduccion [key=" + key + ", claveDeduccion=" + clave + ", nombreDeduccion="
-				+ nombre + ", importe=" + importe + "]";
-	}
-
 	public Boolean getProcesar() {
 		return procesar;
 	}
 
 	public void setProcesar(Boolean procesar) {
 		this.procesar = procesar;
+	}
+
+	public Boolean getInformar() {
+		return informar;
+	}
+
+	public void setInformar(Boolean informar) {
+		this.informar = informar;
 	}
 }

@@ -74,6 +74,7 @@ public class IMSSEnDineroDeduccion extends AbstractIMSSDeduccion implements IDed
 			deduccion.setClave("001");
 			deduccion.setNombre("I.M.S.S. (En dinero)");
 			deduccion.setImporte(cuota);
+			deduccion.setInformar(false);
 			deduccion.setProcesar(false);
 		}
 		
