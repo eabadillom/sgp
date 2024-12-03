@@ -322,14 +322,8 @@ public class RegistroEmpleadosBean implements Serializable {
         
     	this.detBiometrico = biometricoDAO.consultaBiometricoByIdEmpleado(this.empleadoSelected.getIdEmpleado());
     	
-	if(this.detBiometrico != null)
-        {
-            log.info("Biometrico: {}", this.detBiometrico);
-        }else
-        {
-            this.detBiometrico = new DetBiometrico();
-        }
-		
+	log.info("Biometrico: {}", this.detBiometrico);
+        
 		this.nuevaPercepcionEmpleado();
     	PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogFoto", "formRegistroEmpleado:panelDialogEmpleado");
     }
@@ -493,6 +487,12 @@ public class RegistroEmpleadosBean implements Serializable {
                     throw new SGPException("Debe indicar un numero de calle exterior");
                 }
                 
+                if(this.datoEmpresa.getFechaIngreso() == null)
+                {
+                    log.error("Falta fecha de ingreso en dato empresa");
+                    throw new SGPException("Debe indicar la fecha de ingreso");
+                }
+                
                 if (this.empleadoSelected.getIdEmpleado() == null) {
     			
     			pNumeroEmpleado = this.parametroDAO.buscarPorClave("NBEMP");
@@ -501,13 +501,6 @@ public class RegistroEmpleadosBean implements Serializable {
         		sNumeroEmpleado = String.format("%04d", ++numeroEmpleado);
                         transformarAMayusculas();
         		this.empleadoSelected.setNumEmpleado(sNumeroEmpleado);
-                        
-                        if(this.datoEmpresa.getFechaIngreso() == null)
-                        {
-                            log.error("Falta fecha de ingreso en dato empresa");
-                            throw new SGPException("Debe indicar la fecha de ingreso");
-                        }
-                        
         		this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
         		this.empleadoSelected.setFechaRegistro(new Date());
     			empleadoDAO.guardar(empleadoSelected);
@@ -624,27 +617,44 @@ public class RegistroEmpleadosBean implements Serializable {
         PrimeFaces.current().executeScript("PF('dialogBiometrico').show()");
     }
 
-    public void validaHuella() {
-        if(this.detBiometrico == null)
+    public void validaHuella() 
+    {
+        try
         {
-            this.detBiometrico = new DetBiometrico();
-        }
-        if (biometrico != null) {
-            if (numBiometrico == 1) {
-                detBiometrico.setHuella(biometrico);
-            } else {
-                detBiometrico.setHuella2(biometrico);
+            if (biometrico == null) 
+            {
+                throw new SGPException("Error al asignar biométrico");
             }
-            detBiometrico.setActivo((short) 1);
-            detBiometrico.setFechaCaptura(new Date());
+        
+            asignarBiometricos();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Huella asignada"));
-        } else {
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Error al asignar biométrico"));
-            
-            log.warn("EX-0019: Error al consultar por huella al empleado " + detBiometrico.getIdEmpleado().getNumEmpleado() != null ? detBiometrico.getIdEmpleado().getNumEmpleado() : null);
+        }catch (SGPException ex) 
+        {
+            log.warn("EX-0019: Error al consultar por huella al empleado " + detBiometrico.getIdEmpleado().getNumEmpleado() != null ? detBiometrico.getIdEmpleado().getNumEmpleado() : null + " y " + ex.getMessage());
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Error al asignar biométrico"));
+        }finally
+        {
+            PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogBiometrico");
         }
-        PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogBiometrico");
+    }
+    
+    public void asignarBiometricos()
+    {
+        if(this.detBiometrico == null)
+            this.detBiometrico = new DetBiometrico();
+        
+        switch(numBiometrico)
+        {
+            case 1:
+                detBiometrico.setHuella(biometrico);
+                break;
+            case 2:
+                detBiometrico.setHuella2(biometrico);
+                break;
+        }
+        
+        detBiometrico.setActivo((short) 1);
+        detBiometrico.setFechaCaptura(new Date());
     }
     
     public List<CatAsentamiento> sugerenciasCodigoPostal(String consulta) 
