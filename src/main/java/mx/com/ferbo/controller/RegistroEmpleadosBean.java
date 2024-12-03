@@ -41,7 +41,6 @@ import mx.com.ferbo.dao.n.TipoPrestamoDAO;
 import mx.com.ferbo.dao.n.TipoRegimenDAO;
 import mx.com.ferbo.model.CatArea;
 import mx.com.ferbo.model.CatAsentamiento;
-/*Agregando import de CatAsentamientoPK*/
 import mx.com.ferbo.model.CatAsentamientoPK;
 import mx.com.ferbo.model.CatEmpresa;
 import mx.com.ferbo.model.CatEstado;
@@ -493,8 +492,13 @@ public class RegistroEmpleadosBean implements Serializable {
                     throw new SGPException("Debe indicar la fecha de ingreso");
                 }
                 
+                if(this.datoEmpresa.getFechaIngreso() == null)
+                {
+                    log.error("Falta fecha de ingreso");
+                    throw new SGPException("Debe indicar una fecha de ingreso");
+                }
+                
                 if (this.empleadoSelected.getIdEmpleado() == null) {
-    			
     			pNumeroEmpleado = this.parametroDAO.buscarPorClave("NBEMP");
     			sNumeroEmpleado = pNumeroEmpleado.getValor();
         		numeroEmpleado = Integer.parseInt(sNumeroEmpleado);

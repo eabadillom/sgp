@@ -1,7 +1,6 @@
 package mx.com.ferbo.business;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,17 +15,16 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.deduccion.AjusteAlNetoDeduccion;
+import mx.com.ferbo.business.deduccion.IDeducciones;
 import mx.com.ferbo.business.deduccion.PrestamoDeduccion;
 import mx.com.ferbo.business.deduccion.imss.IMSSDeduccion;
-import mx.com.ferbo.business.deduccion.isr.IISR;
-import mx.com.ferbo.business.deduccion.isr.ISRSemanalDeduccion;
+import mx.com.ferbo.business.deduccion.isr.ISRExecutor;
 import mx.com.ferbo.business.otropago.AjusteAlNetoOtroPago;
 import mx.com.ferbo.business.percepcion.BonoPuntualidadPercepcion;
 import mx.com.ferbo.business.percepcion.SeptimoDiaPercepcion;
 import mx.com.ferbo.business.percepcion.SueldoPercepcion;
 import mx.com.ferbo.business.percepcion.ValesDespensaPercepcion;
 import mx.com.ferbo.dao.n.NominaDAO;
-//import mx.com.ferbo.dao.n.PrestamoDAO;
 import mx.com.ferbo.dao.n.RegistroDAO;
 import mx.com.ferbo.model.CatCuotaIMSS;
 import mx.com.ferbo.model.CatDiaNoLaboral;
@@ -60,7 +58,7 @@ public class NominaSemanalBL {
 	private DetEmpleado empleado = null;
 	private Date periodoInicio = null;
 	private Date periodoFin = null;
-	private Date periodoSiguienteInicio = null;
+//	private Date periodoSiguienteInicio = null;
 	private Date periodoSiguienteFin = null;
 	private Date fechaInicioAnio = null;
 	private Date fechafinAnio = null;
@@ -77,6 +75,7 @@ public class NominaSemanalBL {
 	private BigDecimal valesDespensa = null;
 	
 	private BigDecimal totalPercepciones = null;
+	private BigDecimal totalOtrosPagos = null;
 	private BigDecimal totalDeducciones = null;
 	
     private static final int SEPTIMO_DIA = 1;
@@ -85,8 +84,7 @@ public class NominaSemanalBL {
     
     private CatPercepciones parametrosPercepciones = null;
     private List<CatDiaNoLaboral> diasNoLaborales = null;
-    private List<CatTarifaISR> tablaISRSemanal = null;
-    private List<CatTarifaISR> tablaISRMensual = null;
+    private List<CatTarifaISR> tablaISR = null;
     private List<CatTipoPercepcion> tiposPercepcion = null;
     private List<CatTipoDeduccion> tiposDeduccion = null;
     private List<CatCuotaIMSS> cuotasIMSS = null;
@@ -103,6 +101,7 @@ public class NominaSemanalBL {
 	private Integer anio = null;
 	
 	private NominaDAO nominaDAO = null;
+	private List<DetNomina> nominaSemanal = null;
 	
 	
 	//OBJETOS RELACIONADOS A LA NOMINA Y CFDI
@@ -124,7 +123,7 @@ public class NominaSemanalBL {
 		
 		this.semanaAnio = DateUtils.getSemanaAnio(this.periodoInicio);
 		
-		this.periodoSiguienteInicio = DateUtils.addDay(this.periodoInicio, 7);
+//		this.periodoSiguienteInicio = DateUtils.addDay(this.periodoInicio, 7);
 		this.periodoSiguienteFin = DateUtils.addDay(this.periodoFin, 7);
 	}
 	
@@ -178,9 +177,8 @@ public class NominaSemanalBL {
 		DetNominaPercepcion pBonoPuntualidad = null;
 		DetNominaPercepcion pValeDespensa = null;
 		
-		List<DetNominaDeduccion> prestamos = null;
-		
 		List<DetNominaPercepcion> percepciones = null;
+		List<DetNominaOtroPago> otrosPagos = null;
 		List<DetNominaDeduccion> deducciones = null;
 		
 		SueldoPercepcion sueldoBO = null;
@@ -188,7 +186,8 @@ public class NominaSemanalBL {
 		BonoPuntualidadPercepcion bonoPuntualidadBO = null;
 		ValesDespensaPercepcion valesDespensaBO = null;
 		
-		ISRSemanalDeduccion isrBO = null;
+		ISRExecutor isrExecutor = null;
+		IDeducciones isrBO = null;
 		IMSSDeduccion imssBO = null;
 		PrestamoDeduccion prestamosBO = null;
 		
@@ -203,7 +202,9 @@ public class NominaSemanalBL {
 			this.uma = parametrosPercepciones.getUma();
 			nomina = this.newNomina();
 			percepciones = nomina.getPercepciones();
+			otrosPagos = nomina.getOtrosPagos();
 			deducciones = nomina.getDeducciones();
+			
 			
 			this.ultimaSemanaMes = this.esUltimaSemanaMes();
 			
@@ -249,30 +250,29 @@ public class NominaSemanalBL {
 			if(pValeDespensa.getImporteExcento().add(pValeDespensa.getImporteGravado()).compareTo(BigDecimal.ZERO) > 0) //Si hay vales de desapensa, se agregan a la lista de percepciones.
 				percepciones.add(pValeDespensa);
 			
-			
 			/*-------------------------DEDUCCIONES-----------------------*/
 			if(salarioSemanal.compareTo(BigDecimal.ZERO) > 0) {
 				
+				nominaSemanal = this.ultimaSemanaMes ? procesaNominaDelMes() : null;
 				
+				isrExecutor = new ISRExecutor(this.periodoInicio, this.periodoFin, this.tiposDeduccion, this.tiposOtroPago, this.tablaISR, this.nominaSemanal);
+				isrBO = isrExecutor.loadClass("ISRS", DateUtils.toLocalDate(this.periodoFin));
+				isrBO.procesar(nomina, idxD);
 				
-				isrBO = new ISRSemanalDeduccion(this.tiposDeduccion, this.tiposOtroPago, percepciones, this.tablaISRSemanal);
-				isrBO.setPeriodo(this.periodoFin, this.periodoFin);
-				isrBO.setListaNominaMes( this.ultimaSemanaMes ? procesaNominaDelMes() : null);
-				isrBO.setTablaISRMensual(this.ultimaSemanaMes ? this.tablaISRMensual : null);
-				List<DetNominaDeduccion> deduccionesISR = isrBO.procesar(nomina, idxD);
-				deducciones.addAll(deduccionesISR);
 
 				imssBO = new IMSSDeduccion(this.tiposDeduccion, this.cuotasIMSS, this.fechaInicioAnio, this.fechafinAnio, new BigDecimal(DIAS_POR_PERIODO + SEPTIMO_DIA), this.uma, salarioDiarioIntegrado);
-				List<DetNominaDeduccion> aportacionesIMSS = imssBO.procesar(nomina, idxD);
-				deducciones.addAll(aportacionesIMSS) ;
+				imssBO.procesar(nomina, idxD);
 				
 				prestamosBO = new PrestamoDeduccion(this.empleado);
-				prestamos = prestamosBO.procesar(nomina, idxD);
-				deducciones.addAll(prestamos);
+				prestamosBO.procesar(nomina, idxD);
 			}
 			
 			for(DetNominaPercepcion p : percepciones) {
 				log.info("Percepcion: {} - {} - {}", p.getNombre(), p.getImporteExcento(), p.getImporteGravado());
+			}
+			
+			for(DetNominaOtroPago o : otrosPagos) {
+				log.info("Otro pago: {} - {}", o.getNombre(), o.getImporte());
 			}
 			
 			for(DetNominaDeduccion d : deducciones) {
@@ -293,7 +293,7 @@ public class NominaSemanalBL {
 			nomina.setEjercicio(DateUtils.getAnio(this.fechaInicioAnio));
 			nomina.setDiasLaborados(diasTrabajados.intValue());
 			nomina.setDiasNoLaborados(diasLaboralesPeriodo.subtract(diasTrabajados).intValue());
-			nomina.setSubtotal(this.totalPercepciones);
+			nomina.setSubtotal(BigDecimal.ZERO.add(this.totalPercepciones).add(this.totalOtrosPagos));
 			nomina.setDescuento(this.totalDeducciones);
 			nomina.setTotal(neto);
 			nomina.setPeriodo(this.semanaAnio);
@@ -330,6 +330,7 @@ public class NominaSemanalBL {
 	private BigDecimal calcularTotal(DetNomina nomina) {
 		BigDecimal total = null;
 		BigDecimal totalPercepciones = null;
+		BigDecimal totalOtrosPagos = null;
 		BigDecimal totalDeducciones = null;
 		BigDecimal previoNeto = null;
 		BigDecimal neto = null;
@@ -352,12 +353,18 @@ public class NominaSemanalBL {
 			otrosPagos = nomina.getOtrosPagos();
 			
 			totalPercepciones = percepciones.stream()
-			.map(item -> item.getImporteExcento().add(item.getImporteGravado()))
-			.reduce(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP), BigDecimal :: add)
+					.map(item -> item.getImporteExcento().add(item.getImporteGravado()))
+					.reduce(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP), BigDecimal :: add)
 			;
 			
 			this.totalPercepciones = totalPercepciones;
 			
+			totalOtrosPagos = otrosPagos.stream()
+					.map(item -> item.getImporte())
+					.reduce(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP), BigDecimal :: add)
+					;
+			
+			this.totalOtrosPagos = totalOtrosPagos;
 			
 			totalDeducciones = deducciones.stream()
 					.filter(d -> d.getProcesar())
@@ -367,8 +374,8 @@ public class NominaSemanalBL {
 			
 			this.totalDeducciones = totalDeducciones;
 			
-			previoNeto = totalPercepciones.subtract(totalDeducciones).setScale(1, BigDecimal.ROUND_HALF_UP).setScale(2, BigDecimal.ROUND_HALF_UP);
-			neto = totalPercepciones.subtract(totalDeducciones);
+			previoNeto = totalPercepciones.add(totalOtrosPagos).subtract(totalDeducciones).setScale(1, BigDecimal.ROUND_HALF_UP).setScale(2, BigDecimal.ROUND_HALF_UP);
+			neto = totalPercepciones.add(totalOtrosPagos).subtract(totalDeducciones).setScale(2, BigDecimal.ROUND_HALF_UP);
 			ajusteAlNeto = previoNeto.subtract(neto);
 			
 			total = neto.add(ajusteAlNeto);
@@ -389,6 +396,23 @@ public class NominaSemanalBL {
 				otrosPagos.add(opAjusteAlNeto);
 				log.info("Aplicando ajuste al neto como otro pago: {}", opAjusteAlNeto);
 			}
+			
+			//Recalculamos los importes para presentar el ajuste al neto en el resumen del recibo de nomina.
+			this.totalPercepciones = percepciones.stream()
+					.map(item -> item.getImporteExcento().add(item.getImporteGravado()))
+					.reduce(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP), BigDecimal :: add)
+			;
+			
+			this.totalOtrosPagos = otrosPagos.stream()
+					.map(item -> item.getImporte())
+					.reduce(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP), BigDecimal :: add)
+					;
+			
+			this.totalDeducciones = deducciones.stream()
+					.filter(d -> d.getProcesar())
+					.map(item -> item.getImporte())
+					.reduce(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP), BigDecimal::add)
+					;
 			
 			log.info("Neto previo: {}, neto: {}, ajuste al neto: {}, neto ajustado: {}", previoNeto, neto, ajusteAlNeto, total);
 		} catch(Exception ex) {
@@ -521,15 +545,15 @@ public class NominaSemanalBL {
 	private List<DetNomina> procesaNominaDelMes() {
 		List<DetNomina> listaNominaDelMes = null;
 		Date dPeriodoInicio = new Date(this.periodoInicio.getTime());
-		Date dPeriodoFin = new Date(this.periodoFin.getTime());
+//		Date dPeriodoFin = new Date(this.periodoFin.getTime());
 		Date dPeriodoAnteriorFin = null;
 		Date dPeriodoAnteriorInicio = null;
 		
 		Integer mesActual = null;
 		Integer mesAnterior = null;
 		
-		LocalDate periodoAnteriorInicio = null;
-		LocalDate periodoAnteriorFin = null;
+//		LocalDate periodoAnteriorInicio = null;
+//		LocalDate periodoAnteriorFin = null;
 		
 		Integer semanaInicio = null;
 		Integer semanaFin = null;
@@ -559,8 +583,8 @@ public class NominaSemanalBL {
 		
 		log.info("Búsqueda de la semana {} a {}", semanaInicio, semanaFin);
 		
-		periodoAnteriorInicio = DateUtils.toLocalDate(dPeriodoAnteriorInicio);
-		periodoAnteriorFin = DateUtils.toLocalDate(dPeriodoFin );
+//		periodoAnteriorInicio = DateUtils.toLocalDate(dPeriodoAnteriorInicio);
+//		periodoAnteriorFin = DateUtils.toLocalDate(dPeriodoFin );
 		
 		listaNominaDelMes = nominaDAO.buscarPorSemanaRfc(semanaInicio, semanaFin, this.empleado.getDatoEmpresa().getRfc());
 //		listaNominaDelMes = nominaDAO.buscarPorPeriodoEmpleado(periodoAnteriorInicio, periodoAnteriorFin, this.empleado.getDatoEmpresa().getRfc());
@@ -762,14 +786,6 @@ public class NominaSemanalBL {
 		this.parametrosPercepciones = parametrosPercepciones;
 	}
 
-	public List<CatTarifaISR> getTablaISRSemanal() {
-		return tablaISRSemanal;
-	}
-
-	public void setTablaISRSemanal(List<CatTarifaISR> tablaISRSemanal) {
-		this.tablaISRSemanal = tablaISRSemanal;
-	}
-
 	public CatMetodoPago getMetodoPago() {
 		return metodoPago;
 	}
@@ -845,8 +861,8 @@ public class NominaSemanalBL {
 	public void setCuotasIMSS(List<CatCuotaIMSS> cuotasIMSS) {
 		this.cuotasIMSS = cuotasIMSS;
 	}
-
-	public void setTablaISRMensual(List<CatTarifaISR> tablaISRMensual) {
-		this.tablaISRMensual = tablaISRMensual;
+	
+	public void setTablaISR(List<CatTarifaISR> tablaISR) {
+		this.tablaISR = tablaISR;
 	}
 }

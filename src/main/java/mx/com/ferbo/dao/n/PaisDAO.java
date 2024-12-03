@@ -11,82 +11,51 @@ import org.apache.logging.log4j.Logger;
  *
  * @author alberto
  */
-public class PaisDAO extends BaseDAO<Pais, String>
+public class PaisDAO extends BaseDAO<Pais, Integer>
 {
     private static Logger log = LogManager.getLogger(PaisDAO.class);
 
-    public PaisDAO(Class modelClass) {
+    public PaisDAO(Class<Pais> modelClass) {
         super(modelClass);
     }
     
-    public PaisDAO()
-    {
+    public PaisDAO() {
         super(Pais.class);
     }
     
-    public List<Pais> buscarTodos()
-    {
+    public List<Pais> buscarTodos() {
         List<Pais> modelList = null;
         EntityManager em = null;
         
-        try
-        {
+        try {
             em = this.getEntityManager();
-            modelList = em.createNamedQuery("Pais.findAll", Pais.class)
+            modelList = em.createNamedQuery("Pais.findAll", modelClass)
                 .getResultList();
-        }catch (Exception ex) 
-        {
+        } catch (Exception ex) {
             log.error("Problema para obtener el pais: {}", ex.getMessage());
-        }finally 
-        {
+        } finally {
             this.close(em);
         }
         
         return modelList;
     }
     
-    public List<Pais> buscarPorId(Integer idPais)
-    {
-        List<Pais> modelList = null;
+    public Pais buscarPorClave(String clavePais) {
+        Pais model = null;
         EntityManager em = null;
         
-        try
-        {
+        try {
             em = this.getEntityManager();
-            modelList = em.createNamedQuery("Pais.findById", Pais.class)
-                .setParameter("cd_pais", idPais)
-                .getResultList();
-        }catch (Exception ex) 
-        {
+            model = em.createNamedQuery("Pais.findByClave", Pais.class)
+                .setParameter("clavePais", clavePais)
+                .getSingleResult();
+        } catch (Exception ex) {
             log.error("Problema para obtener el pais: {}", ex.getMessage());
-        }finally 
-        {
+        } finally {
             this.close(em);
         }
         
-        return modelList;
-    }
-    
-    public List<Pais> buscarPorClave(String clavePais)
-    {
-        List<Pais> modelList = null;
-        EntityManager em = null;
-        
-        try
-        {
-            em = this.getEntityManager();
-            modelList = em.createNamedQuery("Pais.findByClave", Pais.class)
-                .setParameter("nb_clave", clavePais)
-                .getResultList();
-        }catch (Exception ex) 
-        {
-            log.error("Problema para obtener el pais: {}", ex.getMessage());
-        }finally 
-        {
-            this.close(em);
-        }
-        
-        return modelList;
+        return model;
     }
     
 }
