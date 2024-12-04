@@ -95,93 +95,105 @@
 							                <p:inputText id="curp" value="#{registroEmpleadosBean.empleadoSelected.curp}" maxlength="18" style="text-transform: uppercase">
 							                	<p:ajax process="@this" />
 							                </p:inputText>  
-                                                                    </div>
-                                                                    <div class="field col">
-                                                                         <p:outputLabel for="@next" value="Fecha de nacimiento" />
-                                                                         <p:datePicker id="fNac" value="#{registroEmpleadosBean.empleadoSelected.fechaNacimiento}" monthNavigator="true" yearNavigator="true" yearRange="1940:2015" pattern="dd/MM/yyyy" showIcon="true" locale="es" timeZone="GMT-6">
-                                                                                <p:ajax process="@this" />
-                                                                         </p:datePicker>
-                                                                     </div>
-                                                                     <div class="field col">
-                                                                         <p:outputLabel for="@next" value="Correo"/>
-                                                                         <p:inputText id="correo" value="#{registroEmpleadosBean.empleadoSelected.correo}">
-                                                                                <p:ajax process="@this" />
-                                                                         </p:inputText>  
-                                                                     </div>
-                                                                </div>
-                                                                    <h5>Domicilio</h5>
-                                                                    <div class="formgrid grid">
-                                                                        <div class="field col">
-                                                                            <p:outputLabel for="@next" value="Codigo Postal"/>
-                                                                            <p:autoComplete id="autocomplete" value="#{registroEmpleadosBean.asentamientoSelected}" completeMethod="#{registroEmpleadosBean.sugerenciasCodigoPostal}" 
-                                                                                placeholder="Escribe el codigo postal..." var="sugerencia" itemLabel="#{sugerencia.cp}" itemValue="#{sugerencia}" 
-                                                                                forceSelection="true"  minQueryLength="5" maxlength="5" converter="entityConverter" >
-                                                                                <p:ajax process="@this" event="itemSelect" listener="#{registroEmpleadosBean.domicilioEmpleado()}" update="pais estado municipio localidad asentamiento"/>
-                                                                                <p:column>
-                                                                                    <p:outputLabel value="#{sugerencia.cp}"/>
-                                                                                </p:column>
-                                                                                <p:column>
-                                                                                    <p:outputLabel value="#{sugerencia.descripcion}"/>
-                                                                                </p:column>
-                                                                            </p:autoComplete> 
-                                                                        </div>
-                                                                        <div class="field col">
-                                                                            <p:outputLabel for="@next" value="Pais" />
-                                                                            <p:inputText id="pais" value="#{registroEmpleadosBean.asentamientoSelected.key.localidad.key.municipio.key.estado.key.pais.nombrePais}" >
-                                                                                   <p:ajax process="@this" />
-                                                                            </p:inputText>
-                                                                        </div>
-                                                                        <div class="field col">
-                                                                            <p:outputLabel for="@next" value="Estado" />
-                                                                            <p:inputText id="estado" value="#{registroEmpleadosBean.asentamientoSelected.key.localidad.key.municipio.key.estado.descripcion}" >
-                                                                                   <p:ajax process="@this" />
-                                                                            </p:inputText>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="formgrid grid">
-                                                                        <div class="field col">
-                                                                            <p:outputLabel for="@next" value="Municipio" />
-                                                                            <p:inputText id="municipio" value="#{registroEmpleadosBean.asentamientoSelected.key.localidad.key.municipio.descripcion}" >
-                                                                                   <p:ajax process="@this" />
-                                                                            </p:inputText>
-                                                                        </div>
-                                                                        <div class="field col">
-                                                                            <p:outputLabel for="@next" value="Localidad" />
-                                                                            <p:inputText id="localidad" value="#{registroEmpleadosBean.asentamientoSelected.key.localidad.descripcion}" >
-                                                                                   <p:ajax process="@this" />
-                                                                            </p:inputText>
-                                                                        </div>
-                                                                        <div class="field col">
-                                                                            <p:outputLabel for="@next" value="Asentamiento" />
-                                                                            <p:inputText id="asentamiento" value="#{registroEmpleadosBean.asentamientoSelected.descripcion}" >
-                                                                                <p:ajax process="@this" />
-                                                                            </p:inputText>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="formgrid grid">
-                                                                        <div class="field col">
-                                                                            <p:outputLabel for="@next" value="Calle" />
-                                                                            <p:inputText id="calle" value="#{registroEmpleadosBean.domicilioEmpleadoSelected.calle}" >
-                                                                                   <p:ajax process="@this" />
-                                                                            </p:inputText>
-                                                                        </div>
-                                                                        <div class="field col">
-                                                                            <p:outputLabel for="@next" value="Num. Ext." />
-                                                                            <p:inputText id="numExt" value="#{registroEmpleadosBean.domicilioEmpleadoSelected.numeroExterior}" >
-                                                                                   <p:ajax process="@this" />
-                                                                            </p:inputText>
-                                                                        </div>
-                                                                        <div class="field col">
-                                                                            <p:outputLabel for="@next" value="Num. Int" />
-                                                                            <p:inputText id="numInt" value="#{registroEmpleadosBean.domicilioEmpleadoSelected.numeroInterior}" >
-                                                                                   <p:ajax process="@this" />
-                                                                            </p:inputText>
-                                                                        </div>
-                                                                    </div>
+										</div>
+										<div class="field col">
+											<p:outputLabel for="@next" value="Fecha de nacimiento" />
+											<p:datePicker id="fNac" value="#{registroEmpleadosBean.empleadoSelected.fechaNacimiento}" monthNavigator="true" yearNavigator="true" yearRange="1940:2015" pattern="dd/MM/yyyy" showIcon="true" locale="es" timeZone="GMT-6">
+												<p:ajax process="@this" />
+											</p:datePicker>
+										</div>
+										<div class="field col">
+											<p:outputLabel for="@next" value="Correo"/>
+											<p:inputText id="correo" value="#{registroEmpleadosBean.empleadoSelected.correo}">
+												<p:ajax process="@this" />
+											</p:inputText>  
+										</div>
+									</div>
+									<h5>Domicilio</h5>
+									<div class="formgrid grid">
+									<div class="field col">
+										<p:outputLabel for="@next" value="Codigo Postal"/>
+										<p:autoComplete id="autocomplete" value="#{registroEmpleadosBean.asentamientoSelected}" completeMethod="#{registroEmpleadosBean.sugerenciasCodigoPostal}" 
+										    placeholder="Escribe el codigo postal..." var="sugerencia" itemLabel="#{sugerencia.cp}" itemValue="#{sugerencia}" 
+										    forceSelection="true"  minQueryLength="5" maxlength="5" converter="entityConverter" >
+											<p:ajax process="@this" event="itemSelect" listener="#{registroEmpleadosBean.domicilioEmpleado()}" update="pais estado municipio localidad asentamiento"/>
+											<p:column>
+												<p:outputLabel value="#{sugerencia.cp}"/>
+											</p:column>
+											<p:column>
+												<p:outputLabel value="#{sugerencia.descripcion}"/>
+											</p:column>
+										</p:autoComplete> 
+									</div>
+									<div class="field col">
+										<p:outputLabel for="@next" value="Pais" />
+										<p:inputText id="pais" value="#{registroEmpleadosBean.asentamientoSelected.key.localidad.key.municipio.key.estado.key.pais.nombrePais}" >
+											<p:ajax process="@this" />
+										</p:inputText>
+									</div>
+									<div class="field col">
+										<p:outputLabel for="@next" value="Estado" />
+										<p:inputText id="estado" value="#{registroEmpleadosBean.asentamientoSelected.key.localidad.key.municipio.key.estado.descripcion}" >
+											<p:ajax process="@this" />
+										</p:inputText>
+									</div>
+								</div>
+								<div class="formgrid grid">
+									<div class="field col">
+										<p:outputLabel for="@next" value="Municipio" />
+										<p:inputText id="municipio" value="#{registroEmpleadosBean.asentamientoSelected.key.localidad.key.municipio.descripcion}" >
+											<p:ajax process="@this" />
+										</p:inputText>
+									</div>
+									<div class="field col">
+										<p:outputLabel for="@next" value="Localidad" />
+										<p:inputText id="localidad" value="#{registroEmpleadosBean.asentamientoSelected.key.localidad.descripcion}" >
+											<p:ajax process="@this" />
+										</p:inputText>
+									</div>
+								    <div class="field col">
+								        <p:outputLabel for="@next" value="Asentamiento" />
+								        <p:inputText id="asentamiento" value="#{registroEmpleadosBean.asentamientoSelected.descripcion}" >
+								            <p:ajax process="@this" />
+								        </p:inputText>
+								    </div>
+								</div>
+								<div class="formgrid grid">
+									<div class="field col">
+										<p:outputLabel for="@next" value="Calle" />
+										<p:inputText id="calle" value="#{registroEmpleadosBean.domicilioEmpleadoSelected.calle}" >
+											<p:ajax process="@this" />
+										</p:inputText>
+									</div>
+									<div class="field col">
+										<p:outputLabel for="@next" value="Num. Ext." />
+										<p:inputText id="numExt" value="#{registroEmpleadosBean.domicilioEmpleadoSelected.numeroExterior}" >
+											<p:ajax process="@this" />
+										</p:inputText>
+									</div>
+									<div class="field col">
+										<p:outputLabel for="@next" value="Num. Int" />
+										<p:inputText id="numInt" value="#{registroEmpleadosBean.domicilioEmpleadoSelected.numeroInterior}" >
+											<p:ajax process="@this" />
+										</p:inputText>
+									</div>
+								</div>
 								</p:tab>
 								<p:tab title="Empresarial">
 									<div class="card">
 										<div class="ui-fluid formgrid grid">
+											<div class="field col-12 md:col-3">
+												<p:outputLabel for="@next" value="Fecha de ingreso" />
+								                <p:datePicker id="fIngreso" value="#{registroEmpleadosBean.datoEmpresa.fechaIngreso}" monthNavigator="true" yearNavigator="true" showIcon="true" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy">
+								                	<p:ajax process="@this" />
+								                </p:datePicker>
+											</div>
+											<div class="field col-12 md:col-3">
+												<p:outputLabel for="@next" value="Fecha de baja" />
+												<p:datePicker value="#{registroEmpleadosBean.datoEmpresa.fechaBaja}" showIcon="true" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy">
+													<p:ajax process="@this" />
+												</p:datePicker>
+											</div>
 											<div class="field col-12 md:col-3">
 												<p:outputLabel for="@next" value="RFC" />
 												<p:inputText id="rfc" value="#{registroEmpleadosBean.datoEmpresa.rfc}" maxlength="18" style="text-transform: uppercase">
@@ -199,10 +211,6 @@
 												<p:inputNumber id="salario" value="#{registroEmpleadosBean.datoEmpresa.salarioDiario}" symbol="$ " symbolPosition="p" decimalSeparator="." decimalPlaces="2">
 													<p:ajax process="@this"/>
 												</p:inputNumber>
-											</div>
-											<div class="field col-12 md:col-3">
-												<p:outputLabel for="@next" value="Fecha de ingreso" />
-							                <p:datePicker id="fIngreso" value="#{registroEmpleadosBean.datoEmpresa.fechaIngreso}" monthNavigator="true" yearNavigator="true" pattern="dd/MM/yyyy" showIcon="true" locale="es" timeZone="GMT-6"/>
 											</div>
 											<div class="field col-12 md:col-3">
 												<p:outputLabel for="@next" value="Perfil" />
@@ -258,6 +266,7 @@
 												<p:selectOneMenu id="soTipoJornada" value="#{registroEmpleadosBean.datoEmpresa.tipoJornada}" autoWidth="false" converter="entityConverter">
 													<f:selectItem itemLabel="--Seleccione--" noSelectionOption="true"/>
 													<f:selectItems value="#{registroEmpleadosBean.tiposJornada}" var="tipoJornada" itemValue="#{tipoJornada}" itemLabel="#{tipoJornada.clave} - #{tipoJornada.nombre}"></f:selectItems>
+													<p:ajax process="@this" />
 												</p:selectOneMenu>
 											</div>
 											<div class="field col-12 md:col-3">
@@ -269,12 +278,16 @@
 												</p:selectOneMenu>
 											</div>
 											<div class="field col-12 md:col-3">
-												<p:outputLabel for="@next" value="Hora de entrada"></p:outputLabel>
-												<p:datePicker value="#{registroEmpleadosBean.datoEmpresa.horaEntrada}" timeOnly="true" timeZone="GMT-6" locale="es"></p:datePicker>
+												<p:outputLabel for="@next" value="Hora de entrada" />
+												<p:datePicker value="#{registroEmpleadosBean.datoEmpresa.horaEntrada}" timeOnly="true" timeZone="GMT-6" locale="es">
+													<p:ajax process="@this" />
+												</p:datePicker>
 											</div>
 											<div class="field col-12 md:col-3">
 												<p:outputLabel for="@next" value="Tolerancia (minutos)"></p:outputLabel>
-												<p:inputNumber value="#{registroEmpleadosBean.datoEmpresa.minutosTolerancia}"></p:inputNumber>
+												<p:inputNumber value="#{registroEmpleadosBean.datoEmpresa.minutosTolerancia}">
+													<p:ajax process="@this" />
+												</p:inputNumber>
 											</div>
 											<div class="field col-12 md:col-3">
 												<p:outputLabel for="@next" value="Código Postal"/>
@@ -287,6 +300,7 @@
 												<p:selectOneMenu id="soEntidadFederativa" value="#{registroEmpleadosBean.datoEmpresa.entidadFederativa}" autoWidth="false" converter="entityConverter">
 													<f:selectItem itemLabel="--Seleccione--" noSelectionOption="true"/>
 													<f:selectItems value="#{registroEmpleadosBean.entidadesFederativas}" var="entidad" itemLabel="#{entidad.clave} - #{entidad.nombre}" itemValue="#{entidad}"/>
+													<p:ajax process="@this" />
 												</p:selectOneMenu>
 											</div>
 											<div class="field col-12 md:col-3">
@@ -294,6 +308,7 @@
 												<p:selectOneMenu id="soRiesgoPuesto" value="#{registroEmpleadosBean.datoEmpresa.riesgoPuesto}" autoWidth="false" converter="entityConverter">
 													<f:selectItem itemLabel="--Seleccione--" noSelectionOption="true"/>
 													<f:selectItems value="#{registroEmpleadosBean.riesgosPuesto}" var="riesgo" itemLabel="#{riesgo.clave} - #{riesgo.descripcion}"/>
+													<p:ajax process="@this" />
 												</p:selectOneMenu>
 											</div>
 											<div class="field col-12 md:col-3">
@@ -301,6 +316,7 @@
 												<p:selectOneMenu id="soPeriodicidadPago" value="#{registroEmpleadosBean.datoEmpresa.periodicidadPago}" autoWidth="false" converter="entityConverter">
 													<f:selectItem itemLabel="--Seleccione--" noSelectionOption="true"/>
 													<f:selectItems value="#{registroEmpleadosBean.periodicidadesPago}" var="periodicidad" itemLabel="#{periodicidad.periodicidad} - #{periodicidad.descripcion}" itemValue="#{periodicidad}"/>
+													<p:ajax process="@this" />
 												</p:selectOneMenu>
 											</div>
 											<div class="field col-12 md:col-1">
@@ -488,13 +504,13 @@
 								</div>
 								<div class="p-field">
 									<p:outputLabel value="Fecha inicio"></p:outputLabel>
-									<p:datePicker value="#{registroEmpleadosBean.prestamo.fechaInicio}" showIcon="true" yearNavigator="true" monthNavigator="true" weekCalculator="true" pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es">
+									<p:datePicker value="#{registroEmpleadosBean.prestamo.fechaInicio}" showIcon="true" yearNavigator="true" monthNavigator="true" weekCalculator="true" pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX">
 										<p:ajax process="@this"></p:ajax>
 									</p:datePicker>
 								</div>
 								<div class="p-field">
 									<p:outputLabel value="Fecha Fin"></p:outputLabel>
-									<p:datePicker value="#{registroEmpleadosBean.prestamo.fechaFin}" showIcon="true" yearNavigator="true" monthNavigator="true" weekCalculator="true" pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es">
+									<p:datePicker value="#{registroEmpleadosBean.prestamo.fechaFin}" showIcon="true" yearNavigator="true" monthNavigator="true" weekCalculator="true" pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX">
 										<p:ajax process="@this"></p:ajax>
 									</p:datePicker>
 								</div>
@@ -511,12 +527,6 @@
 									</p:inputNumber>
 								</div>
 								<div class="p-field">
-									<p:outputLabel value="Total"></p:outputLabel>
-									<p:inputNumber value="#{registroEmpleadosBean.prestamo.total}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," minValue="0.00" emptyValue="zero">
-										<p:ajax process="@this"></p:ajax>
-									</p:inputNumber>
-								</div>
-								<div class="p-field">
 									<p:outputLabel value="Periodicidad de pago"></p:outputLabel>
 									<p:selectOneMenu value="#{registroEmpleadosBean.prestamo.periodicidadPago}" converter="entityConverter">
 										<f:selectItem itemLabel="Seleccione la periodicidad de pago" noSelectionOption="true" />
@@ -525,10 +535,16 @@
 										<p:ajax process="@this"></p:ajax>
 									</p:selectOneMenu>
 								</div>
+								<div class="p-field">
+									<p:outputLabel value="Total"></p:outputLabel>
+									<p:inputNumber value="#{registroEmpleadosBean.prestamo.total}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," minValue="0.00" emptyValue="zero">
+										<p:ajax process="@this"></p:ajax>
+									</p:inputNumber>
+								</div>
 							</div>
 							<f:facet name="footer">
 								<p:commandButton value="Agregar" process="@this" actionListener="#{registroEmpleadosBean.agregarPrestamo()}">
-									<p:confirm header="Confirmación" message="¿Está seguro que desea eliminar el préstamo?" icon="pi pi-exclamation-triangle"/>
+									<p:confirm header="Confirmación" message="¿Está seguro que desea agregar el préstamo?" icon="pi pi-exclamation-triangle"/>
 								</p:commandButton>
 							</f:facet>
                         </p:dialog>
@@ -545,8 +561,10 @@
                         </p:confirmDialog>
                         
                         <p:confirmDialog widgetVar="dialogEliminarEmpleado" showEffect="fade" width="300" message="¿Está seguro que desea dar de baja al empleado?" header="Confirmar" severity="warn">
-                            <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{registroEmpleadosBean.eliminaEmpleado()}" process="@this" oncomplete="PF('dialogEliminarEmpleado').hide()"/>
-                            <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('dialogEliminarEmpleado').hide()" />
+                        	<div>
+	                            <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{registroEmpleadosBean.eliminaEmpleado()}" process="@this" oncomplete="PF('dialogEliminarEmpleado').hide()"/>
+	                            <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('dialogEliminarEmpleado').hide()" />
+                        	</div>
                         </p:confirmDialog>
                         
                         <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="300">

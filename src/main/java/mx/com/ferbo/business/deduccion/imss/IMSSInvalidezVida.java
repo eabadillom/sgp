@@ -73,6 +73,7 @@ public class IMSSInvalidezVida extends AbstractIMSSDeduccion implements IDeducci
 			deduccion.setClave("001");
 			deduccion.setNombre("I.M.S.S. (Invalidez y vida)");
 			deduccion.setImporte(cuota);
+			deduccion.setInformar(false);
 			deduccion.setProcesar(false);
 		}
 		

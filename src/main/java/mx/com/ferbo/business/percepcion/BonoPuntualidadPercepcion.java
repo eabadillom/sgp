@@ -69,7 +69,8 @@ public class BonoPuntualidadPercepcion extends AbstractPercepcion implements IPe
     		
     		percepcionEmpleado = this.buscaPercepcionEmpleado(P_BONO_PUNTUALIDAD);
     		
-    		if(    (percepcionEmpleado != null) 
+    		if(    (percepcionEmpleado != null)
+    			&& (percepcionEmpleado.getActivo())
 				&& (percepcionEmpleado.getImporteMaximo() != null)
 				&& (bono.compareTo(percepcionEmpleado.getImporteMaximo()) > 0) ) {
     			

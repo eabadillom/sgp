@@ -17,7 +17,7 @@ import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.dao.n.PeriodicidadPagoDAO;
 import mx.com.ferbo.model.CatPeriodicidadPago;
-import mx.com.ferbo.util.DateUtils;
+import mx.com.ferbo.util.DateUtil;
 
 @Named(value = "perPagoBean")
 @ViewScoped
@@ -38,7 +38,7 @@ public class PeriodicidadPagoBean implements Serializable {
     @PostConstruct
     public void init() {
         this.fechaActual = new Date();
-        DateUtils.setTime(fechaActual, 0, 0, 0, 0);
+        DateUtil.setTime(fechaActual, 0, 0, 0, 0);
         this.cargaLista();
     }
 

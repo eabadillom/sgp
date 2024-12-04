@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.model.CatTarifaISR;
+import mx.com.ferbo.util.PeriodoISR;
 
 public class TarifaISRDAO extends BaseDAO<CatTarifaISR, Integer> {
 	
@@ -38,6 +39,11 @@ public class TarifaISRDAO extends BaseDAO<CatTarifaISR, Integer> {
     				.setParameter("tipo", tipo)
     				.getResultList()
     				;
+    		
+    		for(CatTarifaISR model : modelList) {
+    			PeriodoISR periodo = PeriodoISR.fromAbbreviation(model.getTipo());
+    			model.setPeriodoISR(periodo);
+    		}
     		
     	} catch(NoResultException ex) {
     		log.error("No se encontró la lista de tarifas de ISR para el periodo indicado...", ex);
