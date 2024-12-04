@@ -91,7 +91,7 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
         return model;
     }
 
-    public List<DetEmpleado> buscarActivoEmpresaIngreso(Integer idEmpresa, Date periodoPagoInicio) {
+    public List<DetEmpleado> buscarActivoEmpresaIngreso(Integer idEmpresa, Date periodoPagoInicio, Date periodoPagoFin) {
         List<DetEmpleado> modelList = null;
         EntityManager emSGP = null;
 
@@ -101,7 +101,9 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
             modelList = emSGP.createNamedQuery("DetEmpleado.findByActiveEmpresaIngreso", modelClass)
                     .setParameter("idEmpresa", idEmpresa)
                     .setParameter("periodoPagoInicio", periodoPagoInicio)
-                    .getResultList();
+                    .setParameter("periodoPagoFin", periodoPagoFin)
+                    .getResultList()
+                    ;
 
         } catch (Exception ex) {
             log.warn("Problema para obtener la lista de empleados...", ex);

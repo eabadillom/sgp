@@ -114,6 +114,7 @@ public class IMSSDeduccion extends AbstractIMSSDeduccion implements IDeducciones
 			dIMSS.setClave("FRB-052");
 			dIMSS.setNombre("I.M.S.S.");
 			dIMSS.setImporte(imss);
+			dIMSS.setInformar(true);
 			dIMSS.setProcesar(true);
 			aportacionesIMSS.add(dIMSS);
 			

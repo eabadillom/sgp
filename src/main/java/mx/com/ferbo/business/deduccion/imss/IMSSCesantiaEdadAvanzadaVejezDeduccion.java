@@ -66,6 +66,7 @@ public class IMSSCesantiaEdadAvanzadaVejezDeduccion extends AbstractIMSSDeduccio
 			deduccion.setClave("001");
 			deduccion.setNombre("I.M.S.S. (Cesantía en edad avanzada y vejez)");
 			deduccion.setImporte(cuota);
+			deduccion.setInformar(false);
 			deduccion.setProcesar(false);
 		}
 		

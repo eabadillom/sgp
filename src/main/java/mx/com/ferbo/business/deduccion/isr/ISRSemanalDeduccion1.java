@@ -24,7 +24,7 @@ import mx.com.ferbo.model.DetNominaOtroPagoPK;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.model.sat.CatTipoOtroPago;
-import mx.com.ferbo.util.DateUtils;
+import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.SGPException;
 
 /**Cálculo del ISR, conforme a la reforma de diciembre de 2013.
@@ -78,10 +78,10 @@ public class ISRSemanalDeduccion1 extends AbstractDeduccion implements IDeduccio
 		this.periodoInicio = periodoInicio;
 		this.periodoFin = periodoFin;
 		
-		periodoSiguienteFin = DateUtils.addDay(this.periodoFin, 7);
+		periodoSiguienteFin = DateUtil.addDay(this.periodoFin, 7);
 		
-		Integer mesActual = DateUtils.getMes(this.periodoFin);
-		Integer mesSiguiente = DateUtils.getMes(periodoSiguienteFin);
+		Integer mesActual = DateUtil.getMes(this.periodoFin);
+		Integer mesSiguiente = DateUtil.getMes(periodoSiguienteFin);
 		
 		if(mesSiguiente > mesActual) {
 			this.ultimaSemanaMes = new Boolean(true);
@@ -145,7 +145,7 @@ public class ISRSemanalDeduccion1 extends AbstractDeduccion implements IDeduccio
 				this.subsidioExecutor = new SubsidioEmpleoExecutor();
 			
 			if(this.tarifaSubsidioBO == null)
-				this.tarifaSubsidioBO = subsidioExecutor.loadClass("SUBEM", DateUtils.toLocalDate(periodoFin));
+				this.tarifaSubsidioBO = subsidioExecutor.loadClass("SUBEM", DateUtil.toLocalDate(periodoFin));
 			
 			importeSubsidio = this.tarifaSubsidioBO.calcular(ISubsidioEmpleo.PERIODO_SEMANAL, dBaseISR.getImporte());
 			
@@ -191,6 +191,7 @@ public class ISRSemanalDeduccion1 extends AbstractDeduccion implements IDeduccio
 				dISR.setNombre("I.S.R.");
 				dISR.setImporte(isrDespuesDeSubsidio);
 				dISR.setProcesar(true);
+				dISR.setInformar(true);
 				
 				deduccionesISR.add(dISRAntesSubsidio);
 				deduccionesISR.add(dISR);
@@ -258,10 +259,14 @@ public class ISRSemanalDeduccion1 extends AbstractDeduccion implements IDeduccio
 		opSubsidioEmpleo.setNombre("Subs. al empleo mes");
 		opSubsidioEmpleo.setImporte(importeSubsidio);
 		
-		if(importeSubsidio.compareTo(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP)) > 0)
+		if(importeSubsidio.compareTo(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP)) > 0) {
 			opSubsidioEmpleo.setProcesar(true);
-		else
+			opSubsidioEmpleo.setInformar(true);
+		}
+		else {
 			opSubsidioEmpleo.setProcesar(false);
+			opSubsidioEmpleo.setInformar(false);
+		}
 		nomina.getOtrosPagos().add(opSubsidioEmpleo);
 	}
 	

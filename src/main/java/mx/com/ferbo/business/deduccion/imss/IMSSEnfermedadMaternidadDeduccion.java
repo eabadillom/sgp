@@ -92,6 +92,7 @@ public class IMSSEnfermedadMaternidadDeduccion extends AbstractIMSSDeduccion imp
 			deduccion.setClave("001");
 			deduccion.setNombre("I.M.S.S. (Enfermedad y Maternidad)");
 			deduccion.setImporte(cuota);
+			deduccion.setInformar(false);
 			deduccion.setProcesar(false);
 		}
 		
