@@ -20,10 +20,10 @@
 						<f:selectItem itemLabel="Todas las plantas"></f:selectItem>
 						<f:selectItems value="#{repAsistenciaBean.plantas}" var="planta" itemLabel="#{planta.descripcion}" itemValue="#{planta}"></f:selectItems>
 					</p:selectOneMenu>
-					<p:datePicker showIcon="true" placeholder="Del: dd/mm/aaaa" value="#{repAsistenciaBean.fechaInicio}">
+					<p:datePicker showIcon="true" placeholder="Del: dd/mm/aaaa" value="#{repAsistenciaBean.fechaInicio}" locale="es_MX" pattern="dd/MM/yyyy" timeZone="GMT-6">
 						<p:ajax event="dateSelect" listener="#{repAsistenciaBean.ajustaHoras}" process="@this"></p:ajax>
 					</p:datePicker>
-					<p:datePicker showIcon="true" placeholder="Del: dd/mm/aaaa" value="#{repAsistenciaBean.fechaFin}">
+					<p:datePicker showIcon="true" placeholder="Del: dd/mm/aaaa" value="#{repAsistenciaBean.fechaFin}" locale="es_MX" pattern="dd/MM/yyyy" timeZone="GMT-6">
 						<p:ajax event="dateSelect" listener="#{repAsistenciaBean.ajustaHoras}" process="@this"></p:ajax>
 					</p:datePicker>
 					<p:commandButton value="Buscar" icon="pi pi-search" process="pnl-buscar @this" update="dt-registros :form:cmd-exportar-pdf" actionListener="#{repAsistenciaBean.cargaInfo}" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
@@ -36,12 +36,12 @@
 					</p:column>
 					<p:column headerText="Entrada" style="width: 10rem; text-align: center;" sortBy="#{registro.fechaEntrada}">
 						<p:outputLabel value="#{registro.fechaEntrada}">
-							<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" />
+							<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" timeZone="GMT-6" locale="es_MX"/>
 						</p:outputLabel>
 					</p:column>
 					<p:column headerText="Salida" style="width: 10rem; text-align: center;" sortBy="#{registro.fechaSalida}">
 						<p:outputLabel value="#{registro.fechaSalida}">
-							<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" />
+							<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" timeZone="GMT-6" locale="es_MX"/>
 						</p:outputLabel>
 					</p:column>
 				</p:dataTable>
