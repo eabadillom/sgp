@@ -35,8 +35,8 @@ public class TipoAsentamientoDAO extends BaseDAO{
         }
         catch(Exception ex){
             super.rollback(em);
-            log.error("Hubo algun problema al obtener todos los registros de la tabla CatTipoAsentamiento");
-            throw new SGPException("Problema al obtener los registros" + ex);
+            log.error("Hubo algun problema al obtener todos los registros de la tabla CatTipoAsentamiento " + ex);
+            throw new SGPException("Problema al obtener los registros");
         }
         finally{
             super.close(em);
@@ -59,8 +59,8 @@ public class TipoAsentamientoDAO extends BaseDAO{
         }
         catch(Exception ex){
             super.rollback(em);
-            log.error("Hubo algun problema al buscar el elemento con id: " + id);
-            throw new SGPException("Problema al obtener el elemento por id " + ex);
+            log.error("Hubo algun problema al buscar el elemento con id: " + id + ". " + ex);
+            throw new SGPException("Problema al obtener el elemento por id ");
         }
         finally{
             super.close(em);         
@@ -82,8 +82,8 @@ public class TipoAsentamientoDAO extends BaseDAO{
         }
         catch(Exception ex){
             super.rollback(em);
-            log.error("Hubo algun proble al guardar el registro {} en la tabla CatTipoAsentamiento", tipoasentamiento);
-            throw new SGPException("Problema al guardar el registro " + ex);
+            log.error("Hubo algun proble al guardar el registro en la tabla CatTipoAsentamiento. " + ex);
+            throw new SGPException("Problema al guardar el registro");
         }
         finally{
             super.close(em);
@@ -104,8 +104,8 @@ public class TipoAsentamientoDAO extends BaseDAO{
         }
         catch(Exception ex){
             super.rollback(em);
-            log.error("Hubo algun problema al actualizar el registro {} en la tabla CatTipoAsentamiento", tipoasentamiento);
-            throw new SGPException("Problema al actualizar el registro " + ex);
+            log.error("Hubo algun problema al actualizar el registro en la tabla CatTipoAsentamiento. " + ex);
+            throw new SGPException("Problema al actualizar el registro ");
         }
         finally{
             super.close(em);
@@ -126,8 +126,8 @@ public class TipoAsentamientoDAO extends BaseDAO{
         }
         catch(Exception ex){
             super.rollback(em);
-            log.error("Hubo algun problema al eliminar el registro {} de la tabla CatTipoAsentamiento", tipoasentamiento);
-            throw new SGPException("Problema al eliminar el registro " + ex);
+            log.error("Hubo algun problema al eliminar el registro de la tabla CatTipoAsentamiento. " + ex);
+            throw new SGPException("Problema al eliminar el registro ");
         }
         finally{
             super.close(em);
@@ -147,9 +147,9 @@ public class TipoAsentamientoDAO extends BaseDAO{
             log.info("Finaliza proceso de obtener tododos los tipos de asentamiento en base al asentamiento.");
         }
         catch(Exception ex){
-            log.error("Error al obtener todos los tipos de asentamiento en base al asentamiento de la tabla CatTipoAsentamiento.");
+            log.error("Error al obtener todos los tipos de asentamiento en base al asentamiento de la tabla CatTipoAsentamiento. " + ex);
             super.rollback(em);
-            throw new SGPException("Hubo un problema al obtener todos los tipos de asentamiento" + ex);
+            throw new SGPException("Hubo un problema al obtener todos los tipos de asentamiento");
         }
         finally{
             super.close(em);

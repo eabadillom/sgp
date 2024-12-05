@@ -24,8 +24,8 @@
                     <p:inputText value="#{domiciliosBean.codigopostal}">
                         <p:ajax process="@this"/>
                     </p:inputText>
-                    <p:commandButton value="Buscar" icon="pi pi-search" actionListener="#{domiciliosBean.buscarCodigoPostal}" update="frm" process="@this"/>
-
+                    <p:commandButton value="Buscar" icon="pi pi-search" styleClass="ui-button-success" actionListener="#{domiciliosBean.buscarCodigoPostal}" style="margin: 0.3rem;" update="frm" process="@this"/>
+                    <p:commandButton value="Limpiar todo" actionListener="#{domiciliosBean.limpiarTodo}" style="margin: 0.3rem;" update="frm" process="@this"/>
                 </div>                  
             </p:outputPanel>
 
@@ -44,7 +44,7 @@
                         </p:selectOneMenu>
                         <p:commandButton id="addPais" icon="pi pi-plus" action="#{domiciliosBean.crear('Pais')}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();" process="@this"/>
                         <p:commandButton id="updPais" icon="pi pi-pencil" action="#{domiciliosBean.editar('Pais')}" disabled="#{empty domiciliosBean.pais}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();" process="@this"/>
-                        <p:commandButton id="delPais" icon="pi pi-times" actionListener="#{domiciliosBean.eliminar('Pais')}" disabled="#{empty domiciliosBean.pais}" ajax="true"  oncomplete="PF('dlgBorrar').show();"/>
+                        <p:commandButton id="delPais" icon="pi pi-times" styleClass="ui-button-danger" actionListener="#{domiciliosBean.eliminar('Pais')}" disabled="#{empty domiciliosBean.pais}" ajax="true"  oncomplete="PF('dlgBorrar').show();"/>
                     </div>
                 </div>
 
@@ -58,7 +58,7 @@
                         </p:selectOneMenu>
                         <p:commandButton id="addEstado" icon="pi pi-plus" action="#{domiciliosBean.crear('Estado')}" disabled="#{empty domiciliosBean.pais}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();" process="@this"/>
                         <p:commandButton id="updEstado" icon="pi pi-pencil" action="#{domiciliosBean.editar('Estado')}" disabled="#{empty domiciliosBean.estado}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();" process="@this"/>
-                        <p:commandButton id="delEstado" icon="pi pi-times" actionListener="#{domiciliosBean.eliminar('Estado')}" disabled="#{empty domiciliosBean.estado}" ajax="true"  oncomplete="PF('dlgBorrar').show();"/>
+                        <p:commandButton id="delEstado" icon="pi pi-times" styleClass="ui-button-danger" actionListener="#{domiciliosBean.eliminar('Estado')}" disabled="#{empty domiciliosBean.estado}" ajax="true"  oncomplete="PF('dlgBorrar').show();"/>
                     </div>
                 </div>
 
@@ -75,7 +75,7 @@
                         </p:selectOneMenu>
                         <p:commandButton id="addMunicipio" icon="pi pi-plus" action="#{domiciliosBean.crear('Municipio')}" disabled="#{empty domiciliosBean.estado}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();" process="@this"/>
                         <p:commandButton id="updMunicipio" icon="pi pi-pencil" action="#{domiciliosBean.editar('Municipio')}" disabled="#{empty domiciliosBean.municipio}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();" process="@this"/>
-                        <p:commandButton id="delMunicipio" icon="pi pi-times" action="#{domiciliosBean.eliminar('Municipio')}" disabled="#{empty domiciliosBean.municipio}" ajax="true"  oncomplete="PF('dlgBorrar').show();"/>
+                        <p:commandButton id="delMunicipio" icon="pi pi-times" styleClass="ui-button-danger" action="#{domiciliosBean.eliminar('Municipio')}" disabled="#{empty domiciliosBean.municipio}" ajax="true"  oncomplete="PF('dlgBorrar').show();"/>
                     </div>
                 </div>
 
@@ -89,7 +89,7 @@
                         </p:selectOneMenu>
                         <p:commandButton id="addLocalidad" icon="pi pi-plus" actionListener="#{domiciliosBean.crear('Localidad')}" disabled="#{empty domiciliosBean.municipio}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();" process="@this"/>
                         <p:commandButton id="updLocalidad" icon="pi pi-pencil" actionListener="#{domiciliosBean.editar('Localidad')}" disabled="#{empty domiciliosBean.localidad}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();" process="@this"/>
-                        <p:commandButton id="delLocalidad" icon="pi pi-times" actionListener="#{domiciliosBean.eliminar('Localidad')}" disabled="#{empty domiciliosBean.localidad}" ajax="true" oncomplete="PF('dlgBorrar').show();"/>
+                        <p:commandButton id="delLocalidad" icon="pi pi-times" styleClass="ui-button-danger" actionListener="#{domiciliosBean.eliminar('Localidad')}" disabled="#{empty domiciliosBean.localidad}" ajax="true" oncomplete="PF('dlgBorrar').show();"/>
                     </div>
                 </div>
             </div>
@@ -107,7 +107,7 @@
                         </p:selectOneMenu>
                         <p:commandButton id="addAsentamiento" icon="pi pi-plus" action="#{domiciliosBean.crear('Asentamiento')}" disabled="#{empty domiciliosBean.localidad}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();" process="@this"/>
                         <p:commandButton id="updAsentamiento" icon="pi pi-pencil" action="#{domiciliosBean.editar('Asentamiento')}" disabled="#{empty domiciliosBean.asentamiento}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();" process="@this"/>
-                        <p:commandButton id="delAsentamiento" icon="pi pi-times" action="#{domiciliosBean.eliminar('Asentamiento')}" disabled="#{empty domiciliosBean.asentamiento}" ajax="true"  oncomplete="PF('dlgBorrar').show();"/>
+                        <p:commandButton id="delAsentamiento" icon="pi pi-times" styleClass="ui-button-danger" action="#{domiciliosBean.eliminar('Asentamiento')}" disabled="#{empty domiciliosBean.asentamiento}" ajax="true"  oncomplete="PF('dlgBorrar').show();"/>
                     </div>
                 </div>
                 <div class="field col-12 md:col-6">
@@ -120,7 +120,7 @@
                         </p:selectOneMenu>
                         <p:commandButton id="addTipo" icon="pi pi-plus" actionListener="#{domiciliosBean.crear('Tipo Asentamiento')}" disabled="#{empty domiciliosBean.localidad}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();" process="@this"/>
                         <p:commandButton id="updTipo" icon="pi pi-pencil" actionListener="#{domiciliosBean.editar('Tipo Asentamiento')}" disabled="#{empty domiciliosBean.tipoasentamiento}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();" process="@this"/>
-                        <p:commandButton id="delTipo" icon="pi pi-times" actionListener="#{domiciliosBean.eliminar('Tipo Asentamiento')}" disabled="#{empty domiciliosBean.tipoasentamiento}" ajax="true"  oncomplete="PF('dlgBorrar').show();"/>
+                        <p:commandButton id="delTipo" icon="pi pi-times" styleClass="ui-button-danger" actionListener="#{domiciliosBean.eliminar('Tipo Asentamiento')}" disabled="#{empty domiciliosBean.tipoasentamiento}" ajax="true"  oncomplete="PF('dlgBorrar').show();"/>
                     </div>
                 </div>
 
@@ -136,13 +136,13 @@
                         </p:selectOneMenu>
                         <p:commandButton id="addEntidad" icon="pi pi-plus" action="#{domiciliosBean.crear('Entidad Postal')}" disabled="#{empty domiciliosBean.localidad}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();" process="@this"/>
                         <p:commandButton id="updEntidad" icon="pi pi-pencil" action="#{domiciliosBean.editar('Entidad Postal')}" disabled="#{empty domiciliosBean.entidadpostal}" ajax="true" update="frm:dlgDomicilio" oncomplete="PF('dlgDomicilio').show();" process="@this"/>
-                        <p:commandButton id="delEntidad" icon="pi pi-times" action="#{domiciliosBean.eliminar('Entidad Postal')}" disabled="#{empty domiciliosBean.entidadpostal}" ajax="true" oncomplete="PF('dlgBorrar').show();"/>
+                        <p:commandButton id="delEntidad" icon="pi pi-times" styleClass="ui-button-danger" action="#{domiciliosBean.eliminar('Entidad Postal')}" disabled="#{empty domiciliosBean.entidadpostal}" ajax="true" oncomplete="PF('dlgBorrar').show();"/>
                     </div>
                 </div>
             </div>
 
             <p:dialog header="#{domiciliosBean.operacion}" showEffect="fade" modal="true" widgetVar="dlgDomicilio" id="dlgDomicilio" 
-                      responsive="true" draggable="true" resizable="false" dynamic="true" style="margin: auto">
+                      responsive="true" draggable="true" resizable="false" dynamic="true"  width="500">
                 <p:outputPanel id="datos" class="ui-fluid">
 
                     <h:panelGroup rendered="#{domiciliosBean.paisstatus}">
@@ -234,7 +234,7 @@
                             <p:outputLabel value="Tipo de Asentamiento: " />
 
                             <p:outputLabel for="@next" value="ID del Asentamiento: "/>
-                            <p:inputText value="#{domiciliosBeani.iid}" readonly="#{domiciliosBean.statusid}">
+                            <p:inputText value="#{domiciliosBean.iid}" readonly="#{domiciliosBean.statusid}">
                                 <p:ajax process="@this"/>
                             </p:inputText>
                             <p:outputLabel for="@next" value="Codigo Postal del Asentamiento: "/>
@@ -247,15 +247,15 @@
                             </p:inputText>
 
                             <p:outputLabel value="Tipo de Asentamiento: " />
-                            <p:selectOneMenu value="#{domiciliosBean.asentamiento.tipoAsentamiento}" converter="entityConverter" filter="true" filterMatchMode="contains">
-                                <f:selectItem itemLabel="#{domiciliosBean.tipoasentamiento.descripcion}" itemValue="#{domiciliosBean.tipoasentamiento}" />
+                            <p:selectOneMenu value="#{domiciliosBean.tipotemporal}" converter="entityConverter" filter="true" filterMatchMode="contains">
+                                <f:selectItem itemLabel="#{domiciliosBean.tipotemporal.descripcion}" itemValue="#{domiciliosBean.tipotemporal}" />
                                 <f:selectItems value="#{domiciliosBean.tiposasentamiento}" var="tipoasentamiento" itemLabel="#{tipoasentamiento.descripcion}" itemValue="#{tipoasentamiento}"/>
                                 <p:ajax process="@this" />
                             </p:selectOneMenu>
 
                             <p:outputLabel value="Entidad postal: " />
-                            <p:selectOneMenu value="#{domiciliosBean.asentamiento.entidadPostal}" converter="entityConverter" filter="true" filterMatchMode="contains">
-                                <f:selectItem itemLabel="#{domiciliosBean.asentamiento.entidadPostal.descripcion}" itemValue="#{domiciliosBean.asentamiento.entidadPostal}" />
+                            <p:selectOneMenu value="#{domiciliosBean.entidadtemporal}" converter="entityConverter" filter="true" filterMatchMode="contains">
+                                <f:selectItem itemLabel="#{domiciliosBean.entidadtemporal.descripcion}" itemValue="#{domiciliosBean.entidadtemporal}" />
                                 <f:selectItems value="#{domiciliosBean.entidadespostales}" var="entidadpostal" itemLabel="#{entidadpostal.descripcion}" itemValue="#{entidadpostal}"/>
                                 <p:ajax process="@this"/>
                             </p:selectOneMenu>
@@ -300,13 +300,13 @@
                 <f:facet name="footer">
                     <p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{domiciliosBean.operar}" update="frm" oncomplete="PF('dlgDomicilio').hide();" process="@this datos"/>
 
-                    <p:commandButton value="Cancelar" icon="pi pi-times" actionListener="#{domiciliosBean.limpiarEstatus}" oncomplete="PF('dlgDomicilio').hide();" update="frm"/>
+                    <p:commandButton value="Cancelar" icon="pi pi-times" styleClass="ui-button-danger" actionListener="#{domiciliosBean.limpiarEstatus}" oncomplete="PF('dlgDomicilio').hide();" update="frm"/>
                 </f:facet>
             </p:dialog> 
 
             <p:confirmDialog widgetVar="dlgBorrar" showEffect="fade" width="300"
                              message="Realmente quiere eliminar?" header="Confirmar" severity="warn">
-                <p:commandButton value="Si" icon="pi pi-check" actionListener="#{domiciliosBean.operar}"
+                <p:commandButton value="Si" icon="pi pi-check" styleClass="ui-button-danger" actionListener="#{domiciliosBean.operar}"
                                  oncomplete="PF('dlgBorrar').hide()" update="@form" process="@this"/>
                 <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
                                  onclick="PF('dlgBorrar').hide();" update="@form" />

@@ -35,8 +35,8 @@ public class MunicipioDAO extends BaseDAO {
 
         } catch (Exception ex) {
             super.rollback(em);
-            log.error("Hubo algun problema al obtener todos los registros de la tabla CatMunicipio");
-            throw new SGPException("Problema al obtener los registros" + ex);
+            log.error("Hubo algun problema al obtener todos los registros de la tabla CatMunicipio. " + ex);
+            throw new SGPException("Problema al obtener los registros.");
         } finally {
             super.close(em);
         }
@@ -55,8 +55,8 @@ public class MunicipioDAO extends BaseDAO {
 
         } catch (Exception ex) {
             super.rollback(em);
-            log.error("Hubo algun problema al obtener todos los registros de la tabla CatMunicipio");
-            throw new SGPException("Problema al obtener los registros" + ex);
+            log.error("Hubo algun problema al obtener todos los registros de la tabla CatMunicipio. " + ex);
+            throw new SGPException("Problema al obtener los registros.");
         } finally {
             super.close(em);
         }
@@ -77,8 +77,8 @@ public class MunicipioDAO extends BaseDAO {
             log.info("Finaliza proceso de obtener elemento con id: {}", id);
         } catch (Exception ex) {
             super.rollback(em);
-            log.error("Hubo algun problema al buscar el elemento con id: " + id);
-            throw new SGPException("Problema al obtener el elemento por id " + ex);
+            log.error("Hubo algun problema al buscar el elemento con id: " + id + ". " + ex);
+            throw new SGPException("Problema al obtener el elemento por id.");
         } finally {
             super.close(em);
         }
@@ -98,8 +98,8 @@ public class MunicipioDAO extends BaseDAO {
             log.info("Finaliza proceso de guardar el registro en la tabla CatMunicipio");
         } catch (Exception ex) {
             super.rollback(em);
-            log.error("Hubo algun proble al guardar el registro {} en la tabla CatMunicipio", municipio);
-            throw new SGPException("Problema al guardar el registro " + ex);
+            log.error("Hubo algun proble al guardar el registro en la tabla CatMunicipio. " + ex);
+            throw new SGPException("Problema al guardar el registro.");
         } finally {
             super.close(em);
         }
@@ -118,8 +118,8 @@ public class MunicipioDAO extends BaseDAO {
             log.info("Finaliza proceso de actualizar el registro de la tabla CatMunicipio");
         } catch (Exception ex) {
             super.rollback(em);
-            log.error("Hubo algun problema al actualizar el registro {} en la tabla CatMunicipio", municipio);
-            throw new SGPException("Problema al actualizar el registro " + ex);
+            log.error("Hubo algun problema al actualizar el registro en la tabla CatMunicipio. " + ex);
+            throw new SGPException("Problema al actualizar el registro.");
         } finally {
             super.close(em);
         }
@@ -137,8 +137,8 @@ public class MunicipioDAO extends BaseDAO {
             log.info("Finaliza proceso de eliminar el registro de la tabla CatMunicipio");
         } catch (Exception ex) {
             super.rollback(em);
-            log.error("Hubo algun problema al eliminar el registro {} de la tabla CatMunicipio", municipio);
-            throw new SGPException("Problema al eliminar el registro " + ex);
+            log.error("Hubo algun problema al eliminar el registro de la tabla CatMunicipio. " + ex);
+            throw new SGPException("Problema al eliminar el registro.");
         } finally {
             super.close(em);
         }

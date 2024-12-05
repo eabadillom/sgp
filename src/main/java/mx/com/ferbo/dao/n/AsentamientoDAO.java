@@ -7,6 +7,8 @@ import javax.persistence.TypedQuery;
 import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.model.CatAsentamiento;
 import mx.com.ferbo.model.CatAsentamientoPK;
+import mx.com.ferbo.model.CatEntidadPostal;
+import mx.com.ferbo.model.CatTipoAsentamiento;
 import mx.com.ferbo.util.SGPException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -54,28 +56,45 @@ public class AsentamientoDAO extends BaseDAO<CatAsentamiento, CatAsentamientoPK>
             em.getTransaction().commit();
             log.info("Finaliza el proceso para guardar el registro en la tabla de asentamietos");
         } catch (Exception ex) {
-            log.error("Hubo algun problema al momento de guardar el registro en la tabla de asentamientos");
+            log.error("Hubo algun problema al momento de guardar el registro en la tabla de asentamientos"  + ex);
             super.rollback(em);
-            throw new SGPException("No se pudo guardar el registro de asentamiento" + ex);
+            throw new SGPException("No se pudo guardar el registro de asentamiento");
         } finally {
             super.close(em);
         }
     }
 
-    public synchronized void actualizar(CatAsentamiento asentamiento) throws SGPException {
+    public synchronized void actualizar(String nuevadescripcion, String nuevocp, CatEntidadPostal nuevaentidad, CatTipoAsentamiento nuevotipo, Integer idpais, Integer idestado, Integer idmunicipio, Integer idlocalidad, Integer idasentamiento) throws SGPException {
         EntityManager em = null;
+        String consulta = "";
 
         try {
             log.info("Inicia el proceso para actualizar el registro en la tabla de asentamietos");
             em = super.getEntityManager();
+            consulta += "update CatAsentamiento e set e.descripcion = :nuevadescripcion, e.cp = :nuevocp, e.entidadPostal = :nuevaentidad, e.tipoAsentamiento = :nuevotipo ";
+            consulta += "where e.key.localidad.key.municipio.key.estado.key.pais.id = :idpais ";
+            consulta += "and e.key.localidad.key.municipio.key.estado.key.id = :idestado ";
+            consulta += "and e.key.localidad.key.municipio.key.id = :idmunicipio ";
+            consulta += "and e.key.localidad.key.id = :idlocalidad ";
+            consulta += "and e.key.id = :idasentamiento ";
             em.getTransaction().begin();
-            em.merge(asentamiento);
+            Query query = em.createQuery(consulta);
+            query.setParameter("nuevadescripcion", nuevadescripcion);
+            query.setParameter("nuevocp", nuevocp);
+            query.setParameter("nuevaentidad", nuevaentidad);
+            query.setParameter("nuevotipo", nuevotipo);
+            query.setParameter("idpais", idpais);
+            query.setParameter("idestado", idestado);
+            query.setParameter("idmunicipio", idmunicipio);
+            query.setParameter("idlocalidad", idlocalidad);
+            query.setParameter("idasentamiento", idasentamiento);
+            query.executeUpdate();
             em.getTransaction().commit();
             log.info("Finaliza el proceso para actualizar el registro en la tabla de asentamietos");
         } catch (Exception ex) {
-            log.error("Hubo algun problema al momento de actualizar el registro en la tabla de asentamientos");
+            log.error("Hubo algun problema al momento de actualizar el registro en la tabla de asentamientos" + ex);
             super.rollback(em);
-            throw new SGPException("No se pudo actualizar el registro de asentamiento" + ex);
+            throw new SGPException("No se pudo actualizar el registro de asentamiento");
         } finally {
             super.close(em);
         }
@@ -108,9 +127,9 @@ public class AsentamientoDAO extends BaseDAO<CatAsentamiento, CatAsentamientoPK>
             em.getTransaction().commit();
             log.info("Finaliza el proceso para eliminar el registro en la tabla de asentamietos");
         } catch (Exception ex) {
-            log.error("Hubo algun problema al momento de eliminar el registro en la tabla de asentamientos");
+            log.error("Hubo algun problema al momento de eliminar el registro en la tabla de asentamientos"  + ex);
             super.rollback(em);
-            throw new SGPException("No se pudo eliminar el registro de asentamiento" + ex);
+            throw new SGPException("No se pudo eliminar el registro de asentamiento");
         } finally {
             super.close(em);
         }
@@ -146,6 +165,31 @@ public class AsentamientoDAO extends BaseDAO<CatAsentamiento, CatAsentamientoPK>
 
         return modelList;
     }
+    
+    public synchronized List<CatAsentamiento> obtenerPorCodigo(String cp) throws SGPException{
+        List<CatAsentamiento> resultado = null;
+        EntityManager em = null;
+        String consulta = "";
+        try{
+            log.info("Inicia el proceso para obtener los asentamiento por codigo postal");
+            em = super.getEntityManager();
+            consulta = "select e from CatAsentamiento e where e.cp = :cp ";
+            TypedQuery query = em.createQuery(consulta, CatAsentamiento.class);
+            query.setParameter("cp", cp);
+            resultado = query.getResultList();
+            log.info("Finaliza el proceso para obtener los asentamiento por codigo postal");
+        }
+        catch(Exception ex){
+            log.error("Hubo algun problema al momento de obtener los asentamiento por el codigo postal" + ex);
+            super.rollback(em);
+            throw new SGPException("Hubo algun problema al obtener los asentamientos");
+        }
+        finally{
+            super.close(em);
+        }
+        
+        return resultado;
+    }
 
     public synchronized List<CatAsentamiento> obtenerTodosPorLocalidad(Integer idPais, Integer idEstado, Integer idMunicipio, Integer idLocalidad) throws SGPException {
         EntityManager em = null;
@@ -162,8 +206,8 @@ public class AsentamientoDAO extends BaseDAO<CatAsentamiento, CatAsentamientoPK>
             log.info("Finaliza proceso de obtener todos los asentamientos");
         } catch (Exception ex) {
             super.rollback(em);
-            log.error("Hubo algun problema al obtener todos los registros de la tabla CatLAsentamiento");
-            throw new SGPException("Problema al obtener los registros" + ex);
+            log.error("Hubo algun problema al obtener todos los registros de la tabla CatLAsentamiento" + ex);
+            throw new SGPException("Problema al obtener los registros");
         } finally {
             super.close(em);
         }
@@ -228,8 +272,8 @@ public class AsentamientoDAO extends BaseDAO<CatAsentamiento, CatAsentamientoPK>
             log.info("finaliza proceso de obtener todos los asentamientos en base al tipo.");
         } catch (Exception ex) {
             super.rollback(em);
-            log.error("Hubo algun problema obtener todos los asentamientos por el tipo");
-            throw new SGPException("Problema al obtener todos los registros" + ex);
+            log.error("Hubo algun problema obtener todos los asentamientos por el tipo" + ex);
+            throw new SGPException("Problema al obtener todos los registros" );
         } finally {
             super.close(em);
         }
@@ -260,8 +304,8 @@ public class AsentamientoDAO extends BaseDAO<CatAsentamiento, CatAsentamientoPK>
             log.info("finaliza proceso de obtener todos los asentamientos en base a la entidad.");
         } catch (Exception ex) {
             super.rollback(em);
-            log.error("Hubo algun problema obtener todos los asentamientos por la entidad postal");
-            throw new SGPException("Problema al obtener todos los registros" + ex);
+            log.error("Hubo algun problema obtener todos los asentamientos por la entidad postal" + ex);
+            throw new SGPException("Problema al obtener todos los registros");
         } finally {
             super.close(em);
         }
