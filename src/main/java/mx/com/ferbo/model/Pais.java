@@ -8,6 +8,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -36,7 +37,7 @@ public class Pais implements Serializable {
     @Column(name = "nb_pais")
     private String nombrePais;
     
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "key.pais")
+    @OneToMany(mappedBy = "key.pais")
     private List<CatEstado> estados;
 
     public Pais() {

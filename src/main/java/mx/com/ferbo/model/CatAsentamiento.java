@@ -40,11 +40,11 @@ public class CatAsentamiento implements Serializable
     @Column(name = "cd_codPostal")
     private String cp;
     
-    @ManyToOne(optional = false)
+    @ManyToOne
     @JoinColumn(name = "cd_tipoasntmnto", referencedColumnName = "cd_tipoasntmnto")
     private CatTipoAsentamiento tipoAsentamiento;
     
-    @ManyToOne(optional = false)
+    @ManyToOne
     @JoinColumn(name = "cd_entidadPostal", referencedColumnName = "cd_entidadPostal")
     private CatEntidadPostal entidadPostal;
     
