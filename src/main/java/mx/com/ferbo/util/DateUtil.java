@@ -3,6 +3,8 @@ package mx.com.ferbo.util;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -23,7 +25,8 @@ public class DateUtil {
 	
 	public static final String FORMATO_DD_MM_YYYY          = "dd/MM/yyyy";
 	public static final String FORMATO_YYYY_MM_DD          = "yyyy-MM-dd";
-	public static final String FORMATO_YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss.SSS";
+	public static final String FORMATO_YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd hh:mm:ss.SSS";
+	public static final String FORMATO_ISO_Z = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 	public static final String FORMATO_DD_MM_YYYY_FULL     = "dd MMMM yyyy";
 	public static final String FORMATO_FECHA_CADENA 		= "dd 'de' MMMM 'de' yyyy";
 
@@ -56,13 +59,25 @@ public class DateUtil {
 	public static String PROP_NOVIEMBRE  = "noviembre"; //Para lectura del .properties
 	public static String PROP_DICIEMBRE  = "diciembre"; //Para lectura del .properties
 	
+	public static String PROP_CD_DOMINGO   = "D";
+	public static String PROP_CD_LUNES     = "L";
+	public static String PROP_CD_MARTES    = "M";
+	public static String PROP_CD_MIERCOLES = "MI";
+	public static String PROP_CD_JUEVES    = "J";
+	public static String PROP_CD_VIERNES   = "V";
+	public static String PROP_CD_SABADO    = "S";
+	
+	public static String[] PROP_DIA_SEMANA = {PROP_CD_DOMINGO, PROP_CD_LUNES, PROP_CD_MARTES, PROP_CD_MIERCOLES, PROP_CD_JUEVES, PROP_CD_VIERNES, PROP_CD_SABADO}; 
+	
 	public static final String KEY_SEPARADOR_DIA = " ";//Para lectura del .properties
 	
-	//Para lectura de las fechas de asueto en la Base de Datos.
-	//Las fechas de asueto se pueden categorizar incluso hasta por País
-	//(o región geográfica, según la tabla IPITOOLS_HOLYDAYS O BMEA_IPITOOLS_HOLYDAYS
-	//de la base de datos de Scrittura.
-	public static final String UBICACION_MEXICO = "MX";
+	public static Date now() {
+		Date resultado = null;
+		Calendar c = Calendar.getInstance(TimeZone.getTimeZone("GMT-06:00"), Locale.getDefault());
+		c.setTimeZone(TimeZone.getTimeZone("GMT-06:00"));
+		resultado = new Date(c.getTimeInMillis());
+		return resultado;
+	}
 	
 	/**Metodo para agregar dias a una fecha dada.
 	 * @param fecha Fecha de referencia a la que se desea agregar dias.
@@ -72,7 +87,7 @@ public class DateUtil {
 	public static Date addDay(Date fecha, int dias){
 		Date resultado = null;
 		
-		Calendar c = Calendar.getInstance();
+		Calendar c = Calendar.getInstance(TimeZone.getTimeZone("GMT-06:00"), Locale.getDefault());
 		c.setTime(fecha);
 		c.add(Calendar.DATE, dias);
 		
@@ -80,8 +95,6 @@ public class DateUtil {
 		
 		return resultado;
 	}
-	
-	
 	
 	/**Metodo para agregar meses a una fecha dada.
 	 * @param fecha Fecha de referencia a la que se desea agregar meses.
@@ -133,7 +146,7 @@ public class DateUtil {
 	}
 	
 	/**Devuelve la representación del mes en un formato String a partir de su
-	 * representación Numérica. Vea las constantes de mes para la clase {@link DateUtils}
+	 * representación Numérica. Vea las constantes de mes para la clase {@link DateUtil}
 	 * @param mes Representación Numérica del mes [0-11],<br>
 	 * Donde:<br>
 	 * 	<li>0 = "Enero"</li>
@@ -141,7 +154,7 @@ public class DateUtil {
 	 * 	<li>2 = "Marzo"</li>
 	 * 	<li>3 = "Abril"</li>
 	 *	<li>etc...</li><br>
-	 * Vea también las <i>constantes de mes</i> de la clase {@link DateUtils}
+	 * Vea también las <i>constantes de mes</i> de la clase {@link DateUtil}
 	 * @return Representación en un objeto {@link String} del mes proporcionado
 	 * en el parámetro <strong>int mes</strong>.
 	 * @throws InventarioException Se devuelve cuando se introduce un valor
@@ -172,7 +185,7 @@ public class DateUtil {
 	/**Devuelve el mes en formato numérico [0-11] del objeto {@link Date} dado.
 	 * @param fecha Objeto {@link Date} con la fecha.
 	 * @return Mes en formato numérico [0-11] del objeto. Vea también las <i>constantes
-	 * de mes</i> de la clase {@link DateUtils}
+	 * de mes</i> de la clase {@link DateUtil}
 	 */
 	public static int getMes(Date fecha){
 		int mes = -1;
@@ -199,6 +212,23 @@ public class DateUtil {
 		dia = cal.get(Calendar.DATE);
 		
 		return dia;
+	}
+	
+	public static String getDiaSemana(Date fecha) {
+		String sDia = null;
+		int dia = -1;
+		Calendar cal = null;
+		
+		try {
+			cal = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
+			cal.setTime(fecha);
+			dia = cal.get(Calendar.DAY_OF_WEEK);
+			sDia = PROP_DIA_SEMANA[dia - 1];
+		} catch(Exception ex) {
+			ex.printStackTrace();
+		}
+		
+		return sDia;
 	}
 
 	/**Devuelve la hora, en formato numérico [0-23] del objeto {@link Date} dado.
@@ -261,6 +291,17 @@ public class DateUtil {
 		return milisegundo;
 	}
 	
+	public static int getSemanaAnio(Date fecha) {
+		int semana = -1;
+		Calendar cal = null;
+		
+		cal = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
+		cal.setTime(fecha);
+		semana = cal.get(Calendar.WEEK_OF_YEAR);
+		
+		return semana;
+	}
+	
 	/**Establece valor del año para el objeto {@link Date} dado.
 	 * @param fecha Objeto {@link Date} al cual se desea establecer el nuevo valor para el año.
 	 * @param anio El nuevo valor para el Año que se establecerá en el parametro {@link Date}.
@@ -278,7 +319,7 @@ public class DateUtil {
 	/**Establece el valor del mes para el objeto {@link Date} dado.
 	 * @param fecha Objeto {@link Date} al cual se desea establecer el nuevo valor para el mes.
 	 * @param mes El nuevo valor para el mes que se establecerá en el parámetro {@link Date}.
-	 * Vea las constantes de la clase {@link DateUtils} para establecer correctamente el mes.
+	 * Vea las constantes de la clase {@link DateUtil} para establecer correctamente el mes.
 	 */
 	public static void setMes(Date fecha, int mes){
 		Calendar cal = null;
@@ -372,13 +413,14 @@ public class DateUtil {
 	/**Devuelve un objeto {@link Date} con el día, mes y año que se especifiquen.
 	 * @param year Año en formato numérico (int).
 	 * @param month Mes en formato numérico (int) [0-11]. Vea también las constantes de mes
-	 * para la clase {@link DateUtils}.
+	 * para la clase {@link DateUtil}.
 	 * @param date Dia en formato numérico (int) [1-31].
 	 * @return Objeto {@link Date} con la fecha establecida en los parámetros.
 	 */
 	public static Date getDate(int year, int month, int date){
 		Date     fecha = null;
 		Calendar cal = null;
+		log.debug("Default Time Zone: {}", TimeZone.getDefault());
 		
 		cal = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
 		cal.set(year, month, date);
@@ -414,7 +456,7 @@ public class DateUtil {
 		Calendar cal = null;
 		TimeZone tz = TimeZone.getTimeZone("GMT-06:00");
 		cal = GregorianCalendar.getInstance(tz, Locale.getDefault());
-		log.info("Timezone: {}", TimeZone.getDefault());
+		log.debug("Timezone: {}", TimeZone.getDefault());
 		cal.setTime(fecha);
 		cal.set(Calendar.HOUR_OF_DAY, hour);
 		cal.set(Calendar.MINUTE, minute);
@@ -638,18 +680,17 @@ public class DateUtil {
 		
 		return vencimiento;
 	}
-	
-	public static void main(String[] args) {
-		String sFecha = "2023-11-01";
-		Date fecha = null;
-		Date vencimiento = null;
-		
+
+	public static LocalDate toLocalDate(Date fecha) {
+		LocalDate resultado = null;
+		ZoneId systemDefault = null;
 		try {
-			fecha = getDate(sFecha, FORMATO_YYYY_MM_DD);
-			vencimiento = DateUtil.fechaVencimiento(fecha, 30, false);
-			log.info("Fecha inicio: {}, fecha vencimiento: {}", fecha, vencimiento);
+			systemDefault = ZoneId.of("GMT-6");
+			resultado = fecha.toInstant().atZone(systemDefault).toLocalDate();
 		} catch(Exception ex) {
-			log.error("Problema para obtener el vencimiento...", ex);
+			log.warn("Problema para convertir a LocalDate: " + fecha, ex.getMessage());
+			resultado = null;
 		}
+		return resultado;
 	}
 }

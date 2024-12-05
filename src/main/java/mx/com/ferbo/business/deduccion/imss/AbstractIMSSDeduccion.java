@@ -23,7 +23,7 @@ public class AbstractIMSSDeduccion extends AbstractDeduccion {
 		try {
 			collect = this.cuotasIMSS.stream()
 					.filter(t -> 
-						( t.getKey().getClave().equals(clave)
+						( t.getClave().equals(clave)
 							&& t.getTipoCuota().equals(tipoCuota)
 							&& (t.getBaseMinimo().compareTo(base) <= 0 && t.getBaseMaximo().compareTo(base) >= 0)
 						)

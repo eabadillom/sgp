@@ -20,7 +20,7 @@ import mx.com.ferbo.dao.n.DiaNoLaboralDAO;
 import mx.com.ferbo.dao.n.PaisDAO;
 import mx.com.ferbo.model.CatDiaNoLaboral;
 import mx.com.ferbo.model.Pais;
-import mx.com.ferbo.util.DateUtils;
+import mx.com.ferbo.util.DateUtil;
 
 @Named(value = "diasNLBean")
 @ViewScoped
@@ -50,7 +50,7 @@ public class DiasNoLaboralesBean implements Serializable {
 		Integer anioActual = null;
 		
 		try {
-			anioActual = DateUtils.getAnio(fechaActual);
+			anioActual = DateUtil.getAnio(fechaActual);
 			this.aniosList = new ArrayList<Integer>();
 			this.aniosList.add((anioActual - 1));
 			this.aniosList.add(anioActual);
@@ -62,7 +62,7 @@ public class DiasNoLaboralesBean implements Serializable {
 			this.paisDAO = new PaisDAO();
 			
 			this.paisesList =  paisDAO.buscarTodos();
-			this.paisSelected = paisDAO.buscarPorId("MX");
+			this.paisSelected = paisDAO.buscarPorClave("MX");
 			
 			this.muestraDiasNoLaborales();
 		} catch(Exception ex) {
@@ -77,11 +77,11 @@ public class DiasNoLaboralesBean implements Serializable {
 		
 		try {
 			log.info("Año seleccionado: {}", this.anioSelected);
-			fechaInicio = DateUtils.getDate(this.anioSelected, 0, 1);
-			fechaFin = DateUtils.getDate(this.anioSelected, 11, 31);
+			fechaInicio = DateUtil.getDate(this.anioSelected, 0, 1);
+			fechaFin = DateUtil.getDate(this.anioSelected, 11, 31);
 			
-			DateUtils.setTime(fechaInicio, 0, 0, 0, 0);
-			DateUtils.setTime(fechaFin, 23, 59, 59, 999);
+			DateUtil.setTime(fechaInicio, 0, 0, 0, 0);
+			DateUtil.setTime(fechaFin, 23, 59, 59, 999);
 			
 			log.info("Periodo de busqueda: {} al {}", fechaInicio, fechaFin);
 			if(paisSelected != null)
