@@ -44,19 +44,19 @@ public class DetDomicilioEmpleado implements Serializable
     @Column(name = "cd_domicilioEmp")
     private Integer id;
     
-    @Basic(optional = false)
-    @NotNull
+    @Basic
+    @Null
     @Size(min = 1, max = 150)
     @Column(name = "nb_calle")
     private String calle;
     
-    @Basic(optional = false)
-    @NotNull
+    @Basic
+    @Null
     @Size(min = 1, max = 150)
     @Column(name = "nu_numExt")
     private String numeroExterior;
     
-    @Basic(optional = false)
+    @Basic
     @Null
     @Size(min = 1, max = 150)
     @Column(name = "nu_numInt")
@@ -67,28 +67,28 @@ public class DetDomicilioEmpleado implements Serializable
     @JoinColumn(name = "id_empleado")
     private DetEmpleado empleado;
     
-    @Basic(optional = false)
-    @NotNull
+    @Basic
+    @Null
     @Column(name = "cd_asentamiento")
     private Integer asentamiento;
     
-    @Basic(optional = false)
-    @NotNull
+    @Basic
+    @Null
     @Column(name = "cd_localidad")
     private Integer localidad;
     
-    @Basic(optional = false)
-    @NotNull
+    @Basic
+    @Null
     @Column(name = "cd_municipio")
     private Integer municipio;
     
-    @Basic(optional = false)
-    @NotNull
+    @Basic
+    @Null
     @Column(name = "cd_estado")
     private Integer estado;
     
-    @Basic(optional = false)
-    @NotNull
+    @Basic
+    @Null
     @Column(name = "cd_pais")
     private Integer pais;
     

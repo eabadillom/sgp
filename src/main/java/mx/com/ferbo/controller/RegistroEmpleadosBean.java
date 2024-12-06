@@ -134,8 +134,8 @@ public class RegistroEmpleadosBean implements Serializable {
     private String curp;
     private String rfc;
     private String nss;
-    private String codigoPostal;
-    
+    private String codigoPostal; 
+
     public RegistroEmpleadosBean() {
     	empleadoFotoDAO = new EmpleadoFotoDAO(DetEmpleadoFoto.class);
     	prestamoDAO = new PrestamoDAO();
@@ -474,28 +474,10 @@ public class RegistroEmpleadosBean implements Serializable {
     	try {
     		this.empleadoSelected.setPercepcionesEmpleado(this.percepcionesEmpleado);
     		
-                if(this.domicilioEmpleadoSelected.getCalle() == null)
-                {
-                    log.error("No se capturo la calle");
-                    throw new SGPException("Debe indicar una calle");
-                }
-                
-                if(this.domicilioEmpleadoSelected.getNumeroExterior() == null)
-                {
-                    log.error("No se capturo el numero exterior");
-                    throw new SGPException("Debe indicar un numero de calle exterior");
-                }
-                
                 if(this.datoEmpresa.getFechaIngreso() == null)
                 {
                     log.error("Falta fecha de ingreso en dato empresa");
                     throw new SGPException("Debe indicar la fecha de ingreso");
-                }
-                
-                if(this.datoEmpresa.getFechaIngreso() == null)
-                {
-                    log.error("Falta fecha de ingreso");
-                    throw new SGPException("Debe indicar una fecha de ingreso");
                 }
                 
                 if (this.empleadoSelected.getIdEmpleado() == null) {
@@ -504,27 +486,27 @@ public class RegistroEmpleadosBean implements Serializable {
         		numeroEmpleado = Integer.parseInt(sNumeroEmpleado);
         		sNumeroEmpleado = String.format("%04d", ++numeroEmpleado);
                         transformarAMayusculas();
-        		this.empleadoSelected.setNumEmpleado(sNumeroEmpleado);
-        		this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
+                        this.empleadoSelected.setNumEmpleado(sNumeroEmpleado);
+                        this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
         		this.empleadoSelected.setFechaRegistro(new Date());
     			empleadoDAO.guardar(empleadoSelected);
-                        this.domicilioEmpleadoSelected.setEmpleado(this.empleadoSelected);
-                        this.domicilioEmpleadoDAO.guardar(domicilioEmpleadoSelected);
                         pNumeroEmpleado.setValor(sNumeroEmpleado);
                         this.parametroDAO.actualizar(pNumeroEmpleado);
     		} else {
     			empleadoDAO.actualizar(empleadoSelected);
-                        if(domicilioEmpleadoSelected.getEmpleado() == null)
-                        {
-                            this.domicilioEmpleadoSelected.setEmpleado(empleadoSelected);
-                            this.domicilioEmpleadoDAO.guardar(this.domicilioEmpleadoSelected);
-                        }else{
-                            log.trace("Información del domicilio {}", this.domicilioEmpleadoSelected.toString());
-                            this.domicilioEmpleadoDAO.actualizar(domicilioEmpleadoSelected);
-                        }
                 }
-    		
-    		if(this.empleadoFoto != null) {
+                
+                if(this.domicilioEmpleadoSelected.getId() == null)
+                {
+                    this.domicilioEmpleadoSelected.setEmpleado(this.empleadoSelected);
+                    this.domicilioEmpleadoDAO.guardar(this.domicilioEmpleadoSelected);
+                }else
+                {
+                    log.trace("Información del domicilio {}", this.domicilioEmpleadoSelected.toString());
+                    this.domicilioEmpleadoDAO.actualizar(this.domicilioEmpleadoSelected);
+                }
+                
+                if(this.empleadoFoto != null) {
     			empleadoFotoDAO.actualizar(empleadoFoto);
     		}
     		
@@ -973,5 +955,5 @@ public class RegistroEmpleadosBean implements Serializable {
     {
         this.domicilioEmpleadoSelected = domicilioEmpleadoSelected;
     }
-
+    
 }
