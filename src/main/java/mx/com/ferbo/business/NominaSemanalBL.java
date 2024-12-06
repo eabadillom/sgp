@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
@@ -25,6 +26,7 @@ import mx.com.ferbo.business.percepcion.SeptimoDiaPercepcion;
 import mx.com.ferbo.business.percepcion.SueldoPercepcion;
 import mx.com.ferbo.business.percepcion.ValesDespensaPercepcion;
 import mx.com.ferbo.dao.n.NominaDAO;
+import mx.com.ferbo.dao.n.PercepcionEmpleadoDAO;
 import mx.com.ferbo.dao.n.RegistroDAO;
 import mx.com.ferbo.model.CatCuotaIMSS;
 import mx.com.ferbo.model.CatDiaNoLaboral;
@@ -40,6 +42,7 @@ import mx.com.ferbo.model.DetNominaEmisor;
 import mx.com.ferbo.model.DetNominaOtroPago;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.DetNominaReceptor;
+import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.DetRegistro;
 import mx.com.ferbo.model.sat.CatConcepto;
 import mx.com.ferbo.model.sat.CatMetodoPago;
@@ -102,6 +105,8 @@ public class NominaSemanalBL {
 	private NominaDAO nominaDAO = null;
 	private List<DetNomina> nominaSemanal = null;
 	
+	private PercepcionEmpleadoDAO percepcionEmpleadoDAO = null;
+	
 	
 	//OBJETOS RELACIONADOS A LA NOMINA Y CFDI
 	public NominaSemanalBL(DetEmpleado empleado, Date periodoInicio, Date periodoFin) {
@@ -111,6 +116,7 @@ public class NominaSemanalBL {
 		this.periodoInicio = periodoInicio;
 		this.periodoFin = periodoFin;
 		this.nominaDAO = new NominaDAO();
+		this.percepcionEmpleadoDAO = new PercepcionEmpleadoDAO();
 		
 		anioActual = DateUtil.getAnio(periodoInicio);
 		this.fechaInicioAnio = DateUtil.getDate(anioActual, DateUtil.ENERO, 1);
@@ -174,6 +180,8 @@ public class NominaSemanalBL {
 		DetNominaPercepcion pBonoPuntualidad = null;
 		DetNominaPercepcion pValeDespensa = null;
 		
+		List<DetPercepcionEmpleado> percepcionesEmpleado = null;
+		
 		List<DetNominaPercepcion> percepciones = null;
 		List<DetNominaOtroPago> otrosPagos = null;
 		List<DetNominaDeduccion> deducciones = null;
@@ -234,18 +242,28 @@ public class NominaSemanalBL {
     		if(septimoDia.compareTo(BigDecimal.ZERO) > 0)
     			percepciones.add(pSeptimoDia);
     		
-			tasaBonoPuntualidad = this.parametrosPercepciones.getBonoPuntualidad();
-			bonoPuntualidadBO = new BonoPuntualidadPercepcion(this.tiposPercepcion, tasaBonoPuntualidad, diasTrabajados, mapAsistencias, DIAS_POR_PERIODO, salarioDiarioIntegrado, proporcionalSeptimoDia);
-			bonoPuntualidadBO.setPercepcionesEmpleado(this.empleado.getPercepcionesEmpleado());
-			pBonoPuntualidad = bonoPuntualidadBO.calcular(nomina, idxP++);
-			if(pBonoPuntualidad.getImporteExcento().add(pBonoPuntualidad.getImporteGravado()).compareTo(BigDecimal.ZERO) > 0) //Si el hay bono de puntualidad, se agrega a la lista de percepciones.
-				percepciones.add(pBonoPuntualidad);
-			
-			valesDespensaBO = new ValesDespensaPercepcion(this.tiposPercepcion, diasTrabajados, parametrosPercepciones.getUma(), parametrosPercepciones.getValeDespensa(), diasPeriodo);
-			valesDespensaBO.setPercepcionesEmpleado(this.empleado.getPercepcionesEmpleado());
-			pValeDespensa = valesDespensaBO.calcular(nomina, idxP++);
-			if(pValeDespensa.getImporteExcento().add(pValeDespensa.getImporteGravado()).compareTo(BigDecimal.ZERO) > 0) //Si hay vales de desapensa, se agregan a la lista de percepciones.
-				percepciones.add(pValeDespensa);
+    		percepcionesEmpleado = percepcionEmpleadoDAO.buscarPorEmpleado(this.empleado.getIdEmpleado());
+    		
+    		Optional<DetPercepcionEmpleado> optPercepcion010 = percepcionesEmpleado.stream().filter(p -> p.getTipoPercepcion().getClave().equalsIgnoreCase("010")).findFirst();
+    		
+    		if(optPercepcion010.isPresent() && optPercepcion010.get().getActivo()) {
+    			tasaBonoPuntualidad = this.parametrosPercepciones.getBonoPuntualidad();
+    			bonoPuntualidadBO = new BonoPuntualidadPercepcion(this.tiposPercepcion, tasaBonoPuntualidad, diasTrabajados, mapAsistencias, DIAS_POR_PERIODO, salarioDiarioIntegrado, proporcionalSeptimoDia);
+    			bonoPuntualidadBO.setPercepcionesEmpleado(this.empleado.getPercepcionesEmpleado());
+    			pBonoPuntualidad = bonoPuntualidadBO.calcular(nomina, idxP++);
+    			if(pBonoPuntualidad.getImporteExcento().add(pBonoPuntualidad.getImporteGravado()).compareTo(BigDecimal.ZERO) > 0) //Si el hay bono de puntualidad, se agrega a la lista de percepciones.
+    				percepciones.add(pBonoPuntualidad);
+    		}
+    			
+    		Optional<DetPercepcionEmpleado> optPercepcion029 = percepcionesEmpleado.stream().filter(p -> p.getTipoPercepcion().getClave().equalsIgnoreCase("029")).findFirst();
+    		
+			if(optPercepcion029.isPresent() && optPercepcion029.get().getActivo()) {
+				valesDespensaBO = new ValesDespensaPercepcion(this.tiposPercepcion, diasTrabajados, parametrosPercepciones.getUma(), parametrosPercepciones.getValeDespensa(), diasPeriodo);
+				valesDespensaBO.setPercepcionesEmpleado(this.empleado.getPercepcionesEmpleado());
+				pValeDespensa = valesDespensaBO.calcular(nomina, idxP++);
+				if(pValeDespensa.getImporteExcento().add(pValeDespensa.getImporteGravado()).compareTo(BigDecimal.ZERO) > 0) //Si hay vales de desapensa, se agregan a la lista de percepciones.
+					percepciones.add(pValeDespensa);
+			}
 			
 			/*-------------------------DEDUCCIONES-----------------------*/
 			if(salarioSemanal.compareTo(BigDecimal.ZERO) > 0) {

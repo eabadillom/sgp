@@ -59,7 +59,7 @@
                         </p:dataTable>
                         
                         <p:dialog header="Información..." showEffect="fade" modal="true" widgetVar="dialogEmpleado" responsive="true" resizable="false" width="100%" height="100%" position="center top" cache="false">
-							<p:tabView id="panelDialogEmpleado" class="ui-fluid" dynamic="true" effect="drop">
+							<p:tabView id="panelDialogEmpleado" class="ui-fluid" dynamic="true" effect="drop" activeIndex="#{registroEmpleadosBean.activeTabIndex}">
                                                                 <p:ajax event="tabChange" update="formRegistroEmpleado:panelDialogEmpleado formRegistroEmpleado:panelDialogEmpleado:previewFotografia" oncomplete="PF('dialogEmpleado').initPosition();"/>
 								<p:tab title="Personal">
 							        <h4>Información del empleado</h4>

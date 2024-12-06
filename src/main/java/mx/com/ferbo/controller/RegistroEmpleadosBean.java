@@ -136,6 +136,8 @@ public class RegistroEmpleadosBean implements Serializable {
     private String nss;
     private String codigoPostal;
     
+    private Integer activeTabIndex = 0;
+    
     public RegistroEmpleadosBean() {
     	empleadoFotoDAO = new EmpleadoFotoDAO(DetEmpleadoFoto.class);
     	prestamoDAO = new PrestamoDAO();
@@ -240,6 +242,7 @@ public class RegistroEmpleadosBean implements Serializable {
         this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
         this.domicilioEmpleadoSelected = new DetDomicilioEmpleado();
         this.asentamientoSelected = this.inicializarAsentamiento();
+        this.activeTabIndex = 0;
     }
     
     public CatAsentamiento obtenerAsentamiento(DetDomicilioEmpleado domicilioEmpleado)
@@ -324,6 +327,7 @@ public class RegistroEmpleadosBean implements Serializable {
 	log.info("Biometrico: {}", this.detBiometrico);
         
 		this.nuevaPercepcionEmpleado();
+		this.activeTabIndex = 0;
     	PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogFoto", "formRegistroEmpleado:panelDialogEmpleado");
     }
     
@@ -973,5 +977,13 @@ public class RegistroEmpleadosBean implements Serializable {
     {
         this.domicilioEmpleadoSelected = domicilioEmpleadoSelected;
     }
+
+	public Integer getActiveTabIndex() {
+		return activeTabIndex;
+	}
+
+	public void setActiveTabIndex(Integer activeTabIndex) {
+		this.activeTabIndex = activeTabIndex;
+	}
 
 }
