@@ -69,6 +69,10 @@ public class InfDatoEmpresa implements Serializable {
 	private Date fechaIngreso;
 	
 	@Basic(optional = true)
+	@Column(name = "fh_baja")
+	private Date fechaBaja;
+	
+	@Basic(optional = true)
 	@Column(name = "nu_nss")
 	private String nss;
 	
@@ -318,5 +322,11 @@ public class InfDatoEmpresa implements Serializable {
 	}
 	public void setSindicalizado(Boolean sindicalizado) {
 		this.sindicalizado = sindicalizado;
+	}
+	public Date getFechaBaja() {
+		return fechaBaja;
+	}
+	public void setFechaBaja(Date fechaBaja) {
+		this.fechaBaja = fechaBaja;
 	}
 }

@@ -547,6 +547,10 @@ public class RegistroEmpleadosBean implements Serializable {
         List<String> numEmpl = new ArrayList<>();
         try {
             for (DetEmpleado empleado : lstEmpleadosSelected) {
+            	
+            	if(empleado.getDatoEmpresa() != null)
+            		empleado.getDatoEmpresa().setFechaBaja(new Date());
+            	
                 empleadoDAO.eliminar(empleado);
                 numEmpl.add(empleado.getNumEmpleado());
             }

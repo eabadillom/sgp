@@ -21,7 +21,8 @@ import javax.persistence.Table;
 @Table(name = "det_prestamo")
 @NamedQueries({
 		@NamedQuery(name = "DetPrestamo.findByTipoAndEmpleado", query = "SELECT p FROM DetPrestamo p WHERE p.empleado.idEmpleado = :idEmpleado AND p.tipoPrestamo.tipoPrestamo = :tipoPrestamo ORDER BY p.fechaInicio DESC"),
-		@NamedQuery(name = "DetPrestamo.findByEmpleado", query = "SELECT p FROM DetPrestamo p WHERE p.empleado.idEmpleado = :idEmpleado ORDER BY p.fechaInicio DESC")
+		@NamedQuery(name = "DetPrestamo.findByEmpleado", query = "SELECT p FROM DetPrestamo p WHERE p.empleado.idEmpleado = :idEmpleado ORDER BY p.fechaInicio DESC"),
+		@NamedQuery(name = "DetPrestamo.findByEmpleadoPeriodo", query = "SELECT p FROM DetPrestamo p WHERE p.empleado.idEmpleado = :idEmpleado and ((:fecha between p.fechaInicio AND p.fechaFin) OR (p.fechaInicio <= :fecha AND p.fechaFin IS NULL)) ORDER BY p.fechaInicio DESC")
 })
 public class DetPrestamo implements Serializable{
 	

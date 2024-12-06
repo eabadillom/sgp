@@ -8,7 +8,12 @@
     <ui:define name="title">ISR</ui:define>
     <ui:define name="content">
         <h:form id="form">
-            <p:growl id="messages" showDetail="true" />
+            <p:growl id="messages" showDetail="true" life="2000"/>
+            <p:dialog modal="true" widgetVar="statusInfoDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+					<i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
+			</p:dialog>
             <p:toolbar>
                 <p:toolbarGroup>
                     <p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{isrBean.openNew}"
@@ -17,9 +22,25 @@
                         <p:resetInput target=":dialogs:manage-isr-content" />
                     </p:commandButton>
                 </p:toolbarGroup>
+                <p:toolbarGroup align="right">
+                	<p:selectOneMenu value="#{isrBean.anio}" >
+                		<f:selectItem itemLabel="--SELECCIONE UN AÑO---" noSelectionOption="true" />
+                		<f:selectItems value="#{isrBean.anios}" var="anio" itemLabel="#{anio}" itemValue="#{anio}"/>
+                		<p:ajax process="@this" event="change" listener="#{isrBean.filtrar()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
+                	</p:selectOneMenu>
+                	<p:selectOneMenu value="#{isrBean.periodo}">
+                		<f:selectItem itemLabel="---SELECCIONE UN PERIODO---" noSelectionOption="true"/>
+               			<f:selectItem itemLabel="Diario" itemValue="di" />
+						<f:selectItem itemLabel="Semanal" itemValue="s" />
+						<f:selectItem itemLabel="Decenal" itemValue="de" />
+						<f:selectItem itemLabel="Quincenal" itemValue="q" />
+						<f:selectItem itemLabel="Mensual" itemValue="m" />
+						<p:ajax process="@this" event="change" listener="#{isrBean.filtrar()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
+                	</p:selectOneMenu>
+                </p:toolbarGroup>
             </p:toolbar>
             <p:dataTable id="dt-isr" widgetVar="dtISR" var="isr" value="#{isrBean.listTarifaISR}" reflow="true" styleClass="products-table"
-                selection="#{isrBean.listTarifaISRSelected}" rowKey="#{isr.idIsr}" paginator="true" rows="10" paginatorPosition="bottom"
+                selection="#{isrBean.listTarifaISRSelected}" rowKey="#{isr.idIsr}" paginator="true" rows="11" paginatorPosition="bottom"
                 lazy="true">
                 <p:column headerText="Limite Inferior ($)" style="text-align: center;" width="4rem">
                     <h:outputText value="#{isr.limiteInferior}" >
@@ -42,7 +63,7 @@
                     </h:outputText>
                 </p:column>
                 <p:column headerText="Tipo" style="text-align: center;" width="4rem">
-                    <h:outputText value="#{isr.tipo}" />
+                    <h:outputText value="#{isr.periodoISR.getDescription()}" />
                 </p:column>
                 <p:column headerText="Fecha" style="text-align: center;" width="4rem">
                     <h:outputText value="#{isr.fecha}" >

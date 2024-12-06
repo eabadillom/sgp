@@ -77,7 +77,7 @@ public class UMADAO extends BaseDAO<CatUMA, Integer>
     				.getSingleResult()
     				;
     	} catch(Exception ex) {
-    		
+    		log.error("Problema para obtener la tarifa UMA...", ex);
     	} finally {
     		this.close(em);
     	}

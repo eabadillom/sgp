@@ -1,5 +1,6 @@
 package mx.com.ferbo.controller;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.Serializable;
 import java.net.URL;
@@ -21,6 +22,7 @@ import javax.inject.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
+import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 
 import mx.com.ferbo.dao.n.PlantaDAO;
@@ -63,7 +65,14 @@ public class RepAsistenciabean implements Serializable {
 		plantas = plantaDAO.buscarTodos();
 		this.fechaInicio = new Date();
 		this.fechaFin = new Date();
-		pdfFile = null;
+		
+		byte[] bytes = {};
+		
+		pdfFile = DefaultStreamedContent.builder().contentType("application/pdf").contentLength(bytes.length)
+				.name("ReporteAsistencia.pdf").stream(() -> new ByteArrayInputStream(bytes)).build();
+				
+		xlsFile = DefaultStreamedContent.builder().contentType("application/vnd.ms-excel").contentLength(bytes.length)
+				.name("ReporteAsistencia.xlsx").stream(() -> new ByteArrayInputStream(bytes)).build();
 	}
 	
 	public void cargaInfo() {
@@ -88,8 +97,7 @@ public class RepAsistenciabean implements Serializable {
 			
 			registros = registroDAO.buscarPorPlantaPeriodo(idPlanta, this.fechaInicio, this.fechaFin);
 			
-			this.exportarPDF();
-			this.exportarXLS();
+			log.info("{}  registro(s) encontrado(s)", registros.size());
 			
 		} catch(SGPException ex) {
 			mensaje = ex.getMessage();
