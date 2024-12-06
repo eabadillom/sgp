@@ -5,6 +5,7 @@ import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
@@ -18,7 +19,7 @@ public class CatEstadoPK implements Serializable
 {
     private static final long serialVersionUID = -4501534761783764337L;
     
-    @ManyToOne(optional = false)
+    @ManyToOne
     @NotNull
     @JoinColumn(name = "cd_pais")
     private Pais pais;
