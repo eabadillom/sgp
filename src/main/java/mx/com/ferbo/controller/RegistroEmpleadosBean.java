@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -70,12 +72,12 @@ import mx.com.ferbo.model.sat.CatTipoJornada;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.model.sat.CatTipoRegimen;
 import mx.com.ferbo.util.SGPException;
+import org.primefaces.util.LangUtils;
 
 @Named(value = "registroEmpleadosBean")
 @ViewScoped
 public class RegistroEmpleadosBean implements Serializable {
-    
-    
+
     private static final long serialVersionUID = 1L;
     private static final Logger log = LogManager.getLogger(RegistroEmpleadosBean.class);
 
@@ -121,6 +123,11 @@ public class RegistroEmpleadosBean implements Serializable {
     private List<CatAsentamiento> lstAsentamientos;
     private List<DetDomicilioEmpleado> lstDomicilios;
 
+    private CatPlanta plantaselected;
+    private CatEmpresa empresaselected;
+    private boolean activo;
+    private boolean inactivo;
+
     private DetEmpleado empleadoSelected;
     private DetBiometrico detBiometrico;
     private DetEmpleadoFoto empleadoFoto;
@@ -130,16 +137,18 @@ public class RegistroEmpleadosBean implements Serializable {
     private DetPrestamo prestamo;
     private CatAsentamiento asentamientoSelected;
     private DetDomicilioEmpleado domicilioEmpleadoSelected;
-    
+
     private String curp;
     private String rfc;
     private String nss;
-    private String codigoPostal; 
+    private String codigoPostal;
+    
+    private String texto;
 
     public RegistroEmpleadosBean() {
-    	empleadoFotoDAO = new EmpleadoFotoDAO(DetEmpleadoFoto.class);
-    	prestamoDAO = new PrestamoDAO();
-    	percepcionEmpleadoDAO = new PercepcionEmpleadoDAO();
+        empleadoFotoDAO = new EmpleadoFotoDAO(DetEmpleadoFoto.class);
+        prestamoDAO = new PrestamoDAO();
+        percepcionEmpleadoDAO = new PercepcionEmpleadoDAO();
         empresaDAO = new EmpresaDAO(CatEmpresa.class);
         perfilDAO = new PerfilDAO(CatPerfil.class);
         plantaDAO = new PlantaDAO(CatPlanta.class);
@@ -158,7 +167,7 @@ public class RegistroEmpleadosBean implements Serializable {
         tipoPrestamoDAO = new TipoPrestamoDAO();
         domicilioEmpleadoDAO = new DomicilioEmpleadoDAO();
         asentamientoDAO = new AsentamientoDAO();
-        
+
         empleadoSelected = new DetEmpleado();
         lstEmpleados = new ArrayList<>();
         lstEmpleadosSelected = new ArrayList<>();
@@ -166,6 +175,8 @@ public class RegistroEmpleadosBean implements Serializable {
 
     @PostConstruct
     public void init() {
+        this.activo = false;
+        this.inactivo = false;
         try {
             lstCatEmpresa = empresaDAO.buscarActivo();
             lstCatPerfil = perfilDAO.buscarActivo();
@@ -180,7 +191,7 @@ public class RegistroEmpleadosBean implements Serializable {
             periodicidadesPago = periodicidadDAO.buscarActivos(new Date());
             tiposPercepcion = tipoPercepcionDAO.buscarTodos();
             tiposPrestamo = tipoPrestamoDAO.buscarTodos();
-            
+
             consultaEmpleados();
             prestamo = new DetPrestamo();
             domicilioEmpleadoSelected = new DetDomicilioEmpleado();
@@ -188,28 +199,26 @@ public class RegistroEmpleadosBean implements Serializable {
             log.warn("EX-0008: " + ex.getMessage() + ". Error al cargar init()");
         }
     }
-    
+
     /*
      * Método para consultar los domicilios de los empleados
      */
-    private void consultaAsentamientos()
-    {
+    private void consultaAsentamientos() {
         this.lstAsentamientos = asentamientoDAO.buscarTodos();
     }
-    
+
     /*
      * Método para consultar los domicilios de los empleados
      */
-    private void consultaDomicilios()
-    {
+    private void consultaDomicilios() {
         this.lstDomicilios = domicilioEmpleadoDAO.buscarTodos();
     }
-    
+
     /*
      * Método para consultar a los empleados
      */
     private void consultaEmpleados() {
-    	this.lstEmpleados = empleadoDAO.buscarTodos(false);
+        this.lstEmpleados = empleadoDAO.buscarTodos(false);
     }
 
     /*
@@ -235,236 +244,240 @@ public class RegistroEmpleadosBean implements Serializable {
      */
     public void agregarEmpleado() {
         this.empleadoSelected = new DetEmpleado();
-        this.empleadoSelected.setActivo((short)1);
+        this.empleadoSelected.setActivo((short) 1);
         this.datoEmpresa = new InfDatoEmpresa();
         this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
         this.domicilioEmpleadoSelected = new DetDomicilioEmpleado();
         this.asentamientoSelected = this.inicializarAsentamiento();
     }
-    
-    public CatAsentamiento obtenerAsentamiento(DetDomicilioEmpleado domicilioEmpleado)
-    {
+
+    public CatAsentamiento obtenerAsentamiento(DetDomicilioEmpleado domicilioEmpleado) {
         CatAsentamiento asentamiento = null;
-        
-        if(domicilioEmpleado != null)
-        {
-            asentamiento = this.asentamientoDAO.buscarPorParametros(domicilioEmpleado.getAsentamiento(), 
-                domicilioEmpleado.getLocalidad(), 
-                domicilioEmpleado.getMunicipio(), 
-                domicilioEmpleado.getEstado(), 
-                domicilioEmpleado.getPais());
+
+        if (domicilioEmpleado != null) {
+            asentamiento = this.asentamientoDAO.buscarPorParametros(domicilioEmpleado.getAsentamiento(),
+                    domicilioEmpleado.getLocalidad(),
+                    domicilioEmpleado.getMunicipio(),
+                    domicilioEmpleado.getEstado(),
+                    domicilioEmpleado.getPais());
             log.trace("Asentamiento obtenido {}", asentamiento.toString());
-        }else
-        {
+        } else {
             log.info("No se encontro asentamiento del empleado {}", this.empleadoSelected.getIdEmpleado());
         }
-        
+
         return asentamiento;
     }
-    
-    public void agregarAsentamientoADomicilio(CatAsentamiento auxAsentamiento)
-    {
+
+    public void agregarAsentamientoADomicilio(CatAsentamiento auxAsentamiento) {
         log.debug("Agregando/Actualizando asentamiento en domicilio");
-        if(auxAsentamiento != null)
-        {
+        if (auxAsentamiento != null) {
             this.domicilioEmpleadoSelected.setAsentamiento(auxAsentamiento.getKey().getId());
             this.domicilioEmpleadoSelected.setLocalidad(auxAsentamiento.getKey().getLocalidad().getKey().getId());
             this.domicilioEmpleadoSelected.setMunicipio(auxAsentamiento.getKey().getLocalidad().getKey().getMunicipio().getKey().getId());
             this.domicilioEmpleadoSelected.setEstado(auxAsentamiento.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getId());
             this.domicilioEmpleadoSelected.setPais(auxAsentamiento.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getPais().getId());
         }
-        
+
     }
-    
-    public void editar() 
-    {
-        if(this.empleadoSelected.getIdEmpleado() != null)
-        {
+
+    public void editar() {
+        if (this.empleadoSelected.getIdEmpleado() != null) {
             limpiarVariables();
         }
-        
-    	List<DetPrestamo> prestamos = null;
-    	log.info("Cargando información del empleado: {}", this.empleadoSelected);
+
+        List<DetPrestamo> prestamos = null;
+        log.info("Cargando información del empleado: {}", this.empleadoSelected);
         InfDatoEmpresa datoEmpresa = this.empleadoSelected.getDatoEmpresa();
-    	this.empleadoFoto = empleadoFotoDAO.buscar(this.empleadoSelected.getNumEmpleado());
-    	
-    	if(datoEmpresa == null) {
-    		this.datoEmpresa = new InfDatoEmpresa();
-    		this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
-    	} else {
-    		this.datoEmpresa = datoEmpresa;
-    		this.rfc = this.datoEmpresa.getRfc();
-    		this.nss = this.datoEmpresa.getNss();
-    		this.curp = this.empleadoSelected.getCurp();
-    	}
-    	
-    	percepcionesEmpleado = percepcionEmpleadoDAO.buscarPorEmpleado(this.empleadoSelected.getIdEmpleado());
-    	prestamos = prestamoDAO.buscar(this.empleadoSelected.getIdEmpleado());
-    	this.empleadoSelected.setPrestamos(prestamos); 
-    	this.prestamo = new DetPrestamo();
-    	
-    	log.info("Empleado seleccionado: {}", this.empleadoSelected.getIdEmpleado());
-    	if(empleadoFoto != null)
-    		log.debug("Foto: {}", empleadoFoto.getFotografia());
-    	
+        this.empleadoFoto = empleadoFotoDAO.buscar(this.empleadoSelected.getNumEmpleado());
+
+        if (datoEmpresa == null) {
+            this.datoEmpresa = new InfDatoEmpresa();
+            this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
+        } else {
+            this.datoEmpresa = datoEmpresa;
+            this.rfc = this.datoEmpresa.getRfc();
+            this.nss = this.datoEmpresa.getNss();
+            this.curp = this.empleadoSelected.getCurp();
+        }
+
+        percepcionesEmpleado = percepcionEmpleadoDAO.buscarPorEmpleado(this.empleadoSelected.getIdEmpleado());
+        prestamos = prestamoDAO.buscar(this.empleadoSelected.getIdEmpleado());
+        this.empleadoSelected.setPrestamos(prestamos);
+        this.prestamo = new DetPrestamo();
+
+        log.info("Empleado seleccionado: {}", this.empleadoSelected.getIdEmpleado());
+        if (empleadoFoto != null) {
+            log.debug("Foto: {}", empleadoFoto.getFotografia());
+        }
+
         this.domicilioEmpleadoSelected = this.domicilioEmpleadoDAO.buscarPorId(this.empleadoSelected.getIdEmpleado());
-        
-        if(this.domicilioEmpleadoSelected != null)
-        {
+
+        if (this.domicilioEmpleadoSelected != null) {
             this.asentamientoSelected = this.obtenerAsentamiento(this.domicilioEmpleadoSelected);
             log.info("Cargando información del domicilio {} y del asentamiento {}", this.domicilioEmpleadoSelected.toString(), this.asentamientoSelected.toString());
-        }else
-        {
+        } else {
             this.domicilioEmpleadoSelected = new DetDomicilioEmpleado();
             this.asentamientoSelected = this.inicializarAsentamiento();
         }
-        
-    	this.detBiometrico = biometricoDAO.consultaBiometricoByIdEmpleado(this.empleadoSelected.getIdEmpleado());
-    	
-	log.info("Biometrico: {}", this.detBiometrico);
-        
-		this.nuevaPercepcionEmpleado();
-    	PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogFoto", "formRegistroEmpleado:panelDialogEmpleado");
+
+        this.detBiometrico = biometricoDAO.consultaBiometricoByIdEmpleado(this.empleadoSelected.getIdEmpleado());
+
+        log.info("Biometrico: {}", this.detBiometrico);
+
+        this.nuevaPercepcionEmpleado();
+        PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogFoto", "formRegistroEmpleado:panelDialogEmpleado");
     }
-    
+
     public void nuevaPercepcionEmpleado() {
-    	this.percepcionEmpleado = new DetPercepcionEmpleado();
-		this.percepcionEmpleado.setEmpleado(this.empleadoSelected);
-		this.percepcionEmpleado.setActivo(true);
+        this.percepcionEmpleado = new DetPercepcionEmpleado();
+        this.percepcionEmpleado.setEmpleado(this.empleadoSelected);
+        this.percepcionEmpleado.setActivo(true);
     }
-    
+
     public void agregarPercepcionEmpleado() {
-    	log.info("Agregando percepcion del empleado...");
-    	if(this.percepcionesEmpleado == null)
-    		this.percepcionesEmpleado = new ArrayList<>();
-    	
-    	this.percepcionEmpleado.setEmpleado(this.empleadoSelected);
-    	this.percepcionesEmpleado.add(percepcionEmpleado);
-    	this.nuevaPercepcionEmpleado();
+        log.info("Agregando percepcion del empleado...");
+        if (this.percepcionesEmpleado == null) {
+            this.percepcionesEmpleado = new ArrayList<>();
+        }
+
+        this.percepcionEmpleado.setEmpleado(this.empleadoSelected);
+        this.percepcionesEmpleado.add(percepcionEmpleado);
+        this.nuevaPercepcionEmpleado();
     }
-    
+
     public void eliminarPercepcionEmpleado() {
-    	FacesMessage message = null;
-		Severity severity = null;
-		String mensaje = null;
-		String titulo = "Percepción del empleado";
-		
-		try {
-			if(this.percepcionEmpleado == null)
-				throw new SGPException("Debe indicar una percepción");
-			
-			this.percepcionesEmpleado.remove(this.percepcionEmpleado);
-			this.percepcionEmpleado = new DetPercepcionEmpleado();
-			
-			mensaje = "Percepción eliminada correctamente.";
-    		severity = FacesMessage.SEVERITY_INFO;
-		} catch(SGPException ex) {
-    		mensaje = ex.getMessage();
-    		severity = FacesMessage.SEVERITY_WARN;
-    	} catch(Exception ex) {
-    		log.error("Problema para guardar información del empleado...", ex);
-    		mensaje = "Problema para guardar al empleado.";
-    		severity = FacesMessage.SEVERITY_ERROR;
-    	} finally {
-    		message = new FacesMessage(severity, titulo, mensaje);
-			FacesContext.getCurrentInstance().addMessage(null, message);
-	        PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogEmpleado:dt-percepcion-empleado");
-    	}
+        FacesMessage message = null;
+        Severity severity = null;
+        String mensaje = null;
+        String titulo = "Percepción del empleado";
+
+        try {
+            if (this.percepcionEmpleado == null) {
+                throw new SGPException("Debe indicar una percepción");
+            }
+
+            this.percepcionesEmpleado.remove(this.percepcionEmpleado);
+            this.percepcionEmpleado = new DetPercepcionEmpleado();
+
+            mensaje = "Percepción eliminada correctamente.";
+            severity = FacesMessage.SEVERITY_INFO;
+        } catch (SGPException ex) {
+            mensaje = ex.getMessage();
+            severity = FacesMessage.SEVERITY_WARN;
+        } catch (Exception ex) {
+            log.error("Problema para guardar información del empleado...", ex);
+            mensaje = "Problema para guardar al empleado.";
+            severity = FacesMessage.SEVERITY_ERROR;
+        } finally {
+            message = new FacesMessage(severity, titulo, mensaje);
+            FacesContext.getCurrentInstance().addMessage(null, message);
+            PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogEmpleado:dt-percepcion-empleado");
+        }
     }
-    
+
     public void agregarPrestamo() {
-    	FacesMessage message = null;
-		Severity severity = null;
-		String mensaje = null;
-		String titulo = "Préstamo";
-		
-		try {
-			if(this.prestamo == null)
-				throw new SGPException("Debe indicar un préstamo");
-			
-			if(this.prestamo.getTipoPrestamo() == null)
-				throw new SGPException("Debe indicar el tipo de préstamo");
-			
-			if(this.prestamo.getFechaInicio() == null)
-				throw new SGPException("Debe indicar la fecha de inicio del préstamo.");
-			
-			if(this.prestamo.getFechaFin() == null)
-				throw new SGPException("Debe indicar la fecha de fin del préstamo.");
-			
-			if(this.prestamo.getAcumulado() == null)
-				throw new SGPException("Debe indicar el acumulado del préstamo.");
-			
-			if(this.prestamo.getImporte() == null)
-				throw new SGPException("Debe indicar el importe del préstamo.");
-			
-			if(this.prestamo.getTotal() == null)
-				throw new SGPException("Debe indicar el total del préstamo.");
-			
-			if(this.prestamo.getPeriodicidadPago() == null)
-				throw new SGPException("Debe indicar la periodicidad de pago.");
-			
-			if(this.empleadoSelected.getPrestamos() == null)
-				this.empleadoSelected.setPrestamos(new ArrayList<>());
-			
-			prestamo.setEmpleado(this.empleadoSelected);
-			
-			this.empleadoSelected.getPrestamos().add(prestamo);
-			
-			prestamo = new DetPrestamo();
-			PrimeFaces.current().executeScript("PF('dgPrestamo').hide()");
-			
-			mensaje = "Préstamo agregado correctamente.";
-    		severity = FacesMessage.SEVERITY_INFO;
-		} catch(SGPException ex) {
-    		mensaje = ex.getMessage();
-    		severity = FacesMessage.SEVERITY_WARN;
-    	} catch(Exception ex) {
-    		log.error("Problema para guardar información del empleado...", ex);
-    		mensaje = "Problema para guardar al empleado.";
-    		severity = FacesMessage.SEVERITY_ERROR;
-    	} finally {
-    		message = new FacesMessage(severity, titulo, mensaje);
-			FacesContext.getCurrentInstance().addMessage(null, message);
-	        PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogEmpleado:dt-prestamos");
-    	}
+        FacesMessage message = null;
+        Severity severity = null;
+        String mensaje = null;
+        String titulo = "Préstamo";
+
+        try {
+            if (this.prestamo == null) {
+                throw new SGPException("Debe indicar un préstamo");
+            }
+
+            if (this.prestamo.getTipoPrestamo() == null) {
+                throw new SGPException("Debe indicar el tipo de préstamo");
+            }
+
+            if (this.prestamo.getFechaInicio() == null) {
+                throw new SGPException("Debe indicar la fecha de inicio del préstamo.");
+            }
+
+            if (this.prestamo.getFechaFin() == null) {
+                throw new SGPException("Debe indicar la fecha de fin del préstamo.");
+            }
+
+            if (this.prestamo.getAcumulado() == null) {
+                throw new SGPException("Debe indicar el acumulado del préstamo.");
+            }
+
+            if (this.prestamo.getImporte() == null) {
+                throw new SGPException("Debe indicar el importe del préstamo.");
+            }
+
+            if (this.prestamo.getTotal() == null) {
+                throw new SGPException("Debe indicar el total del préstamo.");
+            }
+
+            if (this.prestamo.getPeriodicidadPago() == null) {
+                throw new SGPException("Debe indicar la periodicidad de pago.");
+            }
+
+            if (this.empleadoSelected.getPrestamos() == null) {
+                this.empleadoSelected.setPrestamos(new ArrayList<>());
+            }
+
+            prestamo.setEmpleado(this.empleadoSelected);
+
+            this.empleadoSelected.getPrestamos().add(prestamo);
+
+            prestamo = new DetPrestamo();
+            PrimeFaces.current().executeScript("PF('dgPrestamo').hide()");
+
+            mensaje = "Préstamo agregado correctamente.";
+            severity = FacesMessage.SEVERITY_INFO;
+        } catch (SGPException ex) {
+            mensaje = ex.getMessage();
+            severity = FacesMessage.SEVERITY_WARN;
+        } catch (Exception ex) {
+            log.error("Problema para guardar información del empleado...", ex);
+            mensaje = "Problema para guardar al empleado.";
+            severity = FacesMessage.SEVERITY_ERROR;
+        } finally {
+            message = new FacesMessage(severity, titulo, mensaje);
+            FacesContext.getCurrentInstance().addMessage(null, message);
+            PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogEmpleado:dt-prestamos");
+        }
     }
-    
+
     public void eliminarPrestamo(DetPrestamo prestamo) {
-    	FacesMessage message = null;
-		Severity severity = null;
-		String mensaje = null;
-		String titulo = "Préstamo";
-		
-		try {
-			if(this.prestamo == null)
-				throw new SGPException("Debe indicar un préstamo");
-			
-			this.empleadoSelected.getPrestamos().remove(this.prestamo);
-			
-			prestamo = new DetPrestamo();
-			PrimeFaces.current().executeScript("PF('dgPrestamo').hide()");
-			
-			mensaje = "Préstamo eliminado correctamente.";
-    		severity = FacesMessage.SEVERITY_INFO;
-		} catch(SGPException ex) {
-    		mensaje = ex.getMessage();
-    		severity = FacesMessage.SEVERITY_WARN;
-    	} catch(Exception ex) {
-    		log.error("Problema para guardar información del empleado...", ex);
-    		mensaje = "Problema para guardar al empleado.";
-    		severity = FacesMessage.SEVERITY_ERROR;
-    	} finally {
-    		message = new FacesMessage(severity, titulo, mensaje);
-			FacesContext.getCurrentInstance().addMessage(null, message);
-	        PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogEmpleado:dt-prestamos");
-    	}
+        FacesMessage message = null;
+        Severity severity = null;
+        String mensaje = null;
+        String titulo = "Préstamo";
+
+        try {
+            if (this.prestamo == null) {
+                throw new SGPException("Debe indicar un préstamo");
+            }
+
+            this.empleadoSelected.getPrestamos().remove(this.prestamo);
+
+            prestamo = new DetPrestamo();
+            PrimeFaces.current().executeScript("PF('dgPrestamo').hide()");
+
+            mensaje = "Préstamo eliminado correctamente.";
+            severity = FacesMessage.SEVERITY_INFO;
+        } catch (SGPException ex) {
+            mensaje = ex.getMessage();
+            severity = FacesMessage.SEVERITY_WARN;
+        } catch (Exception ex) {
+            log.error("Problema para guardar información del empleado...", ex);
+            mensaje = "Problema para guardar al empleado.";
+            severity = FacesMessage.SEVERITY_ERROR;
+        } finally {
+            message = new FacesMessage(severity, titulo, mensaje);
+            FacesContext.getCurrentInstance().addMessage(null, message);
+            PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogEmpleado:dt-prestamos");
+        }
     }
-    
+
     /*
      * Método para guardar empleado
      */
     public synchronized void guardarEmpleado() {
-    	FacesMessage message = null;
+        FacesMessage message = null;
         Severity severity = null;
         String mensaje = null;
         String titulo = "Guardar empleado";
@@ -519,25 +532,25 @@ public class RegistroEmpleadosBean implements Serializable {
     			}
                 biometrico = null;
             }
-    		
-	        consultaEmpleados();
-	        PrimeFaces.current().executeScript("PF('dialogEmpleado').hide()");
-    		mensaje = "El empleado se guardó correctamente.";
-    		severity = FacesMessage.SEVERITY_INFO;
-                
-    	} catch(SGPException ex) {
-    		mensaje = ex.getMessage();
-    		severity = FacesMessage.SEVERITY_WARN;
-    	} catch(Exception ex) {
-    		log.error("Problema para guardar información del empleado...", ex);
-    		mensaje = "Problema para guardar al empleado.";
-    		severity = FacesMessage.SEVERITY_ERROR;
-    	} finally {
+
+            consultaEmpleados();
+            PrimeFaces.current().executeScript("PF('dialogEmpleado').hide()");
+            mensaje = "El empleado se guardó correctamente.";
+            severity = FacesMessage.SEVERITY_INFO;
+
+        } catch (SGPException ex) {
+            mensaje = ex.getMessage();
+            severity = FacesMessage.SEVERITY_WARN;
+        } catch (Exception ex) {
+            log.error("Problema para guardar información del empleado...", ex);
+            mensaje = "Problema para guardar al empleado.";
+            severity = FacesMessage.SEVERITY_ERROR;
+        } finally {
             message = new FacesMessage(severity, titulo, mensaje);
             limpiarVariables();
             FacesContext.getCurrentInstance().addMessage(null, message);
-            PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogEmpleado");	
-    	}
+            PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogEmpleado");
+        }
     }
 
     /*
@@ -547,10 +560,11 @@ public class RegistroEmpleadosBean implements Serializable {
         List<String> numEmpl = new ArrayList<>();
         try {
             for (DetEmpleado empleado : lstEmpleadosSelected) {
-            	
-            	if(empleado.getDatoEmpresa() != null)
-            		empleado.getDatoEmpresa().setFechaBaja(new Date());
-            	
+
+                if (empleado.getDatoEmpresa() != null) {
+                    empleado.getDatoEmpresa().setFechaBaja(new Date());
+                }
+
                 empleadoDAO.eliminar(empleado);
                 numEmpl.add(empleado.getNumEmpleado());
             }
@@ -565,9 +579,9 @@ public class RegistroEmpleadosBean implements Serializable {
         PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:dtEmpleados");
         this.lstEmpleadosSelected.clear();
     }
-    
+
     public void sinFoto() {
-    	this.empleadoFoto = null;
+        this.empleadoFoto = null;
     }
 
     /*
@@ -575,9 +589,9 @@ public class RegistroEmpleadosBean implements Serializable {
      */
     public void eliminaEmpleado() {
         try {
-        	this.empleadoSelected.setActivo((short)0);
-        	this.empleadoSelected.setFechaModificacion(new Date());
-        	empleadoDAO.actualizar(empleadoSelected);
+            this.empleadoSelected.setActivo((short) 0);
+            this.empleadoSelected.setFechaModificacion(new Date());
+            empleadoDAO.actualizar(empleadoSelected);
             consultaEmpleados();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Empleado Eliminado"));
         } catch (SGPException ex) {
@@ -587,18 +601,18 @@ public class RegistroEmpleadosBean implements Serializable {
         }
         PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:dtEmpleados");
     }
- 
+
     public String redirectKardex() {
         String redirect = "/protected/kardexEmpleado.xhtml?faces-redirect=true&idEmpleado=" + empleadoSelected.getIdEmpleado();
         return redirect;
     }
 
     public void oncapture(CaptureEvent captureEvent) {
-    	if(this.empleadoFoto == null) {
-    		this.empleadoFoto = new DetEmpleadoFoto();
-    		this.empleadoSelected.setEmpleadoFoto(empleadoFoto);
-    	}
-    	
+        if (this.empleadoFoto == null) {
+            this.empleadoFoto = new DetEmpleadoFoto();
+            this.empleadoSelected.setEmpleadoFoto(empleadoFoto);
+        }
+
         this.empleadoFoto.setFotografia("data:image/jpeg;base64," + Base64.getEncoder().encodeToString(captureEvent.getData()));
     }
 
@@ -607,34 +621,28 @@ public class RegistroEmpleadosBean implements Serializable {
         PrimeFaces.current().executeScript("PF('dialogBiometrico').show()");
     }
 
-    public void validaHuella() 
-    {
-        try
-        {
-            if (biometrico == null) 
-            {
+    public void validaHuella() {
+        try {
+            if (biometrico == null) {
                 throw new SGPException("Error al asignar biométrico");
             }
-        
+
             asignarBiometricos();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Huella asignada"));
-        }catch (SGPException ex) 
-        {
+        } catch (SGPException ex) {
             log.warn("EX-0019: Error al consultar por huella al empleado " + detBiometrico.getIdEmpleado().getNumEmpleado() != null ? detBiometrico.getIdEmpleado().getNumEmpleado() : null + " y " + ex.getMessage());
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Error al asignar biométrico"));
-        }finally
-        {
+        } finally {
             PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogBiometrico");
         }
     }
-    
-    public void asignarBiometricos()
-    {
-        if(this.detBiometrico == null)
+
+    public void asignarBiometricos() {
+        if (this.detBiometrico == null) {
             this.detBiometrico = new DetBiometrico();
-        
-        switch(numBiometrico)
-        {
+        }
+
+        switch (numBiometrico) {
             case 1:
                 detBiometrico.setHuella(biometrico);
                 break;
@@ -642,37 +650,33 @@ public class RegistroEmpleadosBean implements Serializable {
                 detBiometrico.setHuella2(biometrico);
                 break;
         }
-        
+
         detBiometrico.setActivo((short) 1);
         detBiometrico.setFechaCaptura(new Date());
     }
-    
-    public List<CatAsentamiento> sugerenciasCodigoPostal(String consulta) 
-    {
+
+    public List<CatAsentamiento> sugerenciasCodigoPostal(String consulta) {
         List<CatAsentamiento> listaSugerencias = asentamientoDAO.buscarPorCodigoPostal(consulta);
         return listaSugerencias;
     }
-    
-    public void domicilioEmpleado() 
-    {   
-        log.info("Agregando/Actualizando información al domicilio");    
+
+    public void domicilioEmpleado() {
+        log.info("Agregando/Actualizando información al domicilio");
         this.agregarAsentamientoADomicilio(this.asentamientoSelected);
-        
+
         log.trace("Domicilio seleccionado: {}", this.domicilioEmpleadoSelected.toString());
         log.trace("Asentamiento seleccionado: {}", this.asentamientoSelected.toString());
-        
+
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Informacion", "Se actualizo el asentamiento"));
         PrimeFaces.current().ajax().update("formRegistroEmpleado:messages");
     }
-    
-    public void limpiarVariables() 
-    {
+
+    public void limpiarVariables() {
         this.domicilioEmpleadoSelected = null;
         this.asentamientoSelected = null;
     }
-    
-    public CatAsentamiento inicializarAsentamiento()
-    {
+
+    public CatAsentamiento inicializarAsentamiento() {
         CatAsentamiento aux = new CatAsentamiento();
         aux.setKey(new CatAsentamientoPK());
         aux.getKey().setLocalidad(new CatLocalidad());
@@ -684,14 +688,13 @@ public class RegistroEmpleadosBean implements Serializable {
         aux.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().setPais(new Pais());
         return aux;
     }
-    
-    public void transformarAMayusculas()
-    {
+
+    public void transformarAMayusculas() {
         String nombre = this.empleadoSelected.getNombre().toUpperCase();
         String apellidoPa = this.empleadoSelected.getPrimerAp().toUpperCase();
         String apellidoMa = this.empleadoSelected.getSegundoAp().toUpperCase();
         String curp = this.empleadoSelected.getCurp().toUpperCase();
-        
+
         this.empleadoSelected.setNombre(nombre);
         this.empleadoSelected.setPrimerAp(apellidoPa);
         this.empleadoSelected.setSegundoAp(apellidoMa);
@@ -777,7 +780,7 @@ public class RegistroEmpleadosBean implements Serializable {
     public void setNumBiometrico(int numBiometrico) {
         this.numBiometrico = numBiometrico;
     }
-    
+
     public DetBiometrico getDetBiometrico() {
         return detBiometrico;
     }
@@ -786,133 +789,133 @@ public class RegistroEmpleadosBean implements Serializable {
         this.detBiometrico = detBiometrico;
     }
 
-	public InfDatoEmpresa getDatoEmpresa() {
-		return datoEmpresa;
-	}
+    public InfDatoEmpresa getDatoEmpresa() {
+        return datoEmpresa;
+    }
 
-	public void setDatoEmpresa(InfDatoEmpresa datoEmpresa) {
-		this.datoEmpresa = datoEmpresa;
-	}
+    public void setDatoEmpresa(InfDatoEmpresa datoEmpresa) {
+        this.datoEmpresa = datoEmpresa;
+    }
 
-	public List<CatTipoContrato> getTiposContrato() {
-		return tiposContrato;
-	}
+    public List<CatTipoContrato> getTiposContrato() {
+        return tiposContrato;
+    }
 
-	public void setTiposContrato(List<CatTipoContrato> tiposContrato) {
-		this.tiposContrato = tiposContrato;
-	}
+    public void setTiposContrato(List<CatTipoContrato> tiposContrato) {
+        this.tiposContrato = tiposContrato;
+    }
 
-	public List<CatTipoJornada> getTiposJornada() {
-		return tiposJornada;
-	}
+    public List<CatTipoJornada> getTiposJornada() {
+        return tiposJornada;
+    }
 
-	public void setTiposJornada(List<CatTipoJornada> tiposJornada) {
-		this.tiposJornada = tiposJornada;
-	}
+    public void setTiposJornada(List<CatTipoJornada> tiposJornada) {
+        this.tiposJornada = tiposJornada;
+    }
 
-	public List<CatTipoRegimen> getTiposRegimen() {
-		return tiposRegimen;
-	}
+    public List<CatTipoRegimen> getTiposRegimen() {
+        return tiposRegimen;
+    }
 
-	public void setTiposRegimen(List<CatTipoRegimen> tiposRegimen) {
-		this.tiposRegimen = tiposRegimen;
-	}
+    public void setTiposRegimen(List<CatTipoRegimen> tiposRegimen) {
+        this.tiposRegimen = tiposRegimen;
+    }
 
-	public String getRfc() {
-		return rfc;
-	}
+    public String getRfc() {
+        return rfc;
+    }
 
-	public void setRfc(String rfc) {
-		this.rfc = rfc;
-	}
+    public void setRfc(String rfc) {
+        this.rfc = rfc;
+    }
 
-	public String getCurp() {
-		return curp;
-	}
+    public String getCurp() {
+        return curp;
+    }
 
-	public void setCurp(String curp) {
-		this.curp = curp;
-	}
+    public void setCurp(String curp) {
+        this.curp = curp;
+    }
 
-	public String getNss() {
-		return nss;
-	}
+    public String getNss() {
+        return nss;
+    }
 
-	public void setNss(String nss) {
-		this.nss = nss;
-	}
+    public void setNss(String nss) {
+        this.nss = nss;
+    }
 
-	public DetEmpleadoFoto getEmpleadoFoto() {
-		return empleadoFoto;
-	}
+    public DetEmpleadoFoto getEmpleadoFoto() {
+        return empleadoFoto;
+    }
 
-	public void setEmpleadoFoto(DetEmpleadoFoto empleadoFoto) {
-		this.empleadoFoto = empleadoFoto;
-	}
+    public void setEmpleadoFoto(DetEmpleadoFoto empleadoFoto) {
+        this.empleadoFoto = empleadoFoto;
+    }
 
-	public List<CatEntidadFederativa> getEntidadesFederativas() {
-		return entidadesFederativas;
-	}
+    public List<CatEntidadFederativa> getEntidadesFederativas() {
+        return entidadesFederativas;
+    }
 
-	public void setEntidadesFederativas(List<CatEntidadFederativa> entidadesFederativas) {
-		this.entidadesFederativas = entidadesFederativas;
-	}
+    public void setEntidadesFederativas(List<CatEntidadFederativa> entidadesFederativas) {
+        this.entidadesFederativas = entidadesFederativas;
+    }
 
-	public List<CatRiesgoPuesto> getRiesgosPuesto() {
-		return riesgosPuesto;
-	}
+    public List<CatRiesgoPuesto> getRiesgosPuesto() {
+        return riesgosPuesto;
+    }
 
-	public void setRiesgosPuesto(List<CatRiesgoPuesto> riesgosPuesto) {
-		this.riesgosPuesto = riesgosPuesto;
-	}
+    public void setRiesgosPuesto(List<CatRiesgoPuesto> riesgosPuesto) {
+        this.riesgosPuesto = riesgosPuesto;
+    }
 
-	public List<CatPeriodicidadPago> getPeriodicidadesPago() {
-		return periodicidadesPago;
-	}
+    public List<CatPeriodicidadPago> getPeriodicidadesPago() {
+        return periodicidadesPago;
+    }
 
-	public void setPeriodicidadesPago(List<CatPeriodicidadPago> periodicidadesPago) {
-		this.periodicidadesPago = periodicidadesPago;
-	}
+    public void setPeriodicidadesPago(List<CatPeriodicidadPago> periodicidadesPago) {
+        this.periodicidadesPago = periodicidadesPago;
+    }
 
-	public List<DetPercepcionEmpleado> getPercepcionesEmpleado() {
-		return percepcionesEmpleado;
-	}
+    public List<DetPercepcionEmpleado> getPercepcionesEmpleado() {
+        return percepcionesEmpleado;
+    }
 
-	public void setPercepcionesEmpleado(List<DetPercepcionEmpleado> percepcionesEmpleado) {
-		this.percepcionesEmpleado = percepcionesEmpleado;
-	}
+    public void setPercepcionesEmpleado(List<DetPercepcionEmpleado> percepcionesEmpleado) {
+        this.percepcionesEmpleado = percepcionesEmpleado;
+    }
 
-	public List<CatTipoPercepcion> getTiposPercepcion() {
-		return tiposPercepcion;
-	}
+    public List<CatTipoPercepcion> getTiposPercepcion() {
+        return tiposPercepcion;
+    }
 
-	public void setTiposPercepcion(List<CatTipoPercepcion> tiposPercepcion) {
-		this.tiposPercepcion = tiposPercepcion;
-	}
+    public void setTiposPercepcion(List<CatTipoPercepcion> tiposPercepcion) {
+        this.tiposPercepcion = tiposPercepcion;
+    }
 
-	public DetPercepcionEmpleado getPercepcionEmpleado() {
-		return percepcionEmpleado;
-	}
+    public DetPercepcionEmpleado getPercepcionEmpleado() {
+        return percepcionEmpleado;
+    }
 
-	public void setPercepcionEmpleado(DetPercepcionEmpleado percepcionEmpleado) {
-		this.percepcionEmpleado = percepcionEmpleado;
-	}
+    public void setPercepcionEmpleado(DetPercepcionEmpleado percepcionEmpleado) {
+        this.percepcionEmpleado = percepcionEmpleado;
+    }
 
-	public List<CatTipoPrestamo> getTiposPrestamo() {
-		return tiposPrestamo;
-	}
+    public List<CatTipoPrestamo> getTiposPrestamo() {
+        return tiposPrestamo;
+    }
 
-	public void setTiposPrestamo(List<CatTipoPrestamo> tiposPrestamo) {
-		this.tiposPrestamo = tiposPrestamo;
-	}
+    public void setTiposPrestamo(List<CatTipoPrestamo> tiposPrestamo) {
+        this.tiposPrestamo = tiposPrestamo;
+    }
 
-	public DetPrestamo getPrestamo() {
-		return prestamo;
-	}
+    public DetPrestamo getPrestamo() {
+        return prestamo;
+    }
 
-	public void setPrestamo(DetPrestamo prestamo) {
-		this.prestamo = prestamo;
-	}
+    public void setPrestamo(DetPrestamo prestamo) {
+        this.prestamo = prestamo;
+    }
 
     public List<CatAsentamiento> getLstAsentamientos() {
         return lstAsentamientos;
@@ -929,7 +932,7 @@ public class RegistroEmpleadosBean implements Serializable {
     public void setLstDomicilios(List<DetDomicilioEmpleado> lstDomicilios) {
         this.lstDomicilios = lstDomicilios;
     }
-    
+
     public CatAsentamiento getAsentamientoSelected() {
         return asentamientoSelected;
     }
@@ -937,7 +940,7 @@ public class RegistroEmpleadosBean implements Serializable {
     public void setAsentamientoSelected(CatAsentamiento asentamientoSeleccionado) {
         this.asentamientoSelected = asentamientoSeleccionado;
     }
-    
+
     public String getCodigoPostal() {
         return codigoPostal;
     }
@@ -946,14 +949,188 @@ public class RegistroEmpleadosBean implements Serializable {
         this.codigoPostal = codigoPostal;
     }
 
-    public DetDomicilioEmpleado getDomicilioEmpleadoSelected() 
-    {
+    public DetDomicilioEmpleado getDomicilioEmpleadoSelected() {
         return domicilioEmpleadoSelected;
     }
 
-    public void setDomicilioEmpleadoSelected(DetDomicilioEmpleado domicilioEmpleadoSelected) 
-    {
+    public void setDomicilioEmpleadoSelected(DetDomicilioEmpleado domicilioEmpleadoSelected) {
         this.domicilioEmpleadoSelected = domicilioEmpleadoSelected;
     }
+
+    public CatPlanta getPlantaselected() {
+        return plantaselected;
+    }
+
+    public void setPlantaselected(CatPlanta plantaselected) {
+        this.plantaselected = plantaselected;
+    }
+
+    public CatEmpresa getEmpresaselected() {
+        return empresaselected;
+    }
+
+    public void setEmpresaselected(CatEmpresa empresaselected) {
+        this.empresaselected = empresaselected;
+    }
+
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
+
+    public boolean isInactivo() {
+        return inactivo;
+    }
+
+    public void setInactivo(boolean inactivo) {
+        this.inactivo = inactivo;
+    }
+
+    public String getTexto() {
+        return texto;
+    }
+
+    public void setTexto(String texto) {
+        this.texto = texto;
+    }
+
     
+    
+    public List<DetEmpleado> filtrarEmpleados() {
+        
+        if (this.activo && this.inactivo && this.empresaselected == null && this.plantaselected == null) {
+            return this.lstEmpleados;
+        }
+
+        if (this.activo && this.inactivo && this.empresaselected != null && this.plantaselected == null) {
+            return this.lstEmpleados.stream().
+                    filter(empleado -> empleado.getDatoEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa().getIdEmpresa().equals(this.empresaselected.getIdEmpresa())).
+                    collect(Collectors.toList());
+        }
+
+        if (this.activo && this.inactivo && this.plantaselected != null && this.empresaselected == null) {
+            return this.lstEmpleados.stream().
+                    filter(empleado -> empleado.getDatoEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getPlanta() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getPlanta().getIdPlanta().equals(this.plantaselected.getIdPlanta())).
+                    collect(Collectors.toList());
+        }
+
+        if (this.activo && this.inactivo && this.empresaselected != null && this.plantaselected != null) {
+            return this.lstEmpleados.stream().
+                    filter(empleado -> empleado.getDatoEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa() != null && empleado.getDatoEmpresa().getPlanta() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa().getIdEmpresa().equals(this.empresaselected.getIdEmpresa()) && empleado.getDatoEmpresa().getPlanta().getIdPlanta().equals(this.plantaselected.getIdPlanta())).
+                    collect(Collectors.toList());
+        }
+
+        if (this.activo && this.empresaselected == null && this.plantaselected == null) {
+            return this.lstEmpleados.stream().
+                    filter(empleado -> empleado.getDatoEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getFechaBaja() == null).
+                    collect(Collectors.toList());
+        }
+
+        if (this.inactivo && this.empresaselected == null && this.plantaselected == null) {
+            return this.lstEmpleados.stream().
+                    filter(empleado -> empleado.getDatoEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getFechaBaja() != null).
+                    collect(Collectors.toList());
+
+        }
+
+        if (this.activo && this.empresaselected != null && this.plantaselected == null) {
+            return this.lstEmpleados.stream().
+                    filter(empleado -> empleado.getDatoEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa().getIdEmpresa().equals(this.empresaselected.getIdEmpresa())).
+                    filter(empleado -> empleado.getDatoEmpresa().getFechaBaja() == null).
+                    collect(Collectors.toList());
+
+        }
+
+        if (this.inactivo && this.empresaselected != null && this.plantaselected == null) {
+            return this.lstEmpleados.stream().
+                    filter(empleado -> empleado.getDatoEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa().getIdEmpresa().equals(this.empresaselected.getIdEmpresa())).
+                    filter(empleado -> empleado.getDatoEmpresa().getFechaBaja() != null).
+                    collect(Collectors.toList());
+        }
+
+        if (this.activo && this.plantaselected != null && this.empresaselected == null) {
+            return this.lstEmpleados.stream().
+                    filter(empleado -> empleado.getDatoEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getPlanta() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getPlanta().getIdPlanta().equals(this.plantaselected.getIdPlanta())).
+                    filter(empleado -> empleado.getDatoEmpresa().getFechaBaja() == null).
+                    collect(Collectors.toList());
+        }
+
+        if (this.inactivo && this.plantaselected != null && this.empresaselected == null) {
+            return this.lstEmpleados.stream().
+                    filter(empleado -> empleado.getDatoEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getPlanta() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getPlanta().getIdPlanta().equals(this.plantaselected.getIdPlanta())).
+                    filter(empleado -> empleado.getDatoEmpresa().getFechaBaja() != null).
+                    collect(Collectors.toList());
+        }
+
+        if (this.activo && this.empresaselected != null && this.plantaselected != null) {
+            return this.lstEmpleados.stream().
+                    filter(empleado -> empleado.getDatoEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa() != null && empleado.getDatoEmpresa().getPlanta() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa().getIdEmpresa().equals(this.empresaselected.getIdEmpresa()) && empleado.getDatoEmpresa().getPlanta().getIdPlanta().equals(this.plantaselected.getIdPlanta())).
+                    filter(empleado -> empleado.getDatoEmpresa().getFechaBaja() == null).
+                    collect(Collectors.toList());
+        }
+
+        if (this.inactivo && this.empresaselected != null && this.plantaselected != null) {
+            return this.lstEmpleados.stream().
+                    filter(empleado -> empleado.getDatoEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa() != null && empleado.getDatoEmpresa().getPlanta() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa().getIdEmpresa().equals(this.empresaselected.getIdEmpresa()) && empleado.getDatoEmpresa().getPlanta().getIdPlanta().equals(this.plantaselected.getIdPlanta())).
+                    filter(empleado -> empleado.getDatoEmpresa().getFechaBaja() != null).
+                    collect(Collectors.toList());
+        }
+
+        if (this.empresaselected != null && this.plantaselected == null) {
+            return this.lstEmpleados.stream().
+                    filter(empleado -> empleado.getDatoEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa().getIdEmpresa().equals(this.empresaselected.getIdEmpresa())).
+                    collect(Collectors.toList());
+        }
+
+        if (this.plantaselected != null && this.empresaselected == null) {
+            return this.lstEmpleados.stream().
+                    filter(empleado -> empleado.getDatoEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getPlanta() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getPlanta().getIdPlanta().equals(this.plantaselected.getIdPlanta())).
+                    collect(Collectors.toList());
+        }
+
+        if (this.empresaselected != null && this.plantaselected != null) {
+            return this.lstEmpleados.stream().
+                    filter(empleado -> empleado.getDatoEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa() != null && empleado.getDatoEmpresa().getPlanta() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa().getIdEmpresa().equals(this.empresaselected.getIdEmpresa()) && empleado.getDatoEmpresa().getPlanta().getIdPlanta().equals(this.plantaselected.getIdPlanta())).
+                    collect(Collectors.toList());
+        }
+
+                if(this.texto != null && !this.texto.equals("")){
+            
+            return this.lstEmpleados.stream().
+                    filter( empleado -> empleado.getNombre().contains(this.texto.trim().toUpperCase()) || empleado.getPrimerAp().contains(this.texto.trim().toUpperCase()) || empleado.getSegundoAp().contains(this.texto.trim().toUpperCase())).
+                    collect(Collectors.toList());
+        }
+
+        
+        return null;
+    }  
 }
