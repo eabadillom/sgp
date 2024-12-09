@@ -42,13 +42,13 @@
                             <p:toolbarGroup>
                                 <p:outputLabel id="toggleactivo" value="Activo "/>
                                 <p:toggleSwitch value="#{registroEmpleadosBean.activo}">
-                                    <p:ajax  update="dtEmpleados, toggleinactivo"/>
+                                    <p:ajax  update="dtEmpleados" process="@this"/>
                                 </p:toggleSwitch>
                             </p:toolbarGroup>
                             <p:toolbarGroup>
                                 <p:outputLabel value="Inactivo "/>
                                 <p:toggleSwitch id="toggleinactivo" value="#{registroEmpleadosBean.inactivo}">
-                                    <p:ajax  update="dtEmpleados, toggleactivo"/>
+                                    <p:ajax  update="dtEmpleados" process="@this"/>
                                 </p:toggleSwitch>
                             </p:toolbarGroup>
                             <p:toolbarGroup align="right">
@@ -62,16 +62,25 @@
                                      selection="#{registroEmpleadosBean.lstEmpleadosSelected}" rowKey="#{empleado.idEmpleado}" paginator="true" rows="10" rowSelectMode="add" 
                                      paginatorPosition="bottom" lazy="true">
 
-                            <p:column headerText="Número" sortBy="#{empleado.numEmpleado}" filterBy="#{empleado.numEmpleado}" width="4rem">
+                            <f:facet name="header">
+                                <div class="flex justify-content-start">
+                                    <p:inputText id="filtarNombre" value="#{registroEmpleadosBean.texto}" onkeyup="PF('dtEmpleados').filter()" style="width:300px"
+                                                 placeholder="Buscar empleado por nombre o apellidos">
+                                        <p:ajax update="dtEmpleados" process="@this"/>
+                                        </p:inputText>
+                                </div>
+                            </f:facet>
+
+                            <p:column headerText="Número" sortBy="#{empleado.numEmpleado}" filterable="false" width="4rem">
                                 <h:outputText value="#{empleado.numEmpleado}" styleClass="customer-badge status-#{empleado.activo eq 1 ? 'qualified': 'unqualified'}"/>
                             </p:column>
-                            <p:column headerText="Primer Apellido" sortBy="#{empleado.primerAp}" filterBy="#{empleado.primerAp}">
+                            <p:column headerText="Primer Apellido" sortBy="#{empleado.primerAp}" filterable="false">
                                 <h:outputText style="vertical-alin: middle; margin-left: .5rem" value="#{empleado.primerAp}" />
                             </p:column>
-                            <p:column headerText="Segundo Apellido" sortBy="#{empleado.segundoAp}" filterBy="#{empleado.segundoAp}">
+                            <p:column headerText="Segundo Apellido" sortBy="#{empleado.segundoAp}" filterable="false">
                                 <h:outputText style="vertical-alin: middle; margin-left: .5rem" value="#{empleado.segundoAp}" />
                             </p:column>
-                            <p:column headerText="Nombre" sortBy="#{empleado.nombre}" filterBy="#{empleado.nombre}">
+                            <p:column headerText="Nombre" sortBy="#{empleado.nombre}" filterable="false">
                                 <h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{empleado.nombre}" />
                             </p:column>
                             <p:column width="6rem">

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -71,6 +72,7 @@ import mx.com.ferbo.model.sat.CatTipoJornada;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.model.sat.CatTipoRegimen;
 import mx.com.ferbo.util.SGPException;
+import org.primefaces.util.LangUtils;
 
 @Named(value = "registroEmpleadosBean")
 @ViewScoped
@@ -126,8 +128,6 @@ public class RegistroEmpleadosBean implements Serializable {
     private boolean activo;
     private boolean inactivo;
 
-    private Date fechaactual;
-
     private DetEmpleado empleadoSelected;
     private DetBiometrico detBiometrico;
     private DetEmpleadoFoto empleadoFoto;
@@ -142,6 +142,8 @@ public class RegistroEmpleadosBean implements Serializable {
     private String rfc;
     private String nss;
     private String codigoPostal;
+    
+    private String texto;
 
     public RegistroEmpleadosBean() {
         empleadoFotoDAO = new EmpleadoFotoDAO(DetEmpleadoFoto.class);
@@ -1000,16 +1002,18 @@ public class RegistroEmpleadosBean implements Serializable {
         this.inactivo = inactivo;
     }
 
-    private Date getFechaactual() {
-        return fechaactual;
+    public String getTexto() {
+        return texto;
     }
 
-    private void setFechaactual(Date fechaactual) {
-        this.fechaactual = fechaactual;
+    public void setTexto(String texto) {
+        this.texto = texto;
     }
 
+    
+    
     public List<DetEmpleado> filtrarEmpleados() {
-
+        
         if (this.activo && this.inactivo && this.empresaselected == null && this.plantaselected == null) {
             return this.lstEmpleados;
         }
@@ -1122,7 +1126,6 @@ public class RegistroEmpleadosBean implements Serializable {
                     filter(empleado -> empleado.getDatoEmpresa().getPlanta() != null).
                     filter(empleado -> empleado.getDatoEmpresa().getPlanta().getIdPlanta().equals(this.plantaselected.getIdPlanta())).
                     collect(Collectors.toList());
-
         }
 
         if (this.empresaselected != null && this.plantaselected != null) {
@@ -1133,6 +1136,14 @@ public class RegistroEmpleadosBean implements Serializable {
                     collect(Collectors.toList());
         }
 
+                if(this.texto != null && !this.texto.equals("")){
+            
+            return this.lstEmpleados.stream().
+                    filter( empleado -> empleado.getNombre().contains(this.texto.trim().toUpperCase()) || empleado.getPrimerAp().contains(this.texto.trim().toUpperCase()) || empleado.getSegundoAp().contains(this.texto.trim().toUpperCase())).
+                    collect(Collectors.toList());
+        }
+
+        
         return null;
-    }
+    }  
 }
