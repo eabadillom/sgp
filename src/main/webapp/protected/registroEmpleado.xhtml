@@ -161,19 +161,19 @@
 								<div class="formgrid grid">
 									<div class="field col">
 										<p:outputLabel for="@next" value="Calle" />
-										<p:inputText id="calle" value="#{registroEmpleadosBean.domicilioEmpleadoSelected.calle}" >
+                                                                                <p:inputText id="calle" value="#{registroEmpleadosBean.empleadoSelected.domicilio.calle}" >
 											<p:ajax process="@this" />
 										</p:inputText>
 									</div>
 									<div class="field col">
 										<p:outputLabel for="@next" value="Num. Ext." />
-										<p:inputText id="numExt" value="#{registroEmpleadosBean.domicilioEmpleadoSelected.numeroExterior}" >
+										<p:inputText id="numExt" value="#{registroEmpleadosBean.empleadoSelected.domicilio.numeroExterior}" >
 											<p:ajax process="@this" />
 										</p:inputText>
 									</div>
 									<div class="field col">
 										<p:outputLabel for="@next" value="Num. Int" />
-										<p:inputText id="numInt" value="#{registroEmpleadosBean.domicilioEmpleadoSelected.numeroInterior}" >
+										<p:inputText id="numInt" value="#{registroEmpleadosBean.empleadoSelected.domicilio.numeroInterior}" >
 											<p:ajax process="@this" />
 										</p:inputText>
 									</div>
