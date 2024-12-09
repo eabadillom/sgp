@@ -262,10 +262,6 @@ public class RegistroEmpleadosBean implements Serializable {
         if(auxAsentamiento != null)
         {
             this.empleadoSelected.getDomicilio().setAsentamiento(auxAsentamiento);
-            /*this.domicilioEmpleadoSelected.setLocalidad(auxAsentamiento.getKey().getLocalidad().getKey().getId());
-            this.domicilioEmpleadoSelected.setMunicipio(auxAsentamiento.getKey().getLocalidad().getKey().getMunicipio().getKey().getId());
-            this.domicilioEmpleadoSelected.setEstado(auxAsentamiento.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getId());
-            this.domicilioEmpleadoSelected.setPais(auxAsentamiento.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getPais().getId());*/
         }
         
     }
