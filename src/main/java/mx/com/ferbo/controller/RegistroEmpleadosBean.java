@@ -125,7 +125,9 @@ public class RegistroEmpleadosBean implements Serializable {
     private CatEmpresa empresaselected;
     private boolean activo;
     private boolean inactivo;
-    
+
+    private Date fechaactual;
+
     private DetEmpleado empleadoSelected;
     private DetBiometrico detBiometrico;
     private DetEmpleadoFoto empleadoFoto;
@@ -998,24 +1000,123 @@ public class RegistroEmpleadosBean implements Serializable {
         this.inactivo = inactivo;
     }
 
+    private Date getFechaactual() {
+        return fechaactual;
+    }
+
+    private void setFechaactual(Date fechaactual) {
+        this.fechaactual = fechaactual;
+    }
+
     public List<DetEmpleado> filtrarEmpleados() {
 
-        if (this.empresaselected == null && this.plantaselected == null) {
+        if (this.activo && this.inactivo && this.empresaselected == null && this.plantaselected == null) {
             return this.lstEmpleados;
         }
 
-        if (this.empresaselected != null && this.plantaselected == null) {
-
+        if (this.activo && this.inactivo && this.empresaselected != null && this.plantaselected == null) {
             return this.lstEmpleados.stream().
                     filter(empleado -> empleado.getDatoEmpresa() != null).
                     filter(empleado -> empleado.getDatoEmpresa().getEmpresa() != null).
                     filter(empleado -> empleado.getDatoEmpresa().getEmpresa().getIdEmpresa().equals(this.empresaselected.getIdEmpresa())).
                     collect(Collectors.toList());
+        }
+
+        if (this.activo && this.inactivo && this.plantaselected != null && this.empresaselected == null) {
+            return this.lstEmpleados.stream().
+                    filter(empleado -> empleado.getDatoEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getPlanta() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getPlanta().getIdPlanta().equals(this.plantaselected.getIdPlanta())).
+                    collect(Collectors.toList());
+        }
+
+        if (this.activo && this.inactivo && this.empresaselected != null && this.plantaselected != null) {
+            return this.lstEmpleados.stream().
+                    filter(empleado -> empleado.getDatoEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa() != null && empleado.getDatoEmpresa().getPlanta() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa().getIdEmpresa().equals(this.empresaselected.getIdEmpresa()) && empleado.getDatoEmpresa().getPlanta().getIdPlanta().equals(this.plantaselected.getIdPlanta())).
+                    collect(Collectors.toList());
+        }
+
+        if (this.activo && this.empresaselected == null && this.plantaselected == null) {
+            return this.lstEmpleados.stream().
+                    filter(empleado -> empleado.getDatoEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getFechaBaja() == null).
+                    collect(Collectors.toList());
+        }
+
+        if (this.inactivo && this.empresaselected == null && this.plantaselected == null) {
+            return this.lstEmpleados.stream().
+                    filter(empleado -> empleado.getDatoEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getFechaBaja() != null).
+                    collect(Collectors.toList());
 
         }
 
-        if (this.plantaselected != null && this.empresaselected == null) {
+        if (this.activo && this.empresaselected != null && this.plantaselected == null) {
+            return this.lstEmpleados.stream().
+                    filter(empleado -> empleado.getDatoEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa().getIdEmpresa().equals(this.empresaselected.getIdEmpresa())).
+                    filter(empleado -> empleado.getDatoEmpresa().getFechaBaja() == null).
+                    collect(Collectors.toList());
 
+        }
+
+        if (this.inactivo && this.empresaselected != null && this.plantaselected == null) {
+            return this.lstEmpleados.stream().
+                    filter(empleado -> empleado.getDatoEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa().getIdEmpresa().equals(this.empresaselected.getIdEmpresa())).
+                    filter(empleado -> empleado.getDatoEmpresa().getFechaBaja() != null).
+                    collect(Collectors.toList());
+        }
+
+        if (this.activo && this.plantaselected != null && this.empresaselected == null) {
+            return this.lstEmpleados.stream().
+                    filter(empleado -> empleado.getDatoEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getPlanta() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getPlanta().getIdPlanta().equals(this.plantaselected.getIdPlanta())).
+                    filter(empleado -> empleado.getDatoEmpresa().getFechaBaja() == null).
+                    collect(Collectors.toList());
+        }
+
+        if (this.inactivo && this.plantaselected != null && this.empresaselected == null) {
+            return this.lstEmpleados.stream().
+                    filter(empleado -> empleado.getDatoEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getPlanta() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getPlanta().getIdPlanta().equals(this.plantaselected.getIdPlanta())).
+                    filter(empleado -> empleado.getDatoEmpresa().getFechaBaja() != null).
+                    collect(Collectors.toList());
+        }
+
+        if (this.activo && this.empresaselected != null && this.plantaselected != null) {
+            return this.lstEmpleados.stream().
+                    filter(empleado -> empleado.getDatoEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa() != null && empleado.getDatoEmpresa().getPlanta() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa().getIdEmpresa().equals(this.empresaselected.getIdEmpresa()) && empleado.getDatoEmpresa().getPlanta().getIdPlanta().equals(this.plantaselected.getIdPlanta())).
+                    filter(empleado -> empleado.getDatoEmpresa().getFechaBaja() == null).
+                    collect(Collectors.toList());
+        }
+
+        if (this.inactivo && this.empresaselected != null && this.plantaselected != null) {
+            return this.lstEmpleados.stream().
+                    filter(empleado -> empleado.getDatoEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa() != null && empleado.getDatoEmpresa().getPlanta() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa().getIdEmpresa().equals(this.empresaselected.getIdEmpresa()) && empleado.getDatoEmpresa().getPlanta().getIdPlanta().equals(this.plantaselected.getIdPlanta())).
+                    filter(empleado -> empleado.getDatoEmpresa().getFechaBaja() != null).
+                    collect(Collectors.toList());
+        }
+
+        if (this.empresaselected != null && this.plantaselected == null) {
+            return this.lstEmpleados.stream().
+                    filter(empleado -> empleado.getDatoEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa() != null).
+                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa().getIdEmpresa().equals(this.empresaselected.getIdEmpresa())).
+                    collect(Collectors.toList());
+        }
+
+        if (this.plantaselected != null && this.empresaselected == null) {
             return this.lstEmpleados.stream().
                     filter(empleado -> empleado.getDatoEmpresa() != null).
                     filter(empleado -> empleado.getDatoEmpresa().getPlanta() != null).
@@ -1025,13 +1126,11 @@ public class RegistroEmpleadosBean implements Serializable {
         }
 
         if (this.empresaselected != null && this.plantaselected != null) {
-
             return this.lstEmpleados.stream().
                     filter(empleado -> empleado.getDatoEmpresa() != null).
                     filter(empleado -> empleado.getDatoEmpresa().getEmpresa() != null && empleado.getDatoEmpresa().getPlanta() != null).
                     filter(empleado -> empleado.getDatoEmpresa().getEmpresa().getIdEmpresa().equals(this.empresaselected.getIdEmpresa()) && empleado.getDatoEmpresa().getPlanta().getIdPlanta().equals(this.plantaselected.getIdPlanta())).
                     collect(Collectors.toList());
-
         }
 
         return null;
