@@ -44,7 +44,7 @@ public class CatEstado implements Serializable
     @Column(name = "nb_estado")
     private String descripcion;
     
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "key.estado", fetch= FetchType.LAZY)
+    @OneToMany(mappedBy = "key.estado")
     private List<CatMunicipio> municipios;
     
     public CatEstado() 

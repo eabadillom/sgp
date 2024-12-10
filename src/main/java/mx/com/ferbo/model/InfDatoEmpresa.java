@@ -92,10 +92,6 @@ public class InfDatoEmpresa implements Serializable {
 	@Column(name = "nu_tolerancia")
 	private Integer minutosTolerancia;
 	
-	@Basic(optional = true)
-	@Column(name = "nu_cp")
-	private String codigoPostal;
-	
 	@ManyToOne
 	@JoinColumn(name = "cd_estado", referencedColumnName = "cd_estado")
 	private CatEntidadFederativa entidadFederativa;
@@ -112,7 +108,34 @@ public class InfDatoEmpresa implements Serializable {
 	@Column(name = "st_sindicalizado")
 	private Boolean sindicalizado;
 	
-	
+	@Basic(optional = true)
+	@Column(name = "st_diat_lunes")
+	private Boolean diaLunes;
+        
+        @Basic(optional = true)
+	@Column(name = "st_diat_martes")
+	private Boolean diaMartes;
+        
+        @Basic(optional = true)
+	@Column(name = "st_diat_miercoles")
+	private Boolean diaMiercoles;
+        
+        @Basic(optional = true)
+	@Column(name = "st_diat_jueves")
+	private Boolean diaJueves;
+        
+        @Basic(optional = true)
+	@Column(name = "st_diat_viernes")
+	private Boolean diaViernes;
+        
+        @Basic(optional = true)
+	@Column(name = "st_diat_sabado")
+	private Boolean diaSabado;
+        
+        @Basic(optional = true)
+	@Column(name = "st_diat_domingo")
+	private Boolean diaDomingo;
+        
 	public Integer getId() {
 		return id;
 	}
@@ -203,6 +226,48 @@ public class InfDatoEmpresa implements Serializable {
 	public void setMinutosTolerancia(Integer minutosTolerancia) {
 		this.minutosTolerancia = minutosTolerancia;
 	}
+        public Boolean getDiaLunes() {
+            return diaLunes;
+        }
+        public void setDiaLunes(Boolean diaLunes) {
+            this.diaLunes = diaLunes;
+        }
+        public Boolean getDiaMartes() {
+            return diaMartes;
+        }
+        public void setDiaMartes(Boolean diaMartes) {
+            this.diaMartes = diaMartes;
+        }
+        public Boolean getDiaMiercoles() {
+            return diaMiercoles;
+        }
+        public void setDiaMiercoles(Boolean diaMiercoles) {
+            this.diaMiercoles = diaMiercoles;
+        }
+        public Boolean getDiaJueves() {
+            return diaJueves;
+        }
+        public void setDiaJueves(Boolean diaJueves) {
+            this.diaJueves = diaJueves;
+        }
+        public Boolean getDiaViernes() {
+            return diaViernes;
+        }
+        public void setDiaViernes(Boolean diaViernes) {
+            this.diaViernes = diaViernes;
+        }
+        public Boolean getDiaSabado() {
+            return diaSabado;
+        }
+        public void setDiaSabado(Boolean diaSabado) {
+            this.diaSabado = diaSabado;
+        }
+        public Boolean getDiaDomingo() {
+            return diaDomingo;
+        }
+        public void setDiaDomingo(Boolean diaDomingo) {
+            this.diaDomingo = diaDomingo;
+        }
 	@Override
 	public int hashCode() {
 		return Objects.hash(id);
@@ -223,12 +288,6 @@ public class InfDatoEmpresa implements Serializable {
 		return "{\"id\":\"" + id + "\", \"perfil\":\"" + perfil + "\", \"fechaIngreso\":\"" + fechaIngreso
 				+ "\", \"nss\":\"" + nss + "\", \"rfc\":\"" + rfc + "\", \"salarioDiario\":\"" + salarioDiario
 				+ "\", \"horaEntrada\":\"" + horaEntrada + "\", \"minutosTolerancia\":\"" + minutosTolerancia + "\"}";
-	}
-	public String getCodigoPostal() {
-		return codigoPostal;
-	}
-	public void setCodigoPostal(String codigoPostal) {
-		this.codigoPostal = codigoPostal;
 	}
 	public CatEntidadFederativa getEntidadFederativa() {
 		return entidadFederativa;

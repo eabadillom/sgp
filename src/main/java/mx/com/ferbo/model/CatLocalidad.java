@@ -38,7 +38,7 @@ public class CatLocalidad implements Serializable
     @Column(name = "nb_localidad")
     private String descripcion;
     
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "key.localidad", fetch= FetchType.LAZY)
+    @OneToMany(mappedBy = "key.localidad")
     private List<CatAsentamiento> asentamientos;
     
     public CatLocalidad() 

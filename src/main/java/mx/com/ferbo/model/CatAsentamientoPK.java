@@ -21,7 +21,7 @@ public class CatAsentamientoPK implements Serializable
 {
     private static final long serialVersionUID = 1L;
     
-    @ManyToOne(optional = false)
+    @ManyToOne
     @NotNull
     @JoinColumns(value = {
         @JoinColumn(name = "cd_localidad", referencedColumnName = "cd_localidad", updatable = false),
