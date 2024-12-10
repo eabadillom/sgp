@@ -325,10 +325,10 @@ public class AjustesBean implements Serializable {
         }
     }
     
-    public void tallas(){
+    public void domicilios(){
         String path = null;
         try{
-            path = contextPath + "/protected/settings/sistema/tallas.xhtml";
+            path = contextPath + "/protected/settings/sistema/domicilios.xhtml";
             FacesContext.getCurrentInstance().getExternalContext().redirect(path);
         }
         catch(Exception e) {

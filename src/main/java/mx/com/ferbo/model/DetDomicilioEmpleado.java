@@ -30,8 +30,8 @@ import javax.validation.constraints.Size;
 @Table(name = "det_domicilio_empleado")
 @NamedQueries({
     @NamedQuery(name = "DetDomicilioEmpleado.findAll", query = "SELECT cde FROM DetDomicilioEmpleado cde"),
-    @NamedQuery(name = "DetDomicilioEmpleado.findIdEmpleado", query = "SELECT cde FROM DetDomicilioEmpleado cde INNER JOIN cde.empleado e WHERE e.idEmpleado = :idEmpleado")/*,
-    @NamedQuery(name = "DetDomicilioEmpleado.findParametros", query = "SELECT cde FROM DetDomicilioEmpleado cde INNER JOIN cde.empleado e INNER JOIN cde.asentamiento a WHERE e.idEmpleado = :idEmpleado and a.key.id = :idAsentamiento and a.key.localidad.key.id = :idLocalidad and a.key.localidad.key.municipio.key.id = :idMunicipio and a.key.localidad.key.municipio.key.estado.key.id = :idEstado and a.key.localidad.key.municipio.key.estado.key.pais.id = :idPais")*/
+    @NamedQuery(name = "DetDomicilioEmpleado.findIdEmpleado", query = "SELECT cde FROM DetDomicilioEmpleado cde INNER JOIN cde.empleado e WHERE e.idEmpleado = :idEmpleado"),
+    @NamedQuery(name = "DetDomicilioEmpleado.findParametros", query = "SELECT cde FROM DetDomicilioEmpleado cde INNER JOIN cde.empleado e INNER JOIN cde.asentamiento a WHERE e.idEmpleado = :idEmpleado and a.key.id = :idAsentamiento and a.key.localidad.key.id = :idLocalidad and a.key.localidad.key.municipio.key.id = :idMunicipio and a.key.localidad.key.municipio.key.estado.key.id = :idEstado and a.key.localidad.key.municipio.key.estado.key.pais.id = :idPais")
 })
 public class DetDomicilioEmpleado implements Serializable
 {
@@ -44,19 +44,19 @@ public class DetDomicilioEmpleado implements Serializable
     @Column(name = "cd_domicilioEmp")
     private Integer id;
     
-    @Basic(optional = false)
-    @NotNull
+    @Basic
+    @Null
     @Size(min = 1, max = 150)
     @Column(name = "nb_calle")
     private String calle;
     
-    @Basic(optional = false)
-    @NotNull
+    @Basic
+    @Null
     @Size(min = 1, max = 150)
     @Column(name = "nu_numExt")
     private String numeroExterior;
     
-    @Basic(optional = false)
+    @Basic
     @Null
     @Size(min = 1, max = 150)
     @Column(name = "nu_numInt")
@@ -66,34 +66,34 @@ public class DetDomicilioEmpleado implements Serializable
     @NotNull
     @JoinColumn(name = "id_empleado")
     private DetEmpleado empleado;
-    
-    @Basic(optional = false)
-    @NotNull
+    /*
+    @Basic
+    @Null
     @Column(name = "cd_asentamiento")
     private Integer asentamiento;
     
-    @Basic(optional = false)
-    @NotNull
+    @Basic
+    @Null
     @Column(name = "cd_localidad")
     private Integer localidad;
     
-    @Basic(optional = false)
-    @NotNull
+    @Basic
+    @Null
     @Column(name = "cd_municipio")
     private Integer municipio;
     
-    @Basic(optional = false)
-    @NotNull
+    @Basic
+    @Null
     @Column(name = "cd_estado")
     private Integer estado;
     
-    @Basic(optional = false)
-    @NotNull
+    @Basic
+    @Null
     @Column(name = "cd_pais")
     private Integer pais;
-    
-    /*@OneToOne(optional = false)
-    @NotNull
+    */
+    @OneToOne
+    @Null
     @JoinColumns(value = {
         @JoinColumn(name = "cd_asentamiento", referencedColumnName = "cd_asentamiento"),
         @JoinColumn(name = "cd_localidad", referencedColumnName = "cd_localidad"),
@@ -102,7 +102,7 @@ public class DetDomicilioEmpleado implements Serializable
         @JoinColumn(name = "cd_pais", referencedColumnName = "cd_pais")
     },
         foreignKey = @ForeignKey(name="FK_Domicilio_Empleado_Asentamiento"))
-    private CatAsentamiento asentamiento;*/
+    private CatAsentamiento asentamiento;
     
     public DetDomicilioEmpleado() 
     {
@@ -121,7 +121,7 @@ public class DetDomicilioEmpleado implements Serializable
         this.numeroInterior = numeroInterior;
     }
 
-    public DetDomicilioEmpleado(Integer id, DetEmpleado empleado, Integer asentamiento, Integer localidad, Integer municipio, Integer estado, Integer pais, String calle, String numeroExterior, String numeroInterior) 
+    /*public DetDomicilioEmpleado(Integer id, DetEmpleado empleado, Integer asentamiento, Integer localidad, Integer municipio, Integer estado, Integer pais, String calle, String numeroExterior, String numeroInterior) 
     {
         this.id = id;
         this.calle = calle;
@@ -133,7 +133,7 @@ public class DetDomicilioEmpleado implements Serializable
         this.municipio = municipio;
         this.estado = estado;
         this.pais = pais;
-    }
+    }*/
     
     public Integer getId() 
     {
@@ -185,7 +185,7 @@ public class DetDomicilioEmpleado implements Serializable
         this.empleado = empleado;
     }
 
-    public Integer getAsentamiento() {
+    /*public Integer getAsentamiento() {
         return asentamiento;
     }
 
@@ -223,9 +223,9 @@ public class DetDomicilioEmpleado implements Serializable
 
     public void setPais(Integer pais) {
         this.pais = pais;
-    }
+    }*/
     
-    /*public CatAsentamiento getAsentamiento() 
+    public CatAsentamiento getAsentamiento() 
     {
         return asentamiento;
     }
@@ -233,7 +233,7 @@ public class DetDomicilioEmpleado implements Serializable
     public void setAsentamiento(CatAsentamiento asentamiento) 
     {
         this.asentamiento = asentamiento;
-    }*/
+    }
     
     @Override
     public int hashCode() 

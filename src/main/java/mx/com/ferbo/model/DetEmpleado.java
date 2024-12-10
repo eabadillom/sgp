@@ -233,15 +233,15 @@ public class DetEmpleado implements Serializable {
     @OneToMany(mappedBy = "empleado", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<DetPrestamo> prestamos;
     
+    @OneToOne(mappedBy = "empleado", cascade = {CascadeType.ALL})
+    private DetDomicilioEmpleado domicilio;
+    
     public DetEmpleado() {
     }
 
     public DetEmpleado(Integer idEmpleado) {
         this.idEmpleado = idEmpleado;
     }
-    
-    //@OneToOne(mappedBy = "empleado", fetch= FetchType.LAZY)
-    //private DetDomicilioEmpleado domicilio;
     
     public DetEmpleado(Integer idEmpleado, String numEmpleado, String nombre, String primerAp, Date fechaNacimiento, Date fechaRegistro, String rfc,
             Date fechaIngreso, short activo, BigDecimal sueldoDiario) {
@@ -479,13 +479,13 @@ public class DetEmpleado implements Serializable {
 		this.prestamos = prestamos;
 	}
 
-    /*public DetDomicilioEmpleado getDomicilio() {
+    public DetDomicilioEmpleado getDomicilio() {
         return domicilio;
     }
 
     public void setDomicilio(DetDomicilioEmpleado domicilio) {
         this.domicilio = domicilio;
-    }*/
+    }
     
     @Override
     public int hashCode() {

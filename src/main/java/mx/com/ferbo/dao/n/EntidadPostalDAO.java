@@ -1,4 +1,3 @@
-
 package mx.com.ferbo.dao.n;
 
 import java.util.List;
@@ -10,127 +9,140 @@ import mx.com.ferbo.util.SGPException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class EntidadPostalDAO extends BaseDAO{
-    
-    private static Logger log = LogManager.getLogger(FpClientDAO.class);
-    
+public class EntidadPostalDAO extends BaseDAO {
+
+    private static Logger log = LogManager.getLogger(CatEntidadPostal.class);
+
     public EntidadPostalDAO(Class<CatEntidadPostal> modelClass) {
         super(modelClass);
     }
-    
-    public EntidadPostalDAO(){
+
+    public EntidadPostalDAO() {
         super(CatEntidadPostal.class);
     }
-    
-    public synchronized List<CatEntidadPostal> obtenerTodos() throws SGPException{
+
+    public synchronized List<CatEntidadPostal> obtenerTodos() throws SGPException {
         EntityManager em = null;
         List<CatEntidadPostal> entidadespostales = null;
-        try{
+        try {
             log.info("Inicia proceso de obtener todos los entidadespostales.");
             em = super.getEntityManager();
             TypedQuery<CatEntidadPostal> resultado = em.createQuery("select e from  CatEntidadPostal e", CatEntidadPostal.class);
             entidadespostales = resultado.getResultList();
-            
-        }
-        catch(Exception ex){
+            log.info("Finaliza proceso de obtener todos los entidades postales");
+
+        } catch (Exception ex) {
             super.rollback(em);
             log.error("Hubo algun problema al obtener todos los registros de la tabla CatEntidadPostal");
             throw new SGPException("Problema al obtener los registros" + ex);
-        }
-        finally{
-            log.info("Finaliza proceso de obtener todos los entidades postales");
+        } finally {
             super.close(em);
         }
         return entidadespostales;
     }
-    
-    public synchronized CatEntidadPostal buscarPorId(Integer id) throws SGPException{
-        
+
+    public synchronized CatEntidadPostal buscarPorId(Integer id) throws SGPException {
+
         EntityManager em = null;
         CatEntidadPostal entidadpostal = null;
-        
-        try{
-          log.info("Inicia proceso de obtener elemento con id: {}", id);
-          em = super.getEntityManager();
-          em.getTransaction().begin();
-          entidadpostal = em.find(CatEntidadPostal.class, id);
-          em.getTransaction().commit();
-        }
-        catch(Exception ex){
+
+        try {
+            log.info("Inicia proceso de obtener elemento con id: {}", id);
+            em = super.getEntityManager();
+            em.getTransaction().begin();
+            entidadpostal = em.find(CatEntidadPostal.class, id);
+            em.getTransaction().commit();
+            log.info("Finaliza proceso de obtener elemento con id: {}", id);
+        } catch (Exception ex) {
             super.rollback(em);
-            log.error("Hubo algun problema al buscar el elemento con id: " + id);
-            throw new SGPException("Problema al obtener el elemento por id " + ex);
-        }
-        finally{
+            log.error("Hubo algun problema al buscar el elemento con id: " + id + ". " + ex);
+            throw new SGPException("Problema al obtener el elemento por id");
+        } finally {
             super.close(em);
-           log.info("Finaliza proceso de obtener elemento con id: {}", id);           
         }
         return entidadpostal;
     }
-    
-    public synchronized void guardar(CatEntidadPostal entidadpostal) throws SGPException{
-        
+
+    public synchronized void guardar(CatEntidadPostal entidadpostal) throws SGPException {
+
         EntityManager em = null;
-        
-        try{
+
+        try {
             log.info("Inicia proceso de guardar el registro en la tabla CatEntidadPostal");
             em = super.getEntityManager();
             em.getTransaction().begin();
             em.persist(entidadpostal);
             em.getTransaction().commit();
-        }
-        catch(Exception ex){
-            super.rollback(em);
-            log.error("Hubo algun proble al guardar el registro {} en la tabla CatEntidadPostal", entidadpostal);
-            throw new SGPException("Problema al guardar el registro " + ex);
-        }
-        finally{
-            super.close(em);
             log.info("Finaliza prodceo de guardar el registro en la tabla CatEntidadPostal");
+        } catch (Exception ex) {
+            super.rollback(em);
+            log.error("Hubo algun proble al guardar el registro en la tabla CatEntidadPostal. " + ex);
+            throw new SGPException("Problema al guardar el registro");
+        } finally {
+            super.close(em);
         }
     }
-    
-    public synchronized void actualizar(CatEntidadPostal entidadpostal) throws SGPException{
-        
+
+    public synchronized void actualizar(CatEntidadPostal entidadpostal) throws SGPException {
+
         EntityManager em = null;
-        
-        try{
+
+        try {
             log.info("Inicia proceso de actualizar el registro de la tabla CatEntidadPostal");
             em = super.getEntityManager();
             em.getTransaction().begin();
             em.merge(entidadpostal);
             em.getTransaction().commit();
-        }
-        catch(Exception ex){
+            log.info("Finaliza proceso de actualizar el registro de la tabla CatEntidadPostal");
+        } catch (Exception ex) {
             super.rollback(em);
-            log.error("Hubo algun problema al actualizar el registro {} en la tabla CatEntidadPostal", entidadpostal);
-            throw new SGPException("Problema al actualizar el registro " + ex);
-        }
-        finally{
+            log.error("Hubo algun problema al actualizar el registro en la tabla CatEntidadPostal. " + ex);
+            throw new SGPException("Problema al actualizar el registro");
+        } finally {
             super.close(em);
-            log.info("Finaliza prodceo de actualizar el registro de la tabla CatEntidadPostal");
         }
     }
-    
-    public synchronized void eliminar(CatEntidadPostal entidadpostal) throws SGPException{
-        
+
+    public synchronized void eliminar(CatEntidadPostal entidadpostal) throws SGPException {
+
         EntityManager em = null;
-        
-        try{
+
+        try {
             log.info("Inicia proceso de eliminar el registro de la tabla CatEntidadPostal");
             em = super.getEntityManager();
             em.getTransaction().begin();
             em.remove(em.contains(entidadpostal) ? entidadpostal : em.merge(entidadpostal));
             em.getTransaction().commit();
-        }
-        catch(Exception ex){
+            log.info("Finaliza proceso de eliminar el registro de la tabla CatEntidadPostal");
+        } catch (Exception ex) {
             super.rollback(em);
-            log.error("Hubo algun problema al eliminar el registro {} de la tabla CatEntidadPostal", entidadpostal);
-            throw new SGPException("Problema al eliminar el registro " + ex);
-        }
-        finally{
+            log.error("Hubo algun problema al eliminar el registro de la tabla CatEntidadPostal. " + ex);
+            throw new SGPException("Problema al eliminar el registro");
+        } finally {
             super.close(em);
-            log.info("Finaliza prodceo de actualizar el registro de la tabla CatEntidadPostal");
+            
         }
+    }
+
+    public synchronized List<CatEntidadPostal> obtenerPorAsentamiento(Integer idAsent) throws SGPException {
+        List<CatEntidadPostal> resultado = null;
+        EntityManager em = null;
+
+        try {
+            log.info("Inicia proceso de obtener todas las entidades postales en base al asentamiento.");
+            em = super.getEntityManager();
+            TypedQuery<CatEntidadPostal> consulta = em.createQuery("select e from CatEntidadPostal e where e.id = :idAsent", CatEntidadPostal.class);
+            consulta.setParameter("idAsent", idAsent);
+            resultado = consulta.getResultList();
+            log.info("Finaliza proceso de obtener todas las entidades postales en base al asentamiento.");
+        } catch (Exception ex) {
+            super.rollback(em);
+            log.error("Error al obtener todas las entidades postales en base al asentamiento de la tabla CatEntidadPostal. " + ex);
+            throw new SGPException("Hubo un problema al obtener todas las entidades postales");
+        } finally {
+            super.close(em);
+        }
+
+        return resultado;
     }
 }
