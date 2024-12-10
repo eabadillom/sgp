@@ -137,12 +137,11 @@ public class RegistroEmpleadosBean implements Serializable {
     private DetPrestamo prestamo;
     private CatAsentamiento asentamientoSelected;
     private DetDomicilioEmpleado domicilioEmpleadoSelected;
-
+  
     private String curp;
     private String rfc;
     private String nss;
     private String codigoPostal;
-    
     private String texto;
 
     public RegistroEmpleadosBean() {
@@ -165,7 +164,6 @@ public class RegistroEmpleadosBean implements Serializable {
         periodicidadDAO = new PeriodicidadPagoDAO(CatPeriodicidadPago.class);
         tipoPercepcionDAO = new TipoPercepcionDAO();
         tipoPrestamoDAO = new TipoPrestamoDAO();
-        domicilioEmpleadoDAO = new DomicilioEmpleadoDAO();
         asentamientoDAO = new AsentamientoDAO();
 
         empleadoSelected = new DetEmpleado();
@@ -194,7 +192,6 @@ public class RegistroEmpleadosBean implements Serializable {
 
             consultaEmpleados();
             prestamo = new DetPrestamo();
-            domicilioEmpleadoSelected = new DetDomicilioEmpleado();
         } catch (Exception ex) {
             log.warn("EX-0008: " + ex.getMessage() + ". Error al cargar init()");
         }
@@ -247,22 +244,21 @@ public class RegistroEmpleadosBean implements Serializable {
         this.empleadoSelected.setActivo((short) 1);
         this.datoEmpresa = new InfDatoEmpresa();
         this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
-        this.domicilioEmpleadoSelected = new DetDomicilioEmpleado();
+        this.empleadoSelected.setDomicilio(new DetDomicilioEmpleado());
         this.asentamientoSelected = this.inicializarAsentamiento();
     }
-
-    public CatAsentamiento obtenerAsentamiento(DetDomicilioEmpleado domicilioEmpleado) {
+    
+    public CatAsentamiento obtenerAsentamiento(DetEmpleado domicilioEmpleado)
+    {
         CatAsentamiento asentamiento = null;
-
-        if (domicilioEmpleado != null) {
-            asentamiento = this.asentamientoDAO.buscarPorParametros(domicilioEmpleado.getAsentamiento(),
-                    domicilioEmpleado.getLocalidad(),
-                    domicilioEmpleado.getMunicipio(),
-                    domicilioEmpleado.getEstado(),
-                    domicilioEmpleado.getPais());
+        
+        if(domicilioEmpleado.getDomicilio().getAsentamiento() != null)
+        {
+            asentamiento = domicilioEmpleado.getDomicilio().getAsentamiento();
             log.trace("Asentamiento obtenido {}", asentamiento.toString());
         } else {
             log.info("No se encontro asentamiento del empleado {}", this.empleadoSelected.getIdEmpleado());
+            this.asentamientoSelected = this.inicializarAsentamiento();
         }
 
         return asentamiento;
@@ -270,12 +266,9 @@ public class RegistroEmpleadosBean implements Serializable {
 
     public void agregarAsentamientoADomicilio(CatAsentamiento auxAsentamiento) {
         log.debug("Agregando/Actualizando asentamiento en domicilio");
-        if (auxAsentamiento != null) {
-            this.domicilioEmpleadoSelected.setAsentamiento(auxAsentamiento.getKey().getId());
-            this.domicilioEmpleadoSelected.setLocalidad(auxAsentamiento.getKey().getLocalidad().getKey().getId());
-            this.domicilioEmpleadoSelected.setMunicipio(auxAsentamiento.getKey().getLocalidad().getKey().getMunicipio().getKey().getId());
-            this.domicilioEmpleadoSelected.setEstado(auxAsentamiento.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getId());
-            this.domicilioEmpleadoSelected.setPais(auxAsentamiento.getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getPais().getId());
+        if(auxAsentamiento != null)
+        {
+            this.empleadoSelected.getDomicilio().setAsentamiento(auxAsentamiento);
         }
 
     }
@@ -288,35 +281,36 @@ public class RegistroEmpleadosBean implements Serializable {
         List<DetPrestamo> prestamos = null;
         log.info("Cargando información del empleado: {}", this.empleadoSelected);
         InfDatoEmpresa datoEmpresa = this.empleadoSelected.getDatoEmpresa();
-        this.empleadoFoto = empleadoFotoDAO.buscar(this.empleadoSelected.getNumEmpleado());
-
-        if (datoEmpresa == null) {
-            this.datoEmpresa = new InfDatoEmpresa();
-            this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
-        } else {
-            this.datoEmpresa = datoEmpresa;
-            this.rfc = this.datoEmpresa.getRfc();
-            this.nss = this.datoEmpresa.getNss();
-            this.curp = this.empleadoSelected.getCurp();
-        }
-
-        percepcionesEmpleado = percepcionEmpleadoDAO.buscarPorEmpleado(this.empleadoSelected.getIdEmpleado());
-        prestamos = prestamoDAO.buscar(this.empleadoSelected.getIdEmpleado());
-        this.empleadoSelected.setPrestamos(prestamos);
-        this.prestamo = new DetPrestamo();
-
-        log.info("Empleado seleccionado: {}", this.empleadoSelected.getIdEmpleado());
-        if (empleadoFoto != null) {
-            log.debug("Foto: {}", empleadoFoto.getFotografia());
-        }
-
-        this.domicilioEmpleadoSelected = this.domicilioEmpleadoDAO.buscarPorId(this.empleadoSelected.getIdEmpleado());
-
-        if (this.domicilioEmpleadoSelected != null) {
-            this.asentamientoSelected = this.obtenerAsentamiento(this.domicilioEmpleadoSelected);
-            log.info("Cargando información del domicilio {} y del asentamiento {}", this.domicilioEmpleadoSelected.toString(), this.asentamientoSelected.toString());
-        } else {
-            this.domicilioEmpleadoSelected = new DetDomicilioEmpleado();
+    	this.empleadoFoto = empleadoFotoDAO.buscar(this.empleadoSelected.getNumEmpleado());
+    	
+    	if(datoEmpresa == null) {
+    		this.datoEmpresa = new InfDatoEmpresa();
+    		this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
+    	} else {
+    		this.datoEmpresa = datoEmpresa;
+    		this.rfc = this.datoEmpresa.getRfc();
+    		this.nss = this.datoEmpresa.getNss();
+    		this.curp = this.empleadoSelected.getCurp();
+    	}
+    	
+    	percepcionesEmpleado = percepcionEmpleadoDAO.buscarPorEmpleado(this.empleadoSelected.getIdEmpleado());
+    	prestamos = prestamoDAO.buscar(this.empleadoSelected.getIdEmpleado());
+    	this.empleadoSelected.setPrestamos(prestamos); 
+    	this.prestamo = new DetPrestamo();
+    	
+    	log.info("Empleado seleccionado: {}", this.empleadoSelected.getIdEmpleado());
+    	if(empleadoFoto != null)
+    		log.debug("Foto: {}", empleadoFoto.getFotografia());
+    	
+        //this.domicilioEmpleadoSelected = this.domicilioEmpleadoDAO.buscarPorId(this.empleadoSelected.getIdEmpleado());
+        
+        if(this.empleadoSelected.getDomicilio() != null)
+        {
+            log.info("Cargando información del domicilio {}", this.empleadoSelected.getDomicilio().toString());
+            this.asentamientoSelected = this.obtenerAsentamiento(this.empleadoSelected);
+        }else
+        {
+            this.empleadoSelected.setDomicilio(new DetDomicilioEmpleado());
             this.asentamientoSelected = this.inicializarAsentamiento();
         }
 
@@ -502,21 +496,13 @@ public class RegistroEmpleadosBean implements Serializable {
                         this.empleadoSelected.setNumEmpleado(sNumeroEmpleado);
                         this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
         		this.empleadoSelected.setFechaRegistro(new Date());
+                        this.empleadoSelected.getDomicilio().setEmpleado(this.empleadoSelected);
     			empleadoDAO.guardar(empleadoSelected);
                         pNumeroEmpleado.setValor(sNumeroEmpleado);
                         this.parametroDAO.actualizar(pNumeroEmpleado);
     		} else {
+                        this.empleadoSelected.getDomicilio().setEmpleado(this.empleadoSelected);
     			empleadoDAO.actualizar(empleadoSelected);
-                }
-                
-                if(this.domicilioEmpleadoSelected.getId() == null)
-                {
-                    this.domicilioEmpleadoSelected.setEmpleado(this.empleadoSelected);
-                    this.domicilioEmpleadoDAO.guardar(this.domicilioEmpleadoSelected);
-                }else
-                {
-                    log.trace("Información del domicilio {}", this.domicilioEmpleadoSelected.toString());
-                    this.domicilioEmpleadoDAO.actualizar(this.domicilioEmpleadoSelected);
                 }
                 
                 if(this.empleadoFoto != null) {
@@ -657,22 +643,33 @@ public class RegistroEmpleadosBean implements Serializable {
 
     public List<CatAsentamiento> sugerenciasCodigoPostal(String consulta) {
         List<CatAsentamiento> listaSugerencias = asentamientoDAO.buscarPorCodigoPostal(consulta);
+        
+        if(this.asentamientoSelected == null)
+        {
+            this.asentamientoSelected = this.inicializarAsentamiento();
+        }
+        
         return listaSugerencias;
     }
-
-    public void domicilioEmpleado() {
-        log.info("Agregando/Actualizando información al domicilio");
+    
+    public void domicilioEmpleado() 
+    {
+        if(this.empleadoSelected.getDomicilio() == null)
+        {
+            this.empleadoSelected.setDomicilio(new DetDomicilioEmpleado());
+        }
+        log.info("Agregando/Actualizando información al domicilio");    
         this.agregarAsentamientoADomicilio(this.asentamientoSelected);
-
-        log.trace("Domicilio seleccionado: {}", this.domicilioEmpleadoSelected.toString());
+        
+        log.trace("Domicilio seleccionado: {}", this.empleadoSelected.getDomicilio().toString());
         log.trace("Asentamiento seleccionado: {}", this.asentamientoSelected.toString());
 
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Informacion", "Se actualizo el asentamiento"));
         PrimeFaces.current().ajax().update("formRegistroEmpleado:messages");
     }
-
-    public void limpiarVariables() {
-        this.domicilioEmpleadoSelected = null;
+    
+    public void limpiarVariables() 
+    {
         this.asentamientoSelected = null;
     }
 
@@ -996,8 +993,6 @@ public class RegistroEmpleadosBean implements Serializable {
     public void setTexto(String texto) {
         this.texto = texto;
     }
-
-    
     
     public List<DetEmpleado> filtrarEmpleados() {
         

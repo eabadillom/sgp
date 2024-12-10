@@ -432,7 +432,7 @@ public class NominaSemanalBL {
 			receptor.setNomina(nomina);
 			receptor.setNombre(String.format("%s %s %s", this.empleado.getNombre(), this.empleado.getPrimerAp(), this.empleado.getSegundoAp()).trim());
 			receptor.setRfc(this.empleado.getDatoEmpresa().getRfc());
-			receptor.setCodigoPostal(this.empleado.getDatoEmpresa().getCodigoPostal());
+			receptor.setCodigoPostal(this.empleado.getDomicilio().getAsentamiento().getCp());
 			receptor.setRegimenFiscal(this.regimenFiscalReceptor);
 			receptor.setUsoCfdi(this.usoCFDI);
 			receptor.setCurp(this.empleado.getCurp());
