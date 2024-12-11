@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -48,8 +50,10 @@ import mx.com.ferbo.model.CatTarifaISR;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
+import mx.com.ferbo.model.DetNominaDeduccionPK;
 import mx.com.ferbo.model.DetNominaEmisor;
 import mx.com.ferbo.model.DetNominaOtroPago;
+import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.DetNominaReceptor;
 import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.sat.CatConcepto;
@@ -99,6 +103,9 @@ public class NominaBean implements Serializable {
     private List<CatTipoOtroPago> tiposOtroPago;
     private CatEmpresa empresaSelected;
     private DetNomina nomina;
+    private DetNominaPercepcion percepcion;
+    private DetNominaOtroPago otroPago;
+    private DetNominaDeduccion deduccion;
     private CatMetodoPago metodoPago;
     private CatConcepto concepto;
     private CatUnidadSAT unidadSAT;
@@ -159,6 +166,7 @@ public class NominaBean implements Serializable {
         log.info("Miercoles pasado: {}", periodoFin);
         log.info("Jueves pasado: {}", periodoInicio);
         this.nomina = this.iniciaNominaDTOVacio();
+        this.deduccion = new DetNominaDeduccion();
     }
     
     public void configuraPeriodo() {
@@ -335,6 +343,152 @@ public class NominaBean implements Serializable {
     	//En el caso del ID de Nómina diferente de NULL, el objeto de nómina fue extraido por consulta a la
     	//base de datos sin el detalle completo, por lo que debe extraerse a través del DAO.
     	this.nomina = nominaDAO.buscarPorId(this.nomina.getId());
+    }
+    
+    public void nuevaDeduccion() {
+    	this.deduccion = new DetNominaDeduccion();
+    	this.deduccion.setKey(new DetNominaDeduccionPK());
+    	this.deduccion.getKey().setNomina(this.nomina);
+    }
+    
+    public void agregarPercepcion() {
+    	Integer maxIndex = null;
+		DetNominaPercepcion maxP = null;
+		
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Percepción";
+		
+		try {
+			if(this.percepcion.getImporteExcento() == null && this.percepcion.getImporteGravado() == null)
+				throw new SGPException("Debe indicar un importe (excento o gravado).");
+			
+			if(this.percepcion.getImporteExcento().compareTo(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP)) < 0
+					&& this.percepcion.getImporteGravado().compareTo(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP)) < 0
+					)
+				throw new SGPException("Debe indicar un importe (excento o gravado).");
+			
+			if(this.percepcion.getNombre() == null)
+				throw new SGPException("Debe indicar una descripción para la percepción.");
+			
+			if(this.percepcion.getNombre().trim().equalsIgnoreCase(""))
+				throw new SGPException("Debe indicar una descripción para la percepción.");
+			
+			this.percepcion.setClave("FRB-" + this.percepcion.getTipoPercepcion().getClave() );
+			
+			maxP = Collections.max(nomina.getPercepciones(), Comparator.comparing(d -> d.getKey().getId()));
+			
+			if(maxP.getKey().getId() == null)
+				throw new SGPException("Existen elementos de \"Deducciones\" que no tienen asignado un consecutivo");
+			
+			maxIndex = maxP.getKey().getId() + 1;
+			this.percepcion.getKey().setId(maxIndex);
+			this.nomina.getPercepciones().add(this.percepcion);
+			
+			this.actualizar();
+			
+			PrimeFaces.current().executeScript("PF('dlgAddPercepcion').hide()");
+			
+		} catch(Exception ex) {
+			log.error("Problema para agregar la percepcion...", ex);
+    		mensaje = "Hay un problema para agregar la percepción.";
+			severity = FacesMessage.SEVERITY_ERROR;
+			
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+    	} finally {
+    		PrimeFaces.current().ajax().update(":formNomina:messages", ":formNomina:dtNomina", "formNomina:dg-empleado");
+    	}
+    }
+    
+    public void agregarDeduccion() {
+    	Integer maxIndex = null;
+		DetNominaDeduccion maxD = null;
+		
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Deducción";
+		
+		try {
+			if(this.deduccion.getImporte() == null)
+				throw new SGPException("Debe indicar un importe.");
+			
+			if(this.deduccion.getImporte().compareTo(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP)) < 0)
+				throw new SGPException("El importe indicado es incorrecto.");
+			
+			if(this.deduccion.getNombre() == null)
+				throw new SGPException("Debe indicar una descripción para la deducción.");
+			
+			if(this.deduccion.getNombre().trim().equalsIgnoreCase(""))
+				throw new SGPException("Debe indicar una descripción para la deducción.");
+			
+			this.deduccion.setClave("FRB-" + this.deduccion.getTipoDeduccion().getClave());
+			this.deduccion.setInformar(true);
+			this.deduccion.setProcesar(true);
+			
+			maxD = Collections.max(nomina.getDeducciones(), Comparator.comparing(d -> d.getKey().getId()));
+			
+			if(maxD.getKey().getId() == null)
+				throw new SGPException("Existen elementos de \"Deducciones\" que no tienen asignado un consecutivo");
+			
+			maxIndex = maxD.getKey().getId() + 1;
+			this.deduccion.getKey().setId(maxIndex);
+			this.nomina.getDeducciones().add(deduccion);
+			
+			this.actualizar();
+			
+			PrimeFaces.current().executeScript("PF('dlgAddDeduccion').hide()");
+			
+		} catch(Exception ex) {
+			log.error("Problema para agregar la deducción...", ex);
+    		mensaje = "Hay un problema para agregar la deducción.";
+			severity = FacesMessage.SEVERITY_ERROR;
+			
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+    	} finally {
+    		PrimeFaces.current().ajax().update(":formNomina:messages", ":formNomina:dtNomina", "formNomina:dg-empleado");
+    	}
+		
+		
+    }
+    
+    public List<CatTipoDeduccion> buscaTipoDeduccion(String query) {
+    	List<CatTipoDeduccion> tiposDeduccion = null;
+    	
+    	try {
+    		final String queryLowerCase = query.toLowerCase();
+    		tiposDeduccion = this.tiposDeduccion.stream()
+    				.filter( d -> d.getClave().toLowerCase().contains(queryLowerCase)
+    				      || d.getDescripcion().toLowerCase().contains(queryLowerCase) )
+    				.collect(Collectors.toList())
+    				;
+    	} catch(Exception ex) {
+    		log.warn("No fue posible encontrar el tipo de deducción solicitado: {}", query);
+    		tiposDeduccion = new ArrayList<CatTipoDeduccion>();
+    	}
+    	
+    	return tiposDeduccion;
+    }
+    
+    public List<CatTipoPercepcion> buscaTipoPercepcion(String query) {
+    	List<CatTipoPercepcion> tiposPercepcion = null;
+    	
+    	try {
+    		final String queryLowerCase = query.toLowerCase();
+    		tiposPercepcion = this.tiposPercepcion.stream()
+    				.filter( p -> p.getClave().toLowerCase().contains(queryLowerCase)
+    						|| p.getDescripcion().toLowerCase().contains(queryLowerCase) )
+    				.collect(Collectors.toList())
+    				;
+    	} catch(Exception ex) {
+    		log.warn("No fue posible encontrar el tipo de percepcion solicitado: {}", query);
+    		tiposPercepcion = new ArrayList<CatTipoPercepcion>();
+    	}
+    	
+    	return tiposPercepcion;
     }
     
     public void actualizar() {
@@ -558,6 +712,30 @@ public class NominaBean implements Serializable {
 
 	public void setDetalle(Boolean detalle) {
 		this.detalle = detalle;
+	}
+
+	public DetNominaDeduccion getDeduccion() {
+		return deduccion;
+	}
+
+	public void setDeduccion(DetNominaDeduccion deduccion) {
+		this.deduccion = deduccion;
+	}
+
+	public DetNominaPercepcion getPercepcion() {
+		return percepcion;
+	}
+
+	public void setPercepcion(DetNominaPercepcion percepcion) {
+		this.percepcion = percepcion;
+	}
+
+	public DetNominaOtroPago getOtroPago() {
+		return otroPago;
+	}
+
+	public void setOtroPago(DetNominaOtroPago otroPago) {
+		this.otroPago = otroPago;
 	}
 
 }

@@ -343,6 +343,12 @@
 						</p:dataTable>
 					</p:tab>
 					<p:tab title="Deducciones">
+						<p:toolbar>
+							<p:toolbarGroup >
+								<p:commandButton value="Agregar" icon="pi pi-plus" process="@this" actionListener="#{nominaBean.nuevaDeduccion()}" update="formNomina:dlg-add-deduccion" oncomplete="PF('dlgAddDeduccion').show();">
+								</p:commandButton>
+							</p:toolbarGroup>
+						</p:toolbar>
 						<p:dataTable value="#{nominaBean.filtrarDeducciones()}" var="deduccion" paginator="true" paginatorPosition="bottom" rows="5" lazy="true">
 							<p:column headerText="SAT" width="4rem">
 								<p:outputLabel value="#{deduccion.tipoDeduccion.clave}" />
@@ -354,6 +360,11 @@
 								<p:inputNumber value="#{deduccion.importe}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," readonly="#{nominaBean.nomina.id ne null}">
 									<p:ajax process="@this" update="formNomina:tv-nomina" event="blur" listener="#{nominaBean.actualizar()}"/>
 								</p:inputNumber>
+							</p:column>
+							<p:column width="2rem">
+								<p:commandButton icon="pi pi-times" process="@this" oncomplete="PF('dlgEliminaDeduccion').show();" styleClass="ui-button-outlined ui-button-danger">
+									<f:setPropertyActionListener value="deduccion" target="#{nominaBean.deduccion}" />
+								</p:commandButton>
 							</p:column>
 							<f:facet name="footer">
 								<p:column colspan="2">
@@ -382,6 +393,72 @@
 					</span>
 				</f:facet>
 			</p:dialog>
+			<p:dialog widgetVar="dlgAddPercepcion" header="Percepcion" modal="true">
+				<p:outputPanel id="dlg-add-percepcion" styleClass="ui-fluid">
+					<p:outputLabel value="Percepcion (SAT)" />
+					<p:autoComplete var="percepcion" minQueryLength="3" value="#{nominaBean.percepcion.tipoPercepcion}" completeMethod="#{nominaBean.buscaTipoPercepcion}" itemLabel="#{percepcion.descripcion}" converter="entityConverter" forceSelection="true" effect="fade" scrollHeight="250" placeholder="Escriba el código SAT o nombre de la percepción">
+						<p:ajax process="@this" />
+						<p:column width="3rem">
+							<p:outputLabel value="#{percepcion.clave}" />
+						</p:column>
+						<p:column width="auto">
+							<p:outputLabel value="#{percepcion.descripcion}" />
+						</p:column>
+					</p:autoComplete>
+					<p:outputLabel value="Descripción" />
+					<p:inputText value="#{nominaBean.percepcion.nombre}">
+						<p:ajax process="@this" />
+					</p:inputText>
+					<p:outputLabel value="Importe excento" />
+					<p:inputNumber value="#{nominaBean.percepcion.importeExcento}" decimalPlaces="2" decimalSeparator="." symbol="$ " symbolPosition="p" placeholder="importe excento" emptyValue="null" minValue="0.00">
+						<p:ajax process="@this" />
+					</p:inputNumber>
+					<p:outputLabel value="Importe gravado" />
+					<p:inputNumber value="#{nominaBean.percepcion.importeGravado}" decimalPlaces="2" decimalSeparator="." symbol="$ " symbolPosition="p" placeholder="importe gravado" emptyValue="null" minValue="0.00">
+						<p:ajax process="@this" />
+					</p:inputNumber>
+				</p:outputPanel>
+				
+				<f:facet name="footer">
+					<p:commandButton value="Guardar" process="@this" actionListener="#{nominaBean.agregarDeduccion()}" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();">
+					</p:commandButton>
+					<p:commandButton value="Cancelar" oncomplete="PF('dlgAddDeduccion').hide();">
+					</p:commandButton>
+				</f:facet>
+			</p:dialog>
+			<p:dialog widgetVar="dlgAddDeduccion" header="Deduccion" modal="true">
+				<p:outputPanel id="dlg-add-deduccion" styleClass="ui-fluid">
+					<p:outputLabel value="Deduccion (SAT)" />
+					<p:autoComplete var="deduccion" minQueryLength="3" value="#{nominaBean.deduccion.tipoDeduccion}" completeMethod="#{nominaBean.buscaTipoDeduccion}" itemLabel="#{deduccion.descripcion}" itemValue="#{deduccion}" converter="entityConverter" forceSelection="true" effect="fade" scrollHeight="250" placeholder="Escriba el código SAT o nombre de la deducción">
+						<p:ajax process="@this" />
+						<p:column width="3rem">
+							<p:outputLabel value="#{deduccion.clave}"/>
+						</p:column>
+						<p:column width="auto">
+							<p:outputLabel value="#{deduccion.descripcion}" />
+						</p:column>
+					</p:autoComplete>
+					<p:outputLabel value="Descripcion"/>
+					<p:inputText value="#{nominaBean.deduccion.nombre}">
+						<p:ajax process="@this" />
+					</p:inputText>
+					<p:outputLabel value="Importe"/>
+					<p:inputNumber value="#{nominaBean.deduccion.importe}" decimalPlaces="2" decimalSeparator="." symbol="$ " symbolPosition="p" placeholder="importe" emptyValue="null" minValue="0.00">
+						<p:ajax process="@this" />
+					</p:inputNumber>
+				</p:outputPanel>
+				
+				<f:facet name="footer">
+					<p:commandButton value="Guardar" process="@this" actionListener="#{nominaBean.agregarDeduccion()}" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();">
+					</p:commandButton>
+					<p:commandButton value="Cancelar" oncomplete="PF('dlgAddDeduccion').hide();">
+					</p:commandButton>
+				</f:facet>
+			</p:dialog>
+			<p:confirmDialog widgetVar="dlgEliminaDeduccion" showEffect="fade" width="30rem" message="¿Está seguro que desea eliminar la deducción #{nominaBean.deduccion.nombre}?" header="Confirmar" severity="warn">
+				<p:commandButton value="Sí" icon="pi pi-check" actionListener="#{registroEmpleadosBean.eliminarPrestamo(prestamo)}" process="@this" oncomplete="PF('dlgEliminarPrestamo').hide();"/>
+				<p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('dlgEliminarPrestamo').hide()" />
+			</p:confirmDialog>
         </h:form>
     </ui:define>
 </ui:composition>
