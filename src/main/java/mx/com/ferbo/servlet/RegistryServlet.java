@@ -22,6 +22,7 @@ import mx.com.ferbo.dao.n.TokenDAO;
 import mx.com.ferbo.model.CatEstatusRegistro;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetEmpleadoFoto;
+import mx.com.ferbo.model.InfDatoEmpresa;
 import mx.com.ferbo.model.DetRegistro;
 import mx.com.ferbo.model.DetToken;
 import mx.com.ferbo.response.RegistryResponse;
@@ -51,6 +52,8 @@ public class RegistryServlet extends HttpServlet {
 		HttpSession session = null;
 		Date horaSistema;
 		Date horaLimiteEntrada = null;
+                Integer horaEntrada = null;
+                Integer minutosTolerancia = null;
 
 		EmpleadoFotoDAO empleadoFotoDAO = null;
 		EstatusRegistroDAO estatusDAO = null;
@@ -61,6 +64,7 @@ public class RegistryServlet extends HttpServlet {
 		CatEstatusRegistro statusRetardo = null;
 		DetEmpleado empleado = null;
 		DetEmpleadoFoto foto = null;
+                InfDatoEmpresa empleadoEmpresa = null;
 		DetToken tokenEmpleado = null;
 		DetRegistro registro = null;
 		String tipoRegistro = null;
@@ -123,6 +127,8 @@ public class RegistryServlet extends HttpServlet {
 			}
 			
 			empleado = tokenEmpleado.getEmpleado();
+                        empleadoEmpresa = empleado.getDatoEmpresa();
+                        log.info("Info dato empresa: {}", empleadoEmpresa.toString());
 			
 			prettyGson = new GsonBuilder().setPrettyPrinting().create();
 			
@@ -152,7 +158,12 @@ public class RegistryServlet extends HttpServlet {
 					tipoRegistro = "Salida";
 				
 				horaLimiteEntrada = new Date();
-				DateUtil.setTime(horaLimiteEntrada, 7, 10, 0, 0);
+                                horaEntrada = DateUtil.getHora(empleadoEmpresa.getHoraEntrada());
+                                minutosTolerancia = empleadoEmpresa.getMinutosTolerancia();
+                                log.info("Hora de entrada {}, minutos de tolerancia: {}", horaEntrada, minutosTolerancia);
+				DateUtil.setTime(horaLimiteEntrada, horaEntrada, minutosTolerancia, 0, 0);
+                                log.info("Hora limite de entrada: {}", horaLimiteEntrada);
+                                log.info("Hora actual del sistema: {}", horaSistema);
 				
 				switch (tipoRegistro) {
 				

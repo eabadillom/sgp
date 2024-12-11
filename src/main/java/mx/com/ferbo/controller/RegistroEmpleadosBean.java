@@ -258,6 +258,7 @@ public class RegistroEmpleadosBean implements Serializable {
             log.trace("Asentamiento obtenido {}", asentamiento.toString());
         } else {
             log.info("No se encontro asentamiento del empleado {}", this.empleadoSelected.getIdEmpleado());
+            asentamiento = this.inicializarAsentamiento();
             this.asentamientoSelected = this.inicializarAsentamiento();
         }
 

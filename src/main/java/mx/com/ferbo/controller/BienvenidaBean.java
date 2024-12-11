@@ -50,6 +50,7 @@ public class BienvenidaBean implements Serializable {
     private DetRegistro registro;
     private final RegistroDAO registroDAO;
     private DetEmpleadoFoto empleadoFoto;
+    private String mensajeRegistro;
 
     public BienvenidaBean() {
         registroDAO = new RegistroDAO();
@@ -72,6 +73,7 @@ public class BienvenidaBean implements Serializable {
 
             empleadoLogeado();
             consultaRegistro();
+            mensajeRetardo();
 
             PrimeFaces.current().executeScript("PF('bar').show()");
         } catch (Exception ex) {
@@ -105,6 +107,28 @@ public class BienvenidaBean implements Serializable {
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         registro = registroDAO.buscarPorDia(empleadoSelected.getIdEmpleado(), cal.getTime());
+    }
+    
+    public void mensajeRetardo()
+    {
+        String mensajeRetardo = null;
+        mensajeRegistro = "<span style='font-size:3rem; font-weight: bold;'>REGISTRO CORRECTO</span>";
+        switch(registro.getIdEstatus().getIdEstatus())
+        {
+            case 1:
+                mensajeRegistro += "";
+                break;
+            case 2:
+                if(registro.getFechaSalida() != null)
+                {
+                    mensajeRegistro += "";    
+                }else
+                {
+                    mensajeRetardo = "<span style='font-size:3rem; color:red; font-weight: bold; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);'>, CON RETARDO </span>";
+                    mensajeRegistro += mensajeRetardo;
+                }
+                break;
+        }
     }
 
     //<editor-fold defaultstate="collapsed" desc="Getters&Setters">
@@ -178,6 +202,14 @@ public class BienvenidaBean implements Serializable {
 
     public void setEmpleadoFoto(DetEmpleadoFoto empleadoFoto) {
         this.empleadoFoto = empleadoFoto;
+    }
+    
+    public String getMensajeRegistro() {
+        return mensajeRegistro;
+    }
+
+    public void setMensajeRegistro(String mensajeRegistro) {
+        this.mensajeRegistro = mensajeRegistro;
     }
     //</editor-fold>
 }
