@@ -92,10 +92,6 @@ public class InfDatoEmpresa implements Serializable {
 	@Column(name = "nu_tolerancia")
 	private Integer minutosTolerancia;
 	
-	@Basic(optional = true)
-	@Column(name = "nu_cp")
-	private String codigoPostal;
-	
 	@ManyToOne
 	@JoinColumn(name = "cd_estado", referencedColumnName = "cd_estado")
 	private CatEntidadFederativa entidadFederativa;
@@ -292,12 +288,6 @@ public class InfDatoEmpresa implements Serializable {
 		return "{\"id\":\"" + id + "\", \"perfil\":\"" + perfil + "\", \"fechaIngreso\":\"" + fechaIngreso
 				+ "\", \"nss\":\"" + nss + "\", \"rfc\":\"" + rfc + "\", \"salarioDiario\":\"" + salarioDiario
 				+ "\", \"horaEntrada\":\"" + horaEntrada + "\", \"minutosTolerancia\":\"" + minutosTolerancia + "\"}";
-	}
-	public String getCodigoPostal() {
-		return codigoPostal;
-	}
-	public void setCodigoPostal(String codigoPostal) {
-		this.codigoPostal = codigoPostal;
 	}
 	public CatEntidadFederativa getEntidadFederativa() {
 		return entidadFederativa;

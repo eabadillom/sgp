@@ -72,7 +72,7 @@ public class DomicilioEmpleadoDAO extends BaseDAO<DetDomicilioEmpleado, Integer>
         return model;
     }
     
-    /*public DetDomicilioEmpleado buscarPorParametros(DetEmpleado auxEmpleado, CatAsentamiento auxAsentamiento)
+    public DetDomicilioEmpleado buscarPorParametros(DetEmpleado auxEmpleado, CatAsentamiento auxAsentamiento)
     {
         DetDomicilioEmpleado model = null;
         EntityManager em = null;
@@ -98,6 +98,6 @@ public class DomicilioEmpleadoDAO extends BaseDAO<DetDomicilioEmpleado, Integer>
         }
         
         return model;
-    }*/
+    }
     
 }
