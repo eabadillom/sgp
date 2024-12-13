@@ -22,6 +22,8 @@ import mx.com.ferbo.dao.n.TokenDAO;
 import mx.com.ferbo.model.CatEstatusRegistro;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetEmpleadoFoto;
+import mx.com.ferbo.model.DetEmpleadoConfiguracion;
+import mx.com.ferbo.model.InfDatoEmpresa;
 import mx.com.ferbo.model.DetRegistro;
 import mx.com.ferbo.model.DetToken;
 import mx.com.ferbo.response.RegistryResponse;
@@ -51,6 +53,8 @@ public class RegistryServlet extends HttpServlet {
 		HttpSession session = null;
 		Date horaSistema;
 		Date horaLimiteEntrada = null;
+                Integer horaEntrada = null;
+                Integer minutosTolerancia = null;
 
 		EmpleadoFotoDAO empleadoFotoDAO = null;
 		EstatusRegistroDAO estatusDAO = null;
@@ -61,6 +65,8 @@ public class RegistryServlet extends HttpServlet {
 		CatEstatusRegistro statusRetardo = null;
 		DetEmpleado empleado = null;
 		DetEmpleadoFoto foto = null;
+                DetEmpleadoConfiguracion empleadoConf = null;
+                InfDatoEmpresa empleadoEmpresa = null;
 		DetToken tokenEmpleado = null;
 		DetRegistro registro = null;
 		String tipoRegistro = null;
@@ -123,6 +129,10 @@ public class RegistryServlet extends HttpServlet {
 			}
 			
 			empleado = tokenEmpleado.getEmpleado();
+                        empleadoEmpresa = empleado.getDatoEmpresa();
+                        log.trace("Info dato empresa: {}", empleadoEmpresa.toString());
+                        empleadoConf = empleado.getEmpleadoConfiguracion();
+                        log.trace("Conf. empleado: {}", empleadoConf.toString());
 			
 			prettyGson = new GsonBuilder().setPrettyPrinting().create();
 			
@@ -152,7 +162,12 @@ public class RegistryServlet extends HttpServlet {
 					tipoRegistro = "Salida";
 				
 				horaLimiteEntrada = new Date();
-				DateUtil.setTime(horaLimiteEntrada, 7, 10, 0, 0);
+                                horaEntrada = DateUtil.getHora(empleadoEmpresa.getHoraEntrada());
+                                minutosTolerancia = empleadoEmpresa.getMinutosTolerancia();
+                                log.trace("Hora de entrada {}, minutos de tolerancia: {}", horaEntrada, minutosTolerancia);
+				DateUtil.setTime(horaLimiteEntrada, horaEntrada, minutosTolerancia, 0, 0);
+                                log.trace("Hora limite de entrada: {}", horaLimiteEntrada);
+                                log.trace("Hora actual del sistema: {}", horaSistema);
 				
 				switch (tipoRegistro) {
 				
@@ -164,11 +179,18 @@ public class RegistryServlet extends HttpServlet {
 					registro.setFechaEntrada(fechaActual);
 					registro.setFechaSalida(null);
 					registro.setIdEmpleado(empleado);
-					if (horaSistema.after(horaLimiteEntrada)) {
+                                        if(empleadoConf.getRetardo() == true)
+                                        {
+                                            registro.setIdEstatus((horaSistema.after(horaLimiteEntrada)) ? statusRetardo : statusEnTiempo);
+                                        }else
+                                        {
+                                            registro.setIdEstatus(statusEnTiempo);
+                                        }
+					/*if (horaSistema.after(horaLimiteEntrada)) {
 						registro.setIdEstatus(statusRetardo);
 					} else {
 						registro.setIdEstatus(statusEnTiempo);
-					}
+					}*/
 					registroDAO.guardar(registro);
 					log.info("Entrada registrada correctamente");
 					break;
