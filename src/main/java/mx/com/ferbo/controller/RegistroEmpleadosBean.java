@@ -22,7 +22,6 @@ import org.primefaces.event.CaptureEvent;
 import mx.com.ferbo.dao.n.AreaDAO;
 import mx.com.ferbo.dao.n.AsentamientoDAO;
 import mx.com.ferbo.dao.n.BiometricoDAO;
-import mx.com.ferbo.dao.n.DomicilioEmpleadoDAO;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.EmpleadoFotoDAO;
 import mx.com.ferbo.dao.n.EmpresaDAO;
@@ -103,7 +102,6 @@ public class RegistroEmpleadosBean implements Serializable {
     private RiesgoPuestoDAO riesgoDAO;
     private PeriodicidadPagoDAO periodicidadDAO;
     private TipoPercepcionDAO tipoPercepcionDAO;
-    private DomicilioEmpleadoDAO domicilioEmpleadoDAO;
     private AsentamientoDAO asentamientoDAO;
 
     private List<DetEmpleado> lstEmpleados;
@@ -194,20 +192,6 @@ public class RegistroEmpleadosBean implements Serializable {
         } catch (Exception ex) {
             log.warn("EX-0008: " + ex.getMessage() + ". Error al cargar init()");
         }
-    }
-
-    /*
-     * Método para consultar los domicilios de los empleados
-     */
-    private void consultaAsentamientos() {
-        this.lstAsentamientos = asentamientoDAO.buscarTodos();
-    }
-
-    /*
-     * Método para consultar los domicilios de los empleados
-     */
-    private void consultaDomicilios() {
-        this.lstDomicilios = domicilioEmpleadoDAO.buscarTodos();
     }
 
     /*
