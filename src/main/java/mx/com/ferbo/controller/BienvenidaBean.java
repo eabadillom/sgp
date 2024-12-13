@@ -124,7 +124,8 @@ public class BienvenidaBean implements Serializable {
                     mensajeRegistro += "";    
                 }else
                 {
-                    mensajeRetardo = "<span style='font-size:3rem; color:red; font-weight: bold; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);'>, CON RETARDO </span>";
+                    mensajeRetardo = "<span style='font-size:3rem; font-weight: bold;'>,</span>";
+                    mensajeRetardo += "<span style='font-size:3rem; color:red; font-weight: bold; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);'> CON RETARDO </span>";
                     mensajeRegistro += mensajeRetardo;
                 }
                 break;

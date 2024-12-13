@@ -236,6 +236,9 @@ public class DetEmpleado implements Serializable {
     @OneToOne(mappedBy = "empleado", cascade = {CascadeType.ALL})
     private DetDomicilioEmpleado domicilio;
     
+    @OneToOne(mappedBy = "empleado", cascade = {CascadeType.ALL})
+    private DetEmpleadoConfiguracion empleadoConfiguracion;
+    
     public DetEmpleado() {
     }
 
@@ -485,6 +488,14 @@ public class DetEmpleado implements Serializable {
 
     public void setDomicilio(DetDomicilioEmpleado domicilio) {
         this.domicilio = domicilio;
+    }
+
+    public DetEmpleadoConfiguracion getEmpleadoConfiguracion() {
+        return empleadoConfiguracion;
+    }
+
+    public void setEmpleadoConfiguracion(DetEmpleadoConfiguracion empleadoConfiguracion) {
+        this.empleadoConfiguracion = empleadoConfiguracion;
     }
     
     @Override
