@@ -41,6 +41,7 @@ import mx.com.ferbo.dao.n.TipoJornadaDAO;
 import mx.com.ferbo.dao.n.TipoPercepcionDAO;
 import mx.com.ferbo.dao.n.TipoPrestamoDAO;
 import mx.com.ferbo.dao.n.TipoRegimenDAO;
+import mx.com.ferbo.dao.n.tipobajaempleadoDAO;
 import mx.com.ferbo.model.CatArea;
 import mx.com.ferbo.model.CatAsentamiento;
 import mx.com.ferbo.model.CatAsentamientoPK;
@@ -56,6 +57,7 @@ import mx.com.ferbo.model.CatPerfil;
 import mx.com.ferbo.model.CatPeriodicidadPago;
 import mx.com.ferbo.model.CatPlanta;
 import mx.com.ferbo.model.CatPuesto;
+import mx.com.ferbo.model.CatTipoBajaEmpleado;
 import mx.com.ferbo.model.CatTipoPrestamo;
 import mx.com.ferbo.model.DetBiometrico;
 import mx.com.ferbo.model.DetDomicilioEmpleado;
@@ -128,6 +130,11 @@ public class RegistroEmpleadosBean implements Serializable {
     private boolean activo;
     private boolean inactivo;
 
+    private CatTipoBajaEmpleado tipodebaja;
+    private tipobajaempleadoDAO tipobajaempleadodao;
+    private List<CatTipoBajaEmpleado> tiposdebaja;
+    private boolean statusfechabaja;
+    
     private DetEmpleado empleadoSelected;
     private DetBiometrico detBiometrico;
     private DetEmpleadoFoto empleadoFoto;
@@ -165,6 +172,7 @@ public class RegistroEmpleadosBean implements Serializable {
         tipoPercepcionDAO = new TipoPercepcionDAO();
         tipoPrestamoDAO = new TipoPrestamoDAO();
         asentamientoDAO = new AsentamientoDAO();
+        tipobajaempleadodao = new tipobajaempleadoDAO();
 
         empleadoSelected = new DetEmpleado();
         lstEmpleados = new ArrayList<>();
@@ -189,7 +197,8 @@ public class RegistroEmpleadosBean implements Serializable {
             periodicidadesPago = periodicidadDAO.buscarActivos(new Date());
             tiposPercepcion = tipoPercepcionDAO.buscarTodos();
             tiposPrestamo = tipoPrestamoDAO.buscarTodos();
-
+            tiposdebaja = tipobajaempleadodao.obtenerTodos();
+                    
             consultaEmpleados();
             prestamo = new DetPrestamo();
         } catch (Exception ex) {
@@ -575,9 +584,9 @@ public class RegistroEmpleadosBean implements Serializable {
      */
     public void eliminaEmpleado() {
         try {
-            this.empleadoSelected.setActivo((short) 0);
-            this.empleadoSelected.setFechaModificacion(new Date());
-            empleadoDAO.actualizar(empleadoSelected);
+            //this.empleadoSelected.setActivo((short) 0);
+            //this.empleadoSelected.setFechaModificacion(new Date());
+            this.empleadoDAO.actualizar(this.empleadoSelected);
             consultaEmpleados();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Empleado Eliminado"));
         } catch (SGPException ex) {
@@ -993,6 +1002,30 @@ public class RegistroEmpleadosBean implements Serializable {
     public void setTexto(String texto) {
         this.texto = texto;
     }
+
+    public CatTipoBajaEmpleado getTipodebaja() {
+        return tipodebaja;
+    }
+
+    public void setTipodebaja(CatTipoBajaEmpleado tipodebaja) {
+        this.tipodebaja = tipodebaja;
+    }
+
+    public List<CatTipoBajaEmpleado> getTiposdebaja() {
+        return tiposdebaja;
+    }
+
+    public void setTiposdebaja(List<CatTipoBajaEmpleado> tiposdebaja) {
+        this.tiposdebaja = tiposdebaja;
+    }
+
+    public boolean isStatusfechabaja() {
+        return statusfechabaja;
+    }
+
+    public void setStatusfechabaja(boolean statusfechabaja) {
+        this.statusfechabaja = statusfechabaja;
+    }
     
     public List<DetEmpleado> filtrarEmpleados() {
         
@@ -1128,4 +1161,12 @@ public class RegistroEmpleadosBean implements Serializable {
         
         return null;
     }  
+    
+    public void manipularStatusFechaBaja(){
+        this.statusfechabaja = this.empleadoSelected.getDatoEmpresa().getTipodebaja().getTipodebaja() == null ? false : (this.empleadoSelected.getDatoEmpresa().getTipodebaja().getTipodebaja().startsWith("T"));
+    }
+    
+    public void limpiarStatusFechaSalida(){
+        this.statusfechabaja = false;
+    }
 }
