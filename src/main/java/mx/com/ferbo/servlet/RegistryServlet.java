@@ -131,9 +131,7 @@ public class RegistryServlet extends HttpServlet {
 			empleado = tokenEmpleado.getEmpleado();
                         empleadoEmpresa = empleado.getDatoEmpresa();
                         log.trace("Info dato empresa: {}", empleadoEmpresa.toString());
-                        empleadoConf = empleado.getEmpleadoConfiguracion();
-                        log.trace("Conf. empleado: {}", empleadoConf.toString());
-			
+                        
 			prettyGson = new GsonBuilder().setPrettyPrinting().create();
 			
 			tokenEmpleado.setValido(false);
@@ -179,18 +177,25 @@ public class RegistryServlet extends HttpServlet {
 					registro.setFechaEntrada(fechaActual);
 					registro.setFechaSalida(null);
 					registro.setIdEmpleado(empleado);
-                                        if(empleadoConf.getRetardo() == true)
+                                        
+                                        empleadoConf = empleado.getEmpleadoConfiguracion();
+                                        
+                                        if(empleadoConf == null || empleadoConf.getRetardo() == null)
                                         {
+                                            log.info("Registro sin la configuracion de retardo");
                                             registro.setIdEstatus((horaSistema.after(horaLimiteEntrada)) ? statusRetardo : statusEnTiempo);
                                         }else
                                         {
-                                            registro.setIdEstatus(statusEnTiempo);
+                                            log.info("Registro con la configuracion de retardo: {}", empleadoConf.toString());
+                                            if(empleadoConf.getRetardo() == true)
+                                            {
+                                                registro.setIdEstatus((horaSistema.after(horaLimiteEntrada)) ? statusRetardo : statusEnTiempo);
+                                            }else
+                                            {
+                                                registro.setIdEstatus(statusEnTiempo);
+                                            }
                                         }
-					/*if (horaSistema.after(horaLimiteEntrada)) {
-						registro.setIdEstatus(statusRetardo);
-					} else {
-						registro.setIdEstatus(statusEnTiempo);
-					}*/
+					
 					registroDAO.guardar(registro);
 					log.info("Entrada registrada correctamente");
 					break;
