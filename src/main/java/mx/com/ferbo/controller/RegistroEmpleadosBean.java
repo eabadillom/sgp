@@ -498,6 +498,18 @@ public class RegistroEmpleadosBean implements Serializable {
                     throw new SGPException("Debe indicar la fecha de ingreso");
                 }
                 
+                if(this.datoEmpresa.getHoraEntrada() == null)
+                {
+                    log.error("Falta hora de entrada en dato empresa");
+                    throw new SGPException("Debe indicar la hora de entrada");
+                }
+                
+                if(this.datoEmpresa.getMinutosTolerancia() == null)
+                {
+                    log.error("Falta los minutos de tolerancia para la hora de entrada en dato empresa");
+                    throw new SGPException("Debe indicar los minutos de tolerancia para la hora de entrada");
+                }
+                
                 if (this.empleadoSelected.getIdEmpleado() == null) {
     			pNumeroEmpleado = this.parametroDAO.buscarPorClave("NBEMP");
     			sNumeroEmpleado = pNumeroEmpleado.getValor();
