@@ -54,6 +54,7 @@ public class RegistryServlet extends HttpServlet {
 		Date horaSistema;
 		Date horaLimiteEntrada = null;
                 Integer horaEntrada = null;
+                Integer minEntrada = null;
                 Integer minutosTolerancia = null;
 
 		EmpleadoFotoDAO empleadoFotoDAO = null;
@@ -161,10 +162,12 @@ public class RegistryServlet extends HttpServlet {
 				
 				horaLimiteEntrada = new Date();
                                 horaEntrada = DateUtil.getHora(empleadoEmpresa.getHoraEntrada());
+                                minEntrada = DateUtil.getMinuto(empleadoEmpresa.getHoraEntrada());
+                                log.trace("Hora del empleado: {}", empleadoEmpresa.getHoraEntrada());
                                 minutosTolerancia = empleadoEmpresa.getMinutosTolerancia();
-                                log.trace("Hora de entrada {}, minutos de tolerancia: {}", horaEntrada, minutosTolerancia);
-				DateUtil.setTime(horaLimiteEntrada, horaEntrada, minutosTolerancia, 0, 0);
-                                log.trace("Hora limite de entrada: {}", horaLimiteEntrada);
+                                log.info("Hora de entrada: {}:{}, con {} minutos de tolerancia", horaEntrada, minEntrada, minutosTolerancia);
+				DateUtil.setTime(horaLimiteEntrada, horaEntrada, (minEntrada+minutosTolerancia), 0, 0);
+                                log.info("Hora limite de entrada: {}", horaLimiteEntrada);
                                 log.trace("Hora actual del sistema: {}", horaSistema);
 				
 				switch (tipoRegistro) {
