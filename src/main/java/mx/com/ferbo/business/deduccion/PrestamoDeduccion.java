@@ -30,7 +30,7 @@ public class PrestamoDeduccion extends AbstractDeduccion implements IDeducciones
 	}
 
 	@Override
-	public void procesar(DetNomina nomina, Integer index) {
+	public void procesar(DetNomina nomina) {
 		BigDecimal totalPrestamos = null;
 		List<DetPrestamo> prestamos = null;
 		DetNominaDeduccion deduccion = null;

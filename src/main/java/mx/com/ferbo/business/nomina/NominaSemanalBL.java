@@ -15,10 +15,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.deduccion.AjusteAlNetoDeduccion;
-import mx.com.ferbo.business.deduccion.IDeducciones;
 import mx.com.ferbo.business.deduccion.PrestamoDeduccion;
 import mx.com.ferbo.business.deduccion.imss.IMSSDeduccion;
-import mx.com.ferbo.business.deduccion.isr.ISRExecutor;
 import mx.com.ferbo.business.otropago.AjusteAlNetoOtroPago;
 import mx.com.ferbo.business.percepcion.BonoPuntualidadPercepcion;
 import mx.com.ferbo.business.percepcion.SeptimoDiaPercepcion;
@@ -128,13 +126,10 @@ public class NominaSemanalBL extends NominaBL {
 		BonoPuntualidadPercepcion bonoPuntualidadBO = null;
 		ValesDespensaPercepcion valesDespensaBO = null;
 		
-		ISRExecutor isrExecutor = null;
-		IDeducciones isrBO = null;
 		IMSSDeduccion imssBO = null;
 		PrestamoDeduccion prestamosBO = null;
 		
 		Integer idxP = 0;
-		Integer idxD = 0;
 		
 		BigDecimal tasaBonoPuntualidad = null;
 		
@@ -209,17 +204,18 @@ public class NominaSemanalBL extends NominaBL {
 				
 				nominaSemanal = this.ultimaSemanaMes ? procesaNominaDelMes() : null;
 				
-				isrExecutor = new ISRExecutor(this.periodoInicio, this.periodoFin, this.parametros.getTiposDeduccion(), this.parametros.getTiposOtroPago(), this.parametros.getTablaISR(), this.nominaSemanal);
-				isrBO = isrExecutor.loadClass("ISRS", DateUtil.toLocalDate(this.periodoFin));
-				isrBO.procesar(nomina, idxD);
+				NominaBL.procesarISR(nomina, periodoInicio, periodoFin, parametros, nominaSemanal);
+//				isrExecutor = new ISRExecutor(this.periodoInicio, this.periodoFin, this.parametros.getTiposDeduccion(), this.parametros.getTiposOtroPago(), this.parametros.getTablaISR(), this.nominaSemanal);
+//				isrBO = isrExecutor.loadClass("ISRS", DateUtil.toLocalDate(this.periodoFin));
+//				isrBO.procesar(nomina);
 				
 
 				imssBO = new IMSSDeduccion(this.parametros.getTiposDeduccion(), this.parametros.getCuotasIMSS(), this.fechaInicioAnio, this.fechafinAnio, new BigDecimal(DIAS_POR_PERIODO + SEPTIMO_DIA), this.uma, salarioDiarioIntegrado);
-				imssBO.procesar(nomina, idxD);
+				imssBO.procesar(nomina);
 				
 				prestamosBO = new PrestamoDeduccion(this.empleado);
 				prestamosBO.setFecha(this.periodoFin);
-				prestamosBO.procesar(nomina, idxD);
+				prestamosBO.procesar(nomina);
 			}
 			
 			for(DetNominaPercepcion p : percepciones) {
