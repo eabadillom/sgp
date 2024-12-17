@@ -45,7 +45,7 @@
             <p:remoteCommand autoRun="true" action="#{loginBean.killSesion()}" process="@this" delay="4000"/>
             
             <p:notificationBar position="top" effect="slide" styleClass="top" widgetVar="bar" style="text-align: right;">
-            	<h:outputText value="REGISTRO CORRECTO" style="font-size:3rem; font-weight: bold;"></h:outputText>
+                <h:outputText value="#{bienvenidaBean.mensajeRegistro}" escape="false" />
             </p:notificationBar>
             
             <p:growl id="messages" showDetail="true" life="5000" />
