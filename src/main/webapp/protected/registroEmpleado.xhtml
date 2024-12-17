@@ -481,6 +481,16 @@
 										</p:column>
 									</p:dataTable>
 								</p:tab>
+                                                                <p:tab title="Conf. Empleado">
+                                                                    <div class="ui-fluid formgrid grid align-items-left">
+                                                                        <div class="formgrid">
+                                                                            <div class="field col-12 md:col-1">
+                                                                                <p:outputLabel for="@next" value="Retardo"/>
+                                                                                <p:selectBooleanButton value="#{registroEmpleadosBean.empleadoSelected.empleadoConfiguracion.retardo}" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem" />
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </p:tab>
 							</p:tabView>
 							
                             <f:facet name="footer">

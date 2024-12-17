@@ -22,6 +22,8 @@ import org.primefaces.event.CaptureEvent;
 import mx.com.ferbo.dao.n.AreaDAO;
 import mx.com.ferbo.dao.n.AsentamientoDAO;
 import mx.com.ferbo.dao.n.BiometricoDAO;
+import mx.com.ferbo.dao.n.EmpleadoConfiguracionDAO;
+import mx.com.ferbo.dao.n.DomicilioEmpleadoDAO;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.EmpleadoFotoDAO;
 import mx.com.ferbo.dao.n.EmpresaDAO;
@@ -58,6 +60,7 @@ import mx.com.ferbo.model.CatTipoPrestamo;
 import mx.com.ferbo.model.DetBiometrico;
 import mx.com.ferbo.model.DetDomicilioEmpleado;
 import mx.com.ferbo.model.DetEmpleado;
+import mx.com.ferbo.model.DetEmpleadoConfiguracion;
 import mx.com.ferbo.model.DetEmpleadoFoto;
 import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.DetPrestamo;
@@ -103,6 +106,7 @@ public class RegistroEmpleadosBean implements Serializable {
     private PeriodicidadPagoDAO periodicidadDAO;
     private TipoPercepcionDAO tipoPercepcionDAO;
     private AsentamientoDAO asentamientoDAO;
+    private EmpleadoConfiguracionDAO configuracionEmpleadoDAO;
 
     private List<DetEmpleado> lstEmpleados;
     private List<DetEmpleado> lstEmpleadosSelected;
@@ -228,6 +232,7 @@ public class RegistroEmpleadosBean implements Serializable {
         this.datoEmpresa = new InfDatoEmpresa();
         this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
         this.empleadoSelected.setDomicilio(new DetDomicilioEmpleado());
+        this.empleadoSelected.setEmpleadoConfiguracion(new DetEmpleadoConfiguracion());
         this.asentamientoSelected = this.inicializarAsentamiento();
         this.activeTabIndex = 0;
     }
@@ -242,6 +247,7 @@ public class RegistroEmpleadosBean implements Serializable {
             log.trace("Asentamiento obtenido {}", asentamiento.toString());
         } else {
             log.info("No se encontro asentamiento del empleado {}", this.empleadoSelected.getIdEmpleado());
+            asentamiento = this.inicializarAsentamiento();
             this.asentamientoSelected = this.inicializarAsentamiento();
         }
 
@@ -301,6 +307,12 @@ public class RegistroEmpleadosBean implements Serializable {
         this.detBiometrico = biometricoDAO.consultaBiometricoByIdEmpleado(this.empleadoSelected.getIdEmpleado());
         log.info("Biometrico: {}", this.detBiometrico);
         this.nuevaPercepcionEmpleado();
+        
+        if(/*this.empleadoConfiguracionSelected == null*/ this.empleadoSelected.getEmpleadoConfiguracion() == null)
+        {
+            this.empleadoSelected.setEmpleadoConfiguracion(new DetEmpleadoConfiguracion());
+        }
+        
         PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogFoto", "formRegistroEmpleado:panelDialogEmpleado");
     }
 
@@ -469,6 +481,18 @@ public class RegistroEmpleadosBean implements Serializable {
                     throw new SGPException("Debe indicar la fecha de ingreso");
                 }
                 
+                if(this.datoEmpresa.getHoraEntrada() == null)
+                {
+                    log.error("Falta hora de entrada en dato empresa");
+                    throw new SGPException("Debe indicar la hora de entrada");
+                }
+                
+                if(this.datoEmpresa.getMinutosTolerancia() == null)
+                {
+                    log.error("Falta los minutos de tolerancia para la hora de entrada en dato empresa");
+                    throw new SGPException("Debe indicar los minutos de tolerancia para la hora de entrada");
+                }
+                
                 if (this.empleadoSelected.getIdEmpleado() == null) {
     			pNumeroEmpleado = this.parametroDAO.buscarPorClave("NBEMP");
     			sNumeroEmpleado = pNumeroEmpleado.getValor();
@@ -479,11 +503,13 @@ public class RegistroEmpleadosBean implements Serializable {
                         this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
         		this.empleadoSelected.setFechaRegistro(new Date());
                         this.empleadoSelected.getDomicilio().setEmpleado(this.empleadoSelected);
+                        this.empleadoSelected.getEmpleadoConfiguracion().setEmpleado(this.empleadoSelected);
     			empleadoDAO.guardar(empleadoSelected);
                         pNumeroEmpleado.setValor(sNumeroEmpleado);
                         this.parametroDAO.actualizar(pNumeroEmpleado);
     		} else {
                         this.empleadoSelected.getDomicilio().setEmpleado(this.empleadoSelected);
+                        this.empleadoSelected.getEmpleadoConfiguracion().setEmpleado(this.empleadoSelected);
     			empleadoDAO.actualizar(empleadoSelected);
                 }
                 
@@ -500,7 +526,7 @@ public class RegistroEmpleadosBean implements Serializable {
     			}
                 biometrico = null;
             }
-
+            
             consultaEmpleados();
             PrimeFaces.current().executeScript("PF('dialogEmpleado').hide()");
             mensaje = "El empleado se guardó correctamente.";
@@ -983,7 +1009,7 @@ public class RegistroEmpleadosBean implements Serializable {
     public void setTexto(String texto) {
         this.texto = texto;
     }
-    
+
     public List<DetEmpleado> filtrarEmpleados() {
         
         if (this.activo && this.inactivo && this.empresaselected == null && this.plantaselected == null) {

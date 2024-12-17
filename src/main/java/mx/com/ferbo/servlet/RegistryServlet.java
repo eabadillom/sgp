@@ -22,6 +22,8 @@ import mx.com.ferbo.dao.n.TokenDAO;
 import mx.com.ferbo.model.CatEstatusRegistro;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetEmpleadoFoto;
+import mx.com.ferbo.model.DetEmpleadoConfiguracion;
+import mx.com.ferbo.model.InfDatoEmpresa;
 import mx.com.ferbo.model.DetRegistro;
 import mx.com.ferbo.model.DetToken;
 import mx.com.ferbo.response.RegistryResponse;
@@ -51,6 +53,9 @@ public class RegistryServlet extends HttpServlet {
 		HttpSession session = null;
 		Date horaSistema;
 		Date horaLimiteEntrada = null;
+                Integer horaEntrada = null;
+                Integer minEntrada = null;
+                Integer minutosTolerancia = null;
 
 		EmpleadoFotoDAO empleadoFotoDAO = null;
 		EstatusRegistroDAO estatusDAO = null;
@@ -61,6 +66,8 @@ public class RegistryServlet extends HttpServlet {
 		CatEstatusRegistro statusRetardo = null;
 		DetEmpleado empleado = null;
 		DetEmpleadoFoto foto = null;
+                DetEmpleadoConfiguracion empleadoConf = null;
+                InfDatoEmpresa empleadoEmpresa = null;
 		DetToken tokenEmpleado = null;
 		DetRegistro registro = null;
 		String tipoRegistro = null;
@@ -123,7 +130,9 @@ public class RegistryServlet extends HttpServlet {
 			}
 			
 			empleado = tokenEmpleado.getEmpleado();
-			
+                        empleadoEmpresa = empleado.getDatoEmpresa();
+                        log.trace("Info dato empresa: {}", empleadoEmpresa.toString());
+                        
 			prettyGson = new GsonBuilder().setPrettyPrinting().create();
 			
 			tokenEmpleado.setValido(false);
@@ -152,7 +161,14 @@ public class RegistryServlet extends HttpServlet {
 					tipoRegistro = "Salida";
 				
 				horaLimiteEntrada = new Date();
-				DateUtil.setTime(horaLimiteEntrada, 7, 10, 0, 0);
+                                horaEntrada = DateUtil.getHora(empleadoEmpresa.getHoraEntrada());
+                                minEntrada = DateUtil.getMinuto(empleadoEmpresa.getHoraEntrada());
+                                log.trace("Hora del empleado: {}", empleadoEmpresa.getHoraEntrada());
+                                minutosTolerancia = empleadoEmpresa.getMinutosTolerancia();
+                                log.info("Hora de entrada: {}:{}, con {} minutos de tolerancia", horaEntrada, minEntrada, minutosTolerancia);
+				DateUtil.setTime(horaLimiteEntrada, horaEntrada, (minEntrada+minutosTolerancia), 0, 0);
+                                log.info("Hora limite de entrada: {}", horaLimiteEntrada);
+                                log.trace("Hora actual del sistema: {}", horaSistema);
 				
 				switch (tipoRegistro) {
 				
@@ -164,11 +180,25 @@ public class RegistryServlet extends HttpServlet {
 					registro.setFechaEntrada(fechaActual);
 					registro.setFechaSalida(null);
 					registro.setIdEmpleado(empleado);
-					if (horaSistema.after(horaLimiteEntrada)) {
-						registro.setIdEstatus(statusRetardo);
-					} else {
-						registro.setIdEstatus(statusEnTiempo);
-					}
+                                        
+                                        empleadoConf = empleado.getEmpleadoConfiguracion();
+                                        
+                                        if(empleadoConf == null || empleadoConf.getRetardo() == null)
+                                        {
+                                            log.info("Registro sin la configuracion de retardo");
+                                            registro.setIdEstatus((horaSistema.after(horaLimiteEntrada)) ? statusRetardo : statusEnTiempo);
+                                        }else
+                                        {
+                                            log.info("Registro con la configuracion de retardo: {}", empleadoConf.toString());
+                                            if(empleadoConf.getRetardo() == true)
+                                            {
+                                                registro.setIdEstatus((horaSistema.after(horaLimiteEntrada)) ? statusRetardo : statusEnTiempo);
+                                            }else
+                                            {
+                                                registro.setIdEstatus(statusEnTiempo);
+                                            }
+                                        }
+					
 					registroDAO.guardar(registro);
 					log.info("Entrada registrada correctamente");
 					break;
