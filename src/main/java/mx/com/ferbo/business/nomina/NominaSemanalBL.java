@@ -14,9 +14,13 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import mx.com.ferbo.business.deduccion.AbstractDeduccion;
 import mx.com.ferbo.business.deduccion.AjusteAlNetoDeduccion;
+import mx.com.ferbo.business.deduccion.IDeducciones;
 import mx.com.ferbo.business.deduccion.PrestamoDeduccion;
 import mx.com.ferbo.business.deduccion.imss.IMSSDeduccion;
+import mx.com.ferbo.business.deduccion.isr.ISRExecutor;
+import mx.com.ferbo.business.otropago.AbstractOtroPago;
 import mx.com.ferbo.business.otropago.AjusteAlNetoOtroPago;
 import mx.com.ferbo.business.percepcion.BonoPuntualidadPercepcion;
 import mx.com.ferbo.business.percepcion.SeptimoDiaPercepcion;
@@ -73,7 +77,6 @@ public class NominaSemanalBL extends NominaBL {
 	private BigDecimal uma = null;
 	
 	private Integer anio = null;
-	private NominaDAO nominaDAO = null;
 	private List<DetNomina> nominaSemanal = null;
 	
 	private PercepcionEmpleadoDAO percepcionEmpleadoDAO = null;
@@ -85,7 +88,6 @@ public class NominaSemanalBL extends NominaBL {
 		this.empleado = empleado;
 		this.periodoInicio = periodoInicio;
 		this.periodoFin = periodoFin;
-		this.nominaDAO = new NominaDAO();
 		this.percepcionEmpleadoDAO = new PercepcionEmpleadoDAO();
 		
 		anioActual = DateUtil.getAnio(periodoInicio);
@@ -202,9 +204,10 @@ public class NominaSemanalBL extends NominaBL {
 			/*-------------------------DEDUCCIONES-----------------------*/
 			if(salarioSemanal.compareTo(BigDecimal.ZERO) > 0) {
 				
-				nominaSemanal = this.ultimaSemanaMes ? procesaNominaDelMes() : null;
+//				nominaSemanal = this.ultimaSemanaMes ? procesaNominaDelMes(this.periodoInicio, this.empleado.getDatoEmpresa().getRfc()) : null;
 				
-				NominaBL.procesarISR(nomina, periodoInicio, periodoFin, parametros, nominaSemanal);
+				NominaSemanalBL.procesarISR(nomina, this.periodoInicio, this.periodoFin, this.parametros);
+//				NominaSemanalBL.procesarISR(nomina, this.periodoInicio, this.periodoFin, this.parametros, this.nominaSemanal);
 //				isrExecutor = new ISRExecutor(this.periodoInicio, this.periodoFin, this.parametros.getTiposDeduccion(), this.parametros.getTiposOtroPago(), this.parametros.getTablaISR(), this.nominaSemanal);
 //				isrBO = isrExecutor.loadClass("ISRS", DateUtil.toLocalDate(this.periodoFin));
 //				isrBO.procesar(nomina);
@@ -519,9 +522,9 @@ public class NominaSemanalBL extends NominaBL {
 		return ultimaSemanaMes;
 	}
 	
-	private List<DetNomina> procesaNominaDelMes() {
+	public static List<DetNomina> procesaNominaDelMes(Date periodoInicio, String rfc) {
 		List<DetNomina> listaNominaDelMes = null;
-		Date dPeriodoInicio = new Date(this.periodoInicio.getTime());
+		Date dPeriodoInicio = new Date(periodoInicio.getTime());
 		Date dPeriodoAnteriorFin = null;
 		Date dPeriodoAnteriorInicio = null;
 		
@@ -530,6 +533,8 @@ public class NominaSemanalBL extends NominaBL {
 		
 		Integer semanaInicio = null;
 		Integer semanaFin = null;
+		
+		NominaDAO nominaDAO = new NominaDAO();
 		
 		//Obtener la fecha inicio de la primera semana del mes
 		for(int i = 0; i < 6; i++) {
@@ -560,7 +565,7 @@ public class NominaSemanalBL extends NominaBL {
 		
 		log.info("Búsqueda de la semana {} a {}", semanaInicio, semanaFin);
 		
-		listaNominaDelMes = nominaDAO.buscarPorSemanaRfc(semanaInicio, semanaFin, this.empleado.getDatoEmpresa().getRfc());
+		listaNominaDelMes = nominaDAO.buscarPorSemanaRfc(semanaInicio, semanaFin, rfc);
 		
 		return listaNominaDelMes;
 	}
@@ -669,6 +674,31 @@ public class NominaSemanalBL extends NominaBL {
     	}
     	
         return sdi;
+	}
+	
+	public static synchronized void procesarISR(DetNomina nomina, Date periodoInicio, Date periodoFin, ParametrosNomina parametros) {
+		Boolean esUltimaSemanaMes = false;
+		List<DetNomina> nominaMensual = null;
+		
+		esUltimaSemanaMes = NominaSemanalBL.esUltimaSemanaMes(periodoInicio, periodoFin);
+		if(esUltimaSemanaMes)
+			nominaMensual = NominaSemanalBL.procesaNominaDelMes(periodoInicio, nomina.getReceptor().getRfc());
+		
+		log.info("Procesando cálculo de ISR...");
+		//Primero se debe buscar en "nomina" si ya existen registros de ISR y Subsidio al salario y eliminarlos.
+		List<DetNominaDeduccion> deducciones = nomina.getDeducciones();
+		boolean removedDeducciones = deducciones.removeIf(d -> AbstractDeduccion.D_ISR.equalsIgnoreCase(d.getTipoDeduccion().getClave()));
+		if(removedDeducciones)
+			log.info("Se encontraron conceptos {}, los cuales fueron eliminados para el reproceso de ISR", AbstractDeduccion.D_ISR);
+		
+		List<DetNominaOtroPago> otrosPagos = nomina.getOtrosPagos();
+		boolean removedOtrosPagos = otrosPagos.removeIf(o -> AbstractOtroPago.OP_SUBSIDIO_AL_SALARIO.equalsIgnoreCase(o.getTipoOtroPago().getClave()));
+		if(removedOtrosPagos)
+			log.info("Se encontraron conceptos {}, los cuales fueron eliminados para el reproceso de Subsidio al empleo.", AbstractOtroPago.OP_SUBSIDIO_AL_SALARIO);
+		
+		ISRExecutor isrExecutor = new ISRExecutor(periodoInicio, periodoFin, parametros.getTiposDeduccion(), parametros.getTiposOtroPago(), parametros.getTablaISR(), nominaMensual);
+		IDeducciones isrBO = isrExecutor.loadClass("ISRS", DateUtil.toLocalDate(periodoFin));
+		isrBO.procesar(nomina);
 	}
 	
 	public DetEmpleado getEmpleado() {

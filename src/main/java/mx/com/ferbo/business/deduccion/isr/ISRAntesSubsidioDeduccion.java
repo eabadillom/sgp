@@ -56,6 +56,7 @@ public class ISRAntesSubsidioDeduccion implements IDeduccion {
 			log.error("Problema para obtener el ISR antes del subsidio al empleo...", ex);
 			isrPreSubsidio = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 		} finally {
+			log.info("ISR antes de subsidio: {}", isrPreSubsidio);
 			deduccion = new DetNominaDeduccion();
 			deduccion.setKey(new DetNominaDeduccionPK(nomina, index));
 			deduccion.setTipoDeduccion(tdISR);

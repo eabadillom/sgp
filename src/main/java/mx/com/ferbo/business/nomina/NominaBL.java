@@ -10,8 +10,10 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import mx.com.ferbo.business.deduccion.AbstractDeduccion;
 import mx.com.ferbo.business.deduccion.IDeducciones;
 import mx.com.ferbo.business.deduccion.isr.ISRExecutor;
+import mx.com.ferbo.business.otropago.AbstractOtroPago;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaConcepto;
 import mx.com.ferbo.model.DetNominaDeduccion;
@@ -22,7 +24,6 @@ import mx.com.ferbo.model.DetNominaOtroPagoPK;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.DetNominaPercepcionPK;
 import mx.com.ferbo.model.DetNominaReceptor;
-import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.SGPException;
 
@@ -291,18 +292,5 @@ public abstract class NominaBL {
 		nomina.setSubtotal(subtotal);
 		nomina.setDescuento(descuentos);
 		nomina.setTotal(total);
-	}
-	
-	
-	public static synchronized void procesarISR(DetNomina nomina, Date periodoInicio, Date periodoFin, ParametrosNomina parametros, List<DetNomina> nominaSemanal) {
-		
-		//Primero se debe buscar en "nomina" si ya existen registros de ISR y Subsidio al salario.
-		
-		
-		
-		
-		ISRExecutor isrExecutor = new ISRExecutor(periodoInicio, periodoFin, parametros.getTiposDeduccion(), parametros.getTiposOtroPago(), parametros.getTablaISR(), nominaSemanal);
-		IDeducciones isrBO = isrExecutor.loadClass("ISRS", DateUtil.toLocalDate(periodoFin));
-		isrBO.procesar(nomina);
 	}
 }

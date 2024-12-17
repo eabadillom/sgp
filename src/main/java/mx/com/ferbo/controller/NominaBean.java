@@ -299,7 +299,9 @@ public class NominaBean implements Serializable {
 		String titulo = "Percepción";
 		
 		try {
-			NominaBL.agregarPercepcion(this.nomina, this.percepcion);
+			NominaSemanalBL.agregarPercepcion(this.nomina, this.percepcion);
+			NominaSemanalBL.procesarISR(this.nomina, this.periodoInicio, this.periodoFin, this.parametros);
+			
 			this.percepcion = new DetNominaPercepcion();
 			this.actualizar();
 			

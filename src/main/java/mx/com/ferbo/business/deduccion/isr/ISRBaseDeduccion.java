@@ -53,6 +53,7 @@ public class ISRBaseDeduccion extends AbstractDeduccion implements IDeduccion {
 			log.error("Problema para obtener la base para el ISR...", ex);
 			baseISR = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 		} finally {
+			log.info("Percepciones gravadas: {}", baseISR);
 			deduccion = new DetNominaDeduccion();
 			deduccion.setKey(new DetNominaDeduccionPK(nomina, index));
 			deduccion.setTipoDeduccion(tdISR);
