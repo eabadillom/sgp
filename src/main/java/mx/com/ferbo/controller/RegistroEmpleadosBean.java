@@ -73,6 +73,7 @@ import mx.com.ferbo.model.sat.CatTipoContrato;
 import mx.com.ferbo.model.sat.CatTipoJornada;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.model.sat.CatTipoRegimen;
+import mx.com.ferbo.util.ManageStatus;
 import mx.com.ferbo.util.SGPException;
 import org.primefaces.util.LangUtils;
 
@@ -134,6 +135,9 @@ public class RegistroEmpleadosBean implements Serializable {
     private tipobajaempleadoDAO tipobajaempleadodao;
     private List<CatTipoBajaEmpleado> tiposdebaja;
     private boolean statusfechabaja;
+    private CatTipoBajaEmpleado tipofinrelacion;
+    private String motivofinrelaicion;
+    private Date fechafinrelacion;
     
     private DetEmpleado empleadoSelected;
     private DetBiometrico detBiometrico;
@@ -584,8 +588,20 @@ public class RegistroEmpleadosBean implements Serializable {
      */
     public void eliminaEmpleado() {
         try {
-            //this.empleadoSelected.setActivo((short) 0);
-            //this.empleadoSelected.setFechaModificacion(new Date());
+            if(this.tipofinrelacion.getTipodebaja().startsWith("T")){
+                this.empleadoSelected.setActivo((short) 0);
+            }
+            
+            if(this.tipofinrelacion.getTipodebaja().startsWith("S")){
+                this.empleadoSelected.setActivo((short) 2);
+            }
+            
+            this.empleadoSelected.setFechaModificacion(new Date());
+            this.empleadoSelected.getDatoEmpresa().setTipodebaja(this.tipofinrelacion);
+            this.empleadoSelected.getDatoEmpresa().setMotivobaja(this.motivofinrelaicion);
+            if(this.fechafinrelacion != null){
+                this.empleadoSelected.getDatoEmpresa().setFechaBaja(this.fechafinrelacion);
+            }
             this.empleadoDAO.actualizar(this.empleadoSelected);
             consultaEmpleados();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Empleado Eliminado"));
@@ -1026,6 +1042,30 @@ public class RegistroEmpleadosBean implements Serializable {
     public void setStatusfechabaja(boolean statusfechabaja) {
         this.statusfechabaja = statusfechabaja;
     }
+
+    public CatTipoBajaEmpleado getTipofinrelacion() {
+        return tipofinrelacion;
+    }
+
+    public void setTipofinrelacion(CatTipoBajaEmpleado tipofinrelacion) {
+        this.tipofinrelacion = tipofinrelacion;
+    }
+
+    public String getMotivofinrelaicion() {
+        return motivofinrelaicion;
+    }
+
+    public void setMotivofinrelaicion(String motivofinrelaicion) {
+        this.motivofinrelaicion = motivofinrelaicion;
+    }
+
+    public Date getfechafinrelacion() {
+        return fechafinrelacion;
+    }
+
+    public void setfechafinrelacion(Date fechafinrelacion) {
+        this.fechafinrelacion = fechafinrelacion;
+    }
     
     public List<DetEmpleado> filtrarEmpleados() {
         
@@ -1163,10 +1203,19 @@ public class RegistroEmpleadosBean implements Serializable {
     }  
     
     public void manipularStatusFechaBaja(){
-        this.statusfechabaja = this.empleadoSelected.getDatoEmpresa().getTipodebaja().getTipodebaja() == null ? false : (this.empleadoSelected.getDatoEmpresa().getTipodebaja().getTipodebaja().startsWith("T"));
+        if(this.tipofinrelacion == null){
+            this.statusfechabaja = false;
+            return;
+        }
+        
+        this.statusfechabaja  = this.tipofinrelacion.getTipodebaja().startsWith("T");
     }
     
     public void limpiarStatusFechaSalida(){
         this.statusfechabaja = false;
+    }
+    
+    public String obtenerStatusEmpleadoEmpresa(DetEmpleado empleado){
+        return ManageStatus.getEstadoEmpleadoEmpresa(empleado.getActivo());
     }
 }
