@@ -14,20 +14,12 @@ import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import mx.com.ferbo.business.empleado.RegistroAsistenciaBL;
 
-import mx.com.ferbo.dao.n.EmpleadoFotoDAO;
-import mx.com.ferbo.dao.n.EstatusRegistroDAO;
-import mx.com.ferbo.dao.n.RegistroDAO;
-import mx.com.ferbo.dao.n.TokenDAO;
-import mx.com.ferbo.model.CatEstatusRegistro;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetEmpleadoFoto;
-import mx.com.ferbo.model.DetEmpleadoConfiguracion;
-import mx.com.ferbo.model.InfDatoEmpresa;
-import mx.com.ferbo.model.DetRegistro;
 import mx.com.ferbo.model.DetToken;
 import mx.com.ferbo.response.RegistryResponse;
-import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.SGPException;
 
 /**
@@ -36,12 +28,13 @@ import mx.com.ferbo.util.SGPException;
 public class RegistryServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static Logger log = LogManager.getLogger(RegistryServlet.class);
+        private RegistroAsistenciaBL empleadoAsistencia = null;
        
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
 	public RegistryServlet() {
-
+            empleadoAsistencia = new RegistroAsistenciaBL();
 	}
 
 	/**
@@ -50,97 +43,42 @@ public class RegistryServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		HttpSession session = null;
-		Date horaSistema;
-		Date horaLimiteEntrada = null;
-                Integer horaEntrada = null;
-                Integer minEntrada = null;
-                Integer minutosTolerancia = null;
-
-		EmpleadoFotoDAO empleadoFotoDAO = null;
-		EstatusRegistroDAO estatusDAO = null;
-		TokenDAO detTokenDAO = null;
-		RegistroDAO registroDAO = null;
-		
-		CatEstatusRegistro statusEnTiempo = null;
-		CatEstatusRegistro statusRetardo = null;
-		DetEmpleado empleado = null;
-		DetEmpleadoFoto foto = null;
-                DetEmpleadoConfiguracion empleadoConf = null;
-                InfDatoEmpresa empleadoEmpresa = null;
-		DetToken tokenEmpleado = null;
-		DetRegistro registro = null;
-		String tipoRegistro = null;
-		Date fechaActual = null;
-		Date fechaEntradaInicio = null;
-		Date fechaEntradaFin = null;
-		String numeroEmpleado = null;
-		String jsonResponse = null;
-		int httpStatus = -1;
-		
-		String token = null;
-		String accion = null;
-		RegistryResponse respuesta = null;
+                int httpStatus = -1;
+                String jsonResponse = null;
+                RegistryResponse respuesta = null;
 		Gson prettyGson = null;
-		try {
-			session = request.getSession(true);
-			
-			horaSistema = new Date();
-			fechaEntradaInicio = new Date();
-			fechaEntradaFin = new Date();
-			DateUtil.setTime(fechaEntradaInicio, 0, 0, 0, 0);
-			DateUtil.setTime(fechaEntradaFin, 23, 59, 59, 999);
-			
-			registro = new DetRegistro();
-			registroDAO = new RegistroDAO(DetRegistro.class);
-			numeroEmpleado = request.getParameter("numero");
-			token = request.getParameter("token");
-			accion = request.getParameter("accion");// registro, Entrada/Salida
-			fechaActual = new Date();
-			log.info("Buscando biometricos para el empleado numero: " + numeroEmpleado);
-			
-			if (numeroEmpleado == null) {
-				throw new Exception("Información incorrecta.");
-			}
-			
-			if ("".equalsIgnoreCase(numeroEmpleado.trim()))
-				throw new Exception("Información incorrecta.");
-
-			estatusDAO = new EstatusRegistroDAO(CatEstatusRegistro.class);
-			statusEnTiempo = estatusDAO.buscarPorId(1);
-			statusRetardo = estatusDAO.buscarPorId(2);
-
-			detTokenDAO = new TokenDAO(DetToken.class);
-			log.info("Buscando token........: " + token);
-			tokenEmpleado = detTokenDAO.buscarPorToken(token);
-			log.info("Token: {}, Caducidad: {}", tokenEmpleado.getNbToken(), tokenEmpleado.getCaducidad());
-			log.info("Fecha hora actual: {}", fechaActual);
-			
-			if(tokenEmpleado.getEmpleado().getNumEmpleado().equals(numeroEmpleado) == false)
-				throw new SGPException("La información proporcionada es incorrecta.");
-			
-			if (tokenEmpleado.getCaducidad().before(fechaActual)) {
-				log.info("La fecha recuperada es valida: {}", tokenEmpleado.getCaducidad());
-				throw new SGPException("El token ha expirado.");
-			}
-			
-			if(tokenEmpleado.isValido() == false) {
-				log.info("El token no es válido: {}", tokenEmpleado.isValido());
-				throw new SGPException("El token no es válido.");
-			}
-			
-			empleado = tokenEmpleado.getEmpleado();
-                        empleadoEmpresa = empleado.getDatoEmpresa();
-                        log.trace("Info dato empresa: {}", empleadoEmpresa.toString());
+		Date fechaActual = null;
+                
+                String numeroEmpleado = null;
+                String token = null;
+                String accion = null;
+                
+                HttpSession session = null;
+                DetToken tokenEmpleado = null;
+                DetEmpleado empleado = null;
+                DetEmpleadoFoto foto = null;
+                
+                try {
+                        session = request.getSession(true);
                         
-			prettyGson = new GsonBuilder().setPrettyPrinting().create();
-			
-			tokenEmpleado.setValido(false);
-			empleadoFotoDAO = new EmpleadoFotoDAO(DetEmpleadoFoto.class);
-			foto = empleadoFotoDAO.buscar(empleado.getNumEmpleado());
-			detTokenDAO.actualizar(tokenEmpleado);
-			session.setAttribute("empleado", empleado);
-			session.setAttribute("fotografia", foto);
+                        numeroEmpleado = request.getParameter("numero");
+                        token = request.getParameter("token");
+                        accion = request.getParameter("accion");// registro, Entrada/Salida;
+                        
+                        fechaActual = new Date();
+                        log.info("Fecha hora actual: {}", fechaActual);
+                        
+                        tokenEmpleado = this.empleadoAsistencia.obtenerToken(numeroEmpleado, token, fechaActual);
+                        empleado = tokenEmpleado.getEmpleado();
+                        
+                        prettyGson = new GsonBuilder().setPrettyPrinting().create();
+                        
+                        tokenEmpleado.setValido(false);
+                        foto = this.empleadoAsistencia.buscarFotoEmpleado(empleado.getIdEmpleado());
+                        this.empleadoAsistencia.actualizarToken(tokenEmpleado);
+                        
+                        session.setAttribute("empleado", empleado);
+                        session.setAttribute("fotografia", foto);
 			
 			respuesta = new RegistryResponse();
 			respuesta.setCodigo(0);
@@ -149,75 +87,14 @@ public class RegistryServlet extends HttpServlet {
 				// opcion 1: replicar metodo login debajo, opcion 2: hacer instancia de
 				// loginBean y llamar a su metodo login si es posible
 				respuesta.setUrl("/protected/registroAsistencia.xhtml");
-				
-				log.info("Buscando entrada del empleado {} entre las {} y las {}", 
-						empleado.getNumEmpleado(),
-						DateUtil.getString(fechaEntradaInicio, DateUtil.FORMATO_YYYY_MM_DD_HH_MM_SS),
-						DateUtil.getString(fechaEntradaFin, DateUtil.FORMATO_YYYY_MM_DD_HH_MM_SS));
-				registro = registroDAO.buscarPorEmpleadoFechaEntrada(empleado.getIdEmpleado(), fechaEntradaInicio, fechaEntradaFin);
-				if(registro == null || registro.getIdRegistro() == null)
-					tipoRegistro = "Entrada";
-				else
-					tipoRegistro = "Salida";
-				
-				horaLimiteEntrada = new Date();
-                                horaEntrada = DateUtil.getHora(empleadoEmpresa.getHoraEntrada());
-                                minEntrada = DateUtil.getMinuto(empleadoEmpresa.getHoraEntrada());
-                                log.trace("Hora del empleado: {}", empleadoEmpresa.getHoraEntrada());
-                                minutosTolerancia = empleadoEmpresa.getMinutosTolerancia();
-                                log.info("Hora de entrada: {}:{}, con {} minutos de tolerancia", horaEntrada, minEntrada, minutosTolerancia);
-				DateUtil.setTime(horaLimiteEntrada, horaEntrada, (minEntrada+minutosTolerancia), 0, 0);
-                                log.info("Hora limite de entrada: {}", horaLimiteEntrada);
-                                log.trace("Hora actual del sistema: {}", horaSistema);
-				
-				switch (tipoRegistro) {
-				
-				case "Entrada":
-				case "ENTRADA":
-				case "entrada":
-					log.info("Registrando entrada...");
-					registro = new DetRegistro();
-					registro.setFechaEntrada(fechaActual);
-					registro.setFechaSalida(null);
-					registro.setIdEmpleado(empleado);
-                                        
-                                        empleadoConf = empleado.getEmpleadoConfiguracion();
-                                        
-                                        if(empleadoConf == null || empleadoConf.getRetardo() == null)
-                                        {
-                                            log.info("Registro sin la configuracion de retardo");
-                                            registro.setIdEstatus((horaSistema.after(horaLimiteEntrada)) ? statusRetardo : statusEnTiempo);
-                                        }else
-                                        {
-                                            log.info("Registro con la configuracion de retardo: {}", empleadoConf.toString());
-                                            if(empleadoConf.getRetardo() == true)
-                                            {
-                                                registro.setIdEstatus((horaSistema.after(horaLimiteEntrada)) ? statusRetardo : statusEnTiempo);
-                                            }else
-                                            {
-                                                registro.setIdEstatus(statusEnTiempo);
-                                            }
-                                        }
-					
-					registroDAO.guardar(registro);
-					log.info("Entrada registrada correctamente");
-					break;
-				case "Salida":
-				case "SALIDA":
-				case "salida":
-					log.info("Registrando salida...");
-					registro.setFechaSalida(fechaActual);
-					registroDAO.actualizar(registro);
-					log.info("Salida registrada correctamente");
-					break;
-				}
+				this.empleadoAsistencia.registroAsistenciaEmpleado(empleado, fechaActual);
 			} else if ("perfil".equalsIgnoreCase(accion)) {
 				log.info("Entrando a mi perfil...");
 				respuesta.setUrl("/protected/kardexEmpleado.xhtml");
 			}
 			log.info("Registro completo.");
-			jsonResponse = prettyGson.toJson(respuesta);
-			httpStatus = HttpServletResponse.SC_OK;
+                        jsonResponse = prettyGson.toJson(respuesta);
+                        httpStatus = HttpServletResponse.SC_OK;
 		} catch (Exception ex) {
 			log.warn("Problema para el registro del empleado: {}", ex.getMessage());
 			respuesta = new RegistryResponse();
@@ -240,4 +117,5 @@ public class RegistryServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 	}
+        
 }
