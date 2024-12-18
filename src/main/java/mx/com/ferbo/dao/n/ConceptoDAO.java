@@ -8,4 +8,8 @@ public class ConceptoDAO extends BaseDAO<CatConcepto, String> {
 	public ConceptoDAO(Class<CatConcepto> modelClass) {
 		super(modelClass);
 	}
+	
+	public ConceptoDAO() {
+		super(CatConcepto.class);
+	}
 }

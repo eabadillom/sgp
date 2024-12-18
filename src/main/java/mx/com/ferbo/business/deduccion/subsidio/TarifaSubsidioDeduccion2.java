@@ -68,6 +68,8 @@ public class TarifaSubsidioDeduccion2 implements ISubsidioEmpleo {
 		} catch(Exception ex) {
 			log.warn(ex);
 			throw new SGPException("No es posible determinar el subsidio al empleo...", ex);
+		} finally {
+			log.info("Importe subsidio: {}", importeSubsidio);
 		}
 		
 		return importeSubsidio;
