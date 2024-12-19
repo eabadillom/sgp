@@ -16,7 +16,8 @@
 	e.nombre, e.primer_ap, e.segundo_ap, r.fecha_entrada, r.fecha_salida, er.descripcion
 FROM det_registro r 
 INNER JOIN det_empleado e ON r.id_empleado = e.id_empleado
-INNER JOIN cat_planta p ON e.id_planta = p.id_planta
+INNER JOIN inf_empleado_empresa iee on e.id_empleado_empresa = iee.id_empleado_empresa
+INNER JOIN cat_planta p ON iee.id_planta = p.id_planta
 INNER JOIN cat_estatus_registro er ON er.id_estatus = r.id_estatus 
 WHERE (p.id_planta = $P{idPlanta} OR $P{idPlanta} IS NULL) AND (r.fecha_entrada >= $P{fechaInicio} AND r.fecha_entrada <= $P{fechaFin}) 
 ORDER BY
