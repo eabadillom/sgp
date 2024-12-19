@@ -8,5 +8,9 @@ public class RegimenFiscalDAO extends BaseDAO<CatRegimenFiscal, String> {
 	public RegimenFiscalDAO(Class<CatRegimenFiscal> modelClass) {
 		super(modelClass);
 	}
+	
+	public RegimenFiscalDAO() {
+		super(CatRegimenFiscal.class);
+	}
 
 }

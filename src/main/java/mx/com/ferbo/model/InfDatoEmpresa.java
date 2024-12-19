@@ -3,6 +3,7 @@ package mx.com.ferbo.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.Basic;
@@ -13,6 +14,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import mx.com.ferbo.model.sat.CatEntidadFederativa;
@@ -103,6 +105,10 @@ public class InfDatoEmpresa implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "cd_periodicidad", referencedColumnName = "periodicidad")
 	private CatPeriodicidadPago periodicidadPago;
+        
+        @ManyToOne
+        @JoinColumn(name = "tp_baja", referencedColumnName="tp_baja")
+        private CatTipoBajaEmpleado tipodebaja;
 	
 	@Basic(optional = true)
 	@Column(name = "st_sindicalizado")
@@ -135,6 +141,10 @@ public class InfDatoEmpresa implements Serializable {
         @Basic(optional = true)
 	@Column(name = "st_diat_domingo")
 	private Boolean diaDomingo;
+        
+        @Basic(optional = true)
+        @Column(name = "nb_baja")
+        private String motivobaja;
         
 	public Integer getId() {
 		return id;
@@ -319,4 +329,20 @@ public class InfDatoEmpresa implements Serializable {
 	public void setFechaBaja(Date fechaBaja) {
 		this.fechaBaja = fechaBaja;
 	}
+
+    public CatTipoBajaEmpleado getTipodebaja() {
+        return tipodebaja;
+    }
+
+    public void setTipodebaja(CatTipoBajaEmpleado tipodebaja) {
+        this.tipodebaja = tipodebaja;
+    }
+
+    public String getMotivobaja() {
+        return motivobaja;
+    }
+
+    public void setMotivobaja(String motivobaja) {
+        this.motivobaja = motivobaja;
+    }    
 }

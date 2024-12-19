@@ -61,7 +61,9 @@ public class DetNominaDeduccionPK implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		DetNominaDeduccionPK other = (DetNominaDeduccionPK) obj;
-		return Objects.equals(id, other.id) && Objects.equals(nomina, other.nomina);
+		
+		//return Objects.equals(id, other.id) && Objects.equals(nomina, other.nomina);
+		return this.nomina.equals(other.nomina) && this.id.equals(other.id);
 	}
 
 	@Override

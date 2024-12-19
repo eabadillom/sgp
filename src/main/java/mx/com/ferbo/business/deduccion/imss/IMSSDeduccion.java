@@ -44,7 +44,7 @@ public class IMSSDeduccion extends AbstractIMSSDeduccion implements IDeducciones
 	}
 	
 	@Override
-	public void procesar(DetNomina nomina, Integer index) {
+	public void procesar(DetNomina nomina) {
 		List<DetNominaDeduccion> aportacionesIMSS = null;
 		
 		DetNominaDeduccion dEnfermedadMaternidad = null;
