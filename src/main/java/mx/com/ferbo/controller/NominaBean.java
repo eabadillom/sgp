@@ -227,12 +227,11 @@ public class NominaBean implements Serializable {
     	DetNomina nomina = null;
     	NominaSemanalBL nominaSemanalBO = null;
     	List<DetPercepcionEmpleado> percepcionesEmpleado = null;
-    	log.info("Empleado: {} {} {}, Salario diario: {}", empleado.getNombre(), empleado.getPrimerAp(), empleado.getSegundoAp(), empleado.getDatoEmpresa().getSalarioDiario());
     	percepcionesEmpleado = percepcionEmpleadoDAO.buscarPorEmpleado(empleado.getIdEmpleado());
     	empleado.setPercepcionesEmpleado(percepcionesEmpleado);
     	
 		nominaSemanalBO = new NominaSemanalBL(empleado, periodoInicio, periodoFin);
-		nominaSemanalBO.setParametros(parametros);
+		nominaSemanalBO.setParametros(this.parametros);
 		nominaSemanalBO.setAnio(this.year);
 		nomina = nominaSemanalBO.calculoNomina();
 		return nomina;

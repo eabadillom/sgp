@@ -260,12 +260,11 @@ public class ISRSemanalDeduccion1 extends AbstractDeduccion implements IDeduccio
 		opSubsidioEmpleo.setImporte(importeSubsidio);
 		
 		if(importeSubsidio.compareTo(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP)) > 0) {
-			opSubsidioEmpleo.setProcesar(true);
 			opSubsidioEmpleo.setInformar(true);
-		}
-		else {
+			opSubsidioEmpleo.setProcesar(true);
+		} else {
+			opSubsidioEmpleo.setInformar(true);
 			opSubsidioEmpleo.setProcesar(false);
-			opSubsidioEmpleo.setInformar(false);
 		}
 		nomina.getOtrosPagos().add(opSubsidioEmpleo);
 	}

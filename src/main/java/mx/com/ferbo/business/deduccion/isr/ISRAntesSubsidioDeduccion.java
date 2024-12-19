@@ -63,6 +63,7 @@ public class ISRAntesSubsidioDeduccion implements IDeduccion {
 			deduccion.setClave("---");
 			deduccion.setNombre("I.S.R. antes de Subs al empleo");
 			deduccion.setImporte(isrPreSubsidio);
+			deduccion.setInformar(true);
 			deduccion.setProcesar(false);
 		}
 		

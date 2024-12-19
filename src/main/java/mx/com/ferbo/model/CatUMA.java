@@ -47,6 +47,38 @@ public class CatUMA implements Serializable {
     @Basic(optional = false)
     @Column(name = "fh_aplicacion")
     private LocalDate fechaAplicacion;
+    
+    @Basic(optional = false)
+    @Column(name = "fh_vigencia")
+    private LocalDate fechaVigencia;
+    
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 29 * hash + Objects.hashCode(this.anio);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final CatUMA other = (CatUMA) obj;
+        return Objects.equals(this.anio, other.anio);
+    }
+
+    @Override
+    public String toString() {
+        return "CatUMA[" + "Codigo Año: " + anio + ", Importe Diario: " + importeDiario + ", Importe Mensual: " + importeMensual + ", "
+                + "Importe Anual: " + importeAnual + ", Fecha Publicacion: " + fechaPublicacion + ", Fecha Aplicacion: " + fechaAplicacion + ']';
+    }
 
     public CatUMA() {
     }
@@ -103,32 +135,12 @@ public class CatUMA implements Serializable {
         this.fechaAplicacion = fechaAplicacion;
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 29 * hash + Objects.hashCode(this.anio);
-        return hash;
-    }
+	public LocalDate getFechaVigencia() {
+		return fechaVigencia;
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final CatUMA other = (CatUMA) obj;
-        return Objects.equals(this.anio, other.anio);
-    }
-
-    @Override
-    public String toString() {
-        return "CatUMA[" + "Codigo Año: " + anio + ", Importe Diario: " + importeDiario + ", Importe Mensual: " + importeMensual + ", "
-                + "Importe Anual: " + importeAnual + ", Fecha Publicacion: " + fechaPublicacion + ", Fecha Aplicacion: " + fechaAplicacion + ']';
-    }
+	public void setFechaVigencia(LocalDate fechaVigencia) {
+		this.fechaVigencia = fechaVigencia;
+	}
     
 }

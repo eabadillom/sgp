@@ -50,11 +50,9 @@ public class NominaSemanalBL extends NominaBL {
 	private DetEmpleado empleado = null;
 	private Date periodoInicio = null;
 	private Date periodoFin = null;
-	private Date periodoSiguienteFin = null;
 	private Date fechaInicioAnio = null;
 	private Date fechafinAnio = null;
 	private Integer semanaAnio = null;
-	private Boolean ultimaSemanaMes = null;
 	
 	private BigDecimal diasTrabajados = null;
 	private BigDecimal diasAsueto = null;
@@ -77,7 +75,6 @@ public class NominaSemanalBL extends NominaBL {
 	private BigDecimal uma = null;
 	
 	private Integer anio = null;
-	private List<DetNomina> nominaSemanal = null;
 	
 	private PercepcionEmpleadoDAO percepcionEmpleadoDAO = null;
 	
@@ -98,7 +95,6 @@ public class NominaSemanalBL extends NominaBL {
 		DateUtil.setTime(this.fechafinAnio, 23, 59, 59, 000);
 		
 		this.semanaAnio = DateUtil.getSemanaAnio(this.periodoInicio);
-		this.periodoSiguienteFin = DateUtil.addDay(this.periodoFin, 7);
 	}
 	
 	public DetNomina calculoNomina() {
@@ -137,6 +133,7 @@ public class NominaSemanalBL extends NominaBL {
 		
 		try {
 			log.info("#############################################################################");
+			log.info("Empleado: {} {} {}, Salario diario: {}", empleado.getNombre(), empleado.getPrimerAp(), empleado.getSegundoAp(), empleado.getDatoEmpresa().getSalarioDiario());
 			log.info("Ejecutando la nomina de la semana {} del año en curso...", this.semanaAnio);
 			nomina =  NominaBL.build();
 			
@@ -147,7 +144,6 @@ public class NominaSemanalBL extends NominaBL {
 			deducciones = nomina.getDeducciones();
 			
 			
-			this.ultimaSemanaMes = this.esUltimaSemanaMes();
 			
 			log.debug("Buscando información empresarial del empleado.");
 			
@@ -204,14 +200,7 @@ public class NominaSemanalBL extends NominaBL {
 			/*-------------------------DEDUCCIONES-----------------------*/
 			if(salarioSemanal.compareTo(BigDecimal.ZERO) > 0) {
 				
-//				nominaSemanal = this.ultimaSemanaMes ? procesaNominaDelMes(this.periodoInicio, this.empleado.getDatoEmpresa().getRfc()) : null;
-				
 				NominaSemanalBL.procesarISR(nomina, this.periodoInicio, this.periodoFin, this.parametros);
-//				NominaSemanalBL.procesarISR(nomina, this.periodoInicio, this.periodoFin, this.parametros, this.nominaSemanal);
-//				isrExecutor = new ISRExecutor(this.periodoInicio, this.periodoFin, this.parametros.getTiposDeduccion(), this.parametros.getTiposOtroPago(), this.parametros.getTablaISR(), this.nominaSemanal);
-//				isrBO = isrExecutor.loadClass("ISRS", DateUtil.toLocalDate(this.periodoFin));
-//				isrBO.procesar(nomina);
-				
 
 				imssBO = new IMSSDeduccion(this.parametros.getTiposDeduccion(), this.parametros.getCuotasIMSS(), this.fechaInicioAnio, this.fechafinAnio, new BigDecimal(DIAS_POR_PERIODO + SEPTIMO_DIA), this.uma, salarioDiarioIntegrado);
 				imssBO.procesar(nomina);
@@ -247,12 +236,12 @@ public class NominaSemanalBL extends NominaBL {
 			nomina.setEjercicio(DateUtil.getAnio(this.fechaInicioAnio));
 			nomina.setDiasLaborados(diasTrabajados.intValue());
 			nomina.setDiasNoLaborados(diasLaboralesPeriodo.subtract(diasTrabajados).intValue());
-			nomina.setSubtotal(BigDecimal.ZERO.add(this.totalPercepciones).add(this.totalOtrosPagos));
-			nomina.setDescuento(this.totalDeducciones);
-			nomina.setTotal(neto);
 			nomina.setPeriodo(this.semanaAnio);
 			nomina.setPeriodoInicio(this.periodoInicio.toInstant().atZone(ZoneId.of("GMT-6")).toLocalDate());
 			nomina.setPeriodoFin(this.periodoFin.toInstant().atZone(ZoneId.of("GMT-6")).toLocalDate());
+			nomina.setSubtotal(BigDecimal.ZERO.add(this.totalPercepciones).add(this.totalOtrosPagos));
+			nomina.setDescuento(this.totalDeducciones);
+			nomina.setTotal(neto);
 			
 			DetNominaEmisor emisor = this.getEmisor(nomina);
 			log.info("Emisor: {}", emisor.getNombre());
@@ -458,22 +447,6 @@ public class NominaSemanalBL extends NominaBL {
 		}
 		
 		return emisor;
-	}
-	
-	private Boolean esUltimaSemanaMes() {
-		Boolean ultimaSemanaMes = null;
-		
-		Integer mesActual = DateUtil.getMes(this.periodoFin);
-		Integer mesSiguiente = DateUtil.getMes(this.periodoSiguienteFin);
-		
-		if(mesSiguiente > mesActual) {
-			ultimaSemanaMes = new Boolean(true);
-			log.info("ULTIMA SEMANA DEL MES: {} - {}", this.periodoInicio, this.periodoFin);
-		} else {
-			ultimaSemanaMes = new Boolean(false);
-		}
-		
-		return ultimaSemanaMes;
 	}
 	
 	public static synchronized Boolean esUltimaSemanaMes(Date periodoInicio, Date periodoFin) {

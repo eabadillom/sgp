@@ -94,6 +94,7 @@ public class ParametrosNomina {
 		this.tiposDeduccion = this.tipoDeduccionDAO.buscarTodos();
 		this.cuotasIMSS = this.cuotasIMSSDAO.buscarPorPeriodo(periodoFin);
 		this.tiposOtroPago = this.tipoOtroPagoDAO.buscarTodos();
+		
 	}
 
 	public CatPercepciones getParametrosPercepciones() {
