@@ -109,73 +109,51 @@ public class RegistroAsistenciaBL
     
     public void registroAsistenciaEmpleado(DetEmpleado empleado, Date fechaActual) throws SGPException
     {
-        DetRegistro registro = null;
-        InfDatoEmpresa empleadoEmpresa = null;
+        InfDatoEmpresa empleadoEmpresa = empleado.getDatoEmpresa();
+        log.trace("Info dato empresa: {}", empleadoEmpresa.toString());
         
-        Date horaLimiteEntrada = null;
-        Date fechaEntradaInicio = null;
-        Date fechaEntradaFin = null;
+        Date horaLimiteEntrada = new Date();
+        Date fechaEntradaInicio = new Date();
+        Date fechaEntradaFin = new Date();
         
-        Integer horaEntrada = null;
-        Integer minEntrada = null;
-        Integer minutosTolerancia = null;
+        Integer horaEntrada = DateUtil.getHora(empleadoEmpresa.getHoraEntrada());
+        Integer minEntrada = DateUtil.getMinuto(empleadoEmpresa.getHoraEntrada());
+        Integer minutosTolerancia = empleadoEmpresa.getMinutosTolerancia();
+        log.trace("Hora de entrada: {}:{}, con {} minutos de tolerancia", horaEntrada, minEntrada, minutosTolerancia);
         
-        String tipoRegistro = null;
-        
-        try
-        {
-            horaLimiteEntrada = new Date();
-            fechaEntradaInicio = new Date();
-            fechaEntradaFin = new Date();
-            
-            DateUtil.setTime(fechaEntradaInicio, 0, 0, 0, 0);
-            DateUtil.setTime(fechaEntradaFin, 23, 59, 59, 999);
-            
-            empleadoEmpresa = empleado.getDatoEmpresa();
-            log.trace("Info dato empresa: {}", empleadoEmpresa.toString());
-            
-            log.info("Buscando entrada del empleado {} entre las {} y las {}", empleado.getNumEmpleado(),
-                        DateUtil.getString(fechaEntradaInicio, DateUtil.FORMATO_YYYY_MM_DD_HH_MM_SS),
-                        DateUtil.getString(fechaEntradaFin, DateUtil.FORMATO_YYYY_MM_DD_HH_MM_SS));
-            
-            registro = this.buscarPorEmpleadoFechaEntrada(empleado.getIdEmpleado(), fechaEntradaInicio, fechaEntradaFin);
-            if(registro == null || registro.getIdRegistro() == null)
-                    tipoRegistro = "Entrada";
-            else
-                    tipoRegistro = "Salida";
-            
-            horaEntrada = DateUtil.getHora(empleadoEmpresa.getHoraEntrada());
-            minEntrada = DateUtil.getMinuto(empleadoEmpresa.getHoraEntrada());
-            minutosTolerancia = empleadoEmpresa.getMinutosTolerancia();
-            log.trace("Hora de entrada: {}:{}, con {} minutos de tolerancia", horaEntrada, minEntrada, minutosTolerancia);
-            
-            DateUtil.setTime(horaLimiteEntrada, horaEntrada, (minEntrada+minutosTolerancia), 0, 0);
-            log.trace("Hora limite de entrada: {}", horaLimiteEntrada);            
+        DateUtil.setTime(fechaEntradaInicio, 0, 0, 0, 0);
+        DateUtil.setTime(fechaEntradaFin, 23, 59, 59, 999);
 
-            switch (tipoRegistro) {
+        log.info("Buscando entrada del empleado {} entre las {} y las {}", empleado.getNumEmpleado(),
+                    DateUtil.getString(fechaEntradaInicio, DateUtil.FORMATO_YYYY_MM_DD_HH_MM_SS),
+                    DateUtil.getString(fechaEntradaFin, DateUtil.FORMATO_YYYY_MM_DD_HH_MM_SS));
+        
+        boolean tipoRegistro;
+        DetRegistro registro = this.buscarPorEmpleadoFechaEntrada(empleado.getIdEmpleado(), fechaEntradaInicio, fechaEntradaFin);
+        if(registro == null || registro.getIdRegistro() == null)
+            tipoRegistro = true;
+        else
+            tipoRegistro = false;
+        
+        DateUtil.setTime(horaLimiteEntrada, horaEntrada, (minEntrada+minutosTolerancia), 0, 0);
+        log.trace("Hora limite de entrada: {}", horaLimiteEntrada);            
 
-            case "Entrada":
-            case "ENTRADA":
-            case "entrada":
-                    log.info("Registrando entrada...");
-                    registro = validarConfiguracion(empleado, horaLimiteEntrada, fechaActual);
-                    this.registroDAO.guardar(registro);
-                    log.info("Entrada registrada correctamente");
-                    break;
-            case "Salida":
-            case "SALIDA":
-            case "salida":
-                    log.info("Registrando salida...");
-                    registro.setFechaSalida(fechaActual);
-                    this.registroDAO.actualizar(registro);
-                    log.info("Salida registrada correctamente");
-                    break;
-            }
-        }catch(SGPException ex)
+        if(tipoRegistro == true)
         {
-            log.error("Error al guardar el registro del empleado");
-            throw new SGPException("Error al registrar la asistencia del empleado");
+            log.info("Registrando entrada...");
+            registro = validarConfiguracion(empleado, horaLimiteEntrada, fechaActual);
+            this.registroDAO.guardar(registro);
+            log.info("Entrada registrada correctamente");
         }
+        
+        if(tipoRegistro == false)
+        {       
+            log.info("Registrando salida...");
+            registro.setFechaSalida(fechaActual);
+            this.registroDAO.actualizar(registro);
+            log.info("Salida registrada correctamente");
+        }
+        
     }
     
     public DetRegistro validarConfiguracion(DetEmpleado empleado, Date horaLimiteEntrada, Date fechaActual) throws SGPException
