@@ -163,9 +163,11 @@ public class DetNomina implements Serializable {
     
     @Override
 	public int hashCode() {
+    	if(this.id == null)
+    		return Objects.hash(this);
 		return Objects.hash(id);
 	}
-
+    
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -177,7 +179,7 @@ public class DetNomina implements Serializable {
 		DetNomina other = (DetNomina) obj;
 		return Objects.equals(id, other.id);
 	}
-
+	
 	@Override
 	public String toString() {
 		return "DetNomina [idNomina=" + id + "]";

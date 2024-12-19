@@ -3,7 +3,6 @@ package mx.com.ferbo.business.percepcion;
 import java.math.BigDecimal;
 import java.util.List;
 
-import mx.com.ferbo.business.deduccion.AbstractPercepcion;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.DetNominaPercepcionPK;

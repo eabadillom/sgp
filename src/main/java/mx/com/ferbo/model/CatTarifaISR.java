@@ -66,6 +66,13 @@ public class CatTarifaISR implements Serializable {
     public CatTarifaISR(Integer idIsr) {
         this.idIsr = idIsr;
     }
+    
+    @Override
+	public String toString() {
+		return "CatTarifaISR [idIsr=" + idIsr + ", limiteInferior=" + limiteInferior + ", limiteSuperior="
+				+ limiteSuperior + ", cuotaFija=" + cuotaFija + ", porcAplExceLimInf=" + porcAplExceLimInf + ", tipo="
+				+ tipo + ", fecha=" + fecha + ", periodoISR=" + periodoISR + "]";
+	}
 
     public CatTarifaISR(Integer idIsr, BigDecimal limiteInferior, BigDecimal limiteSuperior, BigDecimal cuotaFija, BigDecimal porcAplExceLimInf, String tipo, Date fecha) {
         this.idIsr = idIsr;

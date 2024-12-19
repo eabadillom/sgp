@@ -91,7 +91,7 @@ public class ISRSemanalDeduccion2 extends AbstractDeduccion implements IDeduccio
 	}
 	
 	@Override
-	public void procesar(DetNomina nomina, Integer index) {
+	public void procesar(DetNomina nomina) {
 		List<DetNominaDeduccion> deduccionesISR = null;
 		List<DetNominaPercepcion> percepciones = null;
 		ISRBaseDeduccion baseISRBO = null;
@@ -196,10 +196,7 @@ public class ISRSemanalDeduccion2 extends AbstractDeduccion implements IDeduccio
 			deduccionesISR.add(dISR);
 			deduccionesISR.add(dISRAntesSubsidio);
 			
-			
-			
 			this.procesaSubsidioAlEmpleo(nomina, importeSubsidio);
-			
 			
 			nomina.getDeducciones().addAll(deduccionesISR);
 		} catch(Exception ex) {

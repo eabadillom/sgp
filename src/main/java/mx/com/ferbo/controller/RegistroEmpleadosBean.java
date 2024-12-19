@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -77,7 +76,6 @@ import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.model.sat.CatTipoRegimen;
 import mx.com.ferbo.util.ManageStatus;
 import mx.com.ferbo.util.SGPException;
-import org.primefaces.util.LangUtils;
 
 @Named(value = "registroEmpleadosBean")
 @ViewScoped
@@ -110,7 +108,6 @@ public class RegistroEmpleadosBean implements Serializable {
     private RiesgoPuestoDAO riesgoDAO;
     private PeriodicidadPagoDAO periodicidadDAO;
     private TipoPercepcionDAO tipoPercepcionDAO;
-    private DomicilioEmpleadoDAO domicilioEmpleadoDAO;
     private AsentamientoDAO asentamientoDAO;
     private EmpleadoConfiguracionDAO configuracionEmpleadoDAO;
 
@@ -155,6 +152,7 @@ public class RegistroEmpleadosBean implements Serializable {
     private String curp;
     private String rfc;
     private String nss;
+    private Integer activeTabIndex = 0;
     private String codigoPostal;
     private String texto;
 
@@ -214,20 +212,6 @@ public class RegistroEmpleadosBean implements Serializable {
     }
 
     /*
-     * Método para consultar los domicilios de los empleados
-     */
-    private void consultaAsentamientos() {
-        this.lstAsentamientos = asentamientoDAO.buscarTodos();
-    }
-
-    /*
-     * Método para consultar los domicilios de los empleados
-     */
-    private void consultaDomicilios() {
-        this.lstDomicilios = domicilioEmpleadoDAO.buscarTodos();
-    }
-
-    /*
      * Método para consultar a los empleados
      */
     private void consultaEmpleados() {
@@ -263,6 +247,7 @@ public class RegistroEmpleadosBean implements Serializable {
         this.empleadoSelected.setDomicilio(new DetDomicilioEmpleado());
         this.empleadoSelected.setEmpleadoConfiguracion(new DetEmpleadoConfiguracion());
         this.asentamientoSelected = this.inicializarAsentamiento();
+        this.activeTabIndex = 0;
     }
     
     public CatAsentamiento obtenerAsentamiento(DetEmpleado domicilioEmpleado)
@@ -333,9 +318,7 @@ public class RegistroEmpleadosBean implements Serializable {
         }
 
         this.detBiometrico = biometricoDAO.consultaBiometricoByIdEmpleado(this.empleadoSelected.getIdEmpleado());
-
         log.info("Biometrico: {}", this.detBiometrico);
-
         this.nuevaPercepcionEmpleado();
         
         if(/*this.empleadoConfiguracionSelected == null*/ this.empleadoSelected.getEmpleadoConfiguracion() == null)
@@ -1013,6 +996,14 @@ public class RegistroEmpleadosBean implements Serializable {
         this.domicilioEmpleadoSelected = domicilioEmpleadoSelected;
     }
 
+	public Integer getActiveTabIndex() {
+		return activeTabIndex;
+	}
+
+	public void setActiveTabIndex(Integer activeTabIndex) {
+		this.activeTabIndex = activeTabIndex;
+	}
+	
     public CatPlanta getPlantaselected() {
         return plantaselected;
     }

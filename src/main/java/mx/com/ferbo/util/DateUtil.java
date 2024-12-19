@@ -580,6 +580,20 @@ public class DateUtil {
 		return lastDayOfMonth;
 	}
 	
+	public static Date getLastDayOfYear(Date fecha) {
+		Date lastDayOfYear = null;
+		GregorianCalendar cal = null;
+		
+		cal = new GregorianCalendar();
+		cal.setTime(fecha);
+		cal.set(GregorianCalendar.DAY_OF_MONTH, 1);
+		cal.set(GregorianCalendar.MONTH, DICIEMBRE);
+		cal.set(GregorianCalendar.DAY_OF_MONTH, 31);
+		lastDayOfYear = new Date(cal.getTimeInMillis());
+		
+		return lastDayOfYear;
+	}
+	
 	public static Date getFirstDayOfMonth(Date fecha){
 		Date firstDayOfMonth = null;
 		GregorianCalendar cal = null;
@@ -592,6 +606,21 @@ public class DateUtil {
 		
 		return firstDayOfMonth;
 	}
+	
+	public static Date getFirstDayOfyear(Date fecha) {
+		Date firstDayOfYear = null;
+		GregorianCalendar cal = null;
+		int firstDay = 1;
+		cal = new GregorianCalendar();
+		cal.setTime(fecha);
+		cal.set(GregorianCalendar.DAY_OF_MONTH, firstDay);
+		cal.set(GregorianCalendar.MONTH, 0);
+		firstDayOfYear = new Date(cal.getTimeInMillis());
+		
+		return firstDayOfYear;
+	}
+	
+	
 	
 	/**Formatea un valor de tiempo en Milisegundos
 	   * @param elapsedTimeMillis Tiempo a formatear
