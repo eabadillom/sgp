@@ -7,12 +7,7 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.dao.n.TipoDeduccionDAO;
 import mx.com.ferbo.model.CatTarifaISR;
-import mx.com.ferbo.model.DetNomina;
-import mx.com.ferbo.model.DetNominaDeduccion;
-import mx.com.ferbo.model.DetNominaDeduccionPK;
-import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.util.SGPException;
 
 public class TarifaISRDeduccion {
@@ -52,6 +47,8 @@ public class TarifaISRDeduccion {
 				throw new SGPException("No se encontró una tarifa de ISR para la base proporcionada.");
 		} catch(Exception ex) {
 			throw new SGPException("No es posible determinar la tasa de ISR...", ex);
+		} finally {
+			log.info("Tarifa ISR: {}", tarifaISR);
 		}
 		
 		return tarifaISR;

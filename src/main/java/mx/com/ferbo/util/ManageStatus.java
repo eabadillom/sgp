@@ -9,7 +9,8 @@ enum StatusClass
 {
     QUALIFIED,
     UNQUALIFIED,
-    PROPOSAL;
+    PROPOSAL,
+    NEGOTIATION;
 }
 
 enum StatusText 
@@ -70,4 +71,22 @@ public class ManageStatus
         return mensaje;
     }
     
+    public static String getEstadoEmpleadoEmpresa(short unstatus) 
+    {
+        String mensaje = "";
+        
+        switch(unstatus)
+        {
+            case 0:
+                mensaje = StatusClass.UNQUALIFIED.toString().toLowerCase();
+                break;
+            case 1:
+                mensaje = StatusClass.QUALIFIED.toString().toLowerCase();
+                break;
+            case 2:
+                mensaje = StatusClass.NEGOTIATION.toString().toLowerCase();
+                break;
+        }
+        return mensaje;
+    }
 }

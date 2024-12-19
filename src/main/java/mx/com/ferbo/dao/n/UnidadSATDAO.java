@@ -8,5 +8,9 @@ public class UnidadSATDAO extends BaseDAO<CatUnidadSAT, String> {
 	public UnidadSATDAO(Class<CatUnidadSAT> modelClass) {
 		super(modelClass);
 	}
+	
+	public UnidadSATDAO() {
+		super(CatUnidadSAT.class);
+	}
 
 }

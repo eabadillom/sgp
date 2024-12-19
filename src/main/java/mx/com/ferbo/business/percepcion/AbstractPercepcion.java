@@ -1,4 +1,4 @@
-package mx.com.ferbo.business.deduccion;
+package mx.com.ferbo.business.percepcion;
 
 import java.util.List;
 import java.util.stream.Collectors;

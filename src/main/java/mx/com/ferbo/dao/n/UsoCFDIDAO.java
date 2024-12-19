@@ -8,4 +8,8 @@ public class UsoCFDIDAO extends BaseDAO<CatUsoCFDI, String> {
 	public UsoCFDIDAO(Class<CatUsoCFDI> modelClass) {
 		super(modelClass);
 	}
+	
+	public UsoCFDIDAO() {
+		super(CatUsoCFDI.class);
+	}
 }

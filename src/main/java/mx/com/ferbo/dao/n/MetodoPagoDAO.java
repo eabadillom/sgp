@@ -8,4 +8,8 @@ public class MetodoPagoDAO extends BaseDAO<CatMetodoPago, String> {
 	public MetodoPagoDAO(Class<CatMetodoPago> modelClass) {
 		super(modelClass);
 	}
+	
+	public MetodoPagoDAO() {
+		super(CatMetodoPago.class);
+	}
 }
