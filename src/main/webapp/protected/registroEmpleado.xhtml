@@ -604,7 +604,7 @@
                             <div class="p-field">
                                 <p:outputLabel value="¿Por que se dio de baja o suspendio el empleado?"/>
                                 <p:selectOneMenu value="#{registroEmpleadosBean.tipofinrelacion}" converter="entityConverter">
-                                    <f:selectItem itemLabel="Seleccione una suspension o una terminacion" value="#{null}"/>
+                                    <f:selectItem itemLabel="-- Seleccione una suspension o una terminacion --" value="#{null}"/>
                                     <f:selectItems value="#{registroEmpleadosBean.tiposdebaja}" var="tipobaja" itemLabel="#{tipobaja.descripcion}" itemValue="#{tipobaja}"/>
                                     <p:ajax event="change" listener="#{registroEmpleadosBean.manipularStatusFechaBaja}" process="@this" oncomplete="PF('dg-eliminarEmpleado').show();" update='formRegistroEmpleado:dg-eliminarEmpleado'/>
                                 </p:selectOneMenu>
@@ -618,14 +618,22 @@
                             
                             <h:panelGroup rendered="#{registroEmpleadosBean.statusfechabaja}">
                             <div class="p-field">
-                                <p:outputLabel for="fechadebaja" value="Seleccione la fecha en la que se dio de baja el empleado"/>
-                                <p:datePicker id="fechadebaja" value="#{registroEmpleadosBean.fechafinrelacion}" showIcon="true" yearNavigator="true" monthNavigator="true" weekCalculator="true" pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX">
+                                <p:outputLabel for="fechadebaja" value="Fecha de ultimo dia laboral"/><br/>
+                                <p:datePicker id="fechadebaja" 
+                                              value="#{registroEmpleadosBean.fechafinrelacion}" 
+                                              showIcon="true" 
+                                              yearNavigator="true" 
+                                              monthNavigator="true" 
+                                              weekCalculator="true" 
+                                              pattern="dd/MM/yyyy" 
+                                              timeZone="GMT-6" 
+                                              locale="es_MX">
                                     <p:ajax process="@this"/>
                                 </p:datePicker>
                             </div>
                             </h:panelGroup>
                             <p:commandButton value="Eliminar" icon="pi pi-check" style="margin: 0.3rem" styleClass="ui-button-danger" onclick="PF('dg-eliminarEmpleado').hide();" oncomplete="PF('dialogEliminarEmpleado').show();" />
-                            <p:commandButton value="Cancelar" icon="pi pi-times" style="margin: 0.3rem" actionListener="#{registroEmpleadosBean.limpiarStatusFechaSalida}" oncomplete="PF('dg-eliminarEmpleado').hide(), PF('dialogEliminarEmpleado').hide();" />
+                            <p:commandButton value="Cancelar" icon="pi pi-times" style="margin: 0.3rem" actionListener="#{registroEmpleadosBean.limpiarEliminar()}" oncomplete="PF('dg-eliminarEmpleado').hide(), PF('dialogEliminarEmpleado').hide();" />
                         </p:dialog>
 
                         <p:confirmDialog widgetVar="dlgEliminarPrestamo" showEffect="fade" width="30rem" message="¿Está seguro que desea eliminar el préstamo seleccionado?" header="Confirmar" severity="warn">
@@ -641,7 +649,7 @@
                         <p:confirmDialog widgetVar="dialogEliminarEmpleado" showEffect="fade" width="300" message="¿Está seguro que desea dar de baja al empleado?" header="Confirmar" severity="warn">
                             <div>
                                 <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{registroEmpleadosBean.eliminaEmpleado()}" process="@this" oncomplete="PF('dialogEliminarEmpleado').hide()"/>
-                                <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" actionListener="#{registroEmpleadosBean.limpiarStatusFechaSalida}" onclick="PF('dialogEliminarEmpleado').hide()" />
+                                <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" actionListener="#{registroEmpleadosBean.limpiarEliminar()}" onclick="PF('dialogEliminarEmpleado').hide()" />
                             </div>
                         </p:confirmDialog>
 

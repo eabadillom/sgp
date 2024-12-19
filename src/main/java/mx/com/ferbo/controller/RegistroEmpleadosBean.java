@@ -613,12 +613,21 @@ public class RegistroEmpleadosBean implements Serializable {
             this.empleadoDAO.actualizar(this.empleadoSelected);
             consultaEmpleados();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Empleado Eliminado"));
+            limpiarEliminar();
+            
         } catch (SGPException ex) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Error al eliminar al empleado"));
             log.warn("EX-0018: " + ex.getMessage() + ". Error al guardar la huella del empleado " + empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
         }
         PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:dtEmpleados");
+    }
+    
+    public void limpiarEliminar(){
+        this.tipofinrelacion = null;
+        this.motivofinrelaicion = null;
+        this.fechafinrelacion = null;
+        this.statusfechabaja = false;
     }
 
     public String redirectKardex() {
@@ -1225,10 +1234,6 @@ public class RegistroEmpleadosBean implements Serializable {
         }
         
         this.statusfechabaja  = this.tipofinrelacion.getTipodebaja().startsWith("T");
-    }
-    
-    public void limpiarStatusFechaSalida(){
-        this.statusfechabaja = false;
     }
     
     public String obtenerStatusEmpleadoEmpresa(DetEmpleado empleado){
