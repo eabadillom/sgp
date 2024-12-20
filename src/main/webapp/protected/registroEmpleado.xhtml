@@ -87,7 +87,7 @@
                                 <p:commandButton styleClass="edit-button m-1" action="#{registroEmpleadosBean.editar}" process="@this" update=":formRegistroEmpleado:panelDialogEmpleado formRegistroEmpleado:panelDialogEmpleado:previewFingerprint1" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dialogEmpleado').show();" icon="pi pi-pencil">
                                     <f:setPropertyActionListener value="#{empleado}" target="#{registroEmpleadosBean.empleadoSelected}" />
                                 </p:commandButton>
-                                <p:commandButton class="ui-button-danger m-1" icon="pi pi-times" process="@this" oncomplete="PF('dg-eliminarEmpleado').show()" update=":formRegistroEmpleado:dg-eliminarEmpleado" >
+                                <p:commandButton class="ui-button-danger m-1" icon="pi pi-times" process="@this" actionListener="#{registroEmpleadosBean.validarEmpleado(empleado)}" oncomplete="PF('dg-eliminarEmpleado').show()" update=":formRegistroEmpleado:dg-eliminarEmpleado" >
                                     <f:setPropertyActionListener value="#{empleado}" target="#{registroEmpleadosBean.empleadoSelected}" />
                                 </p:commandButton>
                             </p:column>
