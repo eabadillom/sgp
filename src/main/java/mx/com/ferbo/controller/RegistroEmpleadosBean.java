@@ -203,7 +203,8 @@ public class RegistroEmpleadosBean implements Serializable {
             tiposPercepcion = tipoPercepcionDAO.buscarTodos();
             tiposPrestamo = tipoPrestamoDAO.buscarTodos();
             tiposdebaja = tipobajaempleadodao.obtenerTodos();
-                    
+            asentamientoSelected = this.inicializarAsentamiento();
+
             consultaEmpleados();
             prestamo = new DetPrestamo();
         } catch (Exception ex) {
@@ -244,7 +245,8 @@ public class RegistroEmpleadosBean implements Serializable {
         this.empleadoSelected.setActivo((short) 1);
         this.datoEmpresa = new InfDatoEmpresa();
         this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
-        this.empleadoSelected.setDomicilio(new DetDomicilioEmpleado());
+        DetDomicilioEmpleado domicilioaux = new DetDomicilioEmpleado();
+        this.empleadoSelected.setDomicilio(domicilioaux);
         this.empleadoSelected.setEmpleadoConfiguracion(new DetEmpleadoConfiguracion());
         this.asentamientoSelected = this.inicializarAsentamiento();
         this.activeTabIndex = 0;
@@ -590,7 +592,7 @@ public class RegistroEmpleadosBean implements Serializable {
     public void sinFoto() {
         this.empleadoFoto = null;
     }
-
+    
     /*
      * Método para eliminar 1 empleado
      */
