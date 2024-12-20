@@ -13,6 +13,7 @@ import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import mx.com.ferbo.business.empleado.EmpleadoBL;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -1240,5 +1241,9 @@ public class RegistroEmpleadosBean implements Serializable {
     
     public String obtenerStatusEmpleadoEmpresa(DetEmpleado empleado){
         return ManageStatus.getEstadoEmpleadoEmpresa(empleado.getActivo());
+    }
+    
+    public void validarEmpleado(DetEmpleado empleado){
+        EmpleadoBL.validarDatosEmpleado(empleado);
     }
 }
