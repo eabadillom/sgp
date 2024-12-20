@@ -87,7 +87,7 @@
                                 <p:commandButton styleClass="edit-button m-1" action="#{registroEmpleadosBean.editar}" process="@this" update=":formRegistroEmpleado:panelDialogEmpleado formRegistroEmpleado:panelDialogEmpleado:previewFingerprint1" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dialogEmpleado').show();" icon="pi pi-pencil">
                                     <f:setPropertyActionListener value="#{empleado}" target="#{registroEmpleadosBean.empleadoSelected}" />
                                 </p:commandButton>
-                                <p:commandButton class="ui-button-danger m-1" icon="pi pi-times" process="@this" oncomplete="PF('dg-eliminarEmpleado').show()" >
+                                <p:commandButton class="ui-button-danger m-1" icon="pi pi-times" process="@this" oncomplete="PF('dg-eliminarEmpleado').show()" update=":formRegistroEmpleado:dg-eliminarEmpleado" >
                                     <f:setPropertyActionListener value="#{empleado}" target="#{registroEmpleadosBean.empleadoSelected}" />
                                 </p:commandButton>
                             </p:column>
@@ -615,24 +615,24 @@
                                     <p:ajax process="@this"/>
                                 </p:inputTextarea>
                             </div>
-                            
+
                             <h:panelGroup rendered="#{registroEmpleadosBean.statusfechabaja}">
-                            <div class="p-field">
-                                <p:outputLabel for="fechadebaja" value="Fecha de ultimo dia laboral"/><br/>
-                                <p:datePicker id="fechadebaja" 
-                                              value="#{registroEmpleadosBean.fechafinrelacion}" 
-                                              showIcon="true" 
-                                              yearNavigator="true" 
-                                              monthNavigator="true" 
-                                              weekCalculator="true" 
-                                              pattern="dd/MM/yyyy" 
-                                              timeZone="GMT-6" 
-                                              locale="es_MX">
-                                    <p:ajax process="@this"/>
-                                </p:datePicker>
-                            </div>
+                                <div class="p-field">
+                                    <p:outputLabel for="fechadebaja" value="Fecha de ultimo dia laboral"/><br/>
+                                    <p:datePicker id="fechadebaja" 
+                                                  value="#{registroEmpleadosBean.fechafinrelacion}" 
+                                                  showIcon="true" 
+                                                  yearNavigator="true" 
+                                                  monthNavigator="true" 
+                                                  weekCalculator="true" 
+                                                  pattern="dd/MM/yyyy" 
+                                                  timeZone="GMT-6" 
+                                                  locale="es_MX">
+                                        <p:ajax process="@this"/>
+                                    </p:datePicker>
+                                </div>
                             </h:panelGroup>
-                            <p:commandButton value="Eliminar" icon="pi pi-check" style="margin: 0.3rem" styleClass="ui-button-danger" onclick="PF('dg-eliminarEmpleado').hide();" oncomplete="PF('dialogEliminarEmpleado').show();" />
+                            <p:commandButton value="Eliminar" icon="pi pi-check" style="margin: 0.3rem" styleClass="ui-button-danger" oncomplete="PF('dg-eliminarEmpleado').hide(); PF('dialogEliminarEmpleado').show();" />
                             <p:commandButton value="Cancelar" icon="pi pi-times" style="margin: 0.3rem" actionListener="#{registroEmpleadosBean.limpiarEliminar()}" oncomplete="PF('dg-eliminarEmpleado').hide(), PF('dialogEliminarEmpleado').hide();" />
                         </p:dialog>
 
