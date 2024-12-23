@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -656,6 +657,12 @@ public class DateUtil {
         
         return days;
 		
+	}
+	
+	public static long weeksDiff(LocalDate fechaIni, LocalDate fechaFin) {
+		long weeks = 0;
+		weeks = ChronoUnit.WEEKS.between(fechaIni, fechaFin);
+		return weeks;
 	}
 	
 	public static boolean isDateBetween(Date fecha, Date fechaIni, Date fechaFin){

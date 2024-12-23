@@ -84,4 +84,23 @@ public class UMADAO extends BaseDAO<CatUMA, Integer>
     	
     	return model;
     }
+    
+    public CatUMA buscarVigentePorFecha(LocalDate fecha) {
+    	CatUMA model = null;
+    	EntityManager em = null;
+    	
+    	try {
+    		em = this.getEntityManager();
+    		model = em.createNamedQuery("CatUMA.buscarVigentePorFecha", modelClass)
+    				.setParameter("fecha", fecha)
+    				.getSingleResult()
+    				;
+    	} catch(Exception ex) {
+    		log.error("Problema para obtener la tarifa UMA...", ex);
+    	} finally {
+    		this.close(em);
+    	}
+    	
+    	return model;
+    }
 }

@@ -137,8 +137,7 @@ public class NominaSemanalBL extends NominaBL {
 			log.info("Ejecutando la nomina de la semana {} del año en curso...", this.semanaAnio);
 			nomina =  NominaBL.build();
 			
-			//TODO Cambiar UMA por CAT_UMA;
-			this.uma = this.parametros.getParametrosPercepciones().getUma();
+			this.uma = this.parametros.getUma().getImporteDiario();
 			percepciones = nomina.getPercepciones();
 			otrosPagos = nomina.getOtrosPagos();
 			deducciones = nomina.getDeducciones();
@@ -406,7 +405,10 @@ public class NominaSemanalBL extends NominaBL {
 			
 			receptor.setNss(this.empleado.getDatoEmpresa().getNss());
 			receptor.setInicioRelacionLaboral(this.empleado.getDatoEmpresa().getFechaIngreso());
-			receptor.setAntiguedad("P----");//TODO pendiente implementar antiguedad
+			//TODO pendiente revisar antiguedad
+			String antiguedad = String.format("P%dW", DateUtil.weeksDiff(DateUtil.toLocalDate(this.empleado.getDatoEmpresa().getFechaIngreso()), DateUtil.toLocalDate(this.periodoFin)) );
+			log.info("Antiguedad: {}", antiguedad);
+			receptor.setAntiguedad(antiguedad);
 			receptor.setTipoContrato(this.empleado.getDatoEmpresa().getTipoContrato());
 			receptor.setSindicalizado(this.empleado.getDatoEmpresa().getSindicalizado());
 			receptor.setTipoJornada(this.empleado.getDatoEmpresa().getTipoJornada());

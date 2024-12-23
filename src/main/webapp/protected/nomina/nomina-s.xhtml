@@ -265,6 +265,10 @@
 									<p:datePicker value="#{nominaBean.nomina.receptor.inicioRelacionLaboral}" readonly="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
 								</div>
 								<div class="field col-12 md:col-3">
+									<p:outputLabel value="Antigüedad" />
+									<p:inputText value="#{nominaBean.nomina.receptor.antiguedad}" readonly="true" />
+								</div>
+								<div class="field col-12 md:col-3">
 									<p:outputLabel value="Jornada" />
 									<p:inputText value="#{nominaBean.nomina.receptor.tipoJornada.clave} - #{nominaBean.nomina.receptor.tipoJornada.nombre}" readonly="true"/>
 								</div>

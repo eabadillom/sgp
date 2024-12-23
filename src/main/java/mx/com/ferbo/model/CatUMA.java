@@ -18,7 +18,8 @@ import javax.persistence.Table;
 @NamedQueries({
     @NamedQuery(name = "CatUMA.findById", query = "SELECT c FROM CatUMA c WHERE c.anio = :anio"),
     @NamedQuery(name = "CatUMA.findAll", query = "SELECT c FROM CatUMA c"),
-    @NamedQuery(name = "CatUMA.buscarVigente", query = "SELECT c FROM CatUMA c WHERE c.fechaAplicacion = (SELECT MAX(c2.fechaAplicacion) FROM CatUMA c2 WHERE c2.fechaAplicacion <= :fecha)")
+    @NamedQuery(name = "CatUMA.buscarVigente", query = "SELECT c FROM CatUMA c WHERE c.fechaAplicacion = (SELECT MAX(c2.fechaAplicacion) FROM CatUMA c2 WHERE c2.fechaAplicacion <= :fecha)"),
+    @NamedQuery(name = "CatUMA.buscarVigentePorFecha", query = "SELECT c FROM CatUMA c WHERE (c.fechaAplicacion <= :fecha AND c.fechaVigencia >= :fecha) OR (c.fechaAplicacion <= :fecha AND c.fechaVigencia IS NULL)")
 })
 public class CatUMA implements Serializable {
     private static final long serialVersionUID = 4255266288379749638L;
