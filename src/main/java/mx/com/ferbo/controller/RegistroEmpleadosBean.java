@@ -13,6 +13,7 @@ import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import mx.com.ferbo.business.empleado.EmpleadoBL;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -203,7 +204,8 @@ public class RegistroEmpleadosBean implements Serializable {
             tiposPercepcion = tipoPercepcionDAO.buscarTodos();
             tiposPrestamo = tipoPrestamoDAO.buscarTodos();
             tiposdebaja = tipobajaempleadodao.obtenerTodos();
-                    
+            asentamientoSelected = this.inicializarAsentamiento();
+
             consultaEmpleados();
             prestamo = new DetPrestamo();
         } catch (Exception ex) {
@@ -244,7 +246,8 @@ public class RegistroEmpleadosBean implements Serializable {
         this.empleadoSelected.setActivo((short) 1);
         this.datoEmpresa = new InfDatoEmpresa();
         this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
-        this.empleadoSelected.setDomicilio(new DetDomicilioEmpleado());
+        DetDomicilioEmpleado domicilioaux = new DetDomicilioEmpleado();
+        this.empleadoSelected.setDomicilio(domicilioaux);
         this.empleadoSelected.setEmpleadoConfiguracion(new DetEmpleadoConfiguracion());
         this.asentamientoSelected = this.inicializarAsentamiento();
         this.activeTabIndex = 0;
@@ -590,7 +593,7 @@ public class RegistroEmpleadosBean implements Serializable {
     public void sinFoto() {
         this.empleadoFoto = null;
     }
-
+    
     /*
      * Método para eliminar 1 empleado
      */
@@ -613,12 +616,21 @@ public class RegistroEmpleadosBean implements Serializable {
             this.empleadoDAO.actualizar(this.empleadoSelected);
             consultaEmpleados();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Empleado Eliminado"));
+            limpiarEliminar();
+            
         } catch (SGPException ex) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Error al eliminar al empleado"));
             log.warn("EX-0018: " + ex.getMessage() + ". Error al guardar la huella del empleado " + empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
         }
         PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:dtEmpleados");
+    }
+    
+    public void limpiarEliminar(){
+        this.tipofinrelacion = null;
+        this.motivofinrelaicion = null;
+        this.fechafinrelacion = null;
+        this.statusfechabaja = false;
     }
 
     public String redirectKardex() {
@@ -1227,11 +1239,11 @@ public class RegistroEmpleadosBean implements Serializable {
         this.statusfechabaja  = this.tipofinrelacion.getTipodebaja().startsWith("T");
     }
     
-    public void limpiarStatusFechaSalida(){
-        this.statusfechabaja = false;
-    }
-    
     public String obtenerStatusEmpleadoEmpresa(DetEmpleado empleado){
         return ManageStatus.getEstadoEmpleadoEmpresa(empleado.getActivo());
+    }
+    
+    public void validarEmpleado(DetEmpleado empleado){
+        EmpleadoBL.validarDatosEmpleado(empleado);
     }
 }
