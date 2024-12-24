@@ -35,6 +35,11 @@ import mx.com.ferbo.util.DateUtil;
 
 public class ParametrosNomina {
 	
+	private Date periodoInicio   = null;
+	private Date periodoFin      = null;
+	private Date fechaInicioAnio = null;
+	private Date fechaFinAnio    = null;
+	
 	private CatUMA                  uma = null;
 	private CatPercepciones         parametrosPercepciones = null;
 	private CatMetodoPago           metodoPago = null;
@@ -156,6 +161,22 @@ public class ParametrosNomina {
 
 	public CatUMA getUma() {
 		return uma;
+	}
+
+	public Date getPeriodoInicio() {
+		return periodoInicio;
+	}
+
+	public Date getPeriodoFin() {
+		return periodoFin;
+	}
+
+	public Date getFechaInicioAnio() {
+		return fechaInicioAnio;
+	}
+
+	public Date getFechaFinAnio() {
+		return fechaFinAnio;
 	}
 	
 }

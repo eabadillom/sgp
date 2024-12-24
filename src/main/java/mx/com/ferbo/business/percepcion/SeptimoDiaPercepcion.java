@@ -27,12 +27,14 @@ public class SeptimoDiaPercepcion extends AbstractPercepcion implements IPercepc
 	}
 
 	@Override
-	public DetNominaPercepcion calcular(DetNomina nomina, Integer index) {
+	public DetNominaPercepcion calcular(DetNomina nomina) {
 		DetNominaPercepcion percepcion = null;
 		BigDecimal septimoDia = null;
 		CatTipoPercepcion tpSeptimoDia = null;
+		Integer index = null;
 		
 		try {
+			index = this.nuevoIndiceDe(nomina.getPercepciones());
 			tpSeptimoDia = this.getTipoPercepcion("001");
 			
 			septimoDia = this.salarioDiario
@@ -45,12 +47,11 @@ public class SeptimoDiaPercepcion extends AbstractPercepcion implements IPercepc
 		} finally {
 			percepcion = new DetNominaPercepcion();
 			percepcion.setKey(new DetNominaPercepcionPK(nomina, index));
-			percepcion.setClave("003");
+			percepcion.setClave(CVE_SEPTIMO_DIA);
 			percepcion.setNombre("Séptimo día");
 			percepcion.setTipoPercepcion(tpSeptimoDia);
 			percepcion.setImporteGravado(septimoDia);
 			percepcion.setImporteExcento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
-			percepcion.setClave("FRB-" + tpSeptimoDia.getClave());
 			
 			this.tiposPercepcion = null;
 			this.salarioDiario = null;

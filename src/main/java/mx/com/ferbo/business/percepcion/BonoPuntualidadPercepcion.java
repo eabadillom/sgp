@@ -39,7 +39,7 @@ public class BonoPuntualidadPercepcion extends AbstractPercepcion implements IPe
 	}
 
 	@Override
-	public DetNominaPercepcion calcular(DetNomina nomina, Integer index) {
+	public DetNominaPercepcion calcular(DetNomina nomina) {
 		DetNominaPercepcion percepcion = null;
 		BigDecimal bono = null;
     	BigDecimal diasPeriodo = null;
@@ -47,7 +47,11 @@ public class BonoPuntualidadPercepcion extends AbstractPercepcion implements IPe
     	CatTipoPercepcion tpBonoPuntualidad = null;
     	DetPercepcionEmpleado percepcionEmpleado = null;
     	
+    	Integer index = null;
+    	
     	try {
+    		index = this.nuevoIndiceDe(nomina.getPercepciones());
+    		
     		tpBonoPuntualidad = this.getTipoPercepcion(P_BONO_PUNTUALIDAD);
     		
     		//TODO VALIDAR PRIMERO SI NO HAY RETARDOS.
@@ -82,12 +86,11 @@ public class BonoPuntualidadPercepcion extends AbstractPercepcion implements IPe
     	} finally {
     		percepcion = new DetNominaPercepcion();
     		percepcion.setKey(new DetNominaPercepcionPK(nomina, index));
-    		percepcion.setClave(P_BONO_PUNTUALIDAD);
+    		percepcion.setClave(CVE_BONO_PUNTUALIDAD);
     		percepcion.setNombre("Bono puntualidad");
     		percepcion.setTipoPercepcion(tpBonoPuntualidad);
     		percepcion.setImporteGravado(bono);
     		percepcion.setImporteExcento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
-    		percepcion.setClave("FRB-" + tpBonoPuntualidad.getClave());
     		
     		this.tiposPercepcion = null;
     		this.percepcionesEmpleado = null;

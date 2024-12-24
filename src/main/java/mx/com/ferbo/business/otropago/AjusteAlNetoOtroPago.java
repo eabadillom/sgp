@@ -25,7 +25,7 @@ public class AjusteAlNetoOtroPago extends AbstractOtroPago implements IOtroPago 
 		DetNominaOtroPago opAjusteAlNeto = null;
 		CatTipoOtroPago tpAjusteAlNeto = null;
 		try {
-			tpAjusteAlNeto = this.getTipoOtroPago("999");
+			tpAjusteAlNeto = this.getTipoOtroPago(OP_AJUSTE_AL_NETO);
 		} catch(Exception ex) {
 			log.error("Problema para generar el ajuste al neto...", ex);
 			ajusteAlNeto = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -33,7 +33,7 @@ public class AjusteAlNetoOtroPago extends AbstractOtroPago implements IOtroPago 
 			opAjusteAlNeto = new DetNominaOtroPago();
 			opAjusteAlNeto.setKey(new DetNominaOtroPagoPK(nomina, index));
 			opAjusteAlNeto.setTipoOtroPago(tpAjusteAlNeto);
-			opAjusteAlNeto.setClave("FRB-999");
+			opAjusteAlNeto.setClave(FRB_AJUSTE_AL_NETO);
 			opAjusteAlNeto.setNombre("Ajuste al neto");
 			opAjusteAlNeto.setImporte(ajusteAlNeto);
 			opAjusteAlNeto.setInformar(true);

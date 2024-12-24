@@ -99,7 +99,7 @@ public class NominaBean implements Serializable {
 
         log.info("Inicio del periodo: {}", periodoFin);
         log.info("Fin del periodo: {}", periodoInicio);
-        this.nomina = NominaBL.build();
+        this.nomina = NominaBL.build(NominaBL.TP_NOMINA_ORDINARIA, parametros, null);
         this.percepcion = new DetNominaPercepcion();
         this.otroPago = new DetNominaOtroPago();
         this.deduccion = new DetNominaDeduccion();
@@ -547,7 +547,7 @@ public class NominaBean implements Serializable {
 		String titulo = "Nómina";
 		
     	try {
-    		NominaBL.actualizar(nomina);
+    		NominaBL.actualizar(nomina, parametros);
     	} catch(Exception ex) {
     		log.error("Problema para recalcular la nómina...", ex);
     		mensaje = "Hay un problema para actualizar la nómina.";

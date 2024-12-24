@@ -17,6 +17,10 @@ public abstract class AbstractDeduccion {
 	protected List<CatTipoDeduccion> tiposDeduccion = null;
 	
 	public static final String D_ISR = "002";
+	public static final String D_AJUSTE_AL_NETO = "004";
+	
+	public static final String FRB_AJUSTE_AL_NETO = "FRBD-004";
+	
 	
 	public CatTipoDeduccion getTipoDeduccion(String clave) {
 		CatTipoDeduccion tipoDeduccion = null;

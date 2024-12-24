@@ -26,7 +26,7 @@ public class AjusteAlNetoDeduccion extends AbstractDeduccion implements IDeducci
 		CatTipoDeduccion tdAjusteAlNeto = null;
 		
 		try {
-			tdAjusteAlNeto = this.getTipoDeduccion("004");
+			tdAjusteAlNeto = this.getTipoDeduccion(D_AJUSTE_AL_NETO);
 		} catch(Exception ex) {
 			log.error("Problema para generar el ajuste al neto...", ex);
 			this.ajusteAlNeto = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -34,7 +34,7 @@ public class AjusteAlNetoDeduccion extends AbstractDeduccion implements IDeducci
 			deduccion = new DetNominaDeduccion();
 			deduccion.setKey(new DetNominaDeduccionPK(nomina, index));
 			deduccion.setTipoDeduccion(tdAjusteAlNeto);
-			deduccion.setClave("FRB-004");
+			deduccion.setClave(FRB_AJUSTE_AL_NETO);
 			deduccion.setNombre("Ajuste al neto");
 			deduccion.setImporte(ajusteAlNeto);
 			deduccion.setInformar(true);

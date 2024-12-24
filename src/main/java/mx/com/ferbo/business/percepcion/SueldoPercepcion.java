@@ -20,28 +20,37 @@ public class SueldoPercepcion extends AbstractPercepcion implements IPercepcion 
 	}
 
 	@Override
-	public DetNominaPercepcion calcular(DetNomina nomina, Integer index) {
+	public DetNominaPercepcion calcular(DetNomina nomina) {
 		DetNominaPercepcion percepcion = null;
+		BigDecimal cantidad = null;
 		BigDecimal salarioSemanal = null;
 		CatTipoPercepcion tpSueldo = null;
+		
+		Integer idxP = null;
+		
 		try {
-			tpSueldo = this.getTipoPercepcion("001");
+			idxP = this.nuevoIndiceDe(nomina.getPercepciones());
+			
+			tpSueldo = this.getTipoPercepcion(P_SUELDO);
 			
 			salarioSemanal = this.salarioDiario
 					.multiply(diasTrabajados)
 					.setScale(2, BigDecimal.ROUND_HALF_UP);
 			
+			cantidad = diasTrabajados.setScale(2, BigDecimal.ROUND_HALF_UP);
+			
 		} catch(Exception ex) {
 			salarioSemanal = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+			cantidad = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 		} finally {
 			percepcion = new DetNominaPercepcion();
-			percepcion.setKey(new DetNominaPercepcionPK(nomina, index));
-			percepcion.setClave("001");
+			percepcion.setKey(new DetNominaPercepcionPK(nomina, idxP));
+			percepcion.setClave(CVE_SUELDO);
 			percepcion.setNombre("Sueldo");
+			percepcion.setCantidad(cantidad);
 			percepcion.setTipoPercepcion(tpSueldo);
 			percepcion.setImporteGravado(salarioSemanal);
 			percepcion.setImporteExcento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
-			percepcion.setClave("FRB-" + tpSueldo.getClave());
 			
 			this.tiposPercepcion = null;
 			this.tiposPercepcion = null;
