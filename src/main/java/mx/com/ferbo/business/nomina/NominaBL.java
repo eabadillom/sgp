@@ -31,6 +31,7 @@ import mx.com.ferbo.model.DetNominaPercepcionPK;
 import mx.com.ferbo.model.DetNominaReceptor;
 import mx.com.ferbo.model.sat.CatConcepto;
 import mx.com.ferbo.model.sat.CatUnidadSAT;
+import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.SGPException;
 
 public abstract class NominaBL {
@@ -115,6 +116,7 @@ public abstract class NominaBL {
 		try {
 			if(nomina.getEmisor() == null)
 				nomina.setEmisor(new DetNominaEmisor());
+			
 			emisor = nomina.getEmisor();
 			emisor.setNomina(nomina);
 			emisor.setNombre(empresa.getRazonSocial());
@@ -181,6 +183,10 @@ public abstract class NominaBL {
 			receptor.setPeriodicidadPago(empleado.getDatoEmpresa().getPeriodicidadPago());
 			receptor.setSalarioDiario(empleado.getDatoEmpresa().getSalarioDiario());
 			receptor.setEntidadFederativa(empleado.getDatoEmpresa().getEntidadFederativa());
+			//TODO pendiente revisar antiguedad
+			String antiguedad = String.format("P%dW", DateUtil.weeksDiff(DateUtil.toLocalDate(empleado.getDatoEmpresa().getFechaIngreso()), DateUtil.toLocalDate(parametros.getPeriodoFin())) );
+			log.info("Antiguedad: {}", antiguedad);
+			receptor.setAntiguedad(antiguedad);
 			
 		} catch(Exception ex) {
 			log.error("Problema para generar el receptor...", ex);
@@ -384,7 +390,7 @@ public abstract class NominaBL {
 			throw new SGPException("Ocurrió un probleam para eliminar la deducción.");
 	}
 	
-	public static synchronized void actualizar(DetNomina nomina, ParametrosNomina parametros) {
+	public static synchronized void calcularTotales(DetNomina nomina, ParametrosNomina parametros) {
 		BigDecimal totalPercepciones = null;
     	BigDecimal totalOtrosPagos = null;
     	BigDecimal totalDeducciones = null;

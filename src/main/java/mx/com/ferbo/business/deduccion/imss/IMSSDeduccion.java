@@ -9,7 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.deduccion.IDeducciones;
-import mx.com.ferbo.model.CatCuotaIMSS;
+import mx.com.ferbo.business.nomina.ParametrosNomina;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
 import mx.com.ferbo.model.DetNominaDeduccionPK;
@@ -33,14 +33,13 @@ public class IMSSDeduccion extends AbstractIMSSDeduccion implements IDeducciones
 	private IMSSInvalidezVida imssInvalidezVidaBO = null;
 	private IMSSCesantiaEdadAvanzadaVejezDeduccion imssCesantiaVejezBO = null;
 	
-	public IMSSDeduccion(List<CatTipoDeduccion> tiposDeduccion, List<CatCuotaIMSS> cuotasIMSS, Date fechaInicioAnio, Date fechaFinAnio, BigDecimal diasPorPeriodo, BigDecimal uma, BigDecimal sdi) {
-		this.cuotasIMSS = cuotasIMSS;
-		this.tiposDeduccion = tiposDeduccion;
-		this.fechaInicioAnio = fechaInicioAnio;
-		this.fechaFinAnio = fechaFinAnio;
-		this.diasPorPeriodo = diasPorPeriodo;
-		this.uma = uma;
-		this.sdi = sdi;
+	public IMSSDeduccion(ParametrosNomina parametros, BigDecimal diasPorPeriodo) {
+		this.cuotasIMSS      = parametros.getCuotasIMSS();
+		this.tiposDeduccion  = parametros.getTiposDeduccion();
+		this.fechaInicioAnio = parametros.getFechaInicioAnio();
+		this.fechaFinAnio    = parametros.getFechaFinAnio();
+		this.diasPorPeriodo  = diasPorPeriodo;
+		this.uma             = parametros.getUma().getImporteDiario();
 	}
 	
 	@Override
@@ -61,6 +60,11 @@ public class IMSSDeduccion extends AbstractIMSSDeduccion implements IDeducciones
 		Integer idx = null;
 		
 		try {
+			if(nomina.getReceptor() == null || nomina.getReceptor().getSalarioDiarioIntegrado() == null)
+				throw new SGPException("Debe configurar el receptor con el salario diario integrado.");
+			
+			this.sdi = nomina.getReceptor().getSalarioDiarioIntegrado();
+			
 			if(this.tiposDeduccion == null)
 				throw new SGPException("No hay una lista de tipos de deducción establecida.");
 			
@@ -94,7 +98,7 @@ public class IMSSDeduccion extends AbstractIMSSDeduccion implements IDeducciones
 			dInvalidezVida = imssInvalidezVidaBO.calcular(nomina, idx++);
 			aportacionesIMSS.add(dInvalidezVida);
 			
-			imssCesantiaVejezBO = new IMSSCesantiaEdadAvanzadaVejezDeduccion(this.fechaInicioAnio, this.fechaFinAnio, diasPorPeriodo, this.sdi);
+			imssCesantiaVejezBO = new IMSSCesantiaEdadAvanzadaVejezDeduccion(this.fechaInicioAnio, this.fechaFinAnio, this.diasPorPeriodo, this.sdi);
 			imssCesantiaVejezBO.setTiposDeduccion(tiposDeduccion);
 			imssCesantiaVejezBO.setCuotasIMSS(cuotasIMSS);
 			dCesantiaVejez = imssCesantiaVejezBO.calcular(nomina, idx++);

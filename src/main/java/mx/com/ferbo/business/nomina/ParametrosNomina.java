@@ -91,6 +91,10 @@ public class ParametrosNomina {
 		Date fechaInicioAnio = DateUtil.getFirstDayOfyear(periodoFin);
 		Date fechafinAnio = DateUtil.getLastDayOfYear(periodoFin);
 		
+		this.fechaInicioAnio = fechaInicioAnio;
+		this.fechaFinAnio = fechafinAnio;
+		this.periodoInicio = new Date(periodoInicio.getTime());
+		this.periodoFin = new Date(periodoFin.getTime());
 		this.diasNoLaborales = this.diaNLDAO.buscarPorPeriodo("MX", periodoInicio, periodoFin);
 		this.parametrosPercepciones = this.catPercepcionesDAO.buscarActual(periodoInicio);
 		this.tablaISR = this.tarifaISRDAO.buscar(fechaInicioAnio, fechafinAnio);
