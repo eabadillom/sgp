@@ -318,6 +318,12 @@
                                                 </p:datePicker>
                                             </div>
                                             <div class="field col-12 md:col-3">
+                                                <p:outputLabel for="@next" value="Hora de salida" />
+                                                <p:datePicker value="#{registroEmpleadosBean.datoEmpresa.horasalida}" timeOnly="true" timeZone="GMT-6" locale="es">
+                                                    <p:ajax process="@this" />
+                                                </p:datePicker>
+                                            </div>
+                                            <div class="field col-12 md:col-3">
                                                 <p:outputLabel for="@next" value="Tolerancia (minutos)"></p:outputLabel>
                                                 <p:inputNumber value="#{registroEmpleadosBean.datoEmpresa.minutosTolerancia}">
                                                     <p:ajax process="@this" />
@@ -347,9 +353,21 @@
                                                     <p:ajax process="@this" />
                                                 </p:selectOneMenu>
                                             </div>
+                                            <div class="field col-12 md:col-3">
+                                                <p:outputLabel for="@next" value="Banco registrado" />
+                                                <p:selectOneMenu id="soBancoRegistrado" value="#{registroEmpleadosBean.datoEmpresa.banco}" autoWidth="false" converter="entityConverter">
+                                                    <f:selectItem itemLabel="--Seleccione--" noSelectionOption="true"/>
+                                                    <f:selectItems value="#{registroEmpleadosBean.lstBancos}" var="banco" itemLabel="#{banco.idBanco} - #{banco.descripcion}" itemValue="#{banco}"/>
+                                                    <p:ajax process="@this" />
+                                                </p:selectOneMenu>
+                                            </div>
                                             <div class="field col-12 md:col-1">
                                                 <p:outputLabel for="@next" value="Sindicalizado"/>
                                                 <p:selectBooleanButton value="#{registroEmpleadosBean.datoEmpresa.sindicalizado}" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem" />
+                                            </div>
+                                            <div class="field col-12 md:col-1">
+                                                <p:outputLabel for="@next" value="De confianza"/>
+                                                <p:selectBooleanButton value="#{registroEmpleadosBean.datoEmpresa.confianza}" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem" />
                                             </div>
                                         </div>    
                                         <div class="formgrid grid align-items-center justify-content-left padding:0.5rem">
@@ -366,6 +384,37 @@
                                             </div>
                                         </div>
                                     </div>
+                                </p:tab>
+                                <p:tab title="Vacaciones">
+                                    <p:dataTable id="dtVacaciones" widgetVar="dtVacaciones" var="vacacion" value="#{registroEmpleadosBean.empleadoSelected.vacaciones}" reflow="true" styleClass="products-table"
+                                                 rowKey="#{vacacion.idVacaciones}" paginator="true" rows="6" rowSelectMode="add" 
+                                                 paginatorPosition="bottom" lazy="true">
+                                        <p:column headerText="Fecha de inicio" style="text-align: center;">
+                                            <p:outputLabel value="#{vacacion.fechainicio}">
+                                                <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+                                            </p:outputLabel>
+                                        </p:column>
+                                        <p:column headerText="Fecha de termino" style="text-align: center;">
+                                            <p:outputLabel value="#{vacacion.fechafin}">
+                                                <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+                                            </p:outputLabel>
+                                        </p:column>
+                                        <p:column headerText="Dias totales" style="text-align: center;">
+                                            <h:outputText value="#{vacacion.diastotales}"/>
+                                        </p:column>
+                                        <p:column headerText="Dias tomados" style="text-align: center;">
+                                            <h:outputText value="#{vacacion.diastomados}"/>
+                                        </p:column>
+                                        <p:column headerText="Dias restantes" style="text-align: center;">
+                                            <h:outputText value="#{(vacacion.diastotales - vacacion.diastomados)}"/>
+                                        </p:column>
+                                        <p:column headerText="Prima vacional Pagada" style="text-align: center;">
+                                            <p:commandButton disabled="true" styleClass="#{vacacion.primapagada ? 'edit-button m-1' : 'ui-button-danger m-1'}" icon="#{vacacion.primapagada ? 'pi pi-check' : 'pi pi-times'}"/>
+                                        </p:column>
+                                        <p:column headerText="Dias pendientes pagados" style="text-align: center;">
+                                            <p:commandButton disabled="true" styleClass="#{vacacion.diaspendientespagados ? 'edit-button m-1' : 'ui-button-danger m-1'}" icon="#{vacacion.diaspendientespagados ? 'pi pi-check' : 'pi pi-times'}"/>
+                                        </p:column>
+                                    </p:dataTable>
                                 </p:tab>
                                 <p:tab title="Biométrica">
                                     <div align="center">
@@ -482,11 +531,15 @@
                                     </p:dataTable>
                                 </p:tab>
                                 <p:tab title="Conf. Empleado">
-                                    <div class="ui-fluid formgrid grid align-items-left">
-                                        <div class="formgrid">
+                                    <div class="card">
+                                        <div class="ui-fluid formgrid grid align-items-left">
                                             <div class="field col-12 md:col-1">
-                                                <p:outputLabel for="@next" value="Retardo"/>
+                                                <p:outputLabel for="@next" value="Retardo"/><br/>
                                                 <p:selectBooleanButton value="#{registroEmpleadosBean.empleadoSelected.empleadoConfiguracion.retardo}" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem" />
+                                            </div>
+                                            <div class="field col-12 md:col-1">
+                                                <p:outputLabel for="@next" value="Horas extra"/><br/>
+                                                <p:selectBooleanButton value="#{registroEmpleadosBean.empleadoSelected.empleadoConfiguracion.horasextra}" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem" />
                                             </div>
                                         </div>
                                     </div>

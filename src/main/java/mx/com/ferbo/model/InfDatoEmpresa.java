@@ -22,313 +22,402 @@ import mx.com.ferbo.model.sat.CatRiesgoPuesto;
 import mx.com.ferbo.model.sat.CatTipoContrato;
 import mx.com.ferbo.model.sat.CatTipoJornada;
 import mx.com.ferbo.model.sat.CatTipoRegimen;
+import mx.com.ferbo.model.sat.CatBanco;
 
 @Entity
 @Table(name = "inf_empleado_empresa")
 public class InfDatoEmpresa implements Serializable {
-	private static final long serialVersionUID = -7428030225407170556L;
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Basic(optional = false)
-	@Column(name = "id_empleado_empresa")
-	private Integer id;
-	
-	@ManyToOne
-	@JoinColumn(name = "id_perfil", referencedColumnName = "id_perfil")
-	private CatPerfil perfil;
-	
-	@ManyToOne
-	@JoinColumn(name = "id_empresa", referencedColumnName = "id_empresa")
-	private CatEmpresa empresa;
-	
-	@ManyToOne
-	@JoinColumn(name = "id_planta", referencedColumnName = "id_planta")
-	private CatPlanta planta;
-	
-	@ManyToOne
-	@JoinColumn(name = "id_area", referencedColumnName = "id_area")
-	private CatArea area;
-	
-	@ManyToOne
-	@JoinColumn(name = "id_puesto", referencedColumnName = "id_puesto")
-	private CatPuesto puesto;
-	
-	@ManyToOne
-	@JoinColumn(name = "cd_contrato", referencedColumnName = "cd_contrato")
-	private CatTipoContrato tipoContrato;
-	
-	@ManyToOne
-	@JoinColumn(name = "cd_jornada", referencedColumnName = "cd_jornada")
-	private CatTipoJornada tipoJornada;
-	
-	@ManyToOne
-	@JoinColumn(name = "cd_tp_regimen", referencedColumnName = "cd_tp_regimen")
-	private CatTipoRegimen tipoRegimen;
-	
-	@Basic(optional = false)
-	@Column(name = "fh_ingreso")
-	private Date fechaIngreso;
-	
-	@Basic(optional = true)
-	@Column(name = "fh_baja")
-	private Date fechaBaja;
-	
-	@Basic(optional = true)
-	@Column(name = "nu_nss")
-	private String nss;
-	
-	@Basic(optional = true)
-	@Column(name = "nb_rfc")
-	private String rfc;
-	
-	@Basic(optional = true)
-	@Column(name = "nu_salario_diario")
-	private BigDecimal salarioDiario;
-	
-	@Basic(optional = true)
-	@Column(name = "tm_entrada")
-	private Date horaEntrada;
-	
-	@Basic(optional = true)
-	@Column(name = "nu_tolerancia")
-	private Integer minutosTolerancia;
-	
-	@ManyToOne
-	@JoinColumn(name = "cd_estado", referencedColumnName = "cd_estado")
-	private CatEntidadFederativa entidadFederativa;
-	
-	@ManyToOne
-	@JoinColumn(name = "cd_riesgo", referencedColumnName = "cd_riesgo")
-	private CatRiesgoPuesto riesgoPuesto;
-	
-	@ManyToOne
-	@JoinColumn(name = "cd_periodicidad", referencedColumnName = "periodicidad")
-	private CatPeriodicidadPago periodicidadPago;
-        
-        @ManyToOne
-        @JoinColumn(name = "tp_baja", referencedColumnName="tp_baja")
-        private CatTipoBajaEmpleado tipodebaja;
-	
-	@Basic(optional = true)
-	@Column(name = "st_sindicalizado")
-	private Boolean sindicalizado;
-	
-	@Basic(optional = true)
-	@Column(name = "st_diat_lunes")
-	private Boolean diaLunes;
-        
-        @Basic(optional = true)
-	@Column(name = "st_diat_martes")
-	private Boolean diaMartes;
-        
-        @Basic(optional = true)
-	@Column(name = "st_diat_miercoles")
-	private Boolean diaMiercoles;
-        
-        @Basic(optional = true)
-	@Column(name = "st_diat_jueves")
-	private Boolean diaJueves;
-        
-        @Basic(optional = true)
-	@Column(name = "st_diat_viernes")
-	private Boolean diaViernes;
-        
-        @Basic(optional = true)
-	@Column(name = "st_diat_sabado")
-	private Boolean diaSabado;
-        
-        @Basic(optional = true)
-	@Column(name = "st_diat_domingo")
-	private Boolean diaDomingo;
-        
-        @Basic(optional = true)
-        @Column(name = "nb_baja")
-        private String motivobaja;
-        
-	public Integer getId() {
-		return id;
-	}
-	public void setId(Integer id) {
-		this.id = id;
-	}
-	public CatPerfil getPerfil() {
-		return perfil;
-	}
-	public void setPerfil(CatPerfil perfil) {
-		this.perfil = perfil;
-	}
-	public CatEmpresa getEmpresa() {
-		return empresa;
-	}
-	public void setEmpresa(CatEmpresa empresa) {
-		this.empresa = empresa;
-	}
-	public CatPlanta getPlanta() {
-		return planta;
-	}
-	public void setPlanta(CatPlanta planta) {
-		this.planta = planta;
-	}
-	public CatArea getArea() {
-		return area;
-	}
-	public void setArea(CatArea area) {
-		this.area = area;
-	}
-	public CatPuesto getPuesto() {
-		return puesto;
-	}
-	public void setPuesto(CatPuesto puesto) {
-		this.puesto = puesto;
-	}
-	public CatTipoContrato getTipoContrato() {
-		return tipoContrato;
-	}
-	public void setTipoContrato(CatTipoContrato tipoContrato) {
-		this.tipoContrato = tipoContrato;
-	}
-	public CatTipoJornada getTipoJornada() {
-		return tipoJornada;
-	}
-	public void setTipoJornada(CatTipoJornada tipoJornada) {
-		this.tipoJornada = tipoJornada;
-	}
-	public CatTipoRegimen getTipoRegimen() {
-		return tipoRegimen;
-	}
-	public void setTipoRegimen(CatTipoRegimen tipoRegimen) {
-		this.tipoRegimen = tipoRegimen;
-	}
-	public Date getFechaIngreso() {
-		return fechaIngreso;
-	}
-	public void setFechaIngreso(Date fechaIngreso) {
-		this.fechaIngreso = fechaIngreso;
-	}
-	public String getNss() {
-		return nss;
-	}
-	public void setNss(String nss) {
-		this.nss = nss;
-	}
-	public String getRfc() {
-		return rfc;
-	}
-	public void setRfc(String rfc) {
-		this.rfc = rfc;
-	}
-	public BigDecimal getSalarioDiario() {
-		return salarioDiario;
-	}
-	public void setSalarioDiario(BigDecimal salarioDiario) {
-		this.salarioDiario = salarioDiario;
-	}
-	public Date getHoraEntrada() {
-		return horaEntrada;
-	}
-	public void setHoraEntrada(Date horaEntrada) {
-		this.horaEntrada = horaEntrada;
-	}
-	public Integer getMinutosTolerancia() {
-		return minutosTolerancia;
-	}
-	public void setMinutosTolerancia(Integer minutosTolerancia) {
-		this.minutosTolerancia = minutosTolerancia;
-	}
-        public Boolean getDiaLunes() {
-            return diaLunes;
+
+    private static final long serialVersionUID = -7428030225407170556L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id_empleado_empresa")
+    private Integer id;
+
+    @ManyToOne
+    @JoinColumn(name = "id_perfil", referencedColumnName = "id_perfil")
+    private CatPerfil perfil;
+
+    @ManyToOne
+    @JoinColumn(name = "id_empresa", referencedColumnName = "id_empresa")
+    private CatEmpresa empresa;
+
+    @ManyToOne
+    @JoinColumn(name = "id_planta", referencedColumnName = "id_planta")
+    private CatPlanta planta;
+
+    @ManyToOne
+    @JoinColumn(name = "id_area", referencedColumnName = "id_area")
+    private CatArea area;
+
+    @ManyToOne
+    @JoinColumn(name = "id_puesto", referencedColumnName = "id_puesto")
+    private CatPuesto puesto;
+
+    @ManyToOne
+    @JoinColumn(name = "cd_contrato", referencedColumnName = "cd_contrato")
+    private CatTipoContrato tipoContrato;
+
+    @ManyToOne
+    @JoinColumn(name = "cd_jornada", referencedColumnName = "cd_jornada")
+    private CatTipoJornada tipoJornada;
+
+    @ManyToOne
+    @JoinColumn(name = "cd_tp_regimen", referencedColumnName = "cd_tp_regimen")
+    private CatTipoRegimen tipoRegimen;
+
+    @Basic(optional = false)
+    @Column(name = "fh_ingreso")
+    private Date fechaIngreso;
+
+    @Basic(optional = true)
+    @Column(name = "fh_baja")
+    private Date fechaBaja;
+
+    @Basic(optional = true)
+    @Column(name = "nu_nss")
+    private String nss;
+
+    @Basic(optional = true)
+    @Column(name = "nb_rfc")
+    private String rfc;
+
+    @Basic(optional = true)
+    @Column(name = "nu_salario_diario")
+    private BigDecimal salarioDiario;
+
+    @Basic(optional = true)
+    @Column(name = "tm_entrada")
+    private Date horaEntrada;
+
+    @Basic(optional = true)
+    @Column(name = "tm_salida")
+    private Date horasalida;
+
+    @Basic(optional = true)
+    @Column(name = "nu_tolerancia")
+    private Integer minutosTolerancia;
+
+    @ManyToOne
+    @JoinColumn(name = "cd_estado", referencedColumnName = "cd_estado")
+    private CatEntidadFederativa entidadFederativa;
+
+    @ManyToOne
+    @JoinColumn(name = "cd_riesgo", referencedColumnName = "cd_riesgo")
+    private CatRiesgoPuesto riesgoPuesto;
+
+    @ManyToOne
+    @JoinColumn(name = "cd_periodicidad", referencedColumnName = "periodicidad")
+    private CatPeriodicidadPago periodicidadPago;
+
+    @ManyToOne
+    @JoinColumn(name = "tp_baja", referencedColumnName = "tp_baja")
+    private CatTipoBajaEmpleado tipodebaja;
+
+    @ManyToOne
+    @JoinColumn(name = "cod_banco", referencedColumnName = "cod_banco")
+    private CatBanco banco;
+
+    @Basic(optional = true)
+    @Column(name = "st_sindicalizado")
+    private Boolean sindicalizado;
+
+    @Basic(optional = true)
+    @Column(name = "st_confianza")
+    private Boolean confianza;
+
+    @Basic(optional = true)
+    @Column(name = "st_diat_lunes")
+    private Boolean diaLunes;
+
+    @Basic(optional = true)
+    @Column(name = "st_diat_martes")
+    private Boolean diaMartes;
+
+    @Basic(optional = true)
+    @Column(name = "st_diat_miercoles")
+    private Boolean diaMiercoles;
+
+    @Basic(optional = true)
+    @Column(name = "st_diat_jueves")
+    private Boolean diaJueves;
+
+    @Basic(optional = true)
+    @Column(name = "st_diat_viernes")
+    private Boolean diaViernes;
+
+    @Basic(optional = true)
+    @Column(name = "st_diat_sabado")
+    private Boolean diaSabado;
+
+    @Basic(optional = true)
+    @Column(name = "st_diat_domingo")
+    private Boolean diaDomingo;
+
+    @Basic(optional = true)
+    @Column(name = "nb_baja")
+    private String motivobaja;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public CatPerfil getPerfil() {
+        return perfil;
+    }
+
+    public void setPerfil(CatPerfil perfil) {
+        this.perfil = perfil;
+    }
+
+    public CatEmpresa getEmpresa() {
+        return empresa;
+    }
+
+    public void setEmpresa(CatEmpresa empresa) {
+        this.empresa = empresa;
+    }
+
+    public CatPlanta getPlanta() {
+        return planta;
+    }
+
+    public void setPlanta(CatPlanta planta) {
+        this.planta = planta;
+    }
+
+    public CatArea getArea() {
+        return area;
+    }
+
+    public void setArea(CatArea area) {
+        this.area = area;
+    }
+
+    public CatPuesto getPuesto() {
+        return puesto;
+    }
+
+    public void setPuesto(CatPuesto puesto) {
+        this.puesto = puesto;
+    }
+
+    public CatTipoContrato getTipoContrato() {
+        return tipoContrato;
+    }
+
+    public void setTipoContrato(CatTipoContrato tipoContrato) {
+        this.tipoContrato = tipoContrato;
+    }
+
+    public CatTipoJornada getTipoJornada() {
+        return tipoJornada;
+    }
+
+    public void setTipoJornada(CatTipoJornada tipoJornada) {
+        this.tipoJornada = tipoJornada;
+    }
+
+    public CatTipoRegimen getTipoRegimen() {
+        return tipoRegimen;
+    }
+
+    public void setTipoRegimen(CatTipoRegimen tipoRegimen) {
+        this.tipoRegimen = tipoRegimen;
+    }
+
+    public Date getFechaIngreso() {
+        return fechaIngreso;
+    }
+
+    public void setFechaIngreso(Date fechaIngreso) {
+        this.fechaIngreso = fechaIngreso;
+    }
+
+    public String getNss() {
+        return nss;
+    }
+
+    public void setNss(String nss) {
+        this.nss = nss;
+    }
+
+    public String getRfc() {
+        return rfc;
+    }
+
+    public void setRfc(String rfc) {
+        this.rfc = rfc;
+    }
+
+    public BigDecimal getSalarioDiario() {
+        return salarioDiario;
+    }
+
+    public void setSalarioDiario(BigDecimal salarioDiario) {
+        this.salarioDiario = salarioDiario;
+    }
+
+    public Date getHoraEntrada() {
+        return horaEntrada;
+    }
+
+    public void setHoraEntrada(Date horaEntrada) {
+        this.horaEntrada = horaEntrada;
+    }
+
+    public Date getHorasalida() {
+        return horasalida;
+    }
+
+    public void setHorasalida(Date horasalida) {
+        this.horasalida = horasalida;
+    }
+
+    public Integer getMinutosTolerancia() {
+        return minutosTolerancia;
+    }
+
+    public void setMinutosTolerancia(Integer minutosTolerancia) {
+        this.minutosTolerancia = minutosTolerancia;
+    }
+
+    public Boolean getDiaLunes() {
+        return diaLunes;
+    }
+
+    public void setDiaLunes(Boolean diaLunes) {
+        this.diaLunes = diaLunes;
+    }
+
+    public Boolean getDiaMartes() {
+        return diaMartes;
+    }
+
+    public void setDiaMartes(Boolean diaMartes) {
+        this.diaMartes = diaMartes;
+    }
+
+    public Boolean getDiaMiercoles() {
+        return diaMiercoles;
+    }
+
+    public void setDiaMiercoles(Boolean diaMiercoles) {
+        this.diaMiercoles = diaMiercoles;
+    }
+
+    public Boolean getDiaJueves() {
+        return diaJueves;
+    }
+
+    public void setDiaJueves(Boolean diaJueves) {
+        this.diaJueves = diaJueves;
+    }
+
+    public Boolean getDiaViernes() {
+        return diaViernes;
+    }
+
+    public void setDiaViernes(Boolean diaViernes) {
+        this.diaViernes = diaViernes;
+    }
+
+    public Boolean getDiaSabado() {
+        return diaSabado;
+    }
+
+    public void setDiaSabado(Boolean diaSabado) {
+        this.diaSabado = diaSabado;
+    }
+
+    public Boolean getDiaDomingo() {
+        return diaDomingo;
+    }
+
+    public void setDiaDomingo(Boolean diaDomingo) {
+        this.diaDomingo = diaDomingo;
+    }
+
+    public Boolean getConfianza() {
+        return confianza;
+    }
+
+    public void setConfianza(Boolean confianza) {
+        this.confianza = confianza;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
         }
-        public void setDiaLunes(Boolean diaLunes) {
-            this.diaLunes = diaLunes;
+        if (obj == null) {
+            return false;
         }
-        public Boolean getDiaMartes() {
-            return diaMartes;
+        if (getClass() != obj.getClass()) {
+            return false;
         }
-        public void setDiaMartes(Boolean diaMartes) {
-            this.diaMartes = diaMartes;
-        }
-        public Boolean getDiaMiercoles() {
-            return diaMiercoles;
-        }
-        public void setDiaMiercoles(Boolean diaMiercoles) {
-            this.diaMiercoles = diaMiercoles;
-        }
-        public Boolean getDiaJueves() {
-            return diaJueves;
-        }
-        public void setDiaJueves(Boolean diaJueves) {
-            this.diaJueves = diaJueves;
-        }
-        public Boolean getDiaViernes() {
-            return diaViernes;
-        }
-        public void setDiaViernes(Boolean diaViernes) {
-            this.diaViernes = diaViernes;
-        }
-        public Boolean getDiaSabado() {
-            return diaSabado;
-        }
-        public void setDiaSabado(Boolean diaSabado) {
-            this.diaSabado = diaSabado;
-        }
-        public Boolean getDiaDomingo() {
-            return diaDomingo;
-        }
-        public void setDiaDomingo(Boolean diaDomingo) {
-            this.diaDomingo = diaDomingo;
-        }
-	@Override
-	public int hashCode() {
-		return Objects.hash(id);
-	}
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		InfDatoEmpresa other = (InfDatoEmpresa) obj;
-		return Objects.equals(id, other.id);
-	}
-	@Override
-	public String toString() {
-		return "{\"id\":\"" + id + "\", \"perfil\":\"" + perfil + "\", \"fechaIngreso\":\"" + fechaIngreso
-				+ "\", \"nss\":\"" + nss + "\", \"rfc\":\"" + rfc + "\", \"salarioDiario\":\"" + salarioDiario
-				+ "\", \"horaEntrada\":\"" + horaEntrada + "\", \"minutosTolerancia\":\"" + minutosTolerancia + "\"}";
-	}
-	public CatEntidadFederativa getEntidadFederativa() {
-		return entidadFederativa;
-	}
-	public void setEntidadFederativa(CatEntidadFederativa entidadFederativa) {
-		this.entidadFederativa = entidadFederativa;
-	}
-	public CatRiesgoPuesto getRiesgoPuesto() {
-		return riesgoPuesto;
-	}
-	public void setRiesgoPuesto(CatRiesgoPuesto riesgoPuesto) {
-		this.riesgoPuesto = riesgoPuesto;
-	}
-	public CatPeriodicidadPago getPeriodicidadPago() {
-		return periodicidadPago;
-	}
-	public void setPeriodicidadPago(CatPeriodicidadPago periodicidadPago) {
-		this.periodicidadPago = periodicidadPago;
-	}
-	public Boolean getSindicalizado() {
-		return sindicalizado;
-	}
-	public void setSindicalizado(Boolean sindicalizado) {
-		this.sindicalizado = sindicalizado;
-	}
-	public Date getFechaBaja() {
-		return fechaBaja;
-	}
-	public void setFechaBaja(Date fechaBaja) {
-		this.fechaBaja = fechaBaja;
-	}
+        InfDatoEmpresa other = (InfDatoEmpresa) obj;
+        return Objects.equals(id, other.id);
+    }
+
+    @Override
+    public String toString() {
+        return "{\"id\":\"" + id + "\", \"perfil\":\"" + perfil + "\", \"fechaIngreso\":\"" + fechaIngreso
+                + "\", \"nss\":\"" + nss + "\", \"rfc\":\"" + rfc + "\", \"salarioDiario\":\"" + salarioDiario
+                + "\", \"horaEntrada\":\"" + horaEntrada + "\", \"minutosTolerancia\":\"" + minutosTolerancia + "\"}";
+    }
+
+    public CatEntidadFederativa getEntidadFederativa() {
+        return entidadFederativa;
+    }
+
+    public void setEntidadFederativa(CatEntidadFederativa entidadFederativa) {
+        this.entidadFederativa = entidadFederativa;
+    }
+
+    public CatRiesgoPuesto getRiesgoPuesto() {
+        return riesgoPuesto;
+    }
+
+    public void setRiesgoPuesto(CatRiesgoPuesto riesgoPuesto) {
+        this.riesgoPuesto = riesgoPuesto;
+    }
+
+    public CatPeriodicidadPago getPeriodicidadPago() {
+        return periodicidadPago;
+    }
+
+    public void setPeriodicidadPago(CatPeriodicidadPago periodicidadPago) {
+        this.periodicidadPago = periodicidadPago;
+    }
+
+    public Boolean getSindicalizado() {
+        return sindicalizado;
+    }
+
+    public void setSindicalizado(Boolean sindicalizado) {
+        this.sindicalizado = sindicalizado;
+    }
+
+    public Date getFechaBaja() {
+        return fechaBaja;
+    }
+
+    public void setFechaBaja(Date fechaBaja) {
+        this.fechaBaja = fechaBaja;
+    }
 
     public CatTipoBajaEmpleado getTipodebaja() {
         return tipodebaja;
@@ -344,5 +433,15 @@ public class InfDatoEmpresa implements Serializable {
 
     public void setMotivobaja(String motivobaja) {
         this.motivobaja = motivobaja;
-    }    
+    }
+
+    public CatBanco getBanco() {
+        return banco;
+    }
+
+    public void setBanco(CatBanco banco) {
+        this.banco = banco;
+    }
+    
+    
 }
