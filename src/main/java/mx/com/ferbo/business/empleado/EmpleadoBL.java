@@ -199,7 +199,7 @@ public class EmpleadoBL {
 
     }
 
-    public static void actualizarPagoVacionesConcepto(DetEmpleado empleado, Date periodoporpagar, String concepto){
+    public static void actualizarPagoVacacionesConcepto(DetEmpleado empleado, Date periodoporpagar, String concepto){
 
         for (int i = 0; i < empleado.getVacaciones().size(); i++) {
 
