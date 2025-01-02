@@ -409,10 +409,10 @@
                                             <h:outputText value="#{(vacacion.diastotales - vacacion.diastomados)}"/>
                                         </p:column>
                                         <p:column headerText="Prima vacional Pagada" style="text-align: center;">
-                                            <p:commandButton disabled="true" styleClass="#{vacacion.primapagada ? 'edit-button m-1' : 'ui-button-danger m-1'}" icon="#{vacacion.primapagada ? 'pi pi-check' : 'pi pi-times'}"/>
+                                            <p:commandButton disabled="true" styleClass="#{vacacion.primapagada ? 'ui-button-success' : 'ui-button-danger m-1'}" icon="#{vacacion.primapagada ? 'pi pi-check' : 'pi pi-times'}"/>
                                         </p:column>
                                         <p:column headerText="Dias pendientes pagados" style="text-align: center;">
-                                            <p:commandButton disabled="true" styleClass="#{vacacion.diaspendientespagados ? 'edit-button m-1' : 'ui-button-danger m-1'}" icon="#{vacacion.diaspendientespagados ? 'pi pi-check' : 'pi pi-times'}"/>
+                                            <p:commandButton disabled="true" styleClass="#{vacacion.diaspendientespagados ? 'ui-button-success' : 'ui-button-danger m-1'}" icon="#{vacacion.diaspendientespagados ? 'pi pi-check' : 'pi pi-times'}"/>
                                         </p:column>
                                     </p:dataTable>
                                 </p:tab>

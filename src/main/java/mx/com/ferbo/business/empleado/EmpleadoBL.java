@@ -144,36 +144,36 @@ public class EmpleadoBL {
             if (siguiente > empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getDiastotales()) {
                 banderasiguiente = 1;
             }
-            
-            if(banderaactual == 1 && banderasiguiente == 1){
+
+            if (banderaactual == 1 && banderasiguiente == 1) {
                 throw new SGPException("No se actualizaron los dias de vacaciones, revise sus periodos de vacaciones");
             }
-            
-            if(banderaactual == 0 && banderasiguiente == 1){
+
+            if (banderaactual == 0 && banderasiguiente == 1) {
                 empleado.getVacaciones().get(empleado.getVacaciones().size() - 2).setDiastomados(actual);
                 throw new SGPException("No se actualizaron los dias de vacaciones dentro del perdiodo " + empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getFechainicio() + " al " + empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getFechafin());
             }
-            
-            if(banderaactual == 1 && banderasiguiente == 0){
+
+            if (banderaactual == 1 && banderasiguiente == 0) {
                 empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).setDiastomados(siguiente);
                 throw new SGPException("No se actualizaron los dias de vacaciones dentro del perdiodo " + empleado.getVacaciones().get(empleado.getVacaciones().size() - 2).getFechainicio() + " al " + empleado.getVacaciones().get(empleado.getVacaciones().size() - 2).getFechafin());
             }
-            
+
             empleado.getVacaciones().get(empleado.getVacaciones().size() - 2).setDiastomados(actual);
             empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).setDiastomados(siguiente);
 
         } else {
-            
+
             if (empleado.getVacaciones().size() == 1) {
-                
+
                 int nuevosdias = 0;
-                
+
                 List<Date> diasnopermitidos = new ArrayList<Date>();
-                
-                for(Date dia : diassolicitados){
-                    if(dia.equals(empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getFechainicio()) || dia.after(empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getFechainicio()) && dia.equals(empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getFechafin()) || dia.before(empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getFechafin())){
+
+                for (Date dia : diassolicitados) {
+                    if (dia.equals(empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getFechainicio()) || dia.after(empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getFechainicio()) && dia.equals(empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getFechafin()) || dia.before(empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getFechafin())) {
                         nuevosdias++;
-                    }else{
+                    } else {
                         diasnopermitidos.add(dia);
                     }
                 }
@@ -182,49 +182,48 @@ public class EmpleadoBL {
                 if (nuevosdias > empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getDiastotales()) {
                     throw new SGPException("El empleado supera el numero de dias permitidos para vacaciones");
                 }
-                
-                if(!diasnopermitidos.isEmpty()){
+
+                if (!diasnopermitidos.isEmpty()) {
                     empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).setDiastomados(nuevosdias);
                     throw new SGPException("Los dias: " + diasnopermitidos + " no fueron agregados por estar fuera del periodo vacional permitido.");
                 }
 
                 empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).setDiastomados(nuevosdias);
-                
+
             } else {
-                
+
                 throw new SGPException("El empleado aun no tiene derecho a vacaciones");
-                
+
             }
         }
 
     }
 
-    public static Date inicioVacacionesEmpleado(DetEmpleado empleado) {
-        if (!empleado.getVacaciones().isEmpty()) {
-            return empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getFechafin();
-        }
-        return null;
-    }
-
-    public static void actualizarPagoVacionesConcepto(DetEmpleado empleado, int anioporpagar, String concepto) {
+    public static void actualizarPagoVacionesConcepto(DetEmpleado empleado, Date periodoporpagar, String concepto){
 
         for (int i = 0; i < empleado.getVacaciones().size(); i++) {
 
-            LocalDate fechainicio = DateUtil.toLocalDate(empleado.getVacaciones().get(i).getFechainicio());
-            LocalDate fechafin = DateUtil.toLocalDate(empleado.getVacaciones().get(i).getFechafin());
-            int anioinicio = fechainicio.getYear();
-            int aniofinal = fechafin.getYear();
+            Date fechainicio = empleado.getVacaciones().get(i).getFechainicio();
+            Date fechafin = empleado.getVacaciones().get(i).getFechafin();
 
-            if (anioporpagar >= anioinicio && anioporpagar < aniofinal) {
+            if (periodoporpagar.after(fechainicio) && periodoporpagar.before(fechafin)) {
 
-                if (concepto.equals("Prima")) {
+                if (concepto.equals("ambas")) {
+                    if (empleado.getVacaciones().get(i).getDiaspendientespagados() == false && empleado.getVacaciones().get(i).getPrimapagada() == false) {
+                      empleado.getVacaciones().get(i).setPrimapagada(Boolean.TRUE);
+                      empleado.getVacaciones().get(i).setDiaspendientespagados(Boolean.TRUE);
+                      break;
+                    }
+                }
+
+                if (concepto.equals("prima")) {
                     if (empleado.getVacaciones().get(i).getPrimapagada() == false) {
                         empleado.getVacaciones().get(i).setPrimapagada(Boolean.TRUE);
                         break;
                     }
                 }
 
-                if (concepto.equals("Dias Pendientes")) {
+                if (concepto.equals("dias pendientes")) {
                     if (empleado.getVacaciones().get(i).getDiaspendientespagados() == false) {
                         empleado.getVacaciones().get(i).setDiaspendientespagados(Boolean.TRUE);
                         break;
