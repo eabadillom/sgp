@@ -128,16 +128,6 @@ public class NominaSemanalBL extends NominaBL {
 			}
 			
 			/*--------------------------RESUMEN--------------------------*/
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
 			for(DetNominaPercepcion p : percepciones) {
 				log.info("Percepcion: {} - {} - {}", p.getNombre(), p.getImporteExcento(), p.getImporteGravado());
 			}
