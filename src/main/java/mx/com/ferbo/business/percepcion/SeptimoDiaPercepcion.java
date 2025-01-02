@@ -15,13 +15,11 @@ public class SeptimoDiaPercepcion extends AbstractPercepcion implements IPercepc
 	
 	private static Logger log = LogManager.getLogger(SeptimoDiaPercepcion.class);
 	
-	private BigDecimal salarioDiario = null;
 	private BigDecimal diasPeriodo = null;
 	private BigDecimal diasTrabajados = null;
 	
-	public SeptimoDiaPercepcion(List<CatTipoPercepcion> tiposPercepcion, BigDecimal salarioDiario, BigDecimal diasPeriodo, BigDecimal diasTrabajados) {
+	public SeptimoDiaPercepcion(List<CatTipoPercepcion> tiposPercepcion, BigDecimal diasPeriodo, BigDecimal diasTrabajados) {
 		this.tiposPercepcion = tiposPercepcion;
-		this.salarioDiario = salarioDiario;
 		this.diasPeriodo = diasPeriodo;
 		this.diasTrabajados = diasTrabajados;
 	}
@@ -29,20 +27,28 @@ public class SeptimoDiaPercepcion extends AbstractPercepcion implements IPercepc
 	@Override
 	public DetNominaPercepcion calcular(DetNomina nomina) {
 		DetNominaPercepcion percepcion = null;
-		BigDecimal septimoDia = null;
-		BigDecimal proporcionalSemanal = null;
-		
-		CatTipoPercepcion tpSeptimoDia = null;
+		BigDecimal          salarioDiario = null;
+		BigDecimal          septimoDia = null;
+		BigDecimal          proporcionalSemanal = null;
+		CatTipoPercepcion   tpSeptimoDia = null;
+		List<DetNominaPercepcion> percepciones = null;
 		Integer index = null;
 		
 		try {
+			percepciones = nomina.getPercepciones();
+			salarioDiario = nomina.getReceptor().getSalarioDiario();
+			
+			boolean removedPercepciones = percepciones.removeIf(d -> AbstractPercepcion.CVE_SEPTIMO_DIA.equalsIgnoreCase(d.getClave()));
+			if(removedPercepciones)
+				log.info("Se encontraron conceptos {}, los cuales fueron eliminados para el reproceso de SEPTIMO DIA.", AbstractPercepcion.CVE_SEPTIMO_DIA);
+			
 			index = this.nuevoIndiceDe(nomina.getPercepciones());
 			tpSeptimoDia = this.getTipoPercepcion("001");
 			
 			proporcionalSemanal = this.diasTrabajados
 					.divide(this.diasPeriodo, 2, BigDecimal.ROUND_HALF_UP);
 			
-			septimoDia = this.salarioDiario
+			septimoDia = salarioDiario
 					.multiply(proporcionalSemanal)
 					.setScale(2,  BigDecimal.ROUND_HALF_UP)
 					;
@@ -60,17 +66,15 @@ public class SeptimoDiaPercepcion extends AbstractPercepcion implements IPercepc
 			percepcion.setImporteGravado(septimoDia);
 			percepcion.setImporteExcento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
 			
+			if(septimoDia != null && septimoDia.compareTo(BigDecimal.ZERO) > 0)
+				nomina.getPercepciones().add(percepcion);
+			
 			this.tiposPercepcion = null;
-			this.salarioDiario = null;
 			this.diasPeriodo = null;
 			this.diasTrabajados = null;
 		}
 		
 		return percepcion;
-	}
-
-	public void setSalarioDiario(BigDecimal salarioDiario) {
-		this.salarioDiario = salarioDiario;
 	}
 
 	public void setDiasPeriodo(BigDecimal diasPeriodo) {

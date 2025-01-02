@@ -60,6 +60,7 @@ public class NominaSemanalBL extends NominaBL {
 	private Integer anio = null;
 	
 	private PercepcionEmpleadoDAO percepcionEmpleadoDAO = null;
+	private List<DetPercepcionEmpleado> percepcionesEmpleado = null;
 	
 	
 	public NominaSemanalBL(DetEmpleado empleado, Date periodoInicio, Date periodoFin) {
@@ -78,6 +79,8 @@ public class NominaSemanalBL extends NominaBL {
 		DateUtil.setTime(this.fechafinAnio, 23, 59, 59, 000);
 		
 		this.semanaAnio = DateUtil.getSemanaAnio(this.periodoInicio);
+		
+		percepcionesEmpleado = percepcionEmpleadoDAO.buscarPorEmpleado(this.empleado.getIdEmpleado());
 	}
 	
 	public DetNomina calculoNomina() {
@@ -87,7 +90,6 @@ public class NominaSemanalBL extends NominaBL {
 		DetNomina  nomina         = null;
 		
 		Map<String, DetRegistro>    mapAsistencias       = null;
-		List<DetPercepcionEmpleado> percepcionesEmpleado = null;
 		List<DetNominaPercepcion>   percepciones         = null;
 		List<DetNominaOtroPago>     otrosPagos           = null;
 		List<DetNominaDeduccion>    deducciones          = null;
@@ -110,9 +112,7 @@ public class NominaSemanalBL extends NominaBL {
     		nomina.getReceptor().setSalarioDiarioIntegrado(this.calculoSDI(this.empleado));
     		
     		/*---------------------------PERCEPCIONES------------------------------*/
-    		NominaSemanalBL.calcularSueldo(nomina, this.parametros, this.empleado.getDatoEmpresa().getSalarioDiario()	, diasTrabajados);
-
-    		percepcionesEmpleado = percepcionEmpleadoDAO.buscarPorEmpleado(this.empleado.getIdEmpleado());
+    		NominaSemanalBL.calcularSueldo(nomina, this.parametros, diasTrabajados);
     		NominaSemanalBL.calcularBonoPuntualidad(nomina, this.parametros, percepcionesEmpleado, mapAsistencias);
     		NominaSemanalBL.calcularValesDespensa(nomina, this.parametros, percepcionesEmpleado);
 			
@@ -126,6 +126,17 @@ public class NominaSemanalBL extends NominaBL {
 				NominaSemanalBL.procesarIMSS(nomina, this.parametros);
 				NominaSemanalBL.procesarPrestamos(nomina, this.parametros, this.empleado);
 			}
+			
+			/*--------------------------RESUMEN--------------------------*/
+			
+			
+			
+			
+			
+			
+			
+			
+			
 			
 			for(DetNominaPercepcion p : percepciones) {
 				log.info("Percepcion: {} - {} - {}", p.getNombre(), p.getImporteExcento(), p.getImporteGravado());
@@ -178,30 +189,25 @@ public class NominaSemanalBL extends NominaBL {
 		return nomina;
 	}
 	
-	public static synchronized void calcularSueldo(DetNomina nomina, ParametrosNomina parametros, BigDecimal salarioDiario, BigDecimal diasTrabajados) {
-		BigDecimal           salarioSemanal = null;
-		BigDecimal           septimoDia = null;
+	/**Cálculo de sueldo semanal (6 días de trabajo + Septimo día)
+	 * @param nomina
+	 * @param parametros
+	 * @param diasTrabajados
+	 */
+	public static synchronized void calcularSueldo(DetNomina nomina, ParametrosNomina parametros, BigDecimal diasTrabajados) {
 		BigDecimal           diasLaboralesPeriodo = new BigDecimal(DIAS_POR_PERIODO).setScale(2, BigDecimal.ROUND_HALF_UP);
-		DetNominaPercepcion  pSueldo = null;
-		DetNominaPercepcion  pSeptimoDia = null;
 		SueldoPercepcion     sueldoBO = null;
 		SeptimoDiaPercepcion septimoDiaBO = null;
 		
-		sueldoBO = new SueldoPercepcion(parametros.getTiposPercepcion(), salarioDiario, diasTrabajados);
-		pSueldo = sueldoBO.calcular(nomina);
-		salarioSemanal = pSueldo.getImporteExcento().add(pSueldo.getImporteGravado());
-		
-		if(salarioSemanal.compareTo(BigDecimal.ZERO) > 0)
-			nomina.getPercepciones().add(pSueldo);
+		sueldoBO = new SueldoPercepcion(parametros.getTiposPercepcion(), diasTrabajados);
+		sueldoBO.calcular(nomina);
 		
 		//Para el séptimo día, se considera el salario diario (sin SDI), dividiendolo entre los días de la semana que se deben laborar,
 		//multiplicado por los días que si laboró el trabajador (parte proporcional de los días trabajados).
-		septimoDiaBO = new SeptimoDiaPercepcion(parametros.getTiposPercepcion(), salarioDiario, diasLaboralesPeriodo, diasTrabajados);
-		pSeptimoDia  = septimoDiaBO.calcular(nomina);
-		septimoDia = pSeptimoDia.getImporteExcento().add(pSeptimoDia.getImporteGravado());
+		septimoDiaBO = new SeptimoDiaPercepcion(parametros.getTiposPercepcion(), diasLaboralesPeriodo, diasTrabajados);
+		septimoDiaBO.calcular(nomina);
 		
-		if(septimoDia.compareTo(BigDecimal.ZERO) > 0)
-			nomina.getPercepciones().add(pSeptimoDia);
+		
 	}
 	
 	private static void calcularBonoPuntualidad(DetNomina nomina, ParametrosNomina parametros, List<DetPercepcionEmpleado> percepcionesEmpleado, Map<String, DetRegistro> mapAsistencias) {
@@ -508,6 +514,12 @@ public class NominaSemanalBL extends NominaBL {
 		isrBO.procesar(nomina);
 	}
 	
+	private static void procesarIMSS(DetNomina nomina, ParametrosNomina parametros) {
+		IMSSDeduccion imssBO = null;
+		imssBO = new IMSSDeduccion(parametros, new BigDecimal(DIAS_POR_PERIODO + SEPTIMO_DIA));
+		imssBO.procesar(nomina);
+	}
+	
 	private static void procesarPrestamos(DetNomina nomina, ParametrosNomina parametros, DetEmpleado empleado) {
 		PrestamoDeduccion prestamosBO = null;
 		prestamosBO = new PrestamoDeduccion(empleado);
@@ -515,12 +527,6 @@ public class NominaSemanalBL extends NominaBL {
 		prestamosBO.procesar(nomina);
 	}
 
-	private static void procesarIMSS(DetNomina nomina, ParametrosNomina parametros) {
-		IMSSDeduccion imssBO = null;
-		imssBO = new IMSSDeduccion(parametros, new BigDecimal(DIAS_POR_PERIODO + SEPTIMO_DIA));
-		imssBO.procesar(nomina);
-	}
-	
 	public DetEmpleado getEmpleado() {
 		return empleado;
 	}

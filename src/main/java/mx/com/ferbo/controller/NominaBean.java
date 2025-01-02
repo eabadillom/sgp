@@ -22,6 +22,7 @@ import org.primefaces.PrimeFaces;
 import mx.com.ferbo.business.nomina.NominaBL;
 import mx.com.ferbo.business.nomina.NominaSemanalBL;
 import mx.com.ferbo.business.nomina.ParametrosNomina;
+import mx.com.ferbo.business.percepcion.AbstractPercepcion;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.EmpresaDAO;
 import mx.com.ferbo.dao.n.NominaDAO;
@@ -317,6 +318,30 @@ public class NominaBean implements Serializable {
     	} finally {
     		PrimeFaces.current().ajax().update("formNomina:messages", "formNomina:tv-nomina");
     	}
+    }
+    
+    public void actualizarPercepcion(DetNominaPercepcion percepcion) {
+    	FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Percepción";
+		
+		try {
+			if(percepcion.getCantidad() != null && AbstractPercepcion.CVE_SUELDO.equalsIgnoreCase(percepcion.getClave()))
+				NominaSemanalBL.calcularSueldo(nomina, parametros, percepcion.getCantidad());
+			
+			this.actualizar();
+			
+		} catch(Exception ex) {
+			log.error("Problema para agregar la percepcion...", ex);
+    		mensaje = "Hay un problema para agregar la percepción.";
+			severity = FacesMessage.SEVERITY_ERROR;
+			
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+		} finally {
+			PrimeFaces.current().ajax().update("formNomina:messages", "formNomina:tv-nomina");
+		}
     }
     
     public void eliminarPercepcion(DetNominaPercepcion percepcion) {
