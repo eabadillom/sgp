@@ -130,7 +130,7 @@ public class DateUtil {
 		
 		return resultado;
 	}
-	
+        
 	/**Devuelve el año en formato numérico del objeto {@link Date} dado.
 	 * @param fecha {@link Date} con la fecha.
 	 * @return Representación numérica del año.

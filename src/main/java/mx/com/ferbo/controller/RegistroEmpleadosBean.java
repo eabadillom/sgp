@@ -42,6 +42,8 @@ import mx.com.ferbo.dao.n.TipoJornadaDAO;
 import mx.com.ferbo.dao.n.TipoPercepcionDAO;
 import mx.com.ferbo.dao.n.TipoPrestamoDAO;
 import mx.com.ferbo.dao.n.TipoRegimenDAO;
+import mx.com.ferbo.dao.n.VacacionesDAO;
+import mx.com.ferbo.dao.n.sat.BancoDAO;
 import mx.com.ferbo.dao.n.tipobajaempleadoDAO;
 import mx.com.ferbo.model.CatArea;
 import mx.com.ferbo.model.CatAsentamiento;
@@ -67,8 +69,10 @@ import mx.com.ferbo.model.DetEmpleadoConfiguracion;
 import mx.com.ferbo.model.DetEmpleadoFoto;
 import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.DetPrestamo;
+import mx.com.ferbo.model.DetVacaciones;
 import mx.com.ferbo.model.InfDatoEmpresa;
 import mx.com.ferbo.model.Pais;
+import mx.com.ferbo.model.sat.CatBanco;
 import mx.com.ferbo.model.sat.CatEntidadFederativa;
 import mx.com.ferbo.model.sat.CatRiesgoPuesto;
 import mx.com.ferbo.model.sat.CatTipoContrato;
@@ -111,6 +115,7 @@ public class RegistroEmpleadosBean implements Serializable {
     private TipoPercepcionDAO tipoPercepcionDAO;
     private AsentamientoDAO asentamientoDAO;
     private EmpleadoConfiguracionDAO configuracionEmpleadoDAO;
+    private BancoDAO bancodao;
 
     private List<DetEmpleado> lstEmpleados;
     private List<DetEmpleado> lstEmpleadosSelected;
@@ -126,6 +131,7 @@ public class RegistroEmpleadosBean implements Serializable {
     private List<CatTipoPrestamo> tiposPrestamo;
     private List<CatAsentamiento> lstAsentamientos;
     private List<DetDomicilioEmpleado> lstDomicilios;
+    private List<CatBanco> lstBancos;
 
     private CatPlanta plantaselected;
     private CatEmpresa empresaselected;
@@ -139,7 +145,7 @@ public class RegistroEmpleadosBean implements Serializable {
     private CatTipoBajaEmpleado tipofinrelacion;
     private String motivofinrelaicion;
     private Date fechafinrelacion;
-    
+
     private DetEmpleado empleadoSelected;
     private DetBiometrico detBiometrico;
     private DetEmpleadoFoto empleadoFoto;
@@ -149,7 +155,7 @@ public class RegistroEmpleadosBean implements Serializable {
     private DetPrestamo prestamo;
     private CatAsentamiento asentamientoSelected;
     private DetDomicilioEmpleado domicilioEmpleadoSelected;
-  
+
     private String curp;
     private String rfc;
     private String nss;
@@ -179,6 +185,7 @@ public class RegistroEmpleadosBean implements Serializable {
         tipoPrestamoDAO = new TipoPrestamoDAO();
         asentamientoDAO = new AsentamientoDAO();
         tipobajaempleadodao = new tipobajaempleadoDAO();
+        bancodao = new BancoDAO();
 
         empleadoSelected = new DetEmpleado();
         lstEmpleados = new ArrayList<>();
@@ -205,6 +212,7 @@ public class RegistroEmpleadosBean implements Serializable {
             tiposPrestamo = tipoPrestamoDAO.buscarTodos();
             tiposdebaja = tipobajaempleadodao.obtenerTodos();
             asentamientoSelected = this.inicializarAsentamiento();
+            lstBancos = bancodao.buscarTodos();
 
             consultaEmpleados();
             prestamo = new DetPrestamo();
@@ -252,13 +260,11 @@ public class RegistroEmpleadosBean implements Serializable {
         this.asentamientoSelected = this.inicializarAsentamiento();
         this.activeTabIndex = 0;
     }
-    
-    public CatAsentamiento obtenerAsentamiento(DetEmpleado domicilioEmpleado)
-    {
+
+    public CatAsentamiento obtenerAsentamiento(DetEmpleado domicilioEmpleado) {
         CatAsentamiento asentamiento = null;
-        
-        if(domicilioEmpleado.getDomicilio().getAsentamiento() != null)
-        {
+
+        if (domicilioEmpleado.getDomicilio().getAsentamiento() != null) {
             asentamiento = domicilioEmpleado.getDomicilio().getAsentamiento();
             log.trace("Asentamiento obtenido {}", asentamiento.toString());
         } else {
@@ -272,8 +278,7 @@ public class RegistroEmpleadosBean implements Serializable {
 
     public void agregarAsentamientoADomicilio(CatAsentamiento auxAsentamiento) {
         log.debug("Agregando/Actualizando asentamiento en domicilio");
-        if(auxAsentamiento != null)
-        {
+        if (auxAsentamiento != null) {
             this.empleadoSelected.getDomicilio().setAsentamiento(auxAsentamiento);
         }
 
@@ -287,35 +292,33 @@ public class RegistroEmpleadosBean implements Serializable {
         List<DetPrestamo> prestamos = null;
         log.info("Cargando información del empleado: {}", this.empleadoSelected);
         InfDatoEmpresa datoEmpresa = this.empleadoSelected.getDatoEmpresa();
-    	this.empleadoFoto = empleadoFotoDAO.buscar(this.empleadoSelected.getNumEmpleado());
-    	
-    	if(datoEmpresa == null) {
-    		this.datoEmpresa = new InfDatoEmpresa();
-    		this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
-    	} else {
-    		this.datoEmpresa = datoEmpresa;
-    		this.rfc = this.datoEmpresa.getRfc();
-    		this.nss = this.datoEmpresa.getNss();
-    		this.curp = this.empleadoSelected.getCurp();
-    	}
-    	
-    	percepcionesEmpleado = percepcionEmpleadoDAO.buscarPorEmpleado(this.empleadoSelected.getIdEmpleado());
-    	prestamos = prestamoDAO.buscar(this.empleadoSelected.getIdEmpleado());
-    	this.empleadoSelected.setPrestamos(prestamos); 
-    	this.prestamo = new DetPrestamo();
-    	
-    	log.info("Empleado seleccionado: {}", this.empleadoSelected.getIdEmpleado());
-    	if(empleadoFoto != null)
-    		log.debug("Foto: {}", empleadoFoto.getFotografia());
-    	
+        this.empleadoFoto = empleadoFotoDAO.buscar(this.empleadoSelected.getNumEmpleado());
+
+        if (datoEmpresa == null) {
+            this.datoEmpresa = new InfDatoEmpresa();
+            this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
+        } else {
+            this.datoEmpresa = datoEmpresa;
+            this.rfc = this.datoEmpresa.getRfc();
+            this.nss = this.datoEmpresa.getNss();
+            this.curp = this.empleadoSelected.getCurp();
+        }
+
+        percepcionesEmpleado = percepcionEmpleadoDAO.buscarPorEmpleado(this.empleadoSelected.getIdEmpleado());
+        prestamos = prestamoDAO.buscar(this.empleadoSelected.getIdEmpleado());
+        this.empleadoSelected.setPrestamos(prestamos);
+        this.prestamo = new DetPrestamo();
+
+        log.info("Empleado seleccionado: {}", this.empleadoSelected.getIdEmpleado());
+        if (empleadoFoto != null) {
+            log.debug("Foto: {}", empleadoFoto.getFotografia());
+        }
+
         //this.domicilioEmpleadoSelected = this.domicilioEmpleadoDAO.buscarPorId(this.empleadoSelected.getIdEmpleado());
-        
-        if(this.empleadoSelected.getDomicilio() != null)
-        {
+        if (this.empleadoSelected.getDomicilio() != null) {
             log.info("Cargando información del domicilio {}", this.empleadoSelected.getDomicilio().toString());
             this.asentamientoSelected = this.obtenerAsentamiento(this.empleadoSelected);
-        }else
-        {
+        } else {
             this.empleadoSelected.setDomicilio(new DetDomicilioEmpleado());
             this.asentamientoSelected = this.inicializarAsentamiento();
         }
@@ -323,12 +326,11 @@ public class RegistroEmpleadosBean implements Serializable {
         this.detBiometrico = biometricoDAO.consultaBiometricoByIdEmpleado(this.empleadoSelected.getIdEmpleado());
         log.info("Biometrico: {}", this.detBiometrico);
         this.nuevaPercepcionEmpleado();
-        
-        if(/*this.empleadoConfiguracionSelected == null*/ this.empleadoSelected.getEmpleadoConfiguracion() == null)
-        {
+
+        if (/*this.empleadoConfiguracionSelected == null*/this.empleadoSelected.getEmpleadoConfiguracion() == null) {
             this.empleadoSelected.setEmpleadoConfiguracion(new DetEmpleadoConfiguracion());
         }
-        
+
         PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:panelDialogFoto", "formRegistroEmpleado:panelDialogEmpleado");
     }
 
@@ -488,61 +490,68 @@ public class RegistroEmpleadosBean implements Serializable {
         CatParametro pNumeroEmpleado = null;
         String sNumeroEmpleado = null;
         int numeroEmpleado = -1;
-    	try {
-    		this.empleadoSelected.setPercepcionesEmpleado(this.percepcionesEmpleado);
-    		
-                if(this.datoEmpresa.getFechaIngreso() == null)
-                {
-                    log.error("Falta fecha de ingreso en dato empresa");
-                    throw new SGPException("Debe indicar la fecha de ingreso");
+        try {
+            this.empleadoSelected.setPercepcionesEmpleado(this.percepcionesEmpleado);
+
+            if (this.datoEmpresa.getFechaIngreso() == null) {
+                log.error("Falta fecha de ingreso en dato empresa");
+                throw new SGPException("Debe indicar la fecha de ingreso");
+            }
+
+            if (this.datoEmpresa.getHoraEntrada() == null) {
+                log.error("Falta hora de entrada en dato empresa");
+                throw new SGPException("Debe indicar la hora de entrada");
+            }
+
+            if (this.datoEmpresa.getHorasalida() == null) {
+                log.error("Falta hora de salida en dato empresa");
+                throw new SGPException("Debe indicar la hora de salida");
+            }
+
+            if (this.datoEmpresa.getMinutosTolerancia() == null) {
+                log.error("Falta los minutos de tolerancia para la hora de entrada en dato empresa");
+                throw new SGPException("Debe indicar los minutos de tolerancia para la hora de entrada");
+            }
+
+            if (this.empleadoSelected.getIdEmpleado() == null) {
+                pNumeroEmpleado = this.parametroDAO.buscarPorClave("NBEMP");
+                sNumeroEmpleado = pNumeroEmpleado.getValor();
+                numeroEmpleado = Integer.parseInt(sNumeroEmpleado);
+                sNumeroEmpleado = String.format("%04d", ++numeroEmpleado);
+                transformarAMayusculas();
+                this.empleadoSelected.setNumEmpleado(sNumeroEmpleado);
+                this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
+                this.empleadoSelected.setFechaRegistro(new Date());
+                this.empleadoSelected.getDomicilio().setEmpleado(this.empleadoSelected);
+                this.empleadoSelected.getEmpleadoConfiguracion().setEmpleado(this.empleadoSelected);
+                empleadoDAO.guardar(empleadoSelected);
+                pNumeroEmpleado.setValor(sNumeroEmpleado);
+                this.parametroDAO.actualizar(pNumeroEmpleado);
+            } else {
+                this.empleadoSelected.getDomicilio().setEmpleado(this.empleadoSelected);
+                this.empleadoSelected.getEmpleadoConfiguracion().setEmpleado(this.empleadoSelected);
+                empleadoDAO.actualizar(empleadoSelected);
+            }
+
+            if (this.empleadoSelected.getVacaciones().isEmpty()) {
+                EmpleadoBL.generarAnioVacaciones(this.empleadoSelected);
+                empleadoDAO.actualizar(empleadoSelected);
+            }
+
+            if (this.empleadoFoto != null) {
+                empleadoFotoDAO.actualizar(empleadoFoto);
+            }
+
+            if (biometrico != null) {
+                detBiometrico.setIdEmpleado(empleadoSelected);
+                if (detBiometrico.getIdBiometrico() == null) {
+                    biometricoDAO.guardar(detBiometrico);
+                } else {
+                    biometricoDAO.actualizar(detBiometrico);
                 }
-                
-                if(this.datoEmpresa.getHoraEntrada() == null)
-                {
-                    log.error("Falta hora de entrada en dato empresa");
-                    throw new SGPException("Debe indicar la hora de entrada");
-                }
-                
-                if(this.datoEmpresa.getMinutosTolerancia() == null)
-                {
-                    log.error("Falta los minutos de tolerancia para la hora de entrada en dato empresa");
-                    throw new SGPException("Debe indicar los minutos de tolerancia para la hora de entrada");
-                }
-                
-                if (this.empleadoSelected.getIdEmpleado() == null) {
-    			pNumeroEmpleado = this.parametroDAO.buscarPorClave("NBEMP");
-    			sNumeroEmpleado = pNumeroEmpleado.getValor();
-        		numeroEmpleado = Integer.parseInt(sNumeroEmpleado);
-        		sNumeroEmpleado = String.format("%04d", ++numeroEmpleado);
-                        transformarAMayusculas();
-                        this.empleadoSelected.setNumEmpleado(sNumeroEmpleado);
-                        this.empleadoSelected.setDatoEmpresa(this.datoEmpresa);
-        		this.empleadoSelected.setFechaRegistro(new Date());
-                        this.empleadoSelected.getDomicilio().setEmpleado(this.empleadoSelected);
-                        this.empleadoSelected.getEmpleadoConfiguracion().setEmpleado(this.empleadoSelected);
-    			empleadoDAO.guardar(empleadoSelected);
-                        pNumeroEmpleado.setValor(sNumeroEmpleado);
-                        this.parametroDAO.actualizar(pNumeroEmpleado);
-    		} else {
-                        this.empleadoSelected.getDomicilio().setEmpleado(this.empleadoSelected);
-                        this.empleadoSelected.getEmpleadoConfiguracion().setEmpleado(this.empleadoSelected);
-    			empleadoDAO.actualizar(empleadoSelected);
-                }
-                
-                if(this.empleadoFoto != null) {
-    			empleadoFotoDAO.actualizar(empleadoFoto);
-    		}
-    		
-    		if (biometrico != null) {
-    			detBiometrico.setIdEmpleado(empleadoSelected);
-    			if (detBiometrico.getIdBiometrico() == null) {
-    				biometricoDAO.guardar(detBiometrico);
-    			} else {
-    				biometricoDAO.actualizar(detBiometrico);
-    			}
                 biometrico = null;
             }
-            
+
             consultaEmpleados();
             PrimeFaces.current().executeScript("PF('dialogEmpleado').hide()");
             mensaje = "El empleado se guardó correctamente.";
@@ -593,31 +602,31 @@ public class RegistroEmpleadosBean implements Serializable {
     public void sinFoto() {
         this.empleadoFoto = null;
     }
-    
+
     /*
      * Método para eliminar 1 empleado
      */
     public void eliminaEmpleado() {
         try {
-            if(this.tipofinrelacion.getTipodebaja().startsWith("T")){
+            if (this.tipofinrelacion.getTipodebaja().startsWith("T")) {
                 this.empleadoSelected.setActivo((short) 0);
             }
-            
-            if(this.tipofinrelacion.getTipodebaja().startsWith("S")){
+
+            if (this.tipofinrelacion.getTipodebaja().startsWith("S")) {
                 this.empleadoSelected.setActivo((short) 2);
             }
-            
+
             this.empleadoSelected.setFechaModificacion(new Date());
             this.empleadoSelected.getDatoEmpresa().setTipodebaja(this.tipofinrelacion);
             this.empleadoSelected.getDatoEmpresa().setMotivobaja(this.motivofinrelaicion);
-            if(this.fechafinrelacion != null){
+            if (this.fechafinrelacion != null) {
                 this.empleadoSelected.getDatoEmpresa().setFechaBaja(this.fechafinrelacion);
             }
             this.empleadoDAO.actualizar(this.empleadoSelected);
             consultaEmpleados();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Empleado Eliminado"));
             limpiarEliminar();
-            
+
         } catch (SGPException ex) {
             FacesContext.getCurrentInstance()
                     .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Error al eliminar al empleado"));
@@ -625,8 +634,8 @@ public class RegistroEmpleadosBean implements Serializable {
         }
         PrimeFaces.current().ajax().update("formRegistroEmpleado:messages", "formRegistroEmpleado:dtEmpleados");
     }
-    
-    public void limpiarEliminar(){
+
+    public void limpiarEliminar() {
         this.tipofinrelacion = null;
         this.motivofinrelaicion = null;
         this.fechafinrelacion = null;
@@ -688,33 +697,29 @@ public class RegistroEmpleadosBean implements Serializable {
 
     public List<CatAsentamiento> sugerenciasCodigoPostal(String consulta) {
         List<CatAsentamiento> listaSugerencias = asentamientoDAO.buscarPorCodigoPostal(consulta);
-        
-        if(this.asentamientoSelected == null)
-        {
+
+        if (this.asentamientoSelected == null) {
             this.asentamientoSelected = this.inicializarAsentamiento();
         }
-        
+
         return listaSugerencias;
     }
-    
-    public void domicilioEmpleado() 
-    {
-        if(this.empleadoSelected.getDomicilio() == null)
-        {
+
+    public void domicilioEmpleado() {
+        if (this.empleadoSelected.getDomicilio() == null) {
             this.empleadoSelected.setDomicilio(new DetDomicilioEmpleado());
         }
-        log.info("Agregando/Actualizando información al domicilio");    
+        log.info("Agregando/Actualizando información al domicilio");
         this.agregarAsentamientoADomicilio(this.asentamientoSelected);
-        
+
         log.trace("Domicilio seleccionado: {}", this.empleadoSelected.getDomicilio().toString());
         log.trace("Asentamiento seleccionado: {}", this.asentamientoSelected.toString());
 
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Informacion", "Se actualizo el asentamiento"));
         PrimeFaces.current().ajax().update("formRegistroEmpleado:messages");
     }
-    
-    public void limpiarVariables() 
-    {
+
+    public void limpiarVariables() {
         this.asentamientoSelected = null;
     }
 
@@ -999,14 +1004,14 @@ public class RegistroEmpleadosBean implements Serializable {
         this.domicilioEmpleadoSelected = domicilioEmpleadoSelected;
     }
 
-	public Integer getActiveTabIndex() {
-		return activeTabIndex;
-	}
+    public Integer getActiveTabIndex() {
+        return activeTabIndex;
+    }
 
-	public void setActiveTabIndex(Integer activeTabIndex) {
-		this.activeTabIndex = activeTabIndex;
-	}
-	
+    public void setActiveTabIndex(Integer activeTabIndex) {
+        this.activeTabIndex = activeTabIndex;
+    }
+
     public CatPlanta getPlantaselected() {
         return plantaselected;
     }
@@ -1094,9 +1099,17 @@ public class RegistroEmpleadosBean implements Serializable {
     public void setfechafinrelacion(Date fechafinrelacion) {
         this.fechafinrelacion = fechafinrelacion;
     }
-    
+
+    public List<CatBanco> getLstBancos() {
+        return lstBancos;
+    }
+
+    public void setLstBancos(List<CatBanco> lstBancos) {
+        this.lstBancos = lstBancos;
+    }
+
     public List<DetEmpleado> filtrarEmpleados() {
-        
+
         if (this.activo && this.inactivo && this.empresaselected == null && this.plantaselected == null) {
             return this.lstEmpleados;
         }
@@ -1219,31 +1232,30 @@ public class RegistroEmpleadosBean implements Serializable {
                     collect(Collectors.toList());
         }
 
-                if(this.texto != null && !this.texto.equals("")){
-            
+        if (this.texto != null && !this.texto.equals("")) {
+
             return this.lstEmpleados.stream().
-                    filter( empleado -> empleado.getNombre().contains(this.texto.trim().toUpperCase()) || empleado.getPrimerAp().contains(this.texto.trim().toUpperCase()) || empleado.getSegundoAp().contains(this.texto.trim().toUpperCase())).
+                    filter(empleado -> empleado.getNombre().contains(this.texto.trim().toUpperCase()) || empleado.getPrimerAp().contains(this.texto.trim().toUpperCase()) || empleado.getSegundoAp().contains(this.texto.trim().toUpperCase())).
                     collect(Collectors.toList());
         }
 
-        
         return null;
-    }  
-    
-    public void manipularStatusFechaBaja(){
-        if(this.tipofinrelacion == null){
+    }
+
+    public void manipularStatusFechaBaja() {
+        if (this.tipofinrelacion == null) {
             this.statusfechabaja = false;
             return;
         }
-        
-        this.statusfechabaja  = this.tipofinrelacion.getTipodebaja().startsWith("T");
+
+        this.statusfechabaja = this.tipofinrelacion.getTipodebaja().startsWith("T");
     }
-    
-    public String obtenerStatusEmpleadoEmpresa(DetEmpleado empleado){
+
+    public String obtenerStatusEmpleadoEmpresa(DetEmpleado empleado) {
         return ManageStatus.getEstadoEmpleadoEmpresa(empleado.getActivo());
     }
-    
-    public void validarEmpleado(DetEmpleado empleado){
+
+    public void validarEmpleado(DetEmpleado empleado) {
         EmpleadoBL.validarDatosEmpleado(empleado);
     }
 }
