@@ -1,9 +1,12 @@
 package mx.com.ferbo.business.nomina;
 
 import java.math.BigDecimal;
+import java.time.Period;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -110,6 +113,31 @@ public abstract class NominaBL {
 		return nomina;
 	}
 	
+	public static String antiguedadPeriodo(Date fechaInicio, Date fechaFin) {
+		
+		Period diferencia = Period.between(DateUtil.toLocalDate(fechaInicio), DateUtil.toLocalDate(fechaFin));
+
+        String formatoDiferencia = String.format("P%dY%dM%dD", 
+            diferencia.getYears(), 
+            diferencia.getMonths(), 
+            diferencia.getDays()
+        );
+        
+		return formatoDiferencia;
+	}
+	
+	public static String antiguedadSemanas(Date fechaInicio, Date fechaFin) {
+		long diasDiferencia = ChronoUnit.DAYS.between(DateUtil.toLocalDate(fechaInicio), DateUtil.toLocalDate(fechaFin));
+
+        // Calcular la diferencia en semanas
+        long semanasDiferencia = diasDiferencia / 7;
+
+        // Formatear el resultado
+        String formatoDiferencia = String.format("P%dW", semanasDiferencia);
+        
+        return formatoDiferencia;
+	}
+	
 	public static DetNominaEmisor getEmisor(DetNomina nomina, CatEmpresa empresa) {
 		DetNominaEmisor emisor = null;
 		
@@ -184,9 +212,9 @@ public abstract class NominaBL {
 			receptor.setSalarioDiario(empleado.getDatoEmpresa().getSalarioDiario());
 			receptor.setEntidadFederativa(empleado.getDatoEmpresa().getEntidadFederativa());
 			//TODO pendiente revisar antiguedad
-			String antiguedad = String.format("P%dW", DateUtil.weeksDiff(DateUtil.toLocalDate(empleado.getDatoEmpresa().getFechaIngreso()), DateUtil.toLocalDate(parametros.getPeriodoFin())) );
-			log.info("Antiguedad: {}", antiguedad);
-			receptor.setAntiguedad(antiguedad);
+			String sAntiguedad = antiguedadSemanas(empleado.getDatoEmpresa().getFechaIngreso(), parametros.getPeriodoFin());
+			log.info("Antiguedad: {}", sAntiguedad);
+			receptor.setAntiguedad(sAntiguedad);
 			
 		} catch(Exception ex) {
 			log.error("Problema para generar el receptor...", ex);
@@ -410,12 +438,12 @@ public abstract class NominaBL {
     	
     	//Buscar el ajuste al neto (como Otro pago o Deduccion).
     	Optional<DetNominaDeduccion> dOpt = nomina.getDeducciones().stream()
-    			.filter(d -> AbstractDeduccion.FRB_AJUSTE_AL_NETO.equalsIgnoreCase(d.getClave()))
+    			.filter(d -> AbstractDeduccion.CVE_AJUSTE_AL_NETO.equalsIgnoreCase(d.getClave()))
     			.findFirst()
     			;
     	
     	Optional<DetNominaOtroPago> opOpt = nomina.getOtrosPagos().stream()
-    			.filter(o -> AbstractOtroPago.FRB_AJUSTE_AL_NETO.equalsIgnoreCase(o.getClave()))
+    			.filter(o -> AbstractOtroPago.CVE_AJUSTE_AL_NETO.equalsIgnoreCase(o.getClave()))
     			.findFirst()
     			;
     	

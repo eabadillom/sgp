@@ -35,6 +35,8 @@ import mx.com.ferbo.util.DateUtil;
 
 public class ParametrosNomina {
 	
+	private Integer anio         = null;
+	
 	private Date periodoInicio   = null;
 	private Date periodoFin      = null;
 	private Date fechaInicioAnio = null;
@@ -71,44 +73,45 @@ public class ParametrosNomina {
 	private UMADAO              umaDAO = null;
 	
 	public ParametrosNomina() {
-		this.diaNLDAO = new DiaNoLaboralDAO();
+		this.diaNLDAO           = new DiaNoLaboralDAO();
 		this.catPercepcionesDAO = new PercepcionesDAO();
-		this.tarifaISRDAO = new TarifaISRDAO();
-		this.metodoPagoDAO = new MetodoPagoDAO();
-		this.conceptoDAO = new ConceptoDAO();
-		this.unidadSATDAO = new UnidadSATDAO();
-		this.periodicidadDAO = new PeriodicidadPagoDAO();
-		this.regimenFiscalDAO = new RegimenFiscalDAO();
-		this.usoCfdiDAO = new UsoCFDIDAO();
-		this.tipoPercepcionDAO = new TipoPercepcionDAO();
-		this.tipoOtroPagoDAO = new TipoOtroPagoDAO();
-		this.tipoDeduccionDAO = new TipoDeduccionDAO();
-		this.cuotasIMSSDAO = new CuotaIMSSDAO();
-		this.umaDAO = new UMADAO();
+		this.tarifaISRDAO       = new TarifaISRDAO();
+		this.metodoPagoDAO      = new MetodoPagoDAO();
+		this.conceptoDAO        = new ConceptoDAO();
+		this.unidadSATDAO       = new UnidadSATDAO();
+		this.periodicidadDAO    = new PeriodicidadPagoDAO();
+		this.regimenFiscalDAO   = new RegimenFiscalDAO();
+		this.usoCfdiDAO         = new UsoCFDIDAO();
+		this.tipoPercepcionDAO  = new TipoPercepcionDAO();
+		this.tipoOtroPagoDAO    = new TipoOtroPagoDAO();
+		this.tipoDeduccionDAO   = new TipoDeduccionDAO();
+		this.cuotasIMSSDAO      = new CuotaIMSSDAO();
+		this.umaDAO             = new UMADAO();
 	}
 	
 	public void cargar(Date periodoInicio, Date periodoFin) {
-		Date fechaInicioAnio = DateUtil.getFirstDayOfyear(periodoFin);
-		Date fechafinAnio = DateUtil.getLastDayOfYear(periodoFin);
-		
-		this.fechaInicioAnio = fechaInicioAnio;
-		this.fechaFinAnio = fechafinAnio;
-		this.periodoInicio = new Date(periodoInicio.getTime());
-		this.periodoFin = new Date(periodoFin.getTime());
+		//Cálculo de fechas importantes del periodo de pago de nómina.
+		this.anio = DateUtil.getAnio(periodoFin);
+		this.fechaInicioAnio = DateUtil.getFirstDayOfyear(periodoFin);
+		this.fechaFinAnio    = DateUtil.getLastDayOfYear(periodoFin);
+		this.periodoInicio   = new Date(periodoInicio.getTime());
+		this.periodoFin      = new Date(periodoFin.getTime());
 		this.diasNoLaborales = this.diaNLDAO.buscarPorPeriodo("MX", periodoInicio, periodoFin);
+		
+		//Catálogos SAT
 		this.parametrosPercepciones = this.catPercepcionesDAO.buscarActual(periodoInicio);
-		this.tablaISR = this.tarifaISRDAO.buscar(fechaInicioAnio, fechafinAnio);
-		this.metodoPago = this.metodoPagoDAO.buscarPorId("PUE");
-		this.concepto = this.conceptoDAO.buscarPorId("84111505");
-		this.unidadSAT = this.unidadSATDAO.buscarPorId("ACT");
-		this.periodicidad = this.periodicidadDAO.buscarPorId("02");
-		this.regimenFiscalReceptor = this.regimenFiscalDAO.buscarPorId("605");
-		this.usoCFDI = this.usoCfdiDAO.buscarPorId("CN01");
-		this.tiposPercepcion = this.tipoPercepcionDAO.buscarTodos();
-		this.tiposDeduccion = this.tipoDeduccionDAO.buscarTodos();
-		this.cuotasIMSS = this.cuotasIMSSDAO.buscarPorPeriodo(periodoFin);
-		this.tiposOtroPago = this.tipoOtroPagoDAO.buscarTodos();
-		this.uma = this.umaDAO.buscarVigentePorFecha(DateUtil.toLocalDate(periodoFin));
+		this.tablaISR               = this.tarifaISRDAO.buscar(this.fechaInicioAnio, this.fechaFinAnio);
+		this.metodoPago             = this.metodoPagoDAO.buscarPorId("PUE");
+		this.concepto               = this.conceptoDAO.buscarPorId("84111505");
+		this.unidadSAT              = this.unidadSATDAO.buscarPorId("ACT");
+		this.periodicidad           = this.periodicidadDAO.buscarPorId("02");
+		this.regimenFiscalReceptor  = this.regimenFiscalDAO.buscarPorId("605");
+		this.usoCFDI                = this.usoCfdiDAO.buscarPorId("CN01");
+		this.tiposPercepcion        = this.tipoPercepcionDAO.buscarTodos();
+		this.tiposDeduccion         = this.tipoDeduccionDAO.buscarTodos();
+		this.cuotasIMSS             = this.cuotasIMSSDAO.buscarPorPeriodo(periodoFin);
+		this.tiposOtroPago          = this.tipoOtroPagoDAO.buscarTodos();
+		this.uma                    = this.umaDAO.buscarVigentePorFecha(DateUtil.toLocalDate(periodoFin));
 	}
 
 	public CatPercepciones getParametrosPercepciones() {
@@ -181,6 +184,10 @@ public class ParametrosNomina {
 
 	public Date getFechaFinAnio() {
 		return fechaFinAnio;
+	}
+
+	public Integer getAnio() {
+		return anio;
 	}
 	
 }

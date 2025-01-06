@@ -648,13 +648,12 @@ public class DateUtil {
 	   * @param elapsedTimeMillis Tiempo a formatear
 	   * @return Tiempo formateado
 	   */
-	  public static String formatElapsedTime(long elapsedTimeMillis) {
-
-	    SimpleDateFormat dateFormat = new SimpleDateFormat("H 'hrs' m 'min' s 'seg' SSS 'ms'");
-	    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-	    return dateFormat.format(new Date(elapsedTimeMillis));
-	  }
-	  
+	public static String formatElapsedTime(long elapsedTimeMillis) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("H 'hrs' m 'min' s 'seg' SSS 'ms'");
+		dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+		return dateFormat.format(new Date(elapsedTimeMillis));
+	}
+	
 	/**Devuelve la diferencia en dias de dos fechas. De preferencia, el primer parametro (fechaIni)
 	 * debera ser la fecha menor, mientras que el segundo parametro debera ser la fecha mayor.
 	 * @param fechaIni

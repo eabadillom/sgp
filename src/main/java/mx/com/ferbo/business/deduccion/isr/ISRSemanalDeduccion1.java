@@ -139,6 +139,7 @@ public class ISRSemanalDeduccion1 extends AbstractDeduccion implements IDeduccio
 			
 			isrPreSubsidioBO = new ISRAntesSubsidioDeduccion(dBaseISR.getImporte(), tarifaISR);
 			dISRAntesSubsidio = isrPreSubsidioBO.calcular(nomina, idxDeduccion++);
+			deduccionesISR.add(dISRAntesSubsidio);
 			isrAntesDeSubsidio = dISRAntesSubsidio.getImporte();
 			
 			if(this.subsidioExecutor == null)
@@ -187,13 +188,12 @@ public class ISRSemanalDeduccion1 extends AbstractDeduccion implements IDeduccio
 				dISR.setKey(new DetNominaDeduccionPK(nomina, idxDeduccion++));
 				tdISR = this.getTipoDeduccion(D_ISR);
 				dISR.setTipoDeduccion(tdISR);
-				dISR.setClave("FRB-" + D_ISR);
+				dISR.setClave(AbstractDeduccion.CVE_ISR);
 				dISR.setNombre("I.S.R.");
 				dISR.setImporte(isrDespuesDeSubsidio);
 				dISR.setProcesar(true);
 				dISR.setInformar(true);
 				
-				deduccionesISR.add(dISRAntesSubsidio);
 				deduccionesISR.add(dISR);
 			} else {
 				log.info("Agregando ISR como Otro pago...");

@@ -33,7 +33,7 @@ public class AjusteAlNetoOtroPago extends AbstractOtroPago implements IOtroPago 
 			opAjusteAlNeto = new DetNominaOtroPago();
 			opAjusteAlNeto.setKey(new DetNominaOtroPagoPK(nomina, index));
 			opAjusteAlNeto.setTipoOtroPago(tpAjusteAlNeto);
-			opAjusteAlNeto.setClave(FRB_AJUSTE_AL_NETO);
+			opAjusteAlNeto.setClave(CVE_AJUSTE_AL_NETO);
 			opAjusteAlNeto.setNombre("Ajuste al neto");
 			opAjusteAlNeto.setImporte(ajusteAlNeto);
 			opAjusteAlNeto.setInformar(true);

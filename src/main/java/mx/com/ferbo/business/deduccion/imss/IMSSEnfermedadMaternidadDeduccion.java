@@ -1,7 +1,6 @@
 package mx.com.ferbo.business.deduccion.imss;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,23 +17,19 @@ public class IMSSEnfermedadMaternidadDeduccion extends AbstractIMSSDeduccion imp
 	
 	private static Logger log = LogManager.getLogger(IMSSEnfermedadMaternidadDeduccion.class);
 	
-	private Date fechaInicioAnio = null;
-	private Date fechaFinAnio = null;
-	private BigDecimal totalDiasPeriodo = null;
+	private BigDecimal diasTrabajados = null;
 	private BigDecimal uma = null;
 	private BigDecimal sdi = null;
 	
 	/**
 	 * @param fechaInicioAnio Fecha de inicio del año en curso (correspondiente al cálculo del periodo).
 	 * @param fechaFinAnio Fecha de fin del año en curso (correspondiente al cálculo del periodo).
-	 * @param totalDiasPeriodo Total de días del periodo (Semanal: 7 días, Quincenal: 15 días, Mensual: 30.4 días)
+	 * @param diasTrabajados De acuerdo al periodo semanal, el total de días trabajados + proporcional septimo día.
 	 * @param uma Unidad de Medida y Actualización (proporcionada por el INEGI)
 	 * @param sdi Salario Diario Integrado.
 	 */
-	public IMSSEnfermedadMaternidadDeduccion(Date fechaInicioAnio, Date fechaFinAnio, BigDecimal totalDiasPeriodo, BigDecimal uma, BigDecimal sdi) {
-		this.fechaInicioAnio = fechaInicioAnio;
-		this.fechaFinAnio = fechaFinAnio;
-		this.totalDiasPeriodo = totalDiasPeriodo;
+	public IMSSEnfermedadMaternidadDeduccion(BigDecimal diasTrabajados, BigDecimal uma, BigDecimal sdi) {
+		this.diasTrabajados = diasTrabajados;
 		this.uma = uma;
 		this.sdi = sdi;
 	}
@@ -42,14 +37,16 @@ public class IMSSEnfermedadMaternidadDeduccion extends AbstractIMSSDeduccion imp
 	@Override
 	public DetNominaDeduccion calcular(DetNomina nomina, Integer index) {
 		DetNominaDeduccion deduccion = null;
-		BigDecimal cuota = null;
-		BigDecimal cero = null;
-		BigDecimal tres = null;
-		BigDecimal limiteUMAs = null;
-		BigDecimal excedente = null;
-		BigDecimal tarifa = null;
-		CatCuotaIMSS tarifaIMSS = null;
-		CatTipoDeduccion tdIMSS = null;
+		BigDecimal cuotaFija         = null;
+		BigDecimal cuotaExcedente    = null;
+		BigDecimal cuota             = null;
+		BigDecimal cero              = null;
+		BigDecimal tres              = null;
+		BigDecimal limiteUMAs        = null;
+		BigDecimal excedente         = null;
+		BigDecimal tarifa            = null;
+		CatCuotaIMSS tarifaIMSS      = null;
+		CatTipoDeduccion tdIMSS      = null;
 		try {
 			if(this.cuotasIMSS == null)
 				throw new SGPException("No se establecio la lista de cuotas del IMSS.");
@@ -68,19 +65,29 @@ public class IMSSEnfermedadMaternidadDeduccion extends AbstractIMSSDeduccion imp
 			//Constantes necesarias para el cálculo de Enfermedad y Maternidad.
 			cero = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
 			tres = new BigDecimal("3.00").setScale(2, BigDecimal.ROUND_HALF_UP);
-			cuota = cero;
+			cuotaExcedente = cero;
+			
+			
+			tarifaIMSS = this.getCuotaIMSS("O", "EM1", 0);
+			cuotaFija = this.uma.multiply(diasTrabajados).multiply(tarifaIMSS.getCuota());
+			
+			
+			
 			
 			limiteUMAs = this.uma.multiply(tres).setScale(2, BigDecimal.ROUND_HALF_UP);
 			excedente = this.sdi.subtract(limiteUMAs);
 			
 			if(this.sdi.compareTo(limiteUMAs) >= 0) {
 				
-				tarifaIMSS = this.getCuotaIMSS("O", "EM1", this.fechaInicioAnio, this.fechaFinAnio, tres);
+				tarifaIMSS = this.getCuotaIMSS("O", "EM1", 1);
 				tarifa = tarifaIMSS.getCuota();
-				cuota = excedente
-						.multiply(tarifa).setScale(2, BigDecimal.ROUND_HALF_UP)
-						.multiply(this.totalDiasPeriodo).setScale(2, BigDecimal.ROUND_HALF_UP);
+				cuotaExcedente = excedente
+						.multiply(tarifa)
+						.multiply(this.diasTrabajados)
+						.setScale(2, BigDecimal.ROUND_HALF_UP);
 			}
+			
+			cuota = cuotaFija.add(cuotaExcedente).setScale(2, BigDecimal.ROUND_HALF_UP);
 			
 		} catch(Exception ex) {
 			log.warn("No fue posible calcular el excedente por Enfermedad y Maternidad.", ex);

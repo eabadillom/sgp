@@ -46,7 +46,7 @@ public class SeptimoDiaPercepcion extends AbstractPercepcion implements IPercepc
 			tpSeptimoDia = this.getTipoPercepcion("001");
 			
 			proporcionalSemanal = this.diasTrabajados
-					.divide(this.diasPeriodo, 2, BigDecimal.ROUND_HALF_UP);
+					.divide(this.diasPeriodo, 4, BigDecimal.ROUND_HALF_UP);
 			
 			septimoDia = salarioDiario
 					.multiply(proporcionalSemanal)
@@ -55,7 +55,7 @@ public class SeptimoDiaPercepcion extends AbstractPercepcion implements IPercepc
 		} catch(Exception ex) {
 			log.error("Problema para obtener el cálculo del septimo día.",  ex);
 			septimoDia = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
-			proporcionalSemanal = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+			proporcionalSemanal = BigDecimal.ZERO.setScale(4, BigDecimal.ROUND_HALF_UP);
 		} finally {
 			percepcion = new DetNominaPercepcion();
 			percepcion.setKey(new DetNominaPercepcionPK(nomina, index));
