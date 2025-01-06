@@ -55,17 +55,23 @@ public class EmpleadoBL {
             throw new SGPException("La fecha de ingreso del empleado está vacía.");
         }
 
-        Date fechaaux = null;
-        Date actualmasuno = DateUtil.now();
-        actualmasuno = DateUtil.addYear(actualmasuno, 1);
+        if (empleado.getDatoEmpresa().getFechaBaja() != null) {
+            throw new SGPException("El empleado " + empleado.getNombre() + " " + empleado.getPrimerAp() + " " + empleado.getSegundoAp() + " ya no trabaja en la empresa");
+        }
+
+        int aniotmp = DateUtil.getAnio(empleado.getDatoEmpresa().getFechaIngreso());
+        int mestmp = DateUtil.getMes(empleado.getDatoEmpresa().getFechaIngreso());
+        int diatmp = DateUtil.getDia(empleado.getDatoEmpresa().getFechaIngreso());
+
+        Date fechaaux = DateUtil.getDate(aniotmp, mestmp, diatmp);
 
         if (empleado.getVacaciones().isEmpty()) {
-            fechaaux = DateUtil.addYear(empleado.getDatoEmpresa().getFechaIngreso(), 1);
+            fechaaux = DateUtil.addYear(fechaaux, 1);
         } else {
             fechaaux = empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getFechafin();
         }
 
-        while (fechaaux.before(actualmasuno)) {
+        while (fechaaux.before(DateUtil.now())) {
             Date fechainicio = null;
             Date fechafin = null;
             Date fechatmp = null;
@@ -73,8 +79,10 @@ public class EmpleadoBL {
             int dias = 0;
 
             if (empleado.getVacaciones().isEmpty()) {
-                fechainicio = DateUtil.addYear(empleado.getDatoEmpresa().getFechaIngreso(), 1);
-                fechafin = DateUtil.addYear(empleado.getDatoEmpresa().getFechaIngreso(), 2);
+
+                fechainicio = fechaaux;
+                fechafin = DateUtil.addYear(fechaaux, 1);
+
                 dias = 12;
             } else {
                 dias = empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getDiastotales();
@@ -199,7 +207,7 @@ public class EmpleadoBL {
 
     }
 
-    public static void actualizarPagoVacacionesConcepto(DetEmpleado empleado, Date periodoporpagar, String concepto){
+    public static void actualizarPagoVacacionesConcepto(DetEmpleado empleado, Date periodoporpagar, String concepto) {
 
         for (int i = 0; i < empleado.getVacaciones().size(); i++) {
 
@@ -210,9 +218,9 @@ public class EmpleadoBL {
 
                 if (concepto.equals("ambas")) {
                     if (empleado.getVacaciones().get(i).getDiaspendientespagados() == false && empleado.getVacaciones().get(i).getPrimapagada() == false) {
-                      empleado.getVacaciones().get(i).setPrimapagada(Boolean.TRUE);
-                      empleado.getVacaciones().get(i).setDiaspendientespagados(Boolean.TRUE);
-                      break;
+                        empleado.getVacaciones().get(i).setPrimapagada(Boolean.TRUE);
+                        empleado.getVacaciones().get(i).setDiaspendientespagados(Boolean.TRUE);
+                        break;
                     }
                 }
 
