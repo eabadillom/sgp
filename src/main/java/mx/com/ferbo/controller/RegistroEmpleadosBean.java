@@ -79,6 +79,7 @@ import mx.com.ferbo.model.sat.CatTipoContrato;
 import mx.com.ferbo.model.sat.CatTipoJornada;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.model.sat.CatTipoRegimen;
+import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.ManageStatus;
 import mx.com.ferbo.util.SGPException;
 
@@ -530,7 +531,7 @@ public class RegistroEmpleadosBean implements Serializable {
             } else {
                 this.empleadoSelected.getDomicilio().setEmpleado(this.empleadoSelected);
                 this.empleadoSelected.getEmpleadoConfiguracion().setEmpleado(this.empleadoSelected);
-                empleadoDAO.actualizar(empleadoSelected);
+                this.empleadoDAO.actualizar(this.empleadoSelected);
             }
 
             if (this.empleadoSelected.getVacaciones().isEmpty()) {
