@@ -2,7 +2,7 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets" 
                 xmlns:p="http://primefaces.org/ui">
 
-    <p:schedule value="#{asistenciaBean.calendario}" draggable="false" resizable="false" widgetVar="actividades" timeZone="Mexico/General" 
+    <p:schedule value="#{asistenciaBean.calendario}" draggable="false" resizable="false" widgetVar="actividades" timeZone="GMT-6"
                 styleClass="ferbo-schedule" view="agendaWeek" showWeekNumbers="true">
         <p:ajax event="eventSelect" listener="#{asistenciaBean.eventoSeleccionado}" update="eventDialog"
                 oncomplete="PF('eventDialog').show();"/>
@@ -15,14 +15,14 @@
                 <div class="field">
                     <p:outputLabel for="hEntrada" value="Hora de entrada" />
                     <p:calendar id="hEntrada" value="#{asistenciaBean.evento.startDate}" pattern="hh:mm:ss a" disabled="true"
-                                timeZone="Mexico/General"/>
+                                timeZone="GMT-6"/>
                 </div>
             </p:panel>
             <p:panel id="pnlSalida" rendered="#{asistenciaBean.evento.description ne null}" styleClass="ferbo-panel-no-border">
                 <div class="field">
                     <p:outputLabel for="hSalida" value="Hora de salida" />
                     <p:calendar id="hSalida" value="#{asistenciaBean.evento.endDate}" 
-                                pattern="hh:mm:ss a" disabled="true" timeZone="Mexico/General"/>
+                                pattern="hh:mm:ss a" disabled="true" timeZone="GMT-6"/>
                     <p:inputText id="registro" rendered="#{asistenciaBean.evento.description eq null}" value="Sin registro" disabled="true"/>
                 </div>
             </p:panel>
@@ -44,19 +44,19 @@
                     <p:outputLabel for="fDesde" value="Fecha" rendered="#{asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') ne 2 
                                                                           and asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') ne 3}"/>
                     <p:calendar id="fDesde" value="#{asistenciaBean.evento.startDate}" pattern="dd/MM/yyyy" disabled="true"
-                                timeZone="Mexico/General" rendered="#{asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') ne 3}"/>
+                                timeZone="GMT-6" rendered="#{asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') ne 3}"/>
                     
                     <p:outputLabel for="fDesdeHr" value="Hora inicial" rendered="#{asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') eq 3}"/>
                     <p:calendar id="fDesdeHr" value="#{asistenciaBean.evento.startDate}" pattern="hh:mm:ss a" disabled="true"
-                                timeZone="Mexico/General" rendered="#{asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') eq 3}"/>
+                                timeZone="GMT-6" rendered="#{asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') eq 3}"/>
                 </div>
                 <div class="field">
                     <p:outputLabel for="fHasta" value="Hasta" rendered="#{asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') eq 2}"/>
-                    <p:calendar id="fHasta" value="#{asistenciaBean.evento.endDate}" pattern="dd/MM/yyyy" disabled="true"
-                                timeZone="Mexico/General" rendered="#{asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') eq 2}"/>
+                    <p:calendar id="fHasta" value="#{asistenciaBean.evento.endDate.minusDays(1)}" pattern="dd/MM/yyyy" disabled="true"
+                                timeZone="GMT-6" rendered="#{asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') eq 2}"/>
                     <p:outputLabel for="fHastaHr" value="Hora final" rendered="#{asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') eq 3}"/>
                     <p:calendar id="fHastaHr" value="#{asistenciaBean.evento.endDate}" pattern="hh:mm:ss a" disabled="true"
-                                timeZone="Mexico/General" rendered="#{asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') eq 3}"/>
+                                timeZone="GMT-6" rendered="#{asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') eq 3}"/>
                 </div>
             </p:panel>
         </p:outputPanel>
@@ -91,7 +91,7 @@
         }
         .ferbo-evento-vacaciones{
             /*background-color: #6cccdc !important;*/
-            background-color: #689f38 !important;
+            background-color: #023e8a !important;
         }
         .ferbo-evento-incapacidad-c{
             background-color: #ae1c89 !important;

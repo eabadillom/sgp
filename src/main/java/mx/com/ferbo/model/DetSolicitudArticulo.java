@@ -180,7 +180,7 @@ public class DetSolicitudArticulo implements Serializable {
 
     @Override
     public String toString() {
-        return "DetSolicitudArticulo{" + "idSolicitud=" + idSolicitud + ", cantidad=" + cantidad + ", aprobada=" + aprobada + ", fechaCap=" + fechaCap + ", fechaMod=" + fechaMod + ", detIncidenciaList=" + detIncidenciaList + ", idArticulo=" + idArticulo + ", idEmpleadoSol=" + idEmpleadoSol + ", idEmpleadoRev=" + idEmpleadoRev + ", descripcionRechazo=" + descripcionRechazo + '}';
+        return "DetSolicitudArticulo{" + "idSolicitud=" + idSolicitud + ", cantidad=" + cantidad + ", aprobada=" + aprobada + ", fechaCap=" + fechaCap + ", fechaMod=" + fechaMod + ", descripcionRechazo=" + descripcionRechazo + '}';
     }
     
 }
