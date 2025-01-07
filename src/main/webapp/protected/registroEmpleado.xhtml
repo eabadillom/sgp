@@ -87,7 +87,7 @@
                                 <p:commandButton styleClass="edit-button m-1" action="#{registroEmpleadosBean.editar}" process="@this" update=":formRegistroEmpleado:panelDialogEmpleado formRegistroEmpleado:panelDialogEmpleado:previewFingerprint1" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dialogEmpleado').show();" icon="pi pi-pencil">
                                     <f:setPropertyActionListener value="#{empleado}" target="#{registroEmpleadosBean.empleadoSelected}" />
                                 </p:commandButton>
-                                <p:commandButton class="ui-button-danger m-1" icon="pi pi-times" process="@this" oncomplete="PF('dg-eliminarEmpleado').show()" >
+                                <p:commandButton class="ui-button-danger m-1" icon="pi pi-times" process="@this" actionListener="#{registroEmpleadosBean.validarEmpleado(empleado)}" oncomplete="PF('dg-eliminarEmpleado').show()" update=":formRegistroEmpleado:dg-eliminarEmpleado" >
                                     <f:setPropertyActionListener value="#{empleado}" target="#{registroEmpleadosBean.empleadoSelected}" />
                                 </p:commandButton>
                             </p:column>
@@ -219,13 +219,13 @@
                                         <div class="ui-fluid formgrid grid align-items-left">
                                             <div class="field col-12 md:col-3">
                                                 <p:outputLabel for="@next" value="Fecha de ingreso" />
-                                                <p:datePicker id="fIngreso" value="#{registroEmpleadosBean.datoEmpresa.fechaIngreso}" monthNavigator="true" yearNavigator="true" showIcon="true" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy">
+                                                <p:datePicker id="fIngreso" value="#{registroEmpleadosBean.datoEmpresa.fechaIngreso}" weekCalculator="true" monthNavigator="true" yearNavigator="true" showIcon="true" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy">
                                                     <p:ajax process="@this" />
                                                 </p:datePicker>
                                             </div>
                                             <div class="field col-12 md:col-3">
                                                 <p:outputLabel for="@next" value="Fecha de baja" />
-                                                <p:datePicker value="#{registroEmpleadosBean.datoEmpresa.fechaBaja}" showIcon="true" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy">
+                                                <p:datePicker value="#{registroEmpleadosBean.datoEmpresa.fechaBaja}" weekCalculator="true" monthNavigator="true" yearNavigator="true" showIcon="true" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy">
                                                     <p:ajax process="@this" />
                                                 </p:datePicker>
                                             </div>
@@ -318,6 +318,12 @@
                                                 </p:datePicker>
                                             </div>
                                             <div class="field col-12 md:col-3">
+                                                <p:outputLabel for="@next" value="Hora de salida" />
+                                                <p:datePicker value="#{registroEmpleadosBean.datoEmpresa.horasalida}" timeOnly="true" timeZone="GMT-6" locale="es">
+                                                    <p:ajax process="@this" />
+                                                </p:datePicker>
+                                            </div>
+                                            <div class="field col-12 md:col-3">
                                                 <p:outputLabel for="@next" value="Tolerancia (minutos)"></p:outputLabel>
                                                 <p:inputNumber value="#{registroEmpleadosBean.datoEmpresa.minutosTolerancia}">
                                                     <p:ajax process="@this" />
@@ -347,9 +353,21 @@
                                                     <p:ajax process="@this" />
                                                 </p:selectOneMenu>
                                             </div>
-                                            <div class="field col-12 md:col-1">
-                                                <p:outputLabel for="@next" value="Sindicalizado"/>
+                                            <div class="field col-12 md:col-3">
+                                                <p:outputLabel for="@next" value="Banco registrado" />
+                                                <p:selectOneMenu id="soBancoRegistrado" value="#{registroEmpleadosBean.datoEmpresa.banco}" autoWidth="false" converter="entityConverter">
+                                                    <f:selectItem itemLabel="--Seleccione--" noSelectionOption="true"/>
+                                                    <f:selectItems value="#{registroEmpleadosBean.lstBancos}" var="banco" itemLabel="#{banco.idBanco} - #{banco.descripcion}" itemValue="#{banco}"/>
+                                                    <p:ajax process="@this" />
+                                                </p:selectOneMenu>
+                                            </div>
+                                            <div class="field col-12 md:col-3">
+                                                <p:outputLabel for="@next" value="Sindicalizado"/><br/>
                                                 <p:selectBooleanButton value="#{registroEmpleadosBean.datoEmpresa.sindicalizado}" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem" />
+                                            </div>
+                                            <div class="field col-12 md:col-3">
+                                                <p:outputLabel for="@next" value="De confianza"/><br/>
+                                                <p:selectBooleanButton value="#{registroEmpleadosBean.datoEmpresa.confianza}" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem" />
                                             </div>
                                         </div>    
                                         <div class="formgrid grid align-items-center justify-content-left padding:0.5rem">
@@ -366,6 +384,37 @@
                                             </div>
                                         </div>
                                     </div>
+                                </p:tab>
+                                <p:tab title="Vacaciones">
+                                    <p:dataTable id="dtVacaciones" widgetVar="dtVacaciones" var="vacacion" value="#{registroEmpleadosBean.empleadoSelected.vacaciones}" reflow="true" styleClass="products-table"
+                                                 rowKey="#{vacacion.idVacaciones}" paginator="true" rows="6" rowSelectMode="add" 
+                                                 paginatorPosition="bottom" lazy="true">
+                                        <p:column headerText="Fecha de inicio" style="text-align: center;">
+                                            <p:outputLabel value="#{vacacion.fechainicio}">
+                                                <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+                                            </p:outputLabel>
+                                        </p:column>
+                                        <p:column headerText="Fecha de termino" style="text-align: center;">
+                                            <p:outputLabel value="#{vacacion.fechafin}">
+                                                <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+                                            </p:outputLabel>
+                                        </p:column>
+                                        <p:column headerText="Dias totales" style="text-align: center;">
+                                            <h:outputText value="#{vacacion.diastotales}"/>
+                                        </p:column>
+                                        <p:column headerText="Dias tomados" style="text-align: center;">
+                                            <h:outputText value="#{vacacion.diastomados}"/>
+                                        </p:column>
+                                        <p:column headerText="Dias restantes" style="text-align: center;">
+                                            <h:outputText value="#{(vacacion.diastotales - vacacion.diastomados)}"/>
+                                        </p:column>
+                                        <p:column headerText="Prima vacional Pagada" style="text-align: center;">
+                                            <p:commandButton disabled="true" styleClass="#{vacacion.primapagada ? 'ui-button-success' : 'ui-button-danger m-1'}" icon="#{vacacion.primapagada ? 'pi pi-check' : 'pi pi-times'}"/>
+                                        </p:column>
+                                        <p:column headerText="Dias pendientes pagados" style="text-align: center;">
+                                            <p:commandButton disabled="true" styleClass="#{vacacion.diaspendientespagados ? 'ui-button-success' : 'ui-button-danger m-1'}" icon="#{vacacion.diaspendientespagados ? 'pi pi-check' : 'pi pi-times'}"/>
+                                        </p:column>
+                                    </p:dataTable>
                                 </p:tab>
                                 <p:tab title="Biométrica">
                                     <div align="center">
@@ -482,11 +531,15 @@
                                     </p:dataTable>
                                 </p:tab>
                                 <p:tab title="Conf. Empleado">
-                                    <div class="ui-fluid formgrid grid align-items-left">
-                                        <div class="formgrid">
-                                            <div class="field col-12 md:col-1">
-                                                <p:outputLabel for="@next" value="Retardo"/>
+                                    <div class="card">
+                                        <div class="ui-fluid formgrid grid align-items-left">
+                                            <div class="field col-12 md:col-3">
+                                                <p:outputLabel for="@next" value="Retardo"/><br/>
                                                 <p:selectBooleanButton value="#{registroEmpleadosBean.empleadoSelected.empleadoConfiguracion.retardo}" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem" />
+                                            </div>
+                                            <div class="field col-12 md:col-3">
+                                                <p:outputLabel for="@next" value="Horas extra"/><br/>
+                                                <p:selectBooleanButton value="#{registroEmpleadosBean.empleadoSelected.empleadoConfiguracion.horasextra}" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem" />
                                             </div>
                                         </div>
                                     </div>
@@ -604,7 +657,7 @@
                             <div class="p-field">
                                 <p:outputLabel value="¿Por que se dio de baja o suspendio el empleado?"/>
                                 <p:selectOneMenu value="#{registroEmpleadosBean.tipofinrelacion}" converter="entityConverter">
-                                    <f:selectItem itemLabel="Seleccione una suspension o una terminacion" value="#{null}"/>
+                                    <f:selectItem itemLabel="-- Seleccione una suspension o una terminacion --" value="#{null}"/>
                                     <f:selectItems value="#{registroEmpleadosBean.tiposdebaja}" var="tipobaja" itemLabel="#{tipobaja.descripcion}" itemValue="#{tipobaja}"/>
                                     <p:ajax event="change" listener="#{registroEmpleadosBean.manipularStatusFechaBaja}" process="@this" oncomplete="PF('dg-eliminarEmpleado').show();" update='formRegistroEmpleado:dg-eliminarEmpleado'/>
                                 </p:selectOneMenu>
@@ -615,17 +668,25 @@
                                     <p:ajax process="@this"/>
                                 </p:inputTextarea>
                             </div>
-                            
+
                             <h:panelGroup rendered="#{registroEmpleadosBean.statusfechabaja}">
-                            <div class="p-field">
-                                <p:outputLabel for="fechadebaja" value="Seleccione la fecha en la que se dio de baja el empleado"/>
-                                <p:datePicker id="fechadebaja" value="#{registroEmpleadosBean.fechafinrelacion}" showIcon="true" yearNavigator="true" monthNavigator="true" weekCalculator="true" pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX">
-                                    <p:ajax process="@this"/>
-                                </p:datePicker>
-                            </div>
+                                <div class="p-field">
+                                    <p:outputLabel for="fechadebaja" value="Fecha de ultimo dia laboral"/><br/>
+                                    <p:datePicker id="fechadebaja" 
+                                                  value="#{registroEmpleadosBean.fechafinrelacion}" 
+                                                  showIcon="true" 
+                                                  yearNavigator="true" 
+                                                  monthNavigator="true" 
+                                                  weekCalculator="true" 
+                                                  pattern="dd/MM/yyyy" 
+                                                  timeZone="GMT-6" 
+                                                  locale="es_MX">
+                                        <p:ajax process="@this"/>
+                                    </p:datePicker>
+                                </div>
                             </h:panelGroup>
-                            <p:commandButton value="Eliminar" icon="pi pi-check" style="margin: 0.3rem" styleClass="ui-button-danger" onclick="PF('dg-eliminarEmpleado').hide();" oncomplete="PF('dialogEliminarEmpleado').show();" />
-                            <p:commandButton value="Cancelar" icon="pi pi-times" style="margin: 0.3rem" actionListener="#{registroEmpleadosBean.limpiarStatusFechaSalida}" oncomplete="PF('dg-eliminarEmpleado').hide(), PF('dialogEliminarEmpleado').hide();" />
+                            <p:commandButton value="Eliminar" icon="pi pi-check" style="margin: 0.3rem" styleClass="ui-button-danger" oncomplete="PF('dg-eliminarEmpleado').hide(); PF('dialogEliminarEmpleado').show();" />
+                            <p:commandButton value="Cancelar" icon="pi pi-times" style="margin: 0.3rem" actionListener="#{registroEmpleadosBean.limpiarEliminar()}" oncomplete="PF('dg-eliminarEmpleado').hide(), PF('dialogEliminarEmpleado').hide();" />
                         </p:dialog>
 
                         <p:confirmDialog widgetVar="dlgEliminarPrestamo" showEffect="fade" width="30rem" message="¿Está seguro que desea eliminar el préstamo seleccionado?" header="Confirmar" severity="warn">
@@ -641,7 +702,7 @@
                         <p:confirmDialog widgetVar="dialogEliminarEmpleado" showEffect="fade" width="300" message="¿Está seguro que desea dar de baja al empleado?" header="Confirmar" severity="warn">
                             <div>
                                 <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{registroEmpleadosBean.eliminaEmpleado()}" process="@this" oncomplete="PF('dialogEliminarEmpleado').hide()"/>
-                                <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" actionListener="#{registroEmpleadosBean.limpiarStatusFechaSalida}" onclick="PF('dialogEliminarEmpleado').hide()" />
+                                <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" actionListener="#{registroEmpleadosBean.limpiarEliminar()}" onclick="PF('dialogEliminarEmpleado').hide()" />
                             </div>
                         </p:confirmDialog>
 

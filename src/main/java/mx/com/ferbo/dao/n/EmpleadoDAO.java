@@ -123,9 +123,9 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
             emSGP = getEntityManager();
             modelList = emSGP.createNamedQuery("DetEmpleado.getAll", DetEmpleado.class)
                     .getResultList();
-
+            
             for (DetEmpleado model : modelList) {
-
+                log.info("Vacacaiones: {}", model.getVacaciones());
                 if (isFullInfo == false) {
                     continue;
                 }

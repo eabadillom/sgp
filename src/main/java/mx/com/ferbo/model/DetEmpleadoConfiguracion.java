@@ -45,6 +45,10 @@ public class DetEmpleadoConfiguracion implements Serializable
     @Basic(optional = true)
     @Column(name = "st_retardo")
     private Boolean retardo;
+    
+    @Basic(optional = true)
+    @Column(name = "st_horas_ext")
+    private Boolean horasextra;
 
     public DetEmpleadoConfiguracion() 
     {
@@ -93,6 +97,14 @@ public class DetEmpleadoConfiguracion implements Serializable
         this.retardo = retardo;
     }
 
+    public Boolean getHorasextra() {
+        return horasextra;
+    }
+
+    public void setHorasextra(Boolean horasextra) {
+        this.horasextra = horasextra;
+    }
+
     @Override
     public int hashCode() 
     {
@@ -119,7 +131,7 @@ public class DetEmpleadoConfiguracion implements Serializable
 
     @Override
     public String toString() {
-        return "DetEmpleadoConfiguracion[" + "id_empleado_conf=" + idEmpleadoConf + ", empleado=" + empleado.getIdEmpleado() + ", retardo=" + retardo + ']';
+        return "DetEmpleadoConfiguracion[" + "id_empleado_conf=" + idEmpleadoConf + ", empleado=" + empleado.getIdEmpleado() + ", retardo=" + retardo + ", horasextra=" + horasextra +']';
     }
     
 }

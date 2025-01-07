@@ -233,10 +233,13 @@ public class DetEmpleado implements Serializable {
     @OneToMany(mappedBy = "empleado", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<DetPrestamo> prestamos;
     
-    @OneToOne(mappedBy = "empleado", cascade = {CascadeType.ALL})
+    @OneToMany(mappedBy = "empleado", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    private List<DetVacaciones> vacaciones;
+    
+    @OneToOne(mappedBy = "empleado", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private DetDomicilioEmpleado domicilio;
     
-    @OneToOne(mappedBy = "empleado", cascade = {CascadeType.ALL})
+    @OneToOne(mappedBy = "empleado", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private DetEmpleadoConfiguracion empleadoConfiguracion;
     
     public DetEmpleado() {
@@ -496,6 +499,14 @@ public class DetEmpleado implements Serializable {
 
     public void setEmpleadoConfiguracion(DetEmpleadoConfiguracion empleadoConfiguracion) {
         this.empleadoConfiguracion = empleadoConfiguracion;
+    }
+
+    public List<DetVacaciones> getVacaciones() {
+        return vacaciones;
+    }
+
+    public void setVacaciones(List<DetVacaciones> vacaciones) {
+        this.vacaciones = vacaciones;
     }
     
     @Override
