@@ -518,7 +518,7 @@ public class NominaSemanalBL extends NominaBL {
 	
 	private static void procesarIMSS(DetNomina nomina, ParametrosNomina parametros, BigDecimal diasTrabajados) {
 		IMSSDeduccion imssBO = null;
-		imssBO = new IMSSDeduccion(parametros, new BigDecimal(DIAS_POR_PERIODO + SEPTIMO_DIA));
+		imssBO = new IMSSDeduccion(parametros, diasTrabajados);
 		imssBO.procesar(nomina);
 	}
 	

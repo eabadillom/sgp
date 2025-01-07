@@ -2,7 +2,6 @@ package mx.com.ferbo.business.deduccion.imss;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -20,17 +19,16 @@ public class IMSSDeduccion extends AbstractIMSSDeduccion implements IDeducciones
 	
 	private static Logger log = LogManager.getLogger(IMSSDeduccion.class);
 	
-	private Date fechaInicioAnio = null;
-	private Date fechaFinAnio = null;
 	private BigDecimal diasTrabajados = null;
-	private BigDecimal uma = null;
+	private BigDecimal ausencias = null;
+	private BigDecimal incapacidades = null;
 	private BigDecimal sdi = null;
 	private ParametrosNomina parametros = null;
 	
 	private IMSSRiesgoTrabajoDeduccion imssRiesgoTrabajoBO = null;
-	private IMSSEnfermedadMaternidadDeduccion imssEnfMatBO = null;
-	private IMSSGastosMedicosPensionadosBeneficiariosDeduccion imssGastosMedicosBO = null;
-	private IMSSEnDineroDeduccion imssEnDineroBO = null;
+	private IMSSEnfMatEnEspecieDeduccion imssEnfMatBO = null;
+	private IMSSEnfMatGastosMedicosDeduccion imssEnfMatGastosMedBO = null;
+	private IMSSEnfMatEnDineroDeduccion imssEnfMatEnDineroBO = null;
 	private IMSSInvalidezVida imssInvalidezVidaBO = null;
 	private IMSSCesantiaEdadAvanzadaVejezDeduccion imssCesantiaVejezBO = null;
 	
@@ -38,10 +36,7 @@ public class IMSSDeduccion extends AbstractIMSSDeduccion implements IDeducciones
 		this.parametros      = parametros;
 		this.cuotasIMSS      = parametros.getCuotasIMSS();
 		this.tiposDeduccion  = parametros.getTiposDeduccion();
-		this.fechaInicioAnio = parametros.getFechaInicioAnio();
-		this.fechaFinAnio    = parametros.getFechaFinAnio();
 		this.diasTrabajados  = diasTrabajados;
-		this.uma             = parametros.getUma().getImporteDiario();
 	}
 	
 	@Override
@@ -76,50 +71,57 @@ public class IMSSDeduccion extends AbstractIMSSDeduccion implements IDeducciones
 			
 			aportacionesIMSS = new ArrayList<>();
 			
+			//RIESGOS DE TRABAJO
 			imssRiesgoTrabajoBO = new IMSSRiesgoTrabajoDeduccion(this.parametros, this.diasTrabajados, this.sdi);
-			imssRiesgoTrabajoBO.setTiposDeduccion(tiposDeduccion);
-			imssRiesgoTrabajoBO.setCuotasIMSS(cuotasIMSS);
-			idx = imssEnfMatBO.nuevoIndiceDe(nomina.getDeducciones());
+			idx = imssRiesgoTrabajoBO.nuevoIndiceDe(nomina.getDeducciones());
+			//TODO Falta integrar la cuota de riesgo de la empresa.
 			dRiesgoTrabajo = imssRiesgoTrabajoBO.calcular(nomina, idx);
 			aportacionesIMSS.add(dRiesgoTrabajo);
-			//TODO Agregar objeto Deducción de Riesgo de trabajo a la lista de deducciones.
 			
-			imssEnfMatBO = new IMSSEnfermedadMaternidadDeduccion(this.diasTrabajados, this.uma, this.sdi);
-			imssEnfMatBO.setTiposDeduccion(tiposDeduccion);
-			imssEnfMatBO.setCuotasIMSS(cuotasIMSS);
-			idx = imssEnfMatBO.nuevoIndiceDe(nomina.getDeducciones());
+			//ENFERMEDADES Y MATERNIDAD (EN ESPECIE)
+			imssEnfMatBO = new IMSSEnfMatEnEspecieDeduccion(this.parametros, this.diasTrabajados, this.ausencias, this.incapacidades, this.sdi);
 			dEnfermedadMaternidad = imssEnfMatBO.calcular(nomina, idx++);
 			aportacionesIMSS.add(dEnfermedadMaternidad);
 			
-			imssGastosMedicosBO = new IMSSGastosMedicosPensionadosBeneficiariosDeduccion(this.fechaInicioAnio, this.fechaFinAnio, this.diasTrabajados, this.sdi);
-			imssGastosMedicosBO.setTiposDeduccion(tiposDeduccion);
-			imssGastosMedicosBO.setCuotasIMSS(cuotasIMSS);
-			dGastosMedicos = imssGastosMedicosBO.calcular(nomina, idx++);
+			//ENFERMEDADES Y MATERNIDAD (GASTOS MEDICOS PARA PENSIONADOS Y BENEFICIARIOS)
+			imssEnfMatGastosMedBO = new IMSSEnfMatGastosMedicosDeduccion(this.parametros, this.diasTrabajados, this.ausencias, this.incapacidades, this.sdi);
+			dGastosMedicos = imssEnfMatGastosMedBO.calcular(nomina, idx++);
 			aportacionesIMSS.add(dGastosMedicos);
 			
-			imssEnDineroBO = new IMSSEnDineroDeduccion(this.fechaInicioAnio, this.fechaFinAnio, this.diasTrabajados, this.sdi);
-			imssEnDineroBO.setTiposDeduccion(tiposDeduccion);
-			imssEnDineroBO.setCuotasIMSS(cuotasIMSS);
-			dEnDinero = imssEnDineroBO.calcular(nomina, idx++);
+			//ENFERMEDADES Y MATERNIDAD (EN DINERO)
+			imssEnfMatEnDineroBO = new IMSSEnfMatEnDineroDeduccion(this.parametros, this.diasTrabajados, this.ausencias, this.incapacidades, this.sdi);
+			dEnDinero = imssEnfMatEnDineroBO.calcular(nomina, idx++);
 			aportacionesIMSS.add(dEnDinero);
 			
-			imssInvalidezVidaBO = new IMSSInvalidezVida(fechaInicioAnio, fechaFinAnio, this.diasTrabajados, this.sdi);
-			imssInvalidezVidaBO.setTiposDeduccion(tiposDeduccion);
-			imssInvalidezVidaBO.setCuotasIMSS(cuotasIMSS);
+			//INVALIDEZ Y VIDA (EN ESPECIE Y EN DINERO)
+			imssInvalidezVidaBO = new IMSSInvalidezVida(this.parametros, new BigDecimal("7.00").setScale(2, BigDecimal.ROUND_HALF_UP), this.sdi);
 			dInvalidezVida = imssInvalidezVidaBO.calcular(nomina, idx++);
 			aportacionesIMSS.add(dInvalidezVida);
 			
-			imssCesantiaVejezBO = new IMSSCesantiaEdadAvanzadaVejezDeduccion(this.fechaInicioAnio, this.fechaFinAnio, this.diasTrabajados, this.sdi);
-			imssCesantiaVejezBO.setTiposDeduccion(tiposDeduccion);
-			imssCesantiaVejezBO.setCuotasIMSS(cuotasIMSS);
+			//CESANTIA EN EDAD AVANZADA Y VEJEZ (RETIRO)
+			imssCesantiaVejezBO = new IMSSCesantiaEdadAvanzadaVejezDeduccion(this.parametros, this.diasTrabajados, this.sdi);
 			dCesantiaVejez = imssCesantiaVejezBO.calcular(nomina, idx++);
 			aportacionesIMSS.add(dCesantiaVejez);
+			
+			//RETIRO, CESANTIA EN EDAD AVANZADA Y VEJEZ (CESANTIA EN EDAD AVANZADA Y VEJEZ)
+			//TODO implementar cálculo.
+			
+			//GUARDERIAS Y PRESTACIONES SOCIALES (EN ESPECIE)
+			//TODO implementar cálculo.
+			
+			//INFONAVIT
+			//TODO implementar cálculo.
 			
 			imss = dEnfermedadMaternidad.getImporte()
 					.add(dGastosMedicos.getImporte())
 					.add(dEnDinero.getImporte())
 					.add(dInvalidezVida.getImporte())
 					.add(dCesantiaVejez.getImporte())
+					;
+			
+			imss = aportacionesIMSS.stream()
+					.map(c -> c.getImporte())
+					.reduce(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP), BigDecimal :: add)
 					;
 			
 			dIMSS = new DetNominaDeduccion();

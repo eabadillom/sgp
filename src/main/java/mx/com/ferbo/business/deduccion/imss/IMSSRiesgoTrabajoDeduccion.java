@@ -14,8 +14,7 @@ import mx.com.ferbo.model.DetNominaDeduccionPK;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.util.SGPException;
 
-/**
- * 
+/**Cálculo de cuota IMSS Riesgo de trabajo.
  */
 public class IMSSRiesgoTrabajoDeduccion extends AbstractIMSSDeduccion implements IDeduccion {
 	

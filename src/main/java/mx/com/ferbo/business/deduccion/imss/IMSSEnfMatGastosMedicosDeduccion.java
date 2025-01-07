@@ -1,12 +1,12 @@
 package mx.com.ferbo.business.deduccion.imss;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.deduccion.IDeduccion;
+import mx.com.ferbo.business.nomina.ParametrosNomina;
 import mx.com.ferbo.model.CatCuotaIMSS;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
@@ -14,32 +14,27 @@ import mx.com.ferbo.model.DetNominaDeduccionPK;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.util.SGPException;
 
-public class IMSSEnDineroDeduccion extends AbstractIMSSDeduccion implements IDeduccion {
+public class IMSSEnfMatGastosMedicosDeduccion extends AbstractIMSSDeduccion implements IDeduccion {
 	
-	private static Logger log = LogManager.getLogger(IMSSEnDineroDeduccion.class);
+	private static Logger log = LogManager.getLogger(IMSSEnfMatGastosMedicosDeduccion.class);
 	
-	private Date fechaInicioAnio = null;
-	private Date fechaFinAnio = null;
-	private BigDecimal totalDiasPeriodo = null;
+	private BigDecimal diasTrabajados = null;
+	private BigDecimal ausencias = null;
+	private BigDecimal incapacidades = null;
 	private BigDecimal sdi = null;
 	
-	/**
-	 * @param fechaInicioAnio Fecha de inicio del año en curso (correspondiente al cálculo del periodo).
-	 * @param fechaFinAnio Fecha de fin del año en curso (correspondiente al cálculo del periodo).
-	 * @param totalDiasPeriodo Total de días del periodo (Semanal: 7 días, Quincenal: 15 días, Mensual: 30.4 días)
-	 * @param sdi Salario Diario Integrado.
-	 */
-	public IMSSEnDineroDeduccion(Date fechaInicioAnio, Date fechaFinAnio, BigDecimal totalDiasPeriodo, BigDecimal sdi) {
-		this.fechaInicioAnio = fechaInicioAnio;
-		this.fechaFinAnio = fechaFinAnio;
-		this.totalDiasPeriodo = totalDiasPeriodo;
+	public IMSSEnfMatGastosMedicosDeduccion(ParametrosNomina parametros, BigDecimal diasTrabajados, BigDecimal ausencias, BigDecimal incapacidades, BigDecimal sdi) {
+		this.cuotasIMSS = parametros.getCuotasIMSS();
+		this.tiposDeduccion = parametros.getTiposDeduccion();
+		this.diasTrabajados = diasTrabajados;
+		this.ausencias = ausencias;
+		this.incapacidades = incapacidades;
 		this.sdi = sdi;
 	}
 
 	@Override
 	public DetNominaDeduccion calcular(DetNomina nomina, Integer index) {
 		DetNominaDeduccion deduccion = null;
-		
 		BigDecimal cuota = null;
 		CatCuotaIMSS tarifaIMSS = null;
 		CatTipoDeduccion tdIMSS = null;
@@ -58,21 +53,25 @@ public class IMSSEnDineroDeduccion extends AbstractIMSSDeduccion implements IDed
 				throw new SGPException("No se establecio la lista de tipos de deduccion.");
 			
 			tdIMSS = this.getTipoDeduccion("001");
-			
-			tarifaIMSS = this.getCuotaIMSS("O", "EM3", this.fechaInicioAnio, this.fechaFinAnio, this.sdi);
+						
+			tarifaIMSS = this.getCuotaIMSS("O", "EM2", 0);
 			cuota = this.sdi
-					.multiply(tarifaIMSS.getCuota()).setScale(2, BigDecimal.ROUND_HALF_UP)
-					.multiply(totalDiasPeriodo).setScale(2, BigDecimal.ROUND_HALF_UP)
+					.multiply(tarifaIMSS.getCuota())
+					.multiply(diasTrabajados)
+					.setScale(2, BigDecimal.ROUND_HALF_UP)
 					;
+			
+			log.info("Gastos medicos pensionados y beneficiarios SDI: {} - Dias trabados: {} - Tarifa: {}", this.sdi, this.diasTrabajados, tarifaIMSS.getCuota());
+			
 		} catch(Exception ex) {
-			log.error("No es posible calcular el excedente En Dinero...", ex);
-			cuota = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+			log.error("No es posible calcular el excedente por Gastos Médicos para pensionados y beneficiarios...", ex);
+			cuota = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
 		} finally {
 			deduccion = new DetNominaDeduccion();
 			deduccion.setKey(new DetNominaDeduccionPK(nomina, index));
 			deduccion.setTipoDeduccion(tdIMSS);
-			deduccion.setClave("001");
-			deduccion.setNombre("I.M.S.S. (En dinero)");
+			deduccion.setClave("FRB-052");
+			deduccion.setNombre("I.M.S.S. (Gastos médicos pensionados y beneficiarios)");
 			deduccion.setImporte(cuota);
 			deduccion.setInformar(false);
 			deduccion.setProcesar(false);

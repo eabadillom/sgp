@@ -1,12 +1,12 @@
 package mx.com.ferbo.business.deduccion.imss;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.deduccion.IDeduccion;
+import mx.com.ferbo.business.nomina.ParametrosNomina;
 import mx.com.ferbo.model.CatCuotaIMSS;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
@@ -18,21 +18,19 @@ public class IMSSInvalidezVida extends AbstractIMSSDeduccion implements IDeducci
 	
 	private static Logger log = LogManager.getLogger(IMSSInvalidezVida.class);
 	
-	private Date fechaInicioAnio = null;
-	private Date fechaFinAnio = null;
-	private BigDecimal totalDiasPeriodo = null;
+	private BigDecimal diasTrabajados = null;
 	private BigDecimal sdi = null;
 	
 	/**
 	 * @param fechaInicioAnio Fecha de inicio del año en curso (correspondiente al cálculo del periodo).
 	 * @param fechaFinAnio Fecha de fin del año en curso (correspondiente al cálculo del periodo).
-	 * @param totalDiasPeriodo Total de días del periodo (Semanal: 7 días, Quincenal: 15 días, Mensual: 30.4 días)
+	 * @param diasTrabajados Total de días del periodo (Semanal: 7 días, Quincenal: 15 días, Mensual: 30.4 días)
 	 * @param sdi Salario Diario Integrado.
 	 */
-	public IMSSInvalidezVida(Date fechaInicioAnio, Date fechaFinAnio, BigDecimal totalDiasPeriodo, BigDecimal sdi) {
-		this.fechaInicioAnio = fechaInicioAnio;
-		this.fechaFinAnio = fechaFinAnio;
-		this.totalDiasPeriodo = totalDiasPeriodo;
+	public IMSSInvalidezVida(ParametrosNomina parametros, BigDecimal diasTrabajados, BigDecimal sdi) {
+		this.diasTrabajados = diasTrabajados;
+		this.cuotasIMSS = parametros.getCuotasIMSS();
+		this.tiposDeduccion = parametros.getTiposDeduccion();
 		this.sdi = sdi;
 	}
 
@@ -58,11 +56,13 @@ public class IMSSInvalidezVida extends AbstractIMSSDeduccion implements IDeducci
 				throw new SGPException("No se establecio la lista de tipos de deduccion.");
 			
 			tdIMSS = this.getTipoDeduccion("001");
-			tarifaIMSS = this.getCuotaIMSS("O", "IV", this.fechaInicioAnio, this.fechaFinAnio, this.sdi);
+			
+			tarifaIMSS = this.getCuotaIMSS("O", "IV", 0);
 			cuota = this.sdi
-					.multiply(tarifaIMSS.getCuota()).setScale(2, BigDecimal.ROUND_HALF_UP)
-					.multiply(totalDiasPeriodo).setScale(2, BigDecimal.ROUND_HALF_UP)
+					.multiply(tarifaIMSS.getCuota())
+					.multiply(diasTrabajados).setScale(2, BigDecimal.ROUND_HALF_UP)
 					;
+			
 		} catch(Exception ex) {
 			log.error("No es posible calcular el la cuota por Invalidez y Vida...", ex);
 			cuota = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);

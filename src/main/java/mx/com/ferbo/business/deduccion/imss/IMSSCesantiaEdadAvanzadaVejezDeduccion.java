@@ -7,6 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.deduccion.IDeduccion;
+import mx.com.ferbo.business.nomina.ParametrosNomina;
 import mx.com.ferbo.model.CatCuotaIMSS;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
@@ -23,9 +24,9 @@ public class IMSSCesantiaEdadAvanzadaVejezDeduccion extends AbstractIMSSDeduccio
 	private BigDecimal totalDiasPeriodo = null;
 	private BigDecimal sdi = null;
 	
-	public IMSSCesantiaEdadAvanzadaVejezDeduccion(Date fechaInicioAnio, Date fechaFinAnio, BigDecimal totalDiasPeriodo, BigDecimal sdi) {
-		this.fechaInicioAnio = fechaInicioAnio;
-		this.fechaFinAnio = fechaFinAnio;
+	public IMSSCesantiaEdadAvanzadaVejezDeduccion(ParametrosNomina parametros, BigDecimal totalDiasPeriodo, BigDecimal sdi) {
+		this.cuotasIMSS = parametros.getCuotasIMSS();
+		this.tiposDeduccion = parametros.getTiposDeduccion();
 		this.totalDiasPeriodo = totalDiasPeriodo;
 		this.sdi = sdi;
 	}
@@ -54,8 +55,9 @@ public class IMSSCesantiaEdadAvanzadaVejezDeduccion extends AbstractIMSSDeduccio
 			tdIMSS = this.getTipoDeduccion("001");
 			tarifaIMSS = this.getCuotaIMSS("O", "CEAV", this.fechaInicioAnio, this.fechaFinAnio, this.sdi);
 			cuota = this.sdi
-					.multiply(tarifaIMSS.getCuota()).setScale(2, BigDecimal.ROUND_HALF_UP)
-					.multiply(totalDiasPeriodo).setScale(2, BigDecimal.ROUND_HALF_UP)
+					.multiply(tarifaIMSS.getCuota())
+					.multiply(totalDiasPeriodo)
+					.setScale(2, BigDecimal.ROUND_HALF_UP)
 					;
 		} catch(Exception ex) {
 			log.error("No es posible calcular la cuota por cesantía en edad avanzada y vejez...", ex);

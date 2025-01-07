@@ -80,6 +80,14 @@ public class CatCuotaIMSS implements Serializable {
 	@Column(name = "fh_vigencia_fin")
 	private Date vigenciaFin;
 	
+	@Override
+	public String toString() {
+		return "CatCuotaIMSS [id=" + id + ", clave=" + clave + ", numero=" + numero + ", descripcion=" + descripcion
+				+ ", baseSalarial=" + baseSalarial + ", baseMinimo=" + baseMinimo + ", baseMaximo=" + baseMaximo
+				+ ", cuota=" + cuota + ", tipoCuota=" + tipoCuota + ", vigenciaInicio=" + vigenciaInicio
+				+ ", vigenciaFin=" + vigenciaFin + "]";
+	}
+	
 	public Integer getId() {
 		return id;
 	}
