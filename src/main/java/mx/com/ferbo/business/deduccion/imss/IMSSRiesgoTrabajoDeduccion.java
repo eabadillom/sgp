@@ -14,17 +14,22 @@ import mx.com.ferbo.model.DetNominaDeduccionPK;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.util.SGPException;
 
-/**Cálculo de cuota IMSS Riesgo de trabajo.
+/**Cálculo de cuota IMSS Riesgo de trabajo.<br>
+ * Fundamento legal: Artículo 73 LEY DEL SEGURO SOCIAL
  */
 public class IMSSRiesgoTrabajoDeduccion extends AbstractIMSSDeduccion implements IDeduccion {
 	
 	private static Logger log = LogManager.getLogger(IMSSRiesgoTrabajoDeduccion.class);
 	
 	private BigDecimal diasTrabajados = null;
+	private BigDecimal ausencias = null;
+	private BigDecimal incapacidades = null;
 	private BigDecimal sdi = null;
 	
-	public IMSSRiesgoTrabajoDeduccion(ParametrosNomina parametros, BigDecimal diasTrabajados, BigDecimal sdi) {
+	public IMSSRiesgoTrabajoDeduccion(ParametrosNomina parametros, BigDecimal diasTrabajados, BigDecimal ausencias, BigDecimal incapacidades, BigDecimal sdi) {
 		this.diasTrabajados = diasTrabajados;
+		this.ausencias = ausencias;
+		this.incapacidades = incapacidades;
 		this.sdi = sdi;
 		this.cuotasIMSS = parametros.getCuotasIMSS();
 		this.tiposDeduccion = parametros.getTiposDeduccion();
@@ -53,9 +58,11 @@ public class IMSSRiesgoTrabajoDeduccion extends AbstractIMSSDeduccion implements
 			tdIMSS = this.getTipoDeduccion("001");
 			
 			tarifaIMSS = this.getCuotaIMSS("O", "RT", 0);
+			//Formula: cuota = SBC x Prima RT x (Dias trabajados - Ausencias - Incapacidades)
+			//Sólo es cubierta por el patrón. El trabajador tiene una prima del 0%.
 			cuota = this.sdi
 					.multiply(tarifaIMSS.getCuota())
-					.multiply(diasTrabajados)
+					.multiply(diasTrabajados.subtract(ausencias).subtract(incapacidades))
 					.setScale(2, BigDecimal.ROUND_HALF_UP)
 					;
 			

@@ -19,7 +19,7 @@ public class IMSSDeduccion extends AbstractIMSSDeduccion implements IDeducciones
 	
 	private static Logger log = LogManager.getLogger(IMSSDeduccion.class);
 	
-	private BigDecimal diasTrabajados = null;
+	private BigDecimal diasPeriodo = null;
 	private BigDecimal ausencias = null;
 	private BigDecimal incapacidades = null;
 	private BigDecimal sdi = null;
@@ -32,11 +32,13 @@ public class IMSSDeduccion extends AbstractIMSSDeduccion implements IDeducciones
 	private IMSSInvalidezVida imssInvalidezVidaBO = null;
 	private IMSSCesantiaEdadAvanzadaVejezDeduccion imssCesantiaVejezBO = null;
 	
-	public IMSSDeduccion(ParametrosNomina parametros, BigDecimal diasTrabajados) {
+	public IMSSDeduccion(ParametrosNomina parametros, BigDecimal diasPeriodo, BigDecimal ausencias, BigDecimal incapacidades) {
 		this.parametros      = parametros;
 		this.cuotasIMSS      = parametros.getCuotasIMSS();
 		this.tiposDeduccion  = parametros.getTiposDeduccion();
-		this.diasTrabajados  = diasTrabajados;
+		this.diasPeriodo     = diasPeriodo;
+		this.ausencias       = ausencias;
+		this.incapacidades   = incapacidades;
 	}
 	
 	@Override
@@ -48,6 +50,7 @@ public class IMSSDeduccion extends AbstractIMSSDeduccion implements IDeducciones
 		DetNominaDeduccion dGastosMedicos = null;
 		DetNominaDeduccion dEnDinero = null;
 		DetNominaDeduccion dInvalidezVida = null;
+		DetNominaDeduccion dRetiro = null;
 		DetNominaDeduccion dCesantiaVejez = null;
 		DetNominaDeduccion dIMSS = null;
 		
@@ -72,45 +75,58 @@ public class IMSSDeduccion extends AbstractIMSSDeduccion implements IDeducciones
 			aportacionesIMSS = new ArrayList<>();
 			
 			//RIESGOS DE TRABAJO
-			imssRiesgoTrabajoBO = new IMSSRiesgoTrabajoDeduccion(this.parametros, this.diasTrabajados, this.sdi);
+			imssRiesgoTrabajoBO = new IMSSRiesgoTrabajoDeduccion(this.parametros, this.diasPeriodo, this.ausencias, this.incapacidades, this.sdi);
 			idx = imssRiesgoTrabajoBO.nuevoIndiceDe(nomina.getDeducciones());
 			//TODO Falta integrar la cuota de riesgo de la empresa.
 			dRiesgoTrabajo = imssRiesgoTrabajoBO.calcular(nomina, idx);
 			aportacionesIMSS.add(dRiesgoTrabajo);
 			
 			//ENFERMEDADES Y MATERNIDAD (EN ESPECIE)
-			imssEnfMatBO = new IMSSEnfMatEnEspecieDeduccion(this.parametros, this.diasTrabajados, this.ausencias, this.incapacidades, this.sdi);
+			imssEnfMatBO = new IMSSEnfMatEnEspecieDeduccion(this.parametros, this.diasPeriodo, this.ausencias, this.incapacidades, this.sdi);
 			dEnfermedadMaternidad = imssEnfMatBO.calcular(nomina, idx++);
 			aportacionesIMSS.add(dEnfermedadMaternidad);
 			
 			//ENFERMEDADES Y MATERNIDAD (GASTOS MEDICOS PARA PENSIONADOS Y BENEFICIARIOS)
-			imssEnfMatGastosMedBO = new IMSSEnfMatGastosMedicosDeduccion(this.parametros, this.diasTrabajados, this.ausencias, this.incapacidades, this.sdi);
+			imssEnfMatGastosMedBO = new IMSSEnfMatGastosMedicosDeduccion(this.parametros, this.diasPeriodo, this.ausencias, this.incapacidades, this.sdi);
 			dGastosMedicos = imssEnfMatGastosMedBO.calcular(nomina, idx++);
 			aportacionesIMSS.add(dGastosMedicos);
 			
 			//ENFERMEDADES Y MATERNIDAD (EN DINERO)
-			imssEnfMatEnDineroBO = new IMSSEnfMatEnDineroDeduccion(this.parametros, this.diasTrabajados, this.ausencias, this.incapacidades, this.sdi);
+			imssEnfMatEnDineroBO = new IMSSEnfMatEnDineroDeduccion(this.parametros, this.diasPeriodo, this.ausencias, this.incapacidades, this.sdi);
 			dEnDinero = imssEnfMatEnDineroBO.calcular(nomina, idx++);
 			aportacionesIMSS.add(dEnDinero);
 			
 			//INVALIDEZ Y VIDA (EN ESPECIE Y EN DINERO)
-			imssInvalidezVidaBO = new IMSSInvalidezVida(this.parametros, new BigDecimal("7.00").setScale(2, BigDecimal.ROUND_HALF_UP), this.sdi);
+			imssInvalidezVidaBO = new IMSSInvalidezVida(this.parametros, this.diasPeriodo, this.ausencias, this.incapacidades, this.sdi);
 			dInvalidezVida = imssInvalidezVidaBO.calcular(nomina, idx++);
 			aportacionesIMSS.add(dInvalidezVida);
 			
+			//GUARDERIAS Y PRESTACIONES SOCIALES (EN ESPECIE) Fund. Art. 211 LSS
+			//TODO implementar cálculo.
+			//Cuota = SBC x prima (Patrón 1%, Trabajador 0%) x (Dias periodo - Ausencias - Incapacidades)
+			
+			
+			//-----------------Aportaciones bimestrales-----------------------------------
+			//RETIRO, CESANTIA EN EDAD AVANZADA Y VEJEZ (CESANTIA EN EDAD AVANZADA Y VEJEZ)
+			//TODO implementar cálculo.
+			dRetiro = null;
+			
 			//CESANTIA EN EDAD AVANZADA Y VEJEZ (RETIRO)
-			imssCesantiaVejezBO = new IMSSCesantiaEdadAvanzadaVejezDeduccion(this.parametros, this.diasTrabajados, this.sdi);
+			imssCesantiaVejezBO = new IMSSCesantiaEdadAvanzadaVejezDeduccion(this.parametros, this.diasPeriodo, this.ausencias, this.incapacidades, this.sdi);
 			dCesantiaVejez = imssCesantiaVejezBO.calcular(nomina, idx++);
 			aportacionesIMSS.add(dCesantiaVejez);
 			
-			//RETIRO, CESANTIA EN EDAD AVANZADA Y VEJEZ (CESANTIA EN EDAD AVANZADA Y VEJEZ)
+			//INFONAVIT Fund. Art. 29 Fracción II LEY DEL INSTITUTO DEL FONDO NACIONAL DE LA VIVIENDA PARA LOS TRABAJADORES.
+			//Descuento de ausentismos, Art. 35 REGLAMENTO DE INSCRIPCIÓN, PAGO DE APORTACIONES Y ENTERO DE DESCUENTOS AL INSTITUTO DEL FONDO NACIONAL DE LA VIVIENDA PARA LOS TRABAJADORES
 			//TODO implementar cálculo.
+			//Cuota = SBC x prima (Patrón 5%, Trabajador 0%) x (Dias trabajados - Ausencias)
 			
-			//GUARDERIAS Y PRESTACIONES SOCIALES (EN ESPECIE)
-			//TODO implementar cálculo.
 			
-			//INFONAVIT
-			//TODO implementar cálculo.
+			
+			
+			
+			
+			
 			
 			imss = dEnfermedadMaternidad.getImporte()
 					.add(dGastosMedicos.getImporte())

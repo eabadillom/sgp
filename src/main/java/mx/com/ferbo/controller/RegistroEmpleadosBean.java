@@ -13,18 +13,16 @@ import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import mx.com.ferbo.business.empleado.EmpleadoBL;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.CaptureEvent;
 
+import mx.com.ferbo.business.empleado.EmpleadoBL;
 import mx.com.ferbo.dao.n.AreaDAO;
 import mx.com.ferbo.dao.n.AsentamientoDAO;
 import mx.com.ferbo.dao.n.BiometricoDAO;
-import mx.com.ferbo.dao.n.EmpleadoConfiguracionDAO;
-import mx.com.ferbo.dao.n.DomicilioEmpleadoDAO;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.EmpleadoFotoDAO;
 import mx.com.ferbo.dao.n.EmpresaDAO;
@@ -42,9 +40,8 @@ import mx.com.ferbo.dao.n.TipoJornadaDAO;
 import mx.com.ferbo.dao.n.TipoPercepcionDAO;
 import mx.com.ferbo.dao.n.TipoPrestamoDAO;
 import mx.com.ferbo.dao.n.TipoRegimenDAO;
-import mx.com.ferbo.dao.n.VacacionesDAO;
-import mx.com.ferbo.dao.n.sat.BancoDAO;
 import mx.com.ferbo.dao.n.tipobajaempleadoDAO;
+import mx.com.ferbo.dao.n.sat.BancoDAO;
 import mx.com.ferbo.model.CatArea;
 import mx.com.ferbo.model.CatAsentamiento;
 import mx.com.ferbo.model.CatAsentamientoPK;
@@ -69,7 +66,6 @@ import mx.com.ferbo.model.DetEmpleadoConfiguracion;
 import mx.com.ferbo.model.DetEmpleadoFoto;
 import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.DetPrestamo;
-import mx.com.ferbo.model.DetVacaciones;
 import mx.com.ferbo.model.InfDatoEmpresa;
 import mx.com.ferbo.model.Pais;
 import mx.com.ferbo.model.sat.CatBanco;
@@ -79,7 +75,6 @@ import mx.com.ferbo.model.sat.CatTipoContrato;
 import mx.com.ferbo.model.sat.CatTipoJornada;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.model.sat.CatTipoRegimen;
-import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.ManageStatus;
 import mx.com.ferbo.util.SGPException;
 
@@ -115,7 +110,6 @@ public class RegistroEmpleadosBean implements Serializable {
     private PeriodicidadPagoDAO periodicidadDAO;
     private TipoPercepcionDAO tipoPercepcionDAO;
     private AsentamientoDAO asentamientoDAO;
-    private EmpleadoConfiguracionDAO configuracionEmpleadoDAO;
     private BancoDAO bancodao;
 
     private List<DetEmpleado> lstEmpleados;

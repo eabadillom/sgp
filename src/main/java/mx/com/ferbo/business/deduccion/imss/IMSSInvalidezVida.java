@@ -14,11 +14,16 @@ import mx.com.ferbo.model.DetNominaDeduccionPK;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.util.SGPException;
 
+/**Cálculo de Invalidez y Vida.<br>
+ * Fundamento legal: Art. 147 LEY DEL SEGURO SOCIAL.
+ */
 public class IMSSInvalidezVida extends AbstractIMSSDeduccion implements IDeduccion {
 	
 	private static Logger log = LogManager.getLogger(IMSSInvalidezVida.class);
 	
 	private BigDecimal diasTrabajados = null;
+	private BigDecimal ausencias = null;
+	private BigDecimal incapacidades = null; 
 	private BigDecimal sdi = null;
 	
 	/**
@@ -27,8 +32,10 @@ public class IMSSInvalidezVida extends AbstractIMSSDeduccion implements IDeducci
 	 * @param diasTrabajados Total de días del periodo (Semanal: 7 días, Quincenal: 15 días, Mensual: 30.4 días)
 	 * @param sdi Salario Diario Integrado.
 	 */
-	public IMSSInvalidezVida(ParametrosNomina parametros, BigDecimal diasTrabajados, BigDecimal sdi) {
+	public IMSSInvalidezVida(ParametrosNomina parametros, BigDecimal diasTrabajados, BigDecimal ausencias, BigDecimal incapacidades, BigDecimal sdi) {
 		this.diasTrabajados = diasTrabajados;
+		this.ausencias = ausencias;
+		this.incapacidades = incapacidades;
 		this.cuotasIMSS = parametros.getCuotasIMSS();
 		this.tiposDeduccion = parametros.getTiposDeduccion();
 		this.sdi = sdi;
@@ -60,7 +67,9 @@ public class IMSSInvalidezVida extends AbstractIMSSDeduccion implements IDeducci
 			tarifaIMSS = this.getCuotaIMSS("O", "IV", 0);
 			cuota = this.sdi
 					.multiply(tarifaIMSS.getCuota())
-					.multiply(diasTrabajados).setScale(2, BigDecimal.ROUND_HALF_UP)
+					//TOTAL DIAS PERIODO - AUSENCIAS - INCAPACIDADES
+					.multiply(diasTrabajados.subtract(ausencias).subtract(incapacidades))
+					.setScale(2, BigDecimal.ROUND_HALF_UP)
 					;
 			
 		} catch(Exception ex) {

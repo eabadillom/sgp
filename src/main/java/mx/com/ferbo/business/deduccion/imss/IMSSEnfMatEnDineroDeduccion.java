@@ -14,6 +14,9 @@ import mx.com.ferbo.model.DetNominaDeduccionPK;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.util.SGPException;
 
+/**Cálculo de cuotas para Enfermedades y Maternidad (En dinero)<br>
+ * Fundamento legal: Art. 107 Fracción I LEY DEL SEGURO SOCIAL
+ */
 public class IMSSEnfMatEnDineroDeduccion extends AbstractIMSSDeduccion implements IDeduccion {
 	
 	private static Logger log = LogManager.getLogger(IMSSEnfMatEnDineroDeduccion.class);
@@ -65,7 +68,8 @@ public class IMSSEnfMatEnDineroDeduccion extends AbstractIMSSDeduccion implement
 			log.info("TARIFA IMSS: {}", tarifaIMSS);
 			cuota = this.sdi
 					.multiply(tarifaIMSS.getCuota())
-					.multiply(diasTrabajados)
+					//TODO A LOS DIAS TRABAJADOS SE LES DEBE RESTAR LAS INCAPACIDADES Y A PARTIR DE ELLO SE REALIZA EL CALCULO.
+					.multiply(diasTrabajados.subtract(incapacidades))
 					.setScale(2, BigDecimal.ROUND_HALF_UP)
 					;
 			

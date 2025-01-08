@@ -14,6 +14,9 @@ import mx.com.ferbo.model.DetNominaDeduccionPK;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.util.SGPException;
 
+/**Cálculo de cuuotas Enfermedades y Maternidad (Gastos Médicos para pensionados y beneficiarios)<br>
+ * Fundamento legal: Artículo 25 segundo párrafo LEY DEL SEGURO SOCIAL.
+ */
 public class IMSSEnfMatGastosMedicosDeduccion extends AbstractIMSSDeduccion implements IDeduccion {
 	
 	private static Logger log = LogManager.getLogger(IMSSEnfMatGastosMedicosDeduccion.class);
@@ -57,7 +60,8 @@ public class IMSSEnfMatGastosMedicosDeduccion extends AbstractIMSSDeduccion impl
 			tarifaIMSS = this.getCuotaIMSS("O", "EM2", 0);
 			cuota = this.sdi
 					.multiply(tarifaIMSS.getCuota())
-					.multiply(diasTrabajados)
+					//TODO A LOS DIAS TRABAJADOS SE LES DEBE RESTAR LAS INCAPACIDADES Y A PARTIR DE ELLO SE REALIZA EL CALCULO.
+					.multiply(diasTrabajados.subtract(incapacidades))
 					.setScale(2, BigDecimal.ROUND_HALF_UP)
 					;
 			

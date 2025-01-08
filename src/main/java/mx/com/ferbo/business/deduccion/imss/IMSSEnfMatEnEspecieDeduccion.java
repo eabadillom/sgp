@@ -15,6 +15,10 @@ import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.util.SGPException;
 
 /**Cálculo de cuota IMSS Enfermedades y Maternidad (En especie - cuota fija y excedente).
+ * Fundamento legal: Art. 106 LEY DEL SEGURO SOCIAL
+ * Transitorio Art. Decimo noveno LEY DEL SEGURO SOCIAL.
+ * 
+ * Ausencias e incapacidades. Fundamento legal: Art. 31 LEY DEL SEGURO SOCIAL
  */
 public class IMSSEnfMatEnEspecieDeduccion extends AbstractIMSSDeduccion implements IDeduccion {
 	
@@ -77,22 +81,27 @@ public class IMSSEnfMatEnEspecieDeduccion extends AbstractIMSSDeduccion implemen
 			
 			
 			tarifaIMSS = this.getCuotaIMSS("O", "EM1", 0);
+			//Fundamento legal: Art. 106 LEY DEL SEGURO SOCIAL Fracción I. Transitorio Art. Decimo noveno Parrafo 1 de la LSS
 			cuotaFija = this.uma
-					.multiply(diasTrabajados)
+					//TODO A LOS DIAS TRABAJADOS SE LES DEBE RESTAR LAS INCAPACIDADES Y A PARTIR DE ELLO SE REALIZA EL CALCULO.
+					.multiply(diasTrabajados.subtract(this.incapacidades))
 					.multiply(tarifaIMSS.getCuota())
 					.setScale(2, BigDecimal.ROUND_HALF_UP)
 					;
 			log.info("Enfermedad y Maternidad SDI: {} - UMA: {} - Tarifa Cuota fija: {}", this.sdi, this.uma, tarifaIMSS.getCuota());
 			
 			limiteUMAs = this.uma.multiply(tres).setScale(2, BigDecimal.ROUND_HALF_UP);
+			
+			//Fundamento legal: Art. 106 LEY DEL SEGURO SOCIAL Fracción II. Transitorio Art. Decimo noveno Parrafo 2 de la LSS
 			excedente = this.sdi.subtract(limiteUMAs);
 			if(this.sdi.compareTo(limiteUMAs) >= 0) {
 				
 				tarifaIMSS = this.getCuotaIMSS("O", "EM1", 1);
 				tarifa = tarifaIMSS.getCuota();
 				cuotaExcedente = excedente
+						//TODO A LOS DIAS TRABAJADOS SE LES DEBE RESTAR LAS INCAPACIDADES Y A PARTIR DE ELLO SE REALIZA EL CALCULO.
+						.multiply(diasTrabajados.subtract(this.incapacidades))
 						.multiply(tarifa)
-						.multiply(this.diasTrabajados)
 						.setScale(2, BigDecimal.ROUND_HALF_UP);
 				
 				log.info("Enfermedad y Maternidad SDI: {} - UMA: {} - Excedente: {}, Tarifa: {}", this.sdi, this.uma, excedente, tarifa);
