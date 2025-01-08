@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -231,15 +232,14 @@ public class RegistroAsistenciaBL
         List<Date> diasDeDescanso = DateUtil.diasLaborales(fechas, diasAsueto);
         log.trace("Dias despues de festividades: {}", diasDeDescanso.size());
         
-        Map<DayOfWeek, Boolean> diasEmpleado = Map.of(
-            DayOfWeek.MONDAY, empleadoEmpresa.getDiaLunes(),
-            DayOfWeek.TUESDAY, empleadoEmpresa.getDiaMartes(),
-            DayOfWeek.WEDNESDAY, empleadoEmpresa.getDiaMiercoles(),
-            DayOfWeek.THURSDAY, empleadoEmpresa.getDiaJueves(),
-            DayOfWeek.FRIDAY, empleadoEmpresa.getDiaViernes(),
-            DayOfWeek.SATURDAY, empleadoEmpresa.getDiaSabado(),
-            DayOfWeek.SUNDAY, empleadoEmpresa.getDiaDomingo()
-        );
+        Map<DayOfWeek, Boolean> diasEmpleado = new HashMap<>();
+        diasEmpleado.put(DayOfWeek.MONDAY, empleadoEmpresa.getDiaLunes());
+        diasEmpleado.put(DayOfWeek.TUESDAY, empleadoEmpresa.getDiaMartes());
+        diasEmpleado.put(DayOfWeek.WEDNESDAY, empleadoEmpresa.getDiaMiercoles());
+        diasEmpleado.put(DayOfWeek.THURSDAY, empleadoEmpresa.getDiaJueves());
+        diasEmpleado.put(DayOfWeek.FRIDAY, empleadoEmpresa.getDiaViernes());
+        diasEmpleado.put(DayOfWeek.SATURDAY, empleadoEmpresa.getDiaSabado());
+        diasEmpleado.put(DayOfWeek.SUNDAY, empleadoEmpresa.getDiaDomingo());
 
         List<Date> diasDeVacaciones = diasDeDescanso.stream()
             .filter(dia -> diasEmpleado.getOrDefault(DateUtil.toLocalDate(dia).getDayOfWeek(), true))
