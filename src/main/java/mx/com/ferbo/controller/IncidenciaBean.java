@@ -275,8 +275,8 @@ public class IncidenciaBean implements Serializable {
                 this.invalidDays = obtenerDiasSeleccionados(empleadoSelected.getDatoEmpresa());
                 this.diasDeVacaciones = empleadoAsistencia.diasVacacionesSolicitados(fechas, this.diasDeAsueto, empleadoSelected.getDatoEmpresa());
                 log.trace("Dias Solicitados: {}", this.diasDeVacaciones.toString());
-                lstRangoRegistro = Arrays.asList(diasDeVacaciones.getFirst(), diasDeVacaciones.getLast());
                 this.diasVacacionesSolicitados = this.diasDeVacaciones.size();
+                lstRangoRegistro = Arrays.asList(diasDeVacaciones.get(0), diasDeVacaciones.get(this.diasVacacionesSolicitados-1));
                 log.trace("Total Dias de Vacaciones Solicitados: {}", this.diasVacacionesSolicitados);
                 PrimeFaces.current().executeScript("PF('dialogPermisos').show();");
                 break;
