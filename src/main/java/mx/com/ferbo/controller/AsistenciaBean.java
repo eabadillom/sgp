@@ -29,10 +29,12 @@ import org.primefaces.model.DefaultScheduleModel;
 import org.primefaces.model.ScheduleEvent;
 import org.primefaces.model.ScheduleModel;
 
+import mx.com.ferbo.business.dianolaboral.DiasDeDescansoObligatorioBL;
 import mx.com.ferbo.dao.n.IncidenciaDAO;
 import mx.com.ferbo.dao.n.TipoSolicitudDAO;
 import mx.com.ferbo.dao.n.RegistroDAO;
 import mx.com.ferbo.dao.n.SolicitudPermisoDAO;
+import mx.com.ferbo.model.CatDiaNoLaboral;
 import mx.com.ferbo.model.CatEstatusIncidencia;
 import mx.com.ferbo.model.CatTipoIncidencia;
 import mx.com.ferbo.model.CatTipoSolicitud;
@@ -40,6 +42,8 @@ import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetIncidencia;
 import mx.com.ferbo.model.DetRegistro;
 import mx.com.ferbo.model.DetSolicitudPermiso;
+import mx.com.ferbo.model.InfDatoEmpresa;
+import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.SGPException;
 import mx.com.ferbo.util.ManageStatus;
 
@@ -50,7 +54,7 @@ import mx.com.ferbo.util.ManageStatus;
 @Named(value = "asistenciaBean")
 @ViewScoped
 public class AsistenciaBean implements Serializable {
-    
+    private DiasDeDescansoObligatorioBL diasDeDescansoObligatorio;
     private static final long serialVersionUID = 1L;
     private static Logger log = LogManager.getLogger(AsistenciaBean.class);
 
@@ -73,7 +77,7 @@ public class AsistenciaBean implements Serializable {
     private List<Date> lstRangoRegistro;
     private List<SelectItem> lstTipoSolSelect;
     private Date fechaSeleccionada;
-
+    
     // Obteniendo Empleado
     private DetEmpleado empleadoSelected;
     private DetIncidencia incidencia;
@@ -92,13 +96,15 @@ public class AsistenciaBean implements Serializable {
         inicializaSolicitud();
         sdf.setTimeZone(TimeZone.getTimeZone(ZoneId.of("GMT-6").normalized()));
         lstRangoRegistro = new ArrayList<>();
-        invalidDays = new ArrayList<>();
+        //invalidDays = new ArrayList<>();
         lstTipoSolSelect = new ArrayList<>();
-        invalidDays.add(0);
+        //invalidDays.add(0);
 
         empleadoSelected = new DetEmpleado();
         httpServletRequest = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         this.empleadoSelected = (DetEmpleado) httpServletRequest.getSession(true).getAttribute("empleado");
+        invalidDays = this.obtenerDiasSeleccionados(empleadoSelected.getDatoEmpresa());
+        this.diasDeDescansoObligatorio = new DiasDeDescansoObligatorioBL();
     }
 
     @PostConstruct
@@ -115,6 +121,7 @@ public class AsistenciaBean implements Serializable {
         generaEventosRegistros(lstRegistros);
         generaEventosIncidencias(lstIncidencias);
         status = new ManageStatus();
+        generaEventosDiasDescansoObligatorio(this.diasDeDescansoObligatorio.getDiasNoLaboralSelected());
     }
 
     private void generaEventosRegistros(List<DetRegistro> registros) {
@@ -122,7 +129,7 @@ public class AsistenciaBean implements Serializable {
         int diaInicioSemana = 5; //JUEVES
         int diaInicioRegistros;
         for (DetRegistro registro : registros) {
-
+            
             Calendar cal = Calendar.getInstance();
             cal.setTime(registro.getFechaEntrada());
             
@@ -178,10 +185,12 @@ public class AsistenciaBean implements Serializable {
 
     private void generaEventosIncidencias(List<DetIncidencia> incidencias) {
         for (DetIncidencia incidencia : incidencias) {
+            LocalDateTime localStartDate = DateUtil.toLocalDateTime(incidencia.getIdSolPermiso().getFechaInicio());
+            LocalDateTime localEndDate = DateUtil.toLocalDateTime(incidencia.getIdSolPermiso().getFechaFin());
             DefaultScheduleEvent eventoEntrada = DefaultScheduleEvent.builder()
                     .title(incidencia.getIdSolPermiso().getIdTipoSolicitud().getDescripcion())
-                    .startDate(convertirDateToLocalDateTime(incidencia.getIdSolPermiso().getFechaInicio()))
-                    .endDate(convertirDateToLocalDateTime(incidencia.getIdSolPermiso().getFechaFin()))
+                    .startDate(localStartDate)
+                    .endDate((incidencia.getIdSolPermiso().getIdTipoSolicitud().getIdTipoSolicitud()==2) ? localEndDate.plusDays(1) : localEndDate)
                     .allDay(true)
                     .description(null)
                     .styleClass(estiloByTipo(incidencia.getIdSolPermiso().getIdTipoSolicitud().getIdTipoSolicitud()))
@@ -191,7 +200,25 @@ public class AsistenciaBean implements Serializable {
             calendario.addEvent(eventoEntrada);
         }
     }
-
+    
+    private void generaEventosDiasDescansoObligatorio(List<CatDiaNoLaboral> diasNoLaboral) 
+    {
+        for (CatDiaNoLaboral auxDiasNoLaboral : diasNoLaboral) 
+        {
+            DefaultScheduleEvent eventoEntrada = DefaultScheduleEvent.builder()
+                    .title(auxDiasNoLaboral.getDescripcion())
+                    .startDate(DateUtil.toLocalDateTime(auxDiasNoLaboral.getFecha()))
+                    .endDate(DateUtil.toLocalDateTime(auxDiasNoLaboral.getFecha()))
+                    .allDay(true)
+                    .description(auxDiasNoLaboral.getDescripcion())
+                    .styleClass(estiloByTipo(2))
+                    .dynamicProperty("tipoSolicitud", "Descanso Obligatorio")
+                    .dynamicProperty("idTipoSolicitud", 2)
+                    .build();
+            calendario.addEvent(eventoEntrada);
+        }
+    }
+    
     public LocalDateTime convertirDateToLocalDateTime(Date fecha) {
         return fecha.toInstant()
                 .atZone(ZoneId.of("GMT-6"))
@@ -213,7 +240,13 @@ public class AsistenciaBean implements Serializable {
                 color = "#689F38";
                 break;
             case 2:
+                color = "#2a9d8f";
+                break;
+            case 3:
                 color = "#ef6262";
+                break;
+            case 4:
+                color = "#e9c46a";
                 break;
             default:
                 color = "#00000000";
@@ -264,6 +297,7 @@ public class AsistenciaBean implements Serializable {
                 solicitudSelected.setFechaFin(fechaSeleccionada);
             } else {
                 solicitudSelected.setFechaInicio(lstRangoRegistro.get(0));
+                DateUtil.setTime(lstRangoRegistro.get(1), 0, 0, 0);
                 solicitudSelected.setFechaFin(lstRangoRegistro.size() > 1 ? lstRangoRegistro.get(1) : lstRangoRegistro.get(0));
             }
             solicitudSelected.setAprobada((short)1);
@@ -395,8 +429,10 @@ public class AsistenciaBean implements Serializable {
             case 3://INCAPACIDAD CORTA
                 fechaSeleccionada = solicitudSelected.getFechaInicio();
                 break;
-            default:
+            case 2://VACACIONES
+            case 4://INCAPACIDAD LARGA
                 lstRangoRegistro = Arrays.asList(solicitudSelected.getFechaInicio(), solicitudSelected.getFechaFin());
+                break;
         }
         PrimeFaces.current().executeScript("PF('dialogVacacionesView').show();");
     }
@@ -415,7 +451,29 @@ public class AsistenciaBean implements Serializable {
         }
         return calendar.getTime();
     }
-
+    
+    public List<Integer> obtenerDiasSeleccionados(InfDatoEmpresa empleadoEmpresa) 
+    {  
+        List<Integer> diasSeleccionados = new ArrayList<>();
+        
+        if (empleadoEmpresa.getDiaLunes() != true) 
+            diasSeleccionados.add(1);
+        if (empleadoEmpresa.getDiaMartes() != true) 
+            diasSeleccionados.add(2);
+        if (empleadoEmpresa.getDiaMiercoles() != true) 
+            diasSeleccionados.add(3);
+        if (empleadoEmpresa.getDiaJueves() != true) 
+            diasSeleccionados.add(4);
+        if (empleadoEmpresa.getDiaViernes() != true) 
+            diasSeleccionados.add(5);
+        if (empleadoEmpresa.getDiaSabado() != true) 
+            diasSeleccionados.add(6);
+        if (empleadoEmpresa.getDiaDomingo() != true) 
+            diasSeleccionados.add(0);
+        log.trace("Dias de bloqueo: {}", diasSeleccionados.toString());
+        return diasSeleccionados;
+    }
+    
     //<editor-fold defaultstate="collapsed" desc="Getters&Setters">
     public ScheduleModel getCalendario() {
         return calendario;
@@ -495,6 +553,10 @@ public class AsistenciaBean implements Serializable {
     
     public ManageStatus getStatus() {
         return status;
+    }
+    
+    public DiasDeDescansoObligatorioBL getDiasDeDescansoObligatorio() {
+        return diasDeDescansoObligatorio;
     }
     //</editor-fold>
 }

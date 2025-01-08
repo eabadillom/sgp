@@ -1,6 +1,13 @@
 package mx.com.ferbo.business.empleado;
 
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import mx.com.ferbo.dao.n.EmpleadoFotoDAO;
 import mx.com.ferbo.dao.n.EstatusRegistroDAO;
 import mx.com.ferbo.dao.n.RegistroDAO;
@@ -9,6 +16,7 @@ import mx.com.ferbo.model.CatEstatusRegistro;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetEmpleadoConfiguracion;
 import mx.com.ferbo.model.DetEmpleadoFoto;
+import mx.com.ferbo.model.DetIncidencia;
 import mx.com.ferbo.model.DetRegistro;
 import mx.com.ferbo.model.DetToken;
 import mx.com.ferbo.model.InfDatoEmpresa;
@@ -184,6 +192,62 @@ public class RegistroAsistenciaBL
             }
         }
         return registro;
+    }
+    
+    public void guardarRegistroVacaciones(DetEmpleado empleado, DetIncidencia incidencia, List<Date> diasAsueto) throws SGPException
+    {
+        InfDatoEmpresa empleadoEmpresa = empleado.getDatoEmpresa();
+        CatEstatusRegistro statusVacaciones = estatusDAO.buscarPorId(5);
+        
+        Integer horaEntrada = DateUtil.getHora(empleadoEmpresa.getHoraEntrada());
+        Integer horaSalida = horaEntrada + 9;
+        
+        List<Date> listaFechas = DateUtil.generarArreglosFechas(incidencia.getIdSolPermiso().getFechaInicio(), incidencia.getIdSolPermiso().getFechaFin());
+        log.trace("Lista de Fechas: {}", listaFechas);
+        
+        listaFechas = diasVacacionesSolicitados(listaFechas, diasAsueto, empleado.getDatoEmpresa());
+        
+        for(Date dia : listaFechas)
+        {
+            DetRegistro registro = new DetRegistro();
+            registro.setIdEmpleado(empleado);
+            registro.setIdEstatus(statusVacaciones);
+            
+            Date registroEntrada = DateUtil.getDate(DateUtil.getAnio(dia), DateUtil.getMes(dia), DateUtil.getDia(dia), horaEntrada, 0, 0);
+            log.trace("Dia hora entrada: {}", registroEntrada);
+            registro.setFechaEntrada(registroEntrada);
+
+            Date registroSalida = DateUtil.getDate(DateUtil.getAnio(dia), DateUtil.getMes(dia), DateUtil.getDia(dia), horaSalida, 0, 0);
+            log.trace("Dia hora salida: {}", registroSalida);
+            registro.setFechaSalida(registroSalida);
+            
+            registroDAO.guardar(registro);
+        }
+    }
+    
+    public List<Date> diasVacacionesSolicitados(List<Date> fechas, List<Date> diasAsueto, InfDatoEmpresa empleadoEmpresa)
+    {
+        log.trace("Dias antes de festividades: {}", fechas.size());
+        List<Date> diasDeDescanso = DateUtil.diasLaborales(fechas, diasAsueto);
+        log.trace("Dias despues de festividades: {}", diasDeDescanso.size());
+        
+        Map<DayOfWeek, Boolean> diasEmpleado = Map.of(
+            DayOfWeek.MONDAY, empleadoEmpresa.getDiaLunes(),
+            DayOfWeek.TUESDAY, empleadoEmpresa.getDiaMartes(),
+            DayOfWeek.WEDNESDAY, empleadoEmpresa.getDiaMiercoles(),
+            DayOfWeek.THURSDAY, empleadoEmpresa.getDiaJueves(),
+            DayOfWeek.FRIDAY, empleadoEmpresa.getDiaViernes(),
+            DayOfWeek.SATURDAY, empleadoEmpresa.getDiaSabado(),
+            DayOfWeek.SUNDAY, empleadoEmpresa.getDiaDomingo()
+        );
+
+        List<Date> diasDeVacaciones = diasDeDescanso.stream()
+            .filter(dia -> diasEmpleado.getOrDefault(DateUtil.toLocalDate(dia).getDayOfWeek(), true))
+            .collect(Collectors.toList());
+
+        log.trace("Dias de descanso: {}", diasDeVacaciones.size());
+        log.trace("Y son: {}", diasDeVacaciones.toString());
+        return diasDeVacaciones;
     }
     
 }

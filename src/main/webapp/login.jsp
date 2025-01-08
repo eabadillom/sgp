@@ -13,7 +13,7 @@
     if (empleado != null) {
         request.getSession().invalidate();
     }
-
+    
     String numEmpleado = "";
     Integer tamanioPermitido = 4;
 %>

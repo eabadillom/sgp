@@ -56,14 +56,16 @@
                                                    and (asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud eq 2 
                                                    or asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud eq 4)}" 
                           styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" 
-                          pattern="dd-MM-yyyy" showIcon="true" readonlyInput="true" timeZone="Mexico/General" value="#{asistenciaBean.lstRangoRegistro}"
-                          mindate="#{asistenciaBean.minDate}" inline="true" selectionMode="range" disabledDays="#{asistenciaBean.invalidDays}"/>
+                          pattern="dd-MM-yyyy" showIcon="true" readonlyInput="true" timeZone="GMT-6" value="#{asistenciaBean.lstRangoRegistro}"
+                          mindate="#{asistenciaBean.minDate}" inline="true" selectionMode="range" disabledDays="#{asistenciaBean.invalidDays}"
+                          disabledDates="#{asistenciaBean.diasDeDescansoObligatorio.diasAsueto}"/>
             <p:datePicker id="dpSimple" rendered="#{asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud ne null 
                                                     and asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud ne 2 
                                                     and asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud ne 4}" 
                           styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" 
-                          pattern="dd-MM-yyyy" showIcon="true" readonlyInput="true" timeZone="Mexico/General" value="#{asistenciaBean.fechaSeleccionada}"
-                          mindate="#{asistenciaBean.minDate}" inline="true" disabledDays="#{asistenciaBean.invalidDays}"/>
+                          pattern="dd-MM-yyyy" showIcon="true" readonlyInput="true" timeZone="GMT-6" value="#{asistenciaBean.fechaSeleccionada}"
+                          mindate="#{asistenciaBean.minDate}" inline="true" disabledDays="#{asistenciaBean.invalidDays}" 
+                          disabledDates="#{asistenciaBean.diasDeDescansoObligatorio.diasAsueto}"/>
         </p:outputPanel>
         <f:facet name="footer">
             <p:commandButton value="Guardar" icon="pi pi-save" actionListener="#{asistenciaBean.guardaSolicitud()}" 
@@ -93,6 +95,7 @@
                         <f:selectItem itemLabel="ENVIADA" itemValue="1"/>
                         <f:selectItem itemLabel="APROBADA" itemValue="2"/>
                         <f:selectItem itemLabel="RECHAZADA" itemValue="3"/>
+                        <f:selectItem itemLabel="CANCELADA" itemValue="4"/>
                     </p:selectOneMenu>
                 </div>
                 </div>
@@ -106,13 +109,13 @@
                                                        and (asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud eq 2 
                                                             or asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud eq 4)}" 
                           styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" disabled="true"
-                          readonlyInput="true" timeZone="Mexico/General" value="#{asistenciaBean.lstRangoRegistro}"
+                          readonlyInput="true" timeZone="GMT-06:00" value="#{asistenciaBean.lstRangoRegistro}"
                           inline="true" selectionMode="range" disabledDays="#{asistenciaBean.invalidDays}"/>
             <p:datePicker id="dpSimpleView" rendered="#{asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud ne null 
                                                         and asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud ne 2 
                                                         and asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud ne 4}" 
                           styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" disabled="true"
-                          readonlyInput="true" timeZone="Mexico/General" value="#{asistenciaBean.fechaSeleccionada}"
+                          readonlyInput="true" timeZone="GMT-06:00" value="#{asistenciaBean.fechaSeleccionada}"
                           inline="true" disabledDays="#{asistenciaBean.invalidDays}"/>
         </p:outputPanel>
         <f:facet name="footer">
