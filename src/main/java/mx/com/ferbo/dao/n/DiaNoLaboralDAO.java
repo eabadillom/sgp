@@ -37,7 +37,7 @@ public class DiaNoLaboralDAO extends BaseDAO<CatDiaNoLaboral, Integer> {
 					;
 			
 			for(CatDiaNoLaboral d : list) {
-				log.info("Pais: {}", d.getPais().getId());
+				log.trace("Pais: {}, Dia No Laboral: {}", d.getPais().getId(), d.getDescripcion());
 			}
 			
 		} catch(Exception ex) {

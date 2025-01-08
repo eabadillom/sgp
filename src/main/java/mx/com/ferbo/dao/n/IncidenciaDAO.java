@@ -33,6 +33,23 @@ public class IncidenciaDAO extends BaseDAO<DetIncidencia, Integer>
             emSGP = getEntityManager();
             modelList = emSGP.createNamedQuery("DetIncidencia.findAll", DetIncidencia.class)
                 .getResultList();
+            
+            for(DetIncidencia aux : modelList)
+            {
+                if(aux.getIdSolPermiso() != null)
+                {
+                    log.trace("DetSolicitudPermiso: {}", aux.getIdSolPermiso().toString());
+                }
+                if(aux.getIdSolPrenda() != null)
+                {
+                    log.trace("DetSolicitudPrenda: {}", aux.getIdSolPrenda().toString());
+                }
+                if(aux.getIdSolArticulo() != null)
+                {
+                    log.trace("DetSolicitudArticulo: {}", aux.getIdSolArticulo().toString());
+                }
+            }
+            
         } catch (Exception ex) {
             log.error("Problema para obtener el listado de incidencias...", ex);
         } finally {

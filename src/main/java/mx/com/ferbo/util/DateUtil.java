@@ -4,13 +4,17 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -749,4 +753,79 @@ public class DateUtil {
 		}
 		return resultado;
 	}
+        
+        public static LocalDateTime toLocalDateTime(Date fecha)
+        {
+            LocalDateTime resultado = null;
+            ZoneId systemDefault = null;
+            
+            try
+            {
+                systemDefault = ZoneId.of("GMT-6");
+                resultado = fecha.toInstant().atZone(systemDefault).toLocalDateTime();
+            }catch(Exception ex) 
+            {
+                log.warn("Problema para convertir a LocalDateTime: " + fecha, ex.getMessage());
+                resultado = null;
+            }
+            return resultado;
+        }
+        
+        /*
+        *Inicializa la fecha dado un parametro del tipo entero,
+        *@param anioEnCurso es el atributo del que se fijara la fecha inicial del año
+        *return fecha, regresa la fecha de inicio del dia 1 de enero del año en curso
+        */
+        public static Date inicializaFechaInicioAnioCurso(Integer anioEnCurso)
+        {
+            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT-06:00"), Locale.getDefault());
+            calendar.set(Calendar.DAY_OF_MONTH, 1);// Día 1
+            calendar.set(Calendar.MONTH, Calendar.JANUARY); // Mes Enero
+            calendar.set(Calendar.YEAR, anioEnCurso);// Año en curso
+            calendar.set(Calendar.HOUR, 0);// Hora
+            calendar.set(Calendar.MINUTE, 0);// Minuto
+            calendar.set(Calendar.SECOND, 0);// Segundo
+            calendar.set(Calendar.MILLISECOND, 0);// Milisegundo
+            
+            return calendar.getTime();
+        }
+        
+        public static Date inicializaFechaTerminoAnioCurso(Integer anioEnCurso)
+        {
+            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT-06:00"), Locale.getDefault());
+            calendar.set(Calendar.DAY_OF_MONTH, 31);// Día 31
+            calendar.set(Calendar.MONTH, Calendar.DECEMBER); // Mes Diciembre
+            calendar.set(Calendar.YEAR, anioEnCurso);// Año en curso
+            calendar.set(Calendar.HOUR, 23);// Hora
+            calendar.set(Calendar.MINUTE, 59);// Minuto
+            calendar.set(Calendar.SECOND, 59);// Segundo
+            calendar.set(Calendar.MILLISECOND, 0);// Milisegundo
+
+            return calendar.getTime();
+        }
+        
+        public static List<Date> generarArreglosFechas(Date inicio, Date fin) 
+        {
+            List<Date> fechas = new ArrayList<>();
+            Date actual = inicio;
+
+            while (!actual.after(fin)) 
+            {
+                fechas.add(actual);
+                log.trace("Fecha: {}", actual);
+                actual = DateUtil.addDay(actual, 1); // Incrementa un día
+            }
+
+            return fechas;
+        }
+        
+        public static List<Date> diasLaborales(List<Date> dias, List<Date> diasAsueto)
+        {
+            List<Date> diasDeTrabajo = dias.stream()
+                .filter(fecha -> !diasAsueto.contains(fecha))
+                .collect(Collectors.toList());
+            
+            return diasDeTrabajo;
+        }
+        
 }
