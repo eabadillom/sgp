@@ -157,13 +157,13 @@
                 </div>
             </div>
             <div class="formgrid grid" >
-                <div class="field col" >
+                <div class="field col" style="width: 5rem" >
                     <p:outputLabel value="Inicio de Vacaciones"/>
                     <p:inputText value="#{incidenciaBean.incidenciaSelected.idSolPermiso.fechaInicio}" disabled="true" >
                         <f:convertDateTime type="date" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
                     </p:inputText>
                 </div>
-                <div class="field col" >
+                <div class="field col" style="width: 5rem" >
                     <p:outputLabel value="Termino de Vacaciones" />
                     <p:inputText value="#{incidenciaBean.incidenciaSelected.idSolPermiso.fechaFin}" disabled="true">
                         <f:convertDateTime type="date" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
@@ -173,14 +173,16 @@
             <p:datePicker id="dpRangoView" rendered="#{incidenciaBean.incidenciaSelected.idSolPermiso.idTipoSolicitud.idTipoSolicitud ne null 
                                                        and (incidenciaBean.incidenciaSelected.idSolPermiso.idTipoSolicitud.idTipoSolicitud eq 2 
                                                        or incidenciaBean.incidenciaSelected.idSolPermiso.idTipoSolicitud.idTipoSolicitud eq 4)}" 
-                          styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" disabled="true" locale="es"
-                          showIcon="true" readonlyInput="true" timeZone="GMT-6" value="#{incidenciaBean.lstRangoRegistro}"
+                          styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" locale="es" disabled="false" 
+                          showIcon="true" readonlyInput="true" value="#{incidenciaBean.lstRangoRegistro}" showMinMaxRange="true" 
+                          mindate="#{incidenciaBean.incidenciaSelected.idSolPermiso.fechaInicio}" maxdate="#{incidenciaBean.incidenciaSelected.idSolPermiso.fechaFin}"
                           inline="true" selectionMode="range" disabledDays="#{incidenciaBean.invalidDays}"/>
             <p:datePicker id="dpSimpleView" rendered="#{incidenciaBean.incidenciaSelected.idSolPermiso.idTipoSolicitud.idTipoSolicitud ne null 
                                                         and (incidenciaBean.incidenciaSelected.idSolPermiso.idTipoSolicitud.idTipoSolicitud eq 1 
                                                         or incidenciaBean.incidenciaSelected.idSolPermiso.idTipoSolicitud.idTipoSolicitud eq 3)}" 
-                          styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" disabled="true" locale="es"
-                          pattern="dd-MM-yyyy" showIcon="true" readonlyInput="true" timeZone="GMT-6" value="#{incidenciaBean.fechaSeleccionada}"
+                          styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" locale="es" disabled="false"
+                          pattern="dd-MM-yyyy" showIcon="true" readonlyInput="true" value="#{incidenciaBean.fechaSeleccionada}"
+                          showMinMaxRange="true" mindate="#{incidenciaBean.fechaSeleccionada}" maxdate="#{incidenciaBean.fechaSeleccionada}"
                           inline="true" disabledDays="#{incidenciaBean.invalidDays}"/>
 
         </p:outputPanel>

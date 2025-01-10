@@ -198,7 +198,8 @@ public class RegistroAsistenciaBL
     public void guardarRegistroVacaciones(DetEmpleado empleado, DetIncidencia incidencia, List<Date> diasAsueto) throws SGPException
     {
         InfDatoEmpresa empleadoEmpresa = empleado.getDatoEmpresa();
-        CatEstatusRegistro statusVacaciones = estatusDAO.buscarPorId(5);
+        String codigo = "V";
+        CatEstatusRegistro statusVacaciones = estatusDAO.buscarPorCodigo(codigo);
         
         Integer horaEntrada = DateUtil.getHora(empleadoEmpresa.getHoraEntrada());
         Integer horaSalida = horaEntrada + 9;
@@ -224,6 +225,23 @@ public class RegistroAsistenciaBL
             
             registroDAO.guardar(registro);
         }
+    }
+    
+    public boolean validarFechasVacaciones(Integer idEmpleado, Date fechaInicial, Date fechaFinal, Integer horaEntrada)
+    {
+        boolean existenVacaciones = false;
+        List<DetRegistro> registro = null;
+        
+        Date fechaInicialEntrada = DateUtil.getDate(DateUtil.getAnio(fechaInicial), DateUtil.getMes(fechaInicial), DateUtil.getDia(fechaInicial), horaEntrada, 0, 0);
+        Date fechaFinEntrada = DateUtil.getDate(DateUtil.getAnio(fechaFinal), DateUtil.getMes(fechaFinal), DateUtil.getDia(fechaFinal), horaEntrada, 0, 0);
+        registro = this.registroDAO.buscar(idEmpleado, fechaInicialEntrada, fechaFinEntrada);
+        
+        if(!registro.isEmpty())
+        {
+           existenVacaciones = true;
+        }
+        
+        return existenVacaciones;
     }
     
     public List<Date> diasVacacionesSolicitados(List<Date> fechas, List<Date> diasAsueto, InfDatoEmpresa empleadoEmpresa)

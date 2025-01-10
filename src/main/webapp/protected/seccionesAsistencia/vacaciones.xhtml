@@ -6,7 +6,7 @@
     <p:toolbar styleClass="mb-0 p-0" style="border: none">
         <p:toolbarGroup align="right">
             <p:commandButton value="Registrar" icon="pi pi-plus" styleClass="ui-button-success" style="margin-right: .5rem" process="@this"
-                             oncomplete="PF('dialogVacaciones').show();"/>
+                             oncomplete="PF('dialogVacaciones').show();" action="#{asistenciaBean.inicializaSolicitud()}"/>
         </p:toolbarGroup>
     </p:toolbar>
     <p:dataTable id="dtSolicitudes" widgetVar="dtSolicitudes" var="solicitud" value="#{asistenciaBean.lstSolicitudes}" reflow="true"
@@ -37,16 +37,17 @@
         </p:column>
     </p:dataTable>
 
-    <p:dialog widgetVar="dialogVacaciones" header="Registrar solicitud" showEffect="fade" responsive="true" modal="true" styleClass="ferbo-dialog" >
+    <p:dialog widgetVar="dialogVacaciones" header="Registrar solicitud" showEffect="fade" responsive="true" modal="true" styleClass="ferbo-dialog" 
+              dynamic="true" cache="false" >
         <p:outputPanel id="pnlDetalleVacaciones" styleClass="ui-fluid">
 
             <div class="formgrid grid">
                 <div class="field col">
                     <p:outputLabel for="soTipoPermiso" value="Tipo"/>
-                    <p:selectOneMenu id="soTipoPermiso" required="true" requiredMessage="Campo requerido" autoWidth="false" 
+                    <p:selectOneMenu id="soTipoPermiso" autoWidth="false" 
                                      value="#{asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud}">
                         <f:selectItem itemLabel="--Seleccione--"/>
-                        <f:selectItems value="#{asistenciaBean.lstTipoSolSelect}" var="tipo" />
+                        <f:selectItems value="#{asistenciaBean.lstTipoSolSelect}" />
                         <p:ajax update="formActividades:tabView:pnlDetalleVacaciones" process="@this" resetValues="true"/>
                     </p:selectOneMenu>
                     <p:message for="soTipoPermiso"/>
@@ -108,20 +109,22 @@
             <p:datePicker id="dpRangoView" rendered="#{asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud ne null 
                                                        and (asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud eq 2 
                                                             or asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud eq 4)}" 
-                          styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" disabled="true"
+                          styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" disabled="false"
                           readonlyInput="true" timeZone="GMT-06:00" value="#{asistenciaBean.lstRangoRegistro}"
+                          mindate="#{asistenciaBean.solicitudSelected.fechaInicio}" maxdate="#{asistenciaBean.solicitudSelected.fechaFin}"
                           inline="true" selectionMode="range" disabledDays="#{asistenciaBean.invalidDays}"/>
             <p:datePicker id="dpSimpleView" rendered="#{asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud ne null 
                                                         and asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud ne 2 
                                                         and asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud ne 4}" 
-                          styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" disabled="true"
+                          styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" disabled="false"
+                          mindate="#{asistenciaBean.fechaSeleccionada}" maxdate="#{asistenciaBean.fechaSeleccionada}"
                           readonlyInput="true" timeZone="GMT-06:00" value="#{asistenciaBean.fechaSeleccionada}"
                           inline="true" disabledDays="#{asistenciaBean.invalidDays}"/>
         </p:outputPanel>
         <f:facet name="footer">
             <p:commandButton value="Cancelar" icon="pi pi-check" actionListener="#{asistenciaBean.actualizarSolicitud()}" 
-                             process="pnlDetalleVacacionesView @this" update="pnlDetalleVacaciones dtSolicitudes"/>
-            <p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('pnlDetalleVacacionesView').hide()" class="ui-button-secondary" />
+                             process="pnlDetalleVacacionesView @this" update="pnlDetalleVacaciones dtSolicitudes"
+                             styleClass="ui-button-raised ui-button-danger" disabled="true"/>
         </f:facet>
     </p:dialog>
     <style>
