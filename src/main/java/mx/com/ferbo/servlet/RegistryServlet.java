@@ -15,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import mx.com.ferbo.business.empleado.RegistroAsistenciaBL;
+import mx.com.ferbo.dao.n.EmpleadoFotoDAO;
 
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetEmpleadoFoto;
@@ -74,7 +75,7 @@ public class RegistryServlet extends HttpServlet {
                         prettyGson = new GsonBuilder().setPrettyPrinting().create();
                         
                         tokenEmpleado.setValido(false);
-                        foto = this.empleadoAsistencia.buscarFotoEmpleado(empleado.getIdEmpleado());
+                        foto = this.empleadoAsistencia.buscarFotoEmpleado(numeroEmpleado);
                         this.empleadoAsistencia.actualizarToken(tokenEmpleado);
                         
                         session.setAttribute("empleado", empleado);

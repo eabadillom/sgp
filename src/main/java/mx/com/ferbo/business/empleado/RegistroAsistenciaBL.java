@@ -71,9 +71,9 @@ public class RegistroAsistenciaBL
         }
     }
     
-    public DetEmpleadoFoto buscarFotoEmpleado(Integer numeroEmpleado)
+    public DetEmpleadoFoto buscarFotoEmpleado(String numeroEmpleado)
     {
-        DetEmpleadoFoto fotoEmpleado = this.empleadoFotoDAO.buscarPorId(numeroEmpleado);
+        DetEmpleadoFoto fotoEmpleado = this.empleadoFotoDAO.buscar(numeroEmpleado);
         return fotoEmpleado;
     }
     
