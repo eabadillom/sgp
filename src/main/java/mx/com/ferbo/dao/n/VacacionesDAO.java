@@ -1,16 +1,20 @@
 
 package mx.com.ferbo.dao.n;
 
+import java.util.Date;
 import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-import mx.com.ferbo.commons.dao.BaseDAO;
-import mx.com.ferbo.model.DetVacaciones;
-import mx.com.ferbo.util.SGPException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class VacacionesDAO extends BaseDAO{
+import mx.com.ferbo.commons.dao.BaseDAO;
+import mx.com.ferbo.model.DetVacaciones;
+import mx.com.ferbo.util.SGPException;
+
+public class VacacionesDAO extends BaseDAO {
     
     private static Logger log = LogManager.getLogger(VacacionesDAO.class);
     
@@ -68,5 +72,24 @@ public class VacacionesDAO extends BaseDAO{
         }
         
         return todasvacaciones;
+    }
+    
+    public DetVacaciones buscarPeriodoPorFecha(Date fecha) {
+    	DetVacaciones model = null;
+    	EntityManager em = null;
+    	
+    	try {
+    		em = this.getEntityManager();
+    		model = em.createNamedQuery("DetVacaciones.buscarPeriodoPorFecha", DetVacaciones.class)
+    				.setParameter("fecha", fecha)
+    				.getSingleResult()
+    				;
+    	} catch(Exception ex) {
+    		log.error("Problema para obtener el periodo vacacional...", ex);
+    	} finally {
+    		this.close(em);
+    	}
+    	
+    	return model;
     }
 }

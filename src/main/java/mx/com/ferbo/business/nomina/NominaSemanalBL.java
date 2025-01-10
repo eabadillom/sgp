@@ -27,6 +27,7 @@ import mx.com.ferbo.business.percepcion.ValesDespensaPercepcion;
 import mx.com.ferbo.dao.n.NominaDAO;
 import mx.com.ferbo.dao.n.PercepcionEmpleadoDAO;
 import mx.com.ferbo.dao.n.RegistroDAO;
+import mx.com.ferbo.dao.n.VacacionesDAO;
 import mx.com.ferbo.model.CatDiaNoLaboral;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetNomina;
@@ -36,6 +37,7 @@ import mx.com.ferbo.model.DetNominaOtroPago;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.DetRegistro;
+import mx.com.ferbo.model.DetVacaciones;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.SGPException;
 
@@ -64,6 +66,8 @@ public class NominaSemanalBL extends NominaBL {
 	private PercepcionEmpleadoDAO percepcionEmpleadoDAO = null;
 	private List<DetPercepcionEmpleado> percepcionesEmpleado = null;
 	
+	private VacacionesDAO vacacionesDAO = null;
+	
 	
 	public NominaSemanalBL(DetEmpleado empleado, ParametrosNomina parametros, Map<String, DetRegistro> mapAsistencias) {
 		this.empleado       = empleado;
@@ -73,6 +77,7 @@ public class NominaSemanalBL extends NominaBL {
 		this.periodoFin     = parametros.getPeriodoFin();
 		
 		this.percepcionEmpleadoDAO = new PercepcionEmpleadoDAO();
+		this.vacacionesDAO = new VacacionesDAO();
 		
 		this.anio = parametros.getAnio();
 		this.fechaInicioAnio = parametros.getFechaInicioAnio();
@@ -542,15 +547,17 @@ public class NominaSemanalBL extends NominaBL {
     	BigDecimal primaVacacional = null;
     	BigDecimal diasAnio = null;
     	BigDecimal sueldoDiario = null;
-    	
     	BigDecimal factorSDI = null;
+    	
+    	DetVacaciones periodoVacacional = null;
     	
     	try {
     		diasAnio = new BigDecimal(DIAS_ANIO).setScale(2, BigDecimal.ROUND_HALF_UP);
     		diasAguinaldo = new BigDecimal(this.parametros.getParametrosPercepciones().getDiasAguinaldo().intValue());
     		
-    		//TODO Dias de vacaciones debe ser un dato calculado, conforme a la ley federal del trabajo
-    		diasVacaciones = new BigDecimal(this.parametros.getParametrosPercepciones().getDiasVacaciones().intValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
+    		periodoVacacional = vacacionesDAO.buscarPeriodoPorFecha(this.periodoFin);
+    		
+    		diasVacaciones = new BigDecimal(periodoVacacional.getDiastotales()).setScale(2, BigDecimal.ROUND_HALF_UP);
     		
     		primaVacacional = new BigDecimal(this.parametros.getParametrosPercepciones().getPrimaVacacional().floatValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
     		sueldoDiario = empleado.getDatoEmpresa().getSalarioDiario();
