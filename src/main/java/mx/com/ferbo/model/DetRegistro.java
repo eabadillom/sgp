@@ -35,7 +35,7 @@ import javax.persistence.TemporalType;
     @NamedQuery(name = "DetRegistro.findByEmpleadoPeriodo", query = "SELECT d FROM DetRegistro d WHERE d.idEmpleado.idEmpleado = :idEmpleado AND d.fechaEntrada BETWEEN :fechaEntrada AND :fechaSalida"),
     @NamedQuery(name = "DetRegistro.findByIdEmplActivo", query = "SELECT d FROM DetRegistro d INNER JOIN d.idEmpleado e INNER JOIN d.idEstatus ce WHERE e.idEmpleado = :idEmp AND e.activo = 1 AND d.fechaEntrada LIKE :fechaEntrada"),
     @NamedQuery(name = "DetRegistro.findByIdEmpleadoAndFecha", query = "SELECT r FROM DetRegistro r WHERE r.idEmpleado.idEmpleado = :idEmpleado AND (r.fechaEntrada BETWEEN :fechaEntradaInicio AND :fechaEntradaFin)"),
-    @NamedQuery(name = "DetRegistro.findToday", query = "SELECT d FROM DetRegistro d INNER JOIN d.idEmpleado e INNER JOIN d.idEstatus ce WHERE e.idEmpleado = :idEmp AND e.activo = 1 AND (d.fechaEntrada BETWEEN :fechaEntrada and :fechaSalida) ORDER BY d.fechaEntrada"),
+    @NamedQuery(name = "DetRegistro.findToday", query = "SELECT d FROM DetRegistro d INNER JOIN d.idEmpleado e INNER JOIN d.idEstatus ce WHERE e.idEmpleado = :idEmp AND e.activo = 1 AND (d.fechaEntrada BETWEEN :inicioDia and :finDia) ORDER BY d.fechaEntrada"),
     @NamedQuery(name = "DetRegistro.findByPlantaPeriodo", query = "SELECT r FROM DetRegistro r WHERE (r.idEmpleado.datoEmpresa.planta.idPlanta = :idPlanta OR :idPlanta IS NULL) AND r.fechaEntrada BETWEEN :fechaInicio AND :fechaFin ORDER BY r.idEmpleado.nombre, r.idEmpleado.primerAp, r.idEmpleado.segundoAp")
 })
 public class DetRegistro implements Serializable {

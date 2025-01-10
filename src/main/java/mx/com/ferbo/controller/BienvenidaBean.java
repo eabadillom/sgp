@@ -103,10 +103,10 @@ public class BienvenidaBean implements Serializable {
 
     public void consultaRegistro() 
     {
-        Calendar calEntrada = registrarHora(0, 0, 0);//Registro Entrada
-        Calendar calSalida = registrarHora(23, 59, 59);//Registro Salida
+        Calendar inicioDiaActual = registrarHora(0, 0, 0);//Hora inicio del dia 00:00:00 - HH:mm:ss
+        Calendar finDiaActual = registrarHora(23, 59, 59);//Hora fin del dia 23:59:59 - HH:mm:ss
         
-        registro = registroDAO.buscarPorEmpleadoFechaEntrada(empleadoSelected.getIdEmpleado(), calEntrada.getTime(), calSalida.getTime());
+        registro = registroDAO.buscarPorEmpleadoFechaEntrada(empleadoSelected.getIdEmpleado(), inicioDiaActual.getTime(), finDiaActual.getTime());
     }
     
     public Calendar registrarHora(int hora, int min, int seg)

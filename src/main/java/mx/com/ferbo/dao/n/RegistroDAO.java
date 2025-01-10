@@ -163,7 +163,7 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
         return modelList;
     }
     
-    public DetRegistro buscarPorDia(Integer idEmp, Date fechaDiaEntrada, Date fechaEntradaSalida)
+    public DetRegistro buscarPorDia(Integer idEmp, Date inicioDiaActual, Date finDiaActual)
     {
         DetRegistro model = null;
         EntityManager em = null;
@@ -173,8 +173,8 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
             em = this.getEntityManager();
             model = em.createNamedQuery("DetRegistro.findToday", DetRegistro.class)
                 .setParameter("idEmp", idEmp)
-                .setParameter("fechaEntrada", fechaDiaEntrada, TemporalType.TIMESTAMP)
-                .setParameter("fechaSalida", fechaEntradaSalida, TemporalType.TIMESTAMP)
+                .setParameter("inicioDia", inicioDiaActual, TemporalType.TIMESTAMP)
+                .setParameter("finDia", finDiaActual, TemporalType.TIMESTAMP)
                 .getSingleResult();
         }catch (Exception ex) 
         {
