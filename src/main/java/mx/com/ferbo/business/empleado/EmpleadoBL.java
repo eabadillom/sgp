@@ -65,12 +65,6 @@ public class EmpleadoBL {
 
         Date fechaaux = DateUtil.getDate(aniotmp, mestmp, diatmp);
 
-        if (empleado.getVacaciones().isEmpty()) {
-            fechaaux = DateUtil.addYear(fechaaux, 1);
-        } else {
-            fechaaux = empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getFechafin();
-        }
-
         while (fechaaux.before(DateUtil.now())) {
             Date fechainicio = null;
             Date fechafin = null;
@@ -91,7 +85,7 @@ public class EmpleadoBL {
                 fechafin = DateUtil.addYear(fechainicio, 1);
 
                 int tamanio = empleado.getVacaciones().size() + 1;
-
+                
                 if (tamanio >= 2 && tamanio <= 5) {
                     dias = dias + 2;
                 }
@@ -100,7 +94,7 @@ public class EmpleadoBL {
                     dias = dias + 2;
                 }
             }
-
+            
             fechafin = DateUtil.addDay(fechafin, -1);
 
             DetVacaciones ultimasvacaciones = new DetVacaciones();
@@ -207,7 +201,7 @@ public class EmpleadoBL {
 
     }
 
-    public static void actualizarPagoVacacionesConcepto(DetEmpleado empleado, Date periodoporpagar, String concepto) {
+    public static void actualizarPagoVacacionesConcepto(DetEmpleado empleado, Date periodoporpagar, boolean prima, boolean diaspendientes) {
 
         for (int i = 0; i < empleado.getVacaciones().size(); i++) {
 
@@ -216,7 +210,7 @@ public class EmpleadoBL {
 
             if (periodoporpagar.after(fechainicio) && periodoporpagar.before(fechafin)) {
 
-                if (concepto.equals("ambas")) {
+                if (prima && diaspendientes) {
                     if (empleado.getVacaciones().get(i).getDiaspendientespagados() == false && empleado.getVacaciones().get(i).getPrimapagada() == false) {
                         empleado.getVacaciones().get(i).setPrimapagada(Boolean.TRUE);
                         empleado.getVacaciones().get(i).setDiaspendientespagados(Boolean.TRUE);
@@ -224,14 +218,14 @@ public class EmpleadoBL {
                     }
                 }
 
-                if (concepto.equals("prima")) {
+                if (prima) {
                     if (empleado.getVacaciones().get(i).getPrimapagada() == false) {
                         empleado.getVacaciones().get(i).setPrimapagada(Boolean.TRUE);
                         break;
                     }
                 }
 
-                if (concepto.equals("dias pendientes")) {
+                if (diaspendientes) {
                     if (empleado.getVacaciones().get(i).getDiaspendientespagados() == false) {
                         empleado.getVacaciones().get(i).setDiaspendientespagados(Boolean.TRUE);
                         break;
