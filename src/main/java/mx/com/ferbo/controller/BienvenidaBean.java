@@ -25,6 +25,7 @@ import mx.com.ferbo.dao.n.RegistroDAO;
 import mx.com.ferbo.model.DetRegistro;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetEmpleadoFoto;
+import mx.com.ferbo.util.DateUtil;
 
 @Named(value = "bienvenidaBean")
 @ViewScoped
@@ -100,13 +101,24 @@ public class BienvenidaBean implements Serializable {
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Acceso correcto", null));
     }
 
-    public void consultaRegistro() {
-        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("America/Mexico_City"));
-        cal.setTime(Date.from(Instant.now()));
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        registro = registroDAO.buscarPorDia(empleadoSelected.getIdEmpleado(), cal.getTime());
+    public void consultaRegistro() 
+    {
+        Calendar calEntrada = registrarHora(0, 0, 0);//Registro Entrada
+        Calendar calSalida = registrarHora(23, 59, 59);//Registro Salida
+        
+        registro = registroDAO.buscarPorEmpleadoFechaEntrada(empleadoSelected.getIdEmpleado(), calEntrada.getTime(), calSalida.getTime());
+    }
+    
+    public Calendar registrarHora(int hora, int min, int seg)
+    {
+        Calendar auxHora = Calendar.getInstance(TimeZone.getTimeZone("America/Mexico_City"));
+        
+        auxHora.setTime(Date.from(Instant.now()));
+        auxHora.set(Calendar.HOUR_OF_DAY, hora);
+        auxHora.set(Calendar.MINUTE, min);
+        auxHora.set(Calendar.SECOND, seg);
+        
+        return auxHora;
     }
     
     public void mensajeRetardo()
