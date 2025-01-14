@@ -41,6 +41,13 @@ public class SolicitudPermisoDAO extends BaseDAO<DetSolicitudPermiso, Integer>
             modelList = em.createNamedQuery("DetSolicitudPermiso.findByIdEmp", DetSolicitudPermiso.class)
                 .setParameter("idEmp", idEmpleado)
                 .getResultList();
+            
+            for(DetSolicitudPermiso aux: modelList)
+            {
+                log.trace("Info Solicitud: {}", aux.toString());
+                log.trace("Info Cat Tipo Solicitud: {}", aux.getIdTipoSolicitud().toString());
+            } 
+            
         }catch(Exception ex) 
         {
             log.error("Problema para obtener la lista de solicitud de permisos...", ex);

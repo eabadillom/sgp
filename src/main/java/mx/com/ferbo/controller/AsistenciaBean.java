@@ -1,5 +1,6 @@
 package mx.com.ferbo.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -79,6 +80,7 @@ public class AsistenciaBean implements Serializable {
     private List<Date> lstRangoRegistro;
     private List<SelectItem> lstTipoSolSelect;
     private Date fechaSeleccionada;
+    private List<Date> fechaDatePickerView;
     
     // Obteniendo Empleado
     private DetEmpleado empleadoSelected;
@@ -97,10 +99,8 @@ public class AsistenciaBean implements Serializable {
         incidenciaDAO = new IncidenciaDAO();
         inicializaSolicitud();
         sdf.setTimeZone(TimeZone.getTimeZone(ZoneId.of("GMT-6").normalized()));
-        lstRangoRegistro = new ArrayList<>();
-        //invalidDays = new ArrayList<>();
         lstTipoSolSelect = new ArrayList<>();
-        //invalidDays.add(0);
+        this.fechaDatePickerView = new ArrayList<>();
 
         empleadoSelected = new DetEmpleado();
         httpServletRequest = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
@@ -120,11 +120,17 @@ public class AsistenciaBean implements Serializable {
                     tipo.getIdTipoSolicitud() == 3 ? "Solo 1 día" : tipo.getIdTipoSolicitud() == 4 ? "Más de 1 día" : null));
         });
         
+        inicializaRangoFechas();
         actualizarListas();
         generaEventosRegistros(lstRegistros);
         generaEventosIncidencias(lstIncidencias);
         status = new ManageStatus();
         generaEventosDiasDescansoObligatorio(this.diasDeDescansoObligatorio.getDiasNoLaboralSelected());
+    }
+    
+    public void inicializaRangoFechas()
+    {
+        lstRangoRegistro = new ArrayList<>();
     }
 
     private void generaEventosRegistros(List<DetRegistro> registros) {
@@ -303,7 +309,7 @@ public class AsistenciaBean implements Serializable {
                 throw new SGPException("Error. Debes selecionar una solicitud");
             }
             
-            if(fechaSeleccionada == null || !lstRangoRegistro.isEmpty())
+            if(fechaSeleccionada == null && lstRangoRegistro == null)
             {
                 throw new SGPException("Error. Debes seleccionar una fecha");
             }
@@ -311,7 +317,10 @@ public class AsistenciaBean implements Serializable {
             if (fechaSeleccionada != null) {
                 solicitudSelected.setFechaInicio(fechaSeleccionada);
                 solicitudSelected.setFechaFin(fechaSeleccionada);
-            } else {
+            } 
+            
+            if(!lstRangoRegistro.isEmpty())
+            {
                 solicitudSelected.setFechaInicio(lstRangoRegistro.get(0));
                 DateUtil.setTime(lstRangoRegistro.get(1), 0, 0, 0);
                 solicitudSelected.setFechaFin(lstRangoRegistro.size() > 1 ? lstRangoRegistro.get(1) : lstRangoRegistro.get(0));
@@ -369,21 +378,27 @@ public class AsistenciaBean implements Serializable {
             actualizarSolicitudPermiso();
             mensaje = "Solicitud registrada";
             severity = FacesMessage.SEVERITY_INFO;
+            PrimeFaces.current().ajax().update("formActividades:tabView:dtSolicitudes");
         } catch (SGPException ex) {
             mensaje = ex.getMessage();
             severity = FacesMessage.SEVERITY_ERROR;
             log.warn("EX-0022: " + ex.getMessage() + ". Error al registrar la solicitud de permiso el empleado: " + empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
+        } catch(NullPointerException ex)
+        {
+            mensaje = "Error al registrar la solicitud, no terminaste de capturar los campos";
+            severity = FacesMessage.SEVERITY_ERROR;
+            log.error("Error al registrar la solicitud de permiso del empleado: {}", ex.getMessage());
         }finally
         {
             message = new FacesMessage(severity, titulo, mensaje);
             FacesContext.getCurrentInstance().addMessage(null, message);
             inicializaSolicitud();
             fechaSeleccionada = null;
-            if(lstRangoRegistro != null){
+            if(!lstRangoRegistro.isEmpty()){
                 lstRangoRegistro.clear();
             }
-            PrimeFaces.current().executeScript("PF('dialogVacacionesView').hide()");
-            PrimeFaces.current().ajax().update("formActividades:messages", "formActividades:tabView:dtSolicitudes");
+            PrimeFaces.current().ajax().update("formActividades:messages");
+            PrimeFaces.current().executeScript("PF('dialogVacaciones').hide()");
         }
     }
     
@@ -450,21 +465,25 @@ public class AsistenciaBean implements Serializable {
         solicitudSelected = new DetSolicitudPermiso();
         CatTipoSolicitud tipoSolicitud = new CatTipoSolicitud();
         solicitudSelected.setIdTipoSolicitud(tipoSolicitud);
+        this.inicializaRangoFechas();
     }
-
-    public void actualizaCalendarioSeleccionado() {
-        if(solicitudSelected  == null)
-        {
-            solicitudSelected = this.solicitudPermisoDAO.buscarPorId(empleadoSelected.getIdEmpleado());
-        }
-        switch (solicitudSelected.getIdTipoSolicitud().getIdTipoSolicitud()) {
+    
+    public void cerrarDialogoVacacionesView()
+    {
+        inicializaSolicitud();
+        this.fechaDatePickerView = new ArrayList<>();
+    }
+    
+    public void actualizaCalendarioSeleccionado() 
+    {
+        switch ((int)solicitudSelected.getIdTipoSolicitud().getIdTipoSolicitud()) {
             case 1://PERMISO
             case 3://INCAPACIDAD CORTA
-                fechaSeleccionada = solicitudSelected.getFechaInicio();
+                this.fechaDatePickerView.add(solicitudSelected.getFechaInicio());
                 break;
             case 2://VACACIONES
             case 4://INCAPACIDAD LARGA
-                lstRangoRegistro = Arrays.asList(solicitudSelected.getFechaInicio(), solicitudSelected.getFechaFin());
+                this.fechaDatePickerView = Arrays.asList(solicitudSelected.getFechaInicio(), solicitudSelected.getFechaFin());
                 break;
         }
         PrimeFaces.current().executeScript("PF('dialogVacacionesView').show();");
@@ -594,6 +613,14 @@ public class AsistenciaBean implements Serializable {
     
     public RegistroAsistenciaBL getEmpleadoAsistencia() {
         return empleadoAsistencia;
+    }
+    
+    public List<Date> getFechaDatePickerView() {
+        return fechaDatePickerView;
+    }
+
+    public void setFechaDatePickerView(List<Date> fechaDatePickerView) {
+        this.fechaDatePickerView = fechaDatePickerView;
     }
     //</editor-fold>
 }
