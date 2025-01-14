@@ -1,7 +1,7 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml" 
                 xmlns:ui="http://java.sun.com/jsf/facelets" 
                 xmlns:p="http://primefaces.org/ui">
-
+    
     <p:schedule value="#{asistenciaBean.calendario}" draggable="false" resizable="false" widgetVar="actividades" timeZone="GMT-6"
                 styleClass="ferbo-schedule" view="agendaWeek" showWeekNumbers="true">
         <p:ajax event="eventSelect" listener="#{asistenciaBean.eventoSeleccionado}" update="eventDialog"
@@ -108,6 +108,8 @@
                     switch (tipo.innerHTML.at(0)) {
                         case 'E':
                             tipo.innerHTML = 'Entrada<br/>'.concat(tipo.innerHTML.replace('Entrada', ''));
+                            tipo.setAttribute('style', 'padding: 0 8px;');
+                            evento.querySelector('.fc-daygrid-event-dot').setAttribute('style', 'display:none!important');
                             break;
                         case 'S':
                             tipo.innerHTML = 'Salida<br/>'.concat(tipo.innerHTML.replace('Salida', ''));
