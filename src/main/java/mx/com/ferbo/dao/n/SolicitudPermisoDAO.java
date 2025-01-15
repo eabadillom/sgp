@@ -1,9 +1,11 @@
 
 package mx.com.ferbo.dao.n;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TemporalType;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -78,6 +80,31 @@ public class SolicitudPermisoDAO extends BaseDAO<DetSolicitudPermiso, Integer>
         }
         
         return modelList;
+    }
+    
+    public DetSolicitudPermiso buscarPorCriterios(Integer idEmpleado, Date fechaInicio, Date fechaFin, Integer idTipoSolicitud)
+    {
+        DetSolicitudPermiso model = null;
+        EntityManager em = null;
+        
+        try
+        {
+            em = this.getEntityManager();
+            model = em.createNamedQuery("DetSolicitudPermiso.findByCriterios", DetSolicitudPermiso.class)
+                .setParameter("idEmp", idEmpleado)
+                .setParameter("fechaInicio", fechaInicio, TemporalType.TIMESTAMP)
+                .setParameter("fechaFin", fechaFin, TemporalType.TIMESTAMP)
+                .setParameter("idTipoSolicitud", idTipoSolicitud)
+                .getSingleResult();
+        }catch(Exception ex) 
+        {
+            log.error("Problema para obtener la solicitud de permiso: {}", ex.getMessage());
+        } finally 
+        {
+            this.close(em);
+        }
+        
+        return model;
     }
     
 }
