@@ -1,6 +1,5 @@
 package mx.com.ferbo.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -81,6 +80,8 @@ public class AsistenciaBean implements Serializable {
     private List<SelectItem> lstTipoSolSelect;
     private Date fechaSeleccionada;
     private List<Date> fechaDatePickerView;
+    private List<Date> diasDeAsueto;
+    private Integer totalDiasTomados;
     
     // Obteniendo Empleado
     private DetEmpleado empleadoSelected;
@@ -126,6 +127,7 @@ public class AsistenciaBean implements Serializable {
         generaEventosIncidencias(lstIncidencias);
         status = new ManageStatus();
         generaEventosDiasDescansoObligatorio(this.diasDeDescansoObligatorio.getDiasNoLaboralSelected());
+        this.diasDeAsueto = diasDeDescansoObligatorio.getDiasAsueto();
     }
     
     public void inicializaRangoFechas()
@@ -315,16 +317,21 @@ public class AsistenciaBean implements Serializable {
             }
             
             if (fechaSeleccionada != null) {
+                DateUtil.setTime(fechaSeleccionada, 0, 0, 0, 0);
                 solicitudSelected.setFechaInicio(fechaSeleccionada);
                 solicitudSelected.setFechaFin(fechaSeleccionada);
             } 
             
             if(!lstRangoRegistro.isEmpty())
             {
+                DateUtil.setTime(lstRangoRegistro.get(0), 0, 0, 0, 0);
                 solicitudSelected.setFechaInicio(lstRangoRegistro.get(0));
-                DateUtil.setTime(lstRangoRegistro.get(1), 0, 0, 0);
+                DateUtil.setTime(lstRangoRegistro.get(1), 0, 0, 0, 0);
                 solicitudSelected.setFechaFin(lstRangoRegistro.size() > 1 ? lstRangoRegistro.get(1) : lstRangoRegistro.get(0));
             }
+            
+            validarSolicitud(empleadoSelected.getIdEmpleado(), solicitudSelected.getFechaInicio(), 
+                    solicitudSelected.getFechaFin(), solicitudSelected.getIdTipoSolicitud().getIdTipoSolicitud());
             
             InfDatoEmpresa empleadoEmpresa = empleadoSelected.getDatoEmpresa();
             Integer horaEntrada = DateUtil.getHora(empleadoEmpresa.getHoraEntrada());
@@ -332,9 +339,8 @@ public class AsistenciaBean implements Serializable {
             if(existeRegistro == true)
             {
                 log.info("Existe por lo menos un registro de vacaciones del empleado {}", empleadoSelected.getNumEmpleado());
-                throw new SGPException("Error. Ya no puedes registrar ese periodo");
+                throw new SGPException("Error. El periodo que solicitaste ya se encuentra aceptado");
             }
-            
             solicitudSelected.setAprobada((short)1);
             solicitudSelected.setFechaCap(new Date());
             solicitudSelected.setIdEmpleadoSol(new DetEmpleado(empleadoSelected.getIdEmpleado()));
@@ -476,13 +482,19 @@ public class AsistenciaBean implements Serializable {
     
     public void actualizaCalendarioSeleccionado() 
     {
+        List<Date> fechas = null;
+        this.totalDiasTomados = null;
         switch ((int)solicitudSelected.getIdTipoSolicitud().getIdTipoSolicitud()) {
             case 1://PERMISO
             case 3://INCAPACIDAD CORTA
+                fechas = DateUtil.generarArreglosFechas(solicitudSelected.getFechaInicio(), solicitudSelected.getFechaFin());
+                this.totalDiasTomados = empleadoAsistencia.diasVacacionesSolicitados(fechas, this.diasDeAsueto, empleadoSelected.getDatoEmpresa()).size();
                 this.fechaDatePickerView.add(solicitudSelected.getFechaInicio());
                 break;
             case 2://VACACIONES
             case 4://INCAPACIDAD LARGA
+                fechas = DateUtil.generarArreglosFechas(solicitudSelected.getFechaInicio(), solicitudSelected.getFechaFin());
+                this.totalDiasTomados = empleadoAsistencia.diasVacacionesSolicitados(fechas, this.diasDeAsueto, empleadoSelected.getDatoEmpresa()).size();
                 this.fechaDatePickerView = Arrays.asList(solicitudSelected.getFechaInicio(), solicitudSelected.getFechaFin());
                 break;
         }
@@ -524,6 +536,15 @@ public class AsistenciaBean implements Serializable {
             diasSeleccionados.add(0);
         log.trace("Dias de bloqueo: {}", diasSeleccionados.toString());
         return diasSeleccionados;
+    }
+    
+    public void validarSolicitud(Integer idEmpleado, Date fechaInicio, Date fechaFin, Integer idTipoSolicitud) throws SGPException
+    {
+        DetSolicitudPermiso solicitudPermiso = this.solicitudPermisoDAO.buscarPorCriterios(idEmpleado, fechaInicio, fechaFin, idTipoSolicitud);
+        if(solicitudPermiso != null)
+        {
+            throw new SGPException("Error. El periodo que solicitaste ya se encuentra registrado");
+        }
     }
     
     //<editor-fold defaultstate="collapsed" desc="Getters&Setters">
@@ -622,5 +643,14 @@ public class AsistenciaBean implements Serializable {
     public void setFechaDatePickerView(List<Date> fechaDatePickerView) {
         this.fechaDatePickerView = fechaDatePickerView;
     }
+    
+    public Integer getTotalDiasTomados() {
+        return totalDiasTomados;
+    }
+
+    public void setTotalDiasTomados(Integer totalDiasTomados) {
+        this.totalDiasTomados = totalDiasTomados;
+    }
+    
     //</editor-fold>
 }

@@ -176,14 +176,16 @@
                           styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" locale="es" disabled="false" 
                           showIcon="true" readonlyInput="true" value="#{incidenciaBean.lstRangoRegistro}" showMinMaxRange="true" 
                           mindate="#{incidenciaBean.incidenciaSelected.idSolPermiso.fechaInicio}" maxdate="#{incidenciaBean.incidenciaSelected.idSolPermiso.fechaFin}"
-                          inline="true" selectionMode="range" disabledDays="#{incidenciaBean.invalidDays}"/>
+                          inline="true" selectionMode="range" disabledDays="#{incidenciaBean.invalidDays}"
+                          disabledDates="#{incidenciaBean.diasDeDescansoObligatorio.diasAsueto}"/>
             <p:datePicker id="dpSimpleView" rendered="#{incidenciaBean.incidenciaSelected.idSolPermiso.idTipoSolicitud.idTipoSolicitud ne null 
                                                         and (incidenciaBean.incidenciaSelected.idSolPermiso.idTipoSolicitud.idTipoSolicitud eq 1 
                                                         or incidenciaBean.incidenciaSelected.idSolPermiso.idTipoSolicitud.idTipoSolicitud eq 3)}" 
                           styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" locale="es" disabled="false"
                           pattern="dd-MM-yyyy" showIcon="true" readonlyInput="true" value="#{incidenciaBean.fechaSeleccionada}"
                           showMinMaxRange="true" mindate="#{incidenciaBean.fechaSeleccionada}" maxdate="#{incidenciaBean.fechaSeleccionada}"
-                          inline="true" disabledDays="#{incidenciaBean.invalidDays}"/>
+                          inline="true" disabledDays="#{incidenciaBean.invalidDays}"
+                          disabledDates="#{incidenciaBean.diasDeDescansoObligatorio.diasAsueto}"/>
 
         </p:outputPanel>
         <f:facet name="footer">
