@@ -21,7 +21,7 @@
 					<div style="padding-right: 1rem;">
 						<p:selectOneMenu id="sel-pais" value="#{diasNLBean.paisSelected}" converter="entityConverter" >
 							<f:selectItem itemLabel="Seleccione un país" noSelectionOption="true" />
-							<f:selectItems value="#{diasNLBean.paisesList}" var="pais" itemLabel="#{pais.nombrePais}" itemValue="#{pais}" />
+							<f:selectItems value="#{diasNLBean.paisesList}" var="pais" itemLabel="#{pais.nombre}" itemValue="#{pais}" />
 							<p:ajax listener="#{diasNLBean.muestraDiasNoLaborales()}" update="dt-diasNL"/>
 						</p:selectOneMenu>
 					</div>
@@ -39,13 +39,16 @@
 					<p:column headerText="Descripción" width="auto">
 						<p:outputLabel value="#{dia.descripcion}"/>
 					</p:column>
-					<p:column style="text-align: center;" width="6rem">
-						<span>
+					<p:column headerText="Oficial" width="3rem" style="text-align: center;">
+						<p:outputLabel value="#{dia.oficial ? 'SI' : 'NO'}"></p:outputLabel>
+					</p:column>
+					<p:column style="text-align: center;" width="7rem">
+						<span style="padding-right: 0.5rem">
 							<p:commandButton icon="pi pi-pencil" action="#{diasNLBean.editaDiaNoLaboral}" oncomplete="PF('dlgDiaNL').show()" process="@this" update="form:pnl-dia-nl">
 								<f:setPropertyActionListener value="#{dia}" target="#{diasNLBean.diaNLSelected}" />
 							</p:commandButton>
 						</span>
-						<span>
+						<span style="padding-left: 0.5rem">
 							<p:commandButton icon="pi pi-times" class="ui-button-danger" process="@this" action="#{diasNLBean.eliminaDiaNoLaboral()}" update="dt-diasNL">
 								<f:setPropertyActionListener value="#{dia}" target="#{diasNLBean.diaNLSelected}" />
 							</p:commandButton>
@@ -58,7 +61,7 @@
 				<p:outputPanel id="pnl-dia-nl" class="ui-fluid">
 					<div class="p-field">
 						<p:outputLabel value="País" for="@next" />
-						<p:inputText value="#{diasNLBean.diaNLSelected.pais.nombrePais}" placeholder="País" readonly="true"/>
+						<p:inputText value="#{diasNLBean.diaNLSelected.pais.nombre}" placeholder="País" readonly="true"/>
 					</div>
 					<div class="p-field">
 						<p:outputLabel value="Fecha" for="@next" />
@@ -70,6 +73,12 @@
 					<div class="p-field">
 						<p:outputLabel value="Descripción" for="@next" />
 						<p:inputText value="#{diasNLBean.diaNLSelected.descripcion}" placeholder="Descripción"/>
+					</div>
+					<div class="p-field">
+						<p:outputLabel value="Es oficial" />
+						<p:toggleSwitch value="#{diasNLBean.diaNLSelected.oficial}" onIcon="pi pi-check" offIcon="pi pi-times">
+							<p:ajax process="@this" />
+						</p:toggleSwitch>
 					</div>
 				</p:outputPanel>
 				<f:facet name="footer">

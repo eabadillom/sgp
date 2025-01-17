@@ -5,10 +5,8 @@ import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -20,7 +18,7 @@ import javax.persistence.Table;
 @NamedQueries({
     @NamedQuery(name = "Pais.findById", query = "SELECT d FROM Pais d WHERE d.id = :cdPais"),
     @NamedQuery(name = "Pais.findByClave", query = "SELECT d FROM Pais d WHERE d.clave = :clavePais"),
-    @NamedQuery(name = "Pais.findAll", query = "SELECT d FROM Pais d ORDER BY d.nombrePais")
+    @NamedQuery(name = "Pais.findAll", query = "SELECT d FROM Pais d ORDER BY d.nombre")
 })
 public class Pais implements Serializable {
 
@@ -35,7 +33,7 @@ public class Pais implements Serializable {
     private String clave;
 
     @Column(name = "nb_pais")
-    private String nombrePais;
+    private String nombre;
     
     @OneToMany(mappedBy = "key.pais")
     private List<CatEstado> estados;
@@ -47,7 +45,7 @@ public class Pais implements Serializable {
         super();
         this.id = id;
         this.clave = clave;
-        this.nombrePais = nombrePais;
+        this.nombre = nombrePais;
     }
 
     public Integer getId() {
@@ -66,12 +64,12 @@ public class Pais implements Serializable {
         this.clave = clave;
     }
 
-    public String getNombrePais() {
-        return nombrePais;
+    public String getNombre() {
+        return nombre;
     }
 
-    public void setNombrePais(String nombrePais) {
-        this.nombrePais = nombrePais;
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
     
     public List<CatEstado> getEstados() {
@@ -108,6 +106,6 @@ public class Pais implements Serializable {
     
     @Override
     public String toString() {
-        return "Pais [clavePais=" + clave + ", nombrePais=" + nombrePais + "]";
+        return "Pais [clave=" + clave + ", nombre=" + nombre + "]";
     }
 }

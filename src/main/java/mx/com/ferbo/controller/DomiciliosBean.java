@@ -738,7 +738,7 @@ public class DomiciliosBean implements Serializable {
             case "Pais":
                 this.iid = this.pais.getId();
                 this.clave = this.pais.getClave();
-                this.descripcion = this.pais.getNombrePais();
+                this.descripcion = this.pais.getNombre();
                 this.paisstatus = true;
                 break;
             
@@ -803,7 +803,7 @@ public class DomiciliosBean implements Serializable {
                     this.pais = new Pais();
                     this.pais.setId(this.iid);
                     this.pais.setClave(this.clave);
-                    this.pais.setNombrePais(this.descripcion);
+                    this.pais.setNombre(this.descripcion);
                     
                     this.paisdao.guardar(this.pais);
                     
@@ -814,7 +814,7 @@ public class DomiciliosBean implements Serializable {
                     this.validarDatos(1, true);
                     
                     this.pais.setClave(this.clave);
-                    this.pais.setNombrePais(this.descripcion);
+                    this.pais.setNombre(this.descripcion);
                     
                     this.paisdao.actualizar(this.pais);
                     
