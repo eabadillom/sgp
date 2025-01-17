@@ -1253,4 +1253,13 @@ public class RegistroEmpleadosBean implements Serializable {
     public void validarEmpleado(DetEmpleado empleado) {
         EmpleadoBL.validarDatosEmpleado(empleado);
     }
+
+    public void recalcularVacaciones() {
+        try {
+            EmpleadoBL.recalcularVacaciones(this.empleadoSelected);
+        } catch (SGPException sgpEx) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", sgpEx.getMessage()));
+            PrimeFaces.current().ajax().update("formRegistroEmpleado:messages");
+        }
+    }
 }

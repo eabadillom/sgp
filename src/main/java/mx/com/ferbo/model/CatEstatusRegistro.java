@@ -19,7 +19,9 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "cat_estatus_registro")
 @NamedQueries({
-    @NamedQuery(name = "CatEstatusRegistro.findAll", query = "SELECT c FROM CatEstatusRegistro c")})
+    @NamedQuery(name = "CatEstatusRegistro.findAll", query = "SELECT c FROM CatEstatusRegistro c"),
+    @NamedQuery(name = "CatEstatusRegistro.findByCodigo", query = "SELECT c FROM CatEstatusRegistro c WHERE c.codigo = :codigo")
+})
 public class CatEstatusRegistro implements Serializable {
 
     private static final long serialVersionUID = 1L;

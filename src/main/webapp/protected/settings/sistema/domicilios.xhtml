@@ -38,7 +38,7 @@
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <p:selectOneMenu value="#{domiciliosBean.pais}" converter="entityConverter" filter="true" filterMatchMode="contains" style="width: 400px; height: 40px;">
                             <f:selectItem itemLabel="Seleccione un pais" itemValue="#{null}" />
-                            <f:selectItems value="#{domiciliosBean.paises}" var="pais" itemLabel="#{pais.nombrePais}" itemValue="#{pais}"/>
+                            <f:selectItems value="#{domiciliosBean.paises}" var="pais" itemLabel="#{pais.nombre}" itemValue="#{pais}"/>
                             <p:ajax event="change" listener="#{domiciliosBean.obtenerLista('Estado')}" 
                                     update="frm" process="@this" />
                         </p:selectOneMenu>
@@ -165,7 +165,7 @@
                     <h:panelGroup rendered="#{domiciliosBean.estadoestatus}">
                         <div class="p-field">
                             <p:outputLabel value="Pais: " />
-                            <p:inputText value="#{domiciliosBean.pais.nombrePais}" readonly="true"/>
+                            <p:inputText value="#{domiciliosBean.pais.nombre}" readonly="true"/>
 
                             <p:outputLabel for="@next" value="ID del Estado: "/>
                             <p:inputText value="#{domiciliosBean.iid}" readonly="#{domiciliosBean.statusid}">
@@ -185,7 +185,7 @@
                     <h:panelGroup rendered="#{domiciliosBean.municipioestatus}">
                         <div class="p-field">
                             <p:outputLabel value="Pais: " />
-                            <p:inputText value="#{domiciliosBean.pais.nombrePais}" readonly="true"/>
+                            <p:inputText value="#{domiciliosBean.pais.nombre}" readonly="true"/>
                             <p:outputLabel value="Estado: " />
                             <p:inputText value="#{domiciliosBean.estado.descripcion}" readonly="true"/>
 
@@ -203,7 +203,7 @@
                     <h:panelGroup  rendered="#{domiciliosBean.localidadestatus}" >
                         <div class="p-field">
                             <p:outputLabel value="Pais: " />
-                            <p:inputText value="#{domiciliosBean.pais.nombrePais}" readonly="true"/>
+                            <p:inputText value="#{domiciliosBean.pais.nombre}" readonly="true"/>
                             <p:outputLabel value="Estado: " />
                             <p:inputText value="#{domiciliosBean.estado.descripcion}" readonly="true"/>
                             <p:outputLabel value="Municipio: " />
@@ -224,7 +224,7 @@
                         <!-- Tipo de asentamiento en editar posiblemente sea un selectonemenu -->
                         <div class="p-field" >
                             <p:outputLabel value="Pais: " />
-                            <p:inputText value="#{domiciliosBean.pais.nombrePais}" readonly="true"/>
+                            <p:inputText value="#{domiciliosBean.pais.nombre}" readonly="true"/>
                             <p:outputLabel value="Estado: " />
                             <p:inputText value="#{domiciliosBean.estado.descripcion}" readonly="true"/>
                             <p:outputLabel value="Municipio: " />

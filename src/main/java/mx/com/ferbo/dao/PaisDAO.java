@@ -22,7 +22,7 @@ public class PaisDAO extends IBaseDAO<PaisDTO, String>{
 		
 		try {
 			p = emSGP.find(Pais.class, id);
-			pais = new PaisDTO(p.getId(), p.getClave(), p.getNombrePais());
+			pais = new PaisDTO(p.getId(), p.getClave(), p.getNombre());
 		} catch(NoResultException ex) {
 			log.warn("No se encontró el pais con id {}", id);
 		} catch(Exception ex) {

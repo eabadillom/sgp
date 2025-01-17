@@ -162,7 +162,7 @@
                                         </div>
                                         <div class="field col">
                                             <p:outputLabel for="@next" value="Pais" />
-                                            <p:inputText id="pais" value="#{registroEmpleadosBean.asentamientoSelected.key.localidad.key.municipio.key.estado.key.pais.nombrePais}" >
+                                            <p:inputText id="pais" value="#{registroEmpleadosBean.asentamientoSelected.key.localidad.key.municipio.key.estado.key.pais.nombre}" >
                                                 <p:ajax process="@this" />
                                             </p:inputText>
                                         </div>
@@ -402,6 +402,11 @@
                                     </div>
                                 </p:tab>
                                 <p:tab title="Vacaciones">
+                                    <p:toolbar styleClass="mb-4">
+                                        <p:toolbarGroup>
+                                            <p:commandButton value="Recalcular vacaciones" icon="pi pi-reload" actionListener="#{registroEmpleadosBean.recalcularVacaciones()}" update="panelDialogEmpleado" oncomplete="PF('dialogEmpleado').hide(); PF('dialogEmpleado').show();" style="margin-right: .5rem" process="@this"/>
+                                        </p:toolbarGroup>
+                                    </p:toolbar>
                                     <p:dataTable id="dtVacaciones" widgetVar="dtVacaciones" var="vacacion" value="#{registroEmpleadosBean.empleadoSelected.vacaciones}" reflow="true" styleClass="products-table"
                                                  rowKey="#{vacacion.idVacaciones}" paginator="true" rows="6" rowSelectMode="add" 
                                                  paginatorPosition="bottom" lazy="true">

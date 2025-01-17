@@ -28,7 +28,8 @@ import javax.validation.constraints.NotNull;
 @Table(name = "det_solicitud_permiso")
 @NamedQueries({
     @NamedQuery(name = "DetSolicitudPermiso.findAll", query = "SELECT d FROM DetSolicitudPermiso d"),
-    @NamedQuery(name = "DetSolicitudPermiso.findByIdEmp", query = "SELECT dsp FROM DetSolicitudPermiso dsp INNER JOIN dsp.idEmpleadoSol de INNER JOIN dsp.idTipoSolicitud cts WHERE de.idEmpleado = :idEmp ORDER BY dsp.fechaCap")
+    @NamedQuery(name = "DetSolicitudPermiso.findByIdEmp", query = "SELECT dsp FROM DetSolicitudPermiso dsp INNER JOIN dsp.idEmpleadoSol de INNER JOIN dsp.idTipoSolicitud cts WHERE de.idEmpleado = :idEmp ORDER BY dsp.fechaCap"),
+    @NamedQuery(name = "DetSolicitudPermiso.findByCriterios", query = "SELECT dsp FROM DetSolicitudPermiso dsp INNER JOIN dsp.idEmpleadoSol de INNER JOIN dsp.idTipoSolicitud cts INNER JOIN dsp.idTipoSolicitud ts WHERE de.idEmpleado = :idEmp AND dsp.fechaInicio = :fechaInicio AND dsp.fechaFin = :fechaFin AND ts.idTipoSolicitud = :idTipoSolicitud")
 })
 public class DetSolicitudPermiso implements Serializable {
 
