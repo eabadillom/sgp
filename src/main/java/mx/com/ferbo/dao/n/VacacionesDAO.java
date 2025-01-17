@@ -74,13 +74,14 @@ public class VacacionesDAO extends BaseDAO {
         return todasvacaciones;
     }
     
-    public DetVacaciones buscarPeriodoPorFecha(Date fecha) {
+    public DetVacaciones buscarPeriodoPorFecha(Integer idEmpleado, Date fecha) {
     	DetVacaciones model = null;
     	EntityManager em = null;
     	
     	try {
     		em = this.getEntityManager();
-    		model = em.createNamedQuery("DetVacaciones.buscarPeriodoPorFecha", DetVacaciones.class)
+    		model = em.createNamedQuery("DetVacaciones.buscarPeriodoPorEmpleadoFecha", DetVacaciones.class)
+    				.setParameter("idEmpleado", idEmpleado)
     				.setParameter("fecha", fecha)
     				.getSingleResult()
     				;

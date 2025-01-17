@@ -3,7 +3,6 @@ package mx.com.ferbo.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.Basic;
@@ -14,15 +13,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import mx.com.ferbo.model.sat.CatBanco;
 import mx.com.ferbo.model.sat.CatEntidadFederativa;
 import mx.com.ferbo.model.sat.CatRiesgoPuesto;
 import mx.com.ferbo.model.sat.CatTipoContrato;
 import mx.com.ferbo.model.sat.CatTipoJornada;
 import mx.com.ferbo.model.sat.CatTipoRegimen;
-import mx.com.ferbo.model.sat.CatBanco;
 
 @Entity
 @Table(name = "inf_empleado_empresa")
@@ -159,6 +157,14 @@ public class InfDatoEmpresa implements Serializable {
     @Basic(optional = true)
     @Column(name = "nb_baja")
     private String motivobaja;
+    
+    @Basic(optional = true)
+    @Column(name = "nu_prima_vacacional", precision = 4, scale = 2)
+    private BigDecimal primaVacacional;
+    
+    @Basic(optional = true)
+    @Column(name = "nu_dias_aguinaldo" , precision = 4, scale = 2)
+    private BigDecimal diasAguinaldo;
 
     public Integer getId() {
         return id;
@@ -442,6 +448,22 @@ public class InfDatoEmpresa implements Serializable {
     public void setBanco(CatBanco banco) {
         this.banco = banco;
     }
+
+	public BigDecimal getPrimaVacacional() {
+		return primaVacacional;
+	}
+
+	public void setPrimaVacacional(BigDecimal primaVacacional) {
+		this.primaVacacional = primaVacacional;
+	}
+
+	public BigDecimal getDiasAguinaldo() {
+		return diasAguinaldo;
+	}
+
+	public void setDiasAguinaldo(BigDecimal diasAguinaldo) {
+		this.diasAguinaldo = diasAguinaldo;
+	}
     
     
 }

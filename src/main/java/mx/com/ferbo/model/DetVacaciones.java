@@ -19,7 +19,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "det_vacaciones")
 @NamedQueries({
-	@NamedQuery(name = "DetVacaciones.buscarPeriodoPorFecha", query = "SELECT v FROM DetVacaciones v WHERE :fecha BETWEEN v.fechainicio AND v.fechafin")
+	@NamedQuery(name = "DetVacaciones.buscarPeriodoPorEmpleadoFecha", query = "SELECT v FROM DetVacaciones v WHERE v.empleado.idEmpleado = :idEmpleado AND :fecha BETWEEN v.fechainicio AND v.fechafin")
 })
 public class DetVacaciones implements Serializable{
 

@@ -27,7 +27,6 @@ import mx.com.ferbo.business.percepcion.ValesDespensaPercepcion;
 import mx.com.ferbo.dao.n.NominaDAO;
 import mx.com.ferbo.dao.n.PercepcionEmpleadoDAO;
 import mx.com.ferbo.dao.n.RegistroDAO;
-import mx.com.ferbo.dao.n.VacacionesDAO;
 import mx.com.ferbo.model.CatDiaNoLaboral;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetNomina;
@@ -37,14 +36,13 @@ import mx.com.ferbo.model.DetNominaOtroPago;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.DetRegistro;
-import mx.com.ferbo.model.DetVacaciones;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.SGPException;
 
 public class NominaSemanalBL extends NominaBL {
 	private static Logger log = LogManager.getLogger(NominaSemanalBL.class);
 	
-	private DetEmpleado empleado = null;
+//	private DetEmpleado empleado = null;
 	private Date periodoInicio = null;
 	private Date periodoFin = null;
 	private Date fechaInicioAnio = null;
@@ -55,29 +53,25 @@ public class NominaSemanalBL extends NominaBL {
 	private BigDecimal valesDespensa = null;
 	
     private static final int SEPTIMO_DIA = 1;
-    private static final int DIAS_ANIO = 365;
     private static final int DIAS_LABORALES_POR_PERIODO = 6;
     
-    private Map<String, DetRegistro> mapAsistencias = null;
-    private ParametrosNomina parametros = null;
+//    private Map<String, DetRegistro> mapAsistencias = null;
+//    private ParametrosNomina parametros = null;
 	
 	private Integer anio = null;
 	
 	private PercepcionEmpleadoDAO percepcionEmpleadoDAO = null;
 	private List<DetPercepcionEmpleado> percepcionesEmpleado = null;
 	
-	private VacacionesDAO vacacionesDAO = null;
-	
-	
 	public NominaSemanalBL(DetEmpleado empleado, ParametrosNomina parametros, Map<String, DetRegistro> mapAsistencias) {
-		this.empleado       = empleado;
-		this.parametros     = parametros;
-		this.mapAsistencias = mapAsistencias;
+		super(empleado, parametros, mapAsistencias);
+//		this.empleado       = empleado;
+//		this.parametros     = parametros;
+//		this.mapAsistencias = mapAsistencias;
 		this.periodoInicio  = parametros.getPeriodoInicio();
 		this.periodoFin     = parametros.getPeriodoFin();
 		
 		this.percepcionEmpleadoDAO = new PercepcionEmpleadoDAO();
-		this.vacacionesDAO = new VacacionesDAO();
 		
 		this.anio = parametros.getAnio();
 		this.fechaInicioAnio = parametros.getFechaInicioAnio();
@@ -276,7 +270,7 @@ public class NominaSemanalBL extends NominaBL {
 		salarioDiarioIntegrado = nomina.getReceptor().getSalarioDiarioIntegrado();
 		
 		Optional<DetPercepcionEmpleado> optPercepcion010 = percepcionesEmpleado.stream()
-				.filter(p -> p.getTipoPercepcion().getClave().equalsIgnoreCase("010"))
+				.filter(p -> p.getTipoPercepcion().getClave().equalsIgnoreCase(AbstractPercepcion.CVE_BONO_PUNTUALIDAD))
 				.findFirst()
 				;
 		
@@ -537,44 +531,6 @@ public class NominaSemanalBL extends NominaBL {
 	 */
 	private BigDecimal getIncapacidades(Map<String, DetRegistro> mapAsistencias, BigDecimal diasLaboralesPorPeriodo) {
 		return BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
-	}
-
-	private BigDecimal calculoSDI(DetEmpleado empleado) {
-		//TODO Complementar el cálculo con las vacaciones de cada año (cálculo de SDI variable)
-		BigDecimal sdi = null;
-    	BigDecimal diasAguinaldo = null;
-    	BigDecimal diasVacaciones = null;
-    	BigDecimal primaVacacional = null;
-    	BigDecimal diasAnio = null;
-    	BigDecimal sueldoDiario = null;
-    	BigDecimal factorSDI = null;
-    	
-    	DetVacaciones periodoVacacional = null;
-    	
-    	try {
-    		diasAnio = new BigDecimal(DIAS_ANIO).setScale(2, BigDecimal.ROUND_HALF_UP);
-    		diasAguinaldo = new BigDecimal(this.parametros.getParametrosPercepciones().getDiasAguinaldo().intValue());
-    		
-    		periodoVacacional = vacacionesDAO.buscarPeriodoPorFecha(this.periodoFin);
-    		
-    		diasVacaciones = new BigDecimal(periodoVacacional.getDiastotales()).setScale(2, BigDecimal.ROUND_HALF_UP);
-    		
-    		primaVacacional = new BigDecimal(this.parametros.getParametrosPercepciones().getPrimaVacacional().floatValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
-    		sueldoDiario = empleado.getDatoEmpresa().getSalarioDiario();
-    		
-    		factorSDI = primaVacacional
-    				.multiply(diasVacaciones).setScale(4, BigDecimal.ROUND_HALF_UP)
-    				.add(diasAguinaldo)
-    				.add(diasAnio)
-    				.divide(diasAnio, 4, BigDecimal.ROUND_HALF_UP)
-    				;
-    		
-    		sdi = sueldoDiario.multiply(factorSDI).setScale(2, BigDecimal.ROUND_HALF_UP);
-    	} catch(Exception ex) {
-    		sdi = BigDecimal.ZERO;
-    	}
-    	
-        return sdi;
 	}
 	
 	public static synchronized void procesarISR(DetNomina nomina, Date periodoInicio, Date periodoFin, ParametrosNomina parametros) {

@@ -83,7 +83,7 @@ public class ISRAntesSubsidioDeduccion implements IDeduccion {
 			if(porcentajeExcedente.compareTo(cien) >= 0)
 				porcentaje = porcentajeExcedente;
 			else
-				porcentaje = porcentajeExcedente.divide(cien, 4, BigDecimal.ROUND_HALF_UP);
+				porcentaje = porcentajeExcedente.divide(cien, 5, BigDecimal.ROUND_HALF_UP);
 			
 			isrPrevio = this.excedente.multiply(porcentaje).setScale(2, BigDecimal.ROUND_HALF_UP);
 		} catch(Exception ex) {

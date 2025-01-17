@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
@@ -19,6 +20,7 @@ import mx.com.ferbo.business.otropago.AbstractOtroPago;
 import mx.com.ferbo.business.otropago.AjusteAlNetoOtroPago;
 import mx.com.ferbo.dao.n.ConceptoDAO;
 import mx.com.ferbo.dao.n.UnidadSATDAO;
+import mx.com.ferbo.dao.n.VacacionesDAO;
 import mx.com.ferbo.model.CatEmpresa;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetNomina;
@@ -32,6 +34,8 @@ import mx.com.ferbo.model.DetNominaOtroPagoPK;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.DetNominaPercepcionPK;
 import mx.com.ferbo.model.DetNominaReceptor;
+import mx.com.ferbo.model.DetRegistro;
+import mx.com.ferbo.model.DetVacaciones;
 import mx.com.ferbo.model.sat.CatConcepto;
 import mx.com.ferbo.model.sat.CatUnidadSAT;
 import mx.com.ferbo.util.DateUtil;
@@ -41,6 +45,22 @@ public abstract class NominaBL {
 	private static Logger log = LogManager.getLogger(NominaBL.class);
 	
 	public static final String TP_NOMINA_ORDINARIA = "O";
+	public static final String TP_NOMINA_EXTRAORDINARIA = "";
+	
+	public static final int DIAS_ANIO = 365;
+	public static final BigDecimal cien = new BigDecimal(100).setScale(2, BigDecimal.ROUND_HALF_UP);
+	
+	protected DetEmpleado empleado = null;
+	protected ParametrosNomina parametros = null;
+	protected Map<String, DetRegistro> mapAsistencias = null;
+	protected VacacionesDAO vacacionesDAO = null;
+	
+	public NominaBL(DetEmpleado empleado, ParametrosNomina parametros, Map<String, DetRegistro> mapAsistencias) {
+		this.empleado = empleado;
+		this.parametros = parametros;
+		this.mapAsistencias = mapAsistencias;
+		this.vacacionesDAO = new VacacionesDAO();
+	}
 	
 	public static synchronized DetNomina build(String tipoNomina, ParametrosNomina parametros, DetEmpleado empleado) {
 		DetNomina nomina = null;
@@ -111,6 +131,44 @@ public abstract class NominaBL {
 		}
 		
 		return nomina;
+	}
+	
+	public BigDecimal calculoSDI(DetEmpleado empleado) {
+		BigDecimal sdi = null;
+    	BigDecimal diasAguinaldo = null;
+    	BigDecimal diasVacaciones = null;
+    	BigDecimal primaVacacional = null;
+    	BigDecimal diasAnio = null;
+    	BigDecimal sueldoDiario = null;
+    	BigDecimal factorSDI = null;
+    	
+    	DetVacaciones periodoVacacional = null;
+    	
+    	try {
+    		diasAnio = new BigDecimal(DIAS_ANIO).setScale(2, BigDecimal.ROUND_HALF_UP);
+    		diasAguinaldo = this.empleado.getDatoEmpresa().getDiasAguinaldo();
+    		
+    		periodoVacacional = vacacionesDAO.buscarPeriodoPorFecha(this.empleado.getIdEmpleado(), this.parametros.getPeriodoFin());
+    		
+    		diasVacaciones = new BigDecimal(periodoVacacional.getDiastotales()).setScale(2, BigDecimal.ROUND_HALF_UP);
+    		
+    		primaVacacional = this.empleado.getDatoEmpresa().getPrimaVacacional().divide(cien).setScale(2, BigDecimal.ROUND_HALF_UP) ;
+    		sueldoDiario = empleado.getDatoEmpresa().getSalarioDiario();
+    		
+    		factorSDI = primaVacacional
+    				.multiply(diasVacaciones).setScale(4, BigDecimal.ROUND_HALF_UP)
+    				.add(diasAguinaldo)
+    				.add(diasAnio)
+    				.divide(diasAnio, 5, BigDecimal.ROUND_HALF_UP)
+    				;
+    		log.info("Factor de integración: {}", factorSDI);
+    		sdi = sueldoDiario.multiply(factorSDI).setScale(2, BigDecimal.ROUND_HALF_UP);
+    		log.info("Salario Diario Integrado: {}", sdi);
+    	} catch(Exception ex) {
+    		sdi = BigDecimal.ZERO;
+    	}
+    	
+        return sdi;
 	}
 	
 	public static String antiguedadPeriodo(Date fechaInicio, Date fechaFin) {

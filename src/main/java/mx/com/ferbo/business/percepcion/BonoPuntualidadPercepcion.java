@@ -67,7 +67,7 @@ public class BonoPuntualidadPercepcion extends AbstractPercepcion implements IPe
     		
     		diasPeriodo = this.diasTrabajados.add(proporcionalSeptimoDia).setScale(2, BigDecimal.ROUND_HALF_UP);
     		
-    		bono = salarioDiarioIntegrado.multiply(this.tasaBono).setScale(2, BigDecimal.ROUND_HALF_UP);
+    		bono = salarioDiarioIntegrado.multiply(this.tasaBono).setScale(5, BigDecimal.ROUND_HALF_UP);
     		bono = bono.multiply(diasPeriodo).setScale(2, BigDecimal.ROUND_HALF_UP);
     		
     		percepcionEmpleado = this.buscaPercepcionEmpleado(P_BONO_PUNTUALIDAD);
