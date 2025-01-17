@@ -41,23 +41,52 @@ public class CatDiaNoLaboral implements Serializable {
 	@ManyToOne
 	private Pais pais;
 	
+	@Column(name = "st_oficial")
+	@Basic(optional = true)
+	private Boolean oficial;
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(descripcion, fecha, id, pais);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CatDiaNoLaboral other = (CatDiaNoLaboral) obj;
+		return Objects.equals(descripcion, other.descripcion) && Objects.equals(fecha, other.fecha)
+				&& Objects.equals(id, other.id) && Objects.equals(pais, other.pais);
+	}
+
+	@Override
+	public String toString() {
+		return "DetDiaNoLaboral [id=" + id + ", fecha=" + fecha + ", descripcion=" + descripcion + "]";
+	}
+	
 	public CatDiaNoLaboral() {
 	}
 	
-	public CatDiaNoLaboral(Integer id, Date fecha, String descripcion, Pais pais) {
+	public CatDiaNoLaboral(Integer id, Date fecha, String descripcion, Pais pais, Boolean oficial) {
 		super();
 		this.id = id;
 		this.fecha = fecha;
 		this.descripcion = descripcion;
 		this.pais = pais;
+		this.oficial = oficial;
 	}
 	
-	public CatDiaNoLaboral(Integer id, Date fecha, String descripcion, Integer idPais, String clavePais, String nombrePais) {
+	public CatDiaNoLaboral(Integer id, Date fecha, String descripcion, Integer idPais, String clavePais, String nombrePais, Boolean oficial) {
 		super();
 		this.id = id;
 		this.fecha = fecha;
 		this.descripcion = descripcion;
 		this.pais = new Pais(idPais, clavePais, nombrePais);
+		this.oficial = oficial;
 	}
 
 	public Integer getId() {
@@ -92,26 +121,11 @@ public class CatDiaNoLaboral implements Serializable {
 		this.pais = pais;
 	}
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(descripcion, fecha, id, pais);
+	public Boolean getOficial() {
+		return oficial;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		CatDiaNoLaboral other = (CatDiaNoLaboral) obj;
-		return Objects.equals(descripcion, other.descripcion) && Objects.equals(fecha, other.fecha)
-				&& Objects.equals(id, other.id) && Objects.equals(pais, other.pais);
-	}
-
-	@Override
-	public String toString() {
-		return "DetDiaNoLaboral [id=" + id + ", fecha=" + fecha + ", descripcion=" + descripcion + "]";
+	public void setOficial(Boolean oficial) {
+		this.oficial = oficial;
 	}
 }
