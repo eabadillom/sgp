@@ -36,6 +36,7 @@ import mx.com.ferbo.util.DateUtil;
 public class ParametrosNomina {
 	
 	private Integer anio         = null;
+	private Integer semanaAnio   = null;
 	
 	private Date periodoInicio   = null;
 	private Date periodoFin      = null;
@@ -91,12 +92,13 @@ public class ParametrosNomina {
 	
 	public void cargar(Date periodoInicio, Date periodoFin) {
 		//Cálculo de fechas importantes del periodo de pago de nómina.
-		this.anio = DateUtil.getAnio(periodoFin);
+		this.anio            = DateUtil.getAnio(periodoFin);
 		this.fechaInicioAnio = DateUtil.getFirstDayOfyear(periodoFin);
 		this.fechaFinAnio    = DateUtil.getLastDayOfYear(periodoFin);
 		this.periodoInicio   = new Date(periodoInicio.getTime());
 		this.periodoFin      = new Date(periodoFin.getTime());
 		this.diasNoLaborales = this.diaNLDAO.buscarPorPeriodo("MX", periodoInicio, periodoFin);
+		this.semanaAnio      = DateUtil.getSemanaAnio(this.periodoInicio);
 		
 		//Catálogos SAT
 		this.parametrosPercepciones = this.catPercepcionesDAO.buscarActual(periodoInicio);
@@ -188,6 +190,10 @@ public class ParametrosNomina {
 
 	public Integer getAnio() {
 		return anio;
+	}
+
+	public Integer getSemanaAnio() {
+		return semanaAnio;
 	}
 	
 }

@@ -1,6 +1,7 @@
 package mx.com.ferbo.controller;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -318,10 +319,16 @@ public class NominaBean implements Serializable {
 		Severity severity = null;
 		String mensaje = null;
 		String titulo = "Percepción";
+		BigDecimal diasLaborales = null;
+		BigDecimal diasNoLaborales = null;
+		BigDecimal diasTrabajados = null;
 		
 		try {
+			percepcion.getCantidad()
+			
 			if(percepcion.getCantidad() != null && AbstractPercepcion.CVE_SUELDO.equalsIgnoreCase(percepcion.getClave()))
-				NominaSemanalBL.calcularSueldo(nomina, parametros, percepcion.getCantidad());
+				
+				NominaSemanalBL.calcularSueldo(nomina, parametros,  diasTrabajados);
 			
 			this.actualizar();
 			

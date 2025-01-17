@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import mx.com.ferbo.business.nomina.ParametrosNomina;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.DetNominaPercepcionPK;
@@ -17,8 +18,8 @@ public class SueldoPercepcion extends AbstractPercepcion implements IPercepcion 
 	
 	private BigDecimal diasTrabajados = null;
 	
-	public SueldoPercepcion(List<CatTipoPercepcion> tiposPercepcion, BigDecimal diasTrabajados) {
-		this.tiposPercepcion = tiposPercepcion;
+	public SueldoPercepcion(ParametrosNomina parametros, BigDecimal diasTrabajados) {
+		this.tiposPercepcion = parametros.getTiposPercepcion();
 		this.diasTrabajados = diasTrabajados;
 	}
 

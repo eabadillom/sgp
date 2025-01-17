@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import mx.com.ferbo.business.nomina.ParametrosNomina;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.DetNominaPercepcionPK;
@@ -15,12 +16,12 @@ public class SeptimoDiaPercepcion extends AbstractPercepcion implements IPercepc
 	
 	private static Logger log = LogManager.getLogger(SeptimoDiaPercepcion.class);
 	
-	private BigDecimal diasPeriodo = null;
+	private BigDecimal diasLaborales = null;
 	private BigDecimal diasTrabajados = null;
 	
-	public SeptimoDiaPercepcion(List<CatTipoPercepcion> tiposPercepcion, BigDecimal diasPeriodo, BigDecimal diasTrabajados) {
-		this.tiposPercepcion = tiposPercepcion;
-		this.diasPeriodo = diasPeriodo;
+	public SeptimoDiaPercepcion(ParametrosNomina parametros, BigDecimal diasLaborales, BigDecimal diasTrabajados) {
+		this.tiposPercepcion = parametros.getTiposPercepcion();
+		this.diasLaborales = diasLaborales;
 		this.diasTrabajados = diasTrabajados;
 	}
 
@@ -46,7 +47,7 @@ public class SeptimoDiaPercepcion extends AbstractPercepcion implements IPercepc
 			tpSeptimoDia = this.getTipoPercepcion("001");
 			
 			proporcionalSemanal = this.diasTrabajados
-					.divide(this.diasPeriodo, 4, BigDecimal.ROUND_HALF_UP);
+					.divide(this.diasLaborales, 4, BigDecimal.ROUND_HALF_UP);
 			
 			septimoDia = salarioDiario
 					.multiply(proporcionalSemanal)
@@ -70,7 +71,7 @@ public class SeptimoDiaPercepcion extends AbstractPercepcion implements IPercepc
 				nomina.getPercepciones().add(percepcion);
 			
 			this.tiposPercepcion = null;
-			this.diasPeriodo = null;
+			this.diasLaborales = null;
 			this.diasTrabajados = null;
 		}
 		
@@ -78,7 +79,7 @@ public class SeptimoDiaPercepcion extends AbstractPercepcion implements IPercepc
 	}
 
 	public void setDiasPeriodo(BigDecimal diasPeriodo) {
-		this.diasPeriodo = diasPeriodo;
+		this.diasLaborales = diasPeriodo;
 	}
 
 	public void setDiasTrabajados(BigDecimal diasTrabajados) {
