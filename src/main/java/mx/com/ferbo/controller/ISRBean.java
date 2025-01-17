@@ -51,8 +51,7 @@ public class ISRBean implements Serializable {
 	@PostConstruct
 	public void init() {
 		Integer anio = null;
-		Date fecha = new Date();
-		
+		Date fecha = DateUtil.now();
 		
 		this.anios = new ArrayList<Integer>();
 		anio = DateUtil.getAnio(fecha) + 1;
@@ -64,10 +63,6 @@ public class ISRBean implements Serializable {
 		this.anio = DateUtil.getAnio(fecha);
 	}
 
-	public void actualizarListaISR() {
-		this.listTarifaISR = this.tarifaISRDAO.buscarTodos();
-	}
-	
 	public void filtrar() {
 		String mensaje = null;
 		Severity severity = null;	
@@ -77,60 +72,94 @@ public class ISRBean implements Serializable {
 		Date fechaFin = null;
 		
 		try {
-			fechaInicio = DateUtil.getDate(this.anio, DateUtil.ENERO, 1);
-			fechaFin = DateUtil.getDate(this.anio, DateUtil.DICIEMBRE, 31);
+			fechaInicio = DateUtil.getDateTime(this.anio, DateUtil.ENERO, 1, 0, 0, 0, 0);
+			fechaFin = DateUtil.getDateTime(this.anio, DateUtil.DICIEMBRE, 31, 23, 59, 59, 999);
 			
 			this.listTarifaISR = this.tarifaISRDAO.buscar(fechaInicio, fechaFin, periodo);
-			mensaje = String.format("Tarifas del %d", this.anio);
-			severity = FacesMessage.SEVERITY_INFO;
+			
 		} catch(Exception ex) {
 			mensaje = "Ocurrió un problema consultar las tarias de ISR.";
+			severity = FacesMessage.SEVERITY_ERROR;
+			
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, titulo, mensaje));
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-isr");
+		} finally {
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-isr");
+		}
+	}
+	
+	public void openNew() {
+		Date fechaInicioAnio = null;
+		fechaInicioAnio = DateUtil.getDateTime(this.anio, DateUtil.ENERO, 1, 0, 0, 0, 0);
+		
+		this.tarifaISR = new CatTarifaISR();
+		this.tarifaISR.setFecha(fechaInicioAnio);
+		
+		this.tarifaISR.setTipo(this.periodo);
+	}
+
+	public void crearISRNuevo() {
+		String mensaje = null;
+		Severity severity = null;	
+		String titulo = "Tarifas ISR";
+		
+		try {
+			if (this.tarifaISR.getIdIsr() == null) {
+				this.tarifaISRDAO.guardar(this.tarifaISR);
+				mensaje = "ISR Añadida";
+			} else {
+				this.tarifaISRDAO.actualizar(this.tarifaISR);
+				mensaje = "ISR Actualizada";
+			}
+			this.filtrar();
+			
+			mensaje = String.format("Tarifas del %d", this.anio);
+			severity = FacesMessage.SEVERITY_INFO;
+			
+			PrimeFaces.current().executeScript("PF('manageISRDialog').hide()");
+		} catch (SGPException ex) {
+			log.error("Ocurrió un problema al guardar la cuota de ISR.", ex);
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+		} catch(Exception ex) {
+			mensaje = "Ocurrió un problema al guardar la cuota de ISR.";
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, titulo, mensaje));
 			PrimeFaces.current().ajax().update("form:messages", "form:dt-isr");
 		}
 	}
-
-	public void crearISRNuevo() {
-		try {
-			if (this.tarifaISR.getIdIsr() == null) {
-				this.tarifaISRDAO.guardar(this.tarifaISR);
-				this.actualizarListaISR();
-				PrimeFaces.current().ajax().update("form:messages", "form:dt-isr");
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("ISR Añadida"));
-			} else {
-				this.tarifaISRDAO.actualizar(this.tarifaISR);
-				PrimeFaces.current().ajax().update("form:messages", "form:dt-isr");
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("ISR Actualizada"));
-			}
-			PrimeFaces.current().executeScript("PF('manageISRDialog').hide()");
-		} catch (SGPException ex) {
-			log.error("Error al guadar el ISR.." + ex);
-		}
-	}
-
+	
 	public void borrarISRRegistro() {
+		String mensaje = null;
+		Severity severity = null;	
+		String titulo = "Tarifas ISR";
+		
 		try {
-			if (this.tarifaISR != null) {
-				this.tarifaISRDAO.eliminar(this.tarifaISR);
-				this.listTarifaISRSelected.remove(this.tarifaISR);
-				this.tarifaISR = null;
-				this.actualizarListaISR();
-				PrimeFaces.current().ajax().update("form:messages", "form:dt-isr");
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("ISR Borrada"));
+			if (this.tarifaISR == null) {
+				throw new SGPException("Debe seleccionar una cuota de ISR.");
 			}
+			
+			this.tarifaISRDAO.eliminar(this.tarifaISR);
+			this.tarifaISR = null;
+			this.filtrar();
+			
+			mensaje = String.format("Tarifas del %d", this.anio);
+			severity = FacesMessage.SEVERITY_INFO;
 			PrimeFaces.current().executeScript("PF('borrarISRDialog').hide()");
 		} catch (SGPException ex) {
 			log.error("Error al eliminar una ISR.." + ex);
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+		} catch(Exception ex) {
+			mensaje = "Problema para eliminar la cuota.";
+			severity = FacesMessage.SEVERITY_ERROR;
+		} finally {
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-isr");
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, titulo, mensaje));
 		}
 	}
 
-	public void openNew() {
-		this.tarifaISR = new CatTarifaISR();
-	}
-
-	// <editor-fold defaultstate="collapsed" desc="Getters&Setters">
 	public CatTarifaISR getTarifaISR() {
 		return tarifaISR;
 	}
@@ -154,7 +183,6 @@ public class ISRBean implements Serializable {
 	public void setListTarifaISRSelected(List<CatTarifaISR> listTarifaISRSelected) {
 		this.listTarifaISRSelected = listTarifaISRSelected;
 	}
-	// </editor-fold>
 
 	public List<Integer> getAnios() {
 		return anios;

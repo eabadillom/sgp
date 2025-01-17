@@ -31,14 +31,18 @@ public class ValesDespensaPercepcion extends AbstractPercepcion implements IPerc
 	}
 	
 	@Override
-	public DetNominaPercepcion calcular(DetNomina nomina, Integer index) {
+	public DetNominaPercepcion calcular(DetNomina nomina) {
 		DetNominaPercepcion percepcion = null;
 		BigDecimal vales = null;
 		
 		CatTipoPercepcion tpValeDespensa = null;
 		DetPercepcionEmpleado percepcionEmpleado = null;
 		
+		Integer index = null;
+		
 		try {
+			index = this.nuevoIndiceDe(nomina.getPercepciones());
+			
 			tpValeDespensa = this.getTipoPercepcion(P_VALES_DESPENSA);
 			
     		if(this.diasTrabajados.compareTo(BigDecimal.ZERO) == 0)
@@ -66,12 +70,11 @@ public class ValesDespensaPercepcion extends AbstractPercepcion implements IPerc
     	} finally {
     		percepcion = new DetNominaPercepcion();
     		percepcion.setKey(new DetNominaPercepcionPK(nomina, index));
-			percepcion.setClave(P_VALES_DESPENSA);
+			percepcion.setClave(CVE_VALES_DESPENSA);
 			percepcion.setNombre("Despensa");
 			percepcion.setTipoPercepcion(tpValeDespensa);
 			percepcion.setImporteGravado(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
 			percepcion.setImporteExcento(vales);
-			percepcion.setClave("FRB-" + tpValeDespensa.getClave());
 			
 			this.tiposPercepcion = null;
 			this.percepcionesEmpleado = null;

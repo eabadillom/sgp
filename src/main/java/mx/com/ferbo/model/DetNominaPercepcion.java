@@ -61,11 +61,15 @@ public class DetNominaPercepcion implements Serializable {
 	@Size(max = 150)
 	private String nombre;
 	
-	@Column(name = "nu_imp_gravado", scale = 12, precision = 2)
+	@Column(name = "nu_cantidad", precision = 6, scale = 2)
+	@Basic(optional = true)
+	private BigDecimal cantidad = null;
+	
+	@Column(name = "nu_imp_gravado", precision = 12, scale = 2)
 	@Basic(optional = false)
 	private BigDecimal importeGravado;
 	
-	@Column(name = "nu_imp_exento", scale = 12, precision = 2)
+	@Column(name = "nu_imp_exento", precision = 12, scale = 2)
 	@Basic(optional = false)
 	private BigDecimal importeExcento;
 
@@ -138,5 +142,13 @@ public class DetNominaPercepcion implements Serializable {
 	public String toString() {
 		return "DetNominaPercepcion [key=" + key + ", clavePercepcion=" + clave + ", nombrePercepcion="
 				+ nombre + ", importeGravado=" + importeGravado + ", importeExcento=" + importeExcento + "]";
+	}
+
+	public BigDecimal getCantidad() {
+		return cantidad;
+	}
+
+	public void setCantidad(BigDecimal cantidad) {
+		this.cantidad = cantidad;
 	}
 }

@@ -13,6 +13,7 @@ import mx.com.ferbo.dao.n.RegimenFiscalDAO;
 import mx.com.ferbo.dao.n.TarifaISRDAO;
 import mx.com.ferbo.dao.n.TipoDeduccionDAO;
 import mx.com.ferbo.dao.n.TipoOtroPagoDAO;
+import mx.com.ferbo.dao.n.UMADAO;
 import mx.com.ferbo.dao.n.UnidadSATDAO;
 import mx.com.ferbo.dao.n.UsoCFDIDAO;
 import mx.com.ferbo.dao.n.sat.TipoPercepcionDAO;
@@ -21,6 +22,7 @@ import mx.com.ferbo.model.CatDiaNoLaboral;
 import mx.com.ferbo.model.CatPercepciones;
 import mx.com.ferbo.model.CatPeriodicidadPago;
 import mx.com.ferbo.model.CatTarifaISR;
+import mx.com.ferbo.model.CatUMA;
 import mx.com.ferbo.model.sat.CatConcepto;
 import mx.com.ferbo.model.sat.CatMetodoPago;
 import mx.com.ferbo.model.sat.CatRegimenFiscal;
@@ -33,6 +35,14 @@ import mx.com.ferbo.util.DateUtil;
 
 public class ParametrosNomina {
 	
+	private Integer anio         = null;
+	
+	private Date periodoInicio   = null;
+	private Date periodoFin      = null;
+	private Date fechaInicioAnio = null;
+	private Date fechaFinAnio    = null;
+	
+	private CatUMA                  uma = null;
 	private CatPercepciones         parametrosPercepciones = null;
 	private CatMetodoPago           metodoPago = null;
 	private CatConcepto             concepto = null;
@@ -60,40 +70,48 @@ public class ParametrosNomina {
 	private TipoDeduccionDAO    tipoDeduccionDAO = null;
 	private CuotaIMSSDAO        cuotasIMSSDAO = null;
 	private TipoOtroPagoDAO     tipoOtroPagoDAO = null;
+	private UMADAO              umaDAO = null;
 	
 	public ParametrosNomina() {
-		this.diaNLDAO = new DiaNoLaboralDAO();
+		this.diaNLDAO           = new DiaNoLaboralDAO();
 		this.catPercepcionesDAO = new PercepcionesDAO();
-		this.tarifaISRDAO = new TarifaISRDAO();
-		this.metodoPagoDAO = new MetodoPagoDAO();
-		this.conceptoDAO = new ConceptoDAO();
-		this.unidadSATDAO = new UnidadSATDAO();
-		this.periodicidadDAO = new PeriodicidadPagoDAO();
-		this.regimenFiscalDAO = new RegimenFiscalDAO();
-		this.usoCfdiDAO = new UsoCFDIDAO();
-		this.tipoPercepcionDAO = new TipoPercepcionDAO();
-		this.tipoOtroPagoDAO = new TipoOtroPagoDAO();
-		this.tipoDeduccionDAO = new TipoDeduccionDAO();
-		this.cuotasIMSSDAO = new CuotaIMSSDAO();
+		this.tarifaISRDAO       = new TarifaISRDAO();
+		this.metodoPagoDAO      = new MetodoPagoDAO();
+		this.conceptoDAO        = new ConceptoDAO();
+		this.unidadSATDAO       = new UnidadSATDAO();
+		this.periodicidadDAO    = new PeriodicidadPagoDAO();
+		this.regimenFiscalDAO   = new RegimenFiscalDAO();
+		this.usoCfdiDAO         = new UsoCFDIDAO();
+		this.tipoPercepcionDAO  = new TipoPercepcionDAO();
+		this.tipoOtroPagoDAO    = new TipoOtroPagoDAO();
+		this.tipoDeduccionDAO   = new TipoDeduccionDAO();
+		this.cuotasIMSSDAO      = new CuotaIMSSDAO();
+		this.umaDAO             = new UMADAO();
 	}
 	
 	public void cargar(Date periodoInicio, Date periodoFin) {
-		Date fechaInicioAnio = DateUtil.getFirstDayOfyear(periodoFin);
-		Date fechafinAnio = DateUtil.getLastDayOfYear(periodoFin);
-		
+		//Cálculo de fechas importantes del periodo de pago de nómina.
+		this.anio = DateUtil.getAnio(periodoFin);
+		this.fechaInicioAnio = DateUtil.getFirstDayOfyear(periodoFin);
+		this.fechaFinAnio    = DateUtil.getLastDayOfYear(periodoFin);
+		this.periodoInicio   = new Date(periodoInicio.getTime());
+		this.periodoFin      = new Date(periodoFin.getTime());
 		this.diasNoLaborales = this.diaNLDAO.buscarPorPeriodo("MX", periodoInicio, periodoFin);
+		
+		//Catálogos SAT
 		this.parametrosPercepciones = this.catPercepcionesDAO.buscarActual(periodoInicio);
-		this.tablaISR = this.tarifaISRDAO.buscar(fechaInicioAnio, fechafinAnio);
-		this.metodoPago = this.metodoPagoDAO.buscarPorId("PUE");
-		this.concepto = this.conceptoDAO.buscarPorId("84111505");
-		this.unidadSAT = this.unidadSATDAO.buscarPorId("ACT");
-		this.periodicidad = this.periodicidadDAO.buscarPorId("02");
-		this.regimenFiscalReceptor = this.regimenFiscalDAO.buscarPorId("605");
-		this.usoCFDI = this.usoCfdiDAO.buscarPorId("CN01");
-		this.tiposPercepcion = this.tipoPercepcionDAO.buscarTodos();
-		this.tiposDeduccion = this.tipoDeduccionDAO.buscarTodos();
-		this.cuotasIMSS = this.cuotasIMSSDAO.buscarPorPeriodo(periodoFin);
-		this.tiposOtroPago = this.tipoOtroPagoDAO.buscarTodos();
+		this.tablaISR               = this.tarifaISRDAO.buscar(this.fechaInicioAnio, this.fechaFinAnio);
+		this.metodoPago             = this.metodoPagoDAO.buscarPorId("PUE");
+		this.concepto               = this.conceptoDAO.buscarPorId("84111505");
+		this.unidadSAT              = this.unidadSATDAO.buscarPorId("ACT");
+		this.periodicidad           = this.periodicidadDAO.buscarPorId("02");
+		this.regimenFiscalReceptor  = this.regimenFiscalDAO.buscarPorId("605");
+		this.usoCFDI                = this.usoCfdiDAO.buscarPorId("CN01");
+		this.tiposPercepcion        = this.tipoPercepcionDAO.buscarTodos();
+		this.tiposDeduccion         = this.tipoDeduccionDAO.buscarTodos();
+		this.cuotasIMSS             = this.cuotasIMSSDAO.buscarPorPeriodo(periodoFin);
+		this.tiposOtroPago          = this.tipoOtroPagoDAO.buscarTodos();
+		this.uma                    = this.umaDAO.buscarVigentePorFecha(DateUtil.toLocalDate(periodoFin));
 	}
 
 	public CatPercepciones getParametrosPercepciones() {
@@ -146,6 +164,30 @@ public class ParametrosNomina {
 
 	public List<CatCuotaIMSS> getCuotasIMSS() {
 		return cuotasIMSS;
+	}
+
+	public CatUMA getUma() {
+		return uma;
+	}
+
+	public Date getPeriodoInicio() {
+		return periodoInicio;
+	}
+
+	public Date getPeriodoFin() {
+		return periodoFin;
+	}
+
+	public Date getFechaInicioAnio() {
+		return fechaInicioAnio;
+	}
+
+	public Date getFechaFinAnio() {
+		return fechaFinAnio;
+	}
+
+	public Integer getAnio() {
+		return anio;
 	}
 	
 }

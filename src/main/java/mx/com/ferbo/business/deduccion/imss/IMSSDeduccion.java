@@ -2,14 +2,13 @@ package mx.com.ferbo.business.deduccion.imss;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.deduccion.IDeducciones;
-import mx.com.ferbo.model.CatCuotaIMSS;
+import mx.com.ferbo.business.nomina.ParametrosNomina;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
 import mx.com.ferbo.model.DetNominaDeduccionPK;
@@ -20,37 +19,38 @@ public class IMSSDeduccion extends AbstractIMSSDeduccion implements IDeducciones
 	
 	private static Logger log = LogManager.getLogger(IMSSDeduccion.class);
 	
-	private Date fechaInicioAnio = null;
-	private Date fechaFinAnio = null;
-	private BigDecimal diasPorPeriodo = null;
-	private BigDecimal uma = null;
+	private BigDecimal diasPeriodo = null;
+	private BigDecimal ausencias = null;
+	private BigDecimal incapacidades = null;
 	private BigDecimal sdi = null;
+	private ParametrosNomina parametros = null;
 	
-	
-	private IMSSEnfermedadMaternidadDeduccion imssEnfMatBO = null;
-	private IMSSGastosMedicosPensionadosBeneficiariosDeduccion imssGastosMedicosBO = null;
-	private IMSSEnDineroDeduccion imssEnDineroBO = null;
+	private IMSSRiesgoTrabajoDeduccion imssRiesgoTrabajoBO = null;
+	private IMSSEnfMatEnEspecieDeduccion imssEnfMatBO = null;
+	private IMSSEnfMatGastosMedicosDeduccion imssEnfMatGastosMedBO = null;
+	private IMSSEnfMatEnDineroDeduccion imssEnfMatEnDineroBO = null;
 	private IMSSInvalidezVida imssInvalidezVidaBO = null;
 	private IMSSCesantiaEdadAvanzadaVejezDeduccion imssCesantiaVejezBO = null;
 	
-	public IMSSDeduccion(List<CatTipoDeduccion> tiposDeduccion, List<CatCuotaIMSS> cuotasIMSS, Date fechaInicioAnio, Date fechaFinAnio, BigDecimal diasPorPeriodo, BigDecimal uma, BigDecimal sdi) {
-		this.cuotasIMSS = cuotasIMSS;
-		this.tiposDeduccion = tiposDeduccion;
-		this.fechaInicioAnio = fechaInicioAnio;
-		this.fechaFinAnio = fechaFinAnio;
-		this.diasPorPeriodo = diasPorPeriodo;
-		this.uma = uma;
-		this.sdi = sdi;
+	public IMSSDeduccion(ParametrosNomina parametros, BigDecimal diasPeriodo, BigDecimal ausencias, BigDecimal incapacidades) {
+		this.parametros      = parametros;
+		this.cuotasIMSS      = parametros.getCuotasIMSS();
+		this.tiposDeduccion  = parametros.getTiposDeduccion();
+		this.diasPeriodo     = diasPeriodo;
+		this.ausencias       = ausencias;
+		this.incapacidades   = incapacidades;
 	}
 	
 	@Override
 	public void procesar(DetNomina nomina) {
 		List<DetNominaDeduccion> aportacionesIMSS = null;
 		
+		DetNominaDeduccion dRiesgoTrabajo = null;
 		DetNominaDeduccion dEnfermedadMaternidad = null;
 		DetNominaDeduccion dGastosMedicos = null;
 		DetNominaDeduccion dEnDinero = null;
 		DetNominaDeduccion dInvalidezVida = null;
+		DetNominaDeduccion dRetiro = null;
 		DetNominaDeduccion dCesantiaVejez = null;
 		DetNominaDeduccion dIMSS = null;
 		
@@ -61,6 +61,11 @@ public class IMSSDeduccion extends AbstractIMSSDeduccion implements IDeducciones
 		Integer idx = null;
 		
 		try {
+			if(nomina.getReceptor() == null || nomina.getReceptor().getSalarioDiarioIntegrado() == null)
+				throw new SGPException("Debe configurar el receptor con el salario diario integrado.");
+			
+			this.sdi = nomina.getReceptor().getSalarioDiarioIntegrado();
+			
 			if(this.tiposDeduccion == null)
 				throw new SGPException("No hay una lista de tipos de deducción establecida.");
 			
@@ -69,42 +74,70 @@ public class IMSSDeduccion extends AbstractIMSSDeduccion implements IDeducciones
 			
 			aportacionesIMSS = new ArrayList<>();
 			
-			imssEnfMatBO = new IMSSEnfermedadMaternidadDeduccion(this.fechaInicioAnio, this.fechaFinAnio, this.diasPorPeriodo, this.uma, this.sdi);
-			imssEnfMatBO.setTiposDeduccion(tiposDeduccion);
-			imssEnfMatBO.setCuotasIMSS(cuotasIMSS);
-			idx = imssEnfMatBO.nuevoIndiceDe(nomina.getDeducciones());
+			//RIESGOS DE TRABAJO
+			imssRiesgoTrabajoBO = new IMSSRiesgoTrabajoDeduccion(this.parametros, this.diasPeriodo, this.ausencias, this.incapacidades, this.sdi);
+			idx = imssRiesgoTrabajoBO.nuevoIndiceDe(nomina.getDeducciones());
+			//TODO Falta integrar la cuota de riesgo de la empresa.
+			dRiesgoTrabajo = imssRiesgoTrabajoBO.calcular(nomina, idx);
+			aportacionesIMSS.add(dRiesgoTrabajo);
+			
+			//ENFERMEDADES Y MATERNIDAD (EN ESPECIE)
+			imssEnfMatBO = new IMSSEnfMatEnEspecieDeduccion(this.parametros, this.diasPeriodo, this.ausencias, this.incapacidades, this.sdi);
 			dEnfermedadMaternidad = imssEnfMatBO.calcular(nomina, idx++);
 			aportacionesIMSS.add(dEnfermedadMaternidad);
 			
-			imssGastosMedicosBO = new IMSSGastosMedicosPensionadosBeneficiariosDeduccion(this.fechaInicioAnio, this.fechaFinAnio, this.diasPorPeriodo, this.sdi);
-			imssGastosMedicosBO.setTiposDeduccion(tiposDeduccion);
-			imssGastosMedicosBO.setCuotasIMSS(cuotasIMSS);
-			dGastosMedicos = imssGastosMedicosBO.calcular(nomina, idx++);
+			//ENFERMEDADES Y MATERNIDAD (GASTOS MEDICOS PARA PENSIONADOS Y BENEFICIARIOS)
+			imssEnfMatGastosMedBO = new IMSSEnfMatGastosMedicosDeduccion(this.parametros, this.diasPeriodo, this.ausencias, this.incapacidades, this.sdi);
+			dGastosMedicos = imssEnfMatGastosMedBO.calcular(nomina, idx++);
 			aportacionesIMSS.add(dGastosMedicos);
 			
-			imssEnDineroBO = new IMSSEnDineroDeduccion(this.fechaInicioAnio, this.fechaFinAnio, this.diasPorPeriodo, this.sdi);
-			imssEnDineroBO.setTiposDeduccion(tiposDeduccion);
-			imssEnDineroBO.setCuotasIMSS(cuotasIMSS);
-			dEnDinero = imssEnDineroBO.calcular(nomina, idx++);
+			//ENFERMEDADES Y MATERNIDAD (EN DINERO)
+			imssEnfMatEnDineroBO = new IMSSEnfMatEnDineroDeduccion(this.parametros, this.diasPeriodo, this.ausencias, this.incapacidades, this.sdi);
+			dEnDinero = imssEnfMatEnDineroBO.calcular(nomina, idx++);
 			aportacionesIMSS.add(dEnDinero);
 			
-			imssInvalidezVidaBO = new IMSSInvalidezVida(fechaInicioAnio, fechaFinAnio, this.diasPorPeriodo, this.sdi);
-			imssInvalidezVidaBO.setTiposDeduccion(tiposDeduccion);
-			imssInvalidezVidaBO.setCuotasIMSS(cuotasIMSS);
+			//INVALIDEZ Y VIDA (EN ESPECIE Y EN DINERO)
+			imssInvalidezVidaBO = new IMSSInvalidezVida(this.parametros, this.diasPeriodo, this.ausencias, this.incapacidades, this.sdi);
 			dInvalidezVida = imssInvalidezVidaBO.calcular(nomina, idx++);
 			aportacionesIMSS.add(dInvalidezVida);
 			
-			imssCesantiaVejezBO = new IMSSCesantiaEdadAvanzadaVejezDeduccion(this.fechaInicioAnio, this.fechaFinAnio, diasPorPeriodo, this.sdi);
-			imssCesantiaVejezBO.setTiposDeduccion(tiposDeduccion);
-			imssCesantiaVejezBO.setCuotasIMSS(cuotasIMSS);
+			//GUARDERIAS Y PRESTACIONES SOCIALES (EN ESPECIE) Fund. Art. 211 LSS
+			//TODO implementar cálculo.
+			//Cuota = SBC x prima (Patrón 1%, Trabajador 0%) x (Dias periodo - Ausencias - Incapacidades)
+			
+			
+			//-----------------Aportaciones bimestrales-----------------------------------
+			//RETIRO, CESANTIA EN EDAD AVANZADA Y VEJEZ (CESANTIA EN EDAD AVANZADA Y VEJEZ)
+			//TODO implementar cálculo.
+			dRetiro = null;
+			
+			//CESANTIA EN EDAD AVANZADA Y VEJEZ (RETIRO)
+			imssCesantiaVejezBO = new IMSSCesantiaEdadAvanzadaVejezDeduccion(this.parametros, this.diasPeriodo, this.ausencias, this.incapacidades, this.sdi);
 			dCesantiaVejez = imssCesantiaVejezBO.calcular(nomina, idx++);
 			aportacionesIMSS.add(dCesantiaVejez);
+			
+			//INFONAVIT Fund. Art. 29 Fracción II LEY DEL INSTITUTO DEL FONDO NACIONAL DE LA VIVIENDA PARA LOS TRABAJADORES.
+			//Descuento de ausentismos, Art. 35 REGLAMENTO DE INSCRIPCIÓN, PAGO DE APORTACIONES Y ENTERO DE DESCUENTOS AL INSTITUTO DEL FONDO NACIONAL DE LA VIVIENDA PARA LOS TRABAJADORES
+			//TODO implementar cálculo.
+			//Cuota = SBC x prima (Patrón 5%, Trabajador 0%) x (Dias trabajados - Ausencias)
+			
+			
+			
+			
+			
+			
+			
 			
 			imss = dEnfermedadMaternidad.getImporte()
 					.add(dGastosMedicos.getImporte())
 					.add(dEnDinero.getImporte())
 					.add(dInvalidezVida.getImporte())
 					.add(dCesantiaVejez.getImporte())
+					;
+			
+			imss = aportacionesIMSS.stream()
+					.map(c -> c.getImporte())
+					.reduce(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP), BigDecimal :: add)
 					;
 			
 			dIMSS = new DetNominaDeduccion();
