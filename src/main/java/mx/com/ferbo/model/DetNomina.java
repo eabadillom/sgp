@@ -95,15 +95,15 @@ public class DetNomina implements Serializable {
     @Basic(optional = false)
     private String lugarExpedicion;
     
-    @Column(name = "nu_subtotal")
+    @Column(name = "nu_subtotal", precision = 12, scale = 2)
     @Basic(optional = false)
     private BigDecimal subtotal;
     
-    @Column(name = "nu_descuento")
+    @Column(name = "nu_descuento", precision = 12, scale = 2)
     @Basic(optional = false)
     private BigDecimal descuento;
     
-    @Column(name = "nu_total")
+    @Column(name = "nu_total", precision = 12, scale = 2)
     @Basic(optional = false)
     private BigDecimal total;
     
@@ -127,9 +127,9 @@ public class DetNomina implements Serializable {
     @Basic(optional = true)
   	private Integer diasLaborados;
     
-    @Column(name = "nu_dias_pagados")
+    @Column(name = "nu_dias_pagados", precision = 6, scale = 2)
     @Basic(optional = true)
-  	private Integer diasPagados;
+  	private BigDecimal diasPagados;
     
     @Column(name = "nu_dias_asueto")
     @Basic(optional = true)
@@ -384,11 +384,11 @@ public class DetNomina implements Serializable {
 		this.diasLaborados = diasLaborados;
 	}
 
-	public Integer getDiasPagados() {
+	public BigDecimal getDiasPagados() {
 		return diasPagados;
 	}
 
-	public void setDiasPagados(Integer diasPagados) {
+	public void setDiasPagados(BigDecimal diasPagados) {
 		this.diasPagados = diasPagados;
 	}
 

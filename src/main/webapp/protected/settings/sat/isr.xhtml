@@ -7,6 +7,39 @@
     template="/WEB-INF/plantillas/template.xhtml">
     <ui:define name="title">ISR</ui:define>
     <ui:define name="content">
+    	<script>
+			PrimeFaces.locales['es'] = {
+				monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+				monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+				dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+				dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
+				dayNamesMin: ['D', 'L', 'M', 'X', 'J', 'V', 'S'],
+				weekHeader: 'Semana',
+				firstDay: 1,
+				isRTL: false,
+				showMonthAfterYear: false,
+				yearSuffix: '',
+				timeOnlyTitle: 'Sólo hora',
+				timeText: 'Tiempo',
+				hourText: 'Hora',
+				minuteText: 'Minuto',
+				secondText: 'Segundo',
+				millisecondText: 'Milisegundo',
+				ampm: false,
+				month: 'Mes',
+				week: 'Semana',
+				day: 'Día',
+				allDayText: 'Todo el día',
+				today: 'Hoy',
+				now: 'Ahora',
+				clear: 'Limpiar',
+				aria: {
+				   close: 'Cerrar',
+				   previous: 'Anterior',
+				   next: 'Siguiente',
+				}
+			};
+		</script>
         <h:form id="form">
             <p:growl id="messages" showDetail="true" life="2000"/>
             <p:dialog modal="true" widgetVar="statusInfoDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
@@ -62,9 +95,7 @@
                         <f:convertNumber minFractionDigits="2" maxFractionDigits="2" locale="es_MX"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Tipo" style="text-align: center;" width="4rem">
-                    <h:outputText value="#{isr.periodoISR.getDescription()}" />
-                </p:column>
+                
                 <p:column headerText="Fecha" style="text-align: center;" width="4rem">
                     <h:outputText value="#{isr.fecha}" >
                         <f:convertDateTime pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
@@ -77,43 +108,21 @@
                         <f:setPropertyActionListener value="#{isr}" target="#{isrBean.tarifaISR}" />
                         <p:resetInput target=":dialogs:manage-isr-content" />
                     </p:commandButton>
+				</p:column>
+				<p:column exportable="false" ariaHeaderText="Actions" width="2rem">
                     <p:commandButton class="ui-button-danger" icon="pi pi-trash"
                         process="@this"
                         oncomplete="PF('borrarISRDialog').show()">
                         <f:setPropertyActionListener value="#{isr}" target="#{isrBean.tarifaISR}" />
-                </p:commandButton>
+                	</p:commandButton>
                 </p:column>
             </p:dataTable>
         </h:form>
         <h:form id="dialogs">
             <p:dialog header="Detalles del ISR" showEffect="fade" modal="true" widgetVar="manageISRDialog"
                 responsive="true" draggable="true" resizable="false" dynamic="true" style="margin: auto">
-                <p:outputPanel id="manage-isr-content" class="ui-fluid" rendered="#{not empty isrBean.tarifaISR}">
-                    <div class="field">
-                        <p:outputLabel for="@next">Limite Inferior ($)</p:outputLabel>
-                        <p:inputText id="lInferior" value="#{isrBean.tarifaISR.limiteInferior}" required="true" >
-                            <p:ajax process="@this"/>
-                        </p:inputText>
-                    </div>
-                    <div class="field">
-                        <p:outputLabel for="@next">Limite Superior ($)</p:outputLabel>
-                        <p:inputText id="lSuperior" value="#{isrBean.tarifaISR.limiteSuperior}" required="true" >
-                            <p:ajax process="@this"/>
-                        </p:inputText>
-                    </div>
-                    <div class="field">
-                        <p:outputLabel for="@next">Cuota Fija</p:outputLabel>
-                        <p:inputText id="cuotaFija" value="#{isrBean.tarifaISR.cuotaFija}" required="true" >
-                            <p:ajax process="@this"/>
-                        </p:inputText>
-                    </div>
-                    <div class="field">
-                        <p:outputLabel for="@next">% sobre excedente limite inferior</p:outputLabel>
-                        <p:inputText id="exceLimInferior" value="#{isrBean.tarifaISR.porcAplExceLimInf}" required="true" >
-                            <p:ajax process="@this"/>
-                        </p:inputText>
-                    </div>
-                    <div class="field">
+                <p:outputPanel id="manage-isr-content" class="ui-fluid" rendered="#{isrBean.tarifaISR ne null}">
+                	<div class="field">
                         <p:outputLabel for="@next">Tipo</p:outputLabel>
                         <p:selectOneRadio id="line" value="#{isrBean.tarifaISR.tipo}" layout="lineDirection" required="true">
                             <f:selectItem itemLabel="Diario" itemValue="di" />
@@ -126,14 +135,38 @@
                     </div>
                     <div class="field">
                         <p:outputLabel for="@next">Fecha</p:outputLabel>
-                        <p:calendar id="fecha" value="#{isrBean.tarifaISR.fecha}" required="true" pattern="dd/MM/yyyy" locale="es" >
+                        <p:calendar id="fecha" value="#{isrBean.tarifaISR.fecha}" required="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
                             <p:ajax process="@this"/>
                         </p:calendar>
+                    </div>
+                    <div class="field">
+                        <p:outputLabel for="@next">Limite Inferior ($)</p:outputLabel>
+                        <p:inputNumber id="lInferior" value="#{isrBean.tarifaISR.limiteInferior}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," inputStyle="text-align: right" maxValue="99999999.99" required="true">
+                            <p:ajax process="@this"/>
+                        </p:inputNumber>
+                    </div>
+                    <div class="field">
+                        <p:outputLabel for="@next">Limite Superior ($)</p:outputLabel>
+                        <p:inputNumber id="lSuperior" value="#{isrBean.tarifaISR.limiteSuperior}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," inputStyle="text-align: right" maxValue="99999999.99" required="true" >
+                            <p:ajax process="@this"/>
+                        </p:inputNumber>
+                    </div>
+                    <div class="field">
+                        <p:outputLabel for="@next">Cuota Fija</p:outputLabel>
+                        <p:inputNumber id="cuotaFija" value="#{isrBean.tarifaISR.cuotaFija}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," inputStyle="text-align: right" maxlength="10" maxValue="99999999.99" required="true" >
+                            <p:ajax process="@this"/>
+                        </p:inputNumber>
+                    </div>
+                    <div class="field">
+                        <p:outputLabel for="@next">% sobre excedente limite inferior</p:outputLabel>
+                        <p:inputNumber id="exceLimInferior" value="#{isrBean.tarifaISR.porcAplExceLimInf}" symbol=" %" symbolPosition="s" decimalPlaces="2" decimalSeparator="." thousandSeparator="," inputStyle="text-align: right" maxValue="99999999.99" required="true" >
+                            <p:ajax process="@this"/>
+                        </p:inputNumber>
                     </div>
                 </p:outputPanel>
                 <f:facet name="footer">
                     <p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{isrBean.crearISRNuevo()}"
-                                     update="manage-isr-content form:dt-isr" process="manage-isr-content @this">
+                                     update="manage-isr-content form:dt-isr" process="manage-isr-content @this" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();">
                     </p:commandButton>
                     <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('manageISRDialog').hide()"
                         class="ui-button-secondary" type="button" />

@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -437,6 +438,7 @@ public class DateUtil {
 		Date     fecha = null;
 		Calendar cal = null;
 		
+//		cal = Calendar.getInstance(TimeZone.getTimeZone("GMT-06:00"), Locale.getDefault());
 		cal = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
 		cal.set(year, month, date, hour, minute, second);
 		fecha = cal.getTime();
@@ -468,6 +470,26 @@ public class DateUtil {
 		cal.set(Calendar.MILLISECOND, millisecond);
 		
 		fecha.setTime(cal.getTimeInMillis());
+	}
+	
+	public static Date getDateTime(int year, int month, int day, int hour, int minute, int second, int millisecond){
+		Date     fecha = null;
+		Calendar cal = null;
+		TimeZone tz = TimeZone.getTimeZone("GMT-06:00");
+		cal = GregorianCalendar.getInstance(tz, Locale.getDefault());
+		log.debug("Timezone: {}", TimeZone.getDefault());
+		cal.setTimeZone(tz);
+		cal.set(Calendar.YEAR, year);
+		cal.set(Calendar.MONTH, month);
+		cal.set(Calendar.DAY_OF_MONTH, day);
+		cal.set(Calendar.HOUR_OF_DAY, hour);
+		cal.set(Calendar.MINUTE, minute);
+		cal.set(Calendar.SECOND, second);
+		cal.set(Calendar.MILLISECOND, millisecond);
+		
+		fecha = cal.getTime();
+		
+		return fecha;
 	}
 	
 	public static void setTime(Date fecha, int hour, int AM_PM, int minute, int second, int millisecond) {
@@ -630,13 +652,12 @@ public class DateUtil {
 	   * @param elapsedTimeMillis Tiempo a formatear
 	   * @return Tiempo formateado
 	   */
-	  public static String formatElapsedTime(long elapsedTimeMillis) {
-
-	    SimpleDateFormat dateFormat = new SimpleDateFormat("H 'hrs' m 'min' s 'seg' SSS 'ms'");
-	    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-	    return dateFormat.format(new Date(elapsedTimeMillis));
-	  }
-	  
+	public static String formatElapsedTime(long elapsedTimeMillis) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("H 'hrs' m 'min' s 'seg' SSS 'ms'");
+		dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+		return dateFormat.format(new Date(elapsedTimeMillis));
+	}
+	
 	/**Devuelve la diferencia en dias de dos fechas. De preferencia, el primer parametro (fechaIni)
 	 * debera ser la fecha menor, mientras que el segundo parametro debera ser la fecha mayor.
 	 * @param fechaIni
@@ -660,6 +681,12 @@ public class DateUtil {
         
         return days;
 		
+	}
+	
+	public static long weeksDiff(LocalDate fechaIni, LocalDate fechaFin) {
+		long weeks = 0;
+		weeks = ChronoUnit.WEEKS.between(fechaIni, fechaFin);
+		return weeks;
 	}
 	
 	public static boolean isDateBetween(Date fecha, Date fechaIni, Date fechaFin){

@@ -82,20 +82,68 @@ public class SolicitudPermisoDAO extends BaseDAO<DetSolicitudPermiso, Integer>
         return modelList;
     }
     
-    public DetSolicitudPermiso buscarPorCriterios(Integer idEmpleado, Date fechaInicio, Date fechaFin, Integer idTipoSolicitud)
+    public List<DetSolicitudPermiso> buscarPorTipoSolicitud(Integer idEmpleado, String permiso, String vacaciones)
     {
-        DetSolicitudPermiso model = null;
+        List<DetSolicitudPermiso> modelList = null;
         EntityManager em = null;
         
         try
         {
             em = this.getEntityManager();
-            model = em.createNamedQuery("DetSolicitudPermiso.findByCriterios", DetSolicitudPermiso.class)
+            modelList = em.createNamedQuery("DetSolicitudPermiso.findByTipoSolicitud", DetSolicitudPermiso.class)
                 .setParameter("idEmp", idEmpleado)
-                .setParameter("fechaInicio", fechaInicio, TemporalType.TIMESTAMP)
+                .setParameter("clavePermiso", permiso)
+                .setParameter("claveVacaciones", vacaciones)
+                .getResultList();
+        }catch(Exception ex) 
+        {
+            log.error("Problema para obtener la lista de solicitud de permisos...", ex);
+        } finally 
+        {
+            this.close(em);
+        }
+        
+        return modelList;
+    }
+    
+    public List<DetSolicitudPermiso> buscarPorIdEmpleadoClaveSolicitud(Integer idEmpleado, String clave)
+    {
+        List<DetSolicitudPermiso> modelList = null;
+        EntityManager em = null;
+        
+        try
+        {
+            em = this.getEntityManager();
+            modelList = em.createNamedQuery("DetSolicitudPermiso.findByClave", DetSolicitudPermiso.class)
+                .setParameter("idEmp", idEmpleado)
+                .setParameter("clave", clave)
+                .getResultList();
+        }catch(Exception ex) 
+        {
+            log.error("Problema para obtener la lista de solicitud de permisos...", ex);
+        } finally 
+        {
+            this.close(em);
+        }
+        
+        return modelList;
+    }
+    
+    public List<DetSolicitudPermiso> buscarPorIdEmpleadoFechasClave(Integer idEmpleado, Date fechaIni, Date fechaFin, String clave1, String clave2)
+    {
+        List<DetSolicitudPermiso> modellist = null;
+        EntityManager em = null;
+        
+        try
+        {
+            em = this.getEntityManager();
+            modellist = em.createNamedQuery("DetSolicitudPermiso.findByCriterios", DetSolicitudPermiso.class)
+                .setParameter("idEmp", idEmpleado)
+                .setParameter("fechaInicio", fechaIni, TemporalType.TIMESTAMP)
                 .setParameter("fechaFin", fechaFin, TemporalType.TIMESTAMP)
-                .setParameter("idTipoSolicitud", idTipoSolicitud)
-                .getSingleResult();
+                .setParameter("clave1", clave1)
+                .setParameter("clave2", clave2)
+                .getResultList();
         }catch(Exception ex) 
         {
             log.error("Problema para obtener la solicitud de permiso: {}", ex.getMessage());
@@ -104,7 +152,7 @@ public class SolicitudPermisoDAO extends BaseDAO<DetSolicitudPermiso, Integer>
             this.close(em);
         }
         
-        return model;
+        return modellist;
     }
     
 }

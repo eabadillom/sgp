@@ -7,6 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.deduccion.IDeduccion;
+import mx.com.ferbo.business.nomina.ParametrosNomina;
 import mx.com.ferbo.model.CatCuotaIMSS;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
@@ -14,19 +15,29 @@ import mx.com.ferbo.model.DetNominaDeduccionPK;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.util.SGPException;
 
+/**Cálculo de Cesantia en edad avanzada y vejez.<br>
+ * Fund. Art. 168 Fracción II LEY DEL SEGURO SOCIAL.<br>
+ * Fund. transitorio publicado en el Diario Oficial de la Federación el 16 de diciembre de 2020<br>
+ * DECRETO por el que se reforman, adicionan y derogan diversas disposiciones de la
+ * Ley del Seguro Social y de la Ley de los Sistemas de Ahorro para el Retiro, Art. Segundo.
+ */
 public class IMSSCesantiaEdadAvanzadaVejezDeduccion extends AbstractIMSSDeduccion implements IDeduccion {
 	
 	private static Logger log = LogManager.getLogger(IMSSCesantiaEdadAvanzadaVejezDeduccion.class);
 	
 	private Date fechaInicioAnio = null;
 	private Date fechaFinAnio = null;
-	private BigDecimal totalDiasPeriodo = null;
+	private BigDecimal diasTrabajados = null;
+	private BigDecimal ausencias = null;
+	private BigDecimal incapacidades = null;
 	private BigDecimal sdi = null;
 	
-	public IMSSCesantiaEdadAvanzadaVejezDeduccion(Date fechaInicioAnio, Date fechaFinAnio, BigDecimal totalDiasPeriodo, BigDecimal sdi) {
-		this.fechaInicioAnio = fechaInicioAnio;
-		this.fechaFinAnio = fechaFinAnio;
-		this.totalDiasPeriodo = totalDiasPeriodo;
+	public IMSSCesantiaEdadAvanzadaVejezDeduccion(ParametrosNomina parametros, BigDecimal diasTrabajados, BigDecimal ausencias, BigDecimal incapacidades,  BigDecimal sdi) {
+		this.cuotasIMSS = parametros.getCuotasIMSS();
+		this.tiposDeduccion = parametros.getTiposDeduccion();
+		this.diasTrabajados = diasTrabajados;
+		this.ausencias = ausencias;
+		this.incapacidades = incapacidades;
 		this.sdi = sdi;
 	}
 	
@@ -52,10 +63,18 @@ public class IMSSCesantiaEdadAvanzadaVejezDeduccion extends AbstractIMSSDeduccio
 				throw new SGPException("No se establecio la lista de tipos de deduccion.");
 			
 			tdIMSS = this.getTipoDeduccion("001");
+			//TODO La prima del IMSS para CEAV debe obtenerse con base en la tabla del transitorio art. segundo de la LSS.
+			//1.0 SM 3.150% de 2023 a 2030
+			//1.01 SM a 1.50 UMA ...
+			//1.51 UMA A 2.00 UMA ...
+			//etc...
 			tarifaIMSS = this.getCuotaIMSS("O", "CEAV", this.fechaInicioAnio, this.fechaFinAnio, this.sdi);
+			
+			//TODO cálculo: SBC x prima (trans. art. segundo LSS) x (diasTrabajados - ausencias - incapacidades)
 			cuota = this.sdi
-					.multiply(tarifaIMSS.getCuota()).setScale(2, BigDecimal.ROUND_HALF_UP)
-					.multiply(totalDiasPeriodo).setScale(2, BigDecimal.ROUND_HALF_UP)
+					.multiply(tarifaIMSS.getCuota())
+					.multiply(diasTrabajados.subtract(ausencias).subtract(incapacidades))
+					.setScale(2, BigDecimal.ROUND_HALF_UP)
 					;
 		} catch(Exception ex) {
 			log.error("No es posible calcular la cuota por cesantía en edad avanzada y vejez...", ex);

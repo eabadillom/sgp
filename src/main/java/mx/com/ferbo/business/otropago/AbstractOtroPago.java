@@ -16,6 +16,10 @@ public class AbstractOtroPago {
 	private static Logger log = LogManager.getLogger(AbstractOtroPago.class);
 	
 	public static final String OP_SUBSIDIO_AL_SALARIO = "002";
+	public static final String OP_AJUSTE_AL_NETO      = "999";
+	
+	public static final String CVE_AJUSTE_AL_NETO = "004";
+	public static final String CVE_SUBSIDIO = "034";
 	
 	protected List<CatTipoOtroPago> tiposOtroPago = null;
 	

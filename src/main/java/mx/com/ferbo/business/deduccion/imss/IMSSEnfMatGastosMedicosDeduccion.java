@@ -1,12 +1,12 @@
 package mx.com.ferbo.business.deduccion.imss;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.deduccion.IDeduccion;
+import mx.com.ferbo.business.nomina.ParametrosNomina;
 import mx.com.ferbo.model.CatCuotaIMSS;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
@@ -14,19 +14,24 @@ import mx.com.ferbo.model.DetNominaDeduccionPK;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.util.SGPException;
 
-public class IMSSGastosMedicosPensionadosBeneficiariosDeduccion extends AbstractIMSSDeduccion implements IDeduccion {
+/**Cálculo de cuuotas Enfermedades y Maternidad (Gastos Médicos para pensionados y beneficiarios)<br>
+ * Fundamento legal: Artículo 25 segundo párrafo LEY DEL SEGURO SOCIAL.
+ */
+public class IMSSEnfMatGastosMedicosDeduccion extends AbstractIMSSDeduccion implements IDeduccion {
 	
-	private static Logger log = LogManager.getLogger(IMSSGastosMedicosPensionadosBeneficiariosDeduccion.class);
+	private static Logger log = LogManager.getLogger(IMSSEnfMatGastosMedicosDeduccion.class);
 	
-	private Date fechaInicioAnio = null;
-	private Date fechaFinAnio = null;
-	private BigDecimal totalDiasPeriodo = null;
+	private BigDecimal diasTrabajados = null;
+	private BigDecimal ausencias = null;
+	private BigDecimal incapacidades = null;
 	private BigDecimal sdi = null;
 	
-	public IMSSGastosMedicosPensionadosBeneficiariosDeduccion(Date fechaInicioAnio, Date fechaFinAnio, BigDecimal totalDiasPeriodo, BigDecimal sdi) {
-		this.fechaInicioAnio = fechaInicioAnio;
-		this.fechaFinAnio = fechaFinAnio;
-		this.totalDiasPeriodo = totalDiasPeriodo;
+	public IMSSEnfMatGastosMedicosDeduccion(ParametrosNomina parametros, BigDecimal diasTrabajados, BigDecimal ausencias, BigDecimal incapacidades, BigDecimal sdi) {
+		this.cuotasIMSS = parametros.getCuotasIMSS();
+		this.tiposDeduccion = parametros.getTiposDeduccion();
+		this.diasTrabajados = diasTrabajados;
+		this.ausencias = ausencias;
+		this.incapacidades = incapacidades;
 		this.sdi = sdi;
 	}
 
@@ -52,12 +57,15 @@ public class IMSSGastosMedicosPensionadosBeneficiariosDeduccion extends Abstract
 			
 			tdIMSS = this.getTipoDeduccion("001");
 						
-			tarifaIMSS = this.getCuotaIMSS("O", "EM2", this.fechaInicioAnio, this.fechaFinAnio, this.sdi);
+			tarifaIMSS = this.getCuotaIMSS("O", "EM2", 0);
 			cuota = this.sdi
-					.multiply(tarifaIMSS.getCuota()).setScale(2, BigDecimal.ROUND_HALF_UP)
-					.multiply(totalDiasPeriodo.setScale(2, BigDecimal.ROUND_HALF_UP))
+					.multiply(tarifaIMSS.getCuota())
+					//TODO A LOS DIAS TRABAJADOS SE LES DEBE RESTAR LAS INCAPACIDADES Y A PARTIR DE ELLO SE REALIZA EL CALCULO.
+					.multiply(diasTrabajados.subtract(incapacidades))
 					.setScale(2, BigDecimal.ROUND_HALF_UP)
 					;
+			
+			log.info("Gastos medicos pensionados y beneficiarios SDI: {} - Dias trabados: {} - Tarifa: {}", this.sdi, this.diasTrabajados, tarifaIMSS.getCuota());
 			
 		} catch(Exception ex) {
 			log.error("No es posible calcular el excedente por Gastos Médicos para pensionados y beneficiarios...", ex);
