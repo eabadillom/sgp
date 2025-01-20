@@ -172,15 +172,16 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
         return foto;
     }
 
-    public synchronized List<DetEmpleado> empleadosSalarioMinimoGeneral(BigDecimal salarioMinimo) throws SGPException{
+    public synchronized List<DetEmpleado> empleadosSalarioMinimoGeneral(BigDecimal salarioMinimo, Date hoy) throws SGPException{
         List<DetEmpleado> empleados = null;
         EntityManager em = null;
         
         try{
             log.info("Inicio el proceso de obtener los empleados por debajo del salario minimo de ZG");
             em = getEntityManager();
-            TypedQuery resultado = em.createQuery("select e from DetEmpleado e where e.datoEmpresa.salarioDiario < :salarioMinimo", DetEmpleado.class);
+            TypedQuery resultado = em.createQuery("select e from DetEmpleado e where e.datoEmpresa.salarioDiario < :salarioMinimo and (e.datoEmpresa.fechaBaja is null or e.datoEmpresa.fechaBaja > :hoy)", DetEmpleado.class);
             resultado.setParameter("salarioMinimo", salarioMinimo);
+            resultado.setParameter("hoy", hoy);
             empleados = resultado.getResultList();
             log.info("Finaliza el proceso de obtener los empleados por debajo del salario minimo de ZG");
         }
@@ -196,15 +197,16 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
         return empleados;
     }
     
-    public synchronized List<DetEmpleado> empleadosSalarioMinimoFrontera(BigDecimal salarioMinimo) throws SGPException{
+    public synchronized List<DetEmpleado> empleadosSalarioMinimoFrontera(BigDecimal salarioMinimo, Date hoy) throws SGPException{
         List<DetEmpleado> empleados = null;
         EntityManager em = null;
         
         try{
             log.info("Inicio el proceso de obtener los empleados por debajo del salario minimo de ZF");
             em = getEntityManager();
-            TypedQuery resultado = em.createQuery("select e from DetEmpleado e where e.datoEmpresa.salarioDiario < :salarioMinimo", DetEmpleado.class);
+            TypedQuery resultado = em.createQuery("select e from DetEmpleado e where e.datoEmpresa.salarioDiario < :salarioMinimo and (e.datoEmpresa.fechaBaja is null or e.datoEmpresa.fechaBaja > :hoy)", DetEmpleado.class);
             resultado.setParameter("salarioMinimo", salarioMinimo);
+            resultado.setParameter("hoy", hoy);
             empleados = resultado.getResultList();
             log.info("Finaliza el proceso de obtener los empleados por debajo del salario minimo de ZF");
         }

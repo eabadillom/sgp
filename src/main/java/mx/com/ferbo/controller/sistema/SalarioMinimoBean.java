@@ -21,6 +21,7 @@ import mx.com.ferbo.dao.SalarioMinimoDAO;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dto.SalarioMinimoDTO;
 import mx.com.ferbo.model.DetEmpleado;
+import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.SGPException;
 
 @Named(value = "salarioMinBean")
@@ -214,12 +215,12 @@ public class SalarioMinimoBean implements Serializable {
             }
 
             if (this.salarioGeneral == true && this.salarioFrontera == false) {
-                this.lstEmpleadosPorActualizar = empleadoDAO.empleadosSalarioMinimoGeneral(this.salario.getZonaG());
+                this.lstEmpleadosPorActualizar = empleadoDAO.empleadosSalarioMinimoGeneral(this.salario.getZonaG(), DateUtil.now());
                 this.salarioSugerido = this.salario.getZonaG();
             }
 
             if (this.salarioFrontera == true && this.salarioGeneral == false) {
-                this.lstEmpleadosPorActualizar = empleadoDAO.empleadosSalarioMinimoFrontera(this.salario.getZonaLFN());
+                this.lstEmpleadosPorActualizar = empleadoDAO.empleadosSalarioMinimoFrontera(this.salario.getZonaLFN(), DateUtil.now());
                 this.salarioSugerido = this.salario.getZonaLFN();
             }
 
