@@ -110,8 +110,8 @@
                     </p:column>
                 </p:dataTable>
                 <f:facet name="footer">
-                    <p:commandButton value="Actualizar empleado(s)" actionListener="#{salarioMinBean.actualizarSalarios()}"  process="dg-menorAlMinimo @this" update="dg-menorAlMinimo" oncomplete="PF('dg-menorAlMinimo').hide(); PF('dg-menorAlMinimo').show();"/>
-                    <p:commandButton value="Cerrar Dialogo" actionListener="#{salarioMinBean.limpiarVariables()}" oncomplete="PF('dg-menorAlMinimo').hide();" update="dg-menorAlMinimo"/>
+                    <p:commandButton value="Actualizar empleado(s)" icon="pi pi-check" styleClass="" actionListener="#{salarioMinBean.actualizarSalarios()}"  process="dg-menorAlMinimo @this" update="dg-menorAlMinimo" oncomplete="PF('dg-menorAlMinimo').hide(); PF('dg-menorAlMinimo').show();"/>
+                    <p:commandButton value="Cerrar Dialogo" icon="pi pi-times" styleClass="ui-button-danger" actionListener="#{salarioMinBean.limpiarVariables()}" oncomplete="PF('dg-menorAlMinimo').hide();" update="dg-menorAlMinimo"/>
                 </f:facet>
             </p:dialog>
         </h:form>
