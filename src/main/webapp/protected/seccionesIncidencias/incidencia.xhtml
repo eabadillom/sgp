@@ -195,6 +195,9 @@
             <p:commandButton value="Rechazar" icon="pi pi-times" class="ui-button-danger" process="pnlDetalleSolicitudPermiso @this" 
                              disabled="#{incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 2 or incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 3 or incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 4}"
                              oncomplete="PF('dialogRechazar').show()"/>
+            <p:commandButton value="Cancelar" icon="pi pi-trash" class="ui-button-danger" process="pnlDetalleSolicitudPermiso @this" 
+                             rendered="#{incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 2}"
+                             actionListener="#{incidenciaBean.actualizarEstatusIncidencia()}"/>
         </f:facet>
     </p:dialog>
     <p:dialog widgetVar="dialogRechazar" header="Detalle rechazo" showEffect="fade" responsive="true" modal="true" 
