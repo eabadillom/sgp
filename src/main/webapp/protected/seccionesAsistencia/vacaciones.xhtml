@@ -55,15 +55,13 @@
                 </div>
             </div>
             <p:datePicker id="dpRango" rendered="#{asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud ne null 
-                                                   and (asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud eq 2 
-                                                   or asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud eq 4)}" 
+                                                   and asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud eq 2}" 
                           styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" 
                           pattern="dd-MM-yyyy" showIcon="true" readonlyInput="true" timeZone="GMT-6" value="#{asistenciaBean.lstRangoRegistro}"
                           mindate="#{asistenciaBean.minDate}" inline="true" selectionMode="range" disabledDays="#{asistenciaBean.invalidDays}"
                           disabledDates="#{asistenciaBean.diasDeDescansoObligatorio.diasAsueto}"/>
             <p:datePicker id="dpSimple" rendered="#{asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud ne null 
-                                                    and asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud ne 2 
-                                                    and asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud ne 4}" 
+                                                    and asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud eq 1}" 
                           styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" 
                           pattern="dd-MM-yyyy" showIcon="true" readonlyInput="true" timeZone="GMT-6" value="#{asistenciaBean.fechaSeleccionada}"
                           mindate="#{asistenciaBean.minDate}" inline="true" disabledDays="#{asistenciaBean.invalidDays}" 
