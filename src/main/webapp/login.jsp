@@ -1,9 +1,7 @@
-<%@page import="mx.com.ferbo.dto.DetEmpleadoDTO"%>
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-         pageEncoding="UTF-8"%>
-<%@ page import="mx.com.ferbo.controller.LoginBean" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="mx.com.ferbo.model.DetEmpleado" %>
-<%@ page import="javax.faces.context.FacesContext" %>    
+<%@ page import="org.apache.logging.log4j.LogManager" %>
+<%@ page import="org.apache.logging.log4j.Logger" %>
 <%DetEmpleado empleado = (DetEmpleado) session.getAttribute("empleado"); %>
 <%
     String path = request.getContextPath();
@@ -13,7 +11,7 @@
     if (empleado != null) {
         request.getSession().invalidate();
     }
-
+    
     String numEmpleado = "";
     Integer tamanioPermitido = 4;
 %>

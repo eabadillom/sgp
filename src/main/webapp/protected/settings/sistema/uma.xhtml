@@ -48,6 +48,11 @@
                         <p:calendar pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
                     </h:outputText>
                 </p:column>
+                <p:column headerText="Fecha de vigencia" style="text-align: center;" width="5rem">
+                	<h:outputText value="#{uma.fechaVigencia}" >
+                        <p:calendar pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
+                    </h:outputText>
+                </p:column>
                 <p:column exportable="false" ariaHeaderText="Actions" width="2rem">
                     <p:commandButton icon="pi pi-bars" update=":dialogs:manage-uma-content"
                         oncomplete="PF('manageUMADialog').show()"
@@ -76,13 +81,19 @@
                     </div>
                     <div class="field">
                         <p:outputLabel for="@next">Fecha Publicación</p:outputLabel>
-                        <p:calendar id="fPublicacion" value="#{umaBean.uma.fechaPublicacion}" required="true" pattern="dd/MM/yyyy" locale="es" >
+                        <p:calendar id="fPublicacion" value="#{umaBean.uma.fechaPublicacion}" required="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6" >
                             <p:ajax process="@this"/>
                         </p:calendar>
                     </div>
                     <div class="field">
                         <p:outputLabel for="@next">Fecha Aplicación</p:outputLabel>
-                        <p:calendar id="fAplicacion" value="#{umaBean.uma.fechaAplicacion}" required="true" pattern="dd/MM/yyyy" locale="es" >
+                        <p:calendar id="fVigencia" value="#{umaBean.uma.fechaAplicacion}" required="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
+                            <p:ajax process="@this"/>
+                        </p:calendar>
+                    </div>
+                    <div class="field">
+                        <p:outputLabel for="@next">Fecha Vigencia</p:outputLabel>
+                        <p:calendar id="fAplicacion" value="#{umaBean.uma.fechaVigencia}" required="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
                             <p:ajax process="@this"/>
                         </p:calendar>
                     </div>

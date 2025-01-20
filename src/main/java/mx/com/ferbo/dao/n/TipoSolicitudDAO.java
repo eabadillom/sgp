@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package mx.com.ferbo.dao.n;
 
 import java.util.List;
@@ -59,6 +55,52 @@ public class TipoSolicitudDAO extends BaseDAO<CatTipoSolicitud, Integer>
         {
             em = getEntityManager();
             modelList = em.createNamedQuery("CatTipoSolicitud.findByActive", CatTipoSolicitud.class)
+                .getResultList();
+        }catch(Exception ex) 
+        {
+            log.error("Problema para obtener el listado de tipos de solicitud...", ex);
+        }finally 
+        {
+           close(em);
+        }
+        
+        return modelList;
+    }
+    
+    public List<CatTipoSolicitud> buscarPermisosyVacaciones(String permiso, String vacaciones)
+    {
+        List<CatTipoSolicitud> modelList = null;
+        EntityManager em = null;
+        
+        try
+        {
+            em = getEntityManager();
+            modelList = em.createNamedQuery("CatTipoSolicitud.findByPermisoYVacaciones", CatTipoSolicitud.class)
+                .setParameter("clavePermiso", permiso)
+                .setParameter("claveVacaciones", vacaciones)
+                .getResultList();
+        }catch(Exception ex) 
+        {
+            log.error("Problema para obtener el listado de tipos de solicitud...", ex);
+        }finally 
+        {
+           close(em);
+        }
+        
+        return modelList;
+    }
+    
+    public List<CatTipoSolicitud> buscarIncapacidades(String incapacidadCorta, String incapacidadLarga)
+    {
+        List<CatTipoSolicitud> modelList = null;
+        EntityManager em = null;
+        
+        try
+        {
+            em = getEntityManager();
+            modelList = em.createNamedQuery("CatTipoSolicitud.findByIncapacidades", CatTipoSolicitud.class)
+                .setParameter("claveIncCorta", incapacidadCorta)
+                .setParameter("claveIncLarga", incapacidadLarga)
                 .getResultList();
         }catch(Exception ex) 
         {

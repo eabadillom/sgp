@@ -99,9 +99,7 @@ public class DiasNoLaboralesBean implements Serializable {
 		log.info("Año seleccionado: {}", this.anioSelected);
 		log.info("Pais seleccionado: {}", this.paisSelected);
 		
-		this.diaNLSelected = new CatDiaNoLaboral(null, null, null, this.paisSelected);
-		
-		
+		this.diaNLSelected = new CatDiaNoLaboral(null, null, null, this.paisSelected, null);
 	}
 	
 	public void guardarDiaNoLaboral() {

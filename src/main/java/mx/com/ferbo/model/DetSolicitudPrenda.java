@@ -191,7 +191,7 @@ public class DetSolicitudPrenda implements Serializable {
 
     @Override
     public String toString() {
-        return "DetSolicitudPrenda{" + "idSolicitud=" + idSolicitud + ", cantidad=" + cantidad + ", aprobada=" + aprobada + ", fechaCap=" + fechaCap + ", fechaMod=" + fechaMod + ", detIncidenciaList=" + detIncidenciaList + ", idPrenda=" + idPrenda + ", idEmpleadoRev=" + idEmpleadoRev + ", idEmpleadoSol=" + idEmpleadoSol + ", idTalla=" + idTalla + ", descripcionRechazo=" + descripcionRechazo + '}';
+        return "DetSolicitudPrenda{" + "idSolicitud=" + idSolicitud + ", cantidad=" + cantidad + ", aprobada=" + aprobada + ", fechaCap=" + fechaCap + ", fechaMod=" + fechaMod + ", descripcionRechazo=" + descripcionRechazo + '}';
     }
     
 }

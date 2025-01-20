@@ -4,12 +4,17 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -433,6 +438,7 @@ public class DateUtil {
 		Date     fecha = null;
 		Calendar cal = null;
 		
+//		cal = Calendar.getInstance(TimeZone.getTimeZone("GMT-06:00"), Locale.getDefault());
 		cal = Calendar.getInstance(TimeZone.getDefault(), Locale.getDefault());
 		cal.set(year, month, date, hour, minute, second);
 		fecha = cal.getTime();
@@ -464,6 +470,26 @@ public class DateUtil {
 		cal.set(Calendar.MILLISECOND, millisecond);
 		
 		fecha.setTime(cal.getTimeInMillis());
+	}
+	
+	public static Date getDateTime(int year, int month, int day, int hour, int minute, int second, int millisecond){
+		Date     fecha = null;
+		Calendar cal = null;
+		TimeZone tz = TimeZone.getTimeZone("GMT-06:00");
+		cal = GregorianCalendar.getInstance(tz, Locale.getDefault());
+		log.debug("Timezone: {}", TimeZone.getDefault());
+		cal.setTimeZone(tz);
+		cal.set(Calendar.YEAR, year);
+		cal.set(Calendar.MONTH, month);
+		cal.set(Calendar.DAY_OF_MONTH, day);
+		cal.set(Calendar.HOUR_OF_DAY, hour);
+		cal.set(Calendar.MINUTE, minute);
+		cal.set(Calendar.SECOND, second);
+		cal.set(Calendar.MILLISECOND, millisecond);
+		
+		fecha = cal.getTime();
+		
+		return fecha;
 	}
 	
 	public static void setTime(Date fecha, int hour, int AM_PM, int minute, int second, int millisecond) {
@@ -626,13 +652,12 @@ public class DateUtil {
 	   * @param elapsedTimeMillis Tiempo a formatear
 	   * @return Tiempo formateado
 	   */
-	  public static String formatElapsedTime(long elapsedTimeMillis) {
-
-	    SimpleDateFormat dateFormat = new SimpleDateFormat("H 'hrs' m 'min' s 'seg' SSS 'ms'");
-	    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-	    return dateFormat.format(new Date(elapsedTimeMillis));
-	  }
-	  
+	public static String formatElapsedTime(long elapsedTimeMillis) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("H 'hrs' m 'min' s 'seg' SSS 'ms'");
+		dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+		return dateFormat.format(new Date(elapsedTimeMillis));
+	}
+	
 	/**Devuelve la diferencia en dias de dos fechas. De preferencia, el primer parametro (fechaIni)
 	 * debera ser la fecha menor, mientras que el segundo parametro debera ser la fecha mayor.
 	 * @param fechaIni
@@ -656,6 +681,12 @@ public class DateUtil {
         
         return days;
 		
+	}
+	
+	public static long weeksDiff(LocalDate fechaIni, LocalDate fechaFin) {
+		long weeks = 0;
+		weeks = ChronoUnit.WEEKS.between(fechaIni, fechaFin);
+		return weeks;
 	}
 	
 	public static boolean isDateBetween(Date fecha, Date fechaIni, Date fechaFin){
@@ -722,4 +753,79 @@ public class DateUtil {
 		}
 		return resultado;
 	}
+        
+        public static LocalDateTime toLocalDateTime(Date fecha)
+        {
+            LocalDateTime resultado = null;
+            ZoneId systemDefault = null;
+            
+            try
+            {
+                systemDefault = ZoneId.of("GMT-6");
+                resultado = fecha.toInstant().atZone(systemDefault).toLocalDateTime();
+            }catch(Exception ex) 
+            {
+                log.warn("Problema para convertir a LocalDateTime: " + fecha, ex.getMessage());
+                resultado = null;
+            }
+            return resultado;
+        }
+        
+        /*
+        *Inicializa la fecha dado un parametro del tipo entero,
+        *@param anioEnCurso es el atributo del que se fijara la fecha inicial del año
+        *return fecha, regresa la fecha de inicio del dia 1 de enero del año en curso
+        */
+        public static Date inicializaFechaInicioAnioCurso(Integer anioEnCurso)
+        {
+            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT-06:00"), Locale.getDefault());
+            calendar.set(Calendar.DAY_OF_MONTH, 1);// Día 1
+            calendar.set(Calendar.MONTH, Calendar.JANUARY); // Mes Enero
+            calendar.set(Calendar.YEAR, anioEnCurso);// Año en curso
+            calendar.set(Calendar.HOUR, 0);// Hora
+            calendar.set(Calendar.MINUTE, 0);// Minuto
+            calendar.set(Calendar.SECOND, 0);// Segundo
+            calendar.set(Calendar.MILLISECOND, 0);// Milisegundo
+            
+            return calendar.getTime();
+        }
+        
+        public static Date inicializaFechaTerminoAnioCurso(Integer anioEnCurso)
+        {
+            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT-06:00"), Locale.getDefault());
+            calendar.set(Calendar.DAY_OF_MONTH, 31);// Día 31
+            calendar.set(Calendar.MONTH, Calendar.DECEMBER); // Mes Diciembre
+            calendar.set(Calendar.YEAR, anioEnCurso);// Año en curso
+            calendar.set(Calendar.HOUR, 23);// Hora
+            calendar.set(Calendar.MINUTE, 59);// Minuto
+            calendar.set(Calendar.SECOND, 59);// Segundo
+            calendar.set(Calendar.MILLISECOND, 0);// Milisegundo
+
+            return calendar.getTime();
+        }
+        
+        public static List<Date> generarArreglosFechas(Date inicio, Date fin) 
+        {
+            List<Date> fechas = new ArrayList<>();
+            Date actual = inicio;
+
+            while (!actual.after(fin)) 
+            {
+                fechas.add(actual);
+                log.trace("Fecha: {}", actual);
+                actual = DateUtil.addDay(actual, 1); // Incrementa un día
+            }
+
+            return fechas;
+        }
+        
+        public static List<Date> diasLaborales(List<Date> dias, List<Date> diasAsueto)
+        {
+            List<Date> diasDeTrabajo = dias.stream()
+                .filter(fecha -> !diasAsueto.contains(fecha))
+                .collect(Collectors.toList());
+            
+            return diasDeTrabajo;
+        }
+        
 }

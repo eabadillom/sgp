@@ -24,23 +24,35 @@ import javax.validation.constraints.Size;
 @Table(name = "cat_tipo_solicitud")
 @NamedQueries({
     @NamedQuery(name = "CatTipoSolicitud.findAll", query = "SELECT c FROM CatTipoSolicitud c"),
-    @NamedQuery(name = "CatTipoSolicitud.findByActive", query = "SELECT c FROM CatTipoSolicitud c WHERE c.activo = 1")
+    @NamedQuery(name = "CatTipoSolicitud.findByActive", query = "SELECT c FROM CatTipoSolicitud c WHERE c.activo = 1"),
+    @NamedQuery(name = "CatTipoSolicitud.findByPermisoYVacaciones", query = "SELECT c FROM CatTipoSolicitud c WHERE (c.clave = :clavePermiso OR c.clave = :claveVacaciones) AND c.activo = 1"),
+    @NamedQuery(name = "CatTipoSolicitud.findByIncapacidades", query = "SELECT c FROM CatTipoSolicitud c WHERE (c.clave = :claveIncCorta OR c.clave = :claveIncLarga) AND c.activo = 1")    
 })
 public class CatTipoSolicitud implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id_tipo_solicitud")
     private Integer idTipoSolicitud;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 45)
     @Column(name = "descripcion")
     private String descripcion;
+    
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 2)
+    @Column(name = "cd_clave")
+    private String clave;
+    
     @Column(name = "activo")
     private Integer activo;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idTipoSolicitud")
     private List<DetSolicitudPermiso> detSolicitudPermisoList;
 
@@ -72,6 +84,14 @@ public class CatTipoSolicitud implements Serializable {
         this.descripcion = descripcion;
     }
 
+    public String getClave() {
+        return clave;
+    }
+
+    public void setClave(String clave) {
+        this.clave = clave;
+    }
+    
     public Integer getActivo() {
         return activo;
     }

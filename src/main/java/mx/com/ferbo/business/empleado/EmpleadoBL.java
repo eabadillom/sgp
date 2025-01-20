@@ -4,6 +4,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import mx.com.ferbo.dao.n.ParametroDAO;
+import mx.com.ferbo.dao.n.VacacionesDAO;
+import mx.com.ferbo.model.CatParametro;
 import mx.com.ferbo.model.DetDomicilioEmpleado;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetEmpleadoConfiguracion;
@@ -49,6 +52,36 @@ public class EmpleadoBL {
 
     }
 
+    public static void recalcularVacaciones(DetEmpleado empleado) throws SGPException {
+
+        if (empleado.getVacaciones().isEmpty()) {
+            throw new SGPException("El empleado no tiene ningun periodo vacacional asignado");
+        }
+
+        if (empleado.getVacaciones().size() > 1) {
+            throw new SGPException("El empleado tiene mas de un periodo vacacional");
+        }
+
+        try {
+            log.info("Inicia el proceso de recalcular el primer periodo vacacional del empleado");
+            DetVacaciones primerasVacaciones = empleado.getVacaciones().get(0);
+            int aniotmp = DateUtil.getAnio(empleado.getDatoEmpresa().getFechaIngreso());
+            int mestmp = DateUtil.getMes(empleado.getDatoEmpresa().getFechaIngreso());
+            int diatmp = DateUtil.getDia(empleado.getDatoEmpresa().getFechaIngreso());
+            Date fechaaux = DateUtil.getDate(aniotmp, mestmp, diatmp);
+            primerasVacaciones.setFechainicio(fechaaux);
+            DateUtil.addYear(fechaaux, 1);
+            Date finalaux = DateUtil.addDay(fechaaux, -1);
+            primerasVacaciones.setFechafin(finalaux);
+            VacacionesDAO vacacionesDAO = new VacacionesDAO();
+            vacacionesDAO.actualizar(primerasVacaciones);
+            log.info("Finaliza el proceso de recalcular el primer periodo vacacional del empleado");
+        } catch (Exception ex) {
+            log.error("Hubo algun problema al recalcular el primer periodo vacacional. " + ex.getMessage());
+            throw new SGPException("Hubo algun problema al recalcular el primer periodo vacacional.");
+        }
+    }
+
     public static void generarAnioVacaciones(DetEmpleado empleado) throws SGPException {
 
         if (empleado.getDatoEmpresa().getFechaIngreso() == null) {
@@ -65,9 +98,7 @@ public class EmpleadoBL {
 
         Date fechaaux = DateUtil.getDate(aniotmp, mestmp, diatmp);
 
-        if (empleado.getVacaciones().isEmpty()) {
-            fechaaux = DateUtil.addYear(fechaaux, 1);
-        } else {
+        if (!empleado.getVacaciones().isEmpty()) {
             fechaaux = empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getFechafin();
         }
 
@@ -79,11 +110,12 @@ public class EmpleadoBL {
             int dias = 0;
 
             if (empleado.getVacaciones().isEmpty()) {
-
                 fechainicio = fechaaux;
                 fechafin = DateUtil.addYear(fechaaux, 1);
-
-                dias = 12;
+                ParametroDAO parametroDAO = new ParametroDAO(CatParametro.class);
+                CatParametro parametro = parametroDAO.buscarPorClave("DIVAC");
+                String sDias = parametro.getValor();
+                dias = Integer.parseInt(sDias);
             } else {
                 dias = empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getDiastotales();
                 fechatmp = empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getFechafin();
@@ -123,125 +155,4 @@ public class EmpleadoBL {
             fechaaux = fechafin;
         }
     }
-
-    public static void actualizarDiasTomados(DetEmpleado empleado, List<Date> diassolicitados) throws SGPException {
-
-        int[] diasporperiodo = {0, 0};
-
-        if (empleado.getVacaciones().size() > 1) {
-
-            for (Date dia : diassolicitados) {
-                if (dia.equals(empleado.getVacaciones().get(empleado.getVacaciones().size() - 2).getFechainicio()) || dia.after(empleado.getVacaciones().get(empleado.getVacaciones().size() - 2).getFechainicio()) && dia.equals(empleado.getVacaciones().get(empleado.getVacaciones().size() - 2).getFechafin()) || dia.before(empleado.getVacaciones().get(empleado.getVacaciones().size() - 2).getFechafin())) {
-                    diasporperiodo[0]++;
-                }
-
-                if (dia.equals(empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getFechainicio()) || dia.after(empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getFechainicio()) && dia.equals(empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getFechafin()) || dia.before(empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getFechafin())) {
-                    diasporperiodo[1]++;
-                }
-            }
-
-            int actual = diasporperiodo[0] + empleado.getVacaciones().get(empleado.getVacaciones().size() - 2).getDiastomados();
-            int siguiente = diasporperiodo[1] + empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getDiastomados();
-            int banderaactual = 0;
-            int banderasiguiente = 0;
-
-            if (actual > empleado.getVacaciones().get(empleado.getVacaciones().size() - 2).getDiastotales()) {
-                banderaactual = 1;
-            }
-
-            if (siguiente > empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getDiastotales()) {
-                banderasiguiente = 1;
-            }
-
-            if (banderaactual == 1 && banderasiguiente == 1) {
-                throw new SGPException("No se actualizaron los dias de vacaciones, revise sus periodos de vacaciones");
-            }
-
-            if (banderaactual == 0 && banderasiguiente == 1) {
-                empleado.getVacaciones().get(empleado.getVacaciones().size() - 2).setDiastomados(actual);
-                throw new SGPException("No se actualizaron los dias de vacaciones dentro del perdiodo " + empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getFechainicio() + " al " + empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getFechafin());
-            }
-
-            if (banderaactual == 1 && banderasiguiente == 0) {
-                empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).setDiastomados(siguiente);
-                throw new SGPException("No se actualizaron los dias de vacaciones dentro del perdiodo " + empleado.getVacaciones().get(empleado.getVacaciones().size() - 2).getFechainicio() + " al " + empleado.getVacaciones().get(empleado.getVacaciones().size() - 2).getFechafin());
-            }
-
-            empleado.getVacaciones().get(empleado.getVacaciones().size() - 2).setDiastomados(actual);
-            empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).setDiastomados(siguiente);
-
-        } else {
-
-            if (empleado.getVacaciones().size() == 1) {
-
-                int nuevosdias = 0;
-
-                List<Date> diasnopermitidos = new ArrayList<Date>();
-
-                for (Date dia : diassolicitados) {
-                    if (dia.equals(empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getFechainicio()) || dia.after(empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getFechainicio()) && dia.equals(empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getFechafin()) || dia.before(empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getFechafin())) {
-                        nuevosdias++;
-                    } else {
-                        diasnopermitidos.add(dia);
-                    }
-                }
-                nuevosdias = nuevosdias + empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getDiastomados();
-
-                if (nuevosdias > empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getDiastotales()) {
-                    throw new SGPException("El empleado supera el numero de dias permitidos para vacaciones");
-                }
-
-                if (!diasnopermitidos.isEmpty()) {
-                    empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).setDiastomados(nuevosdias);
-                    throw new SGPException("Los dias: " + diasnopermitidos + " no fueron agregados por estar fuera del periodo vacional permitido.");
-                }
-
-                empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).setDiastomados(nuevosdias);
-
-            } else {
-
-                throw new SGPException("El empleado aun no tiene derecho a vacaciones");
-
-            }
-        }
-
-    }
-
-    public static void actualizarPagoVacacionesConcepto(DetEmpleado empleado, Date periodoporpagar, String concepto) {
-
-        for (int i = 0; i < empleado.getVacaciones().size(); i++) {
-
-            Date fechainicio = empleado.getVacaciones().get(i).getFechainicio();
-            Date fechafin = empleado.getVacaciones().get(i).getFechafin();
-
-            if (periodoporpagar.after(fechainicio) && periodoporpagar.before(fechafin)) {
-
-                if (concepto.equals("ambas")) {
-                    if (empleado.getVacaciones().get(i).getDiaspendientespagados() == false && empleado.getVacaciones().get(i).getPrimapagada() == false) {
-                        empleado.getVacaciones().get(i).setPrimapagada(Boolean.TRUE);
-                        empleado.getVacaciones().get(i).setDiaspendientespagados(Boolean.TRUE);
-                        break;
-                    }
-                }
-
-                if (concepto.equals("prima")) {
-                    if (empleado.getVacaciones().get(i).getPrimapagada() == false) {
-                        empleado.getVacaciones().get(i).setPrimapagada(Boolean.TRUE);
-                        break;
-                    }
-                }
-
-                if (concepto.equals("dias pendientes")) {
-                    if (empleado.getVacaciones().get(i).getDiaspendientespagados() == false) {
-                        empleado.getVacaciones().get(i).setDiaspendientespagados(Boolean.TRUE);
-                        break;
-                    }
-                }
-
-            }
-
-        }
-
-    }
-
 }
