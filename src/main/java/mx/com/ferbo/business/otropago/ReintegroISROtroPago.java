@@ -38,6 +38,7 @@ public class ReintegroISROtroPago extends AbstractOtroPago implements IOtroPago 
 			opReintegroISR.setClave("FRB-001");
 			opReintegroISR.setNombre("Reintegro de ISR pagado en exceso");
 			opReintegroISR.setImporte(importeISR);
+			opReintegroISR.setInformar(true);
 			opReintegroISR.setProcesar(true);
 		}
 		return opReintegroISR;

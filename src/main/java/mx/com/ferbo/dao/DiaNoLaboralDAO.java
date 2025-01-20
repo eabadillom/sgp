@@ -56,7 +56,7 @@ public class DiaNoLaboralDAO extends IBaseDAO<DiaNoLaboralDTO, Integer> {
 			list = new ArrayList<DiaNoLaboralDTO>();
 			
 			for(CatDiaNoLaboral d : listTmp) {
-				pais = new PaisDTO(d.getPais().getId(), d.getPais().getClave(), d.getPais().getNombrePais());
+				pais = new PaisDTO(d.getPais().getId(), d.getPais().getClave(), d.getPais().getNombre());
 				dia = new DiaNoLaboralDTO(d.getId(), d.getFecha(), d.getDescripcion(), pais);
 				list.add(dia);
 			}
@@ -84,7 +84,7 @@ public class DiaNoLaboralDAO extends IBaseDAO<DiaNoLaboralDTO, Integer> {
 		CatDiaNoLaboral dia = null;
 		
 		try {
-			dia = new CatDiaNoLaboral(e.getId(), e.getFecha(), e.getDescripcion(), e.getPais().getIdPais(), e.getPais().getClavePais(), e.getPais().getNombrePais());
+			dia = new CatDiaNoLaboral(e.getId(), e.getFecha(), e.getDescripcion(), e.getPais().getIdPais(), e.getPais().getClavePais(), e.getPais().getNombrePais(), null);
 			emSGP.getTransaction().begin();
 			dia = emSGP.merge(dia);
 			emSGP.getTransaction().commit();
@@ -120,7 +120,7 @@ public class DiaNoLaboralDAO extends IBaseDAO<DiaNoLaboralDTO, Integer> {
 		CatDiaNoLaboral dia = null;
 		
 		try {
-			dia = new CatDiaNoLaboral(null, e.getFecha(), e.getDescripcion(), e.getPais().getIdPais(), e.getPais().getClavePais(), e.getPais().getNombrePais());
+			dia = new CatDiaNoLaboral(null, e.getFecha(), e.getDescripcion(), e.getPais().getIdPais(), e.getPais().getClavePais(), e.getPais().getNombrePais(), null);
 			emSGP.getTransaction().begin();
 			emSGP.persist(dia);
 			emSGP.getTransaction().commit();

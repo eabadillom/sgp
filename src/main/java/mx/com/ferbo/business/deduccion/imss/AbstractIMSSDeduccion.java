@@ -41,6 +41,37 @@ public class AbstractIMSSDeduccion extends AbstractDeduccion {
 		
 		return tarifa;
 	}
+	
+	public CatCuotaIMSS getCuotaIMSS(String tipoCuota, String clave, Integer numero) {
+		CatCuotaIMSS tarifa = null;
+		List<CatCuotaIMSS> collect = null;
+		
+		try {
+			collect = this.cuotasIMSS.stream()
+					.filter(t -> 
+						( t.getTipoCuota().equals(tipoCuota)
+							&& t.getClave().equals(clave)
+							&& t.getNumero().equals(numero)
+							/*&&
+							(
+								(t.getVigenciaInicio().compareTo(fecha) <= 0 && t.getVigenciaFin().compareTo(fecha) >= 0)
+								|| (t.getVigenciaInicio().compareTo(fecha) >= 0 && t.getVigenciaFin() == null )
+							)*/
+						)
+					)
+					.collect(Collectors.toList())
+					;
+			if(collect.size() > 0)
+				tarifa = collect.get(0);
+			else {
+				throw new SGPException(String.format("No se encontró configuración vigente para la cuota del IMSS %S - %s - %s - %s", tipoCuota, clave, numero));
+			}
+		} catch(Exception ex) {
+			log.warn("No es posible determinar la cuota del IMSS...", ex);
+		}
+		
+		return tarifa;
+	}
 
 	public void setCuotasIMSS(List<CatCuotaIMSS> cuotasIMSS) {
 		this.cuotasIMSS = cuotasIMSS;

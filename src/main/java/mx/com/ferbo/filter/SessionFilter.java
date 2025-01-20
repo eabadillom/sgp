@@ -21,10 +21,6 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.model.DetEmpleado;
 
-/**
- *
- * @author erale
- */
 public class SessionFilter implements Filter {
 
     private static final Logger log = LogManager.getLogger(SessionFilter.class);
@@ -123,6 +119,9 @@ public class SessionFilter implements Filter {
         String strEnabled = filterConfig.getInitParameter(INIT_PARAM_ENABLED);
         Boolean isEnabled = Boolean.valueOf(strEnabled);
         enabled = isEnabled.booleanValue();
+        
+        log.info("Zona horaria por defecto: {}", java.util.TimeZone.getDefault().getID());
+
 
         if (enabled) {
             log.info("La verificacion de excepcion de paginas se encuentra habilitada.");

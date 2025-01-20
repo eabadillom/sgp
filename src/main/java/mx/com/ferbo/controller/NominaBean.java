@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
@@ -22,11 +23,10 @@ import org.primefaces.PrimeFaces;
 import mx.com.ferbo.business.nomina.NominaBL;
 import mx.com.ferbo.business.nomina.NominaSemanalBL;
 import mx.com.ferbo.business.nomina.ParametrosNomina;
+import mx.com.ferbo.business.percepcion.AbstractPercepcion;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.EmpresaDAO;
 import mx.com.ferbo.dao.n.NominaDAO;
-import mx.com.ferbo.dao.n.PercepcionEmpleadoDAO;
-import mx.com.ferbo.dto.DetEmpleadoDTO;
 import mx.com.ferbo.model.CatEmpresa;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetNomina;
@@ -34,6 +34,7 @@ import mx.com.ferbo.model.DetNominaDeduccion;
 import mx.com.ferbo.model.DetNominaOtroPago;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.DetPercepcionEmpleado;
+import mx.com.ferbo.model.DetRegistro;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.model.sat.CatTipoOtroPago;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
@@ -52,9 +53,7 @@ public class NominaBean implements Serializable {
     private EmpleadoDAO empleadoDAO;
     private EmpresaDAO empresaDAO;
     private NominaDAO nominaDAO;
-    private PercepcionEmpleadoDAO percepcionEmpleadoDAO = null;
     
-    private List<DetEmpleadoDTO> lstEmpleadosTmp;
     private List<CatEmpresa> lstEmpresas;
     private List<CatTipoPercepcion> tiposPercepcion;
     private List<CatTipoDeduccion> tiposDeduccion;
@@ -66,12 +65,9 @@ public class NominaBean implements Serializable {
     private DetNominaDeduccion deduccion;
     
     private Date fecha;
-    private Integer year;
-
+//    private Integer year;
     private Date periodoInicio;
     private Date periodoFin;
-    private Date fechaInicioAnio;
-    private Date fechafinAnio;
     private Integer semana;
     
     private List<DetNomina> listaNomina;
@@ -79,16 +75,11 @@ public class NominaBean implements Serializable {
     private Boolean detalle = true;
 
 	public NominaBean() {
-		lstEmpleadosTmp = new ArrayList<>();
-
-		lstEmpresas = new ArrayList<>();
-
 		listaNomina = new ArrayList<>();
 
 		empleadoDAO = new EmpleadoDAO(DetEmpleado.class);
 		empresaDAO = new EmpresaDAO(CatEmpresa.class);
 		nominaDAO = new NominaDAO(DetNomina.class);
-		percepcionEmpleadoDAO = new PercepcionEmpleadoDAO();
 	}
     
     @PostConstruct
@@ -99,7 +90,7 @@ public class NominaBean implements Serializable {
 
         log.info("Inicio del periodo: {}", periodoFin);
         log.info("Fin del periodo: {}", periodoInicio);
-        this.nomina = NominaBL.build();
+        this.nomina = NominaBL.build(NominaBL.TP_NOMINA_ORDINARIA, parametros, null);
         this.percepcion = new DetNominaPercepcion();
         this.otroPago = new DetNominaOtroPago();
         this.deduccion = new DetNominaDeduccion();
@@ -110,7 +101,7 @@ public class NominaBean implements Serializable {
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT-06:00"));
         cal.setTimeZone(TimeZone.getTimeZone("GMT-06:00"));
         cal.setTime(fecha);
-        year = cal.get(Calendar.YEAR);
+//        year = cal.get(Calendar.YEAR);
 
         cal.add(Calendar.DATE, -1);
         cal.set(Calendar.HOUR_OF_DAY, 23);
@@ -131,7 +122,7 @@ public class NominaBean implements Serializable {
     }
 
 	public void calculaFechaFin() {
-		Integer anioActual = null;
+//		Integer anioActual = null;
     	log.debug("Fecha Inicio: {}", this.periodoInicio);
     	log.debug("Fecha Fin: {}", this.periodoFin);
     	this.periodoFin = new Date(this.periodoInicio.getTime());
@@ -140,18 +131,18 @@ public class NominaBean implements Serializable {
     	
     	this.semana = DateUtil.getSemanaAnio(this.periodoInicio);
     	
-    	anioActual = DateUtil.getAnio(periodoInicio);
-    	this.fechaInicioAnio = DateUtil.getDate(anioActual, DateUtil.ENERO, 1);
-    	DateUtil.setTime(this.fechaInicioAnio, 0, 0, 0, 0);
-    	this.fechafinAnio = DateUtil.getDate(anioActual, DateUtil.DICIEMBRE, 31);
-		DateUtil.setTime(this.fechafinAnio, 23, 59, 59, 000);
+//    	anioActual = DateUtil.getAnio(periodoInicio);
+//    	this.fechaInicioAnio = DateUtil.getDate(anioActual, DateUtil.ENERO, 1);
+//    	DateUtil.setTime(this.fechaInicioAnio, 0, 0, 0, 0);
+//    	this.fechafinAnio = DateUtil.getDate(anioActual, DateUtil.DICIEMBRE, 31);
+//		DateUtil.setTime(this.fechafinAnio, 23, 59, 59, 000);
 		
     	log.info("Fecha Inicio: {}", this.periodoInicio);
     	log.info("Fecha Fin: {}", this.periodoFin);
     }
     
     public void calculaFechaInicio() {
-    	Integer anioActual = null;
+//    	Integer anioActual = null;
     	log.debug("Fecha Inicio: {}", this.periodoInicio);
     	log.debug("Fecha Fin: {}", this.periodoFin);
     	this.periodoInicio = new Date(this.periodoFin.getTime());
@@ -160,16 +151,16 @@ public class NominaBean implements Serializable {
     	
     	this.semana = DateUtil.getSemanaAnio(this.periodoInicio);
     	
-    	anioActual = DateUtil.getAnio(periodoInicio);
-    	this.fechaInicioAnio = DateUtil.getDate(anioActual, DateUtil.ENERO, 1);
-    	DateUtil.setTime(this.fechaInicioAnio, 0, 0, 0, 0);
-    	this.fechafinAnio = DateUtil.getDate(anioActual, DateUtil.DICIEMBRE, 31);
-		DateUtil.setTime(this.fechafinAnio, 23, 59, 59, 000);
+//    	anioActual = DateUtil.getAnio(periodoFin);
+//    	this.fechaInicioAnio = DateUtil.getDate(anioActual, DateUtil.ENERO, 1);
+//    	DateUtil.setTime(this.fechaInicioAnio, 0, 0, 0, 0);
+//    	this.fechafinAnio = DateUtil.getDate(anioActual, DateUtil.DICIEMBRE, 31);
+//		DateUtil.setTime(this.fechafinAnio, 23, 59, 59, 000);
 		
     	log.info("Fecha Inicio: {}", this.periodoInicio);
     	log.info("Fecha Fin: {}", this.periodoFin);
     	
-    	this.year = new Integer(anioActual);
+//    	this.year = new Integer(anioActual);
     }
 
     public void calculandoNomina() {
@@ -209,6 +200,7 @@ public class NominaBean implements Serializable {
     	try {
     		this.parametros = new ParametrosNomina();
     		this.parametros.cargar(periodoInicio, periodoFin);
+    		
     		this.tiposPercepcion = this.parametros.getTiposPercepcion();
     		this.tiposOtroPago = this.parametros.getTiposOtroPago();
     		this.tiposDeduccion = this.parametros.getTiposDeduccion();
@@ -226,15 +218,17 @@ public class NominaBean implements Serializable {
     public DetNomina procesaEmpleado(DetEmpleado empleado) {
     	DetNomina nomina = null;
     	NominaSemanalBL nominaSemanalBO = null;
-    	List<DetPercepcionEmpleado> percepcionesEmpleado = null;
-    	log.info("Empleado: {} {} {}, Salario diario: {}", empleado.getNombre(), empleado.getPrimerAp(), empleado.getSegundoAp(), empleado.getDatoEmpresa().getSalarioDiario());
-    	percepcionesEmpleado = percepcionEmpleadoDAO.buscarPorEmpleado(empleado.getIdEmpleado());
-    	empleado.setPercepcionesEmpleado(percepcionesEmpleado);
     	
-		nominaSemanalBO = new NominaSemanalBL(empleado, periodoInicio, periodoFin);
-		nominaSemanalBO.setParametros(parametros);
-		nominaSemanalBO.setAnio(this.year);
-		nomina = nominaSemanalBO.calculoNomina();
+    	List<DetPercepcionEmpleado> percepcionesEmpleado = null;
+    	Map<String, DetRegistro> mapAsistencias = null;
+    	
+//    	percepcionesEmpleado = percepcionEmpleadoDAO.buscarPorEmpleado(empleado.getIdEmpleado());
+    	empleado.setPercepcionesEmpleado(percepcionesEmpleado);
+    	mapAsistencias = NominaSemanalBL.getAsistencias(empleado, this.parametros);
+    	
+		nominaSemanalBO = new NominaSemanalBL(empleado, this.parametros, mapAsistencias);
+		nomina = nominaSemanalBO.calcular();
+		
 		return nomina;
     }
     
@@ -317,6 +311,30 @@ public class NominaBean implements Serializable {
     	} finally {
     		PrimeFaces.current().ajax().update("formNomina:messages", "formNomina:tv-nomina");
     	}
+    }
+    
+    public void actualizarPercepcion(DetNominaPercepcion percepcion) {
+    	FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Percepción";
+		
+		try {
+			if(percepcion.getCantidad() != null && AbstractPercepcion.CVE_SUELDO.equalsIgnoreCase(percepcion.getClave()))
+				NominaSemanalBL.calcularSueldo(nomina, parametros, percepcion.getCantidad());
+			
+			this.actualizar();
+			
+		} catch(Exception ex) {
+			log.error("Problema para agregar la percepcion...", ex);
+    		mensaje = "Hay un problema para agregar la percepción.";
+			severity = FacesMessage.SEVERITY_ERROR;
+			
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+		} finally {
+			PrimeFaces.current().ajax().update("formNomina:messages", "formNomina:tv-nomina");
+		}
     }
     
     public void eliminarPercepcion(DetNominaPercepcion percepcion) {
@@ -548,7 +566,7 @@ public class NominaBean implements Serializable {
 		String titulo = "Nómina";
 		
     	try {
-    		NominaBL.actualizar(nomina);
+    		NominaBL.calcularTotales(nomina, parametros);
     	} catch(Exception ex) {
     		log.error("Problema para recalcular la nómina...", ex);
     		mensaje = "Hay un problema para actualizar la nómina.";
@@ -643,14 +661,6 @@ public class NominaBean implements Serializable {
                 .collect(Collectors.toList());
     }
     
-    public List<DetEmpleadoDTO> getLstEmpleadosTmp() {
-        return lstEmpleadosTmp;
-    }
-
-    public void setLstEmpleadosTmp(List<DetEmpleadoDTO> lstEmpleadosTmp) {
-        this.lstEmpleadosTmp = lstEmpleadosTmp;
-    }
-
     public List<CatEmpresa> getLstEmpresas() {
         return lstEmpresas;
     }
@@ -683,13 +693,13 @@ public class NominaBean implements Serializable {
         this.fecha = fecha;
     }
 
-    public int getYear() {
-        return year;
-    }
-
-    public void setYear(int year) {
-        this.year = year;
-    }
+//    public int getYear() {
+//        return year;
+//    }
+//
+//    public void setYear(int year) {
+//        this.year = year;
+//    }
 
     public Date getPeriodoInicio() {
         return periodoInicio;

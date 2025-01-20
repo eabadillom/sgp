@@ -28,7 +28,10 @@ import javax.validation.constraints.NotNull;
 @Table(name = "det_solicitud_permiso")
 @NamedQueries({
     @NamedQuery(name = "DetSolicitudPermiso.findAll", query = "SELECT d FROM DetSolicitudPermiso d"),
-    @NamedQuery(name = "DetSolicitudPermiso.findByIdEmp", query = "SELECT dsp FROM DetSolicitudPermiso dsp INNER JOIN dsp.idEmpleadoSol de INNER JOIN dsp.idTipoSolicitud cts WHERE de.idEmpleado = :idEmp ORDER BY dsp.fechaCap")
+    @NamedQuery(name = "DetSolicitudPermiso.findByIdEmp", query = "SELECT dsp FROM DetSolicitudPermiso dsp INNER JOIN dsp.idEmpleadoSol de INNER JOIN dsp.idTipoSolicitud cts WHERE de.idEmpleado = :idEmp ORDER BY dsp.fechaCap"),
+    @NamedQuery(name = "DetSolicitudPermiso.findByClave", query = "SELECT dsp FROM DetSolicitudPermiso dsp INNER JOIN dsp.idEmpleadoSol de INNER JOIN dsp.idTipoSolicitud cts WHERE de.idEmpleado = :idEmp AND cts.clave = :clave"),
+    @NamedQuery(name = "DetSolicitudPermiso.findByTipoSolicitud", query = "SELECT dsp FROM DetSolicitudPermiso dsp INNER JOIN dsp.idEmpleadoSol de INNER JOIN dsp.idTipoSolicitud cts WHERE de.idEmpleado = :idEmp AND (cts.clave = :clavePermiso OR cts.clave = :claveVacaciones)"),
+    @NamedQuery(name = "DetSolicitudPermiso.findByCriterios", query = "SELECT dsp FROM DetSolicitudPermiso dsp INNER JOIN dsp.idEmpleadoSol de INNER JOIN dsp.idTipoSolicitud ts WHERE de.idEmpleado = :idEmp AND (:fechaInicio BETWEEN dsp.fechaInicio AND dsp.fechaFin OR :fechaFin BETWEEN dsp.fechaInicio AND dsp.fechaFin OR dsp.fechaInicio BETWEEN :fechaInicio AND :fechaFin OR dsp.fechaFin BETWEEN :fechaInicio AND :fechaFin) AND (ts.clave = :clave1 OR ts.clave = :clave2) and dsp.aprobada in (1,2)")
 })
 public class DetSolicitudPermiso implements Serializable {
 
@@ -198,7 +201,7 @@ public class DetSolicitudPermiso implements Serializable {
 
     @Override
     public String toString() {
-        return "DetSolicitudPermiso{" + "idSolicitud=" + idSolicitud + ", fechaCap=" + fechaCap + ", fechaMod=" + fechaMod + ", fechaInicio=" + fechaInicio + ", fechaFin=" + fechaFin + ", aprobada=" + aprobada + ", descripcionRechazo=" + descripcionRechazo + ", detIncidenciaList=" + detIncidenciaList + ", idTipoSolicitud=" + idTipoSolicitud + ", idEmpleadoSol=" + idEmpleadoSol + ", idEmpleadoRev=" + idEmpleadoRev + '}';
+        return "DetSolicitudPermiso{" + "idSolicitud=" + idSolicitud + ", fechaCap=" + fechaCap + ", fechaMod=" + fechaMod + ", fechaInicio=" + fechaInicio + ", fechaFin=" + fechaFin + ", aprobada=" + aprobada + ", descripcionRechazo=" + descripcionRechazo + '}';
     }
     
 }

@@ -18,7 +18,8 @@ import javax.persistence.Table;
 @NamedQueries({
     @NamedQuery(name = "CatUMA.findById", query = "SELECT c FROM CatUMA c WHERE c.anio = :anio"),
     @NamedQuery(name = "CatUMA.findAll", query = "SELECT c FROM CatUMA c"),
-    @NamedQuery(name = "CatUMA.buscarVigente", query = "SELECT c FROM CatUMA c WHERE c.fechaAplicacion = (SELECT MAX(c2.fechaAplicacion) FROM CatUMA c2 WHERE c2.fechaAplicacion <= :fecha)")
+    @NamedQuery(name = "CatUMA.buscarVigente", query = "SELECT c FROM CatUMA c WHERE c.fechaAplicacion = (SELECT MAX(c2.fechaAplicacion) FROM CatUMA c2 WHERE c2.fechaAplicacion <= :fecha)"),
+    @NamedQuery(name = "CatUMA.buscarVigentePorFecha", query = "SELECT c FROM CatUMA c WHERE (c.fechaAplicacion <= :fecha AND c.fechaVigencia >= :fecha) OR (c.fechaAplicacion <= :fecha AND c.fechaVigencia IS NULL)")
 })
 public class CatUMA implements Serializable {
     private static final long serialVersionUID = 4255266288379749638L;
@@ -47,6 +48,38 @@ public class CatUMA implements Serializable {
     @Basic(optional = false)
     @Column(name = "fh_aplicacion")
     private LocalDate fechaAplicacion;
+    
+    @Basic(optional = false)
+    @Column(name = "fh_vigencia")
+    private LocalDate fechaVigencia;
+    
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 29 * hash + Objects.hashCode(this.anio);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final CatUMA other = (CatUMA) obj;
+        return Objects.equals(this.anio, other.anio);
+    }
+
+    @Override
+    public String toString() {
+        return "CatUMA[" + "Codigo Año: " + anio + ", Importe Diario: " + importeDiario + ", Importe Mensual: " + importeMensual + ", "
+                + "Importe Anual: " + importeAnual + ", Fecha Publicacion: " + fechaPublicacion + ", Fecha Aplicacion: " + fechaAplicacion + ']';
+    }
 
     public CatUMA() {
     }
@@ -103,32 +136,12 @@ public class CatUMA implements Serializable {
         this.fechaAplicacion = fechaAplicacion;
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 29 * hash + Objects.hashCode(this.anio);
-        return hash;
-    }
+	public LocalDate getFechaVigencia() {
+		return fechaVigencia;
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final CatUMA other = (CatUMA) obj;
-        return Objects.equals(this.anio, other.anio);
-    }
-
-    @Override
-    public String toString() {
-        return "CatUMA[" + "Codigo Año: " + anio + ", Importe Diario: " + importeDiario + ", Importe Mensual: " + importeMensual + ", "
-                + "Importe Anual: " + importeAnual + ", Fecha Publicacion: " + fechaPublicacion + ", Fecha Aplicacion: " + fechaAplicacion + ']';
-    }
+	public void setFechaVigencia(LocalDate fechaVigencia) {
+		this.fechaVigencia = fechaVigencia;
+	}
     
 }

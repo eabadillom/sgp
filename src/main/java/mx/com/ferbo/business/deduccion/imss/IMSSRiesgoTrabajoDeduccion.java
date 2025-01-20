@@ -14,40 +14,33 @@ import mx.com.ferbo.model.DetNominaDeduccionPK;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.util.SGPException;
 
-/**Cálculo de Invalidez y Vida.<br>
- * Fundamento legal: Art. 147 LEY DEL SEGURO SOCIAL.
+/**Cálculo de cuota IMSS Riesgo de trabajo.<br>
+ * Fundamento legal: Artículo 73 LEY DEL SEGURO SOCIAL
  */
-public class IMSSInvalidezVida extends AbstractIMSSDeduccion implements IDeduccion {
+public class IMSSRiesgoTrabajoDeduccion extends AbstractIMSSDeduccion implements IDeduccion {
 	
-	private static Logger log = LogManager.getLogger(IMSSInvalidezVida.class);
+	private static Logger log = LogManager.getLogger(IMSSRiesgoTrabajoDeduccion.class);
 	
 	private BigDecimal diasTrabajados = null;
 	private BigDecimal ausencias = null;
-	private BigDecimal incapacidades = null; 
+	private BigDecimal incapacidades = null;
 	private BigDecimal sdi = null;
 	
-	/**
-	 * @param fechaInicioAnio Fecha de inicio del año en curso (correspondiente al cálculo del periodo).
-	 * @param fechaFinAnio Fecha de fin del año en curso (correspondiente al cálculo del periodo).
-	 * @param diasTrabajados Total de días del periodo (Semanal: 7 días, Quincenal: 15 días, Mensual: 30.4 días)
-	 * @param sdi Salario Diario Integrado.
-	 */
-	public IMSSInvalidezVida(ParametrosNomina parametros, BigDecimal diasTrabajados, BigDecimal ausencias, BigDecimal incapacidades, BigDecimal sdi) {
+	public IMSSRiesgoTrabajoDeduccion(ParametrosNomina parametros, BigDecimal diasTrabajados, BigDecimal ausencias, BigDecimal incapacidades, BigDecimal sdi) {
 		this.diasTrabajados = diasTrabajados;
 		this.ausencias = ausencias;
 		this.incapacidades = incapacidades;
+		this.sdi = sdi;
 		this.cuotasIMSS = parametros.getCuotasIMSS();
 		this.tiposDeduccion = parametros.getTiposDeduccion();
-		this.sdi = sdi;
 	}
 
 	@Override
 	public DetNominaDeduccion calcular(DetNomina nomina, Integer index) {
 		DetNominaDeduccion deduccion = null;
-		
-		BigDecimal cuota = null;
 		CatCuotaIMSS tarifaIMSS = null;
 		CatTipoDeduccion tdIMSS = null;
+		BigDecimal cuota = null;
 		
 		try {
 			if(this.cuotasIMSS == null)
@@ -64,23 +57,24 @@ public class IMSSInvalidezVida extends AbstractIMSSDeduccion implements IDeducci
 			
 			tdIMSS = this.getTipoDeduccion("001");
 			
-			tarifaIMSS = this.getCuotaIMSS("O", "IV", 0);
+			tarifaIMSS = this.getCuotaIMSS("O", "RT", 0);
+			//Formula: cuota = SBC x Prima RT x (Dias trabajados - Ausencias - Incapacidades)
+			//Sólo es cubierta por el patrón. El trabajador tiene una prima del 0%.
 			cuota = this.sdi
 					.multiply(tarifaIMSS.getCuota())
-					//TOTAL DIAS PERIODO - AUSENCIAS - INCAPACIDADES
 					.multiply(diasTrabajados.subtract(ausencias).subtract(incapacidades))
 					.setScale(2, BigDecimal.ROUND_HALF_UP)
 					;
 			
 		} catch(Exception ex) {
-			log.error("No es posible calcular el la cuota por Invalidez y Vida...", ex);
-			cuota = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+			log.warn("No fue posible calcular el excedente por Enfermedad y Maternidad.", ex);
+			cuota = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
 		} finally {
 			deduccion = new DetNominaDeduccion();
 			deduccion.setKey(new DetNominaDeduccionPK(nomina, index));
 			deduccion.setTipoDeduccion(tdIMSS);
 			deduccion.setClave("001");
-			deduccion.setNombre("I.M.S.S. (Invalidez y vida)");
+			deduccion.setNombre("I.M.S.S. (Riesgo de trabajo)");
 			deduccion.setImporte(cuota);
 			deduccion.setInformar(false);
 			deduccion.setProcesar(false);
@@ -88,4 +82,5 @@ public class IMSSInvalidezVida extends AbstractIMSSDeduccion implements IDeducci
 		
 		return deduccion;
 	}
+
 }
