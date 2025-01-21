@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -54,9 +53,12 @@ public class NominaSemanalBL extends NominaBL {
     private static final int DIAS_LABORALES_POR_PERIODO = 6;
     
 	private Integer anio = null;
-	
 	private PercepcionEmpleadoDAO percepcionEmpleadoDAO = null;
 	private List<DetPercepcionEmpleado> percepcionesEmpleado = null;
+	private List<String> listaDiasLaboralesEmpleado = null;
+	private List<String> listaDiasNoLaboralesEmpleado = null;
+	
+	public static final int DIAS_PERIODO = 7;
 	
 	public NominaSemanalBL(DetEmpleado empleado, ParametrosNomina parametros, Map<String, DetRegistro> mapAsistencias) {
 		super(empleado, parametros, mapAsistencias);
@@ -80,7 +82,6 @@ public class NominaSemanalBL extends NominaBL {
 		BigDecimal diasPeriodo             = null;
 		BigDecimal diasLaboralesEmpleado   = null;
 		BigDecimal diasNolaboralesEmpleado = null;
-		BigDecimal daisNoLaborales         = null;
 		BigDecimal diasTrabajados          = null;
 		BigDecimal ausencias               = null;
 		BigDecimal incapacidades           = null;
@@ -108,14 +109,17 @@ public class NominaSemanalBL extends NominaBL {
 			//y los que debe descansar.
 			//Por ejemplo, una semana laboral de Lunes a Viernes, con Sábado y Domingo de descanso,
 			//o bien, una semana laboral de Lunes a Sábado, con Domingo de descanso.
-			diasLaboralesEmpleado   = NominaSemanalBL.getDiasLaboralesPorSemana(this.empleado);
-			diasNolaboralesEmpleado = NominaSemanalBL.getDiasNoLaboralesPorSemana(this.empleado);
+			listaDiasLaboralesEmpleado = NominaSemanalBL.getDiasLaboralesPorSemana(this.empleado);
+			listaDiasNoLaboralesEmpleado = NominaSemanalBL.getDiasNoLaboralesPorSemana(this.empleado);
+			diasLaboralesEmpleado   = new BigDecimal(listaDiasLaboralesEmpleado.size()).setScale(2, BigDecimal.ROUND_HALF_UP);
+			diasNolaboralesEmpleado = new BigDecimal(listaDiasNoLaboralesEmpleado.size()).setScale(2, BigDecimal.ROUND_HALF_UP);
 			
 			//Para los días trabajados, se debe considerar el periodo inicio y fin de cálculo de la nómina y validar si de los 6 días que
 			//al trabajador le corresponde laborar, tuvo alguna falta.
-			diasTrabajados = this.getDiasTrabajados(mapAsistencias, diasLaboralesEmpleado);
-			ausencias = this.getAusencias(mapAsistencias, diasLaboralesEmpleado);
+			diasTrabajados = this.getDiasTrabajados(listaDiasLaboralesEmpleado, mapAsistencias, this.parametros);
+			ausencias = this.getAusencias(listaDiasLaboralesEmpleado, mapAsistencias, this.parametros);
 			incapacidades = this.getIncapacidades(mapAsistencias, diasLaboralesEmpleado);
+			
 			
 			
     		nomina.getReceptor().setSalarioDiarioIntegrado(this.calculoSDI(this.empleado));
@@ -187,75 +191,81 @@ public class NominaSemanalBL extends NominaBL {
 		return nomina;
 	}
 	
-	public static BigDecimal getDiasLaboralesPorSemana(DetEmpleado empleado) {
+	public static List<String> getDiasLaboralesPorSemana(DetEmpleado empleado) throws SGPException {
 		List<String> listaDiasLaborales = new ArrayList<String>();
 		
-		if(empleado.getDatoEmpresa().getDiaLunes()) {
-			listaDiasLaborales.add("L");
+		if(empleado.getDatoEmpresa().getDiaLunes().booleanValue()) {
+			listaDiasLaborales.add(DateUtil.PROP_CD_LUNES);
 		}
 		
-		if(empleado.getDatoEmpresa().getDiaMartes()) {
-			listaDiasLaborales.add("M");
+		if(empleado.getDatoEmpresa().getDiaMartes().booleanValue()) {
+			listaDiasLaborales.add(DateUtil.PROP_CD_MARTES);
 		}
 		
-		if(empleado.getDatoEmpresa().getDiaMiercoles()) {
-			listaDiasLaborales.add("X");
+		if(empleado.getDatoEmpresa().getDiaMiercoles().booleanValue()) {
+			listaDiasLaborales.add(DateUtil.PROP_CD_MIERCOLES);
 		}
 		
-		if(empleado.getDatoEmpresa().getDiaJueves()) {
-			listaDiasLaborales.add("J");
+		if(empleado.getDatoEmpresa().getDiaJueves().booleanValue()) {
+			listaDiasLaborales.add(DateUtil.PROP_CD_JUEVES);
 		}
 		
-		if(empleado.getDatoEmpresa().getDiaViernes()) {
-			listaDiasLaborales.add("V");
+		if(empleado.getDatoEmpresa().getDiaViernes().booleanValue()) {
+			listaDiasLaborales.add(DateUtil.PROP_CD_VIERNES);
 		}
 		
-		if(empleado.getDatoEmpresa().getDiaViernes()) {
-			listaDiasLaborales.add("S");
+		if(empleado.getDatoEmpresa().getDiaSabado().booleanValue()) {
+			listaDiasLaborales.add(DateUtil.PROP_CD_SABADO);
 		}
 		
-		if(empleado.getDatoEmpresa().getDiaDomingo()) {
-			listaDiasLaborales.add("S");
+		if(empleado.getDatoEmpresa().getDiaDomingo().booleanValue()) {
+			listaDiasLaborales.add(DateUtil.PROP_CD_DOMINGO);
 		}
 
 		//TODO Validar el Tipo Jornada del empleado, para determinar si debe tener asistencia sólo 6 días (o menos)
 		//o debe ser 7 (caso de monitoreo  turno 24 x 24)
 		
-		return new BigDecimal(listaDiasLaborales.size()).setScale(2, BigDecimal.ROUND_HALF_UP);
+		if(listaDiasLaborales.size() == 0)
+			throw new SGPException("No hay días laborales configurados para el empleado.");
+		
+		return listaDiasLaborales;
 	}
 	
-	public static BigDecimal getDiasNoLaboralesPorSemana(DetEmpleado empleado) {
+	public static List<String> getDiasNoLaboralesPorSemana(DetEmpleado empleado) throws SGPException {
 		List<String> listaDiasNoLaborales = new ArrayList<String>();
 		
 		if(Boolean.FALSE.compareTo(empleado.getDatoEmpresa().getDiaLunes()) == 0) {
-			listaDiasNoLaborales.add("L");
+			listaDiasNoLaborales.add(DateUtil.PROP_CD_LUNES);
 		}
 		
 		if(Boolean.FALSE.compareTo(empleado.getDatoEmpresa().getDiaMartes()) == 0) {
-			listaDiasNoLaborales.add("M");
+			listaDiasNoLaborales.add(DateUtil.PROP_CD_MARTES);
 		}
 		
 		if(Boolean.FALSE.compareTo(empleado.getDatoEmpresa().getDiaMiercoles()) == 0) {
-			listaDiasNoLaborales.add("X");
+			listaDiasNoLaborales.add(DateUtil.PROP_CD_MIERCOLES);
 		}
 		
 		if(Boolean.FALSE.compareTo(empleado.getDatoEmpresa().getDiaJueves()) == 0) {
-			listaDiasNoLaborales.add("J");
+			listaDiasNoLaborales.add(DateUtil.PROP_CD_JUEVES);
 		}
 		
 		if(Boolean.FALSE.compareTo(empleado.getDatoEmpresa().getDiaViernes()) == 0) {
-			listaDiasNoLaborales.add("V");
+			listaDiasNoLaborales.add(DateUtil.PROP_CD_VIERNES);
 		}
 		
-		if(Boolean.FALSE.compareTo(empleado.getDatoEmpresa().getDiaViernes()) == 0) {
-			listaDiasNoLaborales.add("S");
+		if(Boolean.FALSE.compareTo(empleado.getDatoEmpresa().getDiaSabado()) == 0) {
+			listaDiasNoLaborales.add(DateUtil.PROP_CD_SABADO);
 		}
 		
 		if(Boolean.FALSE.compareTo(empleado.getDatoEmpresa().getDiaDomingo()) == 0) {
-			listaDiasNoLaborales.add("S");
+			listaDiasNoLaborales.add(DateUtil.PROP_CD_DOMINGO);
 		}
 		
-		return new BigDecimal(listaDiasNoLaborales.size());
+		if(listaDiasNoLaborales.size() == 0)
+			throw new SGPException("No hay días de descanso asignados para el empleado.");
+		
+		return listaDiasNoLaborales;
 	}
 
 	/**Cálculo de sueldo semanal (6 días de trabajo + Septimo día)
@@ -492,55 +502,56 @@ public class NominaSemanalBL extends NominaBL {
 		return mapAsistencias;
 	}
 	
-	/**Con base en las asistencias del trabajador, se determina cuantos días se presentó a laborar.
-	 * @param mapAsistencias Registro de asistencias del trabajador
-	 * @param diasLaboralesEmpleado Máximo de días por periodo que un trabajador puede laborar (según contrato).<br>
-	 * Por ejemplo, un trabajador, por contrato, puede trabajar 6 días de la semana.
-	 * @return
+	/**Con base en los días que el empleado tenga asignados para laborar (Lunes a Viernes, o Lunes a Sábado)<br>
+	 * y las asistencias del trabajador, se determina cuantos días se presentó a laborar, incluyendo los días<br>
+	 * de descanso obligatorios.<br>
+	 * Si el empleado se presentó a trabajar en un día de descanso, ese tiempo extra se considerará en otro proceso.<br>
+	 * @param listaDiasLaboralesEmpleado Máximo de días por periodo que un trabajador puede laborar (según contrato).<br>
+	 * Por ejemplo, un trabajador, por contrato, puede trabajar 6 días de la semana.<br>
+	 * @param mapAsistencias Registro de asistencias del trabajador<br>
+	 * @param parametros Información necesaria del periodo de nómina a calcular<br>
+	 * (Tipos de percepción, deducción, catálogos IMSS, INEGI, SAT, etc.)
+	 * @return Los días trabajados del periodo indicado en parametros, incluyendo los días de descanso.
 	 */
-	private BigDecimal getDiasTrabajados(Map<String, DetRegistro> mapAsistencias, BigDecimal diasLaboralesEmpleado) {
-		//TODO Completar los días laborales para trabajadores administrativos (descanso 2 días a la semana).
-		BigDecimal  diasTrabajados  = null;
-		BigDecimal  diasRegistrados = null;
-		DetRegistro registro        = null;
-		
-		diasRegistrados = new BigDecimal(mapAsistencias.size()).setScale(2, BigDecimal.ROUND_HALF_UP);
-		
-		if(diasRegistrados.compareTo(diasLaboralesEmpleado) == 0) {
-			return diasRegistrados;
+	private BigDecimal getDiasTrabajados(List<String> listaDiasLaboralesEmpleado, Map<String, DetRegistro> mapAsistencias, ParametrosNomina parametros) {
+		BigDecimal  diasTrabajados        = null;
+		Integer     iDias                 = new Integer(0);
+		DetRegistro registro              = null;
+		for(String sDia : listaDiasLaboralesEmpleado) {
+			registro = mapAsistencias.get(sDia);
+			
+			if(registro == null)
+				continue;
+			
+			iDias++;
 		}
 		
-		Set<String> keySet = mapAsistencias.keySet();
-		
-		for(String key : keySet) {
-			registro = mapAsistencias.get(key);
-			log.info("Buscando día de la semana Key en el catálogo de días no laborales: {}, {}...", key, registro.getFechaEntrada());
-		}
-		diasTrabajados = new BigDecimal(mapAsistencias.size());
+		diasTrabajados = new BigDecimal(iDias).setScale(2, BigDecimal.ROUND_HALF_UP);
 		
 		return diasTrabajados;
 	}
 	
-	private BigDecimal getAusencias(Map<String, DetRegistro> mapAsistencias, BigDecimal diasLaboralesEmpleado) {
-		BigDecimal  diasTrabajados  = null;
-		BigDecimal  diasRegistrados = null;
-		DetRegistro registro        = null;
+	private BigDecimal getAusencias(List<String> listaDiasLaboralesEmpleado, Map<String, DetRegistro> mapAsistencias, ParametrosNomina parametros) {
+		Integer     iAusencias = null;
+		BigDecimal  ausencias  = null;
+		DetRegistro registro   = null;
 		
-		diasRegistrados = new BigDecimal(mapAsistencias.size()).setScale(2, BigDecimal.ROUND_HALF_UP);
+		//Empezamos indicando los días laborales que si debe presentarse a trabajar el empleado (Lunes a Viernes: 5 días, Luens a Sábado, 6 días).
+		//A partir de este conteo, se quitarán las asistencias y los días de descanso obligatorio, para determinar si efectivamente hubo ausencias.
+		iAusencias = listaDiasLaboralesEmpleado.size();
 		
-		if(diasRegistrados.compareTo(diasLaboralesEmpleado) == 0) {
-			return BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+		for(String sDia : listaDiasLaboralesEmpleado) {
+			registro = mapAsistencias.get(sDia);
+			
+			if(registro == null)
+				continue;
+			
+			iAusencias--;
 		}
 		
-		Set<String> keySet = mapAsistencias.keySet();
+		ausencias = new BigDecimal(iAusencias).setScale(2, BigDecimal.ROUND_HALF_UP);
 		
-		for(String key : keySet) {
-			registro = mapAsistencias.get(key);
-			log.info("Buscando día de la semana Key en el catálogo de días no laborales: {}, {}...", key, registro.getFechaEntrada());
-		}
-		diasTrabajados = new BigDecimal(mapAsistencias.size());
-		
-		return diasLaboralesEmpleado.subtract(diasTrabajados);
+		return ausencias;
 	}
 
 	/**TODO Pendiente implementar el calculo de incapacidades

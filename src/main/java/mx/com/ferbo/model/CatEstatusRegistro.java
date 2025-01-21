@@ -23,6 +23,13 @@ import javax.persistence.Table;
     @NamedQuery(name = "CatEstatusRegistro.findByCodigo", query = "SELECT c FROM CatEstatusRegistro c WHERE c.codigo = :codigo")
 })
 public class CatEstatusRegistro implements Serializable {
+	
+	public static final String ST_REG_EN_TIEMPO = "T";
+	public static final String ST_REG_RETARDO = "R";
+	public static final String ST_REG_FALTA = "F";
+	public static final String ST_REG_JUSTIFICADO = "J";
+	public static final String ST_REG_VACACIONES = "V";
+	public static final String ST_REG_ASISTENCIA_DIA_NO_LABORAL = "X";
 
     private static final long serialVersionUID = 1L;
     @Id
