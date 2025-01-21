@@ -304,6 +304,10 @@ public class IncidenciaBean implements Serializable {
     }
 
     public void guardarEstatusIncidencia(boolean aprobada) {
+        FacesMessage message = null;
+        FacesMessage.Severity severity = null;
+        String mensaje = null;
+        String titulo = "Incidencia";
         incidenciaSelected.setIdEmpleadoRev(new DetEmpleado(empleadoSelected.getIdEmpleado()));
         try {
             incidenciaSelected.getIdEstatus().setIdEstatus(aprobada ? 2 : 3);
@@ -333,19 +337,67 @@ public class IncidenciaBean implements Serializable {
             
             log.info("Dias solicitados del empleado {} son: {}", empleadoSelected.getIdEmpleado(), this.diasVacacionesSolicitados);
             
-            String mensaje = "";
             if (incidenciaSelected.getIdEstatus().getIdEstatus() == 2) {
                 mensaje = "Solicitud aprobada correctamente";    
             } else {
                 mensaje = "Solicitud rechazada correctamente";
             }
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(mensaje));
+            severity = FacesMessage.SEVERITY_INFO;
         } catch (SGPException ex) {
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Error al actualizar la solicitud"));
+            mensaje = "Error al actualizar la solicitud";
+            severity = FacesMessage.SEVERITY_ERROR;
             log.warn("EX-0028: " + ex.getMessage() + ". Error al guardar el status del registro de la incidencia del empleado: " + empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
         }
         consultaIncidencias();
+        message = new FacesMessage(severity, titulo, mensaje);
+        FacesContext.getCurrentInstance().addMessage(null, message);
+        PrimeFaces.current().ajax().update("formIncidencias:messages", "formIncidencias:tabViewI:dtIncidencias");
+        if(incidenciaSelected.getIdSolPermiso().getIdSolicitud() != null){
+            PrimeFaces.current().executeScript("PF('dialogPermisos').hide()");
+        }
+    }
+    
+    public void actualizarEstatusIncidencia()
+    {
+        FacesMessage message = null;
+        FacesMessage.Severity severity = null;
+        String mensaje = null;
+        String titulo = "Incidencia";
+        try
+        {
+            incidenciaSelected.setIdEmpleadoRev(new DetEmpleado(empleadoSelected.getIdEmpleado()));
+            incidenciaSelected.getIdEstatus().setIdEstatus(4);
+            incidenciaSelected.setFechaMod(new Date());
+            
+            for(DetSolicitudPermiso auxPermiso: listPermisos)
+            {
+                if(auxPermiso.getIdSolicitud().equals(incidenciaSelected.getIdSolPermiso().getIdSolicitud()))
+                {
+                    auxPermiso.setAprobada((short) 4);
+                    auxPermiso.setFechaMod(new Date());
+                    auxPermiso.setIdEmpleadoRev(new DetEmpleado(empleadoSelected.getIdEmpleado()));
+                    solicitudPermisoDAO.actualizar(auxPermiso);
+                    incidenciaSelected.setIdSolPermiso(auxPermiso);
+                }
+            }
+            
+            incidenciaSelected.getIdSolPermiso().setFechaMod(new Date());
+            incidenciaSelected.getIdSolPermiso().setIdEmpleadoRev(new DetEmpleado(empleadoSelected.getIdEmpleado()));
+            
+            incidenciaDAO.actualizar(incidenciaSelected);
+            if (incidenciaSelected.getIdEstatus().getIdEstatus() == 4) {
+                mensaje = "Solicitud cancelada correctamente";    
+            }
+            severity = FacesMessage.SEVERITY_INFO;
+        }catch (SGPException ex) 
+        {
+            mensaje = "Error al actualizar la solicitud";
+            severity = FacesMessage.SEVERITY_ERROR;
+            log.warn("EX-0028: " + ex.getMessage() + ". Error al guardar el status del registro de la incidencia del empleado: " + empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
+        }
+        consultaIncidencias();
+        message = new FacesMessage(severity, titulo, mensaje);
+        FacesContext.getCurrentInstance().addMessage(null, message);
         PrimeFaces.current().ajax().update("formIncidencias:messages", "formIncidencias:tabViewI:dtIncidencias");
         if(incidenciaSelected.getIdSolPermiso().getIdSolicitud() != null){
             PrimeFaces.current().executeScript("PF('dialogPermisos').hide()");
@@ -353,6 +405,10 @@ public class IncidenciaBean implements Serializable {
     }
     
     public void guardarEstatusArticulo(boolean aprobada) {
+        FacesMessage message = null;
+        FacesMessage.Severity severity = null;
+        String mensaje = null;
+        String titulo = "Incidencia";
         incidenciaSelected.setIdEmpleadoRev(new DetEmpleado(empleadoSelected.getIdEmpleado()));
         try {
             incidenciaSelected.getIdEstatus().setIdEstatus(aprobada ? 2 : 3);
@@ -372,18 +428,19 @@ public class IncidenciaBean implements Serializable {
             
             incidenciaDAO.actualizar(incidenciaSelected);
             
-            String mensaje = "";
             if (incidenciaSelected.getIdEstatus().getIdEstatus() == 2) {
                 mensaje = "Solicitud aprobada correctamente";
             } else {
                 mensaje = "Solicitud rechazada correctamente";
             }
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(mensaje));
+            severity = FacesMessage.SEVERITY_INFO;
         } catch (SGPException ex) {
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Error al actualizar la solicitud"));
+            mensaje = "Error al actualizar la solicitud";
+            severity = FacesMessage.SEVERITY_ERROR;
             log.warn("EX-0029: " + ex.getMessage() + ". Error al guardar el status del registro del artículo del empleado: " + empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
         }
+        message = new FacesMessage(severity, titulo, mensaje);
+        FacesContext.getCurrentInstance().addMessage(null, message);
         consultaIncidencias();
         PrimeFaces.current().ajax().update("formIncidencias:messages", "formIncidencias:tabViewI:dtArticulosSolicitados");
         if(incidenciaSelected.getIdSolArticulo().getIdSolicitud() != null){
@@ -392,6 +449,10 @@ public class IncidenciaBean implements Serializable {
     }
     
     public void guardarEstatusPrenda(boolean aprobada) {
+        FacesMessage message = null;
+        FacesMessage.Severity severity = null;
+        String mensaje = null;
+        String titulo = "Incidencia";
         incidenciaSelected.setIdEmpleadoRev(new DetEmpleado(empleadoSelected.getIdEmpleado()));
         try {
             incidenciaSelected.getIdEstatus().setIdEstatus(aprobada ? 2 : 3);
@@ -411,18 +472,19 @@ public class IncidenciaBean implements Serializable {
             
             incidenciaDAO.actualizar(incidenciaSelected);
             
-            String mensaje = "";
             if (incidenciaSelected.getIdEstatus().getIdEstatus() == 2) {
                 mensaje = "Solicitud aprobada correctamente";
             } else {
                 mensaje = "Solicitud rechazada correctamente";
             }
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(mensaje));
+            severity = FacesMessage.SEVERITY_INFO;
         } catch (SGPException ex) {
-            FacesContext.getCurrentInstance()
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Error al actualizar la solicitud"));
+            mensaje = "Error al actualizar la solicitud";
+            severity = FacesMessage.SEVERITY_ERROR;
             log.warn("EX-0030: " + ex.getMessage() + ". Error al guardar el status del registro de la prenda del empleado: " + empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
         }
+        message = new FacesMessage(severity, titulo, mensaje);
+        FacesContext.getCurrentInstance().addMessage(null, message);
         consultaIncidencias();
         PrimeFaces.current().ajax().update("formIncidencias:messages", "formIncidencias:tabViewI:dtPrendasSolicitados");
         if(incidenciaSelected.getIdSolPrenda().getIdSolicitud() != null){

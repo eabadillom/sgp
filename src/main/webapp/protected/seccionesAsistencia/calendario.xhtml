@@ -6,7 +6,6 @@
                 styleClass="ferbo-schedule" view="agendaWeek" showWeekNumbers="true">
         <p:ajax event="eventSelect" listener="#{asistenciaBean.eventoSeleccionado}" update="eventDialog"
                 oncomplete="PF('eventDialog').show();"/>
-        <p:ajax event="viewChange" oncomplete="actualizaCampos();"/>
     </p:schedule>
 
     <p:dialog id="eventDialog" widgetVar="eventDialog" header="Detalle del registro" showEffect="fade" width="350" responsive="true" modal="true">
@@ -52,7 +51,7 @@
                 </div>
                 <div class="field">
                     <p:outputLabel for="fHasta" value="Hasta" rendered="#{asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') eq 2}"/>
-                    <p:calendar id="fHasta" value="#{asistenciaBean.evento.endDate.minusDays(1)}" pattern="dd/MM/yyyy" disabled="true"
+                    <p:calendar id="fHasta" value="#{(asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') eq 2) ? asistenciaBean.evento.endDate.minusDays(1) : asistenciaBean.evento.endDate}" pattern="dd/MM/yyyy" disabled="true"
                                 timeZone="GMT-6" rendered="#{asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') eq 2}"/>
                     <p:outputLabel for="fHastaHr" value="Hora final" rendered="#{asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') eq 3}"/>
                     <p:calendar id="fHastaHr" value="#{asistenciaBean.evento.endDate}" pattern="hh:mm:ss a" disabled="true"
@@ -99,33 +98,8 @@
         .ferbo-evento-incapacidad-l{
             background-color: #6e1271 !important;
         }
+        .descansoObligatorio{
+            background-color: #2a9d8f !important;
+        }
     </style>
-    <script  type="text/javascript">
-        function actualizaCampos() {
-            Array.from(document.getElementsByClassName('fc-daygrid-event-harness')).forEach(function (dia) {
-                Array.from(dia.getElementsByClassName('fc-daygrid-event')).forEach(function (evento) {
-                    tipo = evento.querySelector('.fc-event-title');
-                    switch (tipo.innerHTML.at(0)) {
-                        case 'E':
-                            tipo.innerHTML = 'Entrada<br/>'.concat(tipo.innerHTML.replace('Entrada', ''));
-                            tipo.setAttribute('style', 'padding: 0 8px;');
-                            evento.querySelector('.fc-daygrid-event-dot').setAttribute('style', 'display:none!important');
-                            break;
-                        case 'S':
-                            tipo.innerHTML = 'Salida<br/>'.concat(tipo.innerHTML.replace('Salida', ''));
-                            tipo.setAttribute('style', 'padding: 0 8px;');
-                            if (evento.querySelector('.fc-daygrid-event-dot') !== null) {
-                                evento.querySelector('.fc-daygrid-event-dot').setAttribute('style', 'display:none!important');
-                            }
-                            break;
-                        case 'C':
-                            tipo.innerHTML = 'Comida<br/>'.concat(tipo.innerHTML.replace('Comida', ''));
-                            tipo.setAttribute('style', 'padding: 0 8px;');
-                            evento.querySelector('.fc-daygrid-event-dot').setAttribute('style', 'display:none!important');
-                            break;
-                    }
-                });
-            });
-        };
-    </script>
 </ui:composition>

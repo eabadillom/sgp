@@ -1,9 +1,11 @@
 package mx.com.ferbo.dao.n;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetEmpleadoFoto;
+import mx.com.ferbo.util.SGPException;
 
 public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
 
@@ -187,4 +190,53 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
     	return model;
     }
 
+    public synchronized List<DetEmpleado> empleadosSalarioMinimoGeneral(BigDecimal salarioMinimo, Date hoy) throws SGPException{
+        List<DetEmpleado> empleados = null;
+        EntityManager em = null;
+        
+        try{
+            log.info("Inicio el proceso de obtener los empleados por debajo del salario minimo de ZG");
+            em = getEntityManager();
+            TypedQuery resultado = em.createQuery("select e from DetEmpleado e where e.datoEmpresa.salarioDiario < :salarioMinimo and (e.datoEmpresa.fechaBaja is null or e.datoEmpresa.fechaBaja > :hoy)", DetEmpleado.class);
+            resultado.setParameter("salarioMinimo", salarioMinimo);
+            resultado.setParameter("hoy", hoy);
+            empleados = resultado.getResultList();
+            log.info("Finaliza el proceso de obtener los empleados por debajo del salario minimo de ZG");
+        }
+        catch(Exception ex){
+            log.warn("Hubo algun problema al momento de obtener los empleados por debajo del salario minimo de ZG. " + ex.getMessage());
+            rollback(em);
+            throw new SGPException("Hubo algun problema al momento de obtener los empleados por debajo del salario minimo de ZG");
+        }
+        finally{
+            close(em);
+        }
+        
+        return empleados;
+    }
+    
+    public synchronized List<DetEmpleado> empleadosSalarioMinimoFrontera(BigDecimal salarioMinimo, Date hoy) throws SGPException{
+        List<DetEmpleado> empleados = null;
+        EntityManager em = null;
+        
+        try{
+            log.info("Inicio el proceso de obtener los empleados por debajo del salario minimo de ZF");
+            em = getEntityManager();
+            TypedQuery resultado = em.createQuery("select e from DetEmpleado e where e.datoEmpresa.salarioDiario < :salarioMinimo and (e.datoEmpresa.fechaBaja is null or e.datoEmpresa.fechaBaja > :hoy)", DetEmpleado.class);
+            resultado.setParameter("salarioMinimo", salarioMinimo);
+            resultado.setParameter("hoy", hoy);
+            empleados = resultado.getResultList();
+            log.info("Finaliza el proceso de obtener los empleados por debajo del salario minimo de ZF");
+        }
+        catch(Exception ex){
+            log.warn("Hubo algun problema al momento de obtener los empleados por debajo del salario minimo de ZF");
+            rollback(em);
+            throw new SGPException("Hubo algun problema al momento de obtener los empleados por debajo del salario minimo de ZF");
+        }
+        finally{
+            close(em);
+        }
+        
+        return empleados;
+    }
 }
