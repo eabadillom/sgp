@@ -75,6 +75,7 @@ import mx.com.ferbo.model.sat.CatTipoContrato;
 import mx.com.ferbo.model.sat.CatTipoJornada;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.model.sat.CatTipoRegimen;
+import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.ManageStatus;
 import mx.com.ferbo.util.SGPException;
 
@@ -1136,14 +1137,14 @@ public class RegistroEmpleadosBean implements Serializable {
         if (this.activo && this.empresaselected == null && this.plantaselected == null) {
             return this.lstEmpleados.stream().
                     filter(empleado -> empleado.getDatoEmpresa() != null).
-                    filter(empleado -> empleado.getDatoEmpresa().getFechaBaja() == null).
+                    filter(empleado -> (empleado.getDatoEmpresa().getFechaBaja() == null || empleado.getDatoEmpresa().getFechaBaja().after(DateUtil.now()))).
                     collect(Collectors.toList());
         }
 
         if (this.inactivo && this.empresaselected == null && this.plantaselected == null) {
             return this.lstEmpleados.stream().
                     filter(empleado -> empleado.getDatoEmpresa() != null).
-                    filter(empleado -> empleado.getDatoEmpresa().getFechaBaja() != null).
+                    filter(empleado -> (empleado.getDatoEmpresa().getFechaBaja() != null && empleado.getDatoEmpresa().getFechaBaja().before(DateUtil.now()))).
                     collect(Collectors.toList());
 
         }
@@ -1153,7 +1154,7 @@ public class RegistroEmpleadosBean implements Serializable {
                     filter(empleado -> empleado.getDatoEmpresa() != null).
                     filter(empleado -> empleado.getDatoEmpresa().getEmpresa() != null).
                     filter(empleado -> empleado.getDatoEmpresa().getEmpresa().getIdEmpresa().equals(this.empresaselected.getIdEmpresa())).
-                    filter(empleado -> empleado.getDatoEmpresa().getFechaBaja() == null).
+                    filter(empleado -> (empleado.getDatoEmpresa().getFechaBaja() == null || empleado.getDatoEmpresa().getFechaBaja().after(DateUtil.now()))).
                     collect(Collectors.toList());
 
         }
@@ -1163,7 +1164,7 @@ public class RegistroEmpleadosBean implements Serializable {
                     filter(empleado -> empleado.getDatoEmpresa() != null).
                     filter(empleado -> empleado.getDatoEmpresa().getEmpresa() != null).
                     filter(empleado -> empleado.getDatoEmpresa().getEmpresa().getIdEmpresa().equals(this.empresaselected.getIdEmpresa())).
-                    filter(empleado -> empleado.getDatoEmpresa().getFechaBaja() != null).
+                    filter(empleado -> (empleado.getDatoEmpresa().getFechaBaja() != null && empleado.getDatoEmpresa().getFechaBaja().before(DateUtil.now()))).
                     collect(Collectors.toList());
         }
 
@@ -1172,7 +1173,7 @@ public class RegistroEmpleadosBean implements Serializable {
                     filter(empleado -> empleado.getDatoEmpresa() != null).
                     filter(empleado -> empleado.getDatoEmpresa().getPlanta() != null).
                     filter(empleado -> empleado.getDatoEmpresa().getPlanta().getIdPlanta().equals(this.plantaselected.getIdPlanta())).
-                    filter(empleado -> empleado.getDatoEmpresa().getFechaBaja() == null).
+                    filter(empleado -> (empleado.getDatoEmpresa().getFechaBaja() == null || empleado.getDatoEmpresa().getFechaBaja().after(DateUtil.now()))).
                     collect(Collectors.toList());
         }
 
@@ -1181,7 +1182,7 @@ public class RegistroEmpleadosBean implements Serializable {
                     filter(empleado -> empleado.getDatoEmpresa() != null).
                     filter(empleado -> empleado.getDatoEmpresa().getPlanta() != null).
                     filter(empleado -> empleado.getDatoEmpresa().getPlanta().getIdPlanta().equals(this.plantaselected.getIdPlanta())).
-                    filter(empleado -> empleado.getDatoEmpresa().getFechaBaja() != null).
+                    filter(empleado -> (empleado.getDatoEmpresa().getFechaBaja() != null && empleado.getDatoEmpresa().getFechaBaja().before(DateUtil.now()))).
                     collect(Collectors.toList());
         }
 
@@ -1190,7 +1191,7 @@ public class RegistroEmpleadosBean implements Serializable {
                     filter(empleado -> empleado.getDatoEmpresa() != null).
                     filter(empleado -> empleado.getDatoEmpresa().getEmpresa() != null && empleado.getDatoEmpresa().getPlanta() != null).
                     filter(empleado -> empleado.getDatoEmpresa().getEmpresa().getIdEmpresa().equals(this.empresaselected.getIdEmpresa()) && empleado.getDatoEmpresa().getPlanta().getIdPlanta().equals(this.plantaselected.getIdPlanta())).
-                    filter(empleado -> empleado.getDatoEmpresa().getFechaBaja() == null).
+                    filter(empleado -> (empleado.getDatoEmpresa().getFechaBaja() == null || empleado.getDatoEmpresa().getFechaBaja().after(DateUtil.now()))).
                     collect(Collectors.toList());
         }
 
@@ -1199,7 +1200,7 @@ public class RegistroEmpleadosBean implements Serializable {
                     filter(empleado -> empleado.getDatoEmpresa() != null).
                     filter(empleado -> empleado.getDatoEmpresa().getEmpresa() != null && empleado.getDatoEmpresa().getPlanta() != null).
                     filter(empleado -> empleado.getDatoEmpresa().getEmpresa().getIdEmpresa().equals(this.empresaselected.getIdEmpresa()) && empleado.getDatoEmpresa().getPlanta().getIdPlanta().equals(this.plantaselected.getIdPlanta())).
-                    filter(empleado -> empleado.getDatoEmpresa().getFechaBaja() != null).
+                    filter(empleado -> (empleado.getDatoEmpresa().getFechaBaja() != null && empleado.getDatoEmpresa().getFechaBaja().before(DateUtil.now()))).
                     collect(Collectors.toList());
         }
 
