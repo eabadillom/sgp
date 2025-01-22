@@ -37,6 +37,7 @@ public class ParametrosNomina {
 	
 	private Integer anio         = null;
 	private Integer semanaAnio   = null;
+	private Integer diasPeriodo  = null;
 	
 	private Date periodoInicio   = null;
 	private Date periodoFin      = null;
@@ -99,6 +100,7 @@ public class ParametrosNomina {
 		this.periodoFin      = new Date(periodoFin.getTime());
 		this.diasNoLaborales = this.diaNLDAO.buscarPorPeriodo("MX", periodoInicio, periodoFin);
 		this.semanaAnio      = DateUtil.getSemanaAnio(this.periodoInicio);
+		this.diasPeriodo     = DateUtil.daysDiff(periodoInicio, periodoFin);
 		
 		//Catálogos SAT
 		this.parametrosPercepciones = this.catPercepcionesDAO.buscarActual(periodoInicio);
@@ -194,6 +196,10 @@ public class ParametrosNomina {
 
 	public Integer getSemanaAnio() {
 		return semanaAnio;
+	}
+
+	public Integer getDiasPeriodo() {
+		return diasPeriodo;
 	}
 	
 }

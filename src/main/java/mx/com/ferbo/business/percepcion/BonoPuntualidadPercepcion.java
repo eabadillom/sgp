@@ -19,27 +19,32 @@ public class BonoPuntualidadPercepcion extends AbstractPercepcion implements IPe
 	
 	private static Logger log = LogManager.getLogger(BonoPuntualidadPercepcion.class);
 	
-	private BigDecimal tasaBono = null;
-	private BigDecimal diasTrabajados = null;
-	private int diasPorPeriodo = 0;
-	private BigDecimal salarioDiarioIntegrado = null;
-	private BigDecimal proporcionalSeptimoDia = null;
 	private Map<String, DetRegistro> mapAsistencias = null;
 	
-	public BonoPuntualidadPercepcion(List<CatTipoPercepcion> tiposPercepcion, BigDecimal tasaBono, BigDecimal diasTrabajados, 
-			Map<String, DetRegistro> mapAsistencias, int diasPorPeriodo,
-			BigDecimal salarioDiarioIntegrado, BigDecimal proporcionalSeptimoDia) {
+	private BigDecimal tasaBono               = null;
+	private BigDecimal diasLaborales          = null;
+	private BigDecimal diasNoLaborales        = null;
+	private BigDecimal diasTrabajados         = null;
+	private BigDecimal salarioDiarioIntegrado = null;
+	private BigDecimal proporcionalSeptimoDia = null;
+	
+	public BonoPuntualidadPercepcion(
+			List<CatTipoPercepcion> tiposPercepcion, BigDecimal tasaBono, Map<String, DetRegistro> mapAsistencias, 
+			BigDecimal diasLaborales, BigDecimal diasNoLaborales, BigDecimal diasTrabajados, BigDecimal salarioDiarioIntegrado,
+			BigDecimal proporcionalSeptimoDia
+	) {
 		this.tiposPercepcion = tiposPercepcion;
 		this.mapAsistencias = mapAsistencias;
 		this.tasaBono = tasaBono;
+		this.diasLaborales = diasLaborales;
+		this.diasNoLaborales = diasNoLaborales;
 		this.diasTrabajados = diasTrabajados;
-		this.diasPorPeriodo = diasPorPeriodo;
 		this.salarioDiarioIntegrado = salarioDiarioIntegrado;
 		this.proporcionalSeptimoDia = proporcionalSeptimoDia;
 	}
 
 	@Override
-	public DetNominaPercepcion calcular(DetNomina nomina) {
+	public void calcular(DetNomina nomina) {
 		DetNominaPercepcion percepcion = null;
 		BigDecimal bono = null;
     	BigDecimal diasPeriodo = null;
@@ -56,7 +61,7 @@ public class BonoPuntualidadPercepcion extends AbstractPercepcion implements IPe
     		
     		//TODO VALIDAR PRIMERO SI NO HAY RETARDOS.
     		//En caso de existir retardos en el periodo de calculo, el bono de puntualidad es CERO.
-    		if(this.diasTrabajados.intValue() < diasPorPeriodo)
+    		if(this.diasTrabajados.compareTo(diasLaborales) < 0)
     			throw new SGPException("Los dias trabajados no pueden ser mayores a los dias que componen al periodo de pago.");
     		
     		for(Map.Entry<String, DetRegistro> entry :  this.mapAsistencias.entrySet()) {
@@ -65,7 +70,7 @@ public class BonoPuntualidadPercepcion extends AbstractPercepcion implements IPe
     				throw new SGPException("Existen dias con retardo no justificados o faltas para el empleado.");
     		}
     		
-    		diasPeriodo = this.diasTrabajados.add(proporcionalSeptimoDia).setScale(2, BigDecimal.ROUND_HALF_UP);
+    		diasPeriodo = this.diasTrabajados.add(this.diasNoLaborales).setScale(2, BigDecimal.ROUND_HALF_UP);
     		
     		bono = salarioDiarioIntegrado.multiply(this.tasaBono).setScale(5, BigDecimal.ROUND_HALF_UP);
     		bono = bono.multiply(diasPeriodo).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -92,6 +97,10 @@ public class BonoPuntualidadPercepcion extends AbstractPercepcion implements IPe
     		percepcion.setImporteGravado(bono);
     		percepcion.setImporteExcento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
     		
+    		//Si el hay bono de puntualidad, se agrega a la lista de percepciones.
+    		if(percepcion.getImporteExcento().add(percepcion.getImporteGravado()).compareTo(BigDecimal.ZERO) > 0)
+    			nomina.getPercepciones().add(percepcion);
+    		
     		this.tiposPercepcion = null;
     		this.percepcionesEmpleado = null;
     		this.mapAsistencias = null;
@@ -100,19 +109,5 @@ public class BonoPuntualidadPercepcion extends AbstractPercepcion implements IPe
     		this.salarioDiarioIntegrado = null;
     		this.proporcionalSeptimoDia = null;
     	}
-    	
-		return percepcion;
-	}
-
-	public void setDiasPorPeriodo(int diasPorPeriodo) {
-		this.diasPorPeriodo = diasPorPeriodo;
-	}
-
-	public void setSalarioDiarioIntegrado(BigDecimal salarioDiarioIntegrado) {
-		this.salarioDiarioIntegrado = salarioDiarioIntegrado;
-	}
-
-	public void setProporcionalSeptimoDia(BigDecimal proporcionalSeptimoDia) {
-		this.proporcionalSeptimoDia = proporcionalSeptimoDia;
 	}
 }

@@ -24,7 +24,7 @@ public class SueldoPercepcion extends AbstractPercepcion implements IPercepcion 
 	}
 
 	@Override
-	public DetNominaPercepcion calcular(DetNomina nomina) {
+	public void calcular(DetNomina nomina) {
 		DetNominaPercepcion percepcion = null;
 		BigDecimal salarioDiario = null;
 		BigDecimal cantidad = null;
@@ -71,10 +71,5 @@ public class SueldoPercepcion extends AbstractPercepcion implements IPercepcion 
 			this.tiposPercepcion = null;
 			this.diasTrabajados = null;
 		}
-		return percepcion;
-	}
-
-	public void setDiasTrabajados(BigDecimal diasTrabajados) {
-		this.diasTrabajados = diasTrabajados;
 	}
 }
