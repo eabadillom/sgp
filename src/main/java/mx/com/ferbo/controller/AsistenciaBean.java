@@ -474,6 +474,28 @@ public class AsistenciaBean implements Serializable {
         }
     }
 
+    public void validarDiasEmpleado() {
+        FacesMessage message = null;
+        FacesMessage.Severity severity = null;
+        String mensaje = null;
+        String titulo = "Cargar informacion";
+
+        try {
+            if (empleadoSelected.getDatoEmpresa().getDiaLunes() == false || empleadoSelected.getDatoEmpresa().getDiaMartes() == false || empleadoSelected.getDatoEmpresa().getDiaMiercoles() == false || empleadoSelected.getDatoEmpresa().getDiaJueves() == false || empleadoSelected.getDatoEmpresa().getDiaViernes() == false) {
+                throw new SGPException("Error: No tiene dias laborales asignados. Por favor contactar a RH");
+            }
+            inicializaSolicitud();
+            PrimeFaces.current().executeScript("PF('dialogVacacionesView').show()");
+        } catch (SGPException sgpEx) {
+            mensaje = sgpEx.getMessage();
+            severity = FacesMessage.SEVERITY_ERROR;
+            message = new FacesMessage(severity, titulo, mensaje);
+            FacesContext.getCurrentInstance().addMessage(null, message);
+            PrimeFaces.current().ajax().update(":formActividades:messages");
+            log.error("Error al obtener los dias laborables del empleado: {}", sgpEx);
+        }
+    }
+
     public void inicializaSolicitud() {
         solicitudSelected = new DetSolicitudPermiso();
         CatTipoSolicitud tipoSolicitud = new CatTipoSolicitud();

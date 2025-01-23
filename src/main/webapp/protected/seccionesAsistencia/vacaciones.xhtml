@@ -6,7 +6,7 @@
     <p:toolbar styleClass="mb-0 p-0" style="border: none">
         <p:toolbarGroup align="right">
             <p:commandButton value="Registrar" icon="pi pi-plus" styleClass="ui-button-success" style="margin-right: .5rem" process="@this"
-                             oncomplete="PF('dialogVacaciones').show();" actionListener="#{asistenciaBean.inicializaSolicitud()}" >
+                             actionListener="#{asistenciaBean.validarDiasEmpleado()}" >
             </p:commandButton>
         </p:toolbarGroup>
     </p:toolbar>
@@ -65,9 +65,9 @@
                 </p:column>    
             </p:dataTable>
             <p:outputLabel value="Total de dias disponibles: #{asistenciaBean.diasTotalesPermitidos}" style="text-align: right;" rendered="#{asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud ne null 
-                                                           and asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud eq 2}"/>
+                                                               and asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud eq 2}"/>
             <p:datePicker id="dpRango"  rendered="#{asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud ne null 
-                                                   and asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud eq 2}"
+                                                    and asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud eq 2}"
                           styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" 
                           pattern="dd-MM-yyyy" showIcon="true" readonlyInput="true" timeZone="GMT-6" value="#{asistenciaBean.lstRangoRegistro}"
                           mindate="#{asistenciaBean.minDate}" inline="true" selectionMode="range" disabledDays="#{asistenciaBean.invalidDays}"
