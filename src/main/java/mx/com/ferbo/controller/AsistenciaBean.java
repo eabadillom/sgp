@@ -479,8 +479,16 @@ public class AsistenciaBean implements Serializable {
         FacesMessage.Severity severity = null;
         String mensaje = null;
         String titulo = "Cargar informacion";
+        List<CatDiaNoLaboral> diasNoLaborables = null; 
 
         try {
+            
+            diasNoLaborables = this.diasDeDescansoObligatorio.diasDescansoAnual();
+            
+            if(diasNoLaborables.isEmpty() || diasNoLaborables.size() < 2){
+                throw new SGPException("Error: Dias de asueto no actualizados. Por favor contactar a RH");
+            }
+            
             if (empleadoSelected.getDatoEmpresa().getDiaLunes() == false || empleadoSelected.getDatoEmpresa().getDiaMartes() == false || empleadoSelected.getDatoEmpresa().getDiaMiercoles() == false || empleadoSelected.getDatoEmpresa().getDiaJueves() == false || empleadoSelected.getDatoEmpresa().getDiaViernes() == false) {
                 throw new SGPException("Error: No tiene dias laborales asignados. Por favor contactar a RH");
             }
