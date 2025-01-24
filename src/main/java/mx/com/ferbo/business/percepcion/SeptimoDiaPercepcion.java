@@ -11,6 +11,7 @@ import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.DetNominaPercepcionPK;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
+import mx.com.ferbo.util.FormatUtil;
 
 public class SeptimoDiaPercepcion extends AbstractPercepcion implements IPercepcion {
 	
@@ -35,6 +36,8 @@ public class SeptimoDiaPercepcion extends AbstractPercepcion implements IPercepc
 		BigDecimal          septimoDia = null;
 		BigDecimal          proporcionalSemanal = null;
 		BigDecimal          t = null;
+		Integer             diaDescanso = null;
+		String              sDiaDescanso = null;
 		
 		List<DetNominaPercepcion> percepciones = null;
 		
@@ -59,14 +62,13 @@ public class SeptimoDiaPercepcion extends AbstractPercepcion implements IPercepc
 					.multiply(proporcionalSemanal)
 					.setScale(2, BigDecimal.ROUND_HALF_UP);
 			
-			if(diasNoLaborales.compareTo(BigDecimal.ONE) == 0) {
-				//Si sólo hay un día de descanso, se otorga sólo el séptimo día.
-				this.percepcionDiaDescanso(nomina, CVE_SEPTIMO_DIA, "Séptimo día", proporcionalSemanal, septimoDia);
-			} else if( diasNoLaborales.compareTo(BigDecimal.ONE.add(BigDecimal.ONE)) == 0) {
-				//Si hay dos días de descanso, se otorga el sexto y septimo día.
-				this.percepcionDiaDescanso(nomina, CVE_SEXTO_DIA, "Sexto día", proporcionalSemanal, septimoDia);
-				this.percepcionDiaDescanso(nomina, CVE_SEPTIMO_DIA, "Séptimo día", proporcionalSemanal, septimoDia);
+			for(int i = 0; i < diasNoLaborales.intValue(); i++) {
+				diaDescanso = diasLaborales.add(new BigDecimal(i+1)).intValue();
+				sDiaDescanso = String.format("%s dia", FormatUtil.convertirAOrdinal(diaDescanso));
+				sDiaDescanso = FormatUtil.capitalizarPrimeraLetra(sDiaDescanso);
+				this.percepcionDiaDescanso(nomina, CVE_SEPTIMO_DIA, sDiaDescanso, proporcionalSemanal, septimoDia);
 			}
+			
 		} catch(Exception ex) {
 			log.error("Problema para obtener el cálculo del septimo día.",  ex);
 			septimoDia = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);

@@ -126,7 +126,8 @@ public class NominaSemanalBL extends NominaBL {
     		
     		/*---------------------------PERCEPCIONES------------------------------*/
     		NominaSemanalBL.calcularSueldo(nomina, this.parametros, diasLaboralesEmpleado, diasNolaboralesEmpleado, diasTrabajados);
-    		NominaSemanalBL.calcularBonoPuntualidad(nomina, this.parametros, this.percepcionesEmpleado, this.mapAsistencias, diasLaboralesEmpleado, diasNolaboralesEmpleado, diasTrabajados);
+    		NominaSemanalBL.calcularBonoPuntualidad(nomina, this.parametros, this.percepcionesEmpleado, this.mapAsistencias, 
+    				this.empleado.getEmpleadoConfiguracion().getRetardo(), diasLaboralesEmpleado, diasNolaboralesEmpleado, diasTrabajados);
     		NominaSemanalBL.calcularValesDespensa(nomina, this.parametros, percepcionesEmpleado);
 			
 			/*-------------------------DEDUCCIONES-----------------------*/
@@ -290,7 +291,7 @@ public class NominaSemanalBL extends NominaBL {
 		septimoDiaBO.calcular(nomina);
 	}
 	
-	private static void calcularBonoPuntualidad(DetNomina nomina, ParametrosNomina parametros, List<DetPercepcionEmpleado> percepcionesEmpleado, Map<String, DetRegistro> mapAsistencias, BigDecimal diasLaborales, BigDecimal diasNoLaborales, BigDecimal diasTrabajados) {
+	private static void calcularBonoPuntualidad(DetNomina nomina, ParametrosNomina parametros, List<DetPercepcionEmpleado> percepcionesEmpleado, Map<String, DetRegistro> mapAsistencias, Boolean procesarRetardos, BigDecimal diasLaborales, BigDecimal diasNoLaborales, BigDecimal diasTrabajados) {
 		BonoPuntualidadPercepcion bonoPuntualidadBO      = null;
 		BigDecimal                tasaBonoPuntualidad    = null;
 		BigDecimal                salarioDiarioIntegrado = null;
@@ -325,7 +326,7 @@ public class NominaSemanalBL extends NominaBL {
 		bonoPuntualidadBO = new BonoPuntualidadPercepcion(
 				parametros.getTiposPercepcion(), tasaBonoPuntualidad, mapAsistencias, diasLaborales, diasNoLaborales,
 				diasTrabajados, salarioDiarioIntegrado, proporcionalSeptimoDia);
-		
+		bonoPuntualidadBO.setProcesaRetardos(procesarRetardos);
 		bonoPuntualidadBO.setPercepcionesEmpleado(percepcionesEmpleado);
 		bonoPuntualidadBO.calcular(nomina);
 	}
