@@ -6,7 +6,7 @@
     <p:toolbar styleClass="mb-0 p-0" style="border: none">
         <p:toolbarGroup align="right">
             <p:commandButton value="Registrar" icon="pi pi-plus" styleClass="ui-button-success" style="margin-right: .5rem" process="@this"
-                             oncomplete="PF('dialogVacaciones').show();" actionListener="#{asistenciaBean.inicializaSolicitud()}" >
+                             actionListener="#{asistenciaBean.validarDiasEmpleado()}" >
             </p:commandButton>
         </p:toolbarGroup>
     </p:toolbar>
@@ -54,8 +54,20 @@
                     <p:message for="soTipoPermiso"/>
                 </div>
             </div>
-            <p:datePicker id="dpRango" rendered="#{asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud ne null 
-                                                   and asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud eq 2}" 
+            <p:dataTable id="dtPeriodosVacaciones" widgetVar="dtPeriodosVacaciones" var="periodo" value="#{asistenciaBean.periodosPorFechaActual()}" reflow="true"
+                         rowKey="#{periodo.idVacaciones}" paginator="true" rows="4" paginatorPosition="bottom" rowSelectMode="add" lazy="true" rendered="#{asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud ne null 
+                                   and asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud eq 2}" >
+                <p:column headerText="Periodos disponibles" filterable="false" style="text-align: center; width: 100px;">
+                    <p:outputLabel value="#{asistenciaBean.foramatoPeriodo(periodo)}" />
+                </p:column>
+                <p:column headerText="Dias permitidos" filterable="false" style="text-align: center; width: 100px;">
+                    <p:outputLabel value="#{periodo.diastotales - periodo.diastomados - periodo.diaspagados}"/>
+                </p:column>    
+            </p:dataTable>
+            <p:outputLabel value="Total de dias disponibles: #{asistenciaBean.diasTotalesPermitidos}" style="text-align: right;" rendered="#{asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud ne null 
+                                                               and asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud eq 2}"/>
+            <p:datePicker id="dpRango"  rendered="#{asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud ne null 
+                                                    and asistenciaBean.solicitudSelected.idTipoSolicitud.idTipoSolicitud eq 2}"
                           styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" 
                           pattern="dd-MM-yyyy" showIcon="true" readonlyInput="true" timeZone="GMT-6" value="#{asistenciaBean.lstRangoRegistro}"
                           mindate="#{asistenciaBean.minDate}" inline="true" selectionMode="range" disabledDays="#{asistenciaBean.invalidDays}"
@@ -98,7 +110,7 @@
                         <f:selectItem itemLabel="CANCELADA" itemValue="4"/>
                     </p:selectOneMenu>
                 </div>
-                </div>
+            </div>
             <div class="formgrid grid" jsf:rendered="#{asistenciaBean.solicitudSelected.aprobada eq 0}">
                 <div class="field col">
                     <p:outputLabel for="txtMotivo" value="Motivo"/>
