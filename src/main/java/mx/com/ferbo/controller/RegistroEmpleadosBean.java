@@ -66,6 +66,7 @@ import mx.com.ferbo.model.DetEmpleadoConfiguracion;
 import mx.com.ferbo.model.DetEmpleadoFoto;
 import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.DetPrestamo;
+import mx.com.ferbo.model.DetVacaciones;
 import mx.com.ferbo.model.InfDatoEmpresa;
 import mx.com.ferbo.model.Pais;
 import mx.com.ferbo.model.sat.CatBanco;
@@ -287,6 +288,11 @@ public class RegistroEmpleadosBean implements Serializable {
 
         List<DetPrestamo> prestamos = null;
         log.info("Cargando información del empleado: {}", this.empleadoSelected);
+        this.empleadoSelected = empleadoDAO.obetenerVacacionesEmpleado(this.empleadoSelected.getIdEmpleado());   
+        if(this.empleadoSelected.getVacaciones() == null){
+            List<DetVacaciones> vacaciones = new ArrayList<DetVacaciones>();
+            this.empleadoSelected.setVacaciones(vacaciones);
+        }
         InfDatoEmpresa datoEmpresa = this.empleadoSelected.getDatoEmpresa();
         this.empleadoFoto = empleadoFotoDAO.buscar(this.empleadoSelected.getNumEmpleado());
 

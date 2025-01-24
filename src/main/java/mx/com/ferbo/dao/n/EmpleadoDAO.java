@@ -128,7 +128,6 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
                     .getResultList();
             
             for (DetEmpleado model : modelList) {
-                log.info("Vacacaiones: {}", model.getVacaciones());
                 if (isFullInfo == false) {
                     continue;
                 }
@@ -220,5 +219,23 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
         }
         
         return empleados;
+    }
+    
+    public DetEmpleado obetenerVacacionesEmpleado(Integer id) {
+        DetEmpleado model = null;
+        EntityManager emSGP = null;
+
+        try {
+            emSGP = getEntityManager();
+            model = emSGP.find(this.modelClass, id);
+                log.info("Vacaciones: {}", model.getVacaciones() == null ? null : model.getVacaciones());
+            
+        } catch (Exception ex) {
+            log.error("Problema para obtener vacaciones del empleado con id " + id, ex);
+        } finally {
+            close(emSGP);
+        }
+
+        return model;
     }
 }

@@ -493,7 +493,7 @@ public class AsistenciaBean implements Serializable {
                 throw new SGPException("Error: No tiene dias laborales asignados. Por favor contactar a RH");
             }
             inicializaSolicitud();
-            PrimeFaces.current().executeScript("PF('dialogVacacionesView').show()");
+            PrimeFaces.current().executeScript("PF('dialogVacaciones').show()");
         } catch (SGPException sgpEx) {
             mensaje = sgpEx.getMessage();
             severity = FacesMessage.SEVERITY_ERROR;
