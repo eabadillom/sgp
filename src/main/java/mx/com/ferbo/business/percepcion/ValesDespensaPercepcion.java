@@ -31,7 +31,7 @@ public class ValesDespensaPercepcion extends AbstractPercepcion implements IPerc
 	}
 	
 	@Override
-	public DetNominaPercepcion calcular(DetNomina nomina) {
+	public void calcular(DetNomina nomina) {
 		DetNominaPercepcion percepcion = null;
 		BigDecimal vales = null;
 		
@@ -76,6 +76,9 @@ public class ValesDespensaPercepcion extends AbstractPercepcion implements IPerc
 			percepcion.setImporteGravado(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
 			percepcion.setImporteExcento(vales);
 			
+			if(percepcion.getImporteExcento().add(percepcion.getImporteGravado()).compareTo(BigDecimal.ZERO) > 0)
+				nomina.getPercepciones().add(percepcion);
+			
 			this.tiposPercepcion = null;
 			this.percepcionesEmpleado = null;
 			this.diasTrabajados = null;
@@ -83,7 +86,5 @@ public class ValesDespensaPercepcion extends AbstractPercepcion implements IPerc
 			this.tasaVales = null;
 			this.diasPeriodo = null;
     	}
-		
-		return percepcion;
 	}
 }

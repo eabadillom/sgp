@@ -19,15 +19,17 @@ public class AbstractPercepcion {
 	protected List<CatTipoPercepcion> tiposPercepcion = null;
 	protected List<DetPercepcionEmpleado> percepcionesEmpleado = null;
 	
-	public static final String P_SUELDO = "001";
-	public static final String P_SEPTIMO_DIA = "001";
+	public static final String P_SUELDO           = "001";
+	public static final String P_SEXTO_DIA        = "001";
+	public static final String P_SEPTIMO_DIA      = "001";
 	public static final String P_BONO_PUNTUALIDAD = "010";
-	public static final String P_VALES_DESPENSA = "029";
+	public static final String P_VALES_DESPENSA   = "029";
 	
-	public static final String CVE_SUELDO = "001";
-	public static final String CVE_SEPTIMO_DIA = "003";
+	public static final String CVE_SUELDO           = "001";
+	public static final String CVE_SEXTO_DIA        = "002";
+	public static final String CVE_SEPTIMO_DIA      = "003";
 	public static final String CVE_BONO_PUNTUALIDAD = "015";
-	public static final String CVE_VALES_DESPENSA = "032";
+	public static final String CVE_VALES_DESPENSA   = "032";
 	
 	public CatTipoPercepcion getTipoPercepcion(String clave) {
 		CatTipoPercepcion tipoPercepcion = null;

@@ -170,6 +170,24 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
         DetEmpleadoFoto foto = null;
         return foto;
     }
+    
+    public DetEmpleado buscarPorRFC(String rfc) {
+    	DetEmpleado model = null;
+    	EntityManager em = null;
+    	try {
+    		em = this.getEntityManager();
+    		model = em.createNamedQuery("DetEmpleado.findByRFC", modelClass)
+    				.setParameter("rfc", rfc)
+    				.getSingleResult();
+
+    	} catch(Exception ex) {
+    		log.error("Problema para obtener el empleado por RFC: " + rfc, ex);
+    	} finally {
+    		this.close(em);
+    	}
+    	
+    	return model;
+    }
 
     public synchronized List<DetEmpleado> empleadosSalarioMinimoGeneral(BigDecimal salarioMinimo, Date hoy) throws SGPException{
         List<DetEmpleado> empleados = null;
