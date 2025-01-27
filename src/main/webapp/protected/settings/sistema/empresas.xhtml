@@ -90,9 +90,21 @@
 		    			<p:inputMask value="#{empresasBean.empresa.codigoPostal}" maxlength="5" mask="99999" validateMask="true"/>
 		    		</div>
 		    		<div class="p-field">
-		    			<p:outputLabel value="Registro Patronal" />
+                                    <p:outputLabel value="Registro Patronal"/>
 		    			<p:inputText value="#{empresasBean.empresa.registroPatronal}" maxlength="20"/>
 		    		</div>
+                            <div calss="p-field">
+                                <p:outputLabel value="Tipo de riesgo"/>
+                                <p:selectOneMenu value="#{empresasBean.empresa.riesgo}" converter="entityConverter">
+                                    <f:selectItem itemLabel="--Seleccione--" itemValue="#{null}"/>
+                                    <f:selectItems value="#{empresasBean.riesgos}" var="riesgo" itemLabel="#{riesgo.descripcion}" itemValue="#{riesgo}"/>
+                                    <p:ajax process="@this" />
+                                </p:selectOneMenu>
+                            </div>
+                            <div class="p-field">
+                                <p:outputLabel value="Prima"/>
+                                    <p:inputNumber value="#{empresasBean.empresa.prima}" symbol="%" symbolPosition="s" emptyValue="always"/>
+                            </div>
 		    	</p:outputPanel>
 	    		<f:facet name="footer">
 	    			<p:commandButton value="Guardar" actionListener="#{empresasBean.guardar}" process="dg-empresa @this" update="dt-empresa">

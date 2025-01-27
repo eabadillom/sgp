@@ -1,6 +1,7 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Objects;
 
@@ -15,9 +16,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.validation.constraints.Null;
 import javax.validation.constraints.Size;
 
 import mx.com.ferbo.model.sat.CatRegimenFiscal;
+import mx.com.ferbo.model.sat.CatRiesgoPuesto;
 
 @Entity
 @Table(name = "cat_empresa")
@@ -90,6 +93,14 @@ public class CatEmpresa implements Serializable {
     @Basic(optional = true)
     @Size(max = 5)
     private String codigoPostal;
+    
+    @Column(name = "pc_prima")
+    @Basic(optional = false)
+    private BigDecimal prima;
+    
+    @ManyToOne
+    @JoinColumn(name = "cd_riesgo")
+    private CatRiesgoPuesto riesgo;
 
     public CatEmpresa() {
     }
@@ -207,6 +218,22 @@ public class CatEmpresa implements Serializable {
 	public void setCodigoPostal(String codigoPostal) {
 		this.codigoPostal = codigoPostal;
 	}
+
+    public BigDecimal getPrima() {
+        return prima;
+    }
+
+    public void setPrima(BigDecimal prima) {
+        this.prima = prima;
+    }
+
+    public CatRiesgoPuesto getRiesgo() {
+        return riesgo;
+    }
+
+    public void setRiesgo(CatRiesgoPuesto riesgo) {
+        this.riesgo = riesgo;
+    }
 
 	@Override
 	public int hashCode() {
