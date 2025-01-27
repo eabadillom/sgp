@@ -426,8 +426,11 @@
                                         <p:column headerText="Dias tomados" style="text-align: center;">
                                             <h:outputText value="#{vacacion.diastomados}"/>
                                         </p:column>
+                                        <p:column headerText="Dias pagados" style="text-align: center;">
+                                            <h:outputText value="#{vacacion.diaspagados}"/>
+                                        </p:column>
                                         <p:column headerText="Dias restantes" style="text-align: center;">
-                                            <h:outputText value="#{(vacacion.diastotales - vacacion.diastomados)}"/>
+                                            <h:outputText value="#{(vacacion.diastotales - vacacion.diastomados - vacacion.diaspagados)}"/>
                                         </p:column>
                                         <p:column headerText="Prima vacional Pagada" style="text-align: center;">
                                             <p:commandButton disabled="true" styleClass="#{vacacion.primapagada ? 'ui-button-success' : 'ui-button-danger m-1'}" icon="#{vacacion.primapagada ? 'pi pi-check' : 'pi pi-times'}"/>

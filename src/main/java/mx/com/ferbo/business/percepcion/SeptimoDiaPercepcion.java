@@ -6,82 +6,99 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import mx.com.ferbo.business.nomina.ParametrosNomina;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.DetNominaPercepcionPK;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
+import mx.com.ferbo.util.FormatUtil;
 
 public class SeptimoDiaPercepcion extends AbstractPercepcion implements IPercepcion {
 	
 	private static Logger log = LogManager.getLogger(SeptimoDiaPercepcion.class);
 	
-	private BigDecimal diasPeriodo = null;
-	private BigDecimal diasTrabajados = null;
+	private ParametrosNomina parametros = null;
+	private BigDecimal diasLaborales   = null;
+	private BigDecimal diasNoLaborales = null;
+	private BigDecimal diasTrabajados  = null;
 	
-	public SeptimoDiaPercepcion(List<CatTipoPercepcion> tiposPercepcion, BigDecimal diasPeriodo, BigDecimal diasTrabajados) {
-		this.tiposPercepcion = tiposPercepcion;
-		this.diasPeriodo = diasPeriodo;
+	public SeptimoDiaPercepcion(ParametrosNomina parametros, BigDecimal diasLaborales, BigDecimal diasNoLaborales, BigDecimal diasTrabajados) {
+		this.parametros = parametros;
+		this.tiposPercepcion = parametros.getTiposPercepcion();
+		this.diasLaborales = diasLaborales;
+		this.diasNoLaborales = diasNoLaborales;
 		this.diasTrabajados = diasTrabajados;
 	}
 
 	@Override
-	public DetNominaPercepcion calcular(DetNomina nomina) {
-		DetNominaPercepcion percepcion = null;
+	public void calcular(DetNomina nomina) {
 		BigDecimal          salarioDiario = null;
 		BigDecimal          septimoDia = null;
 		BigDecimal          proporcionalSemanal = null;
-		CatTipoPercepcion   tpSeptimoDia = null;
+		BigDecimal          t = null;
+		Integer             diaDescanso = null;
+		String              sDiaDescanso = null;
+		
 		List<DetNominaPercepcion> percepciones = null;
-		Integer index = null;
 		
 		try {
 			percepciones = nomina.getPercepciones();
 			salarioDiario = nomina.getReceptor().getSalarioDiario();
 			
-			boolean removedPercepciones = percepciones.removeIf(d -> AbstractPercepcion.CVE_SEPTIMO_DIA.equalsIgnoreCase(d.getClave()));
+			boolean removedPercepciones = percepciones.removeIf(d -> CVE_SEPTIMO_DIA.equalsIgnoreCase(d.getClave()));
 			if(removedPercepciones)
-				log.info("Se encontraron conceptos {}, los cuales fueron eliminados para el reproceso de SEPTIMO DIA.", AbstractPercepcion.CVE_SEPTIMO_DIA);
+				log.info("Se encontraron conceptos {}, los cuales fueron eliminados para el reproceso de SEPTIMO DIA.", CVE_SEPTIMO_DIA);
 			
-			index = this.nuevoIndiceDe(nomina.getPercepciones());
-			tpSeptimoDia = this.getTipoPercepcion("001");
+			t = new BigDecimal(parametros.getDiasPeriodo())
+					.setScale(2, BigDecimal.ROUND_HALF_UP)
+					.subtract(diasNoLaborales)
+					.setScale(2, BigDecimal.ROUND_HALF_UP);
 			
-			proporcionalSemanal = this.diasTrabajados
-					.divide(this.diasPeriodo, 4, BigDecimal.ROUND_HALF_UP);
+			proporcionalSemanal = diasTrabajados
+					.divide(t, 4, BigDecimal.ROUND_HALF_UP)
+					;
 			
 			septimoDia = salarioDiario
 					.multiply(proporcionalSemanal)
-					.setScale(2,  BigDecimal.ROUND_HALF_UP)
-					;
+					.setScale(2, BigDecimal.ROUND_HALF_UP);
+			
+			for(int i = 0; i < diasNoLaborales.intValue(); i++) {
+				diaDescanso = diasLaborales.add(new BigDecimal(i+1)).intValue();
+				sDiaDescanso = String.format("%s dia", FormatUtil.convertirAOrdinal(diaDescanso));
+				sDiaDescanso = FormatUtil.capitalizarPrimeraLetra(sDiaDescanso);
+				this.percepcionDiaDescanso(nomina, CVE_SEPTIMO_DIA, sDiaDescanso, proporcionalSemanal, septimoDia);
+			}
+			
 		} catch(Exception ex) {
 			log.error("Problema para obtener el cálculo del septimo día.",  ex);
 			septimoDia = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 			proporcionalSemanal = BigDecimal.ZERO.setScale(4, BigDecimal.ROUND_HALF_UP);
 		} finally {
-			percepcion = new DetNominaPercepcion();
-			percepcion.setKey(new DetNominaPercepcionPK(nomina, index));
-			percepcion.setClave(CVE_SEPTIMO_DIA);
-			percepcion.setNombre("Séptimo día");
-			percepcion.setTipoPercepcion(tpSeptimoDia);
-			percepcion.setCantidad(proporcionalSemanal);
-			percepcion.setImporteGravado(septimoDia);
-			percepcion.setImporteExcento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
-			
-			if(septimoDia != null && septimoDia.compareTo(BigDecimal.ZERO) > 0)
-				nomina.getPercepciones().add(percepcion);
-			
 			this.tiposPercepcion = null;
-			this.diasPeriodo = null;
+			this.diasLaborales = null;
 			this.diasTrabajados = null;
 		}
 		
-		return percepcion;
 	}
-
-	public void setDiasPeriodo(BigDecimal diasPeriodo) {
-		this.diasPeriodo = diasPeriodo;
-	}
-
-	public void setDiasTrabajados(BigDecimal diasTrabajados) {
-		this.diasTrabajados = diasTrabajados;
+	
+	private void percepcionDiaDescanso(DetNomina nomina, String clave, String nombre, BigDecimal proporcionalSemanal, BigDecimal septimoDia) {
+		DetNominaPercepcion percepcion = null;
+		CatTipoPercepcion   tpSeptimoDia = null;
+		Integer             index = null;
+		
+		index = this.nuevoIndiceDe(nomina.getPercepciones());
+		tpSeptimoDia = this.getTipoPercepcion(P_SEPTIMO_DIA);
+		
+		percepcion = new DetNominaPercepcion();
+		percepcion.setKey(new DetNominaPercepcionPK(nomina, index));
+		percepcion.setClave(clave);
+		percepcion.setNombre(nombre);
+		percepcion.setTipoPercepcion(tpSeptimoDia);
+		percepcion.setCantidad(proporcionalSemanal);
+		percepcion.setImporteGravado(septimoDia);
+		percepcion.setImporteExcento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
+		
+		if(percepcion.getImporteExcento().add(percepcion.getImporteGravado()).compareTo(BigDecimal.ZERO) > 0)
+			nomina.getPercepciones().add(percepcion);
 	}
 }

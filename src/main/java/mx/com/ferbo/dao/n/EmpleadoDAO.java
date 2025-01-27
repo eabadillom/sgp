@@ -128,7 +128,6 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
                     .getResultList();
             
             for (DetEmpleado model : modelList) {
-                log.info("Vacacaiones: {}", model.getVacaciones());
                 if (isFullInfo == false) {
                     continue;
                 }
@@ -170,6 +169,24 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
     public DetEmpleadoFoto buscarFoto(String numeroEmpleado) {
         DetEmpleadoFoto foto = null;
         return foto;
+    }
+    
+    public DetEmpleado buscarPorRFC(String rfc) {
+    	DetEmpleado model = null;
+    	EntityManager em = null;
+    	try {
+    		em = this.getEntityManager();
+    		model = em.createNamedQuery("DetEmpleado.findByRFC", modelClass)
+    				.setParameter("rfc", rfc)
+    				.getSingleResult();
+
+    	} catch(Exception ex) {
+    		log.error("Problema para obtener el empleado por RFC: " + rfc, ex);
+    	} finally {
+    		this.close(em);
+    	}
+    	
+    	return model;
     }
 
     public synchronized List<DetEmpleado> empleadosSalarioMinimoGeneral(BigDecimal salarioMinimo, Date hoy) throws SGPException{
@@ -220,5 +237,23 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
         }
         
         return empleados;
+    }
+    
+    public DetEmpleado obetenerVacacionesEmpleado(Integer id) {
+        DetEmpleado model = null;
+        EntityManager emSGP = null;
+
+        try {
+            emSGP = getEntityManager();
+            model = emSGP.find(this.modelClass, id);
+                log.info("Vacaciones: {}", model.getVacaciones() == null ? null : model.getVacaciones());
+            
+        } catch (Exception ex) {
+            log.error("Problema para obtener vacaciones del empleado con id " + id, ex);
+        } finally {
+            close(emSGP);
+        }
+
+        return model;
     }
 }
