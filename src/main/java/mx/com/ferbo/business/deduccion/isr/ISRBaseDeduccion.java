@@ -40,7 +40,7 @@ public class ISRBaseDeduccion extends AbstractDeduccion implements IDeduccion {
 			if(this.percepciones.size() == 0)
 				throw new SGPException("No hay percepciones gravadas.");
 			
-			tdISR = this.getTipoDeduccion("002");
+			tdISR = this.getTipoDeduccion(D_ISR);
 			
 			baseISR = this.percepciones.stream()
 					.map(item -> item.getImporteGravado())

@@ -45,7 +45,7 @@ public abstract class NominaBL {
 	private static Logger log = LogManager.getLogger(NominaBL.class);
 	
 	public static final String TP_NOMINA_ORDINARIA = "O";
-	public static final String TP_NOMINA_EXTRAORDINARIA = "";
+	public static final String TP_NOMINA_EXTRAORDINARIA = "E";
 	
 	public static final int DIAS_ANIO = 365;
 	public static final BigDecimal cien = new BigDecimal(100).setScale(2, BigDecimal.ROUND_HALF_UP);

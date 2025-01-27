@@ -47,6 +47,16 @@ public class DiasDeDescansoObligatorioBL implements Serializable
         return diasDeAsueto;
     }
     
+    public List<CatDiaNoLaboral> diasDescansoAnual(){
+        List<CatDiaNoLaboral> descanso = null;
+        Integer anio = DateUtil.getAnio(DateUtil.now());
+        Date inicial = DateUtil.inicializaFechaInicioAnioCurso(anio);
+        anio++;
+        Date terminal = DateUtil.inicializaFechaInicioAnioCurso(anio);
+        descanso = diaNoLaboralDAO.buscarPorPeriodo("MX", inicial, terminal);
+        return descanso;
+    }
+    
     public List<CatDiaNoLaboral> getDiasNoLaboralSelected() {
         return diasNoLaboralSelected;
     }

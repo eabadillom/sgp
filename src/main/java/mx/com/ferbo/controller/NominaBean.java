@@ -1,6 +1,7 @@
 package mx.com.ferbo.controller;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -40,6 +41,27 @@ import mx.com.ferbo.model.sat.CatTipoOtroPago;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.SGPException;
+
+//import mx.com.ferbo.business.nomina.NominaBL;
+//import mx.com.ferbo.business.nomina.NominaSemanalBL;
+//import mx.com.ferbo.business.nomina.ParametrosNomina;
+//import mx.com.ferbo.business.percepcion.AbstractPercepcion;
+//import mx.com.ferbo.dao.n.EmpleadoDAO;
+//import mx.com.ferbo.dao.n.EmpresaDAO;
+//import mx.com.ferbo.dao.n.NominaDAO;
+//import mx.com.ferbo.model.CatEmpresa;
+//import mx.com.ferbo.model.DetEmpleado;
+//import mx.com.ferbo.model.DetNomina;
+//import mx.com.ferbo.model.DetNominaDeduccion;
+//import mx.com.ferbo.model.DetNominaOtroPago;
+//import mx.com.ferbo.model.DetNominaPercepcion;
+//import mx.com.ferbo.model.DetPercepcionEmpleado;
+//import mx.com.ferbo.model.DetRegistro;
+//import mx.com.ferbo.model.sat.CatTipoDeduccion;
+//import mx.com.ferbo.model.sat.CatTipoOtroPago;
+//import mx.com.ferbo.model.sat.CatTipoPercepcion;
+//import mx.com.ferbo.util.DateUtil;
+//import mx.com.ferbo.util.SGPException;
 
 @Named(value = "nominaBean")
 @ViewScoped
@@ -122,7 +144,6 @@ public class NominaBean implements Serializable {
     }
 
 	public void calculaFechaFin() {
-//		Integer anioActual = null;
     	log.debug("Fecha Inicio: {}", this.periodoInicio);
     	log.debug("Fecha Fin: {}", this.periodoFin);
     	this.periodoFin = new Date(this.periodoInicio.getTime());
@@ -131,18 +152,11 @@ public class NominaBean implements Serializable {
     	
     	this.semana = DateUtil.getSemanaAnio(this.periodoInicio);
     	
-//    	anioActual = DateUtil.getAnio(periodoInicio);
-//    	this.fechaInicioAnio = DateUtil.getDate(anioActual, DateUtil.ENERO, 1);
-//    	DateUtil.setTime(this.fechaInicioAnio, 0, 0, 0, 0);
-//    	this.fechafinAnio = DateUtil.getDate(anioActual, DateUtil.DICIEMBRE, 31);
-//		DateUtil.setTime(this.fechafinAnio, 23, 59, 59, 000);
-		
     	log.info("Fecha Inicio: {}", this.periodoInicio);
     	log.info("Fecha Fin: {}", this.periodoFin);
     }
     
     public void calculaFechaInicio() {
-//    	Integer anioActual = null;
     	log.debug("Fecha Inicio: {}", this.periodoInicio);
     	log.debug("Fecha Fin: {}", this.periodoFin);
     	this.periodoInicio = new Date(this.periodoFin.getTime());
@@ -151,16 +165,8 @@ public class NominaBean implements Serializable {
     	
     	this.semana = DateUtil.getSemanaAnio(this.periodoInicio);
     	
-//    	anioActual = DateUtil.getAnio(periodoFin);
-//    	this.fechaInicioAnio = DateUtil.getDate(anioActual, DateUtil.ENERO, 1);
-//    	DateUtil.setTime(this.fechaInicioAnio, 0, 0, 0, 0);
-//    	this.fechafinAnio = DateUtil.getDate(anioActual, DateUtil.DICIEMBRE, 31);
-//		DateUtil.setTime(this.fechafinAnio, 23, 59, 59, 000);
-		
     	log.info("Fecha Inicio: {}", this.periodoInicio);
     	log.info("Fecha Fin: {}", this.periodoFin);
-    	
-//    	this.year = new Integer(anioActual);
     }
 
     public void calculandoNomina() {
@@ -222,7 +228,6 @@ public class NominaBean implements Serializable {
     	List<DetPercepcionEmpleado> percepcionesEmpleado = null;
     	Map<String, DetRegistro> mapAsistencias = null;
     	
-//    	percepcionesEmpleado = percepcionEmpleadoDAO.buscarPorEmpleado(empleado.getIdEmpleado());
     	empleado.setPercepcionesEmpleado(percepcionesEmpleado);
     	mapAsistencias = NominaSemanalBL.getAsistencias(empleado, this.parametros);
     	
@@ -318,10 +323,25 @@ public class NominaBean implements Serializable {
 		Severity severity = null;
 		String mensaje = null;
 		String titulo = "Percepción";
+		List<String> listaDiasLaboralesEmpleado = null;
+		BigDecimal diasLaboralesEmpleado = null;
+		List<String> listaDiasNoLaboralesEmpleado = null;
+		BigDecimal diasNoLaboralesEmpleado = null;
+		BigDecimal diasTrabajados = null;
+		DetEmpleado empleado = null;
 		
 		try {
+			empleado = empleadoDAO.buscarPorRFC(this.nomina.getReceptor().getRfc());
+			
+			listaDiasLaboralesEmpleado = NominaSemanalBL.getDiasLaboralesPorSemana(empleado);
+			listaDiasNoLaboralesEmpleado = NominaSemanalBL.getDiasNoLaboralesPorSemana(empleado);
+			diasLaboralesEmpleado   = new BigDecimal(listaDiasLaboralesEmpleado.size()).setScale(2, BigDecimal.ROUND_HALF_UP);
+			diasNoLaboralesEmpleado = new BigDecimal(listaDiasNoLaboralesEmpleado.size()).setScale(2, BigDecimal.ROUND_HALF_UP);
+			diasTrabajados = percepcion.getCantidad();
+			
 			if(percepcion.getCantidad() != null && AbstractPercepcion.CVE_SUELDO.equalsIgnoreCase(percepcion.getClave()))
-				NominaSemanalBL.calcularSueldo(nomina, parametros, percepcion.getCantidad());
+				
+				NominaSemanalBL.calcularSueldo(nomina, parametros,  diasLaboralesEmpleado, diasNoLaboralesEmpleado, diasTrabajados);
 			
 			this.actualizar();
 			
