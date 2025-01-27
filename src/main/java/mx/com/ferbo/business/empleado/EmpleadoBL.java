@@ -142,6 +142,7 @@ public class EmpleadoBL {
             ultimasvacaciones.setDiastotales(dias);
             ultimasvacaciones.setEmpleado(empleado);
             ultimasvacaciones.setDiastomados(0);
+            ultimasvacaciones.setDiaspagados(0);
             ultimasvacaciones.setPrimapagada(Boolean.FALSE);
             ultimasvacaciones.setDiaspendientespagados(Boolean.FALSE);
 
