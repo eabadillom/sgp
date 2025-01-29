@@ -335,4 +335,38 @@ public class AjustesBean implements Serializable {
             e.getMessage();
         }
     }
+    
+    public void incapacidadIMSS(){
+        String path = null;
+        try{
+            path = contextPath + "/protected/settings/imss/catalogoIncapacidadIMSS.xhtml";
+            FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+        }
+        catch(Exception e) {
+            e.getMessage();
+        }
+    }
+    
+    public void controlIncapacidadIMSS(){
+        String path = null;
+        try{
+            path = contextPath + "/protected/settings/imss/controlIncapacidadIMSS.xhtml";
+            FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+        }
+        catch(Exception e) {
+            e.getMessage();
+        }
+    }
+    
+    public void riesgoTrabajoIMSS(){
+        String path = null;
+        try{
+            path = contextPath + "/protected/settings/imss/riesgoTrabajoIMSS.xhtml";
+            FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+        }
+        catch(Exception e) {
+            e.getMessage();
+        }
+    }
+    
 }

@@ -754,6 +754,24 @@ public class DateUtil {
 		return resultado;
 	}
         
+        public static Date toDate(LocalDate fecha)
+        {
+            Date resultado = null;
+            ZoneId systemDefault = null;
+            
+            try
+            {
+                systemDefault = ZoneId.of("GMT-6");
+                resultado = Date.from(fecha.atStartOfDay(systemDefault).toInstant());
+            }catch(Exception ex) 
+            {
+                log.warn("Problema para convertir a Date: " + fecha, ex.getMessage());
+                resultado = null;
+            }
+            
+            return resultado;
+        }
+        
         public static LocalDateTime toLocalDateTime(Date fecha)
         {
             LocalDateTime resultado = null;
