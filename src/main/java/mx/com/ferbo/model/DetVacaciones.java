@@ -25,7 +25,7 @@ public class DetVacaciones implements Serializable{
 
     private static final long serialVersionUID = -2632823297112045342L;
 
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) 
     @Column(name = "id_vacaciones")
     private Integer idVacaciones;
@@ -47,6 +47,9 @@ public class DetVacaciones implements Serializable{
     
     @Column(name = "st_dias_pend_pagados")
     private Boolean diaspendientespagados;
+    
+    @Column(name = "nu_dias_pagados")
+    private Integer diaspagados;
     
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_empleado", referencedColumnName = "id_empleado")
@@ -124,6 +127,16 @@ public class DetVacaciones implements Serializable{
     public void setDiaspendientespagados(Boolean diaspendientespagados) {
         this.diaspendientespagados = diaspendientespagados;
     }
+
+    public Integer getDiaspagados() {
+        return diaspagados;
+    }
+
+    public void setDiaspagados(Integer diaspagados) {
+        this.diaspagados = diaspagados;
+    }
+    
+    
 
     public DetEmpleado getEmpleado() {
         return empleado;

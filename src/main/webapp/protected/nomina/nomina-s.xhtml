@@ -191,23 +191,23 @@
 						<div class="ui-fluid formgrid grid">
 							<div class="field col-12 md:col-3">
 								<p:outputLabel value="Ejercicio"/>
-								<p:inputText value="#{nominaBean.nomina.ejercicio}" readonly="true" />
+								<p:inputText value="#{nominaBean.nomina.ejercicio}" readonly="true" style="text-align: right;"/>
 							</div>
 							<div class="field col-12 md:col-3">
 								<p:outputLabel value="Periodo"/>
-								<p:inputText value="Semana #{nominaBean.semana}" readonly="true"/>
+								<p:inputText value="Semana #{nominaBean.semana}" readonly="true" style="text-align: right;"/>
 							</div>
 							<div class="field col-12 md:col-3">
 								<p:outputLabel value="Dias laborados"/>
-								<p:inputText value="#{nominaBean.nomina.diasLaborados}" />
+								<p:inputNumber value="#{nominaBean.nomina.diasLaborados}" symbol=" días" symbolPosition="s" inputStyle="text-align: right"/>
 							</div>
 							<div class="field col-12 md:col-3">
 								<p:outputLabel value="Faltas"/>
-								<p:inputText value="#{nominaBean.nomina.diasNoLaborados}" />
+								<p:inputNumber value="#{nominaBean.nomina.diasNoLaborados}" symbol=" días" symbolPosition="s" inputStyle="text-align: right"/>
 							</div>
 							<div class="field col-12 md:col-3">
 								<p:outputLabel value="Dias pagados"/>
-								<p:inputText value="#{nominaBean.nomina.diasPagados}" />
+								<p:inputNumber value="#{nominaBean.nomina.diasPagados}" symbol=" días" symbolPosition="s" inputStyle="text-align: right"/>
 							</div>
 							<div class="field col-12 md:col-3">
 								<p:outputLabel value="Subtotal"/>

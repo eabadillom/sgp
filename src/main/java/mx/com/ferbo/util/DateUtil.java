@@ -67,7 +67,7 @@ public class DateUtil {
 	public static String PROP_CD_DOMINGO   = "D";
 	public static String PROP_CD_LUNES     = "L";
 	public static String PROP_CD_MARTES    = "M";
-	public static String PROP_CD_MIERCOLES = "MI";
+	public static String PROP_CD_MIERCOLES = "X";
 	public static String PROP_CD_JUEVES    = "J";
 	public static String PROP_CD_VIERNES   = "V";
 	public static String PROP_CD_SABADO    = "S";
