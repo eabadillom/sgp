@@ -6,6 +6,39 @@
     template="/WEB-INF/plantillas/template.xhtml">
     <ui:define name="title">UMA</ui:define>
     <ui:define name="content">
+    	<script>
+			PrimeFaces.locales['es'] = {
+				monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+				monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+				dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+				dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
+				dayNamesMin: ['D', 'L', 'M', 'X', 'J', 'V', 'S'],
+				weekHeader: 'Semana',
+				firstDay: 1,
+				isRTL: false,
+				showMonthAfterYear: false,
+				yearSuffix: '',
+				timeOnlyTitle: 'Sólo hora',
+				timeText: 'Tiempo',
+				hourText: 'Hora',
+				minuteText: 'Minuto',
+				secondText: 'Segundo',
+				millisecondText: 'Milisegundo',
+				ampm: false,
+				month: 'Mes',
+				week: 'Semana',
+				day: 'Día',
+				allDayText: 'Todo el día',
+				today: 'Hoy',
+				now: 'Ahora',
+				clear: 'Limpiar',
+				aria: {
+				   close: 'Cerrar',
+				   previous: 'Anterior',
+				   next: 'Siguiente',
+				}
+			};
+		</script>
         <h:form id="form">
             <p:growl id="messages" showDetail="true" />
             <p:toolbar>
@@ -38,17 +71,17 @@
                 </p:column>
                 <p:column headerText="Fecha de Publicacion" style="text-align: center;" width="5rem">
                     <h:outputText value="#{uma.fechaPublicacion}" >
-                        <p:calendar pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
+                        <f:convertDateTime type="localDate" pattern="dd/MMM/yyyy" locale="es_MX" timeZone="GMT-6"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="Fecha de Aplicacion" style="text-align: center;" width="5rem">
                     <h:outputText value="#{uma.fechaAplicacion}" >
-                        <p:calendar pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
+                        <f:convertDateTime type="localDate" pattern="dd/MMM/yyyy" locale="es_MX" timeZone="GMT-6"/>
                     </h:outputText>
                 </p:column>
                 <p:column headerText="Fecha de vigencia" style="text-align: center;" width="5rem">
                 	<h:outputText value="#{uma.fechaVigencia}" >
-                        <p:calendar pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
+                        <f:convertDateTime type="localDate" pattern="dd/MMM/yyyy" locale="es_MX" timeZone="GMT-6"/>
                     </h:outputText>
                 </p:column>
                 <p:column exportable="false" ariaHeaderText="Actions" width="2rem">
