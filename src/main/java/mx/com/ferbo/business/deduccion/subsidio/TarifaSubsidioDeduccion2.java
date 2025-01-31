@@ -93,6 +93,10 @@ public class TarifaSubsidioDeduccion2 implements ISubsidioEmpleo {
 				.multiply(importeUMA).setScale(2, BigDecimal.ROUND_HALF_UP)
 				.multiply(diasPeriodo).setScale(2, BigDecimal.ROUND_HALF_UP)
 				;
+//		importeSubsidio = tasaSubsidio
+//				.multiply(importeUMA)
+//				.multiply(diasPeriodo).setScale(2, BigDecimal.ROUND_HALF_UP)
+//				;
 		
 		if(baseISR.compareTo(importeMaximoSemanal) > 0) {
 			importeSubsidio = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -114,7 +118,7 @@ public class TarifaSubsidioDeduccion2 implements ISubsidioEmpleo {
 		
 		importeSubsidio = tasaSubsidio
 				.multiply(importeUMA).setScale(2, BigDecimal.ROUND_HALF_UP)
-				.divide(diasPeriodo, BigDecimal.ROUND_HALF_UP)
+				.divide(diasPeriodo, 2, BigDecimal.ROUND_HALF_UP)
 				;
 		
 		return importeSubsidio;

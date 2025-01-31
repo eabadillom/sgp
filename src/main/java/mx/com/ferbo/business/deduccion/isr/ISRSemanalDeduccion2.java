@@ -193,8 +193,8 @@ public class ISRSemanalDeduccion2 extends AbstractDeduccion implements IDeduccio
 				dISR.setImporte(isrDespuesDeSubsidio);
 			}
 			
-			deduccionesISR.add(dISR);
 			deduccionesISR.add(dISRAntesSubsidio);
+			deduccionesISR.add(dISR);
 			
 			this.procesaSubsidioAlEmpleo(nomina, importeSubsidio);
 			

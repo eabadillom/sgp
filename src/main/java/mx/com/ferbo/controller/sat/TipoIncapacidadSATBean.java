@@ -15,29 +15,29 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.n.sat.TipoIncapacidadDAO;
-import mx.com.ferbo.model.sat.CatTipoIncapacidad;
+import mx.com.ferbo.dao.n.sat.TipoIncapacidadSATDAO;
+import mx.com.ferbo.model.sat.CatTipoIncapacidadSAT;
 import mx.com.ferbo.util.SGPException;
 
 @Named(value = "tipoIncapacidadBean")
 @ViewScoped
-public class TipoIncapacidadBean implements Serializable {
+public class TipoIncapacidadSATBean implements Serializable {
 
     private static final long serialVersionUID = -3103728579268351267L;
-	private static Logger log = LogManager.getLogger(TipoIncapacidadBean.class);
+	private static Logger log = LogManager.getLogger(TipoIncapacidadSATBean.class);
     
-    private CatTipoIncapacidad tipoIncapacidad;
-    private List<CatTipoIncapacidad> listTipoIncapacidad;
+    private CatTipoIncapacidadSAT tipoIncapacidad;
+    private List<CatTipoIncapacidadSAT> listTipoIncapacidad;
 
-    private TipoIncapacidadDAO tipoIncapacidadDAO;
+    private TipoIncapacidadSATDAO tipoIncapacidadDAO;
 
     private boolean guardar;
     private boolean primaryEdit;
 
-    public TipoIncapacidadBean(){
+    public TipoIncapacidadSATBean(){
 
         listTipoIncapacidad = new ArrayList<>();
-        tipoIncapacidadDAO = new TipoIncapacidadDAO();
+        tipoIncapacidadDAO = new TipoIncapacidadSATDAO();
 
     }
 
@@ -47,7 +47,7 @@ public class TipoIncapacidadBean implements Serializable {
     }
 
     public void nuevo(){
-        tipoIncapacidad = new CatTipoIncapacidad();
+        tipoIncapacidad = new CatTipoIncapacidadSAT();
         guardar = true;
         primaryEdit = false;
     }
@@ -113,19 +113,19 @@ public class TipoIncapacidadBean implements Serializable {
 
     }
 
-    public CatTipoIncapacidad getTipoIncapacidad() {
+    public CatTipoIncapacidadSAT getTipoIncapacidad() {
         return tipoIncapacidad;
     }
 
-    public void setTipoIncapacidad(CatTipoIncapacidad tipoIncapacidad) {
+    public void setTipoIncapacidad(CatTipoIncapacidadSAT tipoIncapacidad) {
         this.tipoIncapacidad = tipoIncapacidad;
     }
 
-    public List<CatTipoIncapacidad> getListTipoIncapacidad() {
+    public List<CatTipoIncapacidadSAT> getListTipoIncapacidad() {
         return listTipoIncapacidad;
     }
 
-    public void setLisTipoIncapacidad(List<CatTipoIncapacidad> listTipoIncapacidad) {
+    public void setLisTipoIncapacidad(List<CatTipoIncapacidadSAT> listTipoIncapacidad) {
         this.listTipoIncapacidad = listTipoIncapacidad;
     }
 
