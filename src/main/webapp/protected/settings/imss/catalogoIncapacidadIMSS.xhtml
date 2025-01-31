@@ -1,0 +1,87 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/plantillas/template.xhtml">
+    <ui:define name="title">Catalogo Incapacidades IMSS</ui:define>
+    <ui:define name="content">
+        <h:form id="form">
+            <p:growl id="messages" showDetail="true" />
+            <p:toolbarGroup>
+                <p:commandButton value="Registrar" icon="pi pi-plus" oncomplete="PF('dialogoIncapacidades').show();" update="form:pnlIncapacidad" 
+                                 actionListener="#{tipoIncapacidadIMSS.incializarSolicitud()}" process="@this" style="margin-right: .5rem" >
+                </p:commandButton>
+            </p:toolbarGroup>
+            <p:dataTable id="dtCatalogoIncapacidad" widgetVar="dtCatalogoIncapacidad" var="incapacidad" value="#{tipoIncapacidadIMSS.listaTipoIncapacidadesIMSS}" reflow="true" 
+                paginator="true" rows="10" paginatorPosition="bottom">
+                <p:column headerText="Clave" style="text-align: center;" width="5rem">
+                    <h:outputText value="#{incapacidad.clave}" />
+                </p:column>
+                <p:column headerText="Descripcion" style="text-align: center;" width="5rem">
+                    <h:outputText value="#{incapacidad.descripcion}" />
+                </p:column>
+                <p:column headerText="Porcentaje" style="text-align: center;" width="5rem">
+                    <h:outputText value="#{incapacidad.porcentagePago}%" />
+                </p:column>
+                <p:column headerText="Dias de Incapacidad" style="text-align: center;" width="5rem">
+                    <h:outputText value="#{incapacidad.maxDias}" />
+                </p:column>
+                <p:column headerText="Tipo Incapacidad" style="text-align: center;" width="5rem">
+                    <h:outputText value="#{incapacidad.incapacidadSAT.descripcion}" />
+                </p:column>
+                <p:column exportable="false" ariaHeaderText="Actions" width="5rem">
+                    <p:commandButton class="ui-button-success rounded-button m-1" icon="pi pi-bars" update="form:pnlIncapacidad" 
+                                     oncomplete="PF('dialogoIncapacidades').show()" styleClass="edit-button " process="@this" 
+                                     action="#{tipoIncapacidadIMSS.editarSolicitud(incapacidad.incapacidadSAT)}">
+                        <f:setPropertyActionListener value="#{incapacidad}" target="#{tipoIncapacidadIMSS.tipoIncapacidadSelected}" />
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+            <p:dialog header="#{tipoIncapacidadIMSS.accionBoton} Tipo Incapacidad" id="dialogoIncapacidades" showEffect="fade" modal="true" widgetVar="dialogoIncapacidades" 
+                      responsive="true" draggable="true" resizable="false" dynamic="true" style="margin: auto">
+                <p:outputPanel id="pnlIncapacidad" styleClass="ui-fluid">
+                    <div class="field col">
+                        <p:outputLabel for="clave" value="Clave"/>
+                        <p:inputText id="clave" value="#{tipoIncapacidadIMSS.tipoIncapacidadSelected.clave}">
+                            <p:ajax process="@this"/>
+                        </p:inputText>
+                    </div>
+                    <div class="field col">
+                        <p:outputLabel for="descripcion" value="Descripción"/>
+                        <p:inputText id="descripcion" value="#{tipoIncapacidadIMSS.tipoIncapacidadSelected.descripcion}">
+                            <p:ajax process="@this"/>
+                        </p:inputText>
+                    </div>
+                    <div class="field col">
+                        <p:outputLabel for="porcentaje" value="Porcentaje"/>
+                        <p:inputNumber id="porcentaje" value="#{tipoIncapacidadIMSS.tipoIncapacidadSelected.porcentagePago}" symbol="%" symbolPosition="s" emptyValue="zero">
+                            <p:ajax process="@this"/>
+                        </p:inputNumber>
+                    </div>
+                    <div class="field col">
+                        <p:outputLabel for="diasIncapacidad" value="Dias de Incapacidad"/>
+                        <p:inputText id="diasIncapacidad" value="#{tipoIncapacidadIMSS.tipoIncapacidadSelected.maxDias}" > 
+                            <p:ajax process="@this"/>
+                        </p:inputText>
+                    </div>
+                    <div class="field col">
+                        <p:outputLabel for="codigoSat" value="Codigo SAT"/>
+                        <p:selectOneMenu id="codigoSat" autoWidth="false" converter="entityConverter" 
+                                         value="#{tipoIncapacidadIMSS.tipoIncapacidadSAT}">
+                            <f:selectItem itemLabel="--Seleccione--"/>
+                            <f:selectItems value="#{tipoIncapacidadIMSS.listaIncapacidadesSAT}" var="idTipoSolicitud" itemValue="#{idTipoSolicitud}" itemLabel="#{idTipoSolicitud.descripcion}"/>
+                            <p:ajax event="change" process="@this" />
+                        </p:selectOneMenu>
+                    </div>
+                </p:outputPanel>
+                <f:facet name="footer">
+                    <p:commandButton value="#{tipoIncapacidadIMSS.accionBoton}" icon="#{tipoIncapacidadIMSS.iconoBoton}" actionListener="#{tipoIncapacidadIMSS.metodoBoton()}" 
+                                     process="pnlIncapacidad @this" update="pnlIncapacidad dtCatalogoIncapacidad"/>
+                    <p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dialogoIncapacidades').hide()" class="ui-button-secondary" />
+                </f:facet>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+</ui:composition>

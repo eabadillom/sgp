@@ -7,7 +7,7 @@ package mx.com.ferbo.dao.n.sat;
 import java.util.List;
 import javax.persistence.EntityManager;
 import mx.com.ferbo.commons.dao.BaseDAO;
-import mx.com.ferbo.model.sat.CatTipoIncapacidad;
+import mx.com.ferbo.model.sat.CatTipoIncapacidadSAT;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,29 +15,29 @@ import org.apache.logging.log4j.Logger;
  *
  * @author alberto
  */
-public class TipoIncapacidadDAO extends BaseDAO<CatTipoIncapacidad, String>
+public class TipoIncapacidadSATDAO extends BaseDAO<CatTipoIncapacidadSAT, String>
 {
-    private static Logger log = LogManager.getLogger(CatTipoIncapacidad.class);
+    private static Logger log = LogManager.getLogger(CatTipoIncapacidadSAT.class);
 
-    public TipoIncapacidadDAO(Class<CatTipoIncapacidad> modelClass) 
+    public TipoIncapacidadSATDAO(Class<CatTipoIncapacidadSAT> modelClass) 
     {
         super(modelClass);
     }
     
-    public TipoIncapacidadDAO()
+    public TipoIncapacidadSATDAO()
     {
-        super(CatTipoIncapacidad.class);
+        super(CatTipoIncapacidadSAT.class);
     }
     
-    public List<CatTipoIncapacidad> buscarTodos()
+    public List<CatTipoIncapacidadSAT> buscarTodos()
     {
-        List<CatTipoIncapacidad> modelList = null;
+        List<CatTipoIncapacidadSAT> modelList = null;
         EntityManager em = null;
         
         try
         {
             em = this.getEntityManager();
-            modelList = em.createNamedQuery("CatTipoIncapacidad.findByAll", CatTipoIncapacidad.class)
+            modelList = em.createNamedQuery("CatTipoIncapacidadSAT.findByAll", CatTipoIncapacidadSAT.class)
                 .getResultList();
         }catch (Exception ex) 
         {

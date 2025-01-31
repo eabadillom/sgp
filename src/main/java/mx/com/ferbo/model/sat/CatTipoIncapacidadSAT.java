@@ -14,9 +14,9 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "cat_tipo_incapacidad")
 @NamedQueries({
-    @NamedQuery(name = "CatTipoIncapacidad.findByAll",query = "SELECT ti FROM CatTipoIncapacidad ti")
+    @NamedQuery(name = "CatTipoIncapacidadSAT.findByAll",query = "SELECT ti FROM CatTipoIncapacidadSAT ti")
 })
-public class CatTipoIncapacidad implements Serializable{
+public class CatTipoIncapacidadSAT implements Serializable{
     
     @Id
     @Size(max = 4)
@@ -29,7 +29,7 @@ public class CatTipoIncapacidad implements Serializable{
     @Basic(optional = false)
     private String descripcion;
 
-    public CatTipoIncapacidad(){
+    public CatTipoIncapacidadSAT(){
 
     }
 
@@ -71,7 +71,7 @@ public class CatTipoIncapacidad implements Serializable{
             return false;
         if (getClass() != obj.getClass())
             return false;
-        CatTipoIncapacidad other = (CatTipoIncapacidad) obj;
+        CatTipoIncapacidadSAT other = (CatTipoIncapacidadSAT) obj;
         if (clave == null) {
             if (other.clave != null)
                 return false;
