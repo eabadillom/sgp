@@ -7,12 +7,12 @@ import javax.persistence.EntityManager;
 
 import mx.com.ferbo.commons.dao.DAO;
 import mx.com.ferbo.dto.sat.TipoIncapacidadDTO;
-import mx.com.ferbo.model.sat.CatTipoIncapacidad;
+import mx.com.ferbo.model.sat.CatTipoIncapacidadSAT;
 
-public class CatTipoIncapacidadDAO extends DAO<TipoIncapacidadDTO,CatTipoIncapacidad,String> {
+public class CatTipoIncapacidadDAO extends DAO<TipoIncapacidadDTO,CatTipoIncapacidadSAT,String> {
 
     @Override
-    public TipoIncapacidadDTO getDTO(CatTipoIncapacidad model) {
+    public TipoIncapacidadDTO getDTO(CatTipoIncapacidadSAT model) {
         TipoIncapacidadDTO dto = new TipoIncapacidadDTO();
 
         try {
@@ -30,9 +30,9 @@ public class CatTipoIncapacidadDAO extends DAO<TipoIncapacidadDTO,CatTipoIncapac
     }
 
     @Override
-    public CatTipoIncapacidad getModel(TipoIncapacidadDTO dto) {
+    public CatTipoIncapacidadSAT getModel(TipoIncapacidadDTO dto) {
 
-        CatTipoIncapacidad model = new CatTipoIncapacidad();
+        CatTipoIncapacidadSAT model = new CatTipoIncapacidadSAT();
 
         try {
             
@@ -51,13 +51,13 @@ public class CatTipoIncapacidadDAO extends DAO<TipoIncapacidadDTO,CatTipoIncapac
     @Override
     public TipoIncapacidadDTO buscarPorId(String id) {
         EntityManager em = null;
-        CatTipoIncapacidad model = null;
+        CatTipoIncapacidadSAT model = null;
         TipoIncapacidadDTO dto = null;
 
         try {
             
             em = getEntityManager();
-            model = em.find(CatTipoIncapacidad.class, id);
+            model = em.find(CatTipoIncapacidadSAT.class, id);
             dto = this.getDTO(model);
 
         } catch (Exception e) {
@@ -72,14 +72,14 @@ public class CatTipoIncapacidadDAO extends DAO<TipoIncapacidadDTO,CatTipoIncapac
     @Override
     public List<TipoIncapacidadDTO> buscarTodos() {
 
-        List<CatTipoIncapacidad> listModel = new ArrayList<>();
+        List<CatTipoIncapacidadSAT> listModel = new ArrayList<>();
         List<TipoIncapacidadDTO> listDto = new ArrayList<>();
         EntityManager em = null;
 
         try{
 
             em = getEntityManager();
-            listModel = em.createNamedQuery("CatTipoIncapacidad.findByAll",CatTipoIncapacidad.class).getResultList();
+            listModel = em.createNamedQuery("CatTipoIncapacidad.findByAll",CatTipoIncapacidadSAT.class).getResultList();
             listDto = toDTOList(listModel);
 
         }catch(Exception e){

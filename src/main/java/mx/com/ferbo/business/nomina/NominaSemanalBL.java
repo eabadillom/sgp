@@ -135,7 +135,7 @@ public class NominaSemanalBL extends NominaBL {
     		salarioSemanal = optSueldo.isPresent() ? optSueldo.get().getImporteExcento().add(optSueldo.get().getImporteGravado()) : BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
     		
 			if(salarioSemanal.compareTo(BigDecimal.ZERO) > 0) {
-				NominaSemanalBL.procesarISR(nomina, this.periodoInicio, this.periodoFin, this.parametros);
+				NominaSemanalBL.procesarISR(nomina, this.parametros);
 				NominaSemanalBL.procesarIMSS(nomina, this.parametros, diasPeriodo, ausencias, incapacidades);
 				NominaSemanalBL.procesarPrestamos(nomina, this.parametros, this.empleado);
 			}
@@ -310,11 +310,6 @@ public class NominaSemanalBL extends NominaBL {
 			return;
 		}
 		
-		Optional<DetNominaPercepcion> optSueldo = percepciones.stream()
-				.filter(p -> AbstractPercepcion.CVE_SUELDO.equalsIgnoreCase(p.getClave()))
-				.findFirst()
-				;
-		
 		Optional<DetNominaPercepcion> optSeptimoDia = percepciones.stream()
 				.filter(p -> AbstractPercepcion.CVE_SEPTIMO_DIA.equalsIgnoreCase(p.getClave()))
 				.findFirst()
@@ -337,7 +332,6 @@ public class NominaSemanalBL extends NominaBL {
 	 * @param percepcionesEmpleado Lista de percepciones que se aplicarán al empleado y las restricciones que están configuradas desde el registro de empleados.
 	 */
 	private static void calcularValesDespensa(DetNomina nomina, ParametrosNomina parametros, List<DetPercepcionEmpleado> percepcionesEmpleado) {
-		DetNominaPercepcion pValeDespensa = null;
 		ValesDespensaPercepcion   valesDespensaBO = null;
 		List<DetNominaPercepcion> percepciones = null;
 		BigDecimal                diasTrabajados = null;
@@ -561,13 +555,13 @@ public class NominaSemanalBL extends NominaBL {
 		return BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 	}
 	
-	public static synchronized void procesarISR(DetNomina nomina, Date periodoInicio, Date periodoFin, ParametrosNomina parametros) {
+	public static synchronized void procesarISR(DetNomina nomina, ParametrosNomina parametros) {
 		Boolean esUltimaSemanaMes = false;
 		List<DetNomina> nominaMensual = null;
 		
-		esUltimaSemanaMes = NominaSemanalBL.esUltimaSemanaMes(periodoInicio, periodoFin);
+		esUltimaSemanaMes = NominaSemanalBL.esUltimaSemanaMes(parametros.getPeriodoInicio(), parametros.getPeriodoFin());
 		if(esUltimaSemanaMes)
-			nominaMensual = NominaSemanalBL.procesaNominaDelMes(periodoInicio, nomina.getReceptor().getRfc());
+			nominaMensual = NominaSemanalBL.procesaNominaDelMes(parametros.getPeriodoInicio(), nomina.getReceptor().getRfc());
 		
 		log.info("Procesando cálculo de ISR...");
 		//Primero se debe buscar en "nomina" si ya existen registros de ISR y Subsidio al salario y eliminarlos.
@@ -581,8 +575,8 @@ public class NominaSemanalBL extends NominaBL {
 		if(removedOtrosPagos)
 			log.info("Se encontraron conceptos {}, los cuales fueron eliminados para el reproceso de Subsidio al empleo.", AbstractOtroPago.OP_SUBSIDIO_AL_SALARIO);
 		
-		ISRExecutor isrExecutor = new ISRExecutor(periodoInicio, periodoFin, parametros.getTiposDeduccion(), parametros.getTiposOtroPago(), parametros.getTablaISR(), nominaMensual);
-		IDeducciones isrBO = isrExecutor.loadClass("ISRS", DateUtil.toLocalDate(periodoFin));
+		ISRExecutor isrExecutor = new ISRExecutor(parametros.getPeriodoInicio(), parametros.getPeriodoFin(), parametros.getTiposDeduccion(), parametros.getTiposOtroPago(), parametros.getTablaISR(), nominaMensual);
+		IDeducciones isrBO = isrExecutor.loadClass("ISRS", DateUtil.toLocalDate(parametros.getPeriodoFin()));
 		isrBO.procesar(nomina);
 	}
 	
