@@ -325,7 +325,7 @@
 							</p:column>
 							<p:column headerText="Importe gravado" width="8rem">
 								<p:inputNumber value="#{percepcion.importeGravado}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," inputStyle="text-align: right" readonly="#{nominaBean.nomina.id ne null}">
-									<p:ajax process="@this" update="formNomina:tv-nomina" event="change" listener="#{nominaBean.actualizar()}"/>
+									<p:ajax process="@this" update="formNomina:tv-nomina" event="change" listener="#{nominaBean.actualizarPercepcion(percepcion)}"/>
 								</p:inputNumber>
 							</p:column>
 							<p:column width="2rem">
