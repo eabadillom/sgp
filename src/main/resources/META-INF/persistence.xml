@@ -38,4 +38,4 @@
             <property name="hibernate.connection.v$session.program" value="SGP" />
         </properties>
     </persistence-unit>
-</persistence> 
+</persistence>

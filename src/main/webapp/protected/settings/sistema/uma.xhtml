@@ -10,14 +10,12 @@
             <p:growl id="messages" showDetail="true" />
             <p:toolbar>
                 <p:toolbarGroup>
-                    <p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{umaBean.openNew}"
-                        update=":dialogs:manage-uma-content" oncomplete="PF('manageUMADialog').show()"
-                        style="margin-right: .5rem" >
-                        <p:resetInput target=":dialogs:manage-uma-content" />
+                    <p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{umaBean.incializarUMA()}"
+                        update="pnlContentUMA" oncomplete="PF('manageUMADialog').show()" style="margin-right: .5rem" >
                     </p:commandButton>
                 </p:toolbarGroup>
             </p:toolbar>
-            <p:dataTable id="dt-uma" widgetVar="dtUMA" var="uma" value="#{umaBean.catUMAS}" reflow="true" styleClass="products-table"
+            <p:dataTable id="dtUma" widgetVar="dtUMA" var="uma" value="#{umaBean.catUMAS}" reflow="true" styleClass="products-table"
                 selection="#{umaBean.catUMASeleccionada}" rowKey="#{uma.anio}" paginator="true" rows="10" paginatorPosition="bottom"
                 lazy="true">
                 <p:column headerText="Año" style="text-align: center;" width="4rem">
@@ -54,56 +52,53 @@
                     </h:outputText>
                 </p:column>
                 <p:column exportable="false" ariaHeaderText="Actions" width="2rem">
-                    <p:commandButton icon="pi pi-bars" update=":dialogs:manage-uma-content"
-                        oncomplete="PF('manageUMADialog').show()"
-                        styleClass="edit-button " process="@this">
-                        <f:setPropertyActionListener value="#{uma}" target="#{umaBean.uma}" />
-                        <p:resetInput target=":dialogs:manage-uma-content" />
+                    <p:commandButton icon="pi pi-bars" oncomplete="PF('manageUMADialog').show()" styleClass="edit-button " 
+                                     process="@this" update="form:pnlContentUMA" actionListener="#{umaBean.editarUMA(uma)}">
+                        <f:setPropertyActionListener value="#{uma}" target="#{umaBean.umaSelected}" />
                     </p:commandButton>
                 </p:column>
             </p:dataTable>
-        </h:form>
-        <h:form id="dialogs">
-            <p:dialog header="Detalles de la UMA" showEffect="fade" modal="true" widgetVar="manageUMADialog"
+            <p:dialog id="manageUMADialog" header="#{umaBean.accionBoton} UMA" showEffect="fade" modal="true" widgetVar="manageUMADialog"
                 responsive="true" draggable="true" resizable="false" dynamic="true" style="margin: auto">
-                <p:outputPanel id="manage-uma-content" class="ui-fluid" rendered="#{not empty umaBean.uma}">
-                    <div class="field">
-                        <p:outputLabel for="@next">Año</p:outputLabel>
-                        <p:inputText id="clave" value="#{umaBean.uma.anio}" required="true" >
+                <p:outputPanel id="pnlContentUMA" class="ui-fluid" >
+                    <div class="field col">
+                        <p:outputLabel for="@next" value="Año" />
+                        <p:inputText id="clave" value="#{umaBean.umaSelected.anio}" >
                             <p:ajax process="@this"/>
                         </p:inputText>
                     </div>
-                    <div class="field">
-                        <p:outputLabel for="@next">Valor Diario</p:outputLabel>
-                        <p:inputText id="vDiario" value="#{umaBean.uma.importeDiario}" required="true" >
+                    <div class="field col">
+                        <p:outputLabel for="@next" value="Valor Diario" />
+                        <p:inputText id="vDiario" value="#{umaBean.umaSelected.importeDiario}" >
                             <p:ajax process="@this"/>
                         </p:inputText>
                     </div>
-                    <div class="field">
-                        <p:outputLabel for="@next">Fecha Publicación</p:outputLabel>
-                        <p:calendar id="fPublicacion" value="#{umaBean.uma.fechaPublicacion}" required="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6" >
+                    <div class="field col">
+                        <p:outputLabel for="@next" >Fecha Publicación</p:outputLabel>
+                        <p:calendar id="fPublicacion" value="#{umaBean.fechaPublicacion}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6" >
                             <p:ajax process="@this"/>
                         </p:calendar>
                     </div>
-                    <div class="field">
-                        <p:outputLabel for="@next">Fecha Aplicación</p:outputLabel>
-                        <p:calendar id="fVigencia" value="#{umaBean.uma.fechaAplicacion}" required="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
+                    <div class="field col">
+                        <p:outputLabel for="@next" >Fecha Aplicación</p:outputLabel>
+                        <p:calendar id="fVigencia" value="#{umaBean.fechaAplicacion}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
                             <p:ajax process="@this"/>
                         </p:calendar>
                     </div>
-                    <div class="field">
-                        <p:outputLabel for="@next">Fecha Vigencia</p:outputLabel>
-                        <p:calendar id="fAplicacion" value="#{umaBean.uma.fechaVigencia}" required="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
+                    <div class="field col">
+                        <p:outputLabel for="@next" >Fecha Vigencia</p:outputLabel>
+                        <p:calendar id="fAplicacion" value="#{umaBean.fechaVigencia}" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
                             <p:ajax process="@this"/>
                         </p:calendar>
                     </div>
                 </p:outputPanel>
                 <f:facet name="footer">
-                    <p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{umaBean.crearUMA()}"
-                                     update="manage-uma-content form:dt-uma" process="manage-uma-content @this">
-                    </p:commandButton>
+                    <p:commandButton value="#{umaBean.accionBoton}" icon="#{umaBean.iconoBoton}" actionListener="#{umaBean.metodoBoton()}" 
+                                     process="@this form:pnlContentUMA" update="dtUma" />
                     <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('manageUMADialog').hide()"
-                        class="ui-button-secondary" type="button" />
+                                        class="ui-button-secondary" type="button" >
+                        <p:resetInput target="form:pnlContentUMA" />
+                    </p:commandButton>
                 </f:facet>
             </p:dialog>
         </h:form>
