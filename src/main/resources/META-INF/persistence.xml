@@ -30,6 +30,15 @@
         <class>mx.com.ferbo.model.DetSolicitudPrenda</class>
         <class>mx.com.ferbo.model.DetToken</class>
         <class>mx.com.ferbo.model.Pais</class>
+        <class>mx.com.ferbo.model.CatEstado</class> 
+        <class>mx.com.ferbo.model.CatMunicipio</class>
+        <class>mx.com.ferbo.model.CatLocalidad</class>
+        <class>mx.com.ferbo.model.CatEntidadPostal</class>
+        <class>mx.com.ferbo.model.CatAsentamiento</class>
+        <class>mx.com.ferbo.model.CatTipoAsentamiento</class>
+        <class>mx.com.ferbo.model.DetFpClient</class>
+        <class>mx.com.ferbo.model.DetVacaciones</class>
+        <class>mx.com.ferbo.model.Certificado</class>
         <exclude-unlisted-classes>false</exclude-unlisted-classes>
         <properties>
             <property name="hibernate.connection.datasource" value="java:comp/env/jdbc/sgp"/>
