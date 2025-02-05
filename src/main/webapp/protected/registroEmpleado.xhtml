@@ -557,13 +557,17 @@
                                 <p:tab title="Conf. Empleado">
                                     <div class="card">
                                         <div class="ui-fluid formgrid grid align-items-left">
+                                        	<div class="field col-12 md:col-3">
+                                        		<div><p:outputLabel for="@next" value="Procesar Nomina" /></div>
+                                        		<div><p:selectBooleanButton value="#{registroEmpleadosBean.empleadoSelected.empleadoConfiguracion.procesarNomina}" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem" /></div>
+                                        	</div>
                                             <div class="field col-12 md:col-3">
-                                                <p:outputLabel for="@next" value="Retardo"/><br/>
-                                                <p:selectBooleanButton value="#{registroEmpleadosBean.empleadoSelected.empleadoConfiguracion.retardo}" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem" />
+                                            	<div><p:outputLabel for="@next" value="Retardo"/></div>
+                                                <div><p:selectBooleanButton value="#{registroEmpleadosBean.empleadoSelected.empleadoConfiguracion.retardo}" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem" /></div>
                                             </div>
                                             <div class="field col-12 md:col-3">
-                                                <p:outputLabel for="@next" value="Horas extra"/><br/>
-                                                <p:selectBooleanButton value="#{registroEmpleadosBean.empleadoSelected.empleadoConfiguracion.horasextra}" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem" />
+                                            	<div><p:outputLabel for="@next" value="Horas extra"/></div>
+                                                <div><p:selectBooleanButton value="#{registroEmpleadosBean.empleadoSelected.empleadoConfiguracion.horasextra}" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem" /></div>
                                             </div>
                                         </div>
                                     </div>
