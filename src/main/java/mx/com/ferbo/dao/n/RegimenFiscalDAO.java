@@ -1,6 +1,5 @@
 package mx.com.ferbo.dao.n;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -40,4 +39,37 @@ public class RegimenFiscalDAO extends BaseDAO<CatRegimenFiscal, String> {
         return result;
     }
 
+    public synchronized List<CatRegimenFiscal> buscarPorPersonaFisica() {
+
+        EntityManager em = null;
+        List<CatRegimenFiscal> listaRegimen = null;
+
+        try {
+            em = getEntityManager();
+            listaRegimen = em.createNamedQuery("CatRegimenFiscal.findByst_per_fisica", CatRegimenFiscal.class).getResultList();
+        } catch (Exception ex) {
+            log.error("problema para buscar por persona fisica", ex);
+        } finally {
+            close(em);
+        }
+
+        return listaRegimen;
+    }
+
+    public synchronized List<CatRegimenFiscal> buscarPorPersonaMoral() {
+
+        EntityManager em = null;
+        List<CatRegimenFiscal> listaRegimen = null;
+
+        try {
+            em = getEntityManager();
+            listaRegimen = em.createNamedQuery("CatRegimenFiscal.findByst_per_moral", CatRegimenFiscal.class).getResultList();
+        } catch (Exception e) {
+            log.error("Problema para buscar por persona moral", e);
+        } finally {
+            close(em);
+        }
+
+        return listaRegimen;
+    }
 }

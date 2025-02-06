@@ -81,4 +81,17 @@ public class CertificadoDAO extends BaseDAO<Certificado, Integer> {
         return certificados;
     }
 
+    public String guardar(Certificado e, String msg) {
+        try {
+            EntityManager em = EntityManagerUtil.getEntityManager();
+            em.getTransaction().begin();
+            em.persist(e);
+            em.getTransaction().commit();
+            em.close();
+        } catch (Exception ex) {
+            System.out.println("Error al guardar datos" + ex.getMessage());
+            return "ERROR";
+        }
+        return null;
+    }
 }
