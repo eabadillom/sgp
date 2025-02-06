@@ -17,7 +17,11 @@ public class EmpresaDAO extends BaseDAO<CatEmpresa, Integer>{
 	public EmpresaDAO(Class<CatEmpresa> modelClass) {
 		super(modelClass);
 	}
-	
+        
+	public EmpresaDAO(){
+            super(CatEmpresa.class);
+        }
+        
 	public List<CatEmpresa> buscarActivo() {
 		List<CatEmpresa> list = null;
 		EntityManager emSGP = null;

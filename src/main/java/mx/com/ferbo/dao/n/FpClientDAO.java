@@ -17,7 +17,6 @@ import org.apache.logging.log4j.Logger;
 public class FpClientDAO extends BaseDAO<DetFpClient, Integer> {
 
     private static Logger log = LogManager.getLogger(FpClientDAO.class);
-    EntityManagerFactory emf = null;
 
     public FpClientDAO(Class<DetFpClient> modelClass) {
         super(modelClass);
@@ -33,8 +32,7 @@ public class FpClientDAO extends BaseDAO<DetFpClient, Integer> {
         EntityManager em = null;
 
         try {
-            emf = Persistence.createEntityManagerFactory("sgpPU");
-            em = emf.createEntityManager();
+            em = getEntityManager();
             em.getTransaction().begin();
             em.persist(cliente);
             em.getTransaction().commit();
@@ -53,8 +51,7 @@ public class FpClientDAO extends BaseDAO<DetFpClient, Integer> {
         EntityManager em = null;
 
         try {
-            emf = Persistence.createEntityManagerFactory("sgpPU");
-            em = emf.createEntityManager();
+            em = super.getEntityManager();
             em.getTransaction().begin();
             cliente = em.merge(cliente);
             em.getTransaction().commit();
@@ -73,8 +70,7 @@ public class FpClientDAO extends BaseDAO<DetFpClient, Integer> {
         EntityManager em = null;
         DetFpClient buscado = null;
         try {
-            emf = Persistence.createEntityManagerFactory("sgpPU");
-            em = emf.createEntityManager();
+            em = super.getEntityManager();
             em.getTransaction().begin();
             buscado = em.find(DetFpClient.class, id);
             em.getTransaction().commit();
@@ -97,8 +93,7 @@ public class FpClientDAO extends BaseDAO<DetFpClient, Integer> {
         EntityManager em = null;
 
         try {
-            emf = Persistence.createEntityManagerFactory("sgpPU");
-            em = emf.createEntityManager();
+            em = super.getEntityManager();
             em.getTransaction().begin();
             em.remove(em.contains(cliente) ? cliente : em.merge(cliente));
             em.getTransaction().commit();
@@ -116,8 +111,7 @@ public class FpClientDAO extends BaseDAO<DetFpClient, Integer> {
         List<DetFpClient> clientes = null;
         
         try{
-            emf = Persistence.createEntityManagerFactory("sgpPU");
-            em = emf.createEntityManager();
+            em = super.getEntityManager();
             TypedQuery<DetFpClient> resultado =  em.createQuery("select e from DetFpClient e", DetFpClient.class);
             clientes = resultado.getResultList();
         }
