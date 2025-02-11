@@ -193,8 +193,6 @@
         <f:facet name="footer">
             <p:commandButton value="Aceptar" icon="pi pi-check" class="ui-button-success" process="pnlDetalleRechazo @this"
                              actionListener="#{incidenciaBean.guardarEstatusIncidencia(false)}" oncomplete="PF('dialogRechazar').hide()"/>
-            <p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-secondary" process="@this" 
-                             oncomplete="PF('dialogRechazar').hide()"/>
         </f:facet>
     </p:dialog>
     <style>
