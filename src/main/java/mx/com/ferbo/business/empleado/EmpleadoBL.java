@@ -156,4 +156,20 @@ public class EmpleadoBL {
             fechaaux = fechafin;
         }
     }
+
+    public static void empleadoTieneDiasLaborales(DetEmpleado empleado) throws SGPException {
+
+        if (empleado == null) {
+            throw new SGPException("Error: El empleado no tiene informacion");
+        }
+
+        if (empleado.getDatoEmpresa() == null) {
+            throw new SGPException("Erro: El empleado no tiene informacion empresarial");
+        }
+
+        if (empleado.getDatoEmpresa().getDiaLunes() == false || empleado.getDatoEmpresa().getDiaMartes() == false || empleado.getDatoEmpresa().getDiaMiercoles() == false || empleado.getDatoEmpresa().getDiaJueves() == false || empleado.getDatoEmpresa().getDiaViernes() == false) {
+            throw new SGPException("Error: No tiene dias laborales asignados. Por favor contactar a RH");
+        }
+
+    }
 }

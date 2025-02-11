@@ -30,6 +30,7 @@ public class CatEstatusRegistro implements Serializable {
 	public static final String ST_REG_JUSTIFICADO = "J";
 	public static final String ST_REG_VACACIONES = "V";
 	public static final String ST_REG_ASISTENCIA_DIA_NO_LABORAL = "X";
+        public static final String ST_REG_PERMISO = "P";
 
     private static final long serialVersionUID = 1L;
     @Id
