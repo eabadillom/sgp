@@ -30,18 +30,6 @@
                         </p:selectBooleanButton>
                         <p:outputLabel value="Vacaciones" />
                     </div>
-                    <!--<div class="field col-12 md:col-3">
-                        <p:selectBooleanButton id="idIncCorta" value="#{incidenciaBean.incidenciaIncapacidadCorta}" onIcon="pi pi-check" offIcon="pi pi-times" widgetVar="idIncCorta" style="width:2rem" >
-                            <p:ajax event="change" update="dtIncidencias" process="@this" />
-                        </p:selectBooleanButton>
-                        <p:outputLabel value="Inc. Corta" />
-                    </div>
-                    <div class="field col-12 md:col-3">
-                        <p:selectBooleanButton id="idIncLarga" value="#{incidenciaBean.incidenciaIncapacidadLarga}" onIcon="pi pi-check" offIcon="pi pi-times" widgetVar="idIncLarga" style="width:2rem" >
-                            <p:ajax event="change" update="dtIncidencias" process="@this" />
-                        </p:selectBooleanButton>
-                        <p:outputLabel value="Inc. Larga"/>
-                    </div>-->
                     <div class="field col-12 md:col-3">
                         <p:selectBooleanButton id="idPermiso" value="#{incidenciaBean.incidenciaPermiso}" onIcon="pi pi-check" offIcon="pi pi-times" widgetVar="idPermiso" style="width:2rem" >
                             <p:ajax event="change" update="dtIncidencias" process="@this" />
@@ -56,18 +44,6 @@
                         </p:selectBooleanButton>
                         <p:outputLabel value="Aceptadas" />
                     </div>
-                    <!--<div class="field col-12 md:col-3">
-                        <p:selectBooleanButton id="idEstatusRechazado" value="#{incidenciaBean.estatusRechazado}" onIcon="pi pi-check" offIcon="pi pi-times" style="width:2rem" >
-                            <p:ajax event="change" update="dtIncidencias" process="@this"/>
-                        </p:selectBooleanButton>
-                        <p:outputLabel value="Rechazado" />
-                    </div>-->
-                    <!--<div class="field col-12 md:col-3">
-                        <p:selectBooleanButton id="idEstatusCancelado" value="#{incidenciaBean.estatusCancelado}" onIcon="pi pi-check" offIcon="pi pi-times" style="width:2rem" >
-                            <p:ajax event="change" update="dtIncidencias" process="@this"/>
-                        </p:selectBooleanButton>
-                        <p:outputLabel value="Cancelado" />
-                    </div>-->
                     <div class="field col-12 md:col-3" >
                         <p:selectBooleanButton id="idEstatusEnviado" value="#{incidenciaBean.estatusEnviado}" onIcon="pi pi-check" offIcon="pi pi-times" style="width:2rem" >
                             <p:ajax event="change" update="dtIncidencias" process="@this"/>
@@ -111,12 +87,6 @@
             <p:outputLabel class="customer-badge status-#{incidenciaBean.status.getStatusClass(incidencia.idEstatus.idEstatus)}"
                            value="#{incidencia.idEstatus.descripcion}" style="display: block; width: 7rem"/>
         </p:column>
-        <!-- 
-        <p:column exportable="false">
-            <p:button icon="pi pi-check" styleClass="rounded-button ui-button-success mr-2 mb-2" />
-            <p:button icon="pi pi-times" styleClass="rounded-button ui-button-danger mr-2 mb-2" />
-        </p:column> 
-        -->
         <p:column exportable="false" style="text-align: center" width="20px">
             <p:commandButton icon="pi pi-search" styleClass="rounded-button ui-button-secondary mr-2 mb-2"  process="@this"
                              action="#{incidenciaBean.visualizaDialog()}" update="formIncidencias:tabViewI:dialogPermisos">
