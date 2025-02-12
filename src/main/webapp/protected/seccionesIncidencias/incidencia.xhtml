@@ -142,7 +142,7 @@
                 </div>
             </div>
             <div class="formgrid grid">
-                <p:panel visible="#{incidenciaBean.incidenciaSelected.idEmpleado.empleadoConfiguracion.goceSueldo}">
+                <p:panel visible="#{incidenciaBean.incidenciaSelected.idEmpleado.empleadoConfiguracion.goceSueldo and incidenciaBean.incidenciaSelected.idSolPermiso.idTipoSolicitud.idTipoSolicitud eq 1}">
                     <div class="field col" style="width: 15rem" >
                         <p:outputLabel value="Con goce de sueldo: "/>
                         <p:spinner id="conGoceSueldo" value="#{incidenciaBean.sGoceSueldo}" min="0" max="100" suffix="%"  stepFactor="0.1"/>
