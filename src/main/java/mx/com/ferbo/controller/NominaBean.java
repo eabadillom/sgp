@@ -349,7 +349,7 @@ public class NominaBean implements Serializable {
 			diasTrabajados = percepcion.getCantidad();
 			
 			if(percepcion.getCantidad() != null && AbstractPercepcion.CVE_SUELDO.equalsIgnoreCase(percepcion.getClave())) {
-				NominaSemanalBL.calcularSueldo(nomina, parametros,  diasLaboralesEmpleado, diasNoLaboralesEmpleado, diasTrabajados);
+				NominaSemanalBL.calcularSueldo(nomina, parametros,  diasLaboralesEmpleado, diasNoLaboralesEmpleado, diasTrabajados, null);
 			}
 			NominaSemanalBL.procesarISR(nomina, parametros);
 			

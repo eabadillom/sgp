@@ -69,13 +69,13 @@
 					</div>
 					<div class="field col-12 md:col-2">
 						<p:outputLabel value="Inicio periodo" />
-						<p:datePicker id="dp-periodo-inicio" value="#{nominaBean.periodoInicio}" placeholder="Periodo Inicio" showIcon="true" pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6">
+						<p:datePicker id="dp-periodo-inicio" value="#{nominaBean.periodoInicio}" placeholder="Periodo Inicio" showIcon="true" pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6" readonly="true">
 							<p:ajax process="@this" listener="#{nominaBean.calculaFechaFin}" update="dp-periodo-fin anio semana" />
 						</p:datePicker>
 					</div>
 					<div class="field col-12 md:col-2">
 						<p:outputLabel value="Fin periodo" />
-						<p:datePicker id="dp-periodo-fin" value="#{nominaBean.periodoFin}" placeholder="Periodo Fin" showIcon="true" pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6">
+						<p:datePicker id="dp-periodo-fin" value="#{nominaBean.periodoFin}" placeholder="Periodo Fin" showIcon="true" pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6" readonly="true">
 							<p:ajax process="@this" listener="#{nominaBean.calculaFechaInicio}" update="dp-periodo-inicio anio semana" />
 						</p:datePicker>
 					</div>
@@ -117,11 +117,6 @@
 						</p:outputLabel>
 					</p:column>
 					<p:column width="3rem" style="text-align: right;">
-						<!-- <span style="padding-left: 0.5rem; padding-right: 0.5rem;">
-							<p:commandButton icon="pi pi-save" process="@this">
-								<p:confirm header="Guardar" message="¿Está seguro que desea guardar la información de nómina?"  styleClass="mr-2" icon="pi pi-check"/>
-							</p:commandButton>
-						</span> -->
 						<p:commandButton icon="pi pi-bars" oncomplete="PF('dgEmpleado').show();" actionListener="#{nominaBean.cargaEmpleadoNomina}" process="@this" update="formNomina:dg-empleado">
 							<f:setPropertyActionListener value="#{nomina}" target="#{nominaBean.nomina}" />
 						</p:commandButton>
@@ -129,67 +124,34 @@
 					
 					<p:columnGroup type="footer">
 						<p:row>
-							<p:column style="text-align:right" colspan="2" width="auto"/>
-							<p:column style="text-align:right" width="6rem">
-								<f:facet name="footer">
-									<h:outputText value="Total percepciones" />
-								</f:facet>
-							</p:column>
-							<p:column style="text-align:right" width="6rem">
-								<f:facet name="footer">
-									<div align="right">
-										<h:outputText value="Total deducciones" />
-									</div>
-								</f:facet>
-							</p:column>
-							<p:column style="text-align: right;" width="6rem">
-								<div style="width: 6rem;">
-									<f:facet name="footer">
-										<p:outputLabel value="Total neto" />
-									</f:facet>
-								</div>
-							</p:column>
-							<p:column width="2rem" style="text-align: right;">
-								<div style="width: 2rem;">
-									<f:facet name="footer">
-									</f:facet>
-								</div>
-							</p:column>
-						</p:row>
-							<p:column style="text-align:right" colspan="2" width="auto"/>
-							<p:column style="text-align:right" width="6rem">
+							<p:column footerText="." style="color: rgba(255, 255, 255, 0);" />
+							<p:column style="text-align:right;" footerText="Total:"/>
+							<p:column style="text-align:right;">
 								<f:facet name="footer">
 									<h:outputText value="#{nominaBean.listaNomina.stream().map(item -> item.subtotal).sum()}">
 										<f:convertNumber pattern="$ #,##0.00" />
 									</h:outputText>
 								</f:facet>
 							</p:column>
-							<p:column style="text-align:right" width="6rem">
+							<p:column style="text-align:right;">
 								<f:facet name="footer">
-									<div align="right">
-										<h:outputText value="#{nominaBean.listaNomina.stream().map(item -> item.descuento).sum()}">
-											<f:convertNumber pattern="$ #,##0.00" />
-										</h:outputText>
-									</div>
+									<h:outputText value="#{nominaBean.listaNomina.stream().map(item -> item.descuento).sum()}">
+										<f:convertNumber pattern="$ #,##0.00" />
+									</h:outputText>
 								</f:facet>
 							</p:column>
-							<p:column style="text-align: right;" width="6rem">
-								<div style="width: 6rem;">
-									<f:facet name="footer">
-										<p:outputLabel value="#{nominaBean.listaNomina.stream().map(item -> item.total).sum()}">
-											<f:convertNumber pattern="$ #,##0.00" />
-										</p:outputLabel>
-									</f:facet>
-								</div>
+							<p:column style="text-align:right;">
+								<f:facet name="footer">
+									<p:outputLabel value="#{nominaBean.listaNomina.stream().map(item -> item.total).sum()}">
+										<f:convertNumber pattern="$ #,##0.00" />
+									</p:outputLabel>
+								</f:facet>
 							</p:column>
-							<p:column width="2rem" style="text-align: right;">
-								<div style="width: 2rem;">
-									<f:facet name="footer">
-									</f:facet>
-								</div>
+							<p:column width="3rem">
+								<f:facet name="footer">
+									<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+								</f:facet>
 							</p:column>
-						<p:row>
-							
 						</p:row>
 					</p:columnGroup>
 				</p:dataTable>

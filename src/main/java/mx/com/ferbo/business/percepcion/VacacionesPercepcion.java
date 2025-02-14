@@ -12,15 +12,15 @@ import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.DetNominaPercepcionPK;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
 
-public class SueldoPercepcion extends AbstractPercepcion implements IPercepcion {
+public class VacacionesPercepcion extends AbstractPercepcion implements IPercepcion {
 	
-	private static Logger log = LogManager.getLogger(SueldoPercepcion.class);
+	private static Logger log = LogManager.getLogger(VacacionesPercepcion.class);
 	
-	private BigDecimal diasTrabajados = null;
+	private BigDecimal diasVacaciones = null;
 	
-	public SueldoPercepcion(ParametrosNomina parametros, BigDecimal diasTrabajados) {
+	public VacacionesPercepcion(ParametrosNomina parametros, BigDecimal diasVacaciones) {
 		this.tiposPercepcion = parametros.getTiposPercepcion();
-		this.diasTrabajados = diasTrabajados;
+		this.diasVacaciones = diasVacaciones;
 	}
 
 	@Override
@@ -28,7 +28,7 @@ public class SueldoPercepcion extends AbstractPercepcion implements IPercepcion 
 		DetNominaPercepcion percepcion = null;
 		BigDecimal salarioDiario = null;
 		BigDecimal cantidad = null;
-		BigDecimal salarioSemanal = null;
+		BigDecimal salarioVacaciones = null;
 		CatTipoPercepcion tpSueldo = null;
 		List<DetNominaPercepcion> percepciones = null;
 		
@@ -38,7 +38,7 @@ public class SueldoPercepcion extends AbstractPercepcion implements IPercepcion 
 			percepciones = nomina.getPercepciones();
 			salarioDiario = nomina.getReceptor().getSalarioDiario();
 			
-			boolean removedPercepciones = percepciones.removeIf(d -> CVE_SUELDO.equalsIgnoreCase(d.getClave()));
+			boolean removedPercepciones = percepciones.removeIf(d -> CVE_VACACIONES_EN_TIEMPO.equalsIgnoreCase(d.getClave()));
 			if(removedPercepciones)
 				log.info("Se encontraron conceptos {}, los cuales fueron eliminados para el reproceso de SUELDO.", AbstractPercepcion.CVE_SUELDO);
 			
@@ -46,30 +46,32 @@ public class SueldoPercepcion extends AbstractPercepcion implements IPercepcion 
 			
 			tpSueldo = this.getTipoPercepcion(P_SUELDO);
 			
-			salarioSemanal = salarioDiario
-					.multiply(diasTrabajados)
+			salarioVacaciones = salarioDiario
+					.multiply(diasVacaciones)
 					.setScale(2, BigDecimal.ROUND_HALF_UP);
 			
-			cantidad = diasTrabajados.setScale(2, BigDecimal.ROUND_HALF_UP);
+			cantidad = diasVacaciones.setScale(2, BigDecimal.ROUND_HALF_UP);
 			
 		} catch(Exception ex) {
-			salarioSemanal = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+			salarioVacaciones = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 			cantidad = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 		} finally {
 			percepcion = new DetNominaPercepcion();
 			percepcion.setKey(new DetNominaPercepcionPK(nomina, index));
 			percepcion.setClave(CVE_SUELDO);
-			percepcion.setNombre("Sueldo");
+			percepcion.setNombre("Vacaciones en tiempo");
 			percepcion.setCantidad(cantidad);
 			percepcion.setTipoPercepcion(tpSueldo);
-			percepcion.setImporteGravado(salarioSemanal);
+			percepcion.setImporteGravado(salarioVacaciones);
 			percepcion.setImporteExcento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
 			
-			if(salarioSemanal != null && salarioSemanal.compareTo(BigDecimal.ZERO) > 0)
+			if(salarioVacaciones != null && salarioVacaciones.compareTo(BigDecimal.ZERO) > 0)
 				nomina.getPercepciones().add(percepcion);
 			
 			this.tiposPercepcion = null;
-			this.diasTrabajados = null;
+			this.diasVacaciones = null;
 		}
+
 	}
+
 }
