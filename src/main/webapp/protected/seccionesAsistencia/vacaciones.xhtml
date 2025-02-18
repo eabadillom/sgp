@@ -111,12 +111,10 @@
                     </p:selectOneMenu>
                 </div>
             </div>
-            <div class="formgrid grid" jsf:rendered="#{asistenciaBean.solicitudSelected.aprobada eq 0}">
-                <div class="field col">
-                    <p:outputLabel for="txtMotivo" value="Motivo"/>
-                    <p:inputTextarea id="txtMotivo" value="#{asistenciaBean.solicitudSelected.descripcionRechazo}" disabled="true"/>
-                </div>
-            </div>
+            <p:panel visible="#{asistenciaBean.solicitudSelected.aprobada eq 3}">
+                <p:outputLabel for="txtMotivo" value="Motivo"/>
+                <p:inputTextarea id="txtMotivo" value="#{asistenciaBean.solicitudSelected.descripcionRechazo}" disabled="true"/>
+            </p:panel>
             <div class="formgrid grid" >
                 <div class="field col" >
                     <p:outputLabel value="Dias de #{asistenciaBean.solicitudSelected.idTipoSolicitud.descripcion} Solicitados"/>

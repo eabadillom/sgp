@@ -1,6 +1,7 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -74,6 +75,9 @@ public class DetSolicitudPermiso implements Serializable {
     @JoinColumn(name = "id_empleado_rev", referencedColumnName = "id_empleado")
     @ManyToOne
     private DetEmpleado idEmpleadoRev;
+    @Basic(optional = true)
+    @Column(name = "pc_goce_sueldo")
+    private BigDecimal goceSueldo;
 
     public DetSolicitudPermiso() {
     }
@@ -177,6 +181,14 @@ public class DetSolicitudPermiso implements Serializable {
         this.descripcionRechazo = descripcionRechazo;
     }
 
+    public BigDecimal getGoceSueldo() {
+        return goceSueldo;
+    }
+
+    public void setGoceSueldo(BigDecimal goceSueldo) {
+        this.goceSueldo = goceSueldo;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 3;
@@ -203,5 +215,5 @@ public class DetSolicitudPermiso implements Serializable {
     public String toString() {
         return "DetSolicitudPermiso{" + "idSolicitud=" + idSolicitud + ", fechaCap=" + fechaCap + ", fechaMod=" + fechaMod + ", fechaInicio=" + fechaInicio + ", fechaFin=" + fechaFin + ", aprobada=" + aprobada + ", descripcionRechazo=" + descripcionRechazo + '}';
     }
-    
+
 }

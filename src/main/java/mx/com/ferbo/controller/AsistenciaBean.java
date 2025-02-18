@@ -30,6 +30,7 @@ import org.primefaces.model.ScheduleEvent;
 import org.primefaces.model.ScheduleModel;
 
 import mx.com.ferbo.business.dianolaboral.DiasDeDescansoObligatorioBL;
+import mx.com.ferbo.business.empleado.EmpleadoBL;
 import mx.com.ferbo.business.empleado.RegistroAsistenciaBL;
 import mx.com.ferbo.dao.n.IncidenciaDAO;
 import mx.com.ferbo.dao.n.TipoSolicitudDAO;
@@ -451,7 +452,7 @@ public class AsistenciaBean implements Serializable {
 
                     auxIncidenciaBuscada.setIdEstatus(catEstatusIncidencia);
                     auxIncidenciaBuscada.setIdSolPermiso(solicitudSelected);
-                    incidenciaDAO.actualizar(auxIncidenciaBuscada);
+                    incidenciaDAO.eliminar(auxIncidenciaBuscada);
                 }
             }
             solicitudSelected.setAprobada((short) 4);
@@ -479,19 +480,13 @@ public class AsistenciaBean implements Serializable {
         FacesMessage.Severity severity = null;
         String mensaje = null;
         String titulo = "Cargar informacion";
-        List<CatDiaNoLaboral> diasNoLaborables = null; 
+         
 
         try {
             
-            diasNoLaborables = this.diasDeDescansoObligatorio.diasDescansoAnual();
+            this.diasDeDescansoObligatorio.diasDescansoEstanActualizados(); 
+            EmpleadoBL.empleadoTieneDiasLaborales(empleadoSelected);
             
-            if(diasNoLaborables.isEmpty() || diasNoLaborables.size() < 2){
-                throw new SGPException("Error: Dias de asueto no actualizados. Por favor contactar a RH");
-            }
-            
-            if (empleadoSelected.getDatoEmpresa().getDiaLunes() == false || empleadoSelected.getDatoEmpresa().getDiaMartes() == false || empleadoSelected.getDatoEmpresa().getDiaMiercoles() == false || empleadoSelected.getDatoEmpresa().getDiaJueves() == false || empleadoSelected.getDatoEmpresa().getDiaViernes() == false) {
-                throw new SGPException("Error: No tiene dias laborales asignados. Por favor contactar a RH");
-            }
             inicializaSolicitud();
             PrimeFaces.current().executeScript("PF('dialogVacaciones').show()");
         } catch (SGPException sgpEx) {
