@@ -255,7 +255,7 @@ public class ISRSemanalDeduccion1 extends AbstractDeduccion implements IDeduccio
 		opSubsidioEmpleo = new DetNominaOtroPago();
 		opSubsidioEmpleo.setKey(new DetNominaOtroPagoPK(nomina, indexOP));
 		opSubsidioEmpleo.setTipoOtroPago(topSubsidioEmpleo);
-		opSubsidioEmpleo.setClave("FRB-035");
+		opSubsidioEmpleo.setClave(AbstractOtroPago.CVE_SUBSIDIO);
 		opSubsidioEmpleo.setNombre("Subs. al empleo mes");
 		opSubsidioEmpleo.setImporte(importeSubsidio);
 		

@@ -3,10 +3,12 @@ package mx.com.ferbo.util;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -15,6 +17,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -83,6 +86,32 @@ public class DateUtil {
 		resultado = new Date(c.getTimeInMillis());
 		return resultado;
 	}
+	
+	public static List<Integer> semanasDelAnio(int anio) {
+		WeekFields weekFields = WeekFields.of(Locale.getDefault());
+		LocalDate ultimoDiaDelAnio = LocalDate.of(anio, 12, 31);
+		int totalSemanas = ultimoDiaDelAnio.get(weekFields.weekOfYear());
+		
+		return IntStream.rangeClosed(1, totalSemanas)
+				.boxed()
+				.collect(Collectors.toList());
+	}
+	
+	public static Date getLunesDeSemanaDate(int anio, int semana) {
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT-6:00"));
+        calendar.clear();
+        calendar.set(Calendar.YEAR, anio);
+        calendar.set(Calendar.WEEK_OF_YEAR, semana);
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        return calendar.getTime();
+    }
+	
+	public static LocalDate getLunesDeSemanaLocalDate(int anio, int semana) {
+        WeekFields weekFields = WeekFields.of(Locale.getDefault());
+        return LocalDate.of(anio, 1, 1)
+                .with(weekFields.weekOfYear(), semana)
+                .with(DayOfWeek.MONDAY);
+    }
 	
 	/**Metodo para agregar dias a una fecha dada.
 	 * @param fecha Fecha de referencia a la que se desea agregar dias.
