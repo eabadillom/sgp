@@ -49,6 +49,10 @@ public class DetEmpleadoConfiguracion implements Serializable
     @Basic(optional = true)
     @Column(name = "st_horas_ext")
     private Boolean horasextra;
+    
+    @Basic(optional = true)
+    @Column(name = "st_goce_sueldo")
+    private Boolean goceSueldo;
 
     public DetEmpleadoConfiguracion() 
     {
@@ -103,6 +107,14 @@ public class DetEmpleadoConfiguracion implements Serializable
 
     public void setHorasextra(Boolean horasextra) {
         this.horasextra = horasextra;
+    }
+
+    public Boolean getGoceSueldo() {
+        return goceSueldo;
+    }
+
+    public void setGoceSueldo(Boolean goceSueldo) {
+        this.goceSueldo = goceSueldo;
     }
 
     @Override
