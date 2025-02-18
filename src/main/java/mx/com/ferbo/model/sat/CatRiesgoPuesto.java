@@ -2,6 +2,7 @@ package mx.com.ferbo.model.sat;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -9,8 +10,10 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
+import mx.com.ferbo.model.CatEmpresa;
 
 @Entity
 @Table(name = "cat_riesgo_puesto")
@@ -38,6 +41,9 @@ public class CatRiesgoPuesto implements Serializable{
     @Column(name = "fh_vigencia_fin")
     @Basic(optional = true)
     private Date vigenciaFin;
+    
+    @OneToMany(mappedBy = "riesgo")
+    private List<CatEmpresa> empresas;
 
     public CatRiesgoPuesto(){
 
@@ -73,6 +79,14 @@ public class CatRiesgoPuesto implements Serializable{
 
     public void setVigenciaFin(Date vigenciaFin) {
         this.vigenciaFin = vigenciaFin;
+    }
+
+    public List<CatEmpresa> getEmpresas() {
+        return empresas;
+    }
+
+    public void setEmpresas(List<CatEmpresa> empresas) {
+        this.empresas = empresas;
     }
 
     @Override
