@@ -54,6 +54,10 @@ public class DetEmpleadoConfiguracion implements Serializable
     @Column(name = "st_goce_sueldo")
     private Boolean goceSueldo;
 
+    @Basic(optional = true)
+    @Column(name = "st_asistencia_nl")
+    private Boolean asistenciaDiaNoLaboral;
+    
     public DetEmpleadoConfiguracion() 
     {
     }
@@ -117,6 +121,14 @@ public class DetEmpleadoConfiguracion implements Serializable
         this.goceSueldo = goceSueldo;
     }
 
+    public Boolean getAsistenciaDiaNoLaboral() {
+        return asistenciaDiaNoLaboral;
+    }
+
+    public void setAsistenciaDiaNoLaboral(Boolean asistenciaDiaNoLaboral) {
+        this.asistenciaDiaNoLaboral = asistenciaDiaNoLaboral;
+    }
+
     @Override
     public int hashCode() 
     {
@@ -143,7 +155,7 @@ public class DetEmpleadoConfiguracion implements Serializable
 
     @Override
     public String toString() {
-        return "DetEmpleadoConfiguracion[" + "id_empleado_conf=" + idEmpleadoConf + ", empleado=" + empleado.getIdEmpleado() + ", retardo=" + retardo + ", horasextra=" + horasextra +']';
+        return "DetEmpleadoConfiguracion{" + "idEmpleadoConf=" + idEmpleadoConf + ", empleado=" + empleado.getIdEmpleado() + ", retardo=" + retardo + ", horasextra=" + horasextra + ", goceSueldo=" + goceSueldo + ", asistenciaDiaNoLaboral=" + asistenciaDiaNoLaboral + '}';
     }
     
 }
