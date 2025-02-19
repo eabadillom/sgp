@@ -1,6 +1,7 @@
 package mx.com.ferbo.model.imss;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -10,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -43,6 +45,9 @@ public class CatControlIncapacidadIMSS implements Serializable
     @NotNull
     @Column(name = "nb_descripcion")
     private String descripcion;
+    
+    @OneToMany(mappedBy = "controlIncapacidad")
+    private List<DetIncapacidad> registroIncapacidad;
 
     public CatControlIncapacidadIMSS() 
     {
@@ -81,6 +86,16 @@ public class CatControlIncapacidadIMSS implements Serializable
     public void setDescripcion(String descripcion) 
     {
         this.descripcion = descripcion;
+    }
+
+    public List<DetIncapacidad> getRegistroIncapacidad() 
+    {
+        return registroIncapacidad;
+    }
+
+    public void setRegistroIncapacidad(List<DetIncapacidad> registroIncapacidad) 
+    {
+        this.registroIncapacidad = registroIncapacidad;
     }
 
     @Override

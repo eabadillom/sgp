@@ -7,8 +7,8 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import mx.com.ferbo.dao.n.imss.ControlIncapacidadIMSSDAO;
-import mx.com.ferbo.model.imss.CatControlIncapacidadIMSS;
+import mx.com.ferbo.dao.n.imss.TipoRiesgoIMSSDAO;
+import mx.com.ferbo.model.imss.CatTipoRiesgoIMSS;
 import mx.com.ferbo.util.SGPException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,55 +18,61 @@ import org.primefaces.PrimeFaces;
  *
  * @author alberto
  */
-@Named(value = "controlIncapacidadIMSS")
+@Named(value = "tipoRiesgoIMSSBean")
 @ViewScoped
-public class ControlIncapacidadIMSSBean implements Serializable
+public class TipoRiesgoIMSSBean implements Serializable
 {
     private static final long serialVersionUID = 1L;
-    private static Logger log = LogManager.getLogger(ControlIncapacidadIMSSBean.class);
+    private static Logger log = LogManager.getLogger(TipoRiesgoIMSSBean.class);
     
-    private CatControlIncapacidadIMSS controlIncapacidadSelected;
-    private List<CatControlIncapacidadIMSS> listControlIncapacidadIMSS;
-    private ControlIncapacidadIMSSDAO controIncapacidadIMSSDAO;
+    private List<CatTipoRiesgoIMSS> listaTipoRiesgo;
+    private CatTipoRiesgoIMSS tipoRiesgoSelected;
+    private TipoRiesgoIMSSDAO tipoRiesgoIMSSDAO;
     
     private String accionBoton = "";
     private String iconoBoton = "";
 
-    public ControlIncapacidadIMSSBean() 
+    public TipoRiesgoIMSSBean() 
     {
-        this.controIncapacidadIMSSDAO = new ControlIncapacidadIMSSDAO();
+        this.tipoRiesgoIMSSDAO = new TipoRiesgoIMSSDAO(); 
     }
     
     @PostConstruct
     public void init() 
     {
-        actualizarListaControlIncapacidades();
+        this.inicializarListaTipoRiesgo();
     }
     
-    public void actualizarListaControlIncapacidades()
+    public void inicializarListaTipoRiesgo()
     {
-        this.listControlIncapacidadIMSS = controIncapacidadIMSSDAO.buscarTodos();
+        this.listaTipoRiesgo = this.tipoRiesgoIMSSDAO.buscarTodos();
     }
     
     public void incializarSolicitud()
     {
-        this.controlIncapacidadSelected = new CatControlIncapacidadIMSS();
+        this.tipoRiesgoSelected = new CatTipoRiesgoIMSS();
         this.accionBoton = "Guardar";
         this.iconoBoton = "pi pi-save";
         
-        PrimeFaces.current().ajax().update("form:pnlControlIncapacidad", "form:dialogoControlIncapacidades");
+        PrimeFaces.current().ajax().update("form:pnlTipoRiesgo", "form:dialogoTipoRiesgo");
     }
     
-    public void editarSolicitud(CatControlIncapacidadIMSS aux)
+    public void editarSolicitud(CatTipoRiesgoIMSS auxTipoSolicitud)
     {
-        log.info("Editando un control de incapacidad: {}", aux.toString());
-        this.accionBoton = "Actualizar";
-        this.iconoBoton = "pi pi-check";
-        
-        PrimeFaces.current().ajax().update("form:pnlControlIncapacidad", "form:dialogoControlIncapacidades");
+        try
+        {
+            log.info("Editando un tipo de riesgo de trabajo: {}", auxTipoSolicitud.toString());
+            this.tipoRiesgoSelected = auxTipoSolicitud;
+            this.accionBoton = "Actualizar";
+            this.iconoBoton = "pi pi-check";
+            PrimeFaces.current().ajax().update("form:pnlTipoRiesgo", "form:dialogoTipoRiesgo");
+        }catch (Exception ex) 
+        {
+            log.error("Problema al asignar el tipo de riesgo", ex);
+        }
     }
     
-    public void guardarControlIncapacidad()
+    public void guardarTipoRiesgo()
     {
         FacesMessage message = null;
         FacesMessage.Severity severity = null;
@@ -74,28 +80,28 @@ public class ControlIncapacidadIMSSBean implements Serializable
         String titulo = "Guardar";
         try
         {
-            if(this.controlIncapacidadSelected.getClave() == null)
+            if(this.tipoRiesgoSelected.getClave() == null)
             {
                 throw new SGPException("Debes ingresar la clave");
             }
             
-            if(this.controlIncapacidadSelected.getClave().length() > 3)
+            if(this.tipoRiesgoSelected.getClave().length() > 2)
             {
-                throw new SGPException("La clave debe contener 1 y 3 caracteres");
+                throw new SGPException("La clave debe contener de 1 a 2 caracteres");
             }
             
-            if(this.controlIncapacidadSelected.getDescripcion() == null)
+            if(this.tipoRiesgoSelected.getDescripcion() == null)
             {
-                throw new SGPException("Debes ingresar la descripción");
+                throw new SGPException("Debes ingresar la descripcion");
             }
             
-            if(verificarClave(this.controlIncapacidadSelected.getClave()))
+            if(verificarClave(this.tipoRiesgoSelected.getClave()))
             {
                 throw new SGPException("La clave ya se encuentra registrada");
             }
             
-            this.controIncapacidadIMSSDAO.guardar(this.controlIncapacidadSelected);
-            log.info("El control de incapacidad se guardo correctamente");
+            this.tipoRiesgoIMSSDAO.guardar(tipoRiesgoSelected);
+            log.info("El tipo de riesgo se guardo correctamente");
             mensaje = "Se guardo correctamente";
             severity = FacesMessage.SEVERITY_INFO;
         }catch(SGPException ex)
@@ -103,7 +109,7 @@ public class ControlIncapacidadIMSSBean implements Serializable
             titulo = "Error";
             mensaje = ex.getMessage();
             severity = FacesMessage.SEVERITY_ERROR;
-            log.info("Error al registrar la solicitud de control de incapacidad: {}", ex);
+            log.info("Error al registrar la solicitud de incapacidad: {}", ex);
         }catch (Exception e) 
         {
             titulo = "Error";
@@ -112,15 +118,15 @@ public class ControlIncapacidadIMSSBean implements Serializable
             log.info("ERROR, {}", e);
         }finally
         {
-            actualizarListaControlIncapacidades();
+            this.inicializarListaTipoRiesgo();;
             message = new FacesMessage(severity, titulo, mensaje);
             FacesContext.getCurrentInstance().addMessage(null, message);
-            PrimeFaces.current().executeScript("PF('dialogoControlIncapacidades').hide()");
-            PrimeFaces.current().ajax().update("form:messages","form:dtCatalogoControlIncapacidad");
+            PrimeFaces.current().executeScript("PF('dialogoTipoRiesgo').hide()");
+            PrimeFaces.current().ajax().update("form:messages", "form:dtCatalogoTipoRiesgo");
         }
     }
     
-    public void actualizarControlIncapacidad()
+    public void actualizarTipoRiesgo()
     {
         FacesMessage message = null;
         FacesMessage.Severity severity = null;
@@ -128,23 +134,23 @@ public class ControlIncapacidadIMSSBean implements Serializable
         String titulo = "Actualizar";
         try
         {
-            if(this.controlIncapacidadSelected.getClave() == null)
+            if(this.tipoRiesgoSelected.getClave() == null)
             {
                 throw new SGPException("Debes ingresar la clave");
             }
             
-            if(this.controlIncapacidadSelected.getClave().length() > 3)
+            if(this.tipoRiesgoSelected.getClave().length() > 2)
             {
-                throw new SGPException("La clave debe ser igual a 1 y 3 caracteres");
+                throw new SGPException("La clave debe contener de 1 a 2 caracteres");
             }
             
-            if(this.controlIncapacidadSelected.getDescripcion() == null)
+            if(this.tipoRiesgoSelected.getDescripcion() == null)
             {
-                throw new SGPException("Debes ingresar la descripción");
+                throw new SGPException("Debes ingresar la descripcion");
             }
             
-            this.controIncapacidadIMSSDAO.actualizar(this.controlIncapacidadSelected);
-            log.info("El control de incapacidad se actualizo correctamente");
+            this.tipoRiesgoIMSSDAO.actualizar(this.tipoRiesgoSelected);
+            log.info("El tipo de riesgo se actualizo correctamente");
             mensaje = "Se actualizo correctamente";
             severity = FacesMessage.SEVERITY_INFO;
         }catch(SGPException ex)
@@ -152,7 +158,7 @@ public class ControlIncapacidadIMSSBean implements Serializable
             titulo = "Error";
             mensaje = ex.getMessage();
             severity = FacesMessage.SEVERITY_ERROR;
-            log.info("Error al registrar la solicitud de control de incapacidad: {}", ex);
+            log.info("Error al registrar la solicitud de incapacidad: {}", ex);
         }catch (Exception e) 
         {
             titulo = "Error";
@@ -161,11 +167,11 @@ public class ControlIncapacidadIMSSBean implements Serializable
             log.info("ERROR, {}", e);
         }finally
         {
-            actualizarListaControlIncapacidades();
+            this.inicializarListaTipoRiesgo();
             message = new FacesMessage(severity, titulo, mensaje);
             FacesContext.getCurrentInstance().addMessage(null, message);
-            PrimeFaces.current().executeScript("PF('dialogoControlIncapacidades').hide()");
-            PrimeFaces.current().ajax().update("form:messages","form:dtCatalogoControlIncapacidad");
+            PrimeFaces.current().executeScript("PF('dialogoTipoRiesgo').hide()");
+            PrimeFaces.current().ajax().update("form:messages", "form:dtCatalogoTipoRiesgo");
         }
     }
     
@@ -174,10 +180,10 @@ public class ControlIncapacidadIMSSBean implements Serializable
         switch(this.accionBoton)
         {
             case "Guardar":
-                this.guardarControlIncapacidad();
+                this.guardarTipoRiesgo();
                 break;
             case "Actualizar":
-                this.actualizarControlIncapacidad();
+                this.actualizarTipoRiesgo();
                 break;
         }
     }
@@ -185,7 +191,7 @@ public class ControlIncapacidadIMSSBean implements Serializable
     public boolean verificarClave(String clave)
     {
         boolean exitoso = false;
-        for(CatControlIncapacidadIMSS aux : this.listControlIncapacidadIMSS)
+        for(CatTipoRiesgoIMSS aux : this.listaTipoRiesgo)
         {
             if(clave.toUpperCase().matches(aux.getClave().toUpperCase()) && this.accionBoton.matches("Guardar"))
             {
@@ -194,28 +200,28 @@ public class ControlIncapacidadIMSSBean implements Serializable
         }
         return exitoso;
     }
-    
+
     //<editor-fold defaultstate="collapsed" desc="Getters&Setters">
-    public CatControlIncapacidadIMSS getControlIncapacidadSelected() 
+    public List<CatTipoRiesgoIMSS> getListaTipoRiesgo() 
     {
-        return controlIncapacidadSelected;
+        return listaTipoRiesgo;
     }
 
-    public void setControlIncapacidadSelected(CatControlIncapacidadIMSS controlIncapacidadSelected) 
+    public void setListaTipoRiesgo(List<CatTipoRiesgoIMSS> listaTipoRiesgo) 
     {
-        this.controlIncapacidadSelected = controlIncapacidadSelected;
+        this.listaTipoRiesgo = listaTipoRiesgo;
     }
 
-    public List<CatControlIncapacidadIMSS> getListControlIncapacidadIMSS() 
+    public CatTipoRiesgoIMSS getTipoRiesgoSelected() 
     {
-        return listControlIncapacidadIMSS;
+        return tipoRiesgoSelected;
     }
 
-    public void setListControlIncapacidadIMSS(List<CatControlIncapacidadIMSS> listControlIncapacidadIMSS) 
+    public void setTipoRiesgoSelected(CatTipoRiesgoIMSS tipoRiesgoSelected) 
     {
-        this.listControlIncapacidadIMSS = listControlIncapacidadIMSS;
+        this.tipoRiesgoSelected = tipoRiesgoSelected;
     }
-    
+
     public String getAccionBoton() 
     {
         return accionBoton;
@@ -225,7 +231,7 @@ public class ControlIncapacidadIMSSBean implements Serializable
     {
         this.accionBoton = accionBoton;
     }
-    
+
     public String getIconoBoton() 
     {
         return iconoBoton;

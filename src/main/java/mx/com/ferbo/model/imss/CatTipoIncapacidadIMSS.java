@@ -2,6 +2,7 @@ package mx.com.ferbo.model.imss;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -10,9 +11,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import mx.com.ferbo.model.sat.CatTipoIncapacidadSAT;
@@ -36,7 +38,7 @@ public class CatTipoIncapacidadIMSS implements Serializable
     @Basic(optional = false)
     @NotNull
     @Column(name = "cd_tp_incapacidad")
-    private Integer idIncapacidad;
+    private Integer idTpIncapacidad;
     
     @Basic(optional = false)
     @NotNull
@@ -58,34 +60,47 @@ public class CatTipoIncapacidadIMSS implements Serializable
     @Basic(optional = false)
     private Integer maxDias;
     
-    @OneToOne
+    @Column(name = "ct_semanas_cot")
     @NotNull
-    @JoinColumn(name = "cd_tipo_incapacidad")
+    @Basic(optional = false)
+    private Integer semanasCotizadas;
+    
+    @Column(name = "ct_periodo_cot")
+    @NotNull
+    @Basic(optional = false)
+    private Integer periodoCotAnterior;
+    
+    @ManyToOne(optional = false)
+    @NotNull
+    @JoinColumn(name = "cd_tipo_incapacidad", referencedColumnName = "cd_tipo_incapacidad")
     private CatTipoIncapacidadSAT incapacidadSAT;
+    
+    @OneToMany(mappedBy = "tipoIncapacidad")
+    private List<DetIncapacidad> registroIncapacidad;
 
     public CatTipoIncapacidadIMSS() 
     {
     }
 
-    public CatTipoIncapacidadIMSS(Integer idIncapacidad) 
+    public CatTipoIncapacidadIMSS(Integer idTpIncapacidad) 
     {
-        this.idIncapacidad = idIncapacidad;
+        this.idTpIncapacidad = idTpIncapacidad;
     }
 
-    public CatTipoIncapacidadIMSS(Integer idIncapacidad, String clave) 
+    public CatTipoIncapacidadIMSS(Integer idTpIncapacidad, String clave) 
     {
-        this.idIncapacidad = idIncapacidad;
+        this.idTpIncapacidad = idTpIncapacidad;
         this.clave = clave;
     }
 
-    public Integer getIdIncapacidad() 
+    public Integer getIdTpIncapacidad() 
     {
-        return idIncapacidad;
+        return idTpIncapacidad;
     }
 
-    public void setIdIncapacidad(Integer idIncapacidad) 
+    public void setIdTpIncapacidad(Integer idTpIncapacidad) 
     {
-        this.idIncapacidad = idIncapacidad;
+        this.idTpIncapacidad = idTpIncapacidad;
     }
 
     public String getClave() 
@@ -138,12 +153,41 @@ public class CatTipoIncapacidadIMSS implements Serializable
         this.incapacidadSAT = incapacidadSAT;
     }
 
+    public Integer getSemanasCotizadas() 
+    {
+        return semanasCotizadas;
+    }
+
+    public void setSemanasCotizadas(Integer semanasCotizadas) 
+    {
+        this.semanasCotizadas = semanasCotizadas;
+    }
+
+    public Integer getPeriodoCotAnterior() 
+    {
+        return periodoCotAnterior;
+    }
+
+    public void setPeriodoCotAnterior(Integer periodoCotAnterior) 
+    {
+        this.periodoCotAnterior = periodoCotAnterior;
+    }
+
+    public List<DetIncapacidad> getRegistroIncapacidad() 
+    {
+        return registroIncapacidad;
+    }
+
+    public void setRegistroIncapacidad(List<DetIncapacidad> registroIncapacidad) 
+    {
+        this.registroIncapacidad = registroIncapacidad;
+    }
+
     @Override
     public int hashCode() 
     {
-        int hash = 7;
-        hash = 43 * hash + Objects.hashCode(this.idIncapacidad);
-        hash = 43 * hash + Objects.hashCode(this.clave);
+        int hash = 3;
+        hash = 89 * hash + Objects.hashCode(this.idTpIncapacidad);
         return hash;
     }
 
@@ -160,15 +204,15 @@ public class CatTipoIncapacidadIMSS implements Serializable
             return false;
         }
         final CatTipoIncapacidadIMSS other = (CatTipoIncapacidadIMSS) obj;
-        if (!Objects.equals(this.clave, other.clave)) {
-            return false;
-        }
-        return Objects.equals(this.idIncapacidad, other.idIncapacidad);
+        return Objects.equals(this.idTpIncapacidad, other.idTpIncapacidad);
     }
 
     @Override
-    public String toString() {
-        return "CatTPIncapacidad[" + "idIncapacidad=" + idIncapacidad + ", clave=" + clave + ", descripcion=" + descripcion + ", porcentagePago=" + porcentagePago + ", maxDias=" + maxDias + ", incapacidadSAT=" + incapacidadSAT + ']';
+    public String toString() 
+    {
+        return "CatTipoIncapacidadIMSS[" + "IdTpIncapacidad: " + idTpIncapacidad + ", Clave: " + clave + ", Descripcion: " + descripcion 
+                + ", PorcentagePago: " + porcentagePago + ", MaxDias: " + maxDias + ", SemanasCotizadas: " + semanasCotizadas 
+                + ", PeriodoCotAnterior: " + periodoCotAnterior + ']';
     }
     
 }

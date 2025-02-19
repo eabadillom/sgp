@@ -187,4 +187,54 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
         return model;
     }
     
+    public List<DetRegistro> buscarPorEmpPeriodoSolicitud(Integer idEmp, String codigo, Date fechaInicial, Date fechaFin)
+    {
+        List<DetRegistro> modelList = null;
+        EntityManager em = null;
+        
+        try
+        {
+            em = this.getEntityManager();
+            modelList = em.createNamedQuery("DetRegistro.findByPeriodoSolicitud", DetRegistro.class)
+                .setParameter("idEmp", idEmp)
+                .setParameter("codigo", codigo)
+                .setParameter("fechaInicial", fechaInicial)
+                .setParameter("fechaFinal", fechaFin)
+                .getResultList();
+        }catch (Exception ex) 
+        {
+            log.error("Problema para obtener el listado de registros...", ex);
+            modelList = new ArrayList<>();
+        } finally 
+        {
+            this.close(em);
+        }
+        
+        return modelList;
+    }
+    
+    public DetRegistro buscarPorEstatus(Integer idEmp, Date fecha, String clave)
+    {
+        DetRegistro model = null;
+        EntityManager em = null;
+        
+        try
+        {
+            em = this.getEntityManager();
+            model = em.createNamedQuery("DetRegistro.findByFechaEstatus", DetRegistro.class)
+                .setParameter("idEmp", idEmp)
+                .setParameter("fecha", fecha, TemporalType.TIMESTAMP)
+                .setParameter("codigo", clave)
+                .getSingleResult();
+        }catch (Exception ex) 
+        {
+            log.error("Problema para obtener el registro...", ex);
+        } finally 
+        {
+            this.close(em);
+        }
+        
+        return model;
+    }
+    
 }

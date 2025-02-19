@@ -1,0 +1,57 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/plantillas/template.xhtml">
+    <ui:define name="title">Tipo Riesgo De Trabajo IMSS</ui:define>
+    <ui:define name="content">
+        <h:form id="form">
+            <p:growl id="messages" showDetail="true" />
+            <p:toolbarGroup>
+                <p:commandButton value="Registrar" icon="pi pi-plus" oncomplete="PF('dialogoTipoRiesgo').show();" update="pnlTipoRiesgo" 
+                    actionListener="#{tipoRiesgoIMSSBean.incializarSolicitud()}" process="@this" style="margin-right: .5rem"/>
+            </p:toolbarGroup>
+            <p:dataTable id="dtCatalogoTipoRiesgo" widgetVar="dtCatalogoTipoRiesgo" var="tipoRiesgo" 
+                         value="#{tipoRiesgoIMSSBean.listaTipoRiesgo}" reflow="true" 
+                         paginator="true" rows="10" paginatorPosition="bottom">
+                <p:column headerText="Clave" style="text-align: center;" width="5rem">
+                    <h:outputText value="#{tipoRiesgo.clave}" />
+                </p:column>
+                <p:column headerText="Descripcion" style="text-align: center;" width="5rem">
+                    <h:outputText value="#{tipoRiesgo.descripcion}" />
+                </p:column>
+                <p:column exportable="false" ariaHeaderText="Actions" width="5rem">
+                    <p:commandButton class="ui-button-success rounded-button m-1" icon="pi pi-bars" update="form:pnlTipoRiesgo" 
+                        oncomplete="PF('dialogoTipoRiesgo').show()" styleClass="edit-button " process="@this"
+                        actionListener="#{tipoRiesgoIMSSBean.editarSolicitud(tipoRiesgo)}" >
+                        <f:setPropertyActionListener value="#{tipoRiesgo}" target="#{tipoRiesgoIMSSBean.tipoRiesgoSelected}" />
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+            <p:dialog header="#{tipoRiesgoIMSSBean.accionBoton} Riesgo de Trabajo" id="dialogoTipoRiesgo" showEffect="fade" modal="true" 
+                widgetVar="dialogoTipoRiesgo" responsive="true" draggable="true" resizable="false" dynamic="true" style="margin: auto">
+                <p:outputPanel id="pnlTipoRiesgo" styleClass="ui-fluid">
+                    <div class="field col">
+                        <p:outputLabel for="clave" value="Clave"/>
+                        <p:inputText id="clave" value="#{tipoRiesgoIMSSBean.tipoRiesgoSelected.clave}">
+                            <p:ajax process="@this"/>
+                        </p:inputText>
+                    </div>
+                    <div class="field col">
+                        <p:outputLabel for="descripcion" value="Descripción"/>
+                        <p:inputText id="descripcion" value="#{tipoRiesgoIMSSBean.tipoRiesgoSelected.descripcion}">
+                            <p:ajax process="@this"/>
+                        </p:inputText>
+                    </div>
+                </p:outputPanel>
+                <f:facet name="footer">
+                    <p:commandButton value="#{tipoRiesgoIMSSBean.accionBoton}" icon="#{tipoRiesgoIMSSBean.iconoBoton}" actionListener="#{tipoRiesgoIMSSBean.metodoBoton()}" 
+                                     process="pnlTipoRiesgo @this" update="pnlTipoRiesgo dtCatalogoTipoRiesgo"/>
+                    <p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dialogoTipoRiesgo').hide()" class="ui-button-secondary" />
+                </f:facet>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+</ui:composition>

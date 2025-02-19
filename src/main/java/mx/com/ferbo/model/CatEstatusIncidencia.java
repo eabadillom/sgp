@@ -20,7 +20,9 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "cat_estatus_incidencia")
 @NamedQueries({
-    @NamedQuery(name = "CatEstatusIncidencia.findAll", query = "SELECT c FROM CatEstatusIncidencia c")})
+    @NamedQuery(name = "CatEstatusIncidencia.findAll", query = "SELECT c FROM CatEstatusIncidencia c"),
+    @NamedQuery(name = "CatEstatusIncidencia.findByClave", query = "SELECT c FROM CatEstatusIncidencia c WHERE c.clave = :clave")
+})
 public class CatEstatusIncidencia implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -29,9 +31,15 @@ public class CatEstatusIncidencia implements Serializable {
     @Basic(optional = false)
     @Column(name = "id_estatus")
     private Integer idEstatus;
+    
     @Basic(optional = false)
     @Column(name = "descripcion")
     private String descripcion;
+    
+    @Basic(optional = false)
+    @Column(name = "clave")
+    private String clave;
+    
     @Basic(optional = false)
     @Column(name = "activo")
     private short activo;
@@ -65,6 +73,14 @@ public class CatEstatusIncidencia implements Serializable {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
+    }
+
+    public String getClave() {
+        return clave;
+    }
+
+    public void setClave(String clave) {
+        this.clave = clave;
     }
 
     public short getActivo() {
@@ -105,7 +121,7 @@ public class CatEstatusIncidencia implements Serializable {
 
     @Override
     public String toString() {
-        return "mx.com.ferbo.model.CatEstatusIncidencia[ idEstatus=" + idEstatus + " ]";
+        return "CatEstatusIncidencia[" + "idEstatus=" + idEstatus + ", descripcion=" + descripcion + ", clave=" + clave + ']';
     }
     
 }

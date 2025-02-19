@@ -846,4 +846,34 @@ public class DateUtil {
             return diasDeTrabajo;
         }
         
+        public static Date agregaFechaFin(Date fechaInicio, Integer diasAutorizados)
+        {
+            ZoneId systemDefault = ZoneId.of("GMT-6");
+            
+            LocalDate localFechaInicio = fechaInicio.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+            
+            LocalDate localFechaFin = localFechaInicio.plusDays(diasAutorizados-1);
+            
+            Date fechaFin = Date.from(localFechaFin.atStartOfDay(systemDefault).toInstant());
+            
+            return fechaFin;
+        }
+        
+        public static Date moverFechaUnDiaAdelante(Date fechaInicio)
+        {
+            ZoneId systemDefault = ZoneId.of("GMT-6");
+            
+            LocalDate localFechaInicio = fechaInicio.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+            
+            LocalDate localFechaFin = localFechaInicio.plusDays(1);
+            
+            Date fecha = Date.from(localFechaFin.atStartOfDay(systemDefault).toInstant());
+            
+            return fecha;
+        }
+        
 }

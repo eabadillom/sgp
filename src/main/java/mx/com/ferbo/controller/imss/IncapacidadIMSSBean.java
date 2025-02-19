@@ -1,0 +1,1229 @@
+package mx.com.ferbo.controller.imss;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.view.ViewScoped;
+import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
+import mx.com.ferbo.business.dianolaboral.DiasDeDescansoObligatorioBL;
+import mx.com.ferbo.business.empleado.RegistroAsistenciaBL;
+import mx.com.ferbo.dao.n.EmpleadoDAO;
+import mx.com.ferbo.dao.n.EmpresaDAO;
+import mx.com.ferbo.dao.n.EstatusSolicitudDAO;
+import mx.com.ferbo.dao.n.RegistroDAO;
+import mx.com.ferbo.dao.n.SolicitudPermisoDAO;
+import mx.com.ferbo.dao.n.imss.ControlIncapacidadIMSSDAO;
+import mx.com.ferbo.dao.n.imss.IncapacidadIMSSDAO;
+import mx.com.ferbo.dao.n.imss.RiesgoTrabajoIMSSDAO;
+import mx.com.ferbo.dao.n.imss.TipoIncapacidadIMSSDAO;
+import mx.com.ferbo.dao.n.imss.TipoRiesgoIMSSDAO;
+import mx.com.ferbo.dao.n.sat.TipoIncapacidadSATDAO;
+import mx.com.ferbo.model.CatEstatusSolicitud;
+import mx.com.ferbo.model.DetEmpleado;
+import mx.com.ferbo.model.DetRegistro;
+import mx.com.ferbo.model.DetSolicitudPermiso;
+import mx.com.ferbo.model.InfDatoEmpresa;
+import mx.com.ferbo.model.imss.CatControlIncapacidadIMSS;
+import mx.com.ferbo.model.imss.CatRiesgoTrabajoIMSS;
+import mx.com.ferbo.model.imss.CatTipoIncapacidadIMSS;
+import mx.com.ferbo.model.imss.CatTipoRiesgoIMSS;
+import mx.com.ferbo.model.imss.DetIncapacidad;
+import mx.com.ferbo.model.sat.CatTipoIncapacidadSAT;
+import mx.com.ferbo.util.DateUtil;
+import mx.com.ferbo.util.ManageStatus;
+import mx.com.ferbo.util.SGPException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.primefaces.PrimeFaces;
+
+/**
+ *
+ * @author alberto
+ */
+@Named(value = "registroIncBean")
+@ViewScoped
+public class IncapacidadIMSSBean implements Serializable
+{
+    private static final long serialVersionUID = 1L;
+    private static Logger log = LogManager.getLogger(IncapacidadIMSSBean.class);
+    
+    private final HttpServletRequest httpServletRequest;
+    private RegistroAsistenciaBL empleadoAsistencia;
+    private DiasDeDescansoObligatorioBL diasDeDescansoObligatorio;
+    
+    private IncapacidadIMSSDAO registroIncapacidadDAO;
+    private EmpleadoDAO empleadoDAO;
+    private TipoIncapacidadIMSSDAO tipoIncapacidadIMSSDAO;
+    private ControlIncapacidadIMSSDAO controIncapacidadIMSSDAO;
+    private RiesgoTrabajoIMSSDAO riesgoTrabajoIMSSDAO;
+    private TipoRiesgoIMSSDAO tipoRiesgoIMSSDAO;
+    private EstatusSolicitudDAO estatusSolicitudDAO;
+    private EmpresaDAO infDatoEmpresaDAO;
+    private TipoIncapacidadSATDAO incapacidadSATDAO;
+    
+    private List<DetIncapacidad> listaRegistroIncapacidad;
+    private List<DetIncapacidad> listaRegistroFiltrada;
+    private List<CatTipoIncapacidadIMSS> listaIncapacidadesIMSS;
+    private List<CatControlIncapacidadIMSS> listaControlIncapacidadIMSS;
+    private List<CatRiesgoTrabajoIMSS> listaRiesgoTrabajo;
+    private List<DetEmpleado> listaEmpleados;
+    private List<CatTipoRiesgoIMSS> listaTipoRiesgoIMSS;
+    
+    /*Atributos para el registro de incapacidad*/
+    private DetIncapacidad registroIncapacidad;
+    private CatTipoIncapacidadIMSS tipoIncapacidad;
+    private CatControlIncapacidadIMSS controlIncapacidad;
+    private CatRiesgoTrabajoIMSS riesgoTrabajo;
+    private DetEmpleado empleadoInc;
+    private DetEmpleado empleadoRev;
+    private CatTipoRiesgoIMSS tipoRiesgo;
+    private CatEstatusSolicitud estatusSolicitud;
+    private Date auxIncapacidadFechaInicial;
+    private Date auxIncapacidadFechaFin;
+    private int diasIncapacidad;
+    
+    private DetSolicitudPermiso solicitudPermisoSelected;
+    private SolicitudPermisoDAO solicitudPermisoDAO;
+    private List<DetSolicitudPermiso> lstSolicitudes;
+    private DetRegistro registroSelected;
+    private RegistroDAO registroDAO;
+    private List<DetRegistro> lstRegistros;
+    private List<DetRegistro> lstAuxRegistros;
+    private List<Date> diasDeAsueto;
+    
+    private final String riesgoTrabajoSAT = "01";
+    private final String accidenteTrabajo = "ATRB";
+    private final String accidenteTrabajoDefuncion = "D";
+    private final String estatusIncidenciaAprobada = "A";
+    private final String estatusIncidenciaCancelada = "C";
+    private CatEstatusSolicitud estatusSolicitudAprobada;
+    private CatEstatusSolicitud estatusSolicitudCancelada;
+    private CatRiesgoTrabajoIMSS riesgoIncapacidadDefuncion;
+    private CatTipoIncapacidadSAT tipoIncapacidadSAT;
+    private CatTipoIncapacidadIMSS tipoIncapacidadIMSS;
+    private String accionBoton = "";
+    private String iconoBoton = "";
+    private String diseñoBoton = "";
+    private String claveDefuncion = "";
+    private int estadoAccionBoton;
+    private ManageStatus status;
+    
+    private Date periodoInicio;
+    private Date periodoFin;
+    private boolean estatusAprobado;
+    private boolean estatusCancelado;
+    private boolean tpIncapacidadSelecciondado;
+    
+    public IncapacidadIMSSBean() 
+    {
+        this.registroIncapacidadDAO = new IncapacidadIMSSDAO();
+        this.empleadoDAO = new EmpleadoDAO();
+        this.tipoIncapacidadIMSSDAO = new TipoIncapacidadIMSSDAO();
+        this.controIncapacidadIMSSDAO = new ControlIncapacidadIMSSDAO();
+        this.riesgoTrabajoIMSSDAO = new RiesgoTrabajoIMSSDAO();
+        this.tipoRiesgoIMSSDAO = new TipoRiesgoIMSSDAO();
+        this.estatusSolicitudDAO = new EstatusSolicitudDAO();
+        this.incapacidadSATDAO = new TipoIncapacidadSATDAO();
+        
+        this.solicitudPermisoDAO = new SolicitudPermisoDAO();
+        this.registroDAO = new RegistroDAO();
+        
+        this.httpServletRequest = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+        this.empleadoRev = (DetEmpleado) httpServletRequest.getSession(true).getAttribute("empleado");
+        this.empleadoAsistencia = new RegistroAsistenciaBL();
+        this.diasDeDescansoObligatorio = new DiasDeDescansoObligatorioBL();
+    }
+    
+    @PostConstruct
+    public void init() 
+    {
+        this.actualizarListaRegistroIncapacidades();
+        this.listaIncapacidadesIMSS = this.tipoIncapacidadIMSSDAO.buscarTodos();
+        this.listaControlIncapacidadIMSS = this.controIncapacidadIMSSDAO.buscarTodos();
+        this.listaRiesgoTrabajo = this.riesgoTrabajoIMSSDAO.buscarTodos();
+        this.listaEmpleados = this.empleadoDAO.buscarTodosActivos((short)1);
+        this.listaTipoRiesgoIMSS = this.tipoRiesgoIMSSDAO.buscarTodos();
+        
+        this.status = new ManageStatus();
+        
+        this.periodoFin = new Date();
+        this.periodoInicio = DateUtil.inicializaFechaInicioAnioCurso(DateUtil.getAnio(periodoFin));
+        this.validarFechaInicioFin();
+        this.estatusAprobado = false;
+        this.estatusCancelado = false;
+        this.estatusSolicitudAprobada = this.estatusSolicitudDAO.buscarPorClave(this.estatusIncidenciaAprobada);
+        this.estatusSolicitudCancelada = this.estatusSolicitudDAO.buscarPorClave(this.estatusIncidenciaCancelada);
+        this.riesgoIncapacidadDefuncion = this.riesgoTrabajoIMSSDAO.buscarPorClave(this.accidenteTrabajoDefuncion);
+        this.tipoIncapacidadSAT = this.incapacidadSATDAO.buscarPorId(this.riesgoTrabajoSAT);
+        this.tipoIncapacidadIMSS = this.tipoIncapacidadIMSSDAO.buscarPorClave(this.accidenteTrabajo);
+        this.diasDeAsueto = diasDeDescansoObligatorio.getDiasAsueto();
+    }
+    
+    public void actualizarListaRegistroIncapacidades()
+    {
+        this.listaRegistroIncapacidad = registroIncapacidadDAO.buscarTodos();
+    }
+    
+    public void validarFechaInicioFin()
+    {
+        if(this.periodoFin.equals(this.periodoInicio))
+        {
+            this.periodoInicio = DateUtil.inicializaFechaInicioAnioCurso(DateUtil.getAnio(periodoFin) - 1);
+        }
+    }
+    
+    public List<DetIncapacidad> consultarIncapacidades()
+    {
+        List<DetIncapacidad> listaPeriodo = new ArrayList();
+        
+        if(this.periodoInicio != null && this.periodoFin != null)
+        {
+            List<DetIncapacidad> listAux = listaRegistroIncapacidad.stream()
+                .filter(objeto -> objeto.getFechaInicio().after(this.periodoInicio))
+                .filter(objeto -> objeto.getFechaFin().before(this.periodoFin))
+                .collect(Collectors.toList());
+            
+            listaPeriodo = Stream.concat(listaPeriodo.stream(), listAux.stream()).collect(Collectors.toList());
+        }
+        
+        List<DetIncapacidad> listaTipoEstatus = new ArrayList<>();
+        
+        if(!this.estatusAprobado && !this.estatusCancelado)
+        {
+            List<DetIncapacidad> listAux = listaPeriodo.stream()
+                .filter(objeto -> objeto.getEstatusSolicitud().getClave() == null)
+                .collect(Collectors.toList());
+            
+            listaTipoEstatus = Stream.concat(listaTipoEstatus.stream(), listAux.stream()).collect(Collectors.toList());
+        }
+        
+        if(this.estatusAprobado)
+        {
+            List<DetIncapacidad> listAux = listaPeriodo.stream()
+                .filter(objeto -> objeto.getEstatusSolicitud().equals(this.estatusSolicitudAprobada))
+                .collect(Collectors.toList());
+            
+            listaTipoEstatus = Stream.concat(listaTipoEstatus.stream(), listAux.stream()).collect(Collectors.toList());
+        }
+        
+        if(this.estatusCancelado)
+        {
+            List<DetIncapacidad> listAux = listaPeriodo.stream()
+                .filter(objeto -> objeto.getEstatusSolicitud().equals(this.estatusSolicitudCancelada))
+                .collect(Collectors.toList());
+            
+            listaTipoEstatus = Stream.concat(listaTipoEstatus.stream(), listAux.stream()).collect(Collectors.toList());
+        }
+        
+        return listaTipoEstatus;
+    }
+    
+    public void incializarSolicitud()
+    {
+        log.info("Iniciando un registro de incapacidad");
+        this.registroIncapacidad = new DetIncapacidad();
+        this.tipoIncapacidad = new CatTipoIncapacidadIMSS();
+        this.controlIncapacidad = new CatControlIncapacidadIMSS();
+        this.riesgoTrabajo = new CatRiesgoTrabajoIMSS();
+        this.tipoRiesgo = new CatTipoRiesgoIMSS();
+        this.empleadoInc = new DetEmpleado();
+        this.accionBoton = "Guardar";
+        this.iconoBoton = "pi pi-save";
+        this.diseñoBoton = "ui-button-success";
+        this.estadoAccionBoton = 1;
+         
+        PrimeFaces.current().ajax().update("form:pnlRegistoIncapacidad", "form:dialogoRegistoIncapacidad");
+    }
+    
+    public void editarSolicitud(DetIncapacidad aux)
+    {
+        log.info("Editando un registro de incapacidad: {}", aux.toString());
+        this.tipoIncapacidad = aux.getTipoIncapacidad();
+        this.controlIncapacidad = aux.getControlIncapacidad();
+        
+        if(this.tipoIncapacidad.getIncapacidadSAT().getClave().matches(this.riesgoTrabajoSAT))
+        {
+            this.riesgoTrabajo = aux.getSecuelaRiesgoTrabajo();
+            this.tipoRiesgo = aux.getTipoRiesgo();
+            this.claveDefuncion = this.deshabilitarCamposPorDefuncion(this.riesgoTrabajo.getDescripcion());
+        }else
+        {
+            this.riesgoTrabajo = new CatRiesgoTrabajoIMSS();
+            this.tipoRiesgo = new CatTipoRiesgoIMSS();
+        }
+        
+        this.empleadoInc = aux.getIdEmpleadoInc();
+        this.auxIncapacidadFechaInicial = aux.getFechaInicio();
+        this.auxIncapacidadFechaFin = aux.getFechaFin();
+        this.diasIncapacidad = aux.getDiasAutorizados();
+        this.accionBoton = "Actualizar";
+        this.iconoBoton = "pi pi-check";
+        this.diseñoBoton = "ui-button-info";
+        this.estadoAccionBoton = 2;
+        this.tpIncapacidadSelecciondado = deshabilitarTPIncapacidad(this.tipoIncapacidad);
+        
+        PrimeFaces.current().ajax().update("form:pnlRegistoIncapacidad", "form:dialogoRegistoIncapacidad");
+    }
+    
+    public void cancelarSolicitud(DetIncapacidad aux)
+    {
+        log.info("Cancelar el registro de incapacidad: {}", aux.toString());
+        this.tipoIncapacidad = aux.getTipoIncapacidad();
+        this.controlIncapacidad = aux.getControlIncapacidad();
+        
+        if(this.tipoIncapacidad.getIncapacidadSAT().getClave().matches(riesgoTrabajoSAT))
+        {
+            this.riesgoTrabajo = aux.getSecuelaRiesgoTrabajo();
+            this.tipoRiesgo = aux.getTipoRiesgo();
+            this.claveDefuncion = this.deshabilitarCamposPorDefuncion(this.riesgoTrabajo.getDescripcion());
+            this.tpIncapacidadSelecciondado = true;
+        }else
+        {
+            this.riesgoTrabajo = new CatRiesgoTrabajoIMSS();
+            this.tipoRiesgo = new CatTipoRiesgoIMSS();
+        }
+        
+        this.empleadoInc = aux.getIdEmpleadoInc();
+        this.accionBoton = "Cancelar";
+        this.iconoBoton = "pi pi-trash";
+        this.diseñoBoton = "ui-button-danger";
+        this.estadoAccionBoton = 3;
+        
+        this.tpIncapacidadSelecciondado = deshabilitarTPIncapacidad(this.tipoIncapacidad);
+        
+        PrimeFaces.current().ajax().update("form:pnlRegistoIncapacidad", "form:dialogoRegistoIncapacidad");
+    }
+    
+    public void guardarRegistroIncapacidad()
+    {
+        FacesMessage message = null;
+        FacesMessage.Severity severity = null;
+        String mensaje = null;
+        String titulo = "Guardar";
+        boolean riesgoTrabajoDefuncion = false;
+        try
+        {
+            if(this.empleadoInc == null)
+            {
+                throw new SGPException("Debes seleccionar al empleado");
+            }
+            
+            if(this.tipoIncapacidad == null)
+            {
+                throw new SGPException("Debes seleccionar el tipo de incapacidad");
+            }
+            
+            if(this.controlIncapacidad == null)
+            {
+                throw new SGPException("Debes seleccionar el control de incapacidad");
+            }
+            
+            if(this.riesgoTrabajo == null && this.tipoIncapacidad.getIncapacidadSAT().getClave().matches("01"))
+            {
+                throw new SGPException("Debes seleccionar un riesgo de trabajo");
+            }
+            
+            if(this.tipoRiesgo == null && this.tipoIncapacidad.getIncapacidadSAT().getClave().matches("01"))
+            {
+                throw new SGPException("Debes seleccionar un tipo de riesgo de trabajo");
+            }
+            
+            if(this.registroIncapacidad.getDiasAutorizados() == null)
+            {
+                throw new SGPException("Debes ingresar los dias autorizados");
+            }
+            
+            if(this.registroIncapacidad.getFechaInicio() == null)
+            {
+                throw new SGPException("Debes ingresar la fecha de inicio");
+            }
+            
+            if(this.registroIncapacidad.getDescripcion() == null)
+            {
+                throw new SGPException("Debes ingresa la descripción");
+            }
+            
+            this.registroIncapacidad.setIdEmpleadoInc(this.empleadoInc);
+            
+            InfDatoEmpresa datoEmpresaEmpleado = this.registroIncapacidad.getIdEmpleadoInc().getDatoEmpresa();
+            
+            if(datoEmpresaEmpleado == null)
+            {
+                throw new SGPException("El empleado no tiene información empresarial, consulta con RH");
+            }
+            
+            this.validarFolioIMSS(this.registroIncapacidad);
+            
+            this.registroIncapacidad.setTipoIncapacidad(this.tipoIncapacidad);
+            this.registroIncapacidad.setControlIncapacidad(this.controlIncapacidad);
+            
+            if(this.tipoIncapacidad.getIncapacidadSAT().equals(this.tipoIncapacidadSAT))
+            {
+                this.registroIncapacidad.setSecuelaRiesgoTrabajo(this.riesgoTrabajo);
+                this.registroIncapacidad.setTipoRiesgo(this.tipoRiesgo);
+            }else
+            {
+                this.registroIncapacidad.setSecuelaRiesgoTrabajo(null);
+                this.registroIncapacidad.setTipoRiesgo(null);
+            }
+            
+            this.registroIncapacidad.setIdEmpleadoRev(this.empleadoRev);
+            
+            if(this.registroIncapacidad.getDiasAutorizados() == 0)
+            {
+                this.registroIncapacidad.setFechaFin(this.registroIncapacidad.getFechaInicio());
+            }else
+            {
+                Date fechaFin = DateUtil.agregaFechaFin(this.registroIncapacidad.getFechaInicio(), this.registroIncapacidad.getDiasAutorizados());
+                this.registroIncapacidad.setFechaFin(fechaFin);
+            }
+            
+            Date fechaCaptura = new Date();
+            this.registroIncapacidad.setFechaCaptura(fechaCaptura);
+            this.estatusSolicitud = this.estatusSolicitudDAO.buscarPorClave(this.estatusIncidenciaAprobada);
+            this.registroIncapacidad.setEstatusSolicitud(this.estatusSolicitud);
+            
+            this.validarMaxTiempoIncapacidad(this.registroIncapacidad);
+            
+            /*Valida si tiene registro de incapacidad*/
+            this.validarRegistroIncapacidad(this.registroIncapacidad);
+            
+            /*Valida si hay una solicitud de permiso y/o vacaciones ya registrada en el periodo de la incapacidad*/
+            this.lstSolicitudes = this.validarPeriodoSolicitudPermiso(this.registroIncapacidad);
+            if(!this.lstSolicitudes.isEmpty())
+            {
+                log.info("Las solicitudes son: {}", this.lstSolicitudes.toString());
+                throw new SGPException("Ya existe un periodo de vacaciones y/o permiso");
+            }
+            
+            riesgoTrabajoDefuncion = this.validarSolicitudDefuncion(this.registroIncapacidad);
+            
+            if(riesgoTrabajoDefuncion == false)
+            {
+                //Guarda el registro de incapacidad en asistencia
+                this.empleadoAsistencia.guardarRegistroIncapacidad(this.registroIncapacidad.getIdEmpleadoInc(), this.registroIncapacidad.getFechaInicio(), this.registroIncapacidad.getFechaFin(), this.diasDeAsueto);
+            }
+            
+            this.registroIncapacidadDAO.guardar(this.registroIncapacidad);
+            
+            log.info("La incapacidad se guardo correctamente");
+            mensaje = "Se guardo correctamente la incapacidad";
+            severity = FacesMessage.SEVERITY_INFO;
+        }catch(SGPException ex)
+        {
+            titulo = "Error";
+            mensaje = ex.getMessage();
+            severity = FacesMessage.SEVERITY_ERROR;
+            log.info("Error al registrar la incapacidad: ", ex);
+        }catch (Exception e) 
+        {
+            titulo = "Error";
+            mensaje = "Consulte al administrador de sistemas";
+            severity = FacesMessage.SEVERITY_ERROR;
+            log.info("ERROR: ", e);
+        }finally
+        {
+            actualizarListaRegistroIncapacidades();
+            message = new FacesMessage(severity, titulo, mensaje);
+            FacesContext.getCurrentInstance().addMessage(null, message);
+            PrimeFaces.current().executeScript("PF('dialogoRegistoIncapacidad').hide()");
+            PrimeFaces.current().ajax().update("form:messages","form:dtRegistroIncapacidad");
+        }
+    }
+    
+    public void actualizarRegistroIncapacidad()
+    {
+        FacesMessage message = null;
+        FacesMessage.Severity severity = null;
+        String mensaje = null;
+        String titulo = "Actualizar";
+        
+        try
+        {
+            if(this.riesgoTrabajo == null && this.tipoIncapacidad.getIncapacidadSAT().equals(this.tipoIncapacidadSAT))
+            {
+                throw new SGPException("Debes seleccionar un riesgo de trabajo");
+            }
+            
+            if(this.tipoIncapacidad.getIdTpIncapacidad() == null)
+            {
+                throw new SGPException("Debes seleccionar el tipo de incapacidad");
+            }
+            
+            if(this.controlIncapacidad.getIdControlIncapacidad() == null)
+            {
+                throw new SGPException("Debes seleccionar el control de incapacidad");
+            }
+            
+            if(this.riesgoTrabajo == null && this.tipoIncapacidad.getIncapacidadSAT().equals(this.tipoIncapacidadSAT))
+            {
+                throw new SGPException("Debes seleccionar un riesgo de trabajo");
+            }
+            
+            this.registroIncapacidad.setIdEmpleadoInc(this.empleadoInc);
+            this.registroIncapacidad.setTipoIncapacidad(this.tipoIncapacidad);
+            this.registroIncapacidad.setControlIncapacidad(this.controlIncapacidad);
+            
+            if(this.tipoIncapacidad.getIncapacidadSAT().getClave().matches(riesgoTrabajoSAT))
+            {
+                this.registroIncapacidad.setSecuelaRiesgoTrabajo(this.riesgoTrabajo);
+                this.registroIncapacidad.setTipoRiesgo(this.tipoRiesgo);
+            }else
+            {
+                this.registroIncapacidad.setSecuelaRiesgoTrabajo(null);
+                this.registroIncapacidad.setTipoRiesgo(null);
+            }
+            
+            this.registroIncapacidad.setIdEmpleadoRev(this.empleadoRev);
+            
+            if(this.registroIncapacidad.getTipoIncapacidad().getClave().matches("ENFG") && this.registroIncapacidad.getTipoIncapacidad().getIncapacidadSAT().getClave().matches("02"))
+            {
+                Date fechaFin = DateUtil.agregaFechaFin(this.registroIncapacidad.getFechaInicio(), this.registroIncapacidad.getDiasAutorizados());
+                this.registroIncapacidad.setFechaFin(fechaFin);
+                this.actualizarFechasIncapacidad(this.registroIncapacidad, this.auxIncapacidadFechaFin, this.diasIncapacidad);
+            }
+            
+            this.registroIncapacidadDAO.actualizar(this.registroIncapacidad);
+            
+            log.info("La incapacidad se actualizo correctamente");
+            mensaje = "Se actualizo correctamente la incapacidad";
+            severity = FacesMessage.SEVERITY_INFO;
+        }catch(SGPException ex)
+        {
+            titulo = "Error";
+            mensaje = ex.getMessage();
+            severity = FacesMessage.SEVERITY_ERROR;
+            log.error("Error al actualizar la incapacidad: ", ex);
+        }catch (Exception e) 
+        {
+            titulo = "Error";
+            mensaje = "Consulte al administrador de sistemas";
+            severity = FacesMessage.SEVERITY_ERROR;
+            log.error("ERROR: {}", e);
+        }finally
+        {
+            actualizarListaRegistroIncapacidades();
+            message = new FacesMessage(severity, titulo, mensaje);
+            FacesContext.getCurrentInstance().addMessage(null, message);
+            PrimeFaces.current().executeScript("PF('dialogoRegistoIncapacidad').hide()");
+            PrimeFaces.current().ajax().update("form:messages","form:dtRegistroIncapacidad");
+        }
+    }
+    
+    private void cancelarRegistroIncapacidad()
+    {
+        FacesMessage message = null;
+        FacesMessage.Severity severity = null;
+        String mensaje = null;
+        String titulo = "Cancelar";
+        try
+        {
+            if(this.riesgoTrabajo == null && this.tipoIncapacidad.getIncapacidadSAT().getClave().matches(riesgoTrabajoSAT))
+            {
+                throw new SGPException("Debes seleccionar un riesgo de trabajo");
+            }
+            
+            this.estatusSolicitud = this.estatusSolicitudDAO.buscarPorClave(this.estatusIncidenciaCancelada);
+            this.registroIncapacidad.setEstatusSolicitud(this.estatusSolicitud);
+            this.registroIncapacidad.setIdEmpleadoRev(this.empleadoRev);
+            
+            //Obtiene los registros de incapacidad que estan en asistencia(det_registro)
+            List<DetRegistro> listaRegistroIncapacidades = this.obtenerRegistroAsistencia(this.registroIncapacidad.getIdEmpleadoInc(), this.registroIncapacidad.getFechaInicio(), this.registroIncapacidad.getFechaFin());
+            
+            //Elimina registros de incapacidad en asistencia
+            if(!listaRegistroIncapacidades.isEmpty())
+            {
+                int registrosBorrados = this.cancelarRegistroIncapacidad(listaRegistroIncapacidades);
+                log.info("Registros eliminados del empleado {} en asistencia: {}", this.registroIncapacidad.getIdEmpleadoInc().getIdEmpleado(), registrosBorrados);
+            }
+            
+            this.registroIncapacidadDAO.actualizar(this.registroIncapacidad);
+            
+            log.info("La incapacidad se cancelo correctamente");
+            mensaje = "Se cancelo correctamente la incapacidad";
+            severity = FacesMessage.SEVERITY_INFO;
+        }catch(SGPException ex)
+        {
+            titulo = "Error";
+            mensaje = ex.getMessage();
+            severity = FacesMessage.SEVERITY_ERROR;
+            log.info("Error al cancelar la incapacidad: ", ex);
+        }catch (Exception e) 
+        {
+            titulo = "Error";
+            mensaje = "Consulte al administrador de sistemas";
+            severity = FacesMessage.SEVERITY_ERROR;
+            log.info("ERROR, {}", e);
+        }finally
+        {
+            actualizarListaRegistroIncapacidades();
+            message = new FacesMessage(severity, titulo, mensaje);
+            FacesContext.getCurrentInstance().addMessage(null, message);
+            PrimeFaces.current().executeScript("PF('dialogoRegistoIncapacidad').hide()");
+            PrimeFaces.current().ajax().update("form:messages","form:dtRegistroIncapacidad");
+        }
+    }
+    
+    //Valida si ya existe un registro de incapacidad, con orden de prioridad con defuncion
+    //y despues las demas incapacidades
+    public void validarRegistroIncapacidad(DetIncapacidad incapacidad) throws SGPException
+    {
+        DetEmpleado empleado = incapacidad.getIdEmpleadoInc();
+        Date fechaInicio = incapacidad.getFechaInicio();
+        Date fechaFinal = incapacidad.getFechaFin();
+        
+        List<DetIncapacidad> auxRegistroIncapacidad = this.registroIncapacidadDAO.buscarPorPeriodo(empleado.getIdEmpleado(), fechaInicio, fechaFinal);
+        
+        if(auxRegistroIncapacidad.isEmpty())
+        {
+            log.info("No se encontraron registros de incapacidades");
+        }else
+        {
+            for(DetIncapacidad auxIncapacidad : auxRegistroIncapacidad)
+            {
+                boolean auxRegDefuncion = this.validaRegistroEmpleadoDefuncion(auxIncapacidad);
+                if(auxIncapacidad.getSecuelaRiesgoTrabajo() != null && auxIncapacidad.getSecuelaRiesgoTrabajo().getClave().trim().matches("D") && auxRegDefuncion == true)
+                {
+                    throw new SGPException("Ya tiene un registro de defuncion");
+                }
+            }
+
+            if(!auxRegistroIncapacidad.isEmpty())
+            {
+                log.trace("Registros de incapacidades del empleado {} encontradas: {}", empleadoInc.getIdEmpleado(), auxRegistroIncapacidad.toString());
+                throw new SGPException("El empleado ya cuenta con un registro de incapacidad");
+            }
+        }
+    }
+    
+    public boolean validaRegistroEmpleadoDefuncion(DetIncapacidad auxIncapacidad)
+    {
+        boolean regDefuncion = false;
+        DetEmpleado empleado = auxIncapacidad.getIdEmpleadoInc();
+        InfDatoEmpresa empleadoEmpresa= empleado.getDatoEmpresa();
+        
+        if(empleado.getActivo() == 0 && empleadoEmpresa.getFechaBaja() != null)
+        {
+            regDefuncion = true;
+        }
+        
+        return regDefuncion;
+    }
+    
+    //Valida si existe un periodo de permiso y/o vacaciones
+    public List<DetSolicitudPermiso> validarPeriodoSolicitudPermiso(DetIncapacidad incapacidad) throws SGPException
+    {
+        Integer idEmpleadoInc = incapacidad.getIdEmpleadoInc().getIdEmpleado();
+        Date fechaInicio = incapacidad.getFechaInicio();
+        Date fechaFin = incapacidad.getFechaFin();
+        log.info("Fecha Inicial: {} y Fecha Final: {} del Empleado: {}", fechaInicio, fechaFin, idEmpleadoInc);
+        
+        return this.solicitudPermisoDAO.buscarPorPeriodo(idEmpleadoInc, fechaInicio, fechaFin);
+    }
+    
+    //Busca los registro de incapacidad uno por uno en la seccion de registro asistencia
+    public List<DetRegistro> obtenerRegistroAsistencia(DetEmpleado empleado, Date fechaInicio, Date fechaFin) throws SGPException
+    {
+        List<Date> listaFechasIncapacidades = DateUtil.generarArreglosFechas(fechaInicio, fechaFin);
+        listaFechasIncapacidades = this.empleadoAsistencia.diasVacacionesSolicitados(listaFechasIncapacidades, this.diasDeAsueto, empleado.getDatoEmpresa());
+        int totalFechasIncapacidades = listaFechasIncapacidades.size();
+        
+        String clave = "I";
+        List<DetRegistro> listaRegistroAsistencia = this.registroDAO.buscarPorEmpPeriodoSolicitud(empleado.getIdEmpleado(), clave, fechaInicio, fechaFin);
+        int totalRegistroIncapacidad = listaRegistroAsistencia.size();
+        Integer horaEntrada = 12;
+        
+        log.info("Tamaño rango fechas {}, Tamaño rango registros incapacidad {}", totalFechasIncapacidades, totalRegistroIncapacidad);
+        
+        if(totalRegistroIncapacidad > 0)
+        {
+            listaRegistroAsistencia.clear();
+            for(Date aux : listaFechasIncapacidades)
+            {
+                Date auxFecha = DateUtil.getDate(DateUtil.getAnio(aux), DateUtil.getMes(aux), DateUtil.getDia(aux), horaEntrada, 0, 0);
+                this.registroSelected = this.registroDAO.buscarPorEstatus(empleado.getIdEmpleado(), auxFecha, clave);
+                if(this.registroSelected != null)
+                {
+                    listaRegistroAsistencia.add(this.registroSelected);
+                }
+            }
+            
+            log.info("El empleado {} tiene {} registros en asistencia", empleado.getIdEmpleado(), totalRegistroIncapacidad);
+            
+            if(listaRegistroAsistencia.isEmpty())
+            {
+                throw new SGPException("No se encontraron registros en asistencia");
+            }
+        }else
+        {
+            log.info("El empleado {} tiene {} registros en asistencia", empleado.getIdEmpleado(), totalRegistroIncapacidad);
+        }
+        
+        return listaRegistroAsistencia;
+    }
+    
+    //Quita los registros en asistencia de una incapacidad cancelada
+    public int cancelarRegistroIncapacidad(List<DetRegistro> listaRegistros) throws SGPException
+    {
+        int totalRegistros = 0;
+        try
+        {
+            for(DetRegistro auxRegistro : listaRegistros)
+            {
+                this.registroDAO.eliminar(auxRegistro);
+                totalRegistros = totalRegistros + 1;
+            }
+        }catch(SGPException ex)
+        {
+            log.info("Error al borrar un registo de asistencia: {}", ex);
+            throw new SGPException("Error al cancelar la incapacidad");
+        }
+        return totalRegistros;
+    }
+    
+    //Valida si la solicitud es del tipo defuncion y modifica el 
+    //registro del empleado y de asistencia de la anterior incapacidad
+    public boolean validarSolicitudDefuncion(DetIncapacidad incapacidad) throws SGPException
+    {
+        boolean regDefuncion = false;
+        
+        CatRiesgoTrabajoIMSS secuelaRiesgoTrabajo = incapacidad.getSecuelaRiesgoTrabajo();
+        
+        //log.info("Posible registro de defuncion {}", this.registroIncapacidad.getRiesgoTrabajo().toString());
+        if(secuelaRiesgoTrabajo != null && secuelaRiesgoTrabajo.getClave().matches(this.riesgoIncapacidadDefuncion.getClave()))
+        {
+            //En caso la secuela de riesgo de trabajo del tipo defuncion, se da de baja al empleado
+            String descripcionDefuncion = this.riesgoIncapacidadDefuncion.getDescripcion();
+            log.info("Descripcion del tipo baja defuncion: {}", descripcionDefuncion);
+            this.modificarRegistroIncapacidad(incapacidad);
+            regDefuncion = true;
+        }
+        
+        return regDefuncion;
+    }
+    
+    //Al tener un registro de incapacidad del tipo defuncion dentro del periodo de una 
+    //incapacidad anterior, se elimina el registro parcial en asistencia
+    public void modificarRegistroIncapacidad(DetIncapacidad incapacidad) throws SGPException
+    {
+        DetEmpleado empleado = incapacidad.getIdEmpleadoInc();
+        Date fechaInicial = incapacidad.getFechaInicio();
+        CatRiesgoTrabajoIMSS riesgoDeTrabajo = incapacidad.getSecuelaRiesgoTrabajo();
+        
+        log.info("Baja del empleado {} en la fecha {}", empleado.getIdEmpleado(), fechaInicial);
+        DetIncapacidad auxRegistroIncapacidad = this.registroIncapacidadDAO.buscarPorEmpleadoUltimoPeriodo(empleado.getIdEmpleado(), fechaInicial);
+        
+        if(auxRegistroIncapacidad != null)
+        {
+            log.info("Registro de incapacidad encontrado: {}", auxRegistroIncapacidad.toString());
+            log.info("Fecha original: {}", fechaInicial);
+            Date fechaIni = DateUtil.moverFechaUnDiaAdelante(fechaInicial);
+            log.info("Fecha adelantada: {}", fechaIni);
+            
+            List<DetRegistro> listaRegistroIncapacidades = this.obtenerRegistroAsistencia(empleado, fechaIni, auxRegistroIncapacidad.getFechaFin());
+            int numeroRegistrosIncapacidades = listaRegistroIncapacidades.size();
+
+            if(numeroRegistrosIncapacidades > 0)
+            {
+                int registrosBorrados = this.cancelarRegistroIncapacidad(listaRegistroIncapacidades);
+                log.info("Registros eliminados de asistencia: {}", registrosBorrados);
+            }
+            
+            this.actualizarRegistroEmpleado(empleado, fechaInicial, riesgoDeTrabajo.getDescripcion());
+        }else
+        {
+            this.actualizarRegistroEmpleado(empleado, fechaInicial, riesgoDeTrabajo.getDescripcion());
+        }
+    }
+    
+    //Actualiza los datos del empleado en caso de ser incapacidad por defuncion
+    public void actualizarRegistroEmpleado(DetEmpleado empleado, Date fecha, String descripcion) throws SGPException
+    {
+        log.info("Baja del empleado {} en la fecha {} con la descripcion {}", empleado.getIdEmpleado(), fecha, descripcion);
+        try
+        {
+            InfDatoEmpresa empleadoEmpresa = empleado.getDatoEmpresa();
+            empleadoEmpresa.setFechaBaja(fecha);
+            empleadoEmpresa.setMotivobaja(descripcion);
+            empleado.setDatoEmpresa(empleadoEmpresa);
+            empleado.setActivo((short)0);
+            this.empleadoDAO.actualizar(empleado);
+        }catch(SGPException ex)
+        {
+            log.info("Error al actualizar al empleado: {}", ex);
+            throw new SGPException("No se actualizo el empleado");
+        }
+    }
+    
+    public void actualizarFechasIncapacidad(DetIncapacidad incapacidad, Date auxiliarFecha, int primerosDiasIncapacidad) throws SGPException
+    {
+        log.info("Actualizando fechas de la incapacidad: {}", incapacidad.toString());
+        DetEmpleado empleadoIncapacidad = incapacidad.getIdEmpleadoInc();
+        Date fechaFin = incapacidad.getFechaFin();
+        //this.lstAuxRegistros = this.obtenerRegistroAsistencia(empleadoInc, auxIncapacidadFechaInicial, auxIncapacidadFechaFin);
+        
+        if(primerosDiasIncapacidad < incapacidad.getDiasAutorizados())
+        {
+            Date auxFecha = DateUtil.moverFechaUnDiaAdelante(auxiliarFecha);
+            log.info("Fecha inicial: {} y Fecha final: {}", auxFecha, fechaFin);
+            this.empleadoAsistencia.guardarRegistroIncapacidad(empleadoIncapacidad, auxFecha, fechaFin, this.diasDeAsueto);
+        }
+        
+        if(incapacidad.getDiasAutorizados() < primerosDiasIncapacidad)
+        {
+            Date auxFecha = DateUtil.moverFechaUnDiaAdelante(fechaFin);
+            log.info("Fecha inicial: {} y Fecha final: {}", auxFecha, auxiliarFecha);
+            //Obtiene los registros de incapacidad que estan en asistencia(det_registro)
+            List<DetRegistro> listaRegistroIncapacidades = this.obtenerRegistroAsistencia(empleadoIncapacidad, auxFecha, auxiliarFecha);
+            
+            //Elimina registros de incapacidad en asistencia
+            if(!listaRegistroIncapacidades.isEmpty())
+            {
+                int registrosBorrados = this.cancelarRegistroIncapacidad(listaRegistroIncapacidades);
+                log.info("Registros eliminados de asistencia: {}", registrosBorrados);
+            }
+        }
+        
+    }
+    
+    public void validarFolioIMSS(DetIncapacidad registroIncapacidad) throws SGPException
+    {
+        int contFolios = 0;
+        
+        for(DetIncapacidad auxRegIncapacidad : this.listaRegistroIncapacidad)
+        {
+            if(registroIncapacidad.getFolio().toUpperCase().matches(auxRegIncapacidad.getFolio().toUpperCase()))
+            {
+                contFolios += 1;
+            }
+        }
+        
+        if(contFolios > 0)
+        {
+            throw new SGPException("Ya se encuentra el folio registrado");
+        }
+        
+    }
+    
+    public void validarMaxTiempoIncapacidad(DetIncapacidad auxRegistroIncapacidad) throws SGPException
+    {
+        CatTipoIncapacidadIMSS auxTPIncapacidad = auxRegistroIncapacidad.getTipoIncapacidad();
+        CatControlIncapacidadIMSS auxControlIncapacidad = auxRegistroIncapacidad.getControlIncapacidad();
+        int diasDeIncapacidad = auxRegistroIncapacidad.getDiasAutorizados();
+        
+        switch(auxTPIncapacidad.getClave().trim().toUpperCase())
+        {
+            case "ATRB":
+                //Valida el maximo de dias que se pueden registrar en un accidente de trabajo
+                if(diasDeIncapacidad > auxTPIncapacidad.getMaxDias())
+                {
+                    throw new SGPException("No puedes ingresar más de 364 dias de incapacidad");
+                }else
+                {
+                    break;
+                }
+            case "ATRY":
+                //Valida el maximo de dias que se pueden registrar en un accidente de trayecto
+                if(diasDeIncapacidad > auxTPIncapacidad.getMaxDias())
+                {
+                    throw new SGPException("No puedes ingresar más de 364 dias de incapacidad");
+                }else
+                {
+                    break;
+                }
+            case "ENFG":
+                //Valida el maximo de dias que se pueden registrar es una enfermedad general
+                if(diasDeIncapacidad > auxTPIncapacidad.getMaxDias())
+                {
+                    throw new SGPException("No puedes ingresar más de 361 dias de incapacidad");
+                }else
+                {
+                    break;
+                }
+            case "MAT":
+                //Valida el maximo de dias que se pueden registrar en maternidad prenatal, postnatal o enlaces
+                switch(auxControlIncapacidad.getClave().trim().toUpperCase())
+                {
+                    case "PR":
+                        if(auxRegistroIncapacidad.getDiasAutorizados() > auxTPIncapacidad.getMaxDias())
+                        {
+                            throw new SGPException("No puedes ingresar más de 84 dias de incapacidad");
+                        }else
+                        {
+                            break;
+                        }
+                    case "PO":
+                        if(auxRegistroIncapacidad.getDiasAutorizados() > auxTPIncapacidad.getMaxDias())
+                        {
+                            throw new SGPException("No puedes ingresar más de 84 dias de incapacidad");
+                        }else
+                        {
+                            break;
+                        }
+                    case "E":
+                        if(auxRegistroIncapacidad.getDiasAutorizados() > 21)
+                        {
+                            throw new SGPException("No puedes ingresar más de 21 dias de incapacidad");
+                        }else
+                        {
+                            break;
+                        }
+                }
+            case "L140":
+                //Valida el maximo de dias que se pueden registrar licencia 140 bis
+                if(diasDeIncapacidad > auxTPIncapacidad.getMaxDias())
+                {
+                    throw new SGPException("No puedes ingresar más de 28 dias de incapacidad");
+                }else
+                {
+                    break;
+                }
+        }
+    }
+    
+    public boolean deshabilitarTPIncapacidad(CatTipoIncapacidadIMSS tpIncapacidad)
+    {
+        boolean auxTPIncapacidad = false;
+        
+        switch(tpIncapacidad.getClave().trim().toUpperCase())
+        {
+            case "ATRB":
+                auxTPIncapacidad =  true;
+                break;
+            case "ATRY":
+                auxTPIncapacidad =  true;
+                break;
+            case "ENFG":
+                auxTPIncapacidad =  false;
+                break;
+            case "MAT":
+                auxTPIncapacidad =  true;
+                break;
+            case "L140":
+                auxTPIncapacidad =  true;
+                break;
+        }
+        
+        return auxTPIncapacidad;
+    }
+    
+    public String deshabilitarCamposPorDefuncion(String descripcion)
+    {
+        String palabra1 = "Defuncion";
+        String palabra2 = "Defunción";
+        
+        if(descripcion.toUpperCase().contains(palabra1.toUpperCase()) || descripcion.toUpperCase().contains(palabra2.toUpperCase()))
+        {
+            return "D";
+        }else
+        {
+            return "";
+        }
+    }
+    
+    public void metodoBoton()
+    {
+        switch(this.accionBoton)
+        {
+            case "Guardar":
+                this.guardarRegistroIncapacidad();
+                break;
+            case "Actualizar":
+                this.actualizarRegistroIncapacidad();
+                break;
+            case "Cancelar":
+                this.cancelarRegistroIncapacidad();
+                break;
+        }
+    }
+    
+    //<editor-fold defaultstate="collapsed" desc="Getters&Setters">
+    public List<DetIncapacidad> getListaRegistroIncapacidad() {
+        return listaRegistroIncapacidad;
+    }
+
+    public void setListaRegistroIncapacidad(List<DetIncapacidad> listaRegistroIncapacidad) {
+        this.listaRegistroIncapacidad = listaRegistroIncapacidad;
+    }
+
+    public List<DetIncapacidad> getListaRegistroFiltrada() {
+        return listaRegistroFiltrada;
+    }
+
+    public void setListaRegistroFiltrada(List<DetIncapacidad> listaRegistroFiltrada) {
+        this.listaRegistroFiltrada = listaRegistroFiltrada;
+    }
+
+    public List<CatTipoIncapacidadIMSS> getListaIncapacidadesIMSS() {
+        return listaIncapacidadesIMSS;
+    }
+
+    public void setListaIncapacidadesIMSS(List<CatTipoIncapacidadIMSS> listaIncapacidadesIMSS) {
+        this.listaIncapacidadesIMSS = listaIncapacidadesIMSS;
+    }
+
+    public List<CatControlIncapacidadIMSS> getListaControlIncapacidadIMSS() {
+        return listaControlIncapacidadIMSS;
+    }
+
+    public void setListaControlIncapacidadIMSS(List<CatControlIncapacidadIMSS> listaControlIncapacidadIMSS) {
+        this.listaControlIncapacidadIMSS = listaControlIncapacidadIMSS;
+    }
+
+    public List<CatRiesgoTrabajoIMSS> getListaRiesgoTrabajo() {
+        return listaRiesgoTrabajo;
+    }
+
+    public void setListaRiesgoTrabajo(List<CatRiesgoTrabajoIMSS> listaRiesgoTrabajo) {
+        this.listaRiesgoTrabajo = listaRiesgoTrabajo;
+    }
+
+    public List<DetEmpleado> getListaEmpleados() {
+        return listaEmpleados;
+    }
+
+    public void setListaEmpleados(List<DetEmpleado> listaEmpleados) {
+        this.listaEmpleados = listaEmpleados;
+    }
+
+    public DetIncapacidad getRegistroIncapacidad() {
+        return registroIncapacidad;
+    }
+
+    public void setRegistroIncapacidad(DetIncapacidad registroIncapacidad) {
+        this.registroIncapacidad = registroIncapacidad;
+    }
+
+    public CatTipoIncapacidadIMSS getTipoIncapacidad() {
+        return tipoIncapacidad;
+    }
+
+    public void setTipoIncapacidad(CatTipoIncapacidadIMSS tipoIncapacidad) {
+        this.tipoIncapacidad = tipoIncapacidad;
+    }
+
+    public CatControlIncapacidadIMSS getControlIncapacidad() {
+        return controlIncapacidad;
+    }
+
+    public void setControlIncapacidad(CatControlIncapacidadIMSS controlIncapacidad) {
+        this.controlIncapacidad = controlIncapacidad;
+    }
+
+    public CatRiesgoTrabajoIMSS getRiesgoTrabajo() {
+        return riesgoTrabajo;
+    }
+
+    public void setRiesgoTrabajo(CatRiesgoTrabajoIMSS riesgoTrabajo) {
+        this.riesgoTrabajo = riesgoTrabajo;
+    }
+
+    public DetEmpleado getEmpleadoRev() {
+        return empleadoRev;
+    }
+
+    public void setEmpleadoRev(DetEmpleado empleadoRev) {
+        this.empleadoRev = empleadoRev;
+    }
+
+    public DetEmpleado getEmpleadoInc() {
+        return empleadoInc;
+    }
+
+    public void setEmpleadoInc(DetEmpleado empleadoInc) {
+        this.empleadoInc = empleadoInc;
+    }
+
+    public List<CatTipoRiesgoIMSS> getListaTipoRiesgoIMSS() {
+        return listaTipoRiesgoIMSS;
+    }
+
+    public void setListaTipoRiesgoIMSS(List<CatTipoRiesgoIMSS> listaTipoRiesgoIMSS) {
+        this.listaTipoRiesgoIMSS = listaTipoRiesgoIMSS;
+    }
+
+    public CatTipoRiesgoIMSS getTipoRiesgo() {
+        return tipoRiesgo;
+    }
+
+    public void setTipoRiesgo(CatTipoRiesgoIMSS tipoRiesgo) {
+        this.tipoRiesgo = tipoRiesgo;
+    }
+
+    public CatEstatusSolicitud getEstatusSolicitud() {
+        return estatusSolicitud;
+    }
+
+    public void setEstatusSolicitud(CatEstatusSolicitud estatusSolicitud) {
+        this.estatusSolicitud = estatusSolicitud;
+    }
+
+    public DetSolicitudPermiso getSolicitudPermisoSelected() {
+        return solicitudPermisoSelected;
+    }
+
+    public void setSolicitudPermisoSelected(DetSolicitudPermiso solicitudPermisoSelected) {
+        this.solicitudPermisoSelected = solicitudPermisoSelected;
+    }
+    
+    public List<DetSolicitudPermiso> getLstSolicitudes() {
+        return lstSolicitudes;
+    }
+
+    public void setLstSolicitudes(List<DetSolicitudPermiso> lstSolicitudes) {
+        this.lstSolicitudes = lstSolicitudes;
+    }
+
+    public DetRegistro getRegistroSelected() {
+        return registroSelected;
+    }
+
+    public void setRegistroSelected(DetRegistro registroSelected) {
+        this.registroSelected = registroSelected;
+    }
+    
+    public List<DetRegistro> getLstRegistros() {
+        return lstRegistros;
+    }
+
+    public void setLstRegistros(List<DetRegistro> lstRegistros) {
+        this.lstRegistros = lstRegistros;
+    }
+    
+    public RegistroAsistenciaBL getEmpleadoAsistencia() {
+        return empleadoAsistencia;
+    }
+
+    public CatEstatusSolicitud getEstatusSolicitudAprobada() {
+        return estatusSolicitudAprobada;
+    }
+
+    public void setEstatusSolicitudAprobada(CatEstatusSolicitud estatusSolicitudAprobada) {
+        this.estatusSolicitudAprobada = estatusSolicitudAprobada;
+    }
+
+    public CatEstatusSolicitud getEstatusSolicitudCancelada() {
+        return estatusSolicitudCancelada;
+    }
+
+    public void setEstatusSolicitudCancelada(CatEstatusSolicitud estatusSolicitudCancelada) {
+        this.estatusSolicitudCancelada = estatusSolicitudCancelada;
+    }
+    
+    public CatRiesgoTrabajoIMSS getRiesgoIncapacidadDefuncion() {
+        return riesgoIncapacidadDefuncion;
+    }
+
+    public void setRiesgoIncapacidadDefuncion(CatRiesgoTrabajoIMSS riesgoIncapacidadDefuncion) {
+        this.riesgoIncapacidadDefuncion = riesgoIncapacidadDefuncion;
+    }
+
+    public CatTipoIncapacidadIMSS getTipoIncapacidadIMSS() {
+        return tipoIncapacidadIMSS;
+    }
+
+    public void setTipoIncapacidadIMSS(CatTipoIncapacidadIMSS tipoIncapacidadIMSS) {
+        this.tipoIncapacidadIMSS = tipoIncapacidadIMSS;
+    }
+
+    public CatTipoIncapacidadSAT getTipoIncapacidadSAT() {
+        return tipoIncapacidadSAT;
+    }
+
+    public void setTipoIncapacidadSAT(CatTipoIncapacidadSAT tipoIncapacidadSAT) {
+        this.tipoIncapacidadSAT = tipoIncapacidadSAT;
+    }
+    
+    public String getAccionBoton() {
+        return accionBoton;
+    }
+
+    public void setAccionBoton(String accionBoton) {
+        this.accionBoton = accionBoton;
+    }
+
+    public String getIconoBoton() {
+        return iconoBoton;
+    }
+
+    public void setIconoBoton(String iconoBoton) {
+        this.iconoBoton = iconoBoton;
+    }
+
+    public String getDiseñoBoton() {
+        return diseñoBoton;
+    }
+
+    public void setDiseñoBoton(String diseñoBoton) {
+        this.diseñoBoton = diseñoBoton;
+    }
+    
+    public int getEstadoAccionBoton() {
+        return estadoAccionBoton;
+    }
+
+    public void setEstadoAccionBoton(int estadoAccionBoton) {
+        this.estadoAccionBoton = estadoAccionBoton;
+    }
+
+    public String getClaveDefuncion() {
+        return claveDefuncion;
+    }
+
+    public void setClaveDefuncion(String claveDefuncion) {
+        this.claveDefuncion = claveDefuncion;
+    }
+
+    public ManageStatus getStatus() {
+        return status;
+    }
+    
+    public Date getPeriodoInicio() {
+        return periodoInicio;
+    }
+
+    public void setPeriodoInicio(Date periodoInicio) {
+        this.periodoInicio = periodoInicio;
+    }
+
+    public Date getPeriodoFin() {
+        return periodoFin;
+    }
+
+    public void setPeriodoFin(Date periodoFin) {
+        this.periodoFin = periodoFin;
+    }
+    
+    public boolean isEstatusAprobado() {
+        return estatusAprobado;
+    }
+
+    public void setEstatusAprobado(boolean estatusAprobado) {
+        this.estatusAprobado = estatusAprobado;
+    }
+
+    public boolean isEstatusCancelado() {
+        return estatusCancelado;
+    }
+
+    public void setEstatusCancelado(boolean estatusCancelado) {
+        this.estatusCancelado = estatusCancelado;
+    }
+    
+    public boolean isTpIncapacidadSelecciondado() {
+        return tpIncapacidadSelecciondado;
+    }
+
+    public void setTpIncapacidadSelecciondado(boolean tpIncapacidadSelecciondado) {
+        this.tpIncapacidadSelecciondado = tpIncapacidadSelecciondado;
+    }
+    //</editor-fold>
+    
+}

@@ -24,6 +24,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import mx.com.ferbo.model.imss.DetIncapacidad;
 
 @Entity
 @Table(name = "det_empleado")
@@ -242,6 +243,12 @@ public class DetEmpleado implements Serializable {
     
     @OneToOne(mappedBy = "empleado", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private DetEmpleadoConfiguracion empleadoConfiguracion;
+    
+    @OneToMany(mappedBy = "idEmpleadoInc")
+    private List<DetIncapacidad> registroIncapacidadInc;
+    
+    @OneToMany(mappedBy = "idEmpleadoRev")
+    private List<DetIncapacidad> registroIncapacidadRev;
     
     public DetEmpleado() {
     }
@@ -508,6 +515,22 @@ public class DetEmpleado implements Serializable {
 
     public void setVacaciones(List<DetVacaciones> vacaciones) {
         this.vacaciones = vacaciones;
+    }
+
+    public List<DetIncapacidad> getRegistroIncapacidadInc() {
+        return registroIncapacidadInc;
+    }
+
+    public void setRegistroIncapacidadInc(List<DetIncapacidad> registroIncapacidadInc) {
+        this.registroIncapacidadInc = registroIncapacidadInc;
+    }
+
+    public List<DetIncapacidad> getRegistroIncapacidadRev() {
+        return registroIncapacidadRev;
+    }
+
+    public void setRegistroIncapacidadRev(List<DetIncapacidad> registroIncapacidadRev) {
+        this.registroIncapacidadRev = registroIncapacidadRev;
     }
     
     @Override

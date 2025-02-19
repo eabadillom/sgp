@@ -20,12 +20,12 @@ import javax.validation.constraints.NotNull;
  * @author alberto
  */
 @Entity
-@Table(name = "cat_sec_riesgo_trabajo")
+@Table(name = "cat_tp_riesgo")
 @NamedQueries({
-    @NamedQuery(name = "CatRiesgoTrabajoIMSS.findAll", query = "SELECT crt FROM CatRiesgoTrabajoIMSS crt"),
-    @NamedQuery(name = "CatRiesgoTrabajoIMSS.findByClave", query = "SELECT crt FROM CatRiesgoTrabajoIMSS crt WHERE crt.clave = :clave")
+    @NamedQuery(name = "CatTipoRiesgoIMSS.findAll", query = "SELECT tr FROM CatTipoRiesgoIMSS tr"),
+    @NamedQuery(name = "CatTipoRiesgoIMSS.findByClave", query = "SELECT tr FROM CatTipoRiesgoIMSS tr WHERE tr.clave = :clave")
 })
-public class CatRiesgoTrabajoIMSS implements Serializable
+public class CatTipoRiesgoIMSS implements Serializable 
 {
     private static final long serialVersionUID = 1L;
     
@@ -33,8 +33,8 @@ public class CatRiesgoTrabajoIMSS implements Serializable
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @NotNull
-    @Column(name = "cd_sec_riesgo_trabajo")
-    private Integer idSecRiesgoTrabajo;
+    @Column(name = "cd_tp_riesgo")
+    private Integer idTipoRiesgo;
     
     @Basic(optional = false)
     @NotNull
@@ -46,26 +46,26 @@ public class CatRiesgoTrabajoIMSS implements Serializable
     @Column(name = "nb_descripcion")
     private String descripcion;
     
-    @OneToMany(mappedBy = "secuelaRiesgoTrabajo")
+    @OneToMany(mappedBy = "tipoRiesgo")
     private List<DetIncapacidad> registroIncapacidad;
 
-    public CatRiesgoTrabajoIMSS() 
+    public CatTipoRiesgoIMSS() 
     {
     }
 
-    public CatRiesgoTrabajoIMSS(Integer idSecRiesgoTrabajo) 
+    public CatTipoRiesgoIMSS(Integer idTipoRiesgo) 
     {
-        this.idSecRiesgoTrabajo = idSecRiesgoTrabajo;
+        this.idTipoRiesgo = idTipoRiesgo;
     }
 
-    public Integer getIdSecRiesgoTrabajo() 
+    public Integer getIdTipoRiesgo() 
     {
-        return idSecRiesgoTrabajo;
+        return idTipoRiesgo;
     }
 
-    public void setIdSecRiesgoTrabajo(Integer idSecRiesgoTrabajo) 
+    public void setIdTipoRiesgo(Integer idTipoRiesgo) 
     {
-        this.idSecRiesgoTrabajo = idSecRiesgoTrabajo;
+        this.idTipoRiesgo = idTipoRiesgo;
     }
 
     public String getClave() 
@@ -101,8 +101,8 @@ public class CatRiesgoTrabajoIMSS implements Serializable
     @Override
     public int hashCode() 
     {
-        int hash = 5;
-        hash = 23 * hash + Objects.hashCode(this.idSecRiesgoTrabajo);
+        int hash = 7;
+        hash = 89 * hash + Objects.hashCode(this.idTipoRiesgo);
         return hash;
     }
 
@@ -118,14 +118,13 @@ public class CatRiesgoTrabajoIMSS implements Serializable
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final CatRiesgoTrabajoIMSS other = (CatRiesgoTrabajoIMSS) obj;
-        return Objects.equals(this.idSecRiesgoTrabajo, other.idSecRiesgoTrabajo);
+        final CatTipoRiesgoIMSS other = (CatTipoRiesgoIMSS) obj;
+        return Objects.equals(this.idTipoRiesgo, other.idTipoRiesgo);
     }
 
     @Override
-    public String toString() 
-    {
-        return "CatRiesgoTrabajoIMSS[" + "idSecRiesgoTrabajo=" + idSecRiesgoTrabajo + ", clave=" + clave + ", descripcion=" + descripcion + ']';
+    public String toString() {
+        return "CatTipoRiesgo[" + "IdTipoRiesgo: " + idTipoRiesgo + ", Clave: " + clave + ", Descripcion: " + descripcion + ']';
     }
     
 }

@@ -369,4 +369,15 @@ public class AjustesBean implements Serializable {
         }
     }
     
+    
+    public void tipoRiesgoTrabajoIMSS(){
+        String path = null;
+        try{
+            path = contextPath + "/protected/settings/imss/tipoRiesgoIMSS.xhtml";
+            FacesContext.getCurrentInstance().getExternalContext().redirect(path);
+        }
+        catch(Exception e) {
+            e.getMessage();
+        }
+    }
 }

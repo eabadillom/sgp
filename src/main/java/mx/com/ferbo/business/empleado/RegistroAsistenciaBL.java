@@ -21,6 +21,7 @@ import mx.com.ferbo.model.DetIncidencia;
 import mx.com.ferbo.model.DetRegistro;
 import mx.com.ferbo.model.DetToken;
 import mx.com.ferbo.model.InfDatoEmpresa;
+import mx.com.ferbo.model.imss.DetIncapacidad;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.SGPException;
 import org.apache.logging.log4j.LogManager;
@@ -197,7 +198,15 @@ public class RegistroAsistenciaBL
     
     public void guardarRegistroVacaciones(DetEmpleado empleado, DetIncidencia incidencia, List<Date> diasAsueto) throws SGPException
     {
+        int cantidadRegistrosGuardados = 0;
         InfDatoEmpresa empleadoEmpresa = empleado.getDatoEmpresa();
+        
+        if(empleado.getDatoEmpresa() == null)
+        {
+            log.info("El empleado {} no tiene información de dato empresa", empleado.getIdEmpleado());
+            throw new SGPException("El empleado no tiene información empresarial");
+        }
+        
         String codigo = "V";
         CatEstatusRegistro statusVacaciones = estatusDAO.buscarPorCodigo(codigo);
         
@@ -224,6 +233,114 @@ public class RegistroAsistenciaBL
             registro.setFechaSalida(registroSalida);
             
             registroDAO.guardar(registro);
+            cantidadRegistrosGuardados += 1;
+        }
+        
+        log.info("Num. registros de incapacidad guardados del empleado {} en asistencia {}", empleado.getIdEmpleado(), cantidadRegistrosGuardados);
+    }
+    
+    public void guardarRegistroIncapacidad(DetEmpleado empleadoInc, Date fechaInicio, Date fechaFin, List<Date> diasAsueto) throws SGPException
+    {
+        int cantidadRegistrosGuardados = 0;
+        
+        if(empleadoInc.getDatoEmpresa() == null)
+        {
+            log.info("El empleado {} no tiene información de dato empresa", empleadoInc.getIdEmpleado());
+            throw new SGPException("El empleado no tiene información empresarial, favor de contactar a RH!!");
+        }
+        
+        InfDatoEmpresa empleadoEmpresa = empleadoInc.getDatoEmpresa();
+        
+        if(empleadoEmpresa.getHoraEntrada() == null)
+        {
+            throw new SGPException("El empleado no tiene hora de entrada, favor de contactar a RH!!");
+        }
+        
+        EmpleadoBL.validarDatosEmpleado(empleadoInc);
+        
+        Integer horaEntrada = DateUtil.getHora(empleadoEmpresa.getHoraEntrada());
+        Integer horaSalida = horaEntrada + 9;
+        String codigo = "I";
+        try
+        {
+            CatEstatusRegistro statusIncapacidad = estatusDAO.buscarPorCodigo(codigo);
+
+            List<Date> listaFechas = DateUtil.generarArreglosFechas(fechaInicio, fechaFin);
+            log.trace("Lista de Fechas: {}", listaFechas);
+            
+            listaFechas = diasVacacionesSolicitados(listaFechas, diasAsueto, empleadoInc.getDatoEmpresa());
+
+            for(Date dia : listaFechas)
+            {
+                DetRegistro registro = new DetRegistro();
+                registro.setIdEmpleado(empleadoInc);
+                registro.setIdEstatus(statusIncapacidad);
+
+                Date registroEntrada = DateUtil.getDate(DateUtil.getAnio(dia), DateUtil.getMes(dia), DateUtil.getDia(dia), horaEntrada, 0, 0);
+                registro.setFechaEntrada(registroEntrada);
+                log.trace("Hora entrada: {}", registroEntrada);
+                
+                Date registroSalida = DateUtil.getDate(DateUtil.getAnio(dia), DateUtil.getMes(dia), DateUtil.getDia(dia), horaSalida, 0, 0);
+                registro.setFechaSalida(registroSalida);
+                log.trace("Hora salida: {}", registroSalida);
+                
+                registroDAO.guardar(registro);
+                cantidadRegistrosGuardados += 1;
+            }
+            
+            log.info("Num. registros de incapacidad guardados del empleado {} en asistencia {}", empleadoInc.getIdEmpleado(), cantidadRegistrosGuardados);
+        }catch(SGPException ex)
+        {
+            log.info("Error al registrar la incapacidad: {}", ex);
+            throw new SGPException("Error al registrar la incapacidad");
+        }catch (Exception e) 
+        {
+            log.info("Error: ", e);
+        }
+    }
+    
+    public void actualizarRegistroIncapacidad(DetEmpleado empleadoInc, List<Date> listaFechas, List<Date> diasAsueto) throws SGPException
+    {
+        if(empleadoInc.getDatoEmpresa() == null)
+        {
+            log.info("El empleado {} no tiene información de dato empresa", empleadoInc.getIdEmpleado());
+            throw new SGPException("El empleado no tiene información empresarial");
+        }
+        
+        InfDatoEmpresa empleadoEmpresa = empleadoInc.getDatoEmpresa();
+        Integer horaEntrada = DateUtil.getHora(empleadoEmpresa.getHoraEntrada());
+        Integer horaSalida = horaEntrada + 9;
+        String codigo = "I";
+        
+        try
+        {
+            CatEstatusRegistro statusIncapacidad = estatusDAO.buscarPorCodigo(codigo);
+            log.trace("Lista de Fechas: {}", listaFechas);
+
+            listaFechas = diasVacacionesSolicitados(listaFechas, diasAsueto, empleadoInc.getDatoEmpresa());
+            for(Date dia : listaFechas)
+            {
+                DetRegistro registro = new DetRegistro();
+                registro.setIdEmpleado(empleadoInc);
+                registro.setIdEstatus(statusIncapacidad);
+
+                Date registroEntrada = DateUtil.getDate(DateUtil.getAnio(dia), DateUtil.getMes(dia), DateUtil.getDia(dia), horaEntrada, 0, 0);
+                registro.setFechaEntrada(registroEntrada);
+                log.trace("Dia hora entrada: {}", registroEntrada);
+
+                Date registroSalida = DateUtil.getDate(DateUtil.getAnio(dia), DateUtil.getMes(dia), DateUtil.getDia(dia), horaSalida, 0, 0);
+                registro.setFechaSalida(registroSalida);
+                log.trace("Dia hora salida: {}", registroSalida);
+
+                registroDAO.guardar(registro);
+            }
+        }catch(SGPException ex)
+        {
+            log.info("Error al actualizar la incapacidad: {}", ex);
+            throw new SGPException("Error al actualizar la incapacidad");
+        }catch (Exception e) 
+        {
+            log.info("Error: ", e);
         }
     }
     

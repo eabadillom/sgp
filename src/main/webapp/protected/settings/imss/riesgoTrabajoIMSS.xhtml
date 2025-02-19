@@ -11,10 +11,10 @@
             <p:growl id="messages" showDetail="true" />
             <p:toolbarGroup>
                 <p:commandButton value="Registrar" icon="pi pi-plus" oncomplete="PF('dialogoRiesgoTrabajo').show();" update="pnlRiesgoTrabajo" 
-                    actionListener="#{riesgoTrabajoIMSS.incializarSolicitud()}" process="@this" style="margin-right: .5rem"/>
+                    actionListener="#{riesgoTrabajoIMSSBean.incializarSolicitud()}" process="@this" style="margin-right: .5rem"/>
             </p:toolbarGroup>
             <p:dataTable id="dtCatalogoRiesgoTrabajo" widgetVar="dtCatalogoRiesgoTrabajo" var="riesgoTrabajo" 
-                         value="#{riesgoTrabajoIMSS.listaRiesgoTrabajo}" reflow="true" 
+                         value="#{riesgoTrabajoIMSSBean.listaRiesgoTrabajo}" reflow="true" 
                          paginator="true" rows="10" paginatorPosition="bottom">
                 <p:column headerText="Clave" style="text-align: center;" width="5rem">
                     <h:outputText value="#{riesgoTrabajo.clave}" />
@@ -25,29 +25,29 @@
                 <p:column exportable="false" ariaHeaderText="Actions" width="5rem">
                     <p:commandButton class="ui-button-success rounded-button m-1" icon="pi pi-bars" update="form:pnlRiesgoTrabajo" 
                         oncomplete="PF('dialogoRiesgoTrabajo').show()" styleClass="edit-button " process="@this"
-                        actionListener="#{riesgoTrabajoIMSS.editarSolicitud(riesgoTrabajo)}" >
-                        <f:setPropertyActionListener value="#{riesgoTrabajo}" target="#{riesgoTrabajoIMSS.riesgoTrabajoSelected}" />
+                        actionListener="#{riesgoTrabajoIMSSBean.editarSolicitud(riesgoTrabajo)}" >
+                        <f:setPropertyActionListener value="#{riesgoTrabajo}" target="#{riesgoTrabajoIMSSBean.riesgoTrabajoSelected}" />
                     </p:commandButton>
                 </p:column>
             </p:dataTable>
-            <p:dialog header="#{riesgoTrabajoIMSS.accionBoton} Riesgo de Trabajo" id="dialogoRiesgoTrabajo" showEffect="fade" modal="true" 
+            <p:dialog header="#{riesgoTrabajoIMSSBean.accionBoton} Riesgo de Trabajo" id="dialogoRiesgoTrabajo" showEffect="fade" modal="true" 
                 widgetVar="dialogoRiesgoTrabajo" responsive="true" draggable="true" resizable="false" dynamic="true" style="margin: auto">
                 <p:outputPanel id="pnlRiesgoTrabajo" styleClass="ui-fluid">
                     <div class="field col">
                         <p:outputLabel for="clave" value="Clave"/>
-                        <p:inputText id="clave" value="#{riesgoTrabajoIMSS.riesgoTrabajoSelected.clave}">
+                        <p:inputText id="clave" value="#{riesgoTrabajoIMSSBean.riesgoTrabajoSelected.clave}">
                             <p:ajax process="@this"/>
                         </p:inputText>
                     </div>
                     <div class="field col">
                         <p:outputLabel for="descripcion" value="Descripción"/>
-                        <p:inputText id="descripcion" value="#{riesgoTrabajoIMSS.riesgoTrabajoSelected.descripcion}">
+                        <p:inputText id="descripcion" value="#{riesgoTrabajoIMSSBean.riesgoTrabajoSelected.descripcion}">
                             <p:ajax process="@this"/>
                         </p:inputText>
                     </div>
                 </p:outputPanel>
                 <f:facet name="footer">
-                    <p:commandButton value="#{riesgoTrabajoIMSS.accionBoton}" icon="#{riesgoTrabajoIMSS.iconoBoton}" actionListener="#{riesgoTrabajoIMSS.metodoBoton()}" 
+                    <p:commandButton value="#{riesgoTrabajoIMSSBean.accionBoton}" icon="#{riesgoTrabajoIMSSBean.iconoBoton}" actionListener="#{riesgoTrabajoIMSSBean.metodoBoton()}" 
                                      process="pnlRiesgoTrabajo @this" update="pnlRiesgoTrabajo dtCatalogoRiesgoTrabajo"/>
                     <p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dialogoRiesgoTrabajo').hide()" class="ui-button-secondary" />
                 </f:facet>
