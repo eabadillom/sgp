@@ -1,7 +1,9 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.Basic;
@@ -14,16 +16,19 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.Null;
 import javax.validation.constraints.Size;
 
 import mx.com.ferbo.model.sat.CatRegimenFiscal;
+import mx.com.ferbo.model.sat.CatRiesgoPuesto;
 
 @Entity
 @Table(name = "cat_empresa")
 @NamedQueries({
-	@NamedQuery(name = "CatEmpresa.findActive", query = "SELECT c FROM CatEmpresa c WHERE c.activo = true"),
-	
+    @NamedQuery(name = "CatEmpresa.findActive", query = "SELECT c FROM CatEmpresa c WHERE c.activo = true"),
+
     @NamedQuery(name = "CatEmpresa.findAll", query = "SELECT c "
             + "FROM CatEmpresa c"),
     @NamedQuery(name = "CatEmpresa.findByActive", query = "SELECT c "
@@ -40,56 +45,67 @@ public class CatEmpresa implements Serializable {
     @Basic(optional = false)
     @Column(name = "id_empresa")
     private Integer idEmpresa;
-    
+
     @Basic(optional = false)
     @Column(name = "descripcion")
     private String descripcion;
-    
+
     @Basic(optional = false)
     @Column(name = "activo")
     private Boolean activo;
-    
+
     @Basic(optional = false)
     @Column(name = "nb_razon_social")
     private String razonSocial;
-    
+
     @Basic(optional = false)
     @Column(name = "tp_persona")
     private String tipoPersona;
-    
+
     @Basic(optional = true)
     @Column(name = "nb_regimen_capital")
     private String regimenCapital;
-    
+
     @Basic(optional = false)
     @Column(name = "nb_rfc")
     private String rfc;
-    
+
     @Basic(optional = false)
     @Column(name = "fh_inicio_op")
     private Date fechaInicioOperacion;
-    
+
     @Basic(optional = true)
     @Column(name = "fh_ult_cambio")
     private Date fechaUltimoCambio;
-    
+
     @Basic(optional = false)
     @Column(name = "st_padron")
     private String statusPadron;
-    
+
     @JoinColumn(name = "cd_regimen", referencedColumnName = "cd_regimen")
     @ManyToOne(optional = true)
     private CatRegimenFiscal regimenFiscal;
-    
+
     @Column(name = "nu_reg_pat")
     @Basic(optional = true)
     @Size(max = 20)
     private String registroPatronal;
-    
+
     @Column(name = "nu_cp")
     @Basic(optional = true)
     @Size(max = 5)
     private String codigoPostal;
+
+    @Column(name = "pc_prima")
+    @Basic(optional = false)
+    private BigDecimal prima;
+
+    @ManyToOne
+    @JoinColumn(name = "cd_riesgo")
+    private CatRiesgoPuesto riesgo;
+
+    @OneToMany
+    private List<Certificado> certificados;
 
     public CatEmpresa() {
     }
@@ -128,109 +144,136 @@ public class CatEmpresa implements Serializable {
         this.activo = activo;
     }
 
-	public String getRazonSocial() {
-		return razonSocial;
-	}
+    public String getRazonSocial() {
+        return razonSocial;
+    }
 
-	public void setRazonSocial(String razonSocial) {
-		this.razonSocial = razonSocial;
-	}
+    public void setRazonSocial(String razonSocial) {
+        this.razonSocial = razonSocial;
+    }
 
-	public String getTipoPersona() {
-		return tipoPersona;
-	}
+    public String getTipoPersona() {
+        return tipoPersona;
+    }
 
-	public void setTipoPersona(String tipoPersona) {
-		this.tipoPersona = tipoPersona;
-	}
+    public void setTipoPersona(String tipoPersona) {
+        this.tipoPersona = tipoPersona;
+    }
 
-	public String getRegimenCapital() {
-		return regimenCapital;
-	}
+    public String getRegimenCapital() {
+        return regimenCapital;
+    }
 
-	public void setRegimenCapital(String regimenCapital) {
-		this.regimenCapital = regimenCapital;
-	}
+    public void setRegimenCapital(String regimenCapital) {
+        this.regimenCapital = regimenCapital;
+    }
 
-	public String getRfc() {
-		return rfc;
-	}
+    public String getRfc() {
+        return rfc;
+    }
 
-	public void setRfc(String rfc) {
-		this.rfc = rfc;
-	}
+    public void setRfc(String rfc) {
+        this.rfc = rfc;
+    }
 
-	public Date getFechaInicioOperacion() {
-		return fechaInicioOperacion;
-	}
+    public Date getFechaInicioOperacion() {
+        return fechaInicioOperacion;
+    }
 
-	public void setFechaInicioOperacion(Date fechaInicio) {
-		this.fechaInicioOperacion = fechaInicio;
-	}
+    public void setFechaInicioOperacion(Date fechaInicio) {
+        this.fechaInicioOperacion = fechaInicio;
+    }
 
-	public Date getFechaUltimoCambio() {
-		return fechaUltimoCambio;
-	}
+    public Date getFechaUltimoCambio() {
+        return fechaUltimoCambio;
+    }
 
-	public void setFechaUltimoCambio(Date fechaUltimoCambio) {
-		this.fechaUltimoCambio = fechaUltimoCambio;
-	}
+    public void setFechaUltimoCambio(Date fechaUltimoCambio) {
+        this.fechaUltimoCambio = fechaUltimoCambio;
+    }
 
-	public String getStatusPadron() {
-		return statusPadron;
-	}
+    public String getStatusPadron() {
+        return statusPadron;
+    }
 
-	public void setStatusPadron(String statusPadron) {
-		this.statusPadron = statusPadron;
-	}
+    public void setStatusPadron(String statusPadron) {
+        this.statusPadron = statusPadron;
+    }
 
-	public CatRegimenFiscal getRegimenFiscal() {
-		return regimenFiscal;
-	}
+    public CatRegimenFiscal getRegimenFiscal() {
+        return regimenFiscal;
+    }
 
-	public void setRegimenFiscal(CatRegimenFiscal regimenFiscal) {
-		this.regimenFiscal = regimenFiscal;
-	}
+    public void setRegimenFiscal(CatRegimenFiscal regimenFiscal) {
+        this.regimenFiscal = regimenFiscal;
+    }
 
-	public String getRegistroPatronal() {
-		return registroPatronal;
-	}
+    public String getRegistroPatronal() {
+        return registroPatronal;
+    }
 
-	public void setRegistroPatronal(String registroPatronal) {
-		this.registroPatronal = registroPatronal;
-	}
+    public void setRegistroPatronal(String registroPatronal) {
+        this.registroPatronal = registroPatronal;
+    }
 
-	public String getCodigoPostal() {
-		return codigoPostal;
-	}
+    public String getCodigoPostal() {
+        return codigoPostal;
+    }
 
-	public void setCodigoPostal(String codigoPostal) {
-		this.codigoPostal = codigoPostal;
-	}
+    public void setCodigoPostal(String codigoPostal) {
+        this.codigoPostal = codigoPostal;
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(idEmpresa);
-	}
+    public BigDecimal getPrima() {
+        return prima;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		CatEmpresa other = (CatEmpresa) obj;
-		return Objects.equals(idEmpresa, other.idEmpresa);
-	}
+    public void setPrima(BigDecimal prima) {
+        this.prima = prima;
+    }
 
-	@Override
-	public String toString() {
-		return "CatEmpresa [idEmpresa=" + idEmpresa + ", descripcion=" + descripcion + ", activo=" + activo
-				+ ", razonSocial=" + razonSocial + ", tipoPersona=" + tipoPersona + ", regimenCapital=" + regimenCapital
-				+ ", rfc=" + rfc + ", fechaInicioOperacion=" + fechaInicioOperacion + ", fechaUltimoCambio="
-				+ fechaUltimoCambio + ", statusPadron=" + statusPadron + ", registroPatronal=" + registroPatronal
-				+ ", codigoPostal=" + codigoPostal + "]";
-	}
+    public CatRiesgoPuesto getRiesgo() {
+        return riesgo;
+    }
+
+    public void setRiesgo(CatRiesgoPuesto riesgo) {
+        this.riesgo = riesgo;
+    }
+
+    public List<Certificado> getCertificados() {
+        return certificados;
+    }
+
+    public void setCertificados(List<Certificado> certificados) {
+        this.certificados = certificados;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idEmpresa);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        CatEmpresa other = (CatEmpresa) obj;
+        return Objects.equals(idEmpresa, other.idEmpresa);
+    }
+
+    @Override
+    public String toString() {
+        return "CatEmpresa [idEmpresa=" + idEmpresa + ", descripcion=" + descripcion + ", activo=" + activo
+                + ", razonSocial=" + razonSocial + ", tipoPersona=" + tipoPersona + ", regimenCapital=" + regimenCapital
+                + ", rfc=" + rfc + ", fechaInicioOperacion=" + fechaInicioOperacion + ", fechaUltimoCambio="
+                + fechaUltimoCambio + ", statusPadron=" + statusPadron + ", registroPatronal=" + registroPatronal
+                + ", codigoPostal=" + codigoPostal + "]";
+    }
 }

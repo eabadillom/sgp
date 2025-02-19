@@ -243,7 +243,7 @@ public class UMABean implements Serializable
         BigDecimal valorMensual = null;
         BigDecimal numVeces = new BigDecimal("30.4");
         
-        valorMensual = valorDiario.multiply(numVeces);
+        valorMensual = valorDiario.multiply(numVeces).setScale(2, BigDecimal.ROUND_HALF_UP);
         
         return valorMensual;
     }
@@ -251,9 +251,9 @@ public class UMABean implements Serializable
     public BigDecimal calcularValorAnual(BigDecimal valorMensual)
     {
         BigDecimal valorAnual = null;
-        BigDecimal numVeces = new BigDecimal("12");
+        BigDecimal numVeces = new BigDecimal("12").setScale(2, BigDecimal.ROUND_HALF_UP);
         
-        valorAnual = valorMensual.multiply(numVeces);
+        valorAnual = valorMensual.multiply(numVeces).setScale(2, BigDecimal.ROUND_HALF_UP);
         
         return valorAnual;
     }

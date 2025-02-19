@@ -18,16 +18,18 @@ public class SeptimoDiaPercepcion extends AbstractPercepcion implements IPercepc
 	private static Logger log = LogManager.getLogger(SeptimoDiaPercepcion.class);
 	
 	private ParametrosNomina parametros = null;
-	private BigDecimal diasLaborales   = null;
-	private BigDecimal diasNoLaborales = null;
-	private BigDecimal diasTrabajados  = null;
+	private BigDecimal diasLaborales    = null;
+	private BigDecimal diasNoLaborales  = null;
+	private BigDecimal diasVacaciones   = null;
+	private BigDecimal diasTrabajados   = null;
 	
-	public SeptimoDiaPercepcion(ParametrosNomina parametros, BigDecimal diasLaborales, BigDecimal diasNoLaborales, BigDecimal diasTrabajados) {
+	public SeptimoDiaPercepcion(ParametrosNomina parametros, BigDecimal diasLaborales, BigDecimal diasNoLaborales, BigDecimal diasTrabajados, BigDecimal diasVacaciones) {
 		this.parametros = parametros;
 		this.tiposPercepcion = parametros.getTiposPercepcion();
 		this.diasLaborales = diasLaborales;
 		this.diasNoLaborales = diasNoLaborales;
 		this.diasTrabajados = diasTrabajados;
+		this.diasVacaciones = diasVacaciones;
 	}
 
 	@Override
@@ -55,6 +57,7 @@ public class SeptimoDiaPercepcion extends AbstractPercepcion implements IPercepc
 					.setScale(2, BigDecimal.ROUND_HALF_UP);
 			
 			proporcionalSemanal = diasTrabajados
+					.add(diasVacaciones)
 					.divide(t, 4, BigDecimal.ROUND_HALF_UP)
 					;
 			

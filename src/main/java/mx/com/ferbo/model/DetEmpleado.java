@@ -119,7 +119,7 @@ import mx.com.ferbo.model.imss.DetIncapacidad;
     @NamedQuery(name = "DetEmpleado.getNumEmpleado", query = "SELECT COALESCE(MAX(e.idEmpleado),0) FROM DetEmpleado e"),
     @NamedQuery(name = "DetEmpleado.getAll", query = "SELECT e FROM DetEmpleado e"),
     @NamedQuery(name = "DetEmpleado.getActive", query = "SELECT e FROM DetEmpleado e WHERE e.activo = :activo"),
-    @NamedQuery(name = "DetEmpleado.findByActiveEmpresaIngreso", query = "SELECT e FROM DetEmpleado e WHERE e.datoEmpresa.empresa.idEmpresa = :idEmpresa AND ( (e.datoEmpresa.fechaIngreso <= :periodoPagoInicio AND e.datoEmpresa.fechaBaja IS NULL) OR (e.datoEmpresa.fechaIngreso <= :periodoPagoInicio AND e.datoEmpresa.fechaBaja >= :periodoPagoFin))"),
+    @NamedQuery(name = "DetEmpleado.findByActiveEmpresaIngreso", query = "SELECT e FROM DetEmpleado e WHERE e.empleadoConfiguracion.procesarNomina = true AND e.datoEmpresa.empresa.idEmpresa = :idEmpresa AND ( (e.datoEmpresa.fechaIngreso <= :periodoPagoInicio AND e.datoEmpresa.fechaBaja IS NULL) OR (e.datoEmpresa.fechaIngreso <= :periodoPagoInicio AND e.datoEmpresa.fechaBaja >= :periodoPagoFin)) ORDER BY e.nombre, e.primerAp, e.segundoAp"),
     @NamedQuery(name = "DetEmpleado.findByRFC", query = "SELECT e FROM DetEmpleado e WHERE e.datoEmpresa.rfc = :rfc")
 })
 public class DetEmpleado implements Serializable {

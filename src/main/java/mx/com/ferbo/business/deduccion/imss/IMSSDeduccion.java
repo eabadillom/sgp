@@ -78,7 +78,7 @@ public class IMSSDeduccion extends AbstractIMSSDeduccion implements IDeducciones
 			imssRiesgoTrabajoBO = new IMSSRiesgoTrabajoDeduccion(this.parametros, this.diasPeriodo, this.ausencias, this.incapacidades, this.sdi);
 			idx = imssRiesgoTrabajoBO.nuevoIndiceDe(nomina.getDeducciones());
 			//TODO Falta integrar la cuota de riesgo de la empresa.
-			dRiesgoTrabajo = imssRiesgoTrabajoBO.calcular(nomina, idx);
+			dRiesgoTrabajo = imssRiesgoTrabajoBO.calcular(nomina, idx++);
 			aportacionesIMSS.add(dRiesgoTrabajo);
 			
 			//ENFERMEDADES Y MATERNIDAD (EN ESPECIE)

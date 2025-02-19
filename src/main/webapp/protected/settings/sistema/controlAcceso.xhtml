@@ -9,7 +9,7 @@
     <ui:define name="content">
         <f:event type="preRenderView" listener="#{altasistemaBean.listar(false)}"/>
         <h:form id="frm">
-            <p:growl id="message" showDetails="true" life="4000"/>
+            <p:growl id="message" life="4000"/>
             <p:dialog modal="true" widgetVar="statusDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
                 <div align="center">
                     <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>

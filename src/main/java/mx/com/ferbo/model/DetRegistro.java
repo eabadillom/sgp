@@ -78,6 +78,13 @@ public class DetRegistro implements Serializable {
         this.fechaSalida = fechaSalida;
         this.idEstatus = new CatEstatusRegistro(idEstatus, descripcionEstatus, (short) 0);
     }
+    
+    public DetRegistro(Integer idRegistro, Date fechaEntrada, Date fechaSalida, CatEstatusRegistro statusRegistro) {
+    	this.idRegistro = idRegistro;
+        this.fechaEntrada = fechaEntrada;
+        this.fechaSalida = fechaSalida;
+        this.idEstatus = statusRegistro;
+    }
 
     public Integer getIdRegistro() {
         return idRegistro;

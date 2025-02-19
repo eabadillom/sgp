@@ -7,6 +7,7 @@ import java.util.List;
 import mx.com.ferbo.dao.n.DiaNoLaboralDAO;
 import mx.com.ferbo.model.CatDiaNoLaboral;
 import mx.com.ferbo.util.DateUtil;
+import mx.com.ferbo.util.SGPException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -14,19 +15,18 @@ import org.apache.logging.log4j.Logger;
  *
  * @author alberto
  */
-public class DiasDeDescansoObligatorioBL implements Serializable
-{
+public class DiasDeDescansoObligatorioBL implements Serializable {
+
     private static final long serialVersionUID = 1L;
     private static Logger log = LogManager.getLogger(DiasDeDescansoObligatorioBL.class);
-    
+
     private final DiaNoLaboralDAO diaNoLaboralDAO;
     private List<CatDiaNoLaboral> diasNoLaboralSelected;
     private Date fechaFin;
     private Date fechaInicio;
     private List<Date> diasAsueto;
 
-    public DiasDeDescansoObligatorioBL() 
-    {
+    public DiasDeDescansoObligatorioBL() {
         this.diaNoLaboralDAO = new DiaNoLaboralDAO();
         Integer anioEnCurso = DateUtil.getAnio(new Date());
         this.fechaInicio = DateUtil.inicializaFechaInicioAnioCurso(anioEnCurso - 1);
@@ -34,20 +34,18 @@ public class DiasDeDescansoObligatorioBL implements Serializable
         this.diasNoLaboralSelected = diaNoLaboralDAO.buscarPorPeriodo("MX", this.fechaInicio, this.fechaFin);
         this.diasAsueto = this.diasDeAsueto();
     }
-    
-    public final List<Date> diasDeAsueto()
-    {
+
+    public final List<Date> diasDeAsueto() {
         List<Date> diasDeAsueto = new ArrayList();
-        
-        for(CatDiaNoLaboral aux : diasNoLaboralSelected)
-        {
+
+        for (CatDiaNoLaboral aux : diasNoLaboralSelected) {
             diasDeAsueto.add(aux.getFecha());
         }
-        
+
         return diasDeAsueto;
     }
-    
-    public List<CatDiaNoLaboral> diasDescansoAnual(){
+
+    public List<CatDiaNoLaboral> diasDescansoAnual() {
         List<CatDiaNoLaboral> descanso = null;
         Integer anio = DateUtil.getAnio(DateUtil.now());
         Date inicial = DateUtil.inicializaFechaInicioAnioCurso(anio);
@@ -56,7 +54,7 @@ public class DiasDeDescansoObligatorioBL implements Serializable
         descanso = diaNoLaboralDAO.buscarPorPeriodo("MX", inicial, terminal);
         return descanso;
     }
-    
+
     public List<CatDiaNoLaboral> getDiasNoLaboralSelected() {
         return diasNoLaboralSelected;
     }
@@ -88,5 +86,15 @@ public class DiasDeDescansoObligatorioBL implements Serializable
     public void setDiasAsueto(List<Date> diasAsueto) {
         this.diasAsueto = diasAsueto;
     }
-    
+
+    public void diasDescansoEstanActualizados() throws SGPException {
+        DiasDeDescansoObligatorioBL diasDeDescansoObligatorio = new DiasDeDescansoObligatorioBL();
+        List<CatDiaNoLaboral> diasNoLaborables = new ArrayList<CatDiaNoLaboral>();
+        diasNoLaborables = diasDeDescansoObligatorio.diasDescansoAnual();
+
+        if (diasNoLaborables.isEmpty() || diasNoLaborables.size() < 2) {
+            throw new SGPException("Error: Dias de asueto no actualizados. Por favor contactar a RH");
+        }
+    }
+
 }

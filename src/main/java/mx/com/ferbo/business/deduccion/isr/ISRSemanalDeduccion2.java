@@ -72,50 +72,45 @@ public class ISRSemanalDeduccion2 extends AbstractDeduccion implements IDeduccio
 	}
 	
 	private void setPeriodo(Date periodoInicio, Date periodoFin) {
-		Date periodoSiguienteFin = null;
 		
 		this.periodoInicio = periodoInicio;
 		this.periodoFin = periodoFin;
 		
-		periodoSiguienteFin = DateUtil.addDay(periodoInicio, 7);
-		
-		Integer mesActual = DateUtil.getMes(this.periodoFin);
-		Integer mesSiguiente = DateUtil.getMes(periodoSiguienteFin);
-		
-		if(mesSiguiente > mesActual) {
-			this.ultimaSemanaMes = new Boolean(true);
-			log.info("ULTIMA SEMANA DEL MES: {} - {}", this.periodoInicio, this.periodoFin);
-		} else {
-			this.ultimaSemanaMes = new Boolean(false);
-		}
+		this.ultimaSemanaMes = this.esUltimaSemanaMes(periodoInicio, periodoFin);
 	}
 	
 	@Override
 	public void procesar(DetNomina nomina) {
-		List<DetNominaDeduccion> deduccionesISR = null;
+		List<DetNominaDeduccion>  deduccionesISR = null;
 		List<DetNominaPercepcion> percepciones = null;
-		ISRBaseDeduccion baseISRBO = null;
-		TarifaISRDeduccion tarifaISRBO = null;
+		ISRBaseDeduccion          baseISRBO = null;
+		TarifaISRDeduccion        tarifaISRBO = null;
 		
-		DetNominaDeduccion dBaseISR = null;
-		CatTarifaISR tarifaISR = null;
+		DetNominaDeduccion        dBaseISR = null;
+		CatTarifaISR              tarifaISR = null;
 		
-		BigDecimal importeSubsidio = null;
+		BigDecimal                importeSubsidioSemanal   = null;
+		BigDecimal                importeSubsidioMensual   = null;
+		BigDecimal                importeSubsidioAcumulado = null;
+		BigDecimal                importeSubsidio          = null;
 		
 		ISRAntesSubsidioDeduccion isrPreSubsidioBO = null;
 		
 		ISRAntesSubsidioDeduccion isrPreSubsidioMensualBO = null;
-		DetNominaDeduccion dISRAntesSubsidio = null;
-		DetNominaDeduccion dISR = null;
+		DetNominaDeduccion        dISRAntesSubsidio = null;
+		DetNominaDeduccion        dISR = null;
 		
-		CatTipoDeduccion tdISR = null;
+		CatTipoDeduccion          tdISR = null;
 		
-		BigDecimal isrAntesDeSubsidio = null;
-		BigDecimal isrDespuesDeSubsidio = null;
+		BigDecimal                isrAntesDeSubsidioSemanal = null;
+		BigDecimal                isrAntesDeSubsidioMensual = null;
+		BigDecimal                isrDespuesDeSubsidioSemanal = null;
+		BigDecimal                isrDespuesDeSubsidioMensual = null;
 		
-		BigDecimal baseISRMensual = null;
-		BigDecimal isrRetenidoSemanasAnteriores = null;
-		DetNominaDeduccion dISRAntesSubsidioMensual = null;
+		BigDecimal                baseISRSemanal               = null;
+		BigDecimal                baseISRMensual               = null;
+		BigDecimal                isrRetenidoSemanasAnteriores = null;
+		DetNominaDeduccion        dISRAntesSubsidioMensual     = null;
 		
 		Integer idx = null;
 		
@@ -130,53 +125,70 @@ public class ISRSemanalDeduccion2 extends AbstractDeduccion implements IDeduccio
 			baseISRBO = new ISRBaseDeduccion(percepciones);
 			baseISRBO.setTiposDeduccion(this.tiposDeduccion);
 			dBaseISR = baseISRBO.calcular(nomina, idx++);
+			baseISRSemanal = dBaseISR.getImporte();
 			
-			tarifaISRBO = new TarifaISRDeduccion(this.tablaISRSemanal, dBaseISR.getImporte());
+			tarifaISRBO = new TarifaISRDeduccion(this.tablaISRSemanal, baseISRSemanal);
 			tarifaISR = tarifaISRBO.calcular();
 			
-			isrPreSubsidioBO = new ISRAntesSubsidioDeduccion(dBaseISR.getImporte(), tarifaISR);
+			isrPreSubsidioBO = new ISRAntesSubsidioDeduccion(baseISRSemanal, tarifaISR);
 			dISRAntesSubsidio = isrPreSubsidioBO.calcular(nomina, idx++);
-			isrAntesDeSubsidio = dISRAntesSubsidio.getImporte();
+			isrAntesDeSubsidioSemanal = dISRAntesSubsidio.getImporte();
 			
 			if(this.subsidioExecutor == null)
 				this.subsidioExecutor = new SubsidioEmpleoExecutor();
 			
-			if(this.tarifaSubsidioBO == null)
-				this.tarifaSubsidioBO = subsidioExecutor.loadClass("SUBEM", DateUtil.toLocalDate(periodoFin));
+			if(this.tarifaSubsidioBO == null) {
+				this.tarifaSubsidioBO = subsidioExecutor.loadClass("SUBEM", DateUtil.toLocalDate(periodoFin), isrAntesDeSubsidioSemanal);
+			}
 			
-			importeSubsidio = this.tarifaSubsidioBO.calcular(ISubsidioEmpleo.PERIODO_SEMANAL, dBaseISR.getImporte());
+			importeSubsidioSemanal = this.tarifaSubsidioBO.calcular(ISubsidioEmpleo.PERIODO_SEMANAL, dBaseISR.getImporte());
+			
+			importeSubsidio = importeSubsidioSemanal;
 			
 			//ISR Semanal despues de subsidio al salario.
-			isrDespuesDeSubsidio = isrAntesDeSubsidio.subtract(importeSubsidio);
+			isrDespuesDeSubsidioSemanal = isrAntesDeSubsidioSemanal.subtract(importeSubsidioSemanal);
 			
 			
 			//CALCULO DE ISR MENSUAL
 			if(this.ultimaSemanaMes) {
 				log.info("Percepciones: {}", percepciones);
 				
-				baseISRMensual = this.calcularBaseISRAcumulado(dBaseISR.getImporte(), isrDespuesDeSubsidio);
+				baseISRMensual = this.calcularBaseISRAcumulado(baseISRSemanal, isrDespuesDeSubsidioSemanal);
 				log.info("Base ISR (mensual): {}", baseISRMensual);
+				
+				
 				
 				tarifaISRBO = new TarifaISRDeduccion(tablaISRMensual, baseISRMensual);
 				tarifaISR = tarifaISRBO.calcular();
 				
 				isrPreSubsidioMensualBO = new ISRAntesSubsidioDeduccion(baseISRMensual, tarifaISR);
 				dISRAntesSubsidioMensual = isrPreSubsidioMensualBO.calcular(nomina, idx++);
-				isrAntesDeSubsidio = dISRAntesSubsidioMensual.getImporte();
-				log.info("ISR antes de subsidio al empleo: {}", isrAntesDeSubsidio);
+				isrAntesDeSubsidioMensual = dISRAntesSubsidioMensual.getImporte();
+				log.info("ISR mensual antes de subsidio al empleo: {}", isrAntesDeSubsidioMensual);
 				
-				importeSubsidio = tarifaSubsidioBO.calcular(ISubsidioEmpleo.PERIODO_MENSUAL, baseISRMensual);
+				importeSubsidioMensual = tarifaSubsidioBO.calcular(ISubsidioEmpleo.PERIODO_MENSUAL, baseISRMensual);
 				
-				baseISRMensual = isrAntesDeSubsidio.subtract(importeSubsidio);
-				log.info("ISR Mensual después de subsidio: {}", baseISRMensual);
+				isrDespuesDeSubsidioMensual = isrAntesDeSubsidioMensual.subtract(importeSubsidioMensual);
+				log.info("ISR Mensual después de subsidio: {}", isrDespuesDeSubsidioMensual);
 				
 				isrRetenidoSemanasAnteriores = this.calcularISRSemanasAnteriores(this.listaNominaMes);
 				log.info("ISR Retenido en las semanas anteriores: {}", isrRetenidoSemanasAnteriores);
 				
-				isrDespuesDeSubsidio = baseISRMensual.subtract(isrRetenidoSemanasAnteriores);
+				importeSubsidioAcumulado = this.calcularSubsidioSemanasAnteriores(this.listaNominaMes);
+				log.info("Subsidio otorgado en las semanas anteriores: {}", importeSubsidioAcumulado);
+				
+				importeSubsidio = importeSubsidioMensual.subtract(importeSubsidioAcumulado);
+				
+				if(importeSubsidio.compareTo(BigDecimal.ZERO) < 0)
+					importeSubsidio = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+				
+				log.info("Subsidio otorgado por ajuste mensual: {}", importeSubsidio);
+				
+				isrDespuesDeSubsidioSemanal = isrAntesDeSubsidioSemanal.subtract(importeSubsidio);
+				
 			}
 			
-			log.info("ISR NETO Semanal: {}", isrDespuesDeSubsidio);
+			log.info("ISR NETO Semanal: {}", isrDespuesDeSubsidioSemanal);
 			
 			dISR = new DetNominaDeduccion();
 			dISR.setKey(new DetNominaDeduccionPK(nomina, idx++));
@@ -187,14 +199,14 @@ public class ISRSemanalDeduccion2 extends AbstractDeduccion implements IDeduccio
 			dISR.setProcesar(true);
 			dISR.setInformar(true);
 			
-			if(isrDespuesDeSubsidio.compareTo(BigDecimal.ZERO) < 0) {
+			if(isrDespuesDeSubsidioSemanal.compareTo(BigDecimal.ZERO) < 0) {
 				dISR.setImporte(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
 			} else {
-				dISR.setImporte(isrDespuesDeSubsidio);
+				dISR.setImporte(isrDespuesDeSubsidioSemanal);
 			}
 			
-			deduccionesISR.add(dISR);
 			deduccionesISR.add(dISRAntesSubsidio);
+			deduccionesISR.add(dISR);
 			
 			this.procesaSubsidioAlEmpleo(nomina, importeSubsidio);
 			
@@ -221,11 +233,31 @@ public class ISRSemanalDeduccion2 extends AbstractDeduccion implements IDeduccio
 					.map(d -> d.getImporte())
 					.reduce(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP), BigDecimal :: add)
 					;
-			
+			log.info("ISR causado en el periodo {}: {}", n.getPeriodo(), isrSemanal);
 			isrSemanasAnteriores = isrSemanasAnteriores.add(isrSemanal);
 		}
 		
 		return isrSemanasAnteriores;
+	}
+	
+	private BigDecimal calcularSubsidioSemanasAnteriores(List<DetNomina> listaNominaMes) {
+		BigDecimal subsidioSemanasAnteriores = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+		BigDecimal subsidioSemanal = null;
+		
+		for(DetNomina n : listaNominaMes) {
+			List<DetNominaOtroPago> otrosPagos = n.getOtrosPagos();
+			
+			subsidioSemanal = otrosPagos.stream()
+					.filter(o -> o.getClave().equals(AbstractOtroPago.CVE_SUBSIDIO))
+					.map(o -> o.getImporte())
+					.reduce(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP), BigDecimal :: add)
+					;
+			
+			log.info("Subsidio otorgado en el periodo {}: {}", n.getPeriodo(), subsidioSemanal);
+			subsidioSemanasAnteriores = subsidioSemanasAnteriores.add(subsidioSemanal);
+		}
+		
+		return subsidioSemanasAnteriores;
 	}
 
 	public void procesaSubsidioAlEmpleo(DetNomina nomina, BigDecimal importeSubsidio) {
@@ -247,8 +279,8 @@ public class ISRSemanalDeduccion2 extends AbstractDeduccion implements IDeduccio
 		opSubsidioEmpleo = new DetNominaOtroPago();
 		opSubsidioEmpleo.setKey(new DetNominaOtroPagoPK(nomina, indexOP));
 		opSubsidioEmpleo.setTipoOtroPago(topSubsidioEmpleo);
-		opSubsidioEmpleo.setClave("FRB-035");
-		opSubsidioEmpleo.setNombre("Subs. al empleo mes");
+		opSubsidioEmpleo.setClave(AbstractOtroPago.CVE_SUBSIDIO);
+		opSubsidioEmpleo.setNombre("Subs al empleo acreditado");
 		opSubsidioEmpleo.setImporte(importeSubsidio);
 		opSubsidioEmpleo.setInformar(true);
 		opSubsidioEmpleo.setProcesar(false);
@@ -315,6 +347,51 @@ public class ISRSemanalDeduccion2 extends AbstractDeduccion implements IDeduccio
 		}
 		
 		return baseISRAcumulado;
+	}
+	
+	private Boolean esUltimaSemanaMes(Date periodoInicio, Date periodoFin) {
+		Boolean ultimaSemanaMes = null;
+		Integer mesActualInicio = null;
+		Integer mesActualFin = null;
+		Date periodoSiguienteInicio = null;
+		Date periodoSiguienteFin;
+		Integer mesSiguienteInicio = null;
+		Integer mesSiguienteFin = null;
+		Integer diaInicioMes = null;
+		
+		try {
+			//PRIMERO SE VERIFICA SI EL INICIO DE LA SEMANA COINCIDE CON EL PRIMER DIA DEL MES. 
+			diaInicioMes = DateUtil.getDia(periodoInicio);
+			
+			if(diaInicioMes.compareTo(new Integer(1)) == 0)
+				throw new SGPException("La semana en curso es la primera del mes.");
+			
+			//SI NO, SE VERIFICA SI EL MES DEL PRIMER DIA DE LA SEMANA EN CURSO ES DIFERENTE AL MES DEL ÚLTIMO DIA DE LA SEMANA EN CURSO.
+			//SI EL PRIMER DIA DEL PERIODO ES DE UN MES DIFERENTE AL ÚLTIMO DIA DEL PERIODO, ENTONCES, LA SEMANA NO ES LA ÚLTIMA.
+			mesActualInicio = DateUtil.getMes(periodoInicio);
+			mesActualFin = DateUtil.getMes(periodoFin);
+			
+			if(mesActualInicio.compareTo(mesActualFin) != 0)
+				throw new SGPException("La semana actual termina en un mes diferente al inicial.");
+			
+			//SI NO, CALCULAMOS LAS FECHAS DE INICIO Y FIN DE LA SIGUIENTE SEMANA Y REPETIMOS LA EVALUACIÓN ANTERIOR. 
+			periodoSiguienteInicio = DateUtil.addDay(periodoInicio, 7);
+			periodoSiguienteFin = DateUtil.addDay(periodoFin, 7);
+			
+			mesSiguienteInicio = DateUtil.getMes(periodoSiguienteInicio);
+			mesSiguienteFin = DateUtil.getMes(periodoSiguienteFin);
+			
+			if(mesSiguienteInicio.compareTo(mesSiguienteFin) != 0) {
+				ultimaSemanaMes = new Boolean(true);
+			} else {
+				ultimaSemanaMes = new Boolean(false);
+			}
+			
+		} catch(Exception ex) {
+			ultimaSemanaMes = new Boolean(false);
+		}
+		
+		return ultimaSemanaMes;
 	}
 
 	public DetNominaOtroPago getOpSubsidioEmpleo() {
