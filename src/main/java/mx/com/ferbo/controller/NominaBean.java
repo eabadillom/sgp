@@ -241,6 +241,9 @@ public class NominaBean implements Serializable {
     
     public void cargaEmpleadoNomina() {
     	log.info("Cargando información de nómina: {}", this.nomina);
+    	DetEmpleado empleado = empleadoDAO.buscarPorRFC(this.nomina.getReceptor().getRfc());
+    	
+    	NominaSemanalBL.getAsistencias(empleado, this.parametros);
     	
     	//Si el ID de Nómina es NULL, entonces el objeto de nómina fue generado por el proceso de cálculo y
     	//la información debería estar completamente cargada en memoria.
@@ -250,6 +253,8 @@ public class NominaBean implements Serializable {
     	//En el caso del ID de Nómina diferente de NULL, el objeto de nómina fue extraido por consulta a la
     	//base de datos sin el detalle completo, por lo que debe extraerse a través del DAO.
     	this.nomina = nominaDAO.buscarPorId(this.nomina.getId());
+    	
+    	
     }
 
     public String statusNomina(DetNomina nomina) {

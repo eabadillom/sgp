@@ -188,7 +188,7 @@ public class ISRSemanalDeduccion1 extends AbstractDeduccion implements IDeduccio
 				dISR.setKey(new DetNominaDeduccionPK(nomina, idxDeduccion++));
 				tdISR = this.getTipoDeduccion(D_ISR);
 				dISR.setTipoDeduccion(tdISR);
-				dISR.setClave(AbstractDeduccion.CVE_ISR);
+				dISR.setClave(CVE_ISR);
 				dISR.setNombre("I.S.R.");
 				dISR.setImporte(isrDespuesDeSubsidio);
 				dISR.setProcesar(true);
@@ -255,7 +255,7 @@ public class ISRSemanalDeduccion1 extends AbstractDeduccion implements IDeduccio
 		opSubsidioEmpleo = new DetNominaOtroPago();
 		opSubsidioEmpleo.setKey(new DetNominaOtroPagoPK(nomina, indexOP));
 		opSubsidioEmpleo.setTipoOtroPago(topSubsidioEmpleo);
-		opSubsidioEmpleo.setClave(AbstractOtroPago.CVE_SUBSIDIO);
+		opSubsidioEmpleo.setClave(AbstractOtroPago.CVE_SUBSIDIO_AL_SALARIO);
 		opSubsidioEmpleo.setNombre("Subs. al empleo mes");
 		opSubsidioEmpleo.setImporte(importeSubsidio);
 		
