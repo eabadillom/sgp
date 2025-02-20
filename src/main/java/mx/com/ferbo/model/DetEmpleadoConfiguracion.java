@@ -87,6 +87,10 @@ public class DetEmpleadoConfiguracion implements Serializable
         return "DetEmpleadoConfiguracion[" + "id_empleado_conf=" + idEmpleadoConf + ", empleado=" + empleado.getIdEmpleado() + ", retardo=" + retardo + ", horasextra=" + horasextra +']';
     }
 
+    @Basic(optional = true)
+    @Column(name = "st_asistencia_nl")
+    private Boolean asistenciaDiaNoLaboral;
+    
     public DetEmpleadoConfiguracion() 
     {
     }
@@ -145,6 +149,10 @@ public class DetEmpleadoConfiguracion implements Serializable
 	public Boolean getProcesarNomina() {
 		return procesarNomina;
 	}
+  
+  public void setProcesarNomina(Boolean procesarNomina) {
+		this.procesarNomina = procesarNomina;
+	}
 
     public Boolean getGoceSueldo() {
         return goceSueldo;
@@ -154,8 +162,41 @@ public class DetEmpleadoConfiguracion implements Serializable
         this.goceSueldo = goceSueldo;
     }
 
-	public void setProcesarNomina(Boolean procesarNomina) {
-		this.procesarNomina = procesarNomina;
-	}
+    public Boolean getAsistenciaDiaNoLaboral() {
+        return asistenciaDiaNoLaboral;
+    }
+
+    public void setAsistenciaDiaNoLaboral(Boolean asistenciaDiaNoLaboral) {
+        this.asistenciaDiaNoLaboral = asistenciaDiaNoLaboral;
+    }
+
+    @Override
+    public int hashCode() 
+    {
+        int hash = 7;
+        hash = 79 * hash + Objects.hashCode(this.idEmpleadoConf);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) 
+    {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final DetEmpleadoConfiguracion other = (DetEmpleadoConfiguracion) obj;
+        return Objects.equals(this.idEmpleadoConf, other.idEmpleadoConf);
+    }
+
+    @Override
+    public String toString() {
+        return "DetEmpleadoConfiguracion{" + "idEmpleadoConf=" + idEmpleadoConf + ", empleado=" + empleado.getIdEmpleado() + ", retardo=" + retardo + ", horasextra=" + horasextra + ", goceSueldo=" + goceSueldo + ", asistenciaDiaNoLaboral=" + asistenciaDiaNoLaboral + '}';
+    }
     
 }
