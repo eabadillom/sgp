@@ -4,8 +4,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import mx.com.ferbo.business.dianolaboral.DiasDeDescansoObligatorioBL;
 import mx.com.ferbo.dao.n.ParametroDAO;
 import mx.com.ferbo.dao.n.VacacionesDAO;
+import mx.com.ferbo.model.CatDiaNoLaboral;
 import mx.com.ferbo.model.CatParametro;
 import mx.com.ferbo.model.DetDomicilioEmpleado;
 import mx.com.ferbo.model.DetEmpleado;
@@ -22,6 +24,8 @@ import org.apache.logging.log4j.Logger;
 public class EmpleadoBL {
 
     private static final Logger log = LogManager.getLogger(EmpleadoBL.class);
+
+    private static DiasDeDescansoObligatorioBL diasDescansoAnual = new DiasDeDescansoObligatorioBL();
 
     public static void validarDatosEmpleado(DetEmpleado empleadoporvalidar) {
 
@@ -52,6 +56,40 @@ public class EmpleadoBL {
 
     }
 
+    public static List<String> diasEmpleadoTrabaja(DetEmpleado empleado){
+        List<String> diasLaboralesEmpleado = new ArrayList<String>();
+        
+        if (empleado.getDatoEmpresa().getDiaLunes()) {
+            diasLaboralesEmpleado.add("L");
+        }
+
+        if (empleado.getDatoEmpresa().getDiaMartes()) {
+            diasLaboralesEmpleado.add("M");
+        }
+
+        if (empleado.getDatoEmpresa().getDiaMiercoles()) {
+            diasLaboralesEmpleado.add("X");
+        }
+
+        if(empleado.getDatoEmpresa().getDiaJueves()){
+            diasLaboralesEmpleado.add("J");
+        }
+        
+        if(empleado.getDatoEmpresa().getDiaViernes()){
+            diasLaboralesEmpleado.add("V");
+        }
+        
+        if(empleado.getDatoEmpresa().getDiaSabado()){
+            diasLaboralesEmpleado.add("S");
+        }
+        
+        if(empleado.getDatoEmpresa().getDiaDomingo()){
+            diasLaboralesEmpleado.add("D");
+        }
+        
+        return diasLaboralesEmpleado;
+    }
+    
     public static void recalcularVacaciones(DetEmpleado empleado) throws SGPException {
 
         if (empleado.getVacaciones().isEmpty()) {
@@ -171,5 +209,28 @@ public class EmpleadoBL {
             throw new SGPException("Error: No tiene dias laborales asignados. Por favor contactar a RH");
         }
 
+    }
+
+    public static boolean empleadoAsisteEnDiaDescanso(DetEmpleado empleado) {
+        
+        List<CatDiaNoLaboral> diasDescanso = diasDescansoAnual.diasDescansoAnual();
+        List<String> diasLaboralesEmpleado = new ArrayList<String>();
+        String diaLaborando = DateUtil.getDiaSemana(DateUtil.now());
+        Date hoy = DateUtil.now();
+        DateUtil.resetTime(hoy);
+
+        diasLaboralesEmpleado = diasEmpleadoTrabaja(empleado);
+        
+        for(CatDiaNoLaboral diaDescanso : diasDescanso){
+            if(diaDescanso.getFecha().compareTo(hoy) == 0 && diaDescanso.getOficial()){
+                return true;
+            }
+        }
+        
+        if(!diasLaboralesEmpleado.contains(diaLaborando)){
+            return true;
+        }
+        
+        return false;
     }
 }
