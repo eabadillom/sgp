@@ -34,7 +34,7 @@
         <filter-class>mx.com.ferbo.filter.SessionFilter</filter-class>
         <init-param>
             <param-name>exception-pages</param-name>
-            <param-value>/registry /challenge /login.jsp /login.jsp .png.xhtml .png .css.xhtml .css .js.xhtml .js .gif.xhtml .gif .jpg.xhtml .jpg .bmp.xhtml .bmp .svg.xhtml .svg .jpeg.xhtml .jpeg .ico.xhtml .ico .xml.xhtml .xml .htm .html .tif.xhtml .tif .txt.xhtml .txt .woff.xhtml .woff</param-value>
+            <param-value>/registry /login.jsp /login.jsp .png.xhtml .png .css.xhtml .css .js.xhtml .js .gif.xhtml .gif .jpg.xhtml .jpg .bmp.xhtml .bmp .svg.xhtml .svg .jpeg.xhtml .jpeg .ico.xhtml .ico .xml.xhtml .xml .htm .html .tif.xhtml .tif .txt.xhtml .txt .woff.xhtml .woff</param-value>
         </init-param>
         <init-param>
             <param-name>enabled</param-name>
@@ -61,10 +61,6 @@
         <servlet-name>Registry Servlet</servlet-name>
         <servlet-class>mx.com.ferbo.servlet.RegistryServlet</servlet-class>
     </servlet>
-    <servlet>
-        <servlet-name>Challenge Servlet</servlet-name>
-        <servlet-class>mx.com.ferbo.servlet.ChallengeServlet</servlet-class>
-    </servlet>
     <servlet-mapping>
         <servlet-name>Faces Servlet</servlet-name>
         <url-pattern>*.jsf</url-pattern>
@@ -76,10 +72,6 @@
     <servlet-mapping>
         <servlet-name>Registry Servlet</servlet-name>
         <url-pattern>/registry</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>Challenge Servlet</servlet-name>
-        <url-pattern>/challenge</url-pattern>
     </servlet-mapping>
     <mime-mapping>
         <extension>ttf</extension>

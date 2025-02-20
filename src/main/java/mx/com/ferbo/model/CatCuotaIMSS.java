@@ -19,7 +19,6 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "cat_cuota_imss")
 @NamedQueries({
-	@NamedQuery(name = "CatCuotaIMSS.findByClavePeriodoCuota", query = "SELECT new mx.com.ferbo.dto.CuotaIMSSDTO(c.clave, c.numero, c.descripcion, c.baseSalarial, c.baseMinimo, c.baseMaximo, c.cuota, c.tipoCuota, c.vigenciaInicio) from CatCuotaIMSS c WHERE c.tipoCuota = :tipoCuota AND c.clave = :clave and c.vigenciaInicio BETWEEN :fechaInicio AND :fechaFin and :cuota BETWEEN c.baseMinimo AND c.baseMaximo"),
 	@NamedQuery(name = "CatCuotaIMSS.findByClavePeriodoBase", query = "SELECT c FROM CatCuotaIMSS c WHERE c.tipoCuota = :tipoCuota AND c.clave = :clave and c.vigenciaInicio BETWEEN :fechaInicio AND :fechaFin and :base BETWEEN c.baseMinimo AND c.baseMaximo"),
 	@NamedQuery(name = "CatCuotaIMSS.findByPeriodo", query = "SELECT c FROM CatCuotaIMSS c WHERE (:fecha BETWEEN c.vigenciaInicio AND c.vigenciaFin) OR (c.vigenciaInicio <= :fecha AND c.vigenciaFin IS NULL)"),
 	@NamedQuery(name = "CatCuotaIMSS.findAll", query = "SELECT c FROM CatCuotaIMSS c")

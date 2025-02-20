@@ -23,17 +23,6 @@ import javax.persistence.TemporalType;
 @Table(name = "det_biometrico")
 @NamedQueries({
     @NamedQuery(name = "DetBiometrico.findAll", query = "SELECT d FROM DetBiometrico d"),
-    @NamedQuery(name = "DetBiometrico.findByNumEmpl", query = "SELECT NEW mx.com.ferbo.dto.DetBiometricoDTO("
-            + " d.idBiometrico,"
-            + " d.fechaCaptura,"
-            + " d.activo,"
-            + " d.huella,"
-            + " d.huella2,"
-            + " emp.idEmpleado"
-            + ")"
-            + " FROM DetBiometrico d"
-            + " INNER JOIN d.idEmpleado emp"
-            + " WHERE emp.numEmpleado = :numEmpl"),
     @NamedQuery(name = "DetBiometrico.findByNumeroEmpleado", query = "SELECT d FROM DetBiometrico d INNER JOIN d.idEmpleado e WHERE e.numEmpleado = :numeroEmpleado"),
     @NamedQuery(name = "DetBiometrico.findByIdEmpleado", query = "SELECT d FROM DetBiometrico d WHERE d.idEmpleado.idEmpleado = :idEmpleado")
 })
