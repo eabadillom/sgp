@@ -117,9 +117,7 @@
 						</p:outputLabel>
 					</p:column>
 					<p:column width="3rem" style="text-align: right;">
-						<p:commandButton icon="pi pi-bars" oncomplete="PF('dgEmpleado').show();" actionListener="#{nominaBean.cargaEmpleadoNomina}" process="@this" update="formNomina:dg-empleado">
-							<f:setPropertyActionListener value="#{nomina}" target="#{nominaBean.nomina}" />
-						</p:commandButton>
+						<p:commandButton icon="pi pi-bars" oncomplete="PF('dgEmpleado').show();" actionListener="#{nominaBean.cargaEmpleadoNomina(nomina)}" process="@this" update="formNomina:dg-empleado" />
 					</p:column>
 					
 					<p:columnGroup type="footer">
@@ -277,14 +275,29 @@
 					</p:tab>
 					<p:tab title="Asistencia">
 						<p:panelGrid columns="7" layout="grid">
-							<p:outputLabel value="Lunes" />
-							<p:outputLabel value="Martes" />
-							<p:outputLabel value="Miercoles" />
-							<p:outputLabel value="Jueves" />
-							<p:outputLabel value="Viernes" />
-							<p:outputLabel value="Sabado" />
-							<p:outputLabel value="Domingo" />
-							<p:inputText value=""/>
+							<div>
+								<p:outputLabel value="Lunes" />
+								<p:inputText value=""/>
+							</div>
+							<div>
+								<p:outputLabel value="Martes" />
+							</div>
+							<div>
+								<p:outputLabel value="Miercoles" />
+							</div>
+							<div>
+								<p:outputLabel value="Jueves" />
+							</div>
+							<div>
+								<p:outputLabel value="Viernes" />
+							</div>
+							<div>
+								<p:outputLabel value="Sabado" />
+							</div>
+							<div>
+								<p:outputLabel value="Domingo" />
+							</div>
+							
 						</p:panelGrid>
 					</p:tab>
 					<p:tab title="Percepciones">

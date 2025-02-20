@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import mx.com.ferbo.dto.sat.TipoDeduccionDTO;
 
+@Deprecated
 public class TipoPrestamoDTO {
 	
 	private String clave;
