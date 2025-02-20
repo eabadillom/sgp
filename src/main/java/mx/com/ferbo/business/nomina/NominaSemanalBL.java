@@ -621,10 +621,18 @@ public class NominaSemanalBL extends NominaBL {
 		if(removedDeducciones)
 			log.info("Se encontraron conceptos {}, los cuales fueron eliminados para el reproceso de ISR", AbstractDeduccion.D_ISR);
 		
+		removedDeducciones = deducciones.removeIf(d -> AbstractDeduccion.D_AJUSTE_AL_SUBSIDIO.equalsIgnoreCase(d.getTipoDeduccion().getClave()));
+		if(removedDeducciones)
+			log.info("Se encontraron conceptos {}, los cuales fueron eliminados para el reproceso de ISR", AbstractDeduccion.D_AJUSTE_AL_SUBSIDIO);
+		
 		List<DetNominaOtroPago> otrosPagos = nomina.getOtrosPagos();
 		boolean removedOtrosPagos = otrosPagos.removeIf(o -> AbstractOtroPago.OP_SUBSIDIO_AL_SALARIO.equalsIgnoreCase(o.getTipoOtroPago().getClave()));
 		if(removedOtrosPagos)
 			log.info("Se encontraron conceptos {}, los cuales fueron eliminados para el reproceso de Subsidio al empleo.", AbstractOtroPago.OP_SUBSIDIO_AL_SALARIO);
+		
+		removedOtrosPagos = otrosPagos.removeIf(o -> AbstractOtroPago.OP_ISR_AJUSTADO_POR_SUBSIDIO.equalsIgnoreCase(o.getTipoOtroPago().getClave()));
+		if(removedOtrosPagos)
+			log.info("Se encontraron conceptos {}, los cuales fueron eliminados para el reproceso de Subsidio al empleo.", AbstractOtroPago.OP_ISR_AJUSTADO_POR_SUBSIDIO);
 		
 		ISRExecutor isrExecutor = new ISRExecutor(parametros.getPeriodoInicio(), parametros.getPeriodoFin(), parametros.getTiposDeduccion(), parametros.getTiposOtroPago(), parametros.getTablaISR(), nominaMensual);
 		IDeducciones isrBO = isrExecutor.loadClass("ISRS", DateUtil.toLocalDate(parametros.getPeriodoFin()));

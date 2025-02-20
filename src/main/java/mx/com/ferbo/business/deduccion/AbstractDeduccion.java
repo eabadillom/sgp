@@ -1,5 +1,6 @@
 package mx.com.ferbo.business.deduccion;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -8,7 +9,9 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
+import mx.com.ferbo.model.DetNominaDeduccionPK;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.util.SGPException;
 
@@ -17,10 +20,19 @@ public abstract class AbstractDeduccion {
 	protected List<CatTipoDeduccion> tiposDeduccion = null;
 	
 	public static final String D_ISR = "002";
+	public static final String D_ISR_ANTES_DE_SUBSIDIO = "002";
+	public static final String D_AJUSTE_ISR_MENSUAL = "002";
+	public static final String D_AJUSTE_AL_SUBSIDIO = "107";
+	public static final String D_IMSS = "001";
 	public static final String D_AJUSTE_AL_NETO = "004";
 	
 	public static final String CVE_ISR = "045";
+	public static final String CVE_ISR_ANTES_DE_SUBSIDIO = "002A";
+	public static final String CVE_AJUSTE_ISR_MENSUAL = "104";
+	public static final String CVE_AJUSTE_AL_SUBSIDIO = "107";
+	public static final String CVE_IMSS = "052";
 	public static final String CVE_AJUSTE_AL_NETO = "099";
+	public static final String CVE_PRESTAMO_FONACOT = "061";
 	
 	
 	public CatTipoDeduccion getTipoDeduccion(String clave) {
@@ -62,5 +74,22 @@ public abstract class AbstractDeduccion {
 		}
 		
 		return maxIndex;
+	}
+	
+	public DetNominaDeduccion getDeduccion(DetNomina nomina, int idx, String tipoDeduccion, String clave, String nombre, Boolean informar, Boolean procesar, BigDecimal importe ) {
+		DetNominaDeduccion deduccion = null;
+		CatTipoDeduccion tipo = null;
+		
+		tipo = this.getTipoDeduccion(tipoDeduccion);
+		deduccion = new DetNominaDeduccion();
+		deduccion.setKey(new DetNominaDeduccionPK(nomina, idx));
+		deduccion.setTipoDeduccion(tipo);
+		deduccion.setClave(clave);
+		deduccion.setNombre(nombre);
+		deduccion.setInformar(informar);
+		deduccion.setProcesar(procesar);
+		deduccion.setImporte(importe);
+		
+		return deduccion;
 	}
 }
