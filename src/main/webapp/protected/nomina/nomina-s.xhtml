@@ -41,7 +41,7 @@
 			};
 		</script>
 		<h:form id="formNomina">
-			<p:growl id="messages" showDetail="true" life="5000"/>
+			<p:growl id="messages" showDetail="true" life="3000"/>
 			<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="30rem">
 				<p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes ui-button-primary" icon="pi pi-check"/>
 				<p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-outlined ui-button-secondary" icon="pi pi-times" />
@@ -51,24 +51,52 @@
 					<i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
 				</div>
 			</p:dialog>
-			<p:toolbar>
-				<p:toolbarGroup>
-					<p:datePicker id="dp-periodo-inicio" value="#{nominaBean.periodoInicio}" placeholder="Periodo Inicio" showIcon="true" pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6">
-						<p:ajax process="@this" listener="#{nominaBean.calculaFechaFin}" update="dp-periodo-fin semana" />
-					</p:datePicker>
-					<p:datePicker id="dp-periodo-fin" value="#{nominaBean.periodoFin}" placeholder="Periodo Fin" showIcon="true" pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6">
-						<p:ajax process="@this" listener="#{nominaBean.calculaFechaInicio}" update="dp-periodo-inicio semana" />
-					</p:datePicker>
-					<p:inputText id="semana" value="Semana: #{nominaBean.semana}" readonly="true"></p:inputText>
-				</p:toolbarGroup>
-			    <p:toolbarGroup>
-					<p:commandButton styleClass="ui-button-success" style="margin-right: .5rem" process="@this" value="Cálcular por Empresa" onstart="PF('empresaDialog').show();" update="panelDialogEmpresa"/>
-				</p:toolbarGroup>
-			</p:toolbar>
+			<p:card>
+				<div class="ui-fluid formgrid grid align-items-left">
+					<div class="field col-12 md:col-2">
+						<p:outputLabel value="Año" />
+						<p:spinner id="anio" value="#{nominaBean.anio}" buttons="horizontal">
+							<p:ajax event="change" process="@this" update="semana dp-periodo-inicio dp-periodo-fin" listener="#{nominaBean.calculaSemanas()}"></p:ajax>
+						</p:spinner>
+					</div>
+					<div class="field col-12 md:col-2">
+						<p:outputLabel value="Periodo" />
+						<p:selectOneMenu id="semana" value="#{nominaBean.semana}" filter="true" filterMatchMode="contains" filterPlaceholder="Número de semana">
+							<f:selectItem itemLabel="--Seleccione--" noSelectionOption="true"/>
+							<f:selectItems  value="#{nominaBean.semanasDelAnio}" var="periodo" itemLabel="Semana #{periodo}" itemValue="#{periodo}" />
+							<p:ajax event="change"  update="anio semana dp-periodo-inicio dp-periodo-fin" process="@this" listener="#{nominaBean.calculaFechasPeriodo()}"/>
+						</p:selectOneMenu>
+					</div>
+					<div class="field col-12 md:col-2">
+						<p:outputLabel value="Inicio periodo" />
+						<p:datePicker id="dp-periodo-inicio" value="#{nominaBean.periodoInicio}" placeholder="Periodo Inicio" showIcon="true" pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6" readonly="true">
+							<p:ajax process="@this" listener="#{nominaBean.calculaFechaFin}" update="dp-periodo-fin anio semana" />
+						</p:datePicker>
+					</div>
+					<div class="field col-12 md:col-2">
+						<p:outputLabel value="Fin periodo" />
+						<p:datePicker id="dp-periodo-fin" value="#{nominaBean.periodoFin}" placeholder="Periodo Fin" showIcon="true" pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6" readonly="true">
+							<p:ajax process="@this" listener="#{nominaBean.calculaFechaInicio}" update="dp-periodo-inicio anio semana" />
+						</p:datePicker>
+					</div>
+					<div class="field col-12 md:col-2">
+						<p:outputLabel value="Emisor" />
+						<p:selectOneMenu id="soEmpresa" value="#{nominaBean.empresaSelected}" autoWidth="false" converter="entityConverter">
+							<f:selectItem itemLabel="--Seleccione--"/>
+							<f:selectItems value="#{nominaBean.lstEmpresas}" var="empresa" itemValue="#{empresa}" itemLabel="#{empresa.descripcion}"/>
+							<p:ajax process="@this"/>
+						</p:selectOneMenu>
+					</div>
+					<div class="field col-12 md:col-2">
+						<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+						<p:commandButton value="Calcular" process="@this" update="dtNomina" actionListener="#{nominaBean.calculandoNomina()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
+					</div>
+				</div>
+			</p:card>
 			<div style="padding-top: 1rem;">
 				<p:dataTable id="dtNomina" widgetVar="dt-Nomina" var="nomina" value="#{nominaBean.listaNomina}" lazy="true" reflow="true" styleClass="products-table" rowSelectMode="add" paginatorPosition="bottom" scrollable="true">
 					<p:column headerText="Num" width="4rem">
-						<h:outputText value="#{nomina.receptor.numeroEmpleado}" />
+						<h:outputText value="#{nomina.receptor.numeroEmpleado}" styleClass="customer-badge status-#{nominaBean.statusNomina(nomina)}" />
 					</p:column>
 					<p:column headerText="Empleado">
 						<h:outputText value="#{nomina.receptor.nombre}" />
@@ -89,11 +117,6 @@
 						</p:outputLabel>
 					</p:column>
 					<p:column width="3rem" style="text-align: right;">
-						<!-- <span style="padding-left: 0.5rem; padding-right: 0.5rem;">
-							<p:commandButton icon="pi pi-save" process="@this">
-								<p:confirm header="Guardar" message="¿Está seguro que desea guardar la información de nómina?"  styleClass="mr-2" icon="pi pi-check"/>
-							</p:commandButton>
-						</span> -->
 						<p:commandButton icon="pi pi-bars" oncomplete="PF('dgEmpleado').show();" actionListener="#{nominaBean.cargaEmpleadoNomina}" process="@this" update="formNomina:dg-empleado">
 							<f:setPropertyActionListener value="#{nomina}" target="#{nominaBean.nomina}" />
 						</p:commandButton>
@@ -101,67 +124,34 @@
 					
 					<p:columnGroup type="footer">
 						<p:row>
-							<p:column style="text-align:right" colspan="2" width="auto"/>
-							<p:column style="text-align:right" width="6rem">
-								<f:facet name="footer">
-									<h:outputText value="Total percepciones" />
-								</f:facet>
-							</p:column>
-							<p:column style="text-align:right" width="6rem">
-								<f:facet name="footer">
-									<div align="right">
-										<h:outputText value="Total deducciones" />
-									</div>
-								</f:facet>
-							</p:column>
-							<p:column style="text-align: right;" width="6rem">
-								<div style="width: 6rem;">
-									<f:facet name="footer">
-										<p:outputLabel value="Total neto" />
-									</f:facet>
-								</div>
-							</p:column>
-							<p:column width="2rem" style="text-align: right;">
-								<div style="width: 2rem;">
-									<f:facet name="footer">
-									</f:facet>
-								</div>
-							</p:column>
-						</p:row>
-							<p:column style="text-align:right" colspan="2" width="auto"/>
-							<p:column style="text-align:right" width="6rem">
+							<p:column footerText="." style="color: rgba(255, 255, 255, 0);" />
+							<p:column style="text-align:right;" footerText="Total:"/>
+							<p:column style="text-align:right;">
 								<f:facet name="footer">
 									<h:outputText value="#{nominaBean.listaNomina.stream().map(item -> item.subtotal).sum()}">
 										<f:convertNumber pattern="$ #,##0.00" />
 									</h:outputText>
 								</f:facet>
 							</p:column>
-							<p:column style="text-align:right" width="6rem">
+							<p:column style="text-align:right;">
 								<f:facet name="footer">
-									<div align="right">
-										<h:outputText value="#{nominaBean.listaNomina.stream().map(item -> item.descuento).sum()}">
-											<f:convertNumber pattern="$ #,##0.00" />
-										</h:outputText>
-									</div>
+									<h:outputText value="#{nominaBean.listaNomina.stream().map(item -> item.descuento).sum()}">
+										<f:convertNumber pattern="$ #,##0.00" />
+									</h:outputText>
 								</f:facet>
 							</p:column>
-							<p:column style="text-align: right;" width="6rem">
-								<div style="width: 6rem;">
-									<f:facet name="footer">
-										<p:outputLabel value="#{nominaBean.listaNomina.stream().map(item -> item.total).sum()}">
-											<f:convertNumber pattern="$ #,##0.00" />
-										</p:outputLabel>
-									</f:facet>
-								</div>
+							<p:column style="text-align:right;">
+								<f:facet name="footer">
+									<p:outputLabel value="#{nominaBean.listaNomina.stream().map(item -> item.total).sum()}">
+										<f:convertNumber pattern="$ #,##0.00" />
+									</p:outputLabel>
+								</f:facet>
 							</p:column>
-							<p:column width="2rem" style="text-align: right;">
-								<div style="width: 2rem;">
-									<f:facet name="footer">
-									</f:facet>
-								</div>
+							<p:column width="3rem">
+								<f:facet name="footer">
+									<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+								</f:facet>
 							</p:column>
-						<p:row>
-							
 						</p:row>
 					</p:columnGroup>
 				</p:dataTable>
@@ -170,21 +160,7 @@
 				<p:commandButton value="Guardar" icon="pi pi-pencil" actionListener="#{nominaBean.guardarNominaEmpleado()}" disabled="#{nominaBean.listaNomina.size() lt 0}" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
 			</div>
 		
-			<p:dialog header="Seleccionar Empresa" showEffect="fade" modal="true" widgetVar="empresaDialog" responsive="true" draggable="false">
-				<p:outputPanel id="panelDialogEmpresa" class="ui-fluid">
-					<div class="card">
-						<p:selectOneMenu id="soEmpresa" value="#{nominaBean.empresaSelected}" autoWidth="false" converter="entityConverter">
-							<f:selectItem itemLabel="--Seleccione--"/>
-							<f:selectItems value="#{nominaBean.lstEmpresas}" var="empresa" itemValue="#{empresa}" itemLabel="#{empresa.descripcion}"/>
-						</p:selectOneMenu>
-					</div>
-					<div class="card">
-						<p:commandButton value="Cálcular" icon="pi pi-pencil" actionListener="#{nominaBean.calculandoNomina()}" />
-					</div>
-				</p:outputPanel>
-			</p:dialog>
-			
-			<p:dialog id="dg-empleado" widgetVar="dgEmpleado" header="#{nominaBean.nomina.receptor.nombre}" modal="true" responsive="true" position="center top" height="100%" resizable="false">
+			<p:dialog id="dg-empleado" widgetVar="dgEmpleado" header="#{nominaBean.nomina.receptor.nombre}" modal="true" responsive="true" position="center top" height="100%" resizable="false" showEffect="fade" hideEffect="fade">
 				<p:tabView id="tv-nomina" class="ui-fluid" dynamic="true" cache="true" effect="drop">
 					<p:ajax event="tabChange" oncomplete="PF('dgEmpleado').initPosition();"/>
 					<p:tab title="General">
@@ -439,7 +415,7 @@
 				</p:tabView>
 				<f:facet name="footer">
 					<span style="padding-left: 0.5rem; padding-right: 0.5rem;">
-						<p:commandButton value="Guardar" icon="pi pi-save" actionListener="#{nominaBean.actualizarNomina}" process="@this" disabled="true" />
+						<p:commandButton value="Guardar" icon="pi pi-save" actionListener="#{nominaBean.actualizarNomina}" process="@this" disabled="#{nominaBean.nomina.id ne null}" update="formNomina:dtNomina" />
 					</span>
 					<span style="padding-left: 0.5rem; padding-right: 0.5rem;">
 						<p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dgEmpleado').hide();" styleClass="ui-button-outlined ui-button-secondary" />

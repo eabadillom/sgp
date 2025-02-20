@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -48,27 +49,29 @@ public class NominaDAO extends BaseDAO<DetNomina, Integer> {
 		return modelList;
 	}
 	
-	public List<DetNomina> buscarPorPeriodoEmpleado(LocalDate periodoInicio, LocalDate periodoFin, String rfc) {
-		List<DetNomina> modelList = null;
+	public DetNomina buscarPorPeriodoEmpleado(LocalDate periodoInicio, LocalDate periodoFin, String rfc) {
+		DetNomina model = null;
 		EntityManager em = null;
 		
 		try {
 			em = this.getEntityManager();
-			modelList = em.createNamedQuery("DetNomina.findByPeriodoRfc", modelClass)
+			model = em.createNamedQuery("DetNomina.findByPeriodoRfc", modelClass)
 					.setParameter("periodoInicio", periodoInicio)
 					.setParameter("periodoFin", periodoFin)
 					.setParameter("rfc", rfc)
-					.getResultList()
+					.getSingleResult()
 					;
 			log.debug("periodo inicio {}, periodo fin {}, rfc {}");
 			
+		} catch(NoResultException ex) {
+			log.warn("Problema para obtener la lista de nomina del periodo solicitado...", ex.getMessage());
 		} catch(Exception ex) {
 			log.error("Problema para obtener la lista de nomina del periodo solicitado...", ex);
 		} finally {
 			this.close(em);
 		}
 		
-		return modelList;
+		return model;
 	}
 	
 	public List<DetNomina> buscarPorSemanaRfc(Integer semanaInicio, Integer semanaFin, String rfc) {

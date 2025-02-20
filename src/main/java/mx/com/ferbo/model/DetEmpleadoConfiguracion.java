@@ -42,6 +42,10 @@ public class DetEmpleadoConfiguracion implements Serializable
     @JoinColumn(name = "cd_empleado")
     private DetEmpleado empleado;
     
+    @NotNull
+    @Column(name = "st_proc_nomina")
+    private Boolean procesarNomina;
+    
     @Basic(optional = true)
     @Column(name = "st_retardo")
     private Boolean retardo;
@@ -53,6 +57,35 @@ public class DetEmpleadoConfiguracion implements Serializable
     @Basic(optional = true)
     @Column(name = "st_goce_sueldo")
     private Boolean goceSueldo;
+    
+    @Override
+    public int hashCode() 
+    {
+        int hash = 7;
+        hash = 79 * hash + Objects.hashCode(this.idEmpleadoConf);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) 
+    {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final DetEmpleadoConfiguracion other = (DetEmpleadoConfiguracion) obj;
+        return Objects.equals(this.idEmpleadoConf, other.idEmpleadoConf);
+    }
+
+    @Override
+    public String toString() {
+        return "DetEmpleadoConfiguracion[" + "id_empleado_conf=" + idEmpleadoConf + ", empleado=" + empleado.getIdEmpleado() + ", retardo=" + retardo + ", horasextra=" + horasextra +']';
+    }
 
     @Basic(optional = true)
     @Column(name = "st_asistencia_nl")
@@ -112,6 +145,14 @@ public class DetEmpleadoConfiguracion implements Serializable
     public void setHorasextra(Boolean horasextra) {
         this.horasextra = horasextra;
     }
+
+	public Boolean getProcesarNomina() {
+		return procesarNomina;
+	}
+  
+  public void setProcesarNomina(Boolean procesarNomina) {
+		this.procesarNomina = procesarNomina;
+	}
 
     public Boolean getGoceSueldo() {
         return goceSueldo;
