@@ -21,9 +21,8 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name = "cat_imss_cuotas")
 @NamedQueries({
-    @NamedQuery(name = "CatImssCuotas.findAll", query = "SELECT i FROM CatImssCuotas i"),
-    @NamedQuery(name = "CatImssCuotas.findByActive", query = "SELECT NEW mx.com.ferbo.dto.CatImssCuotasDTO(i.idImssCuotas, i.riesgoTrabajo, i.enfMatEspCtFija, i.enfMatEspCtAd, i.enfMatGastosMed, i.enfMatDinero, i.invVida, i.retCesantiaVejezRetiro, i.retCesantiaVejezCeav, i.guarderia, i.infonavit, i.cuota, i.fechaCap, i.activo) FROM CatImssCuotas i WHERE i.activo = 1"),
-    @NamedQuery(name = "CatImssCuotas.findActual", query = "SELECT NEW mx.com.ferbo.dto.CatImssCuotasDTO(i.idImssCuotas, i.riesgoTrabajo, i.enfMatEspCtFija, i.enfMatEspCtAd, i.enfMatGastosMed, i.enfMatDinero, i.invVida, i.retCesantiaVejezRetiro, i.retCesantiaVejezCeav, i.guarderia, i.infonavit, i.cuota, i.fechaCap, i.activo) FROM CatImssCuotas i WHERE i.activo = 1 AND i.fechaCap LIKE :fechaCap")})
+    @NamedQuery(name = "CatImssCuotas.findAll", query = "SELECT i FROM CatImssCuotas i")
+})
 public class CatImssCuotas implements Serializable {
 
     private static final long serialVersionUID = 1L;
