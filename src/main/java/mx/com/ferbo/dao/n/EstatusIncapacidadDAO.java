@@ -3,7 +3,7 @@ package mx.com.ferbo.dao.n;
 import java.util.List;
 import javax.persistence.EntityManager;
 import mx.com.ferbo.commons.dao.BaseDAO;
-import mx.com.ferbo.model.CatEstatusSolicitud;
+import mx.com.ferbo.model.CatEstatusIncapacidad;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -11,29 +11,29 @@ import org.apache.logging.log4j.Logger;
  *
  * @author alberto
  */
-public class EstatusSolicitudDAO extends BaseDAO<CatEstatusSolicitud, Integer>
+public class EstatusIncapacidadDAO extends BaseDAO<CatEstatusIncapacidad, Integer>
 {
-    private static Logger log = LogManager.getLogger(EstatusSolicitudDAO.class);
+    private static Logger log = LogManager.getLogger(EstatusIncapacidadDAO.class);
     
-    public EstatusSolicitudDAO(Class<CatEstatusSolicitud> modelClass) 
+    public EstatusIncapacidadDAO(Class<CatEstatusIncapacidad> modelClass) 
     {
         super(modelClass);
     }
     
-    public EstatusSolicitudDAO()
+    public EstatusIncapacidadDAO()
     {
-        super(CatEstatusSolicitud.class);
+        super(CatEstatusIncapacidad.class);
     }
     
-    public CatEstatusSolicitud buscarPorClave(String clave)
+    public CatEstatusIncapacidad buscarPorClave(String clave)
     {
-        CatEstatusSolicitud model = null;
+        CatEstatusIncapacidad model = null;
         EntityManager em = null;
         
         try 
         {
             em = this.getEntityManager();
-            model = em.createNamedQuery("CatEstatusSolicitud.findByClave", CatEstatusSolicitud.class)
+            model = em.createNamedQuery("CatEstatusIncapacidad.findByClave", CatEstatusIncapacidad.class)
                 .setParameter("clave", clave)
                 .getSingleResult();
         }catch (Exception ex) 
@@ -47,15 +47,15 @@ public class EstatusSolicitudDAO extends BaseDAO<CatEstatusSolicitud, Integer>
         return model;
     }
     
-    public List<CatEstatusSolicitud> buscarTodos()
+    public List<CatEstatusIncapacidad> buscarTodos()
     {
-        List<CatEstatusSolicitud> listModel = null;
+        List<CatEstatusIncapacidad> listModel = null;
         EntityManager em = null;
         
         try 
         {
             em = this.getEntityManager();
-            listModel = em.createNamedQuery("CatEstatusSolicitud.findAll", CatEstatusSolicitud.class)
+            listModel = em.createNamedQuery("CatEstatusIncapacidad.findAll", CatEstatusIncapacidad.class)
                 .getResultList();
         }catch (Exception ex) 
         {

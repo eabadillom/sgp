@@ -114,7 +114,7 @@ public class IncapacidadIMSSDAO extends BaseDAO<DetIncapacidad, Integer>
         return modelList;
     }
     
-    public List<DetIncapacidad> buscarPorPeriodo(Integer idEmpleado, Date fechaInicio, Date fechaFin)
+    public List<DetIncapacidad> buscarPorPeriodo(Integer idEmpleado, Date fechaInicio, Date fechaFin, String clave)
     {
         List<DetIncapacidad> modelList = null;
         EntityManager em = null;
@@ -126,6 +126,7 @@ public class IncapacidadIMSSDAO extends BaseDAO<DetIncapacidad, Integer>
                 .setParameter("idEmpleado", idEmpleado)
                 .setParameter("fechaInicio", fechaInicio)
                 .setParameter("fechaFin", fechaFin)
+                .setParameter("clave", clave)
                 .getResultList();
         }catch(Exception ex)
         {

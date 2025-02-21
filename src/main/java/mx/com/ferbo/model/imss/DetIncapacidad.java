@@ -16,7 +16,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
-import mx.com.ferbo.model.CatEstatusSolicitud;
+import mx.com.ferbo.model.CatEstatusIncapacidad;
 import mx.com.ferbo.model.DetEmpleado;
 
 /**
@@ -30,7 +30,7 @@ import mx.com.ferbo.model.DetEmpleado;
     @NamedQuery(name = "DetIncapacidad.findByEmpleado", query = "SELECT dri FROM DetIncapacidad dri INNER JOIN dri.idEmpleadoInc dei WHERE dei.idEmpleado = :idEmpleado"),
     @NamedQuery(name = "DetIncapacidad.findByIncapacidadClave", query = "SELECT dri FROM DetIncapacidad dri INNER JOIN dri.tipoIncapacidad cti WHERE cti.clave = :clave"),
     @NamedQuery(name = "DetIncapacidad.findByEstatus", query = "SELECT dri FROM DetIncapacidad dri INNER JOIN dri.estatusSolicitud es WHERE es.clave = :clave"),
-    @NamedQuery(name = "DetIncapacidad.findByPeriodo", query = "SELECT dri FROM DetIncapacidad dri INNER JOIN dri.idEmpleadoInc dei WHERE dei.idEmpleado = :idEmpleado AND ((:fechaInicio = dri.fechaInicio AND :fechaFin = dri.fechaFin) OR ((:fechaInicio = dri.fechaFin) AND (:fechaFin = dri.fechaInicio)) OR ((:fechaInicio BETWEEN dri.fechaInicio AND dri.fechaFin) OR (:fechaFin BETWEEN dri.fechaInicio AND dri.fechaFin)) OR ((dri.fechaInicio BETWEEN :fechaInicio AND :fechaFin) OR (dri.fechaFin BETWEEN :fechaInicio AND :fechaFin))) ORDER BY dri.fechaInicio DESC, dri.idIncapacidad DESC"),
+    @NamedQuery(name = "DetIncapacidad.findByPeriodo", query = "SELECT dri FROM DetIncapacidad dri INNER JOIN dri.idEmpleadoInc dei INNER JOIN dri.estatusSolicitud es WHERE dei.idEmpleado = :idEmpleado AND ((:fechaInicio = dri.fechaInicio AND :fechaFin = dri.fechaFin) OR ((:fechaInicio = dri.fechaFin) AND (:fechaFin = dri.fechaInicio)) OR ((:fechaInicio BETWEEN dri.fechaInicio AND dri.fechaFin) OR (:fechaFin BETWEEN dri.fechaInicio AND dri.fechaFin)) OR ((dri.fechaInicio BETWEEN :fechaInicio AND :fechaFin) OR (dri.fechaFin BETWEEN :fechaInicio AND :fechaFin))) AND es.clave = :clave ORDER BY dri.fechaInicio DESC, dri.idIncapacidad DESC"),
     @NamedQuery(name = "DetIncapacidad.findByEmpleadoUltimoPeriodo", query = "SELECT dri FROM DetIncapacidad dri INNER JOIN dri.idEmpleadoInc dei WHERE dei.idEmpleado = :idEmpleado AND (:fechaInicio BETWEEN dri.fechaInicio AND dri.fechaFin) ORDER BY dri.fechaInicio DESC, dri.idIncapacidad DESC"),
     @NamedQuery(name = "DetIncapacidad.findByParametros", query = "SELECT dri FROM DetIncapacidad dri INNER JOIN dri.idEmpleadoInc dei WHERE dei.idEmpleado = :idEmpleado AND ((:fechaInicio = dri.fechaInicio AND :fechaFin = dri.fechaFin) OR ((:fechaInicio = dri.fechaFin) AND (:fechaFin = dri.fechaInicio)) OR ((:fechaInicio BETWEEN dri.fechaInicio AND dri.fechaFin) OR (:fechaFin BETWEEN dri.fechaInicio AND dri.fechaFin)) OR ((dri.fechaInicio BETWEEN :fechaInicio AND :fechaFin) OR (dri.fechaFin BETWEEN :fechaInicio AND :fechaFin))) ORDER BY dri.fechaInicio DESC, dri.idIncapacidad DESC")
 })
@@ -102,8 +102,8 @@ public class DetIncapacidad implements Serializable
     
     @ManyToOne(optional = true)
     @NotNull
-    @JoinColumn(name = "cd_estatus", referencedColumnName = "cd_estatus_solicitud")
-    private CatEstatusSolicitud estatusSolicitud;
+    @JoinColumn(name = "cd_estatus", referencedColumnName = "cd_estatus_inc")
+    private CatEstatusIncapacidad estatusSolicitud;
     
     public DetIncapacidad() 
     {
@@ -244,12 +244,12 @@ public class DetIncapacidad implements Serializable
         this.descripcion = descripcion;
     }
 
-    public CatEstatusSolicitud getEstatusSolicitud() 
+    public CatEstatusIncapacidad getEstatusSolicitud() 
     {
         return estatusSolicitud;
     }
 
-    public void setEstatusSolicitud(CatEstatusSolicitud estatusSolicitud) 
+    public void setEstatusSolicitud(CatEstatusIncapacidad estatusSolicitud) 
     {
         this.estatusSolicitud = estatusSolicitud;
     }

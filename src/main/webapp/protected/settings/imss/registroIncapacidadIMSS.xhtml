@@ -65,11 +65,11 @@
                         <f:convertDateTime type="date" pattern="dd/MM/yyyy" timeZone="GMT-6"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Estatus" width="5rem">
-                    <p:outputLabel class="customer-badge status-#{registroIncBean.status.getStatusClass(incapacidad.estatusSolicitud.idEstatusSolicitud)}"
+                <p:column headerText="Estatus" style="text-align: center;" width="3rem">
+                    <p:outputLabel class="customer-badge status-#{registroIncBean.status.getEstatusIncapacidad(incapacidad.estatusSolicitud.clave)}"
                         value="#{incapacidad.estatusSolicitud.descripcion}" style="width: 12rem"/>
                 </p:column>
-                <p:column exportable="false" ariaHeaderText="Actions" width="5rem">
+                <p:column exportable="false" ariaHeaderText="Actions" width="4rem">
                     <p:commandButton class="ui-button-success rounded-button m-1" icon="pi pi-bars" update="form:pnlRegistoIncapacidad" 
                         oncomplete="PF('dialogoRegistoIncapacidad').show()" styleClass="edit-button" process="@this"
                         actionListener="#{registroIncBean.editarSolicitud(incapacidad)}" >
@@ -101,7 +101,8 @@
                             <p:outputLabel for="@next" value="Tipo Incapacidad"/>
                             <p:selectOneMenu id="tipoIncapacidad" autoWidth="false" converter="entityConverter" value="#{registroIncBean.tipoIncapacidad}"
                                 disabled="#{registroIncBean.registroIncapacidad.estatusSolicitud.equals(registroIncBean.estatusSolicitudCancelada) eq true 
-                                            or registroIncBean.tpIncapacidadSelecciondado eq true}" >
+                                            or registroIncBean.tpIncapacidadSelecciondado eq true 
+                                            or registroIncBean.registroIncapacidad.controlIncapacidad.clave.matches('D') eq true}" >
                                 <f:selectItem itemLabel="--Seleccione--"/>
                                 <f:selectItems value="#{registroIncBean.listaIncapacidadesIMSS}" var="tipoV" itemLabel="#{tipoV.descripcion}" itemValue="#{tipoIncapacidad}"/>
                                 <p:ajax event="change" update="pnlRegistoIncapacidad" process="@this" resetValues="true"/>
@@ -113,7 +114,8 @@
                             <p:outputLabel for="@next" value="Control Incapacidad"/>
                             <p:selectOneMenu id="controlIncapacidad" autoWidth="false" converter="entityConverter" value="#{registroIncBean.controlIncapacidad}"
                                 disabled="#{registroIncBean.registroIncapacidad.estatusSolicitud.equals(registroIncapacidad.estatusSolicitudCancelada) eq true 
-                                            or registroIncBean.tpIncapacidadSelecciondado eq true}" >
+                                            or registroIncBean.tpIncapacidadSelecciondado eq true 
+                                            or registroIncBean.registroIncapacidad.controlIncapacidad.clave.matches('D') eq true}" >
                                 <f:selectItem itemLabel="--Seleccione--"/>
                                 <f:selectItems value="#{registroIncBean.listaControlIncapacidadIMSS}" var="tipoV" itemLabel="#{tipoV.descripcion}" itemValue="#{controlIncapacidad}"/>
                                 <p:ajax event="change" update="pnlRegistoIncapacidad" process="@this" resetValues="true"/>
@@ -125,7 +127,8 @@
                                              disabled="#{registroIncBean.tpIncapacidadSelecciondado eq true 
                                             or registroIncBean.registroIncapacidad.estatusSolicitud.equals(registroIncBean.estatusSolicitudCancelada) eq true 
                                             or registroIncBean.registroIncapacidad.secuelaRiesgoTrabajo.equals(registroIncBean.riesgoIncapacidadDefuncion) eq true 
-                                            or registroIncBean.tipoIncapacidad.incapacidadSAT.clave.matches('01') eq false}" >
+                                            or registroIncBean.tipoIncapacidad.incapacidadSAT.clave.matches('01') 
+                                            eq false or registroIncBean.registroIncapacidad.controlIncapacidad.clave.matches('D') eq true}" >
                                 <f:selectItem itemLabel="--Seleccione--"/>
                                 <f:selectItems value="#{registroIncBean.listaRiesgoTrabajo}" var="tipoV" itemLabel="#{tipoV.descripcion}" itemValue="#{riesgoTrabajo}"/>
                                 <p:ajax event="change" update="pnlRegistoIncapacidad" process="@this" resetValues="true"/>
@@ -137,7 +140,8 @@
                                 disabled="#{registroIncBean.tpIncapacidadSelecciondado eq true 
                                             or registroIncBean.registroIncapacidad.estatusSolicitud.equals(registroIncBean.estatusSolicitudCancelada) eq true 
                                             or registroIncBean.registroIncapacidad.secuelaRiesgoTrabajo.equals(registroIncBean.riesgoIncapacidadDefuncion) eq true
-                                            or registroIncBean.tipoIncapacidad.incapacidadSAT.clave.matches('01') eq false}" >
+                                            or registroIncBean.tipoIncapacidad.incapacidadSAT.clave.matches('01') eq false 
+                                            or registroIncBean.registroIncapacidad.controlIncapacidad.clave.matches('D') eq true}" >
                                 <f:selectItem itemLabel="--Seleccione--"/>
                                 <f:selectItems value="#{registroIncBean.listaTipoRiesgoIMSS}" var="tipoV" itemLabel="#{tipoV.descripcion}" itemValue="#{tipoRiesgo}"/>
                                 <p:ajax event="change" update="pnlRegistoIncapacidad" process="@this" resetValues="true"/>
@@ -149,7 +153,8 @@
                             <p:outputLabel for="@next" value="Dias Autorizados"/>
                             <p:inputNumber id="diasAutorizados" value="#{registroIncBean.registroIncapacidad.diasAutorizados}" 
                                 disabled="#{registroIncBean.registroIncapacidad.estatusSolicitud.equals(registroIncBean.estatusSolicitudCancelada) eq true 
-                                            or registroIncBean.tpIncapacidadSelecciondado eq true}">
+                                            or registroIncBean.tpIncapacidadSelecciondado eq true 
+                                            or registroIncBean.registroIncapacidad.controlIncapacidad.clave.matches('D') eq true}">
                                 <p:ajax process="@this"/>
                             </p:inputNumber>
                         </div>
@@ -158,7 +163,8 @@
                             <p:datePicker id="fechaInicio" value="#{registroIncBean.registroIncapacidad.fechaInicio}" showIcon="true" pattern="dd/MM/yyyy" locale="es" 
                                           styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" timeZone="GMT-6" 
                                           disabled="#{registroIncBean.registroIncapacidad.estatusSolicitud.equals(registroIncBean.estatusSolicitudCancelada) eq true 
-                                            or registroIncBean.tpIncapacidadSelecciondado eq true}" >
+                                            or registroIncBean.tpIncapacidadSelecciondado eq true 
+                                            or registroIncBean.registroIncapacidad.controlIncapacidad.clave.matches('D') eq true}" >
                                 <p:ajax process="@this"/>
                             </p:datePicker>
                         </div>
@@ -168,7 +174,8 @@
                                 <p:datePicker id="fechaFin" value="#{registroIncBean.registroIncapacidad.fechaFin}" showIcon="true" pattern="dd/MM/yyyy" locale="es" 
                                               styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" timeZone="GMT-6" 
                                               disabled="#{registroIncBean.registroIncapacidad.estatusSolicitud.equals(registroIncBean.estatusSolicitudCancelada) eq true 
-                                                or registroIncBean.tpIncapacidadSelecciondado eq true}" >
+                                                or registroIncBean.tpIncapacidadSelecciondado eq true 
+                                                or registroIncBean.registroIncapacidad.controlIncapacidad.clave.matches('D') eq true}" >
                                     <p:ajax process="@this"/>
                                 </p:datePicker>
                             </div>
@@ -179,7 +186,8 @@
                             <p:outputLabel for="@next" value="Folio"/>
                             <p:inputText id="folio" value="#{registroIncBean.registroIncapacidad.folio}"
                                 disabled="#{registroIncBean.registroIncapacidad.estatusSolicitud.equals(registroIncBean.estatusSolicitudCancelada) eq true 
-                                            or registroIncBean.tpIncapacidadSelecciondado eq true}" >
+                                            or registroIncBean.tpIncapacidadSelecciondado eq true 
+                                            or registroIncBean.registroIncapacidad.controlIncapacidad.clave.matches('D') eq true}" >
                                 <p:ajax process="@this"/>
                             </p:inputText>
                         </div>
@@ -187,7 +195,8 @@
                             <p:outputLabel for="@next" value="Descripcion"/>
                             <p:inputText id="descripcion" value="#{registroIncBean.registroIncapacidad.descripcion}" 
                                 disabled="#{registroIncBean.registroIncapacidad.estatusSolicitud.equals(registroIncBean.estatusSolicitudCancelada) eq true 
-                                            or registroIncBean.tpIncapacidadSelecciondado eq true}">
+                                            or registroIncBean.tpIncapacidadSelecciondado eq true 
+                                            or registroIncBean.registroIncapacidad.controlIncapacidad.clave.matches('D') eq true}">
                                 <p:ajax process="@this"/>
                             </p:inputText>
                         </div>
@@ -198,13 +207,20 @@
                                      actionListener="#{registroIncBean.metodoBoton()}" process="pnlRegistoIncapacidad @this" 
                                      update="pnlRegistoIncapacidad dtRegistroIncapacidad" rendered="#{registroIncBean.estadoAccionBoton ne 3}"
                                      disabled="#{registroIncBean.registroIncapacidad.estatusSolicitud.equals(registroIncBean.estatusSolicitudCancelada) eq true 
-                                                 or registroIncBean.tpIncapacidadSelecciondado eq true}" />
+                                                 or registroIncBean.tpIncapacidadSelecciondado eq true 
+                                                 or registroIncBean.registroIncapacidad.controlIncapacidad.clave.matches('D') eq true}" >
+                        <p:resetInput target="form:pnlRegistoIncapacidad" />
+                    </p:commandButton>
                     <p:commandButton value="#{registroIncBean.accionBoton}" icon="#{registroIncBean.iconoBoton}" class="#{registroIncBean.diseñoBoton}" 
                                      process="pnlRegistoIncapacidad @this" update="pnlRegistoIncapacidad dtRegistroIncapacidad" 
                                      rendered="#{registroIncBean.estadoAccionBoton eq 3}" oncomplete="PF('dialogoBorrarIncapacidad').show()"
                                      disabled="#{registroIncBean.registroIncapacidad.estatusSolicitud.equals(registroIncBean.estatusSolicitudCancelada) eq true 
-                                                 or registroIncBean.registroIncapacidad.secuelaRiesgoTrabajo.equals(registroIncBean.riesgoIncapacidadDefuncion) eq true}" />
-                    <p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dialogoRegistoIncapacidad').hide()" class="ui-button-secondary" >
+                                                 or registroIncBean.registroIncapacidad.secuelaRiesgoTrabajo.equals(registroIncBean.riesgoIncapacidadDefuncion) eq true 
+                                                 or registroIncBean.registroIncapacidad.controlIncapacidad.clave.matches('D') eq true}" >
+                        <p:resetInput target="form:pnlRegistoIncapacidad" />
+                    </p:commandButton>
+                    <p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dialogoRegistoIncapacidad').hide()" 
+                                     class="ui-button-secondary" actionListener="#{registroIncBean.incializarSolicitud()}" >
                         <p:resetInput target="form:pnlRegistoIncapacidad" />
                     </p:commandButton>
                 </f:facet>
@@ -212,9 +228,13 @@
             <p:confirmDialog widgetVar="dialogoBorrarIncapacidad" showEffect="fade" width="300"
                 message="Cancelar Incapacidad?" header="Confirmar" severity="warn">
                 <p:commandButton value="Si" icon="pi pi-check" actionListener="#{registroIncBean.metodoBoton()}"
-                    process="@this" oncomplete="PF('dialogoBorrarIncapacidad').hide()" />
+                    process="@this" oncomplete="PF('dialogoBorrarIncapacidad').hide()" >
+                    <p:resetInput target="form:pnlRegistoIncapacidad" />
+                </p:commandButton>
                 <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
-                    onclick="PF('dialogoBorrarIncapacidad').hide()" />
+                    onclick="PF('dialogoBorrarIncapacidad').hide()" >
+                    <p:resetInput target="form:pnlRegistoIncapacidad" />
+                </p:commandButton>
             </p:confirmDialog>
             <script>
                 PrimeFaces.locales['es'] = 

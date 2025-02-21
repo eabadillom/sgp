@@ -20,7 +20,7 @@ import javax.validation.constraints.NotNull;
  * @author alberto
  */
 @Entity
-@Table(name = "cat_tp_riesgo")
+@Table(name = "cat_tipo_riesgo")
 @NamedQueries({
     @NamedQuery(name = "CatTipoRiesgoIMSS.findAll", query = "SELECT tr FROM CatTipoRiesgoIMSS tr"),
     @NamedQuery(name = "CatTipoRiesgoIMSS.findByClave", query = "SELECT tr FROM CatTipoRiesgoIMSS tr WHERE tr.clave = :clave")

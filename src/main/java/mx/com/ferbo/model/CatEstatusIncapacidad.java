@@ -20,19 +20,19 @@ import mx.com.ferbo.model.imss.DetIncapacidad;
  * @author alberto
  */
 @Entity
-@Table(name = "cat_estatus_solicitud")
+@Table(name = "cat_estatus_incapacidad")
 @NamedQueries({
-    @NamedQuery(name = "CatEstatusSolicitud.findAll", query = "SELECT ces FROM CatEstatusSolicitud ces"),
-    @NamedQuery(name = "CatEstatusSolicitud.findByClave", query = "SELECT ces FROM CatEstatusSolicitud ces WHERE ces.clave = :clave")
+    @NamedQuery(name = "CatEstatusIncapacidad.findAll", query = "SELECT ces FROM CatEstatusIncapacidad ces"),
+    @NamedQuery(name = "CatEstatusIncapacidad.findByClave", query = "SELECT ces FROM CatEstatusIncapacidad ces WHERE ces.clave = :clave")
 })
-public class CatEstatusSolicitud implements Serializable
+public class CatEstatusIncapacidad implements Serializable
 {
     private static final long serialVersionUID = 1L;
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "cd_estatus_solicitud")
+    @Column(name = "cd_estatus_inc")
     private Integer idEstatusSolicitud;
     
     @Basic(optional = false)
@@ -46,16 +46,16 @@ public class CatEstatusSolicitud implements Serializable
     @OneToMany(mappedBy = "estatusSolicitud")
     private List<DetIncapacidad> registroEstatusSolicitudes;
 
-    public CatEstatusSolicitud() 
+    public CatEstatusIncapacidad() 
     {
     }
 
-    public CatEstatusSolicitud(Integer idEstatusSolicitud) 
+    public CatEstatusIncapacidad(Integer idEstatusSolicitud) 
     {
         this.idEstatusSolicitud = idEstatusSolicitud;
     }
 
-    public CatEstatusSolicitud(String clave) 
+    public CatEstatusIncapacidad(String clave) 
     {
         this.clave = clave;
     }
@@ -121,14 +121,14 @@ public class CatEstatusSolicitud implements Serializable
         {
             return false;
         }
-        final CatEstatusSolicitud other = (CatEstatusSolicitud) obj;
+        final CatEstatusIncapacidad other = (CatEstatusIncapacidad) obj;
         return Objects.equals(this.idEstatusSolicitud, other.idEstatusSolicitud);
     }
 
     @Override
     public String toString() 
     {
-        return "CatEstatusSolicitud[" + "IdEstatusSolicitud: " + idEstatusSolicitud + ", Clave: " + clave + ", Descripcion: " + descripcion + ']';
+        return "CatEstatusIncapacidad[" + "IdEstatusSolicitud: " + idEstatusSolicitud + ", Clave: " + clave + ", Descripcion: " + descripcion + ']';
     }
     
 }
