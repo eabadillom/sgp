@@ -144,7 +144,7 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
         return modelList;
     }
     
-    public List<DetEmpleado> buscarTodosActivos(String activo)
+    public List<DetEmpleado> buscarTodosActivos(Short activo)
     {
         List<DetEmpleado> modelList = null;
         EntityManager emSGP = null;

@@ -89,4 +89,21 @@ public class ManageStatus
         }
         return mensaje;
     }
+    
+    public String getEstatusIncapacidad(String clave)
+    {
+        String mensaje = "";
+        
+        switch(clave)
+        {
+            case "A":
+                mensaje = StatusClass.QUALIFIED.toString().toLowerCase();
+                break;
+            case "C":
+                mensaje = StatusClass.UNQUALIFIED.toString().toLowerCase();
+                break;
+        }
+        
+        return mensaje;
+    }
 }

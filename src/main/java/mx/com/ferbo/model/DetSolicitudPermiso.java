@@ -32,46 +32,58 @@ import javax.validation.constraints.NotNull;
     @NamedQuery(name = "DetSolicitudPermiso.findByIdEmp", query = "SELECT dsp FROM DetSolicitudPermiso dsp INNER JOIN dsp.idEmpleadoSol de INNER JOIN dsp.idTipoSolicitud cts WHERE de.idEmpleado = :idEmp ORDER BY dsp.fechaCap"),
     @NamedQuery(name = "DetSolicitudPermiso.findByClave", query = "SELECT dsp FROM DetSolicitudPermiso dsp INNER JOIN dsp.idEmpleadoSol de INNER JOIN dsp.idTipoSolicitud cts WHERE de.idEmpleado = :idEmp AND cts.clave = :clave"),
     @NamedQuery(name = "DetSolicitudPermiso.findByTipoSolicitud", query = "SELECT dsp FROM DetSolicitudPermiso dsp INNER JOIN dsp.idEmpleadoSol de INNER JOIN dsp.idTipoSolicitud cts WHERE de.idEmpleado = :idEmp AND (cts.clave = :clavePermiso OR cts.clave = :claveVacaciones)"),
-    @NamedQuery(name = "DetSolicitudPermiso.findByCriterios", query = "SELECT dsp FROM DetSolicitudPermiso dsp INNER JOIN dsp.idEmpleadoSol de INNER JOIN dsp.idTipoSolicitud ts WHERE de.idEmpleado = :idEmp AND (:fechaInicio BETWEEN dsp.fechaInicio AND dsp.fechaFin OR :fechaFin BETWEEN dsp.fechaInicio AND dsp.fechaFin OR dsp.fechaInicio BETWEEN :fechaInicio AND :fechaFin OR dsp.fechaFin BETWEEN :fechaInicio AND :fechaFin) AND (ts.clave = :clave1 OR ts.clave = :clave2) and dsp.aprobada in (1,2)")
+    @NamedQuery(name = "DetSolicitudPermiso.findByCriterios", query = "SELECT dsp FROM DetSolicitudPermiso dsp INNER JOIN dsp.idEmpleadoSol de INNER JOIN dsp.idTipoSolicitud ts WHERE de.idEmpleado = :idEmp AND (:fechaInicio BETWEEN dsp.fechaInicio AND dsp.fechaFin OR :fechaFin BETWEEN dsp.fechaInicio AND dsp.fechaFin OR dsp.fechaInicio BETWEEN :fechaInicio AND :fechaFin OR dsp.fechaFin BETWEEN :fechaInicio AND :fechaFin) AND (ts.clave = :clave1 OR ts.clave = :clave2) AND dsp.aprobada in (1,2)"),
+    @NamedQuery(name = "DetSolicitudPermiso.findByPeriodo", query = "SELECT dsp FROM DetSolicitudPermiso dsp INNER JOIN dsp.idEmpleadoSol de WHERE de.idEmpleado = :idEmp AND ((:fechaInicio = dsp.fechaInicio AND :fechaFin = dsp.fechaFin) OR ((:fechaInicio = dsp.fechaFin) OR (:fechaFin = dsp.fechaInicio)) OR ((:fechaInicio BETWEEN dsp.fechaInicio AND dsp.fechaFin) OR (:fechaFin BETWEEN dsp.fechaInicio AND dsp.fechaFin)) OR ((dsp.fechaInicio BETWEEN :fechaInicio AND :fechaFin) OR (dsp.fechaFin BETWEEN :fechaInicio AND :fechaFin))) AND dsp.aprobada in (1,2)")
 })
 public class DetSolicitudPermiso implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id_solicitud")
     private Integer idSolicitud;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "fecha_cap")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaCap;
+    
     @Column(name = "fecha_mod")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaMod;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "fecha_inicio")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaInicio;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "fecha_fin")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaFin;
+    
     @Column(name = "aprobada")
     private Short aprobada;
+    
     @Column(name = "descripcion_rechazo")
     private String descripcionRechazo;
+    
     @OneToMany(mappedBy = "idSolPermiso")
     private List<DetIncidencia> detIncidenciaList;
+    
     @JoinColumn(name = "id_tipo_solicitud", referencedColumnName = "id_tipo_solicitud")
     @ManyToOne(optional = false)
     private CatTipoSolicitud idTipoSolicitud;
+    
     @JoinColumn(name = "id_empleado_sol", referencedColumnName = "id_empleado")
     @ManyToOne(optional = false)
     private DetEmpleado idEmpleadoSol;
+    
     @JoinColumn(name = "id_empleado_rev", referencedColumnName = "id_empleado")
     @ManyToOne
     private DetEmpleado idEmpleadoRev;

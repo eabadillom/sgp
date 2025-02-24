@@ -155,4 +155,28 @@ public class SolicitudPermisoDAO extends BaseDAO<DetSolicitudPermiso, Integer>
         return modellist;
     }
     
+    public List<DetSolicitudPermiso> buscarPorPeriodo (Integer idEmpleado, Date fechaIni, Date fechaFin)
+    {
+        List<DetSolicitudPermiso> modellist = null;
+        EntityManager em = null;
+        
+        try
+        {
+            em = this.getEntityManager();
+            modellist = em.createNamedQuery("DetSolicitudPermiso.findByPeriodo", DetSolicitudPermiso.class)
+                .setParameter("idEmp", idEmpleado)
+                .setParameter("fechaInicio", fechaIni, TemporalType.TIMESTAMP)
+                .setParameter("fechaFin", fechaFin, TemporalType.TIMESTAMP)
+                .getResultList();
+        }catch(Exception ex) 
+        {
+            log.error("Problema para obtener la solicitud de permiso: {}", ex.getMessage());
+        } finally 
+        {
+            this.close(em);
+        }
+        
+        return modellist;
+    }
+    
 }
