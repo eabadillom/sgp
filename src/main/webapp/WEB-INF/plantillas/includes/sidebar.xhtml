@@ -15,7 +15,8 @@
 	                <po:menu widgetVar="OmegaMenuWidget">
 	                    <p:menuitem id="registroEmp" value="Registro de Empleados" icon="pi pi-fw pi-list" outcome="/protected/registroEmpleado" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1 or SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 2}"/>
 	                    <p:menuitem id="asistencia" value="Asistencia" icon="pi pi-fw pi-calendar" outcome="/protected/asistencia"/>
-	                    <p:menuitem id="incidencia" value="Incidencias" icon="pi pi-fw pi-check-circle" outcome="/protected/incidencias" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1 or SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 2 or SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 3}"/>
+	                    <p:menuitem id="incapacidad" value="Incapacidad" icon="pi pi-fw pi-calendar" outcome="/protected/settings/imss/registroIncapacidadIMSS" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1}"/>
+                            <p:menuitem id="incidencia" value="Incidencias" icon="pi pi-fw pi-check-circle" outcome="/protected/incidencias" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1 or SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 2 or SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 3}"/>
 	                    <p:menuitem id="uniformes" value="Uniforme" icon="pi pi-fw pi-compass" outcome="/protected/uniformes" rendered="#{SideBarBean.showUniformes}"/>
 	                    <p:menuitem id="articulos" value="Articulos" icon="pi pi-pencil" outcome="/protected/articulosTrabajo" rendered="#{SideBarBean.showUniformes}"/>
 	                    <p:menuitem id="percepciones" value="Valores para Percepciones" icon="pi pi-book" outcome="/protected/percepciones" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1}"/>

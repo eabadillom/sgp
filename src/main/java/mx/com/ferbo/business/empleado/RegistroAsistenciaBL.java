@@ -1,9 +1,6 @@
 package mx.com.ferbo.business.empleado;
 
 import java.time.DayOfWeek;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -187,8 +184,11 @@ public class RegistroAsistenciaBL {
     }
 
     public void guardarRegistroVacaciones(DetEmpleado empleado, DetIncidencia incidencia, List<Date> diasAsueto) throws SGPException {
+        int cantidadRegistrosGuardados = 0;
+        EmpleadoBL.empleadoTieneDiasLaborales(empleado);
         InfDatoEmpresa empleadoEmpresa = empleado.getDatoEmpresa();
         String codigo = "";
+        
         if (incidencia.getIdSolPermiso().getIdTipoSolicitud().getIdTipoSolicitud() == 2) {
             codigo += "V";
         }
@@ -207,7 +207,8 @@ public class RegistroAsistenciaBL {
 
         listaFechas = diasVacacionesSolicitados(listaFechas, diasAsueto, empleado.getDatoEmpresa());
 
-        for (Date dia : listaFechas) {
+        for(Date dia : listaFechas) 
+        {
             DetRegistro registro = new DetRegistro();
             registro.setIdEmpleado(empleado);
             registro.setIdEstatus(statusVacaciones);
@@ -221,10 +222,108 @@ public class RegistroAsistenciaBL {
             registro.setFechaSalida(registroSalida);
 
             registroDAO.guardar(registro);
+            cantidadRegistrosGuardados += 1;
+        }
+        
+        log.info("Num. registros de incapacidad guardados del empleado {} en asistencia {}", empleado.getIdEmpleado(), cantidadRegistrosGuardados);
+    }
+    
+    public void guardarRegistroIncapacidad(DetEmpleado empleadoInc, Date fechaInicio, Date fechaFin, List<Date> diasAsueto) throws SGPException
+    {
+        int cantidadRegistrosGuardados = 0;
+        
+        EmpleadoBL.empleadoTieneDiasLaborales(empleadoInc);
+        
+        InfDatoEmpresa empleadoEmpresa = empleadoInc.getDatoEmpresa();
+        
+        Integer horaEntrada = DateUtil.getHora(empleadoEmpresa.getHoraEntrada());
+        Integer horaSalida = horaEntrada + 9;
+        String codigo = "I";
+        try
+        {
+            CatEstatusRegistro statusIncapacidad = estatusDAO.buscarPorCodigo(codigo);
+
+            List<Date> listaFechas = DateUtil.generarArreglosFechas(fechaInicio, fechaFin);
+            log.trace("Lista de Fechas: {}", listaFechas);
+            
+            listaFechas = diasVacacionesSolicitados(listaFechas, diasAsueto, empleadoInc.getDatoEmpresa());
+
+            for(Date dia : listaFechas)
+            {
+                DetRegistro registro = new DetRegistro();
+                registro.setIdEmpleado(empleadoInc);
+                registro.setIdEstatus(statusIncapacidad);
+
+                Date registroEntrada = DateUtil.getDate(DateUtil.getAnio(dia), DateUtil.getMes(dia), DateUtil.getDia(dia), horaEntrada, 0, 0);
+                registro.setFechaEntrada(registroEntrada);
+                log.trace("Hora entrada: {}", registroEntrada);
+                
+                Date registroSalida = DateUtil.getDate(DateUtil.getAnio(dia), DateUtil.getMes(dia), DateUtil.getDia(dia), horaSalida, 0, 0);
+                registro.setFechaSalida(registroSalida);
+                log.trace("Hora salida: {}", registroSalida);
+                
+                registroDAO.guardar(registro);
+                cantidadRegistrosGuardados += 1;
+            }
+            
+            log.info("Num. registros de incapacidad guardados del empleado {} en asistencia {}", empleadoInc.getIdEmpleado(), cantidadRegistrosGuardados);
+        }catch(SGPException ex)
+        {
+            log.info("Error al registrar la incapacidad: {}", ex);
+            throw new SGPException("Error al registrar la incapacidad");
+        }catch (Exception e) 
+        {
+            log.info("Error: ", e);
+        }
+    }
+    
+    public void actualizarRegistroIncapacidad(DetEmpleado empleadoInc, List<Date> listaFechas, List<Date> diasAsueto) throws SGPException
+    {
+        if(empleadoInc.getDatoEmpresa() == null)
+        {
+            log.info("El empleado {} no tiene información de dato empresa", empleadoInc.getIdEmpleado());
+            throw new SGPException("El empleado no tiene información empresarial");
+        }
+        
+        InfDatoEmpresa empleadoEmpresa = empleadoInc.getDatoEmpresa();
+        Integer horaEntrada = DateUtil.getHora(empleadoEmpresa.getHoraEntrada());
+        Integer horaSalida = horaEntrada + 9;
+        String codigo = "I";
+        
+        try
+        {
+            CatEstatusRegistro statusIncapacidad = estatusDAO.buscarPorCodigo(codigo);
+            log.trace("Lista de Fechas: {}", listaFechas);
+
+            listaFechas = diasVacacionesSolicitados(listaFechas, diasAsueto, empleadoInc.getDatoEmpresa());
+            for(Date dia : listaFechas)
+            {
+                DetRegistro registro = new DetRegistro();
+                registro.setIdEmpleado(empleadoInc);
+                registro.setIdEstatus(statusIncapacidad);
+
+                Date registroEntrada = DateUtil.getDate(DateUtil.getAnio(dia), DateUtil.getMes(dia), DateUtil.getDia(dia), horaEntrada, 0, 0);
+                registro.setFechaEntrada(registroEntrada);
+                log.trace("Dia hora entrada: {}", registroEntrada);
+
+                Date registroSalida = DateUtil.getDate(DateUtil.getAnio(dia), DateUtil.getMes(dia), DateUtil.getDia(dia), horaSalida, 0, 0);
+                registro.setFechaSalida(registroSalida);
+                log.trace("Dia hora salida: {}", registroSalida);
+
+                registroDAO.guardar(registro);
+            }
+        }catch(SGPException ex)
+        {
+            log.info("Error al actualizar la incapacidad: {}", ex);
+            throw new SGPException("Error al actualizar la incapacidad");
+        }catch (Exception e) 
+        {
+            log.info("Error: ", e);
         }
     }
 
-    public boolean validarFechasVacaciones(Integer idEmpleado, Date fechaInicial, Date fechaFinal, Integer horaEntrada) {
+    public boolean validarFechasVacaciones(Integer idEmpleado, Date fechaInicial, Date fechaFinal, Integer horaEntrada) 
+    {
         boolean existenVacaciones = false;
         List<DetRegistro> registro = null;
 
@@ -232,14 +331,16 @@ public class RegistroAsistenciaBL {
         Date fechaFinEntrada = DateUtil.getDate(DateUtil.getAnio(fechaFinal), DateUtil.getMes(fechaFinal), DateUtil.getDia(fechaFinal), horaEntrada, 0, 0);
         registro = this.registroDAO.buscar(idEmpleado, fechaInicialEntrada, fechaFinEntrada);
 
-        if (!registro.isEmpty()) {
+        if(!registro.isEmpty()) 
+        {
             existenVacaciones = true;
         }
 
         return existenVacaciones;
     }
 
-    public List<Date> diasVacacionesSolicitados(List<Date> fechas, List<Date> diasAsueto, InfDatoEmpresa empleadoEmpresa) {
+    public List<Date> diasVacacionesSolicitados(List<Date> fechas, List<Date> diasAsueto, InfDatoEmpresa empleadoEmpresa) 
+    {
         log.trace("Dias antes de festividades: {}", fechas.size());
         List<Date> diasDeDescanso = DateUtil.diasLaborales(fechas, diasAsueto);
         log.trace("Dias despues de festividades: {}", diasDeDescanso.size());

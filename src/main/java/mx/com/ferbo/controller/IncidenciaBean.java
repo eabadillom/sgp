@@ -37,6 +37,7 @@ import mx.com.ferbo.model.DetSolicitudPermiso;
 import mx.com.ferbo.model.DetSolicitudPrenda;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.business.dianolaboral.DiasDeDescansoObligatorioBL;
+import mx.com.ferbo.business.empleado.EmpleadoBL;
 import mx.com.ferbo.model.InfDatoEmpresa;
 import mx.com.ferbo.util.ManageStatus;
 import mx.com.ferbo.util.SGPException;
@@ -79,8 +80,6 @@ public class IncidenciaBean implements Serializable {
     private Date periodoInicio;
     private Date periodoFin;
     private boolean incidenciaVacaciones;
-    private boolean incidenciaIncapacidadCorta;
-    private boolean incidenciaIncapacidadLarga;
     private boolean incidenciaPermiso;
     private boolean estatusAprovado;
     private boolean estatusRechazado;
@@ -126,8 +125,6 @@ public class IncidenciaBean implements Serializable {
         this.periodoInicio = DateUtil.inicializaFechaInicioAnioCurso(DateUtil.getAnio(periodoFin));
         validarFechaInicioFin();
         this.incidenciaVacaciones = false;
-        this.incidenciaIncapacidadCorta = false;
-        this.incidenciaIncapacidadLarga = false;
         this.incidenciaPermiso = false;
         this.estatusAprovado = false;
         this.estatusRechazado = false;
@@ -137,15 +134,7 @@ public class IncidenciaBean implements Serializable {
         status = new ManageStatus();
         this.sGoceSueldo = "100.0";
     }
-
-    public String getsGoceSueldo() {
-        return sGoceSueldo;
-    }
-
-    public void setsGoceSueldo(String sGoceSueldo) {
-        this.sGoceSueldo = sGoceSueldo;
-    }
-
+    
     public void validarFechaInicioFin() {
         if (this.periodoFin.equals(this.periodoInicio)) {
             this.periodoInicio = DateUtil.inicializaFechaInicioAnioCurso(DateUtil.getAnio(periodoFin) - 1);
@@ -194,20 +183,6 @@ public class IncidenciaBean implements Serializable {
             listaTipoPermiso = Stream.concat(listaTipoPermiso.stream(), listAux.stream()).collect(Collectors.toList());
         }
 
-        if (this.incidenciaIncapacidadCorta) {
-            List<DetIncidencia> listAux = listaPeriodo.stream()
-                    .filter(objeto -> objeto.getIdSolPermiso().getIdTipoSolicitud().getIdTipoSolicitud().equals(3))
-                    .collect(Collectors.toList());
-            listaTipoPermiso = Stream.concat(listaTipoPermiso.stream(), listAux.stream()).collect(Collectors.toList());
-        }
-
-        if (this.incidenciaIncapacidadLarga) {
-            List<DetIncidencia> listAux = listaPeriodo.stream()
-                    .filter(objeto -> objeto.getIdSolPermiso().getIdTipoSolicitud().getIdTipoSolicitud().equals(4))
-                    .collect(Collectors.toList());
-            listaTipoPermiso = Stream.concat(listaTipoPermiso.stream(), listAux.stream()).collect(Collectors.toList());
-        }
-
         List<DetIncidencia> listaTipoEstatus = new ArrayList<>();
 
         if (!this.estatusEnviado && !this.estatusAprovado && !this.estatusRechazado && !this.estatusCancelado) {
@@ -245,49 +220,66 @@ public class IncidenciaBean implements Serializable {
         return listaTipoEstatus;
     }
 
-    public void visualizaDialog() {
-        Date fechaInicio = incidenciaSelected.getIdSolPermiso().getFechaInicio();
-        Date fechaFin = incidenciaSelected.getIdSolPermiso().getFechaFin();
-        List<Date> fechas = DateUtil.generarArreglosFechas(fechaInicio, fechaFin);
-        switch (incidenciaSelected.getIdTipo().getIdTipo()) {
-            // Tipo Permisos
-            case 1:
-                switch (incidenciaSelected.getIdSolPermiso().getIdTipoSolicitud().getIdTipoSolicitud()) {
-                    case 1://PERMISO
-                    case 3://INCAPACDAD CORTA
-                        fechaSeleccionada = incidenciaSelected.getIdSolPermiso().getFechaInicio();
-                        break;
-                    default:
-                        lstRangoRegistro = Arrays.asList(incidenciaSelected.getIdSolPermiso().getFechaInicio(), incidenciaSelected.getIdSolPermiso().getFechaFin());
-                        break;
-                }
-                this.invalidDays = obtenerDiasSeleccionados(empleadoSelected.getDatoEmpresa());
-                this.diasDeVacaciones = empleadoAsistencia.diasVacacionesSolicitados(fechas, this.diasDeAsueto, empleadoSelected.getDatoEmpresa());
-                log.trace("Dias Solicitados: {}", this.diasDeVacaciones.toString());
-                this.diasVacacionesSolicitados = this.diasDeVacaciones.size();
-                log.trace("Total Dias de Vacaciones Solicitados: {}", this.diasVacacionesSolicitados);
-                PrimeFaces.current().executeScript("PF('dialogPermisos').show();");
-                break;
-            // Tipo Vacaciones
-            case 2:
-                this.invalidDays = obtenerDiasSeleccionados(empleadoSelected.getDatoEmpresa());
-                this.diasDeVacaciones = empleadoAsistencia.diasVacacionesSolicitados(fechas, this.diasDeAsueto, empleadoSelected.getDatoEmpresa());
-                log.trace("Dias Solicitados: {}", this.diasDeVacaciones.toString());
-                this.diasVacacionesSolicitados = this.diasDeVacaciones.size();
-                lstRangoRegistro = Arrays.asList(diasDeVacaciones.get(0), diasDeVacaciones.get(this.diasVacacionesSolicitados - 1));
-                log.trace("Total Dias de Vacaciones Solicitados: {}", this.diasVacacionesSolicitados);
-                PrimeFaces.current().executeScript("PF('dialogPermisos').show();");
-                break;
-            // Tipo Prendas
-            case 3:
-                PrimeFaces.current().executeScript("PF('dialogPrendas').show();");
-                break;
-            // Tipo Articulos
-            case 4:
-                PrimeFaces.current().executeScript("PF('dialogArticulos').show();");
-                break;
-            default:
-                log.warn("EX-0023: Error al seleccionar opción");
+    public void visualizaDialog(DetIncidencia solicitudIncidencia) {
+        FacesMessage message = null;
+        FacesMessage.Severity severity = null;
+        String mensaje = null;
+        String titulo = "Incidencia";
+        try
+        {
+            incidenciaSelected = solicitudIncidencia;
+            empleadoSelected = solicitudIncidencia.getIdEmpleado();
+            Date fechaInicio = incidenciaSelected.getIdSolPermiso().getFechaInicio();
+            Date fechaFin = incidenciaSelected.getIdSolPermiso().getFechaFin();
+            List<Date> fechas = DateUtil.generarArreglosFechas(fechaInicio, fechaFin);
+            EmpleadoBL.empleadoTieneDiasLaborales(incidenciaSelected.getIdEmpleado());
+            switch (incidenciaSelected.getIdTipo().getIdTipo()) {
+                // Tipo Permisos
+                case 1:
+                    switch (incidenciaSelected.getIdSolPermiso().getIdTipoSolicitud().getIdTipoSolicitud()) {
+                        case 1://PERMISO
+                            fechaSeleccionada = incidenciaSelected.getIdSolPermiso().getFechaInicio();
+                            break;
+                    }
+                    this.invalidDays = obtenerDiasSeleccionados(empleadoSelected.getDatoEmpresa());
+                    this.diasDeVacaciones = empleadoAsistencia.diasVacacionesSolicitados(fechas, this.diasDeAsueto, empleadoSelected.getDatoEmpresa());
+                    log.info("Dias Solicitados: {}", this.diasDeVacaciones.toString());
+                    this.diasVacacionesSolicitados = this.diasDeVacaciones.size();
+                    log.info("Total Dias de Vacaciones Solicitados: {}", this.diasVacacionesSolicitados);
+                    PrimeFaces.current().executeScript("PF('dialogPermisos').show();");
+                    break;
+                // Tipo Vacaciones
+                case 2:
+                    this.invalidDays = obtenerDiasSeleccionados(empleadoSelected.getDatoEmpresa());
+                    this.diasDeVacaciones = empleadoAsistencia.diasVacacionesSolicitados(fechas, this.diasDeAsueto, empleadoSelected.getDatoEmpresa());
+                    log.info("Dias Solicitados: {}", this.diasDeVacaciones.toString());
+                    this.diasVacacionesSolicitados = this.diasDeVacaciones.size();
+                    lstRangoRegistro = Arrays.asList(diasDeVacaciones.get(0), diasDeVacaciones.get(this.diasVacacionesSolicitados - 1));
+                    log.info("Total Dias de Vacaciones Solicitados: {}", this.diasVacacionesSolicitados);
+                    PrimeFaces.current().executeScript("PF('dialogPermisos').show();");
+                    break;
+                // Tipo Prendas
+                case 3:
+                    PrimeFaces.current().executeScript("PF('dialogPrendas').show();");
+                    break;
+                // Tipo Articulos
+                case 4:
+                    PrimeFaces.current().executeScript("PF('dialogArticulos').show();");
+                    break;
+                default:
+                    log.warn("EX-0023: Error al seleccionar opción");
+            }
+            mensaje = "Editando una solicitud";
+            severity = FacesMessage.SEVERITY_INFO;
+        }catch (SGPException e) {
+            mensaje = "Consulte al administrador de sistemas";
+            severity = FacesMessage.SEVERITY_ERROR;
+            log.info("Error: ", e);
+            log.warn("EX-0032: " + e.getMessage() + ". Error al abrir el registro de incidencia del empleado: " + empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
+        } finally {
+            message = new FacesMessage(severity, titulo, mensaje);
+            FacesContext.getCurrentInstance().addMessage(null, message);
+            PrimeFaces.current().ajax().update("formIncidencias:messages", "formIncidencias:tabViewI:pnlDetalleSolicitudPermiso");
         }
     }
 
@@ -683,22 +675,6 @@ public class IncidenciaBean implements Serializable {
         this.incidenciaVacaciones = incidenciaVacaciones;
     }
 
-    public boolean isIncidenciaIncapacidadCorta() {
-        return incidenciaIncapacidadCorta;
-    }
-
-    public void setIncidenciaIncapacidadCorta(boolean incidenciaIncapacidadCorta) {
-        this.incidenciaIncapacidadCorta = incidenciaIncapacidadCorta;
-    }
-
-    public boolean isIncidenciaIncapacidadLarga() {
-        return incidenciaIncapacidadLarga;
-    }
-
-    public void setIncidenciaIncapacidadLarga(boolean incidenciaIncapacidadLarga) {
-        this.incidenciaIncapacidadLarga = incidenciaIncapacidadLarga;
-    }
-
     public boolean isIncidenciaPermiso() {
         return incidenciaPermiso;
     }
@@ -793,6 +769,14 @@ public class IncidenciaBean implements Serializable {
 
     public void setDiasDeVacaciones(List<Date> diasDeVacaciones) {
         this.diasDeVacaciones = diasDeVacaciones;
+    }
+    
+    public String getsGoceSueldo() {
+        return sGoceSueldo;
+    }
+
+    public void setsGoceSueldo(String sGoceSueldo) {
+        this.sGoceSueldo = sGoceSueldo;
     }
     //</editor-fold>
 }

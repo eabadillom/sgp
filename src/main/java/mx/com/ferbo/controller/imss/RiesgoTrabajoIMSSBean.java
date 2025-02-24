@@ -18,7 +18,7 @@ import org.primefaces.PrimeFaces;
  *
  * @author alberto
  */
-@Named(value = "riesgoTrabajoIMSS")
+@Named(value = "riesgoTrabajoIMSSBean")
 @ViewScoped
 public class RiesgoTrabajoIMSSBean implements Serializable
 {
@@ -103,13 +103,13 @@ public class RiesgoTrabajoIMSSBean implements Serializable
             titulo = "Error";
             mensaje = ex.getMessage();
             severity = FacesMessage.SEVERITY_ERROR;
-            log.info("Error al registrar la solicitud de riesgo de trabajo: {}", ex.getMessage());
+            log.info("Error al registrar la solicitud de riesgo de trabajo: {}", ex);
         }catch (Exception e) 
         {
             titulo = "Error";
             mensaje = "Consulte al administrador de sistemas";
             severity = FacesMessage.SEVERITY_ERROR;
-            log.info("ERROR, {}", e.getMessage());
+            log.info("ERROR, {}", e);
         }finally
         {
             actualizarListaRiesgoTrabajo();
@@ -152,13 +152,13 @@ public class RiesgoTrabajoIMSSBean implements Serializable
             titulo = "Error";
             mensaje = ex.getMessage();
             severity = FacesMessage.SEVERITY_ERROR;
-            log.info("Error al actualizar la solicitud de riesgo de trabajo: {}", ex.getMessage());
+            log.info("Error al actualizar la solicitud de riesgo de trabajo: {}", ex);
         }catch (Exception e) 
         {
             titulo = "Error";
             mensaje = "Consulte al administrador de sistemas";
             severity = FacesMessage.SEVERITY_ERROR;
-            log.info("ERROR, {}", e.getMessage());
+            log.info("ERROR, {}", e);
         }finally
         {
             actualizarListaRiesgoTrabajo();
