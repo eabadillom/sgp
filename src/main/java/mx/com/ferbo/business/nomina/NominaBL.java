@@ -46,6 +46,7 @@ public abstract class NominaBL {
 	
 	public static final String TP_NOMINA_ORDINARIA = "O";
 	public static final String TP_NOMINA_EXTRAORDINARIA = "E";
+	public static final String TP_COMPROBANTE_NOMINA = "N";
 	
 	public static final int DIAS_ANIO = 365;
 	public static final BigDecimal cien = new BigDecimal(100).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -82,6 +83,7 @@ public abstract class NominaBL {
 		
 		try {
 			nomina = new DetNomina();
+			nomina.setTipoComprobante(TP_COMPROBANTE_NOMINA);
 			
 			if(empleado == null) {
 				emisor = new DetNominaEmisor();
@@ -108,15 +110,19 @@ public abstract class NominaBL {
 				unidadSAT = parametros.getUnidadSAT();
 			}
 			
+			concepto = new DetNominaConcepto();
+			concepto.setKey(new DetNominaConceptoPK(nomina, 0));
+			concepto.setConcepto(conceptoSAT);
+			concepto.setCantidad(BigDecimal.ONE.setScale(2, BigDecimal.ROUND_HALF_UP));
+			concepto.setUnidad(unidadSAT);
+			concepto.setNombreConcepto("Pago de nómina");
+			concepto.setObjetoImpuesto("01");
+			conceptos.add(concepto);
+			
 			if(TP_NOMINA_ORDINARIA.equalsIgnoreCase(tipoNomina)) {
-				concepto = new DetNominaConcepto();
-				concepto.setKey(new DetNominaConceptoPK(nomina, 0));
-				concepto.setConcepto(conceptoSAT);
-				concepto.setCantidad(BigDecimal.ONE.setScale(2, BigDecimal.ROUND_HALF_UP));
-				concepto.setUnidad(unidadSAT);
-				concepto.setNombreConcepto("Pago de nómina");
-				concepto.setObjetoImpuesto("01");
-				conceptos.add(concepto);
+				nomina.setTipoNomina(TP_NOMINA_ORDINARIA);
+			} else if(TP_NOMINA_EXTRAORDINARIA.equalsIgnoreCase(tipoNomina)) {
+				nomina.setTipoNomina(TP_NOMINA_EXTRAORDINARIA);
 			}
 			
 			nomina.setEmisor(emisor);

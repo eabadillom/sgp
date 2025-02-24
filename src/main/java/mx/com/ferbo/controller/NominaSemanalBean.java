@@ -21,6 +21,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
+import mx.com.ferbo.business.nomina.AsistenciaBL;
 import mx.com.ferbo.business.nomina.NominaBL;
 import mx.com.ferbo.business.nomina.NominaSemanalBL;
 import mx.com.ferbo.business.nomina.ParametrosNomina;
@@ -28,6 +29,7 @@ import mx.com.ferbo.business.percepcion.AbstractPercepcion;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.EmpresaDAO;
 import mx.com.ferbo.dao.n.NominaDAO;
+import mx.com.ferbo.dto.ui.Asistencia;
 import mx.com.ferbo.model.CatEmpresa;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetNomina;
@@ -43,12 +45,12 @@ import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.ManageStatus;
 import mx.com.ferbo.util.SGPException;
 
-@Named(value = "nominaBean")
+@Named(value = "nomSemanal")
 @ViewScoped
-public class NominaBean implements Serializable {
+public class NominaSemanalBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private static Logger log = LogManager.getLogger(NominaBean.class);
+    private static Logger log = LogManager.getLogger(NominaSemanalBean.class);
 
     private ParametrosNomina parametros = null;
     
@@ -74,10 +76,11 @@ public class NominaBean implements Serializable {
     
     private List<DetNomina> listaNomina;
     private List<Integer> semanasDelAnio;
+    private List<Asistencia> asistencias;
     
     private Boolean detalle = true;
 
-	public NominaBean() {
+	public NominaSemanalBean() {
 		listaNomina = new ArrayList<>();
 
 		empleadoDAO = new EmpleadoDAO(DetEmpleado.class);
@@ -243,7 +246,10 @@ public class NominaBean implements Serializable {
     	log.info("Cargando información de nómina: {}", nomina);
     	DetEmpleado empleado = empleadoDAO.buscarPorRFC(nomina.getReceptor().getRfc());
     	
-    	NominaSemanalBL.getAsistencias(empleado, this.parametros);
+    	Map<String, DetRegistro> mapAsistencias = NominaSemanalBL.getAsistencias(empleado, this.parametros);
+    	List<Asistencia> asistencias = AsistenciaBL.getAsistenciaSemanal(mapAsistencias);
+    	
+    	this.asistencias = asistencias;
     	
     	//Si el ID de Nómina es NULL, entonces el objeto de nómina fue generado por el proceso de cálculo y
     	//la información debería estar completamente cargada en memoria.
@@ -815,5 +821,13 @@ public class NominaBean implements Serializable {
 
 	public void setAnio(Integer anio) {
 		this.anio = anio;
+	}
+
+	public List<Asistencia> getAsistencias() {
+		return asistencias;
+	}
+
+	public void setAsistencias(List<Asistencia> asistencias) {
+		this.asistencias = asistencias;
 	}
 }

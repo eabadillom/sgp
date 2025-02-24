@@ -46,6 +46,11 @@ public class DetNomina implements Serializable {
     @Column(name = "id_nomina")
     private Integer id;
     
+    @Column(name = "tp_nomina")
+    @Basic(optional = false)
+    @Size(max = 5)
+    private String tipoNomina;
+    
     @Column(name = "cd_moneda")
     @Size(max = 5)
     @Basic(optional = false)
@@ -430,5 +435,13 @@ public class DetNomina implements Serializable {
 
 	public void setPeriodoFin(LocalDate periodoFin) {
 		this.periodoFin = periodoFin;
+	}
+
+	public String getTipoNomina() {
+		return tipoNomina;
+	}
+
+	public void setTipoNomina(String tipoNomina) {
+		this.tipoNomina = tipoNomina;
 	}
 }
