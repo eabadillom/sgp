@@ -186,8 +186,8 @@ public class IncapacidadIMSSBean implements Serializable
         if(this.periodoInicio != null && this.periodoFin != null)
         {
             List<DetIncapacidad> listAux = listaRegistroIncapacidad.stream()
-                .filter(objeto -> objeto.getFechaInicio().after(this.periodoInicio))
-                .filter(objeto -> objeto.getFechaFin().before(this.periodoFin))
+                .filter(objeto -> (objeto.getFechaInicio().compareTo(this.periodoInicio) == 0 || objeto.getFechaInicio().compareTo(this.periodoInicio) > 0))
+                .filter(objeto -> (objeto.getFechaFin().compareTo(this.periodoFin) == 0 || objeto.getFechaFin().compareTo(this.periodoFin) < 0))
                 .collect(Collectors.toList());
             
             listaPeriodo = Stream.concat(listaPeriodo.stream(), listAux.stream()).collect(Collectors.toList());
