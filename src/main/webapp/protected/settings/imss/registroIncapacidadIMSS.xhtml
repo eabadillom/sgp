@@ -91,7 +91,8 @@
                             <p:outputLabel for="@next" value="Empleado"/>
                             <p:selectOneMenu id="empleado" autoWidth="false" converter="entityConverter" value="#{registroIncBean.empleadoInc}"
                                              disabled="#{registroIncBean.registroIncapacidad.estatusSolicitud.clave.matches('C') eq true 
-                                                        or registroIncBean.registroIncapacidad.idEmpleadoInc.idEmpleado ne null}" >
+                                                        or registroIncBean.registroIncapacidad.idEmpleadoInc.idEmpleado ne null}" 
+                                             filter="true" filterMatchMode="contains" styleClass="custom-style">
                                 <f:selectItem itemLabel="--Seleccione--"/>
                                 <f:selectItems value="#{registroIncBean.listaEmpleados}" var="tipoV" itemLabel="#{tipoV.nombre} #{tipoV.primerAp} #{tipoV.segundoAp}" itemValue="#{empleadoInc}"/>
                                 <p:ajax event="change" update="pnlRegistoIncapacidad" process="@this" resetValues="true"/>
