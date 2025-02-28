@@ -19,7 +19,6 @@
                             <p:menuitem id="incidencia" value="Incidencias" icon="pi pi-fw pi-check-circle" outcome="/protected/incidencias" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1 or SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 2 or SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 3}"/>
 	                    <p:menuitem id="uniformes" value="Uniforme" icon="pi pi-fw pi-compass" outcome="/protected/uniformes" rendered="#{SideBarBean.showUniformes}"/>
 	                    <p:menuitem id="articulos" value="Articulos" icon="pi pi-pencil" outcome="/protected/articulosTrabajo" rendered="#{SideBarBean.showUniformes}"/>
-	                    <p:menuitem id="percepciones" value="Valores para Percepciones" icon="pi pi-book" outcome="/protected/percepciones" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1}"/>
 	                    <p:menuitem id="cuotasImss" value="Cuotas del IMSS" icon="pi pi-book" outcome="/protected/cuotasImss" rendered="#{sideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1}"/>
 	                    <p:submenu id="nomina" label="Nomina" icon="pi pi-fw pi-money-bill">
 		                    <p:menuitem id="nomina-semanal" value="Semanal" outcome="/protected/nomina/nomina-s" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1 }"/>

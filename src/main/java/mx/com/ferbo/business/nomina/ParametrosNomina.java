@@ -1,5 +1,6 @@
 package mx.com.ferbo.business.nomina;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -8,7 +9,6 @@ import mx.com.ferbo.dao.n.CuotaIMSSDAO;
 import mx.com.ferbo.dao.n.DiaNoLaboralDAO;
 import mx.com.ferbo.dao.n.EstatusRegistroDAO;
 import mx.com.ferbo.dao.n.MetodoPagoDAO;
-import mx.com.ferbo.dao.n.PercepcionesDAO;
 import mx.com.ferbo.dao.n.PeriodicidadPagoDAO;
 import mx.com.ferbo.dao.n.RegimenFiscalDAO;
 import mx.com.ferbo.dao.n.TarifaISRDAO;
@@ -21,7 +21,6 @@ import mx.com.ferbo.dao.n.sat.TipoPercepcionDAO;
 import mx.com.ferbo.model.CatCuotaIMSS;
 import mx.com.ferbo.model.CatDiaNoLaboral;
 import mx.com.ferbo.model.CatEstatusRegistro;
-import mx.com.ferbo.model.CatPercepciones;
 import mx.com.ferbo.model.CatPeriodicidadPago;
 import mx.com.ferbo.model.CatTarifaISR;
 import mx.com.ferbo.model.CatUMA;
@@ -34,7 +33,6 @@ import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.model.sat.CatUnidadSAT;
 import mx.com.ferbo.model.sat.CatUsoCFDI;
 import mx.com.ferbo.util.DateUtil;
-import mx.com.ferbo.util.SGPException;
 
 public class ParametrosNomina {
 	
@@ -48,7 +46,6 @@ public class ParametrosNomina {
 	private Date fechaFinAnio    = null;
 	
 	private CatUMA                   uma                    = null;
-	private CatPercepciones          parametrosPercepciones = null;
 	private CatMetodoPago            metodoPago             = null;
 	private CatConcepto              concepto               = null;
 	private CatUnidadSAT             unidadSAT              = null;
@@ -64,7 +61,6 @@ public class ParametrosNomina {
 	private List<CatEstatusRegistro> statusRegistros        = null;
 	
 	private DiaNoLaboralDAO     diaNLDAO           = null;
-	private PercepcionesDAO     catPercepcionesDAO = null;
 	private TarifaISRDAO        tarifaISRDAO       = null;
 	private MetodoPagoDAO       metodoPagoDAO      = null;
 	private ConceptoDAO         conceptoDAO        = null;
@@ -77,11 +73,17 @@ public class ParametrosNomina {
 	private CuotaIMSSDAO        cuotasIMSSDAO      = null;
 	private TipoOtroPagoDAO     tipoOtroPagoDAO    = null;
 	private UMADAO              umaDAO             = null;
-	private EstatusRegistroDAO  statusRegistroDAO = null;
+	private EstatusRegistroDAO  statusRegistroDAO  = null;
 	
+	private BigDecimal          bonoPuntualidad    = null;
+	private BigDecimal          valeDespensa       = null;
+	
+	public BigDecimal getValeDespensa() {
+		return valeDespensa;
+	}
+
 	public ParametrosNomina() {
 		this.diaNLDAO           = new DiaNoLaboralDAO();
-		this.catPercepcionesDAO = new PercepcionesDAO();
 		this.tarifaISRDAO       = new TarifaISRDAO();
 		this.metodoPagoDAO      = new MetodoPagoDAO();
 		this.conceptoDAO        = new ConceptoDAO();
@@ -109,7 +111,6 @@ public class ParametrosNomina {
 		this.diasPeriodo     = DateUtil.daysDiff(periodoInicio, periodoFin);
 		
 		//Catálogos SAT
-		this.parametrosPercepciones = this.catPercepcionesDAO.buscarActual(periodoInicio);
 		this.tablaISR               = this.tarifaISRDAO.buscar(this.fechaInicioAnio, this.fechaFinAnio);
 		this.metodoPago             = this.metodoPagoDAO.buscarPorId("PUE");
 		this.concepto               = this.conceptoDAO.buscarPorId("84111505");
@@ -125,12 +126,12 @@ public class ParametrosNomina {
 		
 		//Status de registro de asistencia
 		this.statusRegistros        = this.statusRegistroDAO.buscarTodos();
+		
+		//TODO Temporalmente se movieron las tasas de bono de puntualidad y vales de despensa a esta clase, sin embargo, deben parametrizarse en otro lugar.
+		this.bonoPuntualidad        = new BigDecimal("0.1").setScale(2, BigDecimal.ROUND_HALF_UP);
+		this.valeDespensa           = new BigDecimal("0.4").setScale(2, BigDecimal.ROUND_HALF_UP);
 	}
 	
-	public CatPercepciones getParametrosPercepciones() {
-		return parametrosPercepciones;
-	}
-
 	public CatMetodoPago getMetodoPago() {
 		return metodoPago;
 	}
@@ -213,6 +214,10 @@ public class ParametrosNomina {
 
 	public List<CatEstatusRegistro> getStatusRegistros() {
 		return statusRegistros;
+	}
+	
+	public BigDecimal getBonoPuntualidad() {
+		return bonoPuntualidad;
 	}
 	
 }

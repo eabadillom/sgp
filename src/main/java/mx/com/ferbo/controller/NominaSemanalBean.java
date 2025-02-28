@@ -45,7 +45,7 @@ import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.ManageStatus;
 import mx.com.ferbo.util.SGPException;
 
-@Named(value = "nomSemanal")
+@Named(value = "nominaS")
 @ViewScoped
 public class NominaSemanalBean implements Serializable {
 
@@ -90,7 +90,7 @@ public class NominaSemanalBean implements Serializable {
     
     @PostConstruct
     public void init() {
-        log.info("====================== entrada init nominaBean ======================");
+        log.info("====================== entrada init NominaSemanalBean ======================");
         this.configuraPeriodo();
         lstEmpresas = empresaDAO.buscarActivo();
 

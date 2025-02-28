@@ -130,6 +130,12 @@ public class DateUtil {
 		return resultado;
 	}
 	
+	public static LocalDate addDay(LocalDate fecha, int dias) {
+		LocalDate resultado = null;
+		resultado = fecha.plusDays(dias);
+		return resultado;
+	}
+	
 	/**Metodo para agregar meses a una fecha dada.
 	 * @param fecha Fecha de referencia a la que se desea agregar meses.
 	 * @param meses Numero de meses a agregar.
@@ -348,6 +354,10 @@ public class DateUtil {
 		cal.set(Calendar.YEAR, anio);
 		
 		fecha.setTime(cal.getTimeInMillis());
+	}
+	
+	public static LocalDate setAnio(LocalDate fecha, int anio) {
+		return fecha.withYear(anio);
 	}
 	
 	/**Establece el valor del mes para el objeto {@link Date} dado.

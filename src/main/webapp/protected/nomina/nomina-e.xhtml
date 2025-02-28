@@ -6,6 +6,10 @@
                 template="/WEB-INF/plantillas/template.xhtml">
 
 	<ui:define name="title">Nómina extraordinaria</ui:define>
+	<ui:define name="head">
+		<h:outputStylesheet library="webjars" name="font-awesome/5.12.0/css/all.min-jsf.css" />
+		<h:outputStylesheet library="webjars" name="font-awesome/5.12.0/css/v4-shims.min-jsf.css" />
+	</ui:define>
 	<ui:define name="content">
 		<script>
 			PrimeFaces.locales['es'] = {
@@ -40,7 +44,7 @@
 				}
 			};
 		</script>
-		<h:form id="formNomina">
+		<h:form id="form">
 			<p:growl id="messages" showDetail="true" life="3000"/>
 			<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="30rem">
 				<p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes ui-button-primary" icon="pi pi-check"/>
@@ -51,479 +55,161 @@
 					<i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
 				</div>
 			</p:dialog>
-			<p:card>
-				<div class="ui-fluid formgrid grid align-items-left">
-					<div class="field col-12 md:col-2">
-						<p:outputLabel value="Año" />
-						<p:spinner id="anio" value="#{nomExtra.anio}" buttons="horizontal">
-							<p:ajax event="change" process="@this" update="semana dp-periodo-inicio dp-periodo-fin" listener="#{nomExtra.calculaSemanas()}"></p:ajax>
-						</p:spinner>
-					</div>
-					<div class="field col-12 md:col-2">
-						<p:outputLabel value="Periodo" />
-						<p:selectOneMenu id="semana" value="#{nomExtra.semana}" filter="true" filterMatchMode="contains" filterPlaceholder="Número de semana">
-							<f:selectItem itemLabel="--Seleccione--" noSelectionOption="true"/>
-							<f:selectItems  value="#{nomExtra.semanasDelAnio}" var="periodo" itemLabel="Semana #{periodo}" itemValue="#{periodo}" />
-							<p:ajax event="change"  update="anio semana dp-periodo-inicio dp-periodo-fin" process="@this" listener="#{nomExtra.calculaFechasPeriodo()}"/>
-						</p:selectOneMenu>
-					</div>
-					<div class="field col-12 md:col-2">
-						<p:outputLabel value="Inicio periodo" />
-						<p:datePicker id="dp-periodo-inicio" value="#{nomExtra.periodoInicio}" placeholder="Periodo Inicio" showIcon="true" pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6" readonly="true">
-							<p:ajax process="@this" listener="#{nomExtra.calculaFechaFin}" update="dp-periodo-fin anio semana" />
-						</p:datePicker>
-					</div>
-					<div class="field col-12 md:col-2">
-						<p:outputLabel value="Fin periodo" />
-						<p:datePicker id="dp-periodo-fin" value="#{nomExtra.periodoFin}" placeholder="Periodo Fin" showIcon="true" pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6" readonly="true">
-							<p:ajax process="@this" listener="#{nomExtra.calculaFechaInicio}" update="dp-periodo-inicio anio semana" />
-						</p:datePicker>
-					</div>
-					<div class="field col-12 md:col-2">
-						<p:outputLabel value="Emisor" />
-						<p:selectOneMenu id="soEmpresa" value="#{nomExtra.empresaSelected}" autoWidth="false" converter="entityConverter">
-							<f:selectItem itemLabel="--Seleccione--"/>
-							<f:selectItems value="#{nomExtra.lstEmpresas}" var="empresa" itemValue="#{empresa}" itemLabel="#{empresa.descripcion}"/>
-							<p:ajax process="@this"/>
-						</p:selectOneMenu>
-					</div>
-					<div class="field col-12 md:col-2">
-						<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
-						<p:commandButton value="Calcular" process="@this" update="dtNomina" actionListener="#{nomExtra.calculandoNomina()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
-					</div>
-				</div>
-			</p:card>
-			<div style="padding-top: 1rem;">
-				<p:dataTable id="dtNomina" widgetVar="dt-Nomina" var="nomina" value="#{nomExtra.listaNomina}" lazy="true" reflow="true" styleClass="products-table" rowSelectMode="add" paginatorPosition="bottom" scrollable="true">
-					<p:column headerText="Num" width="4rem">
-						<h:outputText value="#{nomina.receptor.numeroEmpleado}" styleClass="customer-badge status-#{nomExtra.statusNomina(nomina)}" />
-					</p:column>
-					<p:column headerText="Empleado">
-						<h:outputText value="#{nomina.receptor.nombre}" />
-					</p:column>
-					<p:column headerText="Percepciones" width="7rem" style="text-align: right;">
-						<h:outputText value="#{nomina.subtotal}">
-							<f:convertNumber pattern="$ #,##0.00" />
-						</h:outputText>
-					</p:column>
-					<p:column headerText="Deducciones" width="7rem" style="text-align: right;">
-						<p:outputLabel value="#{nomina.descuento}">
-							<f:convertNumber pattern="$ #,##0.00" />
-						</p:outputLabel>
-					</p:column>
-					<p:column headerText="Neto" width="7rem" style="text-align: right;">
-						<p:outputLabel value="#{nomina.total}">
-							<f:convertNumber pattern="$ #,##0.00" />
-						</p:outputLabel>
-					</p:column>
-					<p:column width="3rem" style="text-align: right;">
-						<p:commandButton icon="pi pi-bars" oncomplete="PF('dgEmpleado').show();" actionListener="#{nomExtra.cargaEmpleadoNomina(nomina)}" process="@this" update="formNomina:dg-empleado" />
-					</p:column>
-					
-					<p:columnGroup type="footer">
-						<p:row>
-							<p:column footerText="." style="color: rgba(255, 255, 255, 0);" />
-							<p:column style="text-align:right;" footerText="Total:"/>
-							<p:column style="text-align:right;">
-								<f:facet name="footer">
-									<h:outputText value="#{nomExtra.listaNomina.stream().map(item -> item.subtotal).sum()}">
-										<f:convertNumber pattern="$ #,##0.00" />
-									</h:outputText>
-								</f:facet>
-							</p:column>
-							<p:column style="text-align:right;">
-								<f:facet name="footer">
-									<h:outputText value="#{nomExtra.listaNomina.stream().map(item -> item.descuento).sum()}">
-										<f:convertNumber pattern="$ #,##0.00" />
-									</h:outputText>
-								</f:facet>
-							</p:column>
-							<p:column style="text-align:right;">
-								<f:facet name="footer">
-									<p:outputLabel value="#{nomExtra.listaNomina.stream().map(item -> item.total).sum()}">
-										<f:convertNumber pattern="$ #,##0.00" />
-									</p:outputLabel>
-								</f:facet>
-							</p:column>
-							<p:column width="3rem">
-								<f:facet name="footer">
-									<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
-								</f:facet>
-							</p:column>
-						</p:row>
-					</p:columnGroup>
-				</p:dataTable>
-			</div>
-			<div align="center">
-				<p:commandButton value="Guardar" icon="pi pi-pencil" actionListener="#{nomExtra.guardarNominaEmpleado()}" disabled="#{nomExtra.listaNomina.size() lt 0}" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
-			</div>
-		
-			<p:dialog id="dg-empleado" widgetVar="dgEmpleado" header="#{nomExtra.nomina.receptor.nombre}" modal="true" responsive="true" position="center top" height="100%" resizable="false" showEffect="fade" hideEffect="fade">
-				<p:tabView id="tv-nomina" class="ui-fluid" dynamic="true" cache="true" effect="drop">
-					<p:ajax event="tabChange" oncomplete="PF('dgEmpleado').initPosition();"/>
-					<p:tab title="General">
-						<div class="ui-fluid formgrid grid">
-							<div class="field col-12 md:col-3">
-								<p:outputLabel value="Ejercicio"/>
-								<p:inputText value="#{nomExtra.nomina.ejercicio}" readonly="true" style="text-align: right;"/>
-							</div>
-							<div class="field col-12 md:col-3">
-								<p:outputLabel value="Periodo"/>
-								<p:inputText value="Semana #{nomExtra.semana}" readonly="true" style="text-align: right;"/>
-							</div>
-							<div class="field col-12 md:col-3">
-								<p:outputLabel value="Dias laborados"/>
-								<p:inputNumber value="#{nomExtra.nomina.diasLaborados}" symbol=" días" symbolPosition="s" inputStyle="text-align: right"/>
-							</div>
-							<div class="field col-12 md:col-3">
-								<p:outputLabel value="Faltas"/>
-								<p:inputNumber value="#{nomExtra.nomina.diasNoLaborados}" symbol=" días" symbolPosition="s" inputStyle="text-align: right"/>
-							</div>
-							<div class="field col-12 md:col-3">
-								<p:outputLabel value="Dias pagados"/>
-								<p:inputNumber value="#{nomExtra.nomina.diasPagados}" symbol=" días" symbolPosition="s" inputStyle="text-align: right"/>
-							</div>
-							<div class="field col-12 md:col-3">
-								<p:outputLabel value="Subtotal"/>
-								<p:inputNumber value="#{nomExtra.nomina.subtotal}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," readonly="true" inputStyle="text-align: right"/>
-							</div>
-							<div class="field col-12 md:col-3">
-								<p:outputLabel value="Descuentos" />
-								<p:inputNumber value="#{nomExtra.nomina.descuento}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," readonly="true" inputStyle="text-align: right"/>
-							</div>
-							<div class="field col-12 md:col-3">
-								<p:outputLabel value="Total" />
-								<p:inputNumber value="#{nomExtra.nomina.total}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," readonly="true" inputStyle="text-align: right"/>
-							</div>
+			<p:accordionPanel id="acc">
+				<p:tab title="Información del periodo extraordinario">
+					<div class="ui-fluid formgrid grid align-items-left">
+						<div class="field col-12 md:col-2">
+							<p:outputLabel value="Empresa" />
+							<p:selectOneMenu id="empresa" value="#{nominaE.empresa}" converter="entityConverter" autoWidth="false">
+								<f:selectItem itemLabel="--Empresa--" noSelectionOption="true"/>
+								<f:selectItems value="#{nominaE.empresas}" var="empresa" itemLabel="#{empresa.descripcion}" itemValue="#{empresa}"/>
+								<p:ajax event="change" process="@this" listener="#{nominaE.calculaPeriodo()}" update="anio periodo fecha-periodo fecha-pago" />
+							</p:selectOneMenu>
 						</div>
-					</p:tab>
-					<p:tab title="Emisor">
-						<p:outputPanel>
-							<div class="ui-fluid formgrid grid">
-								<div class="field col-12 md:col-6">
-									<p:outputLabel value="Emisor"/>
-									<p:inputText value="#{nomExtra.nomina.emisor.nombre}" readonly="true"/>
-								</div>
-								<div class="field col-12 md:col-6">
-									<p:outputLabel value="Regimen Fiscal" />
-									<p:inputText value="#{nomExtra.nomina.emisor.regimenFiscal.clave} - #{nomExtra.nomina.emisor.regimenFiscal.nombre}" readonly="true"/>
-								</div>
-								<div class="field col-12 md:col-3">
-									<p:outputLabel value="RFC"/>
-									<p:inputText value="#{nomExtra.nomina.emisor.rfc}" readonly="true"/>
-								</div>
-								<div class="field col-12 md:col-3">
-									<p:outputLabel value="Registro Patronal" />
-									<p:inputText value="#{nomExtra.nomina.emisor.registroPatronal}" readonly="true"/>
-								</div>
-								<div class="field col-12 md:col-3">
-									<p:outputLabel value="Lugar de expedición"/>
-									<p:inputText value="#{nomExtra.nomina.emisor.codigoPostal}" readonly="true"/>
-								</div>
-							</div>
-						</p:outputPanel>
-					</p:tab>
-					<p:tab title="Receptor">
-						<p:outputPanel>
-							<div class="ui-fluid formgrid grid">
-								<div class="field col-12 md:col-6">
-									<p:outputLabel value="Receptor"/>
-									<p:inputText value="#{nomExtra.nomina.receptor.nombre}" readonly="true"/>
-								</div>
-								<div class="field col-12 md:col-3">
-									<p:outputLabel value="RFC" />
-									<p:inputText value="#{nomExtra.nomina.receptor.rfc}" readonly="true"/>
-								</div>
-								<div class="field col-12 md:col-3">
-									<p:outputLabel value="CURP" />
-									<p:inputText value="#{nomExtra.nomina.receptor.curp}" readonly="true"/>
-								</div>
-								<div class="field col-12 md:col-3">
-									<p:outputLabel value="Fecha inicio relación laboral" />
-									<p:datePicker value="#{nomExtra.nomina.receptor.inicioRelacionLaboral}" readonly="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
-								</div>
-								<div class="field col-12 md:col-3">
-									<p:outputLabel value="Antigüedad" />
-									<p:inputText value="#{nomExtra.nomina.receptor.antiguedad}" readonly="true" />
-								</div>
-								<div class="field col-12 md:col-3">
-									<p:outputLabel value="Jornada" />
-									<p:inputText value="#{nomExtra.nomina.receptor.tipoJornada.clave} - #{nomExtra.nomina.receptor.tipoJornada.nombre}" readonly="true"/>
-								</div>
-								<div class="field col-12 md:col-3">
-									<p:outputLabel value="NSS" />
-									<p:inputText value="#{nomExtra.nomina.receptor.nss}" readonly="true"/>
-								</div>
-								<div class="field col-12 md:col-3">
-									<p:outputLabel value="Tipo salario" />
-									<p:inputText value="Tipo Salario (FIJO)" readonly="true"/>
-								</div>
-								<div class="field col-12 md:col-3">
-									<p:outputLabel value="Domicilio fiscal" />
-									<p:inputText value="#{nomExtra.nomina.receptor.codigoPostal}" readonly="true"/>
-								</div>
-								<div class="field col-12 md:col-3">
-									<p:outputLabel value="Salario diario" />
-									<p:inputNumber value="#{nomExtra.nomina.receptor.salarioDiario}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," inputStyle="text-align: right" readonly="true"/>
-								</div>
-								<div class="field col-12 md:col-3">
-									<p:outputLabel value="Salario diario integrado" />
-									<p:inputNumber value="#{nomExtra.nomina.receptor.salarioDiarioIntegrado}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," inputStyle="text-align: right" readonly="true"/>
-								</div>
-							</div>
-						</p:outputPanel>
-					</p:tab>
-					<p:tab title="Asistencia">
-						<p:dataTable value="#{nomExtra.asistencias}" var="asistencia">
-							<p:column headerText="Dia">
-								<p:outputLabel value="#{asistencia.diaSemana}" />
-							</p:column>
-							<p:column headerText="Entrada">
-								<p:outputLabel value="#{asistencia.entrada}">
-									<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" />
-								</p:outputLabel>
-							</p:column>
-							<p:column headerText="Salida">
-								<p:outputLabel value="#{asistencia.salida}">
-									<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" />
-								</p:outputLabel>
-							</p:column>
-							<p:column headerText="Status">
-								<p:outputLabel value="#{asistencia.status.nombre}" />
-							</p:column>
-						</p:dataTable>
-					</p:tab>
-					<p:tab title="Percepciones">
-						<p:toolbar>
-							<p:toolbarGroup >
-								<p:commandButton value="Agregar" icon="pi pi-plus" process="@this" actionListener="#{nomExtra.nuevaPercepcion()}" update="formNomina:dlg-add-percepcion" oncomplete="PF('dlgAddPercepcion').show();">
-								</p:commandButton>
-							</p:toolbarGroup>
-						</p:toolbar>
-						<p:dataTable value="#{nomExtra.nomina.percepciones}" var="percepcion" paginator="true" rows="5" paginatorPosition="bottom" lazy="true">
-							<p:column headerText="SAT" width="4rem">
-								<p:outputLabel value="#{percepcion.tipoPercepcion.clave}" />
-							</p:column>
-							<p:column headerText="Descripción">
-								<p:outputLabel value="#{percepcion.nombre}" />
-							</p:column>
-							<p:column headerText="Valor" width="5rem">
-								<p:inputNumber value="#{percepcion.cantidad}" decimalPlaces="2" decimalSeparator="." thousandSeparator="," inputStyle="text-align: right" readonly="#{nomExtra.nomina.id ne null}">
-									<p:ajax process="@this" update="formNomina:tv-nomina" event="change" listener="#{nomExtra.actualizarPercepcion(percepcion)}"/>
-								</p:inputNumber>
-							</p:column>
-							<p:column headerText="Importe excento" width="8rem">
-								<p:inputNumber value="#{percepcion.importeExcento}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," inputStyle="text-align: right" readonly="#{nomExtra.nomina.id ne null}">
-									<p:ajax process="@this" update="formNomina:tv-nomina" event="change" listener="#{nomExtra.actualizar()}"/>
-								</p:inputNumber>
-							</p:column>
-							<p:column headerText="Importe gravado" width="8rem">
-								<p:inputNumber value="#{percepcion.importeGravado}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," inputStyle="text-align: right" readonly="#{nomExtra.nomina.id ne null}">
-									<p:ajax process="@this" update="formNomina:tv-nomina" event="change" listener="#{nomExtra.actualizarPercepcion(percepcion)}"/>
-								</p:inputNumber>
-							</p:column>
-							<p:column width="2rem">
-								<p:commandButton icon="pi pi-times" action="#{nomExtra.eliminarPercepcion(percepcion)}" styleClass="ui-button-outlined ui-button-danger">
-									<p:confirm header="Eliminar percepción" message="¿Está seguro que desea ELIMINAR la percepción #{percepcion.tipoPercepcion.clave} - #{percepcion.nombre}?" icon="pi pi-exclamation-triangle" />
-								</p:commandButton>
-							</p:column>
-							<p:columnGroup type="footer">
-								<p:row>
-									<p:column colspan="4" style="text-align:right;" footerText="Total:"/>
-									<p:column style="text-align:right;">
-										<f:facet name="footer">
-											<p:outputLabel value="#{nomExtra.nomina.percepciones.stream().map(item-> (item.importeGravado.add(item.importeExcento) ) ).sum()}">
-												<f:convertNumber pattern="$ #,##0.00" />
-											</p:outputLabel>
-										</f:facet>
-									</p:column>
-									<p:column>
-									</p:column>
-								</p:row>
-							</p:columnGroup>
-						</p:dataTable>
-					</p:tab>
-					<p:tab title="Otros pagos">
-						<p:toolbar>
-							<p:toolbarGroup >
-								<p:commandButton value="Agregar" icon="pi pi-plus" process="@this" actionListener="#{nomExtra.nuevoOtroPago()}" update="formNomina:dlg-add-otro-pago" oncomplete="PF('dlgAddOtroPago').show();">
-								</p:commandButton>
-							</p:toolbarGroup>
-						</p:toolbar>
-						<p:dataTable value="#{nomExtra.filtraOtroPagos()}" var="otroPago" paginator="true" paginatorPosition="bottom" rows="5" lazy="true">
-							<p:column headerText="SAT" width="4rem">
-								<p:outputLabel value="#{otroPago.tipoOtroPago.clave}" />
-							</p:column>
-							<p:column headerText="Descripción">
-								<p:outputLabel value="#{otroPago.nombre}" />
-							</p:column>
-							<p:column headerText="Importe" width="10rem">
-								<p:inputNumber value="#{otroPago.importe}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," inputStyle="text-align: right" readonly="#{nomExtra.nomina.id ne null}">
-									<p:ajax process="@this" update="formNomina:tv-nomina" event="blur" listener="#{nomExtra.actualizar()}"/>
-								</p:inputNumber>
-							</p:column>
-							<p:column width="2rem">
-								<p:commandButton icon="pi pi-times" action="#{nomExtra.eliminarOtroPago(otroPago)}" styleClass="ui-button-outlined ui-button-danger">
-									<p:confirm header="Eliminar otro pago" message="¿Está seguro que desea ELIMINAR el pago #{otroPago.tipoOtroPago.clave} - #{otroPago.nombre}?" icon="pi pi-exclamation-triangle" />
-								</p:commandButton>
-							</p:column>
-							<p:columnGroup type="footer">
-								<p:row>
-									<p:column colspan="2" style="text-align:right;" footerText="Total:"/>
-									<p:column style="text-align:right;">
-										<f:facet name="footer">
-											<p:outputLabel value="#{nomExtra.nomina.otrosPagos.stream().map(item->item.importe).sum()}">
-												<f:convertNumber pattern="$ #,##0.00" />
-											</p:outputLabel>
-										</f:facet>
-									</p:column>
-									<p:column>
-									</p:column>
-								</p:row>
-							</p:columnGroup>
-						</p:dataTable>
-					</p:tab>
-					<p:tab title="Deducciones">
-						<p:toolbar>
-							<p:toolbarGroup align="left">
-								<p:commandButton value="Agregar" icon="pi pi-plus" process="@this" actionListener="#{nomExtra.nuevaDeduccion()}" update="formNomina:dlg-add-deduccion" oncomplete="PF('dlgAddDeduccion').show();">
-								</p:commandButton>
-							</p:toolbarGroup>
-							<p:toolbarGroup align="right">
-								<span style="padding-left: 0.5rem; padding-right: 0.5rem;">
-									<p:selectBooleanButton onLabel="Con detalle" offLabel="Sin detalle" onIcon="pi pi-check" offIcon="pi pi-times" value="#{nomExtra.detalle}">
-										<p:ajax process="@this" update="formNomina:tv-nomina" />
-									</p:selectBooleanButton>
-								</span>
-							</p:toolbarGroup>
-						</p:toolbar>
-						<p:dataTable value="#{nomExtra.filtrarDeducciones()}" var="deduccion" paginator="true" paginatorPosition="bottom" rows="5" lazy="true">
-							<p:column headerText="SAT" width="4rem">
-								<p:outputLabel value="#{deduccion.tipoDeduccion.clave}" />
-							</p:column>
-							<p:column headerText="Descripción">
-								<p:outputLabel value="#{deduccion.nombre}"/>
-							</p:column>
-							<p:column headerText="Importe" width="10rem">
-								<p:inputNumber value="#{deduccion.importe}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," inputStyle="text-align: right" readonly="#{nomExtra.nomina.id ne null}">
-									<p:ajax process="@this" update="formNomina:tv-nomina" event="blur" listener="#{nomExtra.actualizar()}"/>
-								</p:inputNumber>
-							</p:column>
-							<p:column width="2rem">
-								<p:commandButton icon="pi pi-times" action="#{nomExtra.eliminarDeduccion(deduccion)}" styleClass="ui-button-outlined ui-button-danger">
-									<p:confirm header="Eliminar deducción" message="¿Está seguro que desea ELIMINAR la deducción #{deduccion.tipoDeduccion.clave} - #{deduccion.nombre}?" icon="pi pi-exclamation-triangle" />
-								</p:commandButton>
-							</p:column>
-							<p:columnGroup type="footer">
-								<p:row>
-									<p:column colspan="2" style="text-align:right;" footerText="Total:"/>
-									<p:column style="text-align:right;">
-										<f:facet name="footer">
-											<p:outputLabel value="#{nomExtra.nomina.deducciones.stream().filter(d -> d.procesar).map(item->item.importe).sum()}">
-												<f:convertNumber pattern="$ #,##0.00" />
-											</p:outputLabel>
-										</f:facet>
-									</p:column>
-									<p:column>
-									</p:column>
-								</p:row>
-							</p:columnGroup>
-						</p:dataTable>
-					</p:tab>
-				</p:tabView>
-				<f:facet name="footer">
-					<span style="padding-left: 0.5rem; padding-right: 0.5rem;">
-						<p:commandButton value="Guardar" icon="pi pi-save" actionListener="#{nomExtra.actualizarNomina}" process="@this" disabled="#{nomExtra.nomina.id ne null}" update="formNomina:dtNomina" />
-					</span>
-					<span style="padding-left: 0.5rem; padding-right: 0.5rem;">
-						<p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dgEmpleado').hide();" styleClass="ui-button-outlined ui-button-secondary" />
-					</span>
-				</f:facet>
-			</p:dialog>
-			
-			<p:dialog widgetVar="dlgAddPercepcion" header="Percepcion" modal="true">
-				<p:outputPanel id="dlg-add-percepcion" styleClass="ui-fluid">
-					<p:outputLabel value="Percepcion (SAT)" />
-					<p:autoComplete var="percepcion" minQueryLength="3" value="#{nomExtra.percepcion.tipoPercepcion}" completeMethod="#{nomExtra.buscaTipoPercepcion}" itemLabel="#{percepcion.descripcion}" itemValue="#{percepcion}" converter="entityConverter" forceSelection="true" effect="fade" scrollHeight="250" placeholder="Escriba el código SAT o nombre de la percepción">
-						<p:ajax process="@this" />
-						<p:column width="3rem">
-							<p:outputLabel value="#{percepcion.clave}" />
+						<div class="field col-12 md:col-2">
+							<p:outputLabel value="Año" />
+							<p:spinner id="anio" value="#{nominaE.nominaPeriodo.key.anio}" buttons="horizontal">
+								<p:ajax event="change" process="@this" listener="#{nominaE.calculaPeriodo()}" update="periodo fecha-periodo fecha-pago" />
+							</p:spinner>
+						</div>
+						<div class="field col-12 md:col-2">
+							<p:outputLabel value="Periodo" />
+							<p:spinner id="periodo" value="#{nominaE.nominaPeriodo.key.periodo}" buttons="horizontal">
+								<p:ajax process="@this"/>
+							</p:spinner>
+						</div>
+						<div class="field col-12 md:col-2">
+							<p:outputLabel value="Fecha periodo" />
+							<p:datePicker id="fecha-periodo" value="#{nominaE.nominaPeriodo.periodoInicio}" pattern="dd/MM/yyyy" showIcon="true" locale="es_MX" timeZone="GMT-6">
+								<p:ajax process="@this"/>
+							</p:datePicker>
+						</div>
+						<div class="field col-12 md:col-2">
+							<p:outputLabel value="Fecha pago" />
+							<p:datePicker id="fecha-pago" value="#{nominaE.nominaPeriodo.fechaPago}" pattern="dd/MM/yyyy" showIcon="true" locale="es_MX" timeZone="GMT-6">
+								<p:ajax process="@this"/>
+							</p:datePicker>
+						</div>
+						<div class="field col-12 md:col-2">
+							<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+							<p:commandButton value="Calcular" process="@this" update="form:acc:dtNomina form:acc" actionListener="#{nominaE.calcularNomina()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
+						</div>
+					</div>
+				</p:tab>
+				<p:tab title="Lista de empleados (#{nominaE.listaNomina.size()})">
+					<p:dataTable id="dtNomina" emptyMessage="No se encontró información" var="nomina" value="#{nominaE.listaNomina}" selection="#{nominaE.listaNominaSelected}" rowKey="#{nomina.id}">
+						
+						<p:column selectionMode="multiple" />
+						<p:column headerText="Num" width="4rem">
+							<h:outputText value="#{nomina.receptor.numeroEmpleado}" styleClass="customer-badge status-#{nominaE.statusNomina(nomina)}" />
 						</p:column>
-						<p:column width="auto">
-							<p:outputLabel value="#{percepcion.descripcion}" />
+						<p:column headerText="Empleado">
+							<h:outputText value="#{nomina.receptor.nombre}" />
 						</p:column>
-					</p:autoComplete>
+						<p:column headerText="Percepciones" width="7rem" style="text-align: right;">
+							<h:outputText value="#{nomina.subtotal}">
+								<f:convertNumber pattern="$ #,##0.00" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="Deducciones" width="7rem" style="text-align: right;">
+							<p:outputLabel value="#{nomina.descuento}">
+								<f:convertNumber pattern="$ #,##0.00" />
+							</p:outputLabel>
+						</p:column>
+						<p:column headerText="Neto" width="7rem" style="text-align: right;">
+							<p:outputLabel value="#{nomina.total}">
+								<f:convertNumber pattern="$ #,##0.00" />
+							</p:outputLabel>
+						</p:column>
+						<p:column width="3rem" style="text-align: right;">
+							<p:commandButton icon="pi pi-bars" process="@this" update="form:dg-empleado" />
+						</p:column>
+						
+						<p:columnGroup type="footer">
+							<p:row>
+								<p:column footerText="." style="color: rgba(255, 255, 255, 0);" />
+								<p:column footerText="." style="color: rgba(255, 255, 255, 0);" />
+								<p:column style="text-align:right;" footerText="Total:"/>
+								<p:column style="text-align:right;">
+									<f:facet name="footer">
+										<h:outputText value="#{nominaE.listaNomina.stream().map(item -> item.subtotal).sum()}">
+											<f:convertNumber pattern="$ #,##0.00" />
+										</h:outputText>
+									</f:facet>
+								</p:column>
+								<p:column style="text-align:right;">
+									<f:facet name="footer">
+										<h:outputText value="#{nominaE.listaNomina.stream().map(item -> item.descuento).sum()}">
+											<f:convertNumber pattern="$ #,##0.00" />
+										</h:outputText>
+									</f:facet>
+								</p:column>
+								<p:column style="text-align:right;">
+									<f:facet name="footer">
+										<p:outputLabel value="#{nominE.listaNomina.stream().map(item -> item.total).sum()}">
+											<f:convertNumber pattern="$ #,##0.00" />
+										</p:outputLabel>
+									</f:facet>
+								</p:column>
+								<p:column width="3rem">
+									<f:facet name="footer">
+										<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+									</f:facet>
+								</p:column>
+							</p:row>
+						</p:columnGroup>
+					</p:dataTable>
+				</p:tab>
+				<p:tab id="toolbar" title="Configurar conceptos">
+					<div class="ui-fluid formgrid grid align-items-left">
+						<div class="field col-12 md:col-2">
+							<p:commandButton icon="pi pi-plus" value="Percepciones" process="@this" actionListener="#{nominaE.nuevaPercepcion()}" update="form:pnl-add-percepcion" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dlgPercepcionAll').show();"/>
+						</div>
+						<div class="field col-12 md:col-2">
+							<p:commandButton icon="pi pi-minus" value="Deducciones" />
+						</div>
+					</div>
+				</p:tab>
+			</p:accordionPanel>
+			<p:dialog id="dlg-percepcion-all" widgetVar="dlgPercepcionAll" header="Agregar percepción" modal="true" responsive="true" position="center top" height="100%" resizable="false" showEffect="fade" hideEffect="fade">
+				
+				<p:outputPanel id="pnl-add-percepcion" styleClass="ui-fluid">
+					<p:outputLabel value="Percepciones" />
+					<p:selectOneMenu id="percepcion" value="#{nominaE.percepcion}" filter="true" filterMatchMode="contains" filterPlaceholder="Concepto" converter="entityConverter">
+						<f:selectItem itemLabel="--Seleccione--" noSelectionOption="true" />
+						<f:selectItems value="#{nominaE.percepciones}" var="percepcion" itemLabel="#{percepcion.nombre}" itemValue="#{percepcion}" />
+						<p:ajax process="@this" event="change" update="tipoPercepcion nombrePercepcion" listener="#{nominaE.setTipoPercepcion()}"/>
+					</p:selectOneMenu>
+					<p:separator/>
 					<p:outputLabel value="Descripción" />
-					<p:inputText value="#{nomExtra.percepcion.nombre}">
+					<p:inputText id="nombrePercepcion" value="#{nominaE.nomPercepcion.nombre}">
 						<p:ajax process="@this" />
 					</p:inputText>
+					
+					<p:outputLabel value="Tipo percepción (SAT)" />
+					<p:selectOneMenu id="tipoPercepcion" value="#{nominaE.nomPercepcion.tipoPercepcion}" filter="true" filterMatchMode="contains" converter="entityConverter">
+						<f:selectItem itemLabel="--Seleccione--" noSelectionOption="true" />
+						<f:selectItems value="#{nominaE.tiposPercepcion}" var="tipoPercepcion" itemLabel="#{tipoPercepcion.clave} - #{tipoPercepcion.descripcion}" itemValue="#{percepcion}" />
+					</p:selectOneMenu>
 					<p:outputLabel value="Importe excento" />
-					<p:inputNumber value="#{nomExtra.percepcion.importeExcento}" decimalPlaces="2" decimalSeparator="." symbol="$ " symbolPosition="p" placeholder="importe excento" emptyValue="null" minValue="0.00">
+					<p:inputNumber value="#{nominaE.nomPercepcion.importeExcento}" decimalPlaces="2" decimalSeparator="." symbol="$ " symbolPosition="p" placeholder="importe excento" emptyValue="null" minValue="0.00">
 						<p:ajax process="@this" />
 					</p:inputNumber>
 					<p:outputLabel value="Importe gravado" />
-					<p:inputNumber value="#{nomExtra.percepcion.importeGravado}" decimalPlaces="2" decimalSeparator="." symbol="$ " symbolPosition="p" placeholder="importe gravado" emptyValue="null" minValue="0.00">
+					<p:inputNumber value="#{nominaE.nomPercepcion.importeGravado}" decimalPlaces="2" decimalSeparator="." symbol="$ " symbolPosition="p" placeholder="importe gravado" emptyValue="null" minValue="0.00">
 						<p:ajax process="@this" />
 					</p:inputNumber>
 				</p:outputPanel>
 				<f:facet name="footer">
-					<p:commandButton value="Aceptar" icon="pi pi-check" process="@this" actionListener="#{nomExtra.agregarPercepcion()}" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
-					<p:commandButton value="Cancelar" icon="pi pi-times" styleClass="ui-button-outlined ui-button-secondary" oncomplete="PF('dlgAddDeduccion').hide();" />
+					<p:commandButton value="Aceptar" icon="pi pi-check" process="@this" actionListener="#{nominaE.agregarPercepcion()}" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
+					<p:commandButton value="Calcular" icon="fas fa-light fa-calculator" />
+					<p:commandButton value="Cancelar" icon="pi pi-times" styleClass="ui-button-outlined ui-button-secondary" oncomplete="PF('dlgPercepcionAll').hide();" />
 				</f:facet>
+				
 			</p:dialog>
 			
-			<p:dialog widgetVar="dlgAddOtroPago" header="Otro pago" modal="true">
-				<p:outputPanel id="dlg-add-otro-pago" styleClass="ui-fluid">
-					<p:outputLabel value="Otro pago (SAT)" />
-					<p:autoComplete var="otroPago" minQueryLength="3" value="#{nomExtra.otroPago.tipoOtroPago}" completeMethod="#{nomExtra.buscaTipoOtroPago}" itemLabel="#{otroPago.descripcion}" itemValue="#{otroPago}" converter="entityConverter" forceSelection="true" effect="fade" scrollHeight="250" placeholder="Escriba el código SAT o nombre del pago">
-						<p:ajax process="@this" />
-						<p:column width="3rem">
-							<p:outputLabel value="#{otroPago.clave}" />
-						</p:column>
-						<p:column width="auto">
-							<p:outputLabel value="#{otroPago.descripcion}" />
-						</p:column>
-					</p:autoComplete>
-					<p:outputLabel value="Descripción" />
-					<p:inputText value="#{nomExtra.otroPago.nombre}">
-						<p:ajax process="@this" />
-					</p:inputText>
-					<p:outputLabel value="Importe excento" />
-					<p:inputNumber value="#{nomExtra.otroPago.importe}" decimalPlaces="2" decimalSeparator="." symbol="$ " symbolPosition="p" placeholder="Importe" emptyValue="null" minValue="0.00">
-						<p:ajax process="@this" />
-					</p:inputNumber>
-				</p:outputPanel>
-				<f:facet name="footer">
-					<p:commandButton value="Aceptar" icon="pi pi-check" process="@this" actionListener="#{nomExtra.agregarOtroPago()}" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
-					<p:commandButton value="Cancelar" icon="pi pi-times" styleClass="ui-button-outlined ui-button-secondary" oncomplete="PF('dlgAddOtroPago').hide();" />
-				</f:facet>
-			</p:dialog>
 			
-			<p:dialog widgetVar="dlgAddDeduccion" header="Deduccion" modal="true">
-				<p:outputPanel id="dlg-add-deduccion" styleClass="ui-fluid">
-					<p:outputLabel value="Deduccion (SAT)" />
-					<p:autoComplete var="deduccion" minQueryLength="3" value="#{nomExtra.deduccion.tipoDeduccion}" completeMethod="#{nomExtra.buscaTipoDeduccion}" itemLabel="#{deduccion.descripcion}" itemValue="#{deduccion}" converter="entityConverter" forceSelection="true" effect="fade" scrollHeight="250" placeholder="Escriba el código SAT o nombre de la deducción">
-						<p:ajax process="@this" />
-						<p:column width="3rem">
-							<p:outputLabel value="#{deduccion.clave}"/>
-						</p:column>
-						<p:column width="auto">
-							<p:outputLabel value="#{deduccion.descripcion}" />
-						</p:column>
-					</p:autoComplete>
-					<p:outputLabel value="Descripcion"/>
-					<p:inputText value="#{nomExtra.deduccion.nombre}">
-						<p:ajax process="@this" />
-					</p:inputText>
-					<p:outputLabel value="Importe"/>
-					<p:inputNumber value="#{nomExtra.deduccion.importe}" decimalPlaces="2" decimalSeparator="." symbol="$ " symbolPosition="p" placeholder="importe" emptyValue="null" minValue="0.00">
-						<p:ajax process="@this" />
-					</p:inputNumber>
-				</p:outputPanel>
-				<f:facet name="footer">
-					<p:commandButton value="Aceptar" icon="pi pi-check" process="@this" actionListener="#{nomExtra.agregarDeduccion()}" update="tv-nomina" />
-					<p:commandButton value="Cancelar" icon="pi pi-times" styleClass="ui-button-outlined ui-button-secondary" oncomplete="PF('dlgAddDeduccion').hide();" />
-				</f:facet>
+			<p:dialog id="dg-empleado" widgetVar="dgEmpleado" header="#{nominaS.nomina.receptor.nombre}" modal="true" responsive="true" position="center top" height="100%" resizable="false" showEffect="fade" hideEffect="fade">
 			</p:dialog>
         </h:form>
     </ui:define>

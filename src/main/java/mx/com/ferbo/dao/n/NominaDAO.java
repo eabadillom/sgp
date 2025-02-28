@@ -74,6 +74,33 @@ public class NominaDAO extends BaseDAO<DetNomina, Integer> {
 		return model;
 	}
 	
+	public DetNomina buscar(String rfcEmisor, String tipoNomina, Integer anio, Integer periodo, String rfcReceptor) {
+		DetNomina model = null;
+		EntityManager em = null;
+		
+		try {
+			em = this.getEntityManager();
+			model = em.createNamedQuery("DetNomina.findByEmisorTipoNominaAnioPeriodoReceptor", this.modelClass)
+					.setParameter("rfcEmisor", rfcEmisor)
+					.setParameter("tipoNomina", tipoNomina)
+					.setParameter("anio", anio)
+					.setParameter("periodo", periodo)
+					.setParameter("rfcReceptor", rfcReceptor)
+					.getSingleResult()
+					;
+			
+		} catch(NoResultException ex) {
+			log.warn("Problema para obtener la lista de nomina del periodo solicitado...", ex.getMessage());
+		} catch(Exception ex) {
+			log.error("Problema para obtener la lista de nomina del periodo solicitado...", ex);
+		} finally {
+			this.close(em);
+		}
+		
+		
+		return model;
+	}
+	
 	public List<DetNomina> buscarPorSemanaRfc(Integer semanaInicio, Integer semanaFin, String rfc) {
 		List<DetNomina> modelList = null;
 		EntityManager em = null;

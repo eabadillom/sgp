@@ -6,166 +6,226 @@ import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.application.FacesMessage.Severity;
+import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.business.nomina.NominaBL;
+import mx.com.ferbo.business.nomina.NominaExtraordinariaBL;
+import mx.com.ferbo.business.nomina.NominaPeriodoBL;
 import mx.com.ferbo.business.nomina.ParametrosNomina;
+import mx.com.ferbo.business.nomina.PercepcionBL;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.EmpresaDAO;
 import mx.com.ferbo.dao.n.NominaDAO;
-import mx.com.ferbo.dto.ui.Asistencia;
+import mx.com.ferbo.dao.n.PercepcionDAO;
+import mx.com.ferbo.dao.n.PeriodicidadPagoDAO;
 import mx.com.ferbo.model.CatEmpresa;
+import mx.com.ferbo.model.CatPercepcion;
+import mx.com.ferbo.model.CatPeriodicidadPago;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetNomina;
-import mx.com.ferbo.model.DetNominaDeduccion;
-import mx.com.ferbo.model.DetNominaOtroPago;
 import mx.com.ferbo.model.DetNominaPercepcion;
-import mx.com.ferbo.model.sat.CatTipoDeduccion;
-import mx.com.ferbo.model.sat.CatTipoOtroPago;
+import mx.com.ferbo.model.DetNominaPeriodo;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.util.DateUtil;
+import mx.com.ferbo.util.ManageStatus;
+import mx.com.ferbo.util.SGPException;
 
-@Named(value = "nomExtra")
+@Named(value = "nominaE")
 @ViewScoped
 public class NominaExtraordinariaBean implements Serializable {
 
 	private static final long serialVersionUID = -7354838193241382936L;
 	private static Logger log = LogManager.getLogger(NominaExtraordinariaBean.class);
 	
+	private Integer anio = null;
+	private Date fecha = null;
+	private List<Integer> semanasDelAnio = null;
+	private Date periodoInicio = null;
+	private Date periodoFin = null;
+	private DetNominaPeriodo nominaPeriodo = null;
+	
+	private CatEmpresa empresa = null;
+	private List<CatEmpresa> empresas = null;
+	private EmpresaDAO empresaDAO = null;
+	
+	private CatPeriodicidadPago periodicidad = null;
+	private PeriodicidadPagoDAO periodicidadDAO = null;
+	
+	private EmpleadoDAO empleadoDAO = null;
+	private NominaDAO nominaDAO = null;
+	private List<DetNomina> listaNomina = null;
+	private List<DetNomina> listaNominaSelected = null;
 	private ParametrosNomina parametros = null;
 	
-	private EmpleadoDAO empleadoDAO;
-    private EmpresaDAO empresaDAO;
-    private NominaDAO nominaDAO;
-    
-    private List<CatEmpresa> empresas;
-    private List<CatTipoPercepcion> tiposPercepcion;
-    private List<CatTipoDeduccion> tiposDeduccion;
-    private List<CatTipoOtroPago> tiposOtroPago;
-    private CatEmpresa empresa;
-    private DetNomina nomina;
-    private DetNominaPercepcion percepcion;
-    private DetNominaOtroPago otroPago;
-    private DetNominaDeduccion deduccion;
-    
-    private Integer anio;
-    private Date fecha;
-    private Date periodoInicio;
-    private Date periodoFin;
-    private Integer semana;
-    
-    private List<DetNomina> listaNomina;
-    private List<Integer> semanasDelAnio;
-    private List<Asistencia> asistencias;
-    
-    private Boolean detalle = true;
-    
+	private CatPercepcion percepcion = null;
+	private List<CatPercepcion> percepciones = null;
+	private PercepcionDAO percepcionDAO = null;
+	
+	private DetNominaPercepcion nomPercepcion = null;
+	private List<CatTipoPercepcion> tiposPercepcion = null;
+
     public NominaExtraordinariaBean() {
-    	listaNomina = new ArrayList<>();
-    	
-    	empleadoDAO = new EmpleadoDAO(DetEmpleado.class);
-    	empresaDAO = new EmpresaDAO(CatEmpresa.class);
-    	nominaDAO = new NominaDAO(DetNomina.class);
+    	log.info("Entrando al constructor de NominaExtraordinariaBean");
+    	empresaDAO = new EmpresaDAO();
+    	periodicidadDAO = new PeriodicidadPagoDAO();
+    	empleadoDAO = new EmpleadoDAO();
+    	nominaDAO = new NominaDAO();
+    	percepcionDAO = new PercepcionDAO();
 	}
     
     @PostConstruct
     public void init() {
-    	log.info("====================== entrada init nominaBean ======================");
-        
-        empresas = empresaDAO.buscarActivo();
-
-        log.info("Inicio del periodo: {}", periodoFin);
-        log.info("Fin del periodo: {}", periodoInicio);
-        this.nomina = NominaBL.build(NominaBL.TP_NOMINA_ORDINARIA, parametros, null);
-        this.percepcion = new DetNominaPercepcion();
-        this.otroPago = new DetNominaOtroPago();
-        this.deduccion = new DetNominaDeduccion();
-        
-        this.fecha = DateUtil.now();
-        this.anio = DateUtil.getAnio(fecha);
-        this.semanasDelAnio = DateUtil.semanasDelAnio(this.anio);
-        this.semana = DateUtil.getSemanaAnio(this.fecha);
-        
-        this.parametros = new ParametrosNomina();
-		this.parametros.cargar(periodoInicio, periodoFin);
+    	log.info("====================== Entrada a nómina extraordinaria ======================");
+    	this.empresas = empresaDAO.buscarActivo();
+    	this.listaNomina = new ArrayList<DetNomina>();
+    	this.listaNominaSelected = new ArrayList<DetNomina>();
+    	//De acuerdo a la definición del complemento de nómina 1.2, la periodicidad de pago para
+    	//nóminas extraordinarias es 99 (Otro).
+    	this.periodicidad = periodicidadDAO.buscarPorId("99");
+    	this.nomPercepcion = PercepcionBL.build();
+    	this.percepciones = percepcionDAO.buscarTodos();
     }
     
-    /*GETTERS Y SETTERS*/
-
-	public List<CatEmpresa> getEmpresas() {
-		return empresas;
-	}
-
-	public void setEmpresas(List<CatEmpresa> empresas) {
-		this.empresas = empresas;
-	}
-
-	public List<CatTipoPercepcion> getTiposPercepcion() {
-		return tiposPercepcion;
-	}
-
-	public void setTiposPercepcion(List<CatTipoPercepcion> tiposPercepcion) {
-		this.tiposPercepcion = tiposPercepcion;
-	}
-
-	public List<CatTipoDeduccion> getTiposDeduccion() {
-		return tiposDeduccion;
-	}
-
-	public void setTiposDeduccion(List<CatTipoDeduccion> tiposDeduccion) {
-		this.tiposDeduccion = tiposDeduccion;
-	}
-
-	public List<CatTipoOtroPago> getTiposOtroPago() {
-		return tiposOtroPago;
-	}
-
-	public void setTiposOtroPago(List<CatTipoOtroPago> tiposOtroPago) {
-		this.tiposOtroPago = tiposOtroPago;
-	}
-
-	public CatEmpresa getEmpresa() {
-		return empresa;
-	}
-
-	public void setEmpresa(CatEmpresa empresa) {
-		this.empresa = empresa;
-	}
-
-	public DetNomina getNomina() {
+    public String statusNomina(DetNomina nomina) {
+    	if(nomina == null)
+    		return "";
+    	
+        return ManageStatus.getEstadoEmpleadoEmpresa((nomina.getId() == null ? (short) 2 : (short) 1));
+    }
+    
+    public void calculaPeriodo() {
+    	Integer anio = null;
+    	try {
+    		if(this.empresa == null)
+    			throw new SGPException("Debe seleccionar una empresa");
+    		
+    		if(this.nominaPeriodo == null)
+    			anio = DateUtil.getAnio(DateUtil.now());
+    		else
+    			anio = this.nominaPeriodo.getKey().getAnio();
+    		this.nominaPeriodo = NominaPeriodoBL.build(this.empresa, NominaBL.TP_NOMINA_EXTRAORDINARIA, this.periodicidad, anio);
+    		this.nominaPeriodo.setPeriodoInicio(DateUtil.setAnio(this.nominaPeriodo.getPeriodoInicio(), anio));
+    		this.nominaPeriodo.setPeriodoFin(DateUtil.setAnio(this.nominaPeriodo.getPeriodoFin(), anio));
+    		this.nominaPeriodo.setFechaPago(DateUtil.setAnio(this.nominaPeriodo.getFechaPago(), anio));
+    		
+    	} catch (SGPException ex) {
+			log.error("Problema para generar el periodo...", ex);
+		}
+    }
+    
+    public void calcularNomina() {
+    	FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Nómina";
+		
+		List<DetEmpleado> listaEmpleados = null;
+		
+		try {
+			this.listaNomina.clear();
+			listaEmpleados = this.empleadoDAO.buscarActivoEmpresaIngreso(empresa.getIdEmpresa(), DateUtil.toDate(this.nominaPeriodo.getPeriodoInicio()), DateUtil.toDate(this.nominaPeriodo.getPeriodoFin()));
+			this.procesaListaEmpleados(listaEmpleados);
+			mensaje = "Nomina cargada correctamente.";
+    		severity = FacesMessage.SEVERITY_INFO;
+    	} catch(Exception ex) {
+    		log.error("Problema para procesar la nómina.");
+    		mensaje = "Hay un problema para procesar la nómina.";
+    		severity = FacesMessage.SEVERITY_ERROR;
+    	} finally {
+    		if(listaEmpleados != null)
+    			listaEmpleados.clear();
+    		message = new FacesMessage(severity, titulo, mensaje);
+    		FacesContext.getCurrentInstance().addMessage(null, message);
+    		PrimeFaces.current().ajax().update(":form:messages");
+    	}
+		
+    }
+    
+    private void procesaListaEmpleados(List<DetEmpleado> listaEmpleados) {
+    	DetNomina nomina = null;
+    	Integer idNominaTmp = -1;
+    	
+    	this.parametros = new ParametrosNomina();
+    	this.parametros.cargar(DateUtil.toDate(this.nominaPeriodo.getPeriodoInicio()), DateUtil.toDate(this.nominaPeriodo.getPeriodoFin()));
+    	
+    	this.tiposPercepcion = this.parametros.getTiposPercepcion();
+    	
+    	for(DetEmpleado empleado : listaEmpleados) {
+    		nomina = nominaDAO.buscar(this.empresa.getRfc(), this.nominaPeriodo.getKey().getTipoNomina(), this.nominaPeriodo.getKey().getAnio(), this.nominaPeriodo.getKey().getPeriodo(), empleado.getRfc());
+    		
+    		if(nomina == null) {
+    			nomina = this.procesaEmpleado(empleado);
+    			nomina.setId(idNominaTmp--);
+    		}
+    		
+    		this.listaNomina.add(nomina);
+    	}
+    	log.info("Lista nomina: {}", this.listaNomina);
+    }
+    
+    private DetNomina procesaEmpleado(DetEmpleado empleado) {
+    	DetNomina nomina = null;
+    	NominaExtraordinariaBL nominaBO = null;
+		nominaBO = new NominaExtraordinariaBL(empleado, this.parametros);
+		nomina = nominaBO.calcular();
 		return nomina;
+    }
+    
+    public void setTipoPercepcion() {
+    	this.nomPercepcion.setClave(this.percepcion.getClave());
+    	this.nomPercepcion.setTipoPercepcion(this.percepcion.getTipoPercepcion());
+    	this.nomPercepcion.setNombre(this.percepcion.getNombre());
+    }
+    
+    public void nuevaPercepcion() {
+    	log.info("Agregando nueva percepcion...");
+    	
+    	this.nomPercepcion = PercepcionBL.build();
+    }
+    
+    public void agregarPercepcion() {
+    	log.info("Agregando percepcion a los empleados seleccionados...");
+    	
+    	for(DetNomina nomina : this.listaNominaSelected) {
+    		log.info("Agreagndo percepción al empleado: {}", nomina.getReceptor().getNombre());
+    	}
+    	
+    	
+    	
+    }
+    
+    
+    /***************GETTERS Y SETTERS***************/
+	public Integer getAnio() {
+		return anio;
 	}
 
-	public void setNomina(DetNomina nomina) {
-		this.nomina = nomina;
+	public void setAnio(Integer anio) {
+		this.anio = anio;
 	}
 
-	public DetNominaPercepcion getPercepcion() {
-		return percepcion;
+	public Date getFecha() {
+		return fecha;
 	}
 
-	public void setPercepcion(DetNominaPercepcion percepcion) {
-		this.percepcion = percepcion;
+	public void setFecha(Date fecha) {
+		this.fecha = fecha;
 	}
 
-	public DetNominaOtroPago getOtroPago() {
-		return otroPago;
+	public List<Integer> getSemanasDelAnio() {
+		return semanasDelAnio;
 	}
 
-	public void setOtroPago(DetNominaOtroPago otroPago) {
-		this.otroPago = otroPago;
-	}
-
-	public DetNominaDeduccion getDeduccion() {
-		return deduccion;
-	}
-
-	public void setDeduccion(DetNominaDeduccion deduccion) {
-		this.deduccion = deduccion;
+	public void setSemanasDelAnio(List<Integer> semanasDelAnio) {
+		this.semanasDelAnio = semanasDelAnio;
 	}
 
 	public Date getPeriodoInicio() {
@@ -184,12 +244,28 @@ public class NominaExtraordinariaBean implements Serializable {
 		this.periodoFin = periodoFin;
 	}
 
-	public Integer getSemana() {
-		return semana;
+	public DetNominaPeriodo getNominaPeriodo() {
+		return nominaPeriodo;
 	}
 
-	public void setSemana(Integer semana) {
-		this.semana = semana;
+	public void setNominaPeriodo(DetNominaPeriodo nominaPeriodo) {
+		this.nominaPeriodo = nominaPeriodo;
+	}
+
+	public CatEmpresa getEmpresa() {
+		return empresa;
+	}
+
+	public void setEmpresa(CatEmpresa empresa) {
+		this.empresa = empresa;
+	}
+
+	public List<CatEmpresa> getEmpresas() {
+		return empresas;
+	}
+
+	public void setEmpresas(List<CatEmpresa> empresas) {
+		this.empresas = empresas;
 	}
 
 	public List<DetNomina> getListaNomina() {
@@ -200,30 +276,43 @@ public class NominaExtraordinariaBean implements Serializable {
 		this.listaNomina = listaNomina;
 	}
 
-	public List<Integer> getSemanasDelAnio() {
-		return semanasDelAnio;
+	public List<DetNomina> getListaNominaSelected() {
+		return listaNominaSelected;
 	}
 
-	public void setSemanasDelAnio(List<Integer> semanasDelAnio) {
-		this.semanasDelAnio = semanasDelAnio;
+	public void setListaNominaSelected(List<DetNomina> listaNominaSelected) {
+		this.listaNominaSelected = listaNominaSelected;
 	}
 
-	public Boolean getDetalle() {
-		return detalle;
+	public DetNominaPercepcion getNomPercepcion() {
+		return nomPercepcion;
 	}
 
-	public void setDetalle(Boolean detalle) {
-		this.detalle = detalle;
+	public void setNomPercepcion(DetNominaPercepcion percepcion) {
+		this.nomPercepcion = percepcion;
+	}
+	
+	public CatPercepcion getPercepcion() {
+		return percepcion;
 	}
 
-	public Integer getAnio() {
-		return anio;
+	public void setPercepcion(CatPercepcion percepcion) {
+		this.percepcion = percepcion;
 	}
 
-	public void setAnio(Integer anio) {
-		this.anio = anio;
+	public List<CatPercepcion> getPercepciones() {
+		return percepciones;
 	}
-    
-    
 
+	public void setPercepciones(List<CatPercepcion> percepciones) {
+		this.percepciones = percepciones;
+	}
+
+	public List<CatTipoPercepcion> getTiposPercepcion() {
+		return tiposPercepcion;
+	}
+
+	public void setTiposPercepcion(List<CatTipoPercepcion> tiposPercepcion) {
+		this.tiposPercepcion = tiposPercepcion;
+	}
 }
