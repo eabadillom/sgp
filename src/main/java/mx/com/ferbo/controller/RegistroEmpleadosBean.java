@@ -535,11 +535,6 @@ public class RegistroEmpleadosBean implements Serializable {
                 this.empleadoDAO.actualizar(this.empleadoSelected);
             }
 
-            if (this.empleadoSelected.getVacaciones().isEmpty()) {
-                EmpleadoBL.generarAnioVacaciones(this.empleadoSelected);
-                empleadoDAO.actualizar(empleadoSelected);
-            }
-
             if (this.empleadoFoto != null) {
                 empleadoFotoDAO.actualizar(empleadoFoto);
             }
