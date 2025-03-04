@@ -111,7 +111,17 @@ public class DateUtil {
                 .with(weekFields.weekOfYear(), semana)
                 .with(DayOfWeek.MONDAY);
     }
-
+	
+	public static LocalDate addDay(LocalDate fecha, int dias) {
+		LocalDate resultado = null;
+		resultado = fecha.plusDays(dias);
+		return resultado;
+	}
+	
+	public static LocalDate setAnio(LocalDate fecha, int anio) {
+		return fecha.withYear(anio);
+	}
+	
     /**
      * Metodo para agregar dias a una fecha dada.
      *
