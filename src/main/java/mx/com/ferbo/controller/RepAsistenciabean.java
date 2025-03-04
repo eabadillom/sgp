@@ -332,34 +332,31 @@ public class RepAsistenciabean implements Serializable {
     }
 
     public String obtenerEstatusAsistencia(DetRegistro registro) {
-        String estatus = "";
 
-        switch (registro.getIdEstatus().getDescripcion()) {
-            case "A tiempo":
-            case "Justificado":
-            case "Vacaciones":
-            case "Permiso":
-            case "Asistencia en día no laboral":
-            case "Incapacidad":
-                estatus += "Asistencia correcta";
+        switch (registro.getIdEstatus().getCodigo()) {
+            case "T":
+            case "J":
+            case "V":
+            case "P":
+            case "X":
+            case "I":
+            case "D":
                 this.badgeColor = new String();
                 this.badgeColor = "success";
                 break;
 
-            case "Retardo":
-                estatus += "Con observaciones";
+            case "R":
                 this.badgeColor = new String();
                 this.badgeColor = "warning";
                 break;
 
-            case "Falta":
-                estatus += "Asistencia incorrecta";
+            case "F":
                 this.badgeColor = new String();
                 this.badgeColor = "danger";
                 break;
         }
 
-        return estatus;
+        return registro.getIdEstatus().getDescripcion();
     }
 
     public List<CatPlanta> getPlantas() {
