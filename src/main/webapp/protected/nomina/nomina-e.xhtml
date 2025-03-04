@@ -98,7 +98,9 @@
 				</p:tab>
 				<p:tab title="Lista de empleados (#{nominaE.listaNomina.size()})">
 					<p:dataTable id="dtNomina" emptyMessage="No se encontró información" var="nomina" value="#{nominaE.listaNomina}" selection="#{nominaE.listaNominaSelected}" rowKey="#{nomina.id}">
-						
+						<p:ajax event="rowSelectCheckbox" process="@this"/>
+						<p:ajax event="rowUnselectCheckbox" process="@this"/>
+						<p:ajax process="@this" event="toggleSelect" />
 						<p:column selectionMode="multiple" />
 						<p:column headerText="Num" width="4rem">
 							<h:outputText value="#{nomina.receptor.numeroEmpleado}" styleClass="customer-badge status-#{nominaE.statusNomina(nomina)}" />
@@ -163,7 +165,7 @@
 				<p:tab id="toolbar" title="Configurar conceptos">
 					<div class="ui-fluid formgrid grid align-items-left">
 						<div class="field col-12 md:col-2">
-							<p:commandButton icon="pi pi-plus" value="Percepciones" process="@this" actionListener="#{nominaE.nuevaPercepcion()}" update="form:pnl-add-percepcion" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dlgPercepcionAll').show();"/>
+							<p:commandButton icon="pi pi-plus" value="Percepciones" process="@this" actionListener="#{nominaE.nuevaPercepcion()}" update="form:pnl-add-percepcion" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dlgPercepcionAll').show();"/>
 						</div>
 						<div class="field col-12 md:col-2">
 							<p:commandButton icon="pi pi-minus" value="Deducciones" />
@@ -201,7 +203,7 @@
 					</p:inputNumber>
 				</p:outputPanel>
 				<f:facet name="footer">
-					<p:commandButton value="Aceptar" icon="pi pi-check" process="@this" actionListener="#{nominaE.agregarPercepcion()}" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
+					<p:commandButton value="Agregar" icon="pi pi-check" process="@this" actionListener="#{nominaE.agregarPercepcion()}" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
 					<p:commandButton value="Calcular" icon="fas fa-light fa-calculator" />
 					<p:commandButton value="Cancelar" icon="pi pi-times" styleClass="ui-button-outlined ui-button-secondary" oncomplete="PF('dlgPercepcionAll').hide();" />
 				</f:facet>
@@ -209,7 +211,46 @@
 			</p:dialog>
 			
 			
-			<p:dialog id="dg-empleado" widgetVar="dgEmpleado" header="#{nominaS.nomina.receptor.nombre}" modal="true" responsive="true" position="center top" height="100%" resizable="false" showEffect="fade" hideEffect="fade">
+			<p:dialog id="dg-empleado" widgetVar="dgEmpleado" header="#{nominaE.nomina.receptor.nombre}" modal="true" responsive="true" position="center top" height="100%" resizable="false" showEffect="fade" hideEffect="fade">
+				<p:tabView id="tv-nomina" class="ui-fluid" dynamic="true" cache="true" effect="drop">
+					<p:ajax event="tabChange" oncomplete="PF('dgEmpleado').initPosition();"/>
+					<p:tab title="General">
+						<div class="ui-fluid formgrid grid">
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Ejercicio"/>
+								<p:inputText value="#{nominaE.nomina.ejercicio}" readonly="true" style="text-align: right;"/>
+							</div>
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Periodo"/>
+								<p:inputText value="Semana #{nominaE.nomina.periodo}" readonly="true" style="text-align: right;"/>
+							</div>
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Dias laborados"/>
+								<p:inputNumber value="#{nominaE.nomina.diasLaborados}" symbol=" días" symbolPosition="s" inputStyle="text-align: right"/>
+							</div>
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Faltas"/>
+								<p:inputNumber value="#{nominaE.nomina.diasNoLaborados}" symbol=" días" symbolPosition="s" inputStyle="text-align: right"/>
+							</div>
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Dias pagados"/>
+								<p:inputNumber value="#{nominaE.nomina.diasPagados}" symbol=" días" symbolPosition="s" inputStyle="text-align: right"/>
+							</div>
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Subtotal"/>
+								<p:inputNumber value="#{nominaE.nomina.subtotal}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," readonly="true" inputStyle="text-align: right"/>
+							</div>
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Descuentos" />
+								<p:inputNumber value="#{nominaE.nomina.descuento}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," readonly="true" inputStyle="text-align: right"/>
+							</div>
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Total" />
+								<p:inputNumber value="#{nominaE.nomina.total}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," readonly="true" inputStyle="text-align: right"/>
+							</div>
+						</div>
+					</p:tab>
+				</p:tabView>
 			</p:dialog>
         </h:form>
     </ui:define>

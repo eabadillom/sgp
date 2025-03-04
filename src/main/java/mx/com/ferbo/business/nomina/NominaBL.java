@@ -56,6 +56,10 @@ public abstract class NominaBL {
 	protected Map<String, DetRegistro> mapAsistencias = null;
 	protected VacacionesDAO vacacionesDAO = null;
 	
+	public NominaBL() {
+		
+	}
+	
 	public NominaBL(DetEmpleado empleado, ParametrosNomina parametros, Map<String, DetRegistro> mapAsistencias) {
 		this.empleado = empleado;
 		this.parametros = parametros;

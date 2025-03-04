@@ -51,6 +51,8 @@ public class NominaExtraordinariaBean implements Serializable {
 	private Date periodoInicio = null;
 	private Date periodoFin = null;
 	private DetNominaPeriodo nominaPeriodo = null;
+	private DetNomina nomina = null;
+	private NominaExtraordinariaBL nominaBO = null;
 	
 	private CatEmpresa empresa = null;
 	private List<CatEmpresa> empresas = null;
@@ -173,9 +175,7 @@ public class NominaExtraordinariaBean implements Serializable {
     
     private DetNomina procesaEmpleado(DetEmpleado empleado) {
     	DetNomina nomina = null;
-    	NominaExtraordinariaBL nominaBO = null;
-		nominaBO = new NominaExtraordinariaBL(empleado, this.parametros);
-		nomina = nominaBO.calcular();
+		nomina = NominaBL.build(NominaBL.TP_NOMINA_EXTRAORDINARIA, this.parametros, empleado);
 		return nomina;
     }
     
@@ -189,12 +189,19 @@ public class NominaExtraordinariaBean implements Serializable {
     	log.info("Agregando nueva percepcion...");
     	
     	this.nomPercepcion = PercepcionBL.build();
+    	log.info("Percepcion: {}", this.nomPercepcion);
+    	
+    	PrimeFaces.current().ajax().update("form:dlg-percepcion-all");
     }
     
     public void agregarPercepcion() {
     	log.info("Agregando percepcion a los empleados seleccionados...");
     	
+    	log.info("Percepcion: {}", this.nomPercepcion);
+    	this.nominaBO = new NominaExtraordinariaBL();
+    	
     	for(DetNomina nomina : this.listaNominaSelected) {
+    		nomina.getPercepciones().add(nomPercepcion);
     		log.info("Agreagndo percepción al empleado: {}", nomina.getReceptor().getNombre());
     	}
     	
@@ -314,5 +321,13 @@ public class NominaExtraordinariaBean implements Serializable {
 
 	public void setTiposPercepcion(List<CatTipoPercepcion> tiposPercepcion) {
 		this.tiposPercepcion = tiposPercepcion;
+	}
+
+	public DetNomina getNomina() {
+		return nomina;
+	}
+
+	public void setNomina(DetNomina nomina) {
+		this.nomina = nomina;
 	}
 }

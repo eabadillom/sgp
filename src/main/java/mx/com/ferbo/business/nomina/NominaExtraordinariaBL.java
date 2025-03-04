@@ -19,6 +19,10 @@ public class NominaExtraordinariaBL extends NominaBL {
 	private Date fechaInicioAnio = null;
 	private Date fechafinAnio = null;
 	private Integer anio = null;
+	
+	public NominaExtraordinariaBL() {
+		super();
+	}
 
 	public NominaExtraordinariaBL(DetEmpleado empleado, ParametrosNomina parametros) {
 		super(empleado, parametros, null);
@@ -28,11 +32,12 @@ public class NominaExtraordinariaBL extends NominaBL {
 		this.fechafinAnio = null;
 	}
 	
-	public DetNomina calcular() {
-		DetNomina nomina = null;
+	
+	
+	public DetNomina calcular(DetNomina nomina, ParametrosNomina parametros) {
 		
 		try {
-			nomina = NominaBL.build(TP_NOMINA_EXTRAORDINARIA, this.parametros, this.empleado);
+			
 			
 			
 		} catch(Exception ex) {
