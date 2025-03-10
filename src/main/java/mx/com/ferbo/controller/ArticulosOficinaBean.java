@@ -1,12 +1,10 @@
 package mx.com.ferbo.controller;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -14,6 +12,8 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
+import mx.com.ferbo.business.incidencia.EstatusIncidenciaBL;
+import mx.com.ferbo.business.incidencia.EstatusSolicitudBL;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,7 +24,6 @@ import mx.com.ferbo.dao.n.SolicitudArticuloDAO;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.IncidenciaDAO;
 import mx.com.ferbo.model.CatArticulo;
-import mx.com.ferbo.model.CatEstatusIncidencia;
 import mx.com.ferbo.model.CatTipoIncidencia;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetIncidencia;
@@ -45,7 +44,6 @@ public class ArticulosOficinaBean implements Serializable {
     private List<Integer> lstCantidad;
     private List<DetSolicitudArticulo> lstSolicitudArticulos;
     private List<DetSolicitudArticulo> lstSolicitudArticulosRealizadas;
-    private List<DetIncidencia> incidenciasBuscada;
 
     private DetEmpleado empleadoSelected;
     private DetSolicitudArticulo solicitud;
@@ -64,7 +62,6 @@ public class ArticulosOficinaBean implements Serializable {
 
     private DetIncidencia incidencia;
     private CatTipoIncidencia catTipoIncidencia;
-    private CatEstatusIncidencia catEstatusIncidencia;
 
     public ArticulosOficinaBean() {
         lstArticulosActivas = new ArrayList<>();
@@ -90,7 +87,7 @@ public class ArticulosOficinaBean implements Serializable {
     @PostConstruct
     public void init() {
         lstSolicitudArticulos = new ArrayList<>();
-        solicitud.setIdEmpleadoSol(empleadoSelected);
+        solicitud.setEmpleadoSol(empleadoSelected);
         actualizarListas();
         lstArticulosActivas = articulosDAO.buscarTodosActivos();
         status = new ManageStatus();
@@ -98,8 +95,12 @@ public class ArticulosOficinaBean implements Serializable {
     
     public void actualizarListas()
     {
-        lstSolicitudArticulosRealizadas = solicitudArticulosDAO.buscarPorIdEmpleado(solicitud.getIdEmpleadoSol().getIdEmpleado());
-        incidenciasBuscada = incidenciaDAO.buscarPorIdEmpleadoArticulo(solicitud.getIdEmpleadoSol().getIdEmpleado());
+        lstSolicitudArticulosRealizadas = solicitudArticulosDAO.buscarPorIdEmpleado(solicitud.getEmpleadoSol().getIdEmpleado());
+    }
+    
+    public void editarArticulo(DetSolicitudArticulo solicitudArticulo)
+    {
+        solicitud = solicitudArticulo;
     }
 
     public void seleccionarItem(CatArticulo item) {
@@ -110,105 +111,109 @@ public class ArticulosOficinaBean implements Serializable {
 
     public void preRegistro() {
         solicitud.setFechaCap(new Date());
-        solicitud.setIdEmpleadoSol(empleadoSelected);
-        solicitud.setIdArticulo(articuloSelected);
+        solicitud.setEmpleadoSol(empleadoSelected);
+        solicitud.setArticulo(articuloSelected);
         lstSolicitudArticulos.add(solicitud);
         PrimeFaces.current().executeInitScript("PF('dialogComplementoArtiulo').hide()");
         PrimeFaces.current().executeInitScript("PF('articuloOficinaDialog').hide()");
         PrimeFaces.current().ajax().update("formActividadesArticulos:messages", "formActividadesArticulos:tabView:dt-articuloOficinas", "formActividadesArticulos:tabView:btnRegistro");
     }
 
-    public void registro() throws IOException {
+    public void registro() {
+        FacesMessage message = null;
+        FacesMessage.Severity severity = null;
+        String mensaje = null;
+        String titulo = "Articulo";
         for (DetSolicitudArticulo solicitudArticulo : lstSolicitudArticulos) {
             try {
-                solicitudArticulo.setAprobada((short) 1);
-                solicitudArticulosDAO.guardar(solicitudArticulo);
-                actualizarListas();
+                solicitudArticulo.setEstatus(EstatusSolicitudBL.estatusEnviado());
                 
                 incidencia = new DetIncidencia();
                 catTipoIncidencia = new CatTipoIncidencia();
-                catEstatusIncidencia = new CatEstatusIncidencia();
-
                 catTipoIncidencia.setIdTipo(4);
-                catEstatusIncidencia.setIdEstatus(1);
 
-                incidencia.setIdTipo(catTipoIncidencia);
-                incidencia.setIdEmpleado(empleadoSelected);
-                incidencia.setIdEstatus(catEstatusIncidencia);
+                incidencia.setTipoIncidencia(catTipoIncidencia);
+                incidencia.setEmpleado(empleadoSelected);
+                incidencia.setEstatusIncidencia(EstatusIncidenciaBL.estatusEnviado());
                 incidencia.setVisible((short) 1);
-                incidencia.setIdSolArticulo(solicitudArticulo);
+                incidencia.setSolArticulo(solicitudArticulo);
                 incidencia.setFechaCap(new Date());
 
                 incidenciaDAO.guardar(incidencia);
-
-            } catch (SGPException e) {
-                log.warn("EX-0034: " + e.getMessage() + ". Error al guardar el registro de articulos del empleado: " + empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
+                actualizarListas();
+                mensaje = "Solicitud Registrada";
+                severity = FacesMessage.SEVERITY_INFO;
+            } catch (SGPException e) 
+            {
+                log.warn("Error al guardar el registro de articulos del empleado: {}", empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
+                log.warn("EX-0034: ", e);
+                mensaje = e.getMessage();
+                severity = FacesMessage.SEVERITY_ERROR;
+            }catch(Exception e)
+            {
+                log.warn("Error al guardar el registro del articulo del empleado: {}", empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
+                log.warn("EX-0032: ", e);
+                mensaje = "Consulte con su administrador de sistemas";
+                severity = FacesMessage.SEVERITY_ERROR;
             }
         }
-        FacesContext.getCurrentInstance().getExternalContext().redirect("articulosTrabajo.xhtml");
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Solicitud Registrada"));
+        lstSolicitudArticulos.clear();
+        message = new FacesMessage(severity, titulo, mensaje);
+        FacesContext.getCurrentInstance().addMessage(null, message);
+        PrimeFaces.current().ajax().update(":formActividadesArticulos:messages", ":formActividadesArticulos:tabView:dt-articuloOficinas", ":formActividadesArticulos:tabView:btnRegistro");
+        PrimeFaces.current().executeScript("PF('articuloOficinaDialog').hide()");
     }
     
     public void actualizarRegistro()
     {
-        actualizarListas();
         FacesMessage message = null;
         FacesMessage.Severity severity = null;
         String mensaje = null;
         String titulo = "Articulo";
         try
         {
-            if(incidenciasBuscada == null)
+            incidencia = incidenciaDAO.buscarPorArticulo(empleadoSelected.getIdEmpleado(), solicitud.getIdSolicitud());
+            if(incidencia == null)
             {
-                throw new SGPException("Error con la conexión a la base de datos!!!");
+                throw new SGPException("Error al editar la solicitud, favor de contactar al administrador de sistemas");
             }
             
-            switch (solicitud.getAprobada().intValue()) 
+            switch (solicitud.getEstatus().getClave()) 
             {
-                case 2:
+                case "A":
                     throw new SGPException("No se puede modificar el artículo");
-                case 3:
+                case "R":
                     throw new SGPException("No se puede modificar el artículo");
-                case 4:
+                case "C":
                     throw new SGPException("No se puede modificar el artículo");
             }
             
-            for(DetIncidencia auxIncidenciaBuscada : incidenciasBuscada)
-            {
-                if(Objects.equals(auxIncidenciaBuscada.getIdSolArticulo().getIdSolicitud(), solicitud.getIdSolicitud()))
-                {
-                    catEstatusIncidencia = new CatEstatusIncidencia();
-                    catEstatusIncidencia.setIdEstatus(4);
-                    
-                    auxIncidenciaBuscada.setIdEstatus(catEstatusIncidencia);
-                    auxIncidenciaBuscada.setIdSolArticulo(solicitud);
-                    incidenciaDAO.actualizar(auxIncidenciaBuscada);                    
-                }
-            }
-            
-            solicitud.setAprobada((short) 4);
-            solicitudArticulosDAO.actualizar(solicitud);
+            solicitud.setEstatus(EstatusSolicitudBL.estatusCancelado());
+            incidencia.setEstatusIncidencia(EstatusIncidenciaBL.estatusCancelado());
+            incidencia.setSolArticulo(solicitud);
+            incidenciaDAO.actualizar(incidencia);                    
             
             actualizarListas();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Estatus Modificada"));
-            PrimeFaces.current().ajax().update("formActividadesArticulos:tabView:dt-uniformes-sol");
-            PrimeFaces.current().executeScript("PF('dialogCambiarEstatus').hide()");
+            mensaje = "Se actualizo la solicitud correctamente";
+            severity = FacesMessage.SEVERITY_INFO;
         }catch(SGPException e)
         {
+            log.warn("Error al actualizar el registro del articulo del empleado: {}", empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
+            log.warn("EX-0032: ", e);
             mensaje = e.getMessage();
-            severity = FacesMessage.SEVERITY_INFO;
+            severity = FacesMessage.SEVERITY_ERROR;
         }catch(Exception e)
         {
-            log.warn("EX-0032: " + e.getMessage() + ". Error al actualizar el registro del articulo del empleado: " + empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
+            log.warn("Error al actualizar el registro del articulo del empleado: {}", empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
+            log.warn("EX-0032: ", e);
+            mensaje = "Consulte con su administrador de sistemas";
+            severity = FacesMessage.SEVERITY_ERROR;
         }finally
         {
-            if(severity != null)
-            {
-                message = new FacesMessage(severity, titulo, mensaje);
-                FacesContext.getCurrentInstance().addMessage(null, message);
-                PrimeFaces.current().ajax().update(":formActividadesArticulos:messages");
-                PrimeFaces.current().executeScript("PF('dialogCambiarEstatus').hide()");
-            }
+            message = new FacesMessage(severity, titulo, mensaje);
+            FacesContext.getCurrentInstance().addMessage(null, message);
+            PrimeFaces.current().ajax().update(":formActividadesArticulos:messages", ":formActividadesArticulos:tabView:dt-articuloOficinas-sol");
+            PrimeFaces.current().executeScript("PF('dialogCambiarEstatus').hide()");
         }
     }
 
@@ -307,14 +312,6 @@ public class ArticulosOficinaBean implements Serializable {
 
     public void setCantidadSelected(Integer cantidadSelected) {
         this.cantidadSelected = cantidadSelected;
-    }
-
-    public List<DetIncidencia> getIncidenciasBuscada() {
-        return incidenciasBuscada;
-    }
-
-    public void setIncidenciasBuscada(List<DetIncidencia> incidenciasBuscada) {
-        this.incidenciasBuscada = incidenciasBuscada;
     }
     
     public ManageStatus getStatus() {

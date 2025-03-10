@@ -122,7 +122,7 @@ public class PrendasBean implements Serializable {
             }
         } catch (Exception ex) {
             fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: no se cargaron los elementos", null));
-            pf.ajax().update("message");
+            pf.ajax().update("frm:message");
             log.error(ex);
         }
     }
@@ -140,12 +140,12 @@ public class PrendasBean implements Serializable {
         try {
             this.prendadao.guardar(prenda);
         } catch (SGPException ex) {
-            fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error: " + ex.getMessage(), null));
-            pf.ajax().update("message");
+            fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: " + ex.getMessage(), null));
+            pf.ajax().update("frm:message");
             log.error(ex);
         } catch (Exception ex) {
             fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: " + ex.getMessage(), null));
-            pf.ajax().update("message");
+            pf.ajax().update("frm:message");
             log.error(ex);
         }
     }
@@ -154,12 +154,12 @@ public class PrendasBean implements Serializable {
         try {
             this.prendadao.actualizar(prenda);
         } catch (SGPException ex) {
-            fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error: " + ex.getMessage(), null));
-            pf.ajax().update("message");
+            fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: " + ex.getMessage(), null));
+            pf.ajax().update("frm:message");
             log.error(ex);
         } catch (Exception ex) {
             fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: " + ex.getMessage(), null));
-            pf.ajax().update("message");
+            pf.ajax().update("frm:message");
             log.error(ex);
         }
     }
@@ -170,12 +170,12 @@ public class PrendasBean implements Serializable {
             this.borrarImagen();
             this.listar(true);
         } catch (SGPException ex) {
-            fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error: " + ex.getMessage(), null));
-            pf.ajax().update("message");
+            fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: " + ex.getMessage(), null));
+            pf.ajax().update("frm:message");
             log.error(ex);
         } catch (Exception ex) {
             fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: " + ex.getMessage(), null));
-            pf.ajax().update("message");
+            pf.ajax().update("frm:message");
             log.error(ex);
         }
     }
@@ -247,8 +247,8 @@ public class PrendasBean implements Serializable {
                 contenidoimagen = IOUtil.read(this.imagen.getInputStream());
             } catch (IOException ex) {
                 log.error("Hubo algun problema al momento de convertir la imagen a un arreglo de bytes", ex);
-                fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error: problema al momento de guardar la imagen", null));
-                pf.ajax().update("message");
+                fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: problema al momento de guardar la imagen", null));
+                pf.ajax().update("frm:message");
             }
 
             ruta = this.getDireccion() + "prendas/" + nombreimagen + ".jpg";
@@ -258,8 +258,8 @@ public class PrendasBean implements Serializable {
                 fos.flush();
             } catch (IOException ex) {
                 log.error("Hubo algun problema al momento de guardar la imagen en el servidor", ex);
-                fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error: problema al momento de guardar la imagen", null));
-                pf.ajax().update("message");
+                fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: problema al momento de guardar la imagen", null));
+                pf.ajax().update("frm:message");
             }
         } else if (imagen == null && buscado == null) {
 
@@ -277,8 +277,8 @@ public class PrendasBean implements Serializable {
             } catch (IOException ex) {
 
                 log.error("Problema al guardar la imagen por defecto en el servidor", ex);
-                fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error: problema al momento de guardar la imagen", null));
-                pf.ajax().update("message");
+                fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: problema al momento de guardar la imagen", null));
+                pf.ajax().update("frm:message");
 
             }
         }

@@ -20,6 +20,7 @@ import mx.com.ferbo.dao.n.EmpleadoFotoDAO;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetEmpleadoFoto;
 import mx.com.ferbo.model.DetToken;
+import mx.com.ferbo.model.InfDatoEmpresa;
 import mx.com.ferbo.response.RegistryResponse;
 import mx.com.ferbo.util.SGPException;
 
@@ -81,6 +82,14 @@ public class RegistryServlet extends HttpServlet {
                         session.setAttribute("empleado", empleado);
                         session.setAttribute("fotografia", foto);
 			
+                        InfDatoEmpresa empleadoEmpresa = empleado.getDatoEmpresa();
+                        
+                        if(empleadoEmpresa.getFechaBaja() != null && empleado.getActivo() == 0)
+                        {
+                            log.warn("Empleado {} dado de baja del sistema", empleado.getIdEmpleado());
+                            throw new Exception("Acceso Denegado");
+                        }
+                        
 			respuesta = new RegistryResponse();
 			respuesta.setCodigo(0);
 			respuesta.setMensaje(null);
@@ -97,12 +106,19 @@ public class RegistryServlet extends HttpServlet {
                         jsonResponse = prettyGson.toJson(respuesta);
                         httpStatus = HttpServletResponse.SC_OK;
 		} catch (Exception ex) {
-			log.warn("Problema para el registro del empleado: {}", ex.getMessage());
+                        log.warn("Problema para el registro del empleado: {}", ex.getMessage());
 			respuesta = new RegistryResponse();
-			respuesta.setCodigo(1);
-			respuesta.setMensaje("Hubo un error en el proceso de registro.");
-			respuesta.setUrl(null);
-			log.error("Problema para obtener el número de empleado...", ex);
+                        if(ex.getMessage().contains("Acceso Denegado"))
+                        {
+                            respuesta.setCodigo(2);
+                            respuesta.setMensaje("Acceso Denegado");
+                            respuesta.setUrl(null);
+                        }else{
+                            respuesta.setCodigo(1);
+                            respuesta.setMensaje("Hubo un error en el proceso de registro.");
+                            respuesta.setUrl(null);
+                        }
+                        log.error("Problema para obtener el número de empleado...", ex);
 			httpStatus = HttpServletResponse.SC_BAD_REQUEST;
 			prettyGson = new GsonBuilder().setPrettyPrinting().create();
 			jsonResponse = prettyGson.toJson(respuesta);

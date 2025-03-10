@@ -38,7 +38,7 @@ public class CatTipoIncidencia implements Serializable {
     @Column(name = "clave")
     private String clave;
     
-    @OneToMany(mappedBy = "idTipo")
+    @OneToMany(mappedBy = "tipoIncidencia")
     private List<DetIncidencia> detIncidenciaList;
 
     public CatTipoIncidencia() {

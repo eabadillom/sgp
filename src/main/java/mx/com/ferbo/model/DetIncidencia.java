@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -17,6 +18,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 
 /**
  *
@@ -25,48 +27,63 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name = "det_incidencia")
 @NamedQueries({
-    @NamedQuery(name = "DetIncidencia.findAll", query = "SELECT d FROM DetIncidencia d JOIN d.idEmpleado e JOIN d.idTipo ct JOIN d.idEstatus ce LEFT JOIN d.idSolPermiso sp LEFT JOIN d.idSolArticulo sa LEFT JOIN d.idSolPrenda spr LEFT JOIN sp.idTipoSolicitud tp LEFT JOIN sa.idArticulo a LEFT JOIN spr.idPrenda p LEFT JOIN spr.idTalla t ORDER BY d.fechaCap"),
-    @NamedQuery(name = "DetIncidencia.findByIdEmpleado", query = "SELECT d FROM DetIncidencia d JOIN d.idEmpleado e JOIN d.idTipo ct JOIN d.idEstatus ce LEFT JOIN d.idSolPermiso sp JOIN sp.idTipoSolicitud tp WHERE e.idEmpleado = :idEmpleado AND ce.idEstatus = 2"),
-    @NamedQuery(name = "DetIncidencia.findByIdEmpleadoPrenda", query = "SELECT d FROM DetIncidencia d JOIN d.idEmpleado e JOIN d.idTipo ct JOIN d.idEstatus ce INNER JOIN d.idSolPrenda sp WHERE e.idEmpleado = :idEmpleado"),
-    @NamedQuery(name = "DetIncidencia.findByIdEmpleadoArticulo", query = "SELECT d FROM DetIncidencia d JOIN d.idEmpleado e JOIN d.idTipo ct JOIN d.idEstatus ce INNER JOIN d.idSolArticulo sp WHERE e.idEmpleado = :idEmpleado"),
-    @NamedQuery(name = "DetIncidencia.findByIdEmpleadoPermiso", query = "SELECT d FROM DetIncidencia d JOIN d.idEmpleado e JOIN d.idTipo ct JOIN d.idEstatus ce INNER JOIN d.idSolPermiso sp WHERE e.idEmpleado = :idEmpleado")
+    @NamedQuery(name = "DetIncidencia.findAll", query = "SELECT d FROM DetIncidencia d JOIN d.empleado e JOIN d.tipoIncidencia ct JOIN d.estatusIncidencia ce LEFT JOIN d.solPermiso sp LEFT JOIN d.solArticulo sa LEFT JOIN d.solPrenda spr LEFT JOIN sp.tipoSolicitud tp LEFT JOIN sa.articulo a LEFT JOIN spr.prenda p LEFT JOIN spr.talla t ORDER BY d.fechaCap"),
+    @NamedQuery(name = "DetIncidencia.findByIdEmpleado", query = "SELECT d FROM DetIncidencia d JOIN d.empleado e WHERE e.idEmpleado = :idEmpleado"),
+    @NamedQuery(name = "DetIncidencia.findByArticulo", query = "SELECT d FROM DetIncidencia d INNER JOIN d.empleado e INNER JOIN d.solArticulo sa WHERE e.idEmpleado = :idEmpleado AND sa.idSolicitud = :idSolicitud"),
+    @NamedQuery(name = "DetIncidencia.findByPermiso", query = "SELECT d FROM DetIncidencia d INNER JOIN d.empleado e INNER JOIN d.solPermiso sp WHERE e.idEmpleado = :idEmpleado AND sp.idSolicitud = :idSolicitud"),
+    @NamedQuery(name = "DetIncidencia.findByPrenda", query = "SELECT d FROM DetIncidencia d INNER JOIN d.empleado e INNER JOIN d.solPrenda sp WHERE e.idEmpleado = :idEmpleado AND sp.idSolicitud = :idSolicitud"),
+    @NamedQuery(name = "DetIncidencia.findByIdEmpleadoPrenda", query = "SELECT d FROM DetIncidencia d JOIN d.empleado e JOIN d.tipoIncidencia ct JOIN d.estatusIncidencia ce INNER JOIN d.solPrenda sp WHERE e.idEmpleado = :idEmpleado AND ct.clave = 'PR'"),
+    @NamedQuery(name = "DetIncidencia.findByIdEmpleadoArticulo", query = "SELECT d FROM DetIncidencia d JOIN d.empleado e JOIN d.tipoIncidencia ct JOIN d.estatusIncidencia ce INNER JOIN d.solArticulo sp WHERE e.idEmpleado = :idEmpleado AND ct.clave = 'A'"),
+    @NamedQuery(name = "DetIncidencia.findByIdEmpleadoPermiso", query = "SELECT d FROM DetIncidencia d JOIN d.empleado e JOIN d.tipoIncidencia ct JOIN d.estatusIncidencia ce INNER JOIN d.solPermiso sp WHERE e.idEmpleado = :idEmpleado AND (ct.clave = 'PE' OR ct.clave = 'V')")
 })
 public class DetIncidencia implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id_incidencia")
     private Integer idIncidencia;
+    
     @JoinColumn(name = "id_empleado", referencedColumnName = "id_empleado")
     @ManyToOne()
-    private DetEmpleado idEmpleado;
+    private DetEmpleado empleado;
+    
     @JoinColumn(name = "id_empleado_rev", referencedColumnName = "id_empleado")
     @ManyToOne()
-    private DetEmpleado idEmpleadoRev;
+    @Null
+    private DetEmpleado empleadoRev;
+    
     @Column(name = "visible")
     private Short visible;
+    
     @JoinColumn(name = "id_estatus", referencedColumnName = "id_estatus")
     @ManyToOne()
-    private CatEstatusIncidencia idEstatus;
+    private CatEstatusIncidencia estatusIncidencia;
+    
     @JoinColumn(name = "id_tipo", referencedColumnName = "id_tipo")
     @ManyToOne()
-    private CatTipoIncidencia idTipo;
+    private CatTipoIncidencia tipoIncidencia;
+    
     @JoinColumn(name = "id_sol_articulo", referencedColumnName = "id_solicitud")
-    @ManyToOne()
-    private DetSolicitudArticulo idSolArticulo;
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private DetSolicitudArticulo solArticulo;
+    
     @JoinColumn(name = "id_sol_permiso", referencedColumnName = "id_solicitud")
-    @ManyToOne()
-    private DetSolicitudPermiso idSolPermiso;
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private DetSolicitudPermiso solPermiso;
+    
     @JoinColumn(name = "id_sol_prenda", referencedColumnName = "id_solicitud")
-    @ManyToOne()
-    private DetSolicitudPrenda idSolPrenda;
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private DetSolicitudPrenda solPrenda;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "fecha_cap")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaCap;
+    
     @Column(name = "fecha_mod")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaMod;
@@ -86,19 +103,20 @@ public class DetIncidencia implements Serializable {
         this.idIncidencia = idIncidencia;
     }
 
-    public DetEmpleado getIdEmpleado() {
-        return idEmpleado;
+    public DetEmpleado getEmpleado() {
+        return empleado;
     }
 
-    public void setIdEmpleado(DetEmpleado idEmpleado) {
-        this.idEmpleado = idEmpleado;
-    }
-    public DetEmpleado getIdEmpleadoRev() {
-        return idEmpleadoRev;
+    public void setEmpleado(DetEmpleado empleado) {
+        this.empleado = empleado;
     }
 
-    public void setIdEmpleadoRev(DetEmpleado idEmpleadoRev) {
-        this.idEmpleadoRev = idEmpleadoRev;
+    public DetEmpleado getEmpleadoRev() {
+        return empleadoRev;
+    }
+
+    public void setEmpleadoRev(DetEmpleado empleadoRev) {
+        this.empleadoRev = empleadoRev;
     }
 
     public Short getVisible() {
@@ -109,44 +127,44 @@ public class DetIncidencia implements Serializable {
         this.visible = visible;
     }
 
-    public CatEstatusIncidencia getIdEstatus() {
-        return idEstatus;
+    public CatEstatusIncidencia getEstatusIncidencia() {
+        return estatusIncidencia;
     }
 
-    public void setIdEstatus(CatEstatusIncidencia idEstatus) {
-        this.idEstatus = idEstatus;
+    public void setEstatusIncidencia(CatEstatusIncidencia estatusIncidencia) {
+        this.estatusIncidencia = estatusIncidencia;
     }
 
-    public CatTipoIncidencia getIdTipo() {
-        return idTipo;
+    public CatTipoIncidencia getTipoIncidencia() {
+        return tipoIncidencia;
     }
 
-    public void setIdTipo(CatTipoIncidencia idTipo) {
-        this.idTipo = idTipo;
+    public void setTipoIncidencia(CatTipoIncidencia tipoIncidencia) {
+        this.tipoIncidencia = tipoIncidencia;
     }
 
-    public DetSolicitudArticulo getIdSolArticulo() {
-        return idSolArticulo;
+    public DetSolicitudArticulo getSolArticulo() {
+        return solArticulo;
     }
 
-    public void setIdSolArticulo(DetSolicitudArticulo idSolArticulo) {
-        this.idSolArticulo = idSolArticulo;
+    public void setSolArticulo(DetSolicitudArticulo solArticulo) {
+        this.solArticulo = solArticulo;
     }
 
-    public DetSolicitudPermiso getIdSolPermiso() {
-        return idSolPermiso;
+    public DetSolicitudPermiso getSolPermiso() {
+        return solPermiso;
     }
 
-    public void setIdSolPermiso(DetSolicitudPermiso idSolPermiso) {
-        this.idSolPermiso = idSolPermiso;
+    public void setSolPermiso(DetSolicitudPermiso solPermiso) {
+        this.solPermiso = solPermiso;
     }
 
-    public DetSolicitudPrenda getIdSolPrenda() {
-        return idSolPrenda;
+    public DetSolicitudPrenda getSolPrenda() {
+        return solPrenda;
     }
 
-    public void setIdSolPrenda(DetSolicitudPrenda idSolPrenda) {
-        this.idSolPrenda = idSolPrenda;
+    public void setSolPrenda(DetSolicitudPrenda solPrenda) {
+        this.solPrenda = solPrenda;
     }
 
     public Date getFechaCap() {
@@ -189,7 +207,13 @@ public class DetIncidencia implements Serializable {
 
     @Override
     public String toString() {
-        return "DetIncidencia{" + "idIncidencia=" + idIncidencia + ", idEmpleado=" + idEmpleado + ", idEmpleadoRev=" + idEmpleadoRev + ", visible=" + visible + ", idEstatus=" + idEstatus + ", idTipo=" + idTipo + ", idSolArticulo=" + idSolArticulo + ", idSolPermiso=" + idSolPermiso + ", idSolPrenda=" + idSolPrenda + ", fechaCap=" + fechaCap + ", fechaMod=" + fechaMod + '}';
+        return "DetIncidencia[" + "idIncidencia=" + idIncidencia + ", idEmpleado=" + empleado.getIdEmpleado() + 
+                ", idEmpleadoRev=" + ((empleadoRev != null) ? empleadoRev.getIdEmpleado() : "null") + ", visible=" + visible + 
+                ", idEstatus=" + estatusIncidencia.getClave() + ", idTipo=" + tipoIncidencia.getClave() + 
+                ", idSolArticulo=" + ((solArticulo != null) ? solArticulo.getIdSolicitud() : "null") + 
+                ", idSolPermiso=" + ((solPermiso != null) ? solPermiso.getIdSolicitud() : "null") + 
+                ", idSolPrenda=" + ((solPrenda != null) ? solPrenda.getIdSolicitud() : "null") + 
+                ", fechaCap=" + fechaCap + ", fechaMod=" + fechaMod + ']';
     }
     
 }
