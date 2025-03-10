@@ -19,7 +19,8 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "det_vacaciones")
 @NamedQueries({
-	@NamedQuery(name = "DetVacaciones.buscarPeriodoPorEmpleadoFecha", query = "SELECT v FROM DetVacaciones v WHERE v.empleado.idEmpleado = :idEmpleado AND :fecha BETWEEN v.fechainicio AND v.fechafin")
+	@NamedQuery(name = "DetVacaciones.buscarPeriodoPorEmpleadoFecha", query = "SELECT v FROM DetVacaciones v WHERE v.empleado.idEmpleado = :idEmpleado AND :fecha BETWEEN v.fechaInicio AND v.fechaFin"),
+	@NamedQuery(name = "DetVacaciones.buscarPorRfcVencimiento", query = "SELECT v FROM DetVacaciones v WHERE (v.diasTotales - v.diasTomados) > 0 AND v.empleado.datoEmpresa.rfc = :rfc AND v.fechaFin < :fecha ORDER BY v.fechaInicio " )
 })
 public class DetVacaciones implements Serializable{
 
@@ -31,25 +32,25 @@ public class DetVacaciones implements Serializable{
     private Integer idVacaciones;
     
     @Column(name = "fh_inicio")
-    private Date fechainicio;
+    private Date fechaInicio;
     
     @Column(name = "fh_fin")
-    private Date fechafin;
+    private Date fechaFin;
     
     @Column(name = "nu_dias_totales")
-    private Integer diastotales;
+    private Integer diasTotales;
     
     @Column(name = "nu_dias_tomados")
-    private Integer diastomados;
+    private Integer diasTomados;
     
     @Column(name = "st_prima_pagada")
-    private Boolean primapagada;
+    private Boolean primaPagada;
     
     @Column(name = "st_dias_pend_pagados")
-    private Boolean diaspendientespagados;
+    private Boolean diasPendientesPagados;
     
     @Column(name = "nu_dias_pagados")
-    private Integer diaspagados;
+    private Integer diasPagados;
     
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_empleado", referencedColumnName = "id_empleado")
@@ -62,14 +63,14 @@ public class DetVacaciones implements Serializable{
         this.idVacaciones = idVacaciones;
     }
 
-    public DetVacaciones(Integer idVacaciones, Date fechainicio, Date fechafin, Integer diastotales, Integer diastomados, Boolean primapagada, Boolean diaspendientespagados) {
+    public DetVacaciones(Integer idVacaciones, Date fechaInicio, Date fechaFin, Integer diasTotales, Integer diasTomados, Boolean primaPagada, Boolean diasPendientesPagados) {
         this.idVacaciones = idVacaciones;
-        this.fechainicio = fechainicio;
-        this.fechafin = fechafin;
-        this.diastotales = diastotales;
-        this.diastomados = diastomados;
-        this.primapagada = primapagada;
-        this.diaspendientespagados = diaspendientespagados;
+        this.fechaInicio = fechaInicio;
+        this.fechaFin = fechaFin;
+        this.diasTotales = diasTotales;
+        this.diasTomados = diasTomados;
+        this.primaPagada = primaPagada;
+        this.diasPendientesPagados = diasPendientesPagados;
     }
     
     public Integer getIdVacaciones() {
@@ -80,60 +81,60 @@ public class DetVacaciones implements Serializable{
         this.idVacaciones = idVacaciones;
     }
 
-    public Date getFechainicio() {
-        return fechainicio;
+    public Date getFechaInicio() {
+        return fechaInicio;
     }
 
-    public void setFechainicio(Date fechainicio) {
-        this.fechainicio = fechainicio;
+    public void setFechaInicio(Date fechaInicio) {
+        this.fechaInicio = fechaInicio;
     }
 
-    public Date getFechafin() {
-        return fechafin;
+    public Date getFechaFin() {
+        return fechaFin;
     }
 
-    public void setFechafin(Date fechafin) {
-        this.fechafin = fechafin;
+    public void setFechaFin(Date fechafin) {
+        this.fechaFin = fechafin;
     }
 
-    public Integer getDiastotales() {
-        return diastotales;
+    public Integer getDiasTotales() {
+        return diasTotales;
     }
 
-    public void setDiastotales(Integer diastotales) {
-        this.diastotales = diastotales;
+    public void setDiasTotales(Integer diastotales) {
+        this.diasTotales = diastotales;
     }
 
-    public Integer getDiastomados() {
-        return diastomados;
+    public Integer getDiasTomados() {
+        return diasTomados;
     }
 
-    public void setDiastomados(Integer diastomados) {
-        this.diastomados = diastomados;
+    public void setDiasTomados(Integer diastomados) {
+        this.diasTomados = diastomados;
     }
 
-    public Boolean getPrimapagada() {
-        return primapagada;
+    public Boolean getPrimaPagada() {
+        return primaPagada;
     }
 
-    public void setPrimapagada(Boolean primapagada) {
-        this.primapagada = primapagada;
+    public void setPrimaPagada(Boolean primapagada) {
+        this.primaPagada = primapagada;
     }
 
-    public Boolean getDiaspendientespagados() {
-        return diaspendientespagados;
+    public Boolean getDiasPendientesPagados() {
+        return diasPendientesPagados;
     }
 
-    public void setDiaspendientespagados(Boolean diaspendientespagados) {
-        this.diaspendientespagados = diaspendientespagados;
+    public void setDiasPendientesPagados(Boolean diasPendientesPagados) {
+        this.diasPendientesPagados = diasPendientesPagados;
     }
 
-    public Integer getDiaspagados() {
-        return diaspagados;
+    public Integer getDiasPagados() {
+        return diasPagados;
     }
 
-    public void setDiaspagados(Integer diaspagados) {
-        this.diaspagados = diaspagados;
+    public void setDiasPagados(Integer diasPagados) {
+        this.diasPagados = diasPagados;
     }
     
     
@@ -170,7 +171,7 @@ public class DetVacaciones implements Serializable{
 
     @Override
     public String toString() {
-        return "DetVacaciones{" + "idVacaciones=" + idVacaciones + ", fechainicio=" + fechainicio + ", fechafin=" + fechafin + ", diastotales=" + diastotales + ", diastomados=" + diastomados + ", primapagada=" + primapagada + ", diaspendientespagados=" + diaspendientespagados + '}';
+        return "DetVacaciones{" + "idVacaciones=" + idVacaciones + ", fechainicio=" + fechaInicio + ", fechafin=" + fechaFin + ", diastotales=" + diasTotales + ", diastomados=" + diasTomados + ", primapagada=" + primaPagada + ", diaspendientespagados=" + diasPendientesPagados + '}';
     }
    
 }

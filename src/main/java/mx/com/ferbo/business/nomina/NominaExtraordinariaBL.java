@@ -1,14 +1,15 @@
 package mx.com.ferbo.business.nomina;
 
 import java.util.Date;
-import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import mx.com.ferbo.business.percepcion.AbstractPercepcion;
+import mx.com.ferbo.business.percepcion.VacacionesReportadasPercepcion;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetNomina;
-import mx.com.ferbo.model.DetRegistro;
+import mx.com.ferbo.model.DetNominaPercepcion;
 
 public class NominaExtraordinariaBL extends NominaBL {
 	
@@ -32,21 +33,32 @@ public class NominaExtraordinariaBL extends NominaBL {
 		this.fechafinAnio = null;
 	}
 	
-	
-	
-	public DetNomina calcular(DetNomina nomina, ParametrosNomina parametros) {
+	public DetNomina calcular(DetNomina nomina, ParametrosNomina parametros, DetNominaPercepcion percepcion) {
+		String clavePercepcion = null;
 		
 		try {
+			clavePercepcion = percepcion.getClave();
 			
-			
+			switch (clavePercepcion) {
+			case AbstractPercepcion.CVE_VACACIONES_REPORTADAS:
+				calcularVacacionesReportadas(nomina, parametros);
+				break;
+
+			default:
+				log.info("haciendo algo general...");
+				break;
+			}
 			
 		} catch(Exception ex) {
-			
-		} finally {
-			
+			log.error("Problema para calcular la percepcion: {} - {}", percepcion.getClave(), percepcion.getNombre());
 		}
 		
 		return nomina;
+	}
+	
+	public static synchronized void calcularVacacionesReportadas(DetNomina nomina, ParametrosNomina parametros) {
+		VacacionesReportadasPercepcion vacacionesBO = new VacacionesReportadasPercepcion(parametros);
+		vacacionesBO.calcular(nomina);
 	}
 
 }

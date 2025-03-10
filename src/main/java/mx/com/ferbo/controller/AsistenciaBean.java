@@ -590,9 +590,9 @@ public class AsistenciaBean implements Serializable {
             List<DetVacaciones> periodosTmp = vacacionesDAO.obtenerPeriodosPorFecha(empleadoSelected.getIdEmpleado(), DateUtil.now());
 
             for (DetVacaciones periodo : periodosTmp) {
-                if (periodo.getDiastomados() < periodo.getDiastotales() && (periodo.getDiaspagados() + periodo.getDiastomados()) < periodo.getDiastotales()) {
+                if (periodo.getDiasTomados() < periodo.getDiasTotales() && (periodo.getDiasPagados() + periodo.getDiasTomados()) < periodo.getDiasTotales()) {
                     periodos.add(periodo);
-                    this.diasTotalesPermitidos += (periodo.getDiastotales() - periodo.getDiaspagados() - periodo.getDiastomados());
+                    this.diasTotalesPermitidos += (periodo.getDiasTotales() - periodo.getDiasPagados() - periodo.getDiasTomados());
                 }
             }
         } catch (SGPException sgpEx) {
@@ -604,10 +604,10 @@ public class AsistenciaBean implements Serializable {
     public String foramatoPeriodo(DetVacaciones vacacion) {
 
         String sfechaInicio = "";
-        sfechaInicio += vacacion.getFechainicio();
+        sfechaInicio += vacacion.getFechaInicio();
 
         String sfechaFin = "";
-        sfechaFin += vacacion.getFechafin();
+        sfechaFin += vacacion.getFechaFin();
 
         String resultado = "";
 

@@ -21,6 +21,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.LazyCollection;
@@ -166,6 +167,9 @@ public class DetNomina implements Serializable {
     @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "key.nomina", cascade = CascadeType.ALL)
     private List<DetNominaDeduccion> deducciones;
+    
+    @Transient
+    private DetEmpleado empleado;
     
     @Override
 	public int hashCode() {
@@ -444,5 +448,13 @@ public class DetNomina implements Serializable {
 
 	public void setTipoNomina(String tipoNomina) {
 		this.tipoNomina = tipoNomina;
+	}
+
+	public DetEmpleado getEmpleado() {
+		return empleado;
+	}
+
+	public void setEmpleado(DetEmpleado empleado) {
+		this.empleado = empleado;
 	}
 }

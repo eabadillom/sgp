@@ -17,6 +17,8 @@ public class ValesDespensaPercepcion extends AbstractPercepcion implements IPerc
 	
 	private static Logger log = LogManager.getLogger(ValesDespensaPercepcion.class);
 	
+	private BigDecimal siete = new BigDecimal("7.00").setScale(2, BigDecimal.ROUND_HALF_UP);
+	
 	private BigDecimal diasTrabajados = null;
 	private BigDecimal uma = null;
 	private BigDecimal tasaVales = null;
@@ -33,12 +35,16 @@ public class ValesDespensaPercepcion extends AbstractPercepcion implements IPerc
 	@Override
 	public void calcular(DetNomina nomina) {
 		DetNominaPercepcion percepcion = null;
-		BigDecimal vales = null;
+		BigDecimal importeVales = null;
 		
 		CatTipoPercepcion tpValeDespensa = null;
 		DetPercepcionEmpleado percepcionEmpleado = null;
 		
 		Integer index = null;
+		
+		BigDecimal limiteExcento = null;
+		BigDecimal importeGravado = null;
+		BigDecimal importeExento = null;
 		
 		try {
 			index = this.nuevoIndiceDe(nomina.getPercepciones());
@@ -48,33 +54,47 @@ public class ValesDespensaPercepcion extends AbstractPercepcion implements IPerc
     		if(this.diasTrabajados.compareTo(BigDecimal.ZERO) == 0)
     			throw new SGPException("No es posible asignar vales de despensa.");
     		
-    		vales = uma.multiply(tasaVales).setScale(4, BigDecimal.ROUND_HALF_UP);
-    		vales = vales.multiply(diasPeriodo).setScale(2, BigDecimal.ROUND_HALF_UP);
+    		importeVales = uma.multiply(tasaVales).setScale(4, BigDecimal.ROUND_HALF_UP);
+    		importeVales = importeVales.multiply(diasPeriodo).setScale(2, BigDecimal.ROUND_HALF_UP);
     		
 			percepcionEmpleado = this.buscaPercepcionEmpleado(P_VALES_DESPENSA);
     		
     		if(    (percepcionEmpleado != null) 
     			&& (percepcionEmpleado.getActivo())
 				&& (percepcionEmpleado.getImporteMaximo() != null)
-				&& (vales.compareTo(percepcionEmpleado.getImporteMaximo()) > 0) ) {
+				&& (importeVales.compareTo(percepcionEmpleado.getImporteMaximo()) > 0) ) {
     			
-    			vales = percepcionEmpleado.getImporteMaximo();
+    			importeVales = percepcionEmpleado.getImporteMaximo();
+    		}
+    		
+    		/* Los vales de despensa están exentos de ISR hasta por 7 veces la UMA diaria.
+    		 */
+    		limiteExcento = this.uma.multiply(siete).setScale(2, BigDecimal.ROUND_HALF_UP);
+    		
+    		if(importeVales.compareTo(limiteExcento) > 0) {
+    			importeGravado = importeVales.subtract(limiteExcento);
+    			importeExento = limiteExcento.setScale(2, BigDecimal.ROUND_HALF_UP);
+    		} else {
+    			importeGravado = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+    			importeExento = importeVales.setScale(2, BigDecimal.ROUND_HALF_UP);
     		}
     		
 		} catch(SGPException ex){
 			log.warn("No es posible calcular los vales de despensa: {}", ex.getMessage());
-			vales = BigDecimal.ZERO;
+			importeExento = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+			importeGravado = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
     	} catch(Exception ex) {
     		log.error("No es posible calcular los vales de despensa...", ex);
-    		vales = BigDecimal.ZERO;
+    		importeExento = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+			importeGravado = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
     	} finally {
     		percepcion = new DetNominaPercepcion();
     		percepcion.setKey(new DetNominaPercepcionPK(nomina, index));
 			percepcion.setClave(CVE_VALES_DESPENSA);
 			percepcion.setNombre("Despensa");
 			percepcion.setTipoPercepcion(tpValeDespensa);
-			percepcion.setImporteGravado(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
-			percepcion.setImporteExcento(vales);
+			percepcion.setImporteGravado(importeGravado);
+			percepcion.setImporteExcento(importeExento);
 			
 			if(percepcion.getImporteExcento().add(percepcion.getImporteGravado()).compareTo(BigDecimal.ZERO) > 0)
 				nomina.getPercepciones().add(percepcion);

@@ -14,7 +14,7 @@ import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.model.DetVacaciones;
 import mx.com.ferbo.util.SGPException;
 
-public class VacacionesDAO extends BaseDAO {
+public class VacacionesDAO extends BaseDAO<DetVacaciones, Integer> {
     
     private static Logger log = LogManager.getLogger(VacacionesDAO.class);
     
@@ -26,30 +26,6 @@ public class VacacionesDAO extends BaseDAO {
         super(DetVacaciones.class);
     }
     
-    public synchronized DetVacaciones buscarPorId(Integer id) throws SGPException{
-        DetVacaciones vacaciones = null;
-        EntityManager em = null;
-        
-        try{
-            log.info("Inicia el proceso de obtener las vaciones por id");
-            em = super.getEntityManager();
-            em.getTransaction().begin();
-            vacaciones = em.find(DetVacaciones.class, id);
-            em.getTransaction().commit();
-            log.info("Finaliza el proceso de obtener las vacaciones por id");
-        }
-        catch(Exception ex){
-            log.warn("Hubo algn probleman al obtener las vacaciones por id: {}", ex);
-            super.rollback(em);
-            throw new SGPException("Hubo algun problema al obtener las vacaciones");
-        }
-        finally{
-            super.close(em);
-        }
-        
-        return vacaciones;
-    }
-    
     public synchronized List<DetVacaciones> obtenerTodos() throws SGPException{
         List<DetVacaciones> todasvacaciones = null;
         EntityManager  em = null;
@@ -58,7 +34,7 @@ public class VacacionesDAO extends BaseDAO {
             log.info("Inicia el proceso de obtener todas las vacaciones del empleado");
             em = super.getEntityManager();
             em.getTransaction().begin();
-            TypedQuery resultado = em.createQuery("select e from DetVacaciones e", DetVacaciones.class);
+            TypedQuery<DetVacaciones> resultado = em.createQuery("select e from DetVacaciones e", DetVacaciones.class);
             todasvacaciones = resultado.getResultList();
             log.info("Finaliza el proceso de obtener todas las vacaciones del empleado");
         }
@@ -101,7 +77,7 @@ public class VacacionesDAO extends BaseDAO {
         try{
             log.info("Inicia el proceso para obtener los periodos vacacionales en base a una fecha.");
             em = getEntityManager();
-            TypedQuery query = em.createQuery("select v from DetVacaciones v where v.empleado.idEmpleado = :idEmpleado and v.fechafin < :fechaSeleccionada", DetVacaciones.class);
+            TypedQuery<DetVacaciones> query = em.createQuery("select v from DetVacaciones v where v.empleado.idEmpleado = :idEmpleado and v.fechafin < :fechaSeleccionada", DetVacaciones.class);
             query.setParameter("idEmpleado", idEmpleado);
             query.setParameter("fechaSeleccionada", fechaSeleccionada);
             periodos = query.getResultList();
@@ -117,5 +93,25 @@ public class VacacionesDAO extends BaseDAO {
         }
         
         return periodos;
+    }
+    
+    public List<DetVacaciones> obtenerPorRfcFecha(String rfc, Date fecha) {
+    	List<DetVacaciones> modelList = null;
+    	EntityManager em = null;
+    	
+    	try {
+    		em = this.getEntityManager();
+    		modelList = em.createNamedQuery("DetVacaciones.buscarPorRfcVencimiento", DetVacaciones.class)
+    				.setParameter("rfc", rfc)
+    				.setParameter("fecha", fecha)
+    				.getResultList()
+    				;
+    	} catch(Exception ex) {
+    		log.error("Probleam para obtener la lista de periodos vacacionales...", ex);
+    	} finally {
+    		this.close(em);
+    	}
+    	
+    	return modelList;
     }
 }
