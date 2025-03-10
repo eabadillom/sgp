@@ -101,14 +101,17 @@ public class EmpleadoBL {
         try {
             log.info("Inicia el proceso de recalcular el primer periodo vacacional del empleado");
             DetVacaciones primerasVacaciones = empleado.getVacaciones().get(0);
-            int aniotmp = DateUtil.getAnio(empleado.getDatoEmpresa().getFechaIngreso());
-            int mestmp = DateUtil.getMes(empleado.getDatoEmpresa().getFechaIngreso());
-            int diatmp = DateUtil.getDia(empleado.getDatoEmpresa().getFechaIngreso());
-            Date fechaaux = DateUtil.getDate(aniotmp, mestmp, diatmp);
-            primerasVacaciones.setFechainicio(fechaaux);
-            DateUtil.addYear(fechaaux, 1);
-            Date finalaux = DateUtil.addDay(fechaaux, -1);
-            primerasVacaciones.setFechafin(finalaux);
+            int anio= DateUtil.getAnio(empleado.getDatoEmpresa().getFechaIngreso());
+            int mes= DateUtil.getMes(empleado.getDatoEmpresa().getFechaIngreso());
+            int dia= DateUtil.getDia(empleado.getDatoEmpresa().getFechaIngreso());
+            Date nuevaFechaInicio = DateUtil.getDate(anio, mes, dia);
+            DateUtil.setTime(nuevaFechaInicio, 0, 0, 0, 0);
+            Date nuevaFechaFin = DateUtil.getDate(anio, mes, dia);
+            DateUtil.setTime(nuevaFechaFin, 0, 0, 0, 0);
+            nuevaFechaFin = DateUtil.addYear(nuevaFechaFin, 1);
+            nuevaFechaFin = DateUtil.addDay(nuevaFechaFin, -1);
+            primerasVacaciones.setFechainicio(nuevaFechaInicio);
+            primerasVacaciones.setFechafin(nuevaFechaFin);
             VacacionesDAO vacacionesDAO = new VacacionesDAO();
             vacacionesDAO.actualizar(primerasVacaciones);
             log.info("Finaliza el proceso de recalcular el primer periodo vacacional del empleado");

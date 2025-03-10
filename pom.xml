@@ -225,6 +225,11 @@
             <artifactId>jasperreports</artifactId>
             <version>6.19.0</version>
         </dependency>
+        <dependency>
+		     <groupId>org.webjars</groupId>
+		     <artifactId>font-awesome</artifactId>
+		     <version>5.12.0</version>
+		</dependency>
     </dependencies>
     <repositories>
         <repository>
@@ -333,6 +338,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-shade-plugin</artifactId>
+                        <version>3.2.4</version>
                         <configuration>
                             <finalName>${project.name}-theme-${project.version}-jakarta</finalName>
                             <shadedArtifactAttached>false</shadedArtifactAttached>
