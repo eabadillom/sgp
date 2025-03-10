@@ -51,7 +51,7 @@
                 </div>
                 <div class="field">
                     <p:outputLabel for="fHasta" value="Hasta" rendered="#{asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') eq 2}"/>
-                    <p:calendar id="fHasta" value="#{(asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') eq 2) ? asistenciaBean.evento.endDate.minusDays(1) : asistenciaBean.evento.endDate}" pattern="dd/MM/yyyy" disabled="true"
+                    <p:calendar id="fHasta" value="#{(asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') eq 2 or asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') eq 9)}" pattern="dd/MM/yyyy" disabled="true"
                                 timeZone="GMT-6" rendered="#{asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') eq 2}"/>
                     <p:outputLabel for="fHastaHr" value="Hora final" rendered="#{asistenciaBean.evento.dynamicProperties.get('idTipoSolicitud') eq 3}"/>
                     <p:calendar id="fHastaHr" value="#{asistenciaBean.evento.endDate}" pattern="hh:mm:ss a" disabled="true"
@@ -82,24 +82,41 @@
             background: none !important;
         }
         
-        .ferbo-evento-comida{
-            background-color: #f39c12 !important;
+        .ferbo-evento-aTiempo{
+            background-color: #1a695e !important;/*Verde Claro 1*/
         }
-        .ferbo-evento-permiso{
-            background-color: #425691 !important;
+        .ferbo-evento-retardo{
+            background-color: #ff6600 !important;/*Naranja 2*/
+        }
+        .ferbo-evento-falta{
+            background-color: #ff0000 !important;/*Rojo 3*/
+        }
+        .ferbo-evento-justificado{
+            background-color: #49ad56 !important;/*Verde Medio 4*/
+        }
+        .ferbo-evento-asistenciaDiaNoLaboral{
+            background-color: #057914 !important;/*Verde Fuerte 5*/
+        }
+        .ferbo-evento-descanso{
+            background-color: #2a9d8f !important;/*Azul Turquesa 6*/
         }
         .ferbo-evento-vacaciones{
-            /*background-color: #6cccdc !important;*/
-            background-color: #023e8a !important;
+            background-color: #21569b !important;/*Azul Fuerte 7*/
         }
-        .ferbo-evento-incapacidad-c{
-            background-color: #ae1c89 !important;
+        .ferbo-evento-permiso{
+            background-color: #66a1ee !important;/*Azul Claro 8*/
         }
-        .ferbo-evento-incapacidad-l{
-            background-color: #6e1271 !important;
+        .ferbo-evento-incapacidad{
+            background-color: #6254be !important;/*Morado 9*/
         }
-        .descansoObligatorio{
-            background-color: #2a9d8f !important;
+        .ferbo-evento-diaFestivo{
+            background-color: #ff00ea !important;/*Rosa 10*/
+        }
+        .ferbo-evento-comida{
+            background-color: #999191 !important;/*Gris 11*/
+        }
+        .ferbo-evento-none{
+            background-color: #2a9d8f !important;/*Verde Agua Default*/
         }
     </style>
 </ui:composition>

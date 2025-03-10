@@ -30,25 +30,33 @@ import javax.persistence.Table;
 public class CatPrenda implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id_prenda")
     private Integer idPrenda;
+    
     @Column(name = "descripcion")
     private String descripcion;
+    
     @Column(name = "precio", precision = 5, scale = 2)
     private BigDecimal precio;
+    
     @Column(name = "cantidadMax")
     private Integer cantidadMax;
+    
     @Basic(optional = false)
     @Column(name = "activo")
     private short activo;
+    
     @Column(name = "detalle")
     private String detalle;
-    @OneToMany(mappedBy = "idPrenda")
+    
+    @OneToMany(mappedBy = "prendaInv")
     private List<DetInventario> detInventarioList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idPrenda")
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "prenda")
     private List<DetSolicitudPrenda> detSolicitudPrendaList;
 
     public CatPrenda() {

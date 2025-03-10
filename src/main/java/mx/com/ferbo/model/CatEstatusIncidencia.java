@@ -43,7 +43,8 @@ public class CatEstatusIncidencia implements Serializable {
     @Basic(optional = false)
     @Column(name = "activo")
     private short activo;
-    @OneToMany(mappedBy = "idEstatus")
+    
+    @OneToMany(mappedBy = "estatusIncidencia")
     private List<DetIncidencia> detIncidenciaList;
 
     public CatEstatusIncidencia() {

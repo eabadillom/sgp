@@ -120,7 +120,7 @@ public class DetEmpleado implements Serializable {
     @OneToMany(mappedBy = "idEmpleado")
     private List<BitacoraCatPerfil> bitacoraCatPerfilList;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idEmpleadoSol")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "empleadoSol")
     private List<DetSolicitudPermiso> detSolicitudPermisoList;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idEmpleado")
@@ -129,10 +129,10 @@ public class DetEmpleado implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idEmpleado")
     private List<DetRegistro> detRegistroList;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idEmpleadoSol")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "empleadoSol")
     private List<DetSolicitudArticulo> detSolicitudArticuloList;
 
-    @OneToMany(mappedBy = "idEmpleadoRev")
+    @OneToMany(mappedBy = "empleadoRev")
     private List<DetSolicitudPrenda> detSolicitudPrendaList;
 
     @OneToOne(cascade = {CascadeType.ALL})

@@ -15,8 +15,9 @@
                         <p:growl id="messages" showDetail="true" />
                         <p:toolbar styleClass="mb-4">
                             <p:toolbarGroup>
-                                <p:commandButton value="Nuevo" icon="pi pi-plus" actionListener="#{percepcionesBean.crearPercepcionNueva}" update="manage-nomina-content" oncomplete="PF('manageNominaDialog').show()" 
-                                                 styleClass="ui-button-success" style="margin-right: .5rem" />
+                                <p:commandButton value="Agregar" icon="pi pi-plus" class="ui-button-success m-1" styleClass="edit-button" style="margin-right: .5rem" 
+                                                 actionListener="#{percepcionesBean.crearPercepcionNueva}" update="manage-nomina-content" 
+                                                 oncomplete="PF('manageNominaDialog').show()" />
                                 
                             </p:toolbarGroup>
                         </p:toolbar>

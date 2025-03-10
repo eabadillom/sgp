@@ -1,16 +1,11 @@
 package mx.com.ferbo.controller;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
-import java.util.TimeZone;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -22,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultScheduleEvent;
@@ -32,21 +28,23 @@ import org.primefaces.model.ScheduleModel;
 import mx.com.ferbo.business.dianolaboral.DiasDeDescansoObligatorioBL;
 import mx.com.ferbo.business.empleado.EmpleadoBL;
 import mx.com.ferbo.business.empleado.RegistroAsistenciaBL;
+import mx.com.ferbo.business.incidencia.SolicitudPermisoBL;
+import mx.com.ferbo.business.incidencia.CalendarioBL;
+import mx.com.ferbo.business.incapacidad.IncapacidadBL;
+import mx.com.ferbo.business.incidencia.EstatusIncidenciaBL;
+import mx.com.ferbo.business.incidencia.EstatusSolicitudBL;
+
 import mx.com.ferbo.dao.n.IncidenciaDAO;
 import mx.com.ferbo.dao.n.TipoSolicitudDAO;
-import mx.com.ferbo.dao.n.RegistroDAO;
 import mx.com.ferbo.dao.n.SolicitudPermisoDAO;
 import mx.com.ferbo.dao.n.VacacionesDAO;
-import mx.com.ferbo.model.CatDiaNoLaboral;
-import mx.com.ferbo.model.CatEstatusIncidencia;
 import mx.com.ferbo.model.CatTipoIncidencia;
 import mx.com.ferbo.model.CatTipoSolicitud;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetIncidencia;
-import mx.com.ferbo.model.DetRegistro;
 import mx.com.ferbo.model.DetSolicitudPermiso;
 import mx.com.ferbo.model.DetVacaciones;
-import mx.com.ferbo.model.InfDatoEmpresa;
+
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.SGPException;
 import mx.com.ferbo.util.ManageStatus;
@@ -59,23 +57,19 @@ import mx.com.ferbo.util.ManageStatus;
 @ViewScoped
 public class AsistenciaBean implements Serializable {
 
-    private DiasDeDescansoObligatorioBL diasDeDescansoObligatorio;
     private RegistroAsistenciaBL empleadoAsistencia;
     private static final long serialVersionUID = 1L;
     private static Logger log = LogManager.getLogger(AsistenciaBean.class);
 
     private ScheduleModel calendario;
     private ScheduleEvent evento;
-    private final RegistroDAO registroDAO;
     private final SolicitudPermisoDAO solicitudPermisoDAO;
     private final TipoSolicitudDAO tipoSolicitudDAO;
     private DetSolicitudPermiso solicitudSelected;
     private final IncidenciaDAO incidenciaDAO;
-    private final SimpleDateFormat sdf = new SimpleDateFormat("hh:mm aa");
     private Date minDate;
     private Date maxDate;
 
-    private List<DetRegistro> lstRegistros;
     private List<DetSolicitudPermiso> lstSolicitudes;
     private List<CatTipoSolicitud> lstTipoSol;
     private List<DetIncidencia> lstIncidencias;
@@ -85,7 +79,7 @@ public class AsistenciaBean implements Serializable {
     private List<SelectItem> lstTipoSolSelect;
     private Date fechaSeleccionada;
     private List<Date> fechaDatePickerView;
-    private List<Date> diasDeAsueto;
+    private final List<Date> diasDeAsueto;
     private Integer totalDiasTomados;
 
     private VacacionesDAO vacacionesDAO;
@@ -95,31 +89,28 @@ public class AsistenciaBean implements Serializable {
     private DetEmpleado empleadoSelected;
     private DetIncidencia incidencia;
     private CatTipoIncidencia catTipoIncidencia;
-    private CatEstatusIncidencia catEstatusIncidencia;
     private final HttpServletRequest httpServletRequest;
     private ManageStatus status;
     private final String permisos = "P";
     private final String vacaciones = "V";
-
+    
     @SuppressWarnings("OverridableMethodCallInConstructor")
     public AsistenciaBean() {
+        this.diasDeAsueto = DiasDeDescansoObligatorioBL.diasDeAsueto();
         calendario = new DefaultScheduleModel();
-        registroDAO = new RegistroDAO();
         solicitudPermisoDAO = new SolicitudPermisoDAO();
         tipoSolicitudDAO = new TipoSolicitudDAO();
         incidenciaDAO = new IncidenciaDAO();
         vacacionesDAO = new VacacionesDAO();
         inicializaSolicitud();
-        sdf.setTimeZone(TimeZone.getTimeZone(ZoneId.of("GMT-6").normalized()));
         lstTipoSolSelect = new ArrayList<>();
         this.fechaDatePickerView = new ArrayList<>();
 
         empleadoSelected = new DetEmpleado();
         httpServletRequest = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         this.empleadoSelected = (DetEmpleado) httpServletRequest.getSession(true).getAttribute("empleado");
-        invalidDays = this.obtenerDiasSeleccionados(empleadoSelected.getDatoEmpresa());
+        invalidDays = SolicitudPermisoBL.obtenerDiasSeleccionados(empleadoSelected.getDatoEmpresa());
         this.empleadoAsistencia = new RegistroAsistenciaBL();
-        this.diasDeDescansoObligatorio = new DiasDeDescansoObligatorioBL();
     }
 
     @PostConstruct
@@ -135,115 +126,23 @@ public class AsistenciaBean implements Serializable {
         status = new ManageStatus();
         inicializaRangoFechas();
         actualizarListas();
-        this.diasDeAsueto = diasDeDescansoObligatorio.getDiasAsueto();
-        generaEventosRegistros(lstRegistros);
-        generaEventosIncidencias(lstIncidencias);
-        generaEventosDiasDescansoObligatorio(this.diasDeDescansoObligatorio.getDiasNoLaboralSelected());
+        calendario = CalendarioBL.crearCalendario(empleadoSelected);
         this.minDate = DateUtil.now();
+    }
+    
+    public void actualizarSolicitudPermiso() {
+        lstSolicitudes = solicitudPermisoDAO.buscarPorIdEmpleado(empleadoSelected.getIdEmpleado());
+        lstTipoSol = tipoSolicitudDAO.buscarPermisosyVacaciones(permisos, vacaciones);
+    }
+    
+    public void actualizarListas() {
+        lstIncidencias = incidenciaDAO.buscarPorIdEmpleadoPermiso(empleadoSelected.getIdEmpleado());
     }
 
     public void inicializaRangoFechas() {
         lstRangoRegistro = new ArrayList<>();
     }
-
-    private void generaEventosRegistros(List<DetRegistro> registros) {
-        int retardosSemana = 0;
-        int diaInicioSemana = 5; //JUEVES
-        int diaInicioRegistros;
-        for (DetRegistro registro : registros) {
-
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(registro.getFechaEntrada());
-
-            if (cal.get(Calendar.DAY_OF_WEEK) == diaInicioSemana) {
-                retardosSemana = 0;
-                diaInicioRegistros = diaInicioSemana;
-            } else {
-                diaInicioRegistros = cal.get(Calendar.DAY_OF_WEEK);
-            }
-
-            if (registro.getIdEstatus().getIdEstatus() == 2) {
-                retardosSemana += 1;
-            }
-
-            //Evento de entrada
-            DefaultScheduleEvent eventoEntrada = DefaultScheduleEvent.builder()
-                    .title("Entrada " + sdf.format(registro.getFechaEntrada()))
-                    .startDate(convertirDateToLocalDateTime(registro.getFechaEntrada()))
-                    .endDate(convertirDateToLocalDateTime(registro.getFechaEntrada()))
-                    .description(null)
-                    .dynamicProperty("estatus", registro.getIdEstatus().getDescripcion())
-                    .build();
-
-            calendario.addEvent(eventoEntrada);
-
-            //Genera horario de comida
-            DefaultScheduleEvent eventoComida = DefaultScheduleEvent.builder()
-                    .title("Comida\n 2:00 PM - 03:00 PM")
-                    .startDate(convertirDateToLocalDateTime(generaHorarioComida(true, registro.getFechaEntrada())))
-                    .endDate(convertirDateToLocalDateTime(generaHorarioComida(false, registro.getFechaEntrada())))
-                    .description(null)
-                    .styleClass(estiloByTipo(0))
-                    .dynamicProperty("tipoSolicitud", "Horario de comida")
-                    .dynamicProperty("idTipoSolicitud", 3)
-                    .build();
-            calendario.addEvent(eventoComida);
-
-            //Evento de salida
-            if (registro.getFechaSalida() != null) {
-                DefaultScheduleEvent eventoSalida = DefaultScheduleEvent.builder()
-                        .title("Salida " + sdf.format(registro.getFechaSalida()))
-                        .startDate(convertirDateToLocalDateTime(registro.getFechaSalida()))
-                        .endDate(convertirDateToLocalDateTime(registro.getFechaSalida()))
-                        .description(sdf.format(registro.getFechaSalida()))
-                        .dynamicProperty("estatus", registro.getIdEstatus().getDescripcion())
-                        .build();
-                calendario.addEvent(eventoSalida);
-            }
-        }
-
-    }
-
-    private void generaEventosIncidencias(List<DetIncidencia> incidencias) {
-        for (DetIncidencia incidencia : incidencias) {
-            LocalDateTime localStartDate = DateUtil.toLocalDateTime(incidencia.getIdSolPermiso().getFechaInicio());
-            LocalDateTime localEndDate = DateUtil.toLocalDateTime(incidencia.getIdSolPermiso().getFechaFin());
-            DefaultScheduleEvent eventoEntrada = DefaultScheduleEvent.builder()
-                    .title(incidencia.getIdSolPermiso().getIdTipoSolicitud().getDescripcion())
-                    .startDate(localStartDate)
-                    .endDate((incidencia.getIdSolPermiso().getIdTipoSolicitud().getIdTipoSolicitud() == 2) ? localEndDate.plusDays(1) : localEndDate)
-                    .allDay(true)
-                    .description(null)
-                    .styleClass(estiloByTipo(incidencia.getIdSolPermiso().getIdTipoSolicitud().getIdTipoSolicitud()))
-                    .dynamicProperty("tipoSolicitud", incidencia.getIdSolPermiso().getIdTipoSolicitud().getDescripcion())
-                    .dynamicProperty("idTipoSolicitud", incidencia.getIdSolPermiso().getIdTipoSolicitud().getIdTipoSolicitud())
-                    .build();
-            calendario.addEvent(eventoEntrada);
-        }
-    }
-
-    private void generaEventosDiasDescansoObligatorio(List<CatDiaNoLaboral> diasNoLaboral) {
-        for (CatDiaNoLaboral auxDiasNoLaboral : diasNoLaboral) {
-            DefaultScheduleEvent eventoEntrada = DefaultScheduleEvent.builder()
-                    .title(auxDiasNoLaboral.getDescripcion())
-                    .startDate(DateUtil.toLocalDateTime(auxDiasNoLaboral.getFecha()))
-                    .endDate(DateUtil.toLocalDateTime(auxDiasNoLaboral.getFecha()))
-                    .allDay(true)
-                    .description(auxDiasNoLaboral.getDescripcion())
-                    .styleClass(estiloByTipo(5))
-                    .dynamicProperty("tipoSolicitud", "Descanso Obligatorio")
-                    .dynamicProperty("idTipoSolicitud", 5)
-                    .build();
-            calendario.addEvent(eventoEntrada);
-        }
-    }
-
-    public LocalDateTime convertirDateToLocalDateTime(Date fecha) {
-        return fecha.toInstant()
-                .atZone(ZoneId.of("GMT-6"))
-                .toLocalDateTime();
-    }
-
+    
     public void eventoSeleccionado(SelectEvent<ScheduleEvent> selectEvent) {
         evento = selectEvent.getObject();
     }
@@ -252,74 +151,13 @@ public class AsistenciaBean implements Serializable {
         evento = DefaultScheduleEvent.builder().startDate(selectEvent.getObject()).endDate(selectEvent.getObject()).build();
     }
 
-    private String findBgColor(Integer idEstatus) {
-        String color;
-        switch (idEstatus) {
-            case 1:
-                color = "#689F38";
-                break;
-            case 2:
-                color = "#023e8a";
-                break;
-            case 3:
-                color = "#ef6262";
-                break;
-            case 4:
-                color = "#e9c46a";
-                break;
-            case 5:
-                color = "#2a9d8f";
-                break;
-            default:
-                color = "#00000000";
-                break;
-        }
-        return color;
-    }
-
-    private String estiloByTipo(int idTipoEvento) {
-        String estilo;
-        switch (idTipoEvento) {
-            case 1:
-                estilo = "ferbo-evento-permiso";
-                break;
-            case 2:
-                estilo = "ferbo-evento-vacaciones";
-                break;
-            case 3:
-                estilo = "ferbo-evento-incapacidad-c";
-                break;
-            case 4:
-                estilo = "ferbo-evento-incapacidad-l";
-                break;
-            case 5:
-                estilo = "ferbo-evento-descansoObligatorio";
-                break;
-            default:
-                estilo = "ferbo-evento-comida";
-                break;
-        }
-        return estilo;
-    }
-
-    public void actualizarSolicitudPermiso() {
-        lstSolicitudes = solicitudPermisoDAO.buscarPorTipoSolicitud(empleadoSelected.getIdEmpleado(), permisos, vacaciones);
-        lstTipoSol = tipoSolicitudDAO.buscarPermisosyVacaciones(permisos, vacaciones);
-    }
-
-    public void actualizarListas() {
-        lstRegistros = registroDAO.consultaRegistrosPorIdEmp(empleadoSelected.getIdEmpleado());
-        lstIncidencias = incidenciaDAO.buscarPorIdEmpleado(empleadoSelected.getIdEmpleado());
-        incidenciasBuscada = incidenciaDAO.buscarPorIdEmpleadoPermiso(empleadoSelected.getIdEmpleado());
-    }
-
     public void guardaSolicitud() {
         FacesMessage message = null;
         FacesMessage.Severity severity = null;
         String mensaje = null;
         String titulo = "Solicitud";
         try {
-            if (solicitudSelected.getIdTipoSolicitud() == null) {
+            if (solicitudSelected.getTipoSolicitud() == null) {
                 throw new SGPException("Error. Debes selecionar una solicitud");
             }
 
@@ -340,7 +178,7 @@ public class AsistenciaBean implements Serializable {
                 solicitudSelected.setFechaFin(lstRangoRegistro.size() > 1 ? lstRangoRegistro.get(1) : lstRangoRegistro.get(0));
 
                 List<Date> fechas = DateUtil.generarArreglosFechas(lstRangoRegistro.get(0), lstRangoRegistro.get(1));
-                List<Date> fechasSinDiasFeriados = empleadoAsistencia.diasVacacionesSolicitados(fechas, this.diasDeAsueto, empleadoSelected.getDatoEmpresa());
+                List<Date> fechasSinDiasFeriados = DateUtil.diasVacacionesSolicitados(fechas, this.diasDeAsueto, empleadoSelected.getDatoEmpresa());
 
                 if (fechasSinDiasFeriados.size() > this.diasTotalesPermitidos) {
                     throw new SGPException("El numero de dias seleccionados es mayor a los permitidos");
@@ -350,69 +188,61 @@ public class AsistenciaBean implements Serializable {
             if (solicitudSelected.getFechaInicio() == null || solicitudSelected.getFechaFin() == null) {
                 throw new SGPException("Error. Debes seleccionar una fecha");
             }
-
-            validarSolicitud(empleadoSelected.getIdEmpleado(), solicitudSelected.getFechaInicio(), solicitudSelected.getFechaFin());
-
-            /*InfDatoEmpresa empleadoEmpresa = empleadoSelected.getDatoEmpresa();
-            Integer horaEntrada = DateUtil.getHora(empleadoEmpresa.getHoraEntrada());
-            boolean existeRegistro = this.empleadoAsistencia.validarFechasVacaciones(empleadoSelected.getIdEmpleado(), solicitudSelected.getFechaInicio(), solicitudSelected.getFechaFin(), horaEntrada);
+            
+            solicitudSelected.setEstatus(EstatusSolicitudBL.estatusEnviado());
+            solicitudSelected.setFechaCap(new Date());
+            solicitudSelected.setEmpleadoSol(empleadoSelected);
+            
+            SolicitudPermisoBL.validarSolicitudPermiso(solicitudSelected);
+            IncapacidadBL.validarRegistrosIncapacidades(empleadoSelected, solicitudSelected.getFechaInicio(), solicitudSelected.getFechaFin());
+            /*
+            boolean existeRegistro = SolicitudPermisoBL.validarFechasVacaciones(empleadoSelected, solicitudSelected.getFechaInicio(), solicitudSelected.getFechaFin());
             if(existeRegistro == true)
             {
                 log.info("Existe por lo menos un registro de vacaciones del empleado {}", empleadoSelected.getNumEmpleado());
                 throw new SGPException("Error. El periodo que solicitaste ya se encuentra aceptado");
             }*/
-            solicitudSelected.setAprobada((short) 1);
-            solicitudSelected.setFechaCap(new Date());
-            solicitudSelected.setIdEmpleadoSol(new DetEmpleado(empleadoSelected.getIdEmpleado()));
-            solicitudPermisoDAO.guardar(solicitudSelected);
-
+            
             catTipoIncidencia = new CatTipoIncidencia();
-            switch (solicitudSelected.getIdTipoSolicitud().getIdTipoSolicitud()) {
+            switch (solicitudSelected.getTipoSolicitud().getClave()) {
                 // Tipo Permisos
-                case 1:
+                case "P":
                     catTipoIncidencia.setIdTipo(1);
                     break;
                 // Tipo Vacaciones
-                case 2:
+                case "V":
                     catTipoIncidencia.setIdTipo(2);
-                    break;
-                // Incapacidad Corta
-                case 3:
-                    catTipoIncidencia.setIdTipo(1);
-                    break;
-                // Incapacidad Larga
-                case 4:
-                    catTipoIncidencia.setIdTipo(1);
                     break;
                 default:
                     log.warn("EX-0023: Error al seleccionar opción");
             }
-            catEstatusIncidencia = new CatEstatusIncidencia();
-            catEstatusIncidencia.setIdEstatus(1);
-
+            
             incidencia = new DetIncidencia();
-            incidencia.setIdTipo(catTipoIncidencia);
-            incidencia.setIdEmpleado(empleadoSelected);
-            incidencia.setIdEstatus(catEstatusIncidencia);
+            incidencia.setTipoIncidencia(catTipoIncidencia);
+            incidencia.setEmpleado(empleadoSelected);
+            incidencia.setEstatusIncidencia(EstatusIncidenciaBL.estatusEnviado());
             incidencia.setVisible((short) 1);
-            incidencia.setIdSolPermiso(solicitudSelected);
+            incidencia.setSolPermiso(solicitudSelected);
             incidencia.setFechaCap(new Date());
 
             incidenciaDAO.guardar(incidencia);
-
-            actualizarSolicitudPermiso();
+            
             mensaje = "Se guardo correctamente";
             severity = FacesMessage.SEVERITY_INFO;
             PrimeFaces.current().ajax().update("formActividades:tabView:dtSolicitudes");
         } catch (SGPException ex) {
+            log.warn("Error al registrar la solicitud de permiso el empleado: {}", empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
+            log.warn("EX-0022: ", ex);
             mensaje = ex.getMessage();
             severity = FacesMessage.SEVERITY_ERROR;
-            log.warn("EX-0022: " + ex.getMessage() + ". Error al registrar la solicitud de permiso el empleado: " + empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
         } catch (NullPointerException ex) {
-            mensaje = "Error al registrar la solicitud, no terminaste de capturar los campos";
+            log.error("Error al registrar la solicitud de permiso del empleado {}", empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
+            log.error("EX-0033: ", ex);
+            mensaje = "Consulte al administrador de sistemas";
             severity = FacesMessage.SEVERITY_ERROR;
-            log.error("Error al registrar la solicitud de permiso del empleado: {}", ex);
         } finally {
+            actualizarListas();
+            actualizarSolicitudPermiso();
             message = new FacesMessage(severity, titulo, mensaje);
             FacesContext.getCurrentInstance().addMessage(null, message);
             inicializaSolicitud();
@@ -426,48 +256,42 @@ public class AsistenciaBean implements Serializable {
     }
 
     public void actualizarSolicitud() {
-        actualizarListas();
         FacesMessage message = null;
         FacesMessage.Severity severity = null;
         String mensaje = null;
         String titulo = "Solicitud";
         try {
-            if (incidenciasBuscada == null) {
-                throw new SGPException("Error con la conexión a la base de datos!!!");
-            }
-
-            switch ((int) solicitudSelected.getAprobada()) {
-                case 2:
+            switch (solicitudSelected.getEstatus().getClave()) {
+                case "A":
                     throw new SGPException("No se puede modificar el permiso");
-                case 3:
+                case "R":
                     throw new SGPException("No se puede modificar el permiso");
-                case 4:
+                case "C":
                     throw new SGPException("No se puede modificar el permiso");
             }
-
-            for (DetIncidencia auxIncidenciaBuscada : incidenciasBuscada) {
-                if (Objects.equals(auxIncidenciaBuscada.getIdSolPermiso().getIdSolicitud(), solicitudSelected.getIdSolicitud())) {
-                    catEstatusIncidencia = new CatEstatusIncidencia();
-                    catEstatusIncidencia.setIdEstatus(4);
-
-                    auxIncidenciaBuscada.setIdEstatus(catEstatusIncidencia);
-                    auxIncidenciaBuscada.setIdSolPermiso(solicitudSelected);
-                    incidenciaDAO.eliminar(auxIncidenciaBuscada);
-                }
-            }
-            solicitudSelected.setAprobada((short) 4);
-            solicitudPermisoDAO.actualizar(solicitudSelected);
-
-            actualizarListas();
+            
+            solicitudSelected.setEstatus(EstatusSolicitudBL.estatusCancelado());
+            incidencia = this.incidenciaDAO.buscarPorPermiso(empleadoSelected.getIdEmpleado(), solicitudSelected.getIdSolicitud());
+            incidencia.setEstatusIncidencia(EstatusIncidenciaBL.estatusCancelado());
+            incidencia.setSolPermiso(solicitudSelected);
+            incidenciaDAO.actualizar(incidencia);
+            
             mensaje = "Se modifico correctamente";
             severity = FacesMessage.SEVERITY_INFO;
             PrimeFaces.current().ajax().update("formActividades:tabView:dtSolicitudes");
         } catch (SGPException e) {
+            log.warn("Error al actualizar el registro del permiso del empleado: {}", empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
+            log.warn(e);
             mensaje = e.getMessage();
             severity = FacesMessage.SEVERITY_ERROR;
         } catch (Exception e) {
-            log.warn("EX-0032: " + e.getMessage() + ". Error al actualizar el registro del permiso del empleado: " + empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
+            log.warn("Error al actualizar el registro del permiso del empleado: {}", empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
+            log.warn("EX-0032: ", e);
+            mensaje = "Consulte al administrador de sistemas";
+            severity = FacesMessage.SEVERITY_ERROR;
         } finally {
+            actualizarListas();
+            actualizarSolicitudPermiso();
             message = new FacesMessage(severity, titulo, mensaje);
             FacesContext.getCurrentInstance().addMessage(null, message);
             PrimeFaces.current().ajax().update(":formActividades:messages");
@@ -484,7 +308,7 @@ public class AsistenciaBean implements Serializable {
 
         try {
             
-            this.diasDeDescansoObligatorio.diasDescansoEstanActualizados(); 
+            DiasDeDescansoObligatorioBL.diasDescansoEstanActualizados();
             EmpleadoBL.empleadoTieneDiasLaborales(empleadoSelected);
             
             inicializaSolicitud();
@@ -502,7 +326,7 @@ public class AsistenciaBean implements Serializable {
     public void inicializaSolicitud() {
         solicitudSelected = new DetSolicitudPermiso();
         CatTipoSolicitud tipoSolicitud = new CatTipoSolicitud();
-        solicitudSelected.setIdTipoSolicitud(tipoSolicitud);
+        solicitudSelected.setTipoSolicitud(tipoSolicitud);
         this.inicializaRangoFechas();
     }
 
@@ -514,75 +338,22 @@ public class AsistenciaBean implements Serializable {
     public void actualizaCalendarioSeleccionado() {
         List<Date> fechas = null;
         this.totalDiasTomados = null;
-        switch ((int) solicitudSelected.getIdTipoSolicitud().getIdTipoSolicitud()) {
-            case 1://PERMISO
-            case 3://INCAPACIDAD CORTA
+        switch (solicitudSelected.getTipoSolicitud().getClave()) 
+        {
+            case "P"://PERMISO
                 fechas = DateUtil.generarArreglosFechas(solicitudSelected.getFechaInicio(), solicitudSelected.getFechaFin());
-                this.totalDiasTomados = empleadoAsistencia.diasVacacionesSolicitados(fechas, this.diasDeAsueto, empleadoSelected.getDatoEmpresa()).size();
+                this.totalDiasTomados = DateUtil.diasVacacionesSolicitados(fechas, this.diasDeAsueto, this.empleadoSelected.getDatoEmpresa()).size();
                 this.fechaDatePickerView.addAll(fechas);
                 break;
-            case 2://VACACIONES
-            case 4://INCAPACIDAD LARGA
+            case "V"://VACACIONES
                 fechas = DateUtil.generarArreglosFechas(solicitudSelected.getFechaInicio(), solicitudSelected.getFechaFin());
-                this.totalDiasTomados = empleadoAsistencia.diasVacacionesSolicitados(fechas, this.diasDeAsueto, empleadoSelected.getDatoEmpresa()).size();
+                this.totalDiasTomados = DateUtil.diasVacacionesSolicitados(fechas, this.diasDeAsueto, this.empleadoSelected.getDatoEmpresa()).size();
                 this.fechaDatePickerView = Arrays.asList(solicitudSelected.getFechaInicio(), solicitudSelected.getFechaFin());
                 break;
         }
         PrimeFaces.current().executeScript("PF('dialogVacacionesView').show();");
     }
-
-    private Date generaHorarioComida(boolean inicio, Date fecha) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(fecha);
-        if (inicio) {
-            calendar.set(Calendar.HOUR_OF_DAY, 15);
-            calendar.set(Calendar.MINUTE, 0);
-            calendar.set(Calendar.SECOND, 0);
-        } else {
-            calendar.set(Calendar.HOUR_OF_DAY, 16);
-            calendar.set(Calendar.MINUTE, 0);
-            calendar.set(Calendar.SECOND, 0);
-        }
-        return calendar.getTime();
-    }
-
-    public List<Integer> obtenerDiasSeleccionados(InfDatoEmpresa empleadoEmpresa) {
-        List<Integer> diasSeleccionados = new ArrayList<>();
-
-        if (empleadoEmpresa.getDiaLunes() != true) {
-            diasSeleccionados.add(1);
-        }
-        if (empleadoEmpresa.getDiaMartes() != true) {
-            diasSeleccionados.add(2);
-        }
-        if (empleadoEmpresa.getDiaMiercoles() != true) {
-            diasSeleccionados.add(3);
-        }
-        if (empleadoEmpresa.getDiaJueves() != true) {
-            diasSeleccionados.add(4);
-        }
-        if (empleadoEmpresa.getDiaViernes() != true) {
-            diasSeleccionados.add(5);
-        }
-        if (empleadoEmpresa.getDiaSabado() != true) {
-            diasSeleccionados.add(6);
-        }
-        if (empleadoEmpresa.getDiaDomingo() != true) {
-            diasSeleccionados.add(0);
-        }
-        log.trace("Dias de bloqueo: {}", diasSeleccionados.toString());
-        return diasSeleccionados;
-    }
-
-    public void validarSolicitud(Integer idEmpleado, Date fechaInicio, Date fechaFin) throws SGPException {
-        List<DetSolicitudPermiso> solicitudes = this.solicitudPermisoDAO.buscarPorIdEmpleadoFechasClave(idEmpleado, fechaInicio, fechaFin, permisos, vacaciones);
-        log.trace("Solicitudes: {}", solicitudes.toString());
-
-        if (!solicitudes.isEmpty()) {
-            throw new SGPException("Error. El periodo que solicitaste ya se encuentra registrado");
-        }
-    }
-
+    
     public List<DetVacaciones> periodosPorFechaActual() {
         List<DetVacaciones> periodos = new ArrayList<DetVacaciones>();
         this.diasTotalesPermitidos = 0;
@@ -601,7 +372,7 @@ public class AsistenciaBean implements Serializable {
         return periodos;
     }
 
-    public String foramatoPeriodo(DetVacaciones vacacion) {
+    public String formatoPeriodo(DetVacaciones vacacion) {
 
         String sfechaInicio = "";
         sfechaInicio += vacacion.getFechainicio();
@@ -624,7 +395,7 @@ public class AsistenciaBean implements Serializable {
 
         return this.maxDate;
     }
-
+    
     //<editor-fold defaultstate="collapsed" desc="Getters&Setters">
     public ScheduleModel getCalendario() {
         return calendario;
@@ -706,10 +477,10 @@ public class AsistenciaBean implements Serializable {
         return status;
     }
 
-    public DiasDeDescansoObligatorioBL getDiasDeDescansoObligatorio() {
-        return diasDeDescansoObligatorio;
+    public List<Date> getDiasDeAsueto() {
+        return diasDeAsueto;
     }
-
+    
     public RegistroAsistenciaBL getEmpleadoAsistencia() {
         return empleadoAsistencia;
     }

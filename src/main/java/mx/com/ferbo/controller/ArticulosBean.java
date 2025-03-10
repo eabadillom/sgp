@@ -118,7 +118,7 @@ public class ArticulosBean implements Serializable {
             }
         } catch (Exception ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: no se cargaron los elementos", null));
-            PrimeFaces.current().ajax().update("message");
+            PrimeFaces.current().ajax().update("frm:message");
             log.error(ex);
         }
     }
@@ -136,12 +136,12 @@ public class ArticulosBean implements Serializable {
         try {
             this.articulodao.guardar(articulo);
         } catch (SGPException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error: " + ex.getMessage(), null));
-            PrimeFaces.current().ajax().update("message");
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: " + ex.getMessage(), null));
+            PrimeFaces.current().ajax().update("frm:message");
             log.error(ex);
         } catch (Exception ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: " + ex.getMessage(), null));
-            PrimeFaces.current().ajax().update("message");
+            PrimeFaces.current().ajax().update("frm:message");
             log.error(ex);
         }
     }
@@ -150,12 +150,12 @@ public class ArticulosBean implements Serializable {
         try {
             this.articulodao.actualizar(articulo);
         } catch (SGPException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error: " + ex.getMessage(), null));
-            PrimeFaces.current().ajax().update("message");
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: " + ex.getMessage(), null));
+            PrimeFaces.current().ajax().update("frm:message");
             log.error(ex);
         } catch (Exception ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: " + ex.getMessage(), null));
-            PrimeFaces.current().ajax().update("message");
+            PrimeFaces.current().ajax().update("frm:message");
             log.error(ex);
         }
     }
@@ -166,12 +166,12 @@ public class ArticulosBean implements Serializable {
             this.borrarImagen();
             this.listar(true);
         } catch (SGPException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error: " + ex.getMessage(), null));
-            PrimeFaces.current().ajax().update("message");
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: " + ex.getMessage(), null));
+            PrimeFaces.current().ajax().update("frm:message");
             log.error(ex);
         } catch (Exception ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: " + ex.getMessage(), null));
-            PrimeFaces.current().ajax().update("message");
+            PrimeFaces.current().ajax().update("frm:message");
             log.error(ex);
         }
     }
@@ -243,8 +243,8 @@ public class ArticulosBean implements Serializable {
                 contenidoimagen = IOUtil.read(this.imagen.getInputStream());
             } catch (IOException ex) {
                 log.error("Hubo algun problema al momento de convertir la imagen a un arreglo de bytes", ex);
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error: problema al momento de guardar la imagen", null));
-                PrimeFaces.current().ajax().update("message");
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: problema al momento de guardar la imagen", null));
+                PrimeFaces.current().ajax().update("frm:message");
             }
 
             ruta = this.getDireccion() + "articulos/" + nombreimagen + ".jpg";
@@ -254,8 +254,8 @@ public class ArticulosBean implements Serializable {
                 fos.flush();
             } catch (IOException ex) {
                 log.error("Hubo algun problema al momento de guardar la imagen en el servidor", ex);
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error: problema al momento de guardar la imagen", null));
-                PrimeFaces.current().ajax().update("message");
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: problema al momento de guardar la imagen", null));
+                PrimeFaces.current().ajax().update("frm:message");
             }
         } else if (imagen == null && buscado == null) {
 
@@ -272,8 +272,8 @@ public class ArticulosBean implements Serializable {
                 Files.copy(source, destination);
             } catch (IOException ex) {
                 log.error("Problema al guardar la imagen por defecto en el servidor", ex);
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Error: problema al momento de guardar la imagen", null));
-                PrimeFaces.current().ajax().update("message");
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: problema al momento de guardar la imagen", null));
+                PrimeFaces.current().ajax().update("frm:message");
             }
         }
         this.listar(true);

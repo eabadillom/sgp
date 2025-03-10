@@ -35,14 +35,14 @@ public class IncidenciaDAO extends BaseDAO<DetIncidencia, Integer> {
                     .getResultList();
 
             for (DetIncidencia aux : modelList) {
-                if (aux.getIdSolPermiso() != null) {
-                    log.trace("DetSolicitudPermiso: {}", aux.getIdSolPermiso().toString());
+                if (aux.getSolPermiso() != null) {
+                    log.trace("DetSolicitudPermiso: {}", aux.getSolPermiso().toString());
                 }
-                if (aux.getIdSolPrenda() != null) {
-                    log.trace("DetSolicitudPrenda: {}", aux.getIdSolPrenda().toString());
+                if (aux.getSolPrenda() != null) {
+                    log.trace("DetSolicitudPrenda: {}", aux.getSolPrenda().toString());
                 }
-                if (aux.getIdSolArticulo() != null) {
-                    log.trace("DetSolicitudArticulo: {}", aux.getIdSolArticulo().toString());
+                if (aux.getSolArticulo() != null) {
+                    log.trace("DetSolicitudArticulo: {}", aux.getSolArticulo().toString());
                 }
             }
 
@@ -90,6 +90,66 @@ public class IncidenciaDAO extends BaseDAO<DetIncidencia, Integer> {
 
         return modelList;
     }
+    
+    public DetIncidencia buscarPorArticulo(Integer idEmpleado, Integer idSolicitudArticulo)
+    {
+        DetIncidencia model = null;
+        EntityManager emSGP = null;
+        
+        try {
+            emSGP = getEntityManager();
+            model = emSGP.createNamedQuery("DetIncidencia.findByArticulo", DetIncidencia.class)
+                    .setParameter("idEmpleado", idEmpleado)
+                    .setParameter("idSolicitud", idSolicitudArticulo)
+                    .getSingleResult();
+        } catch (Exception ex) {
+            log.error("Problema para obtener la incidencia por id empleado...", ex);
+        } finally {
+            close(emSGP);
+        }
+        
+        return model;
+    }
+    
+    public DetIncidencia buscarPorPermiso(Integer idEmpleado, Integer idSolicitudPrenda)
+    {
+        DetIncidencia model = null;
+        EntityManager emSGP = null;
+        
+        try {
+            emSGP = getEntityManager();
+            model = emSGP.createNamedQuery("DetIncidencia.findByPermiso", DetIncidencia.class)
+                    .setParameter("idEmpleado", idEmpleado)
+                    .setParameter("idSolicitud", idSolicitudPrenda)
+                    .getSingleResult();
+        } catch (Exception ex) {
+            log.error("Problema para obtener la incidencia por id empleado...", ex);
+        } finally {
+            close(emSGP);
+        }
+        
+        return model;
+    }
+    
+    public DetIncidencia buscarPorPrenda(Integer idEmpleado, Integer idSolicitudPrenda)
+    {
+        DetIncidencia model = null;
+        EntityManager emSGP = null;
+        
+        try {
+            emSGP = getEntityManager();
+            model = emSGP.createNamedQuery("DetIncidencia.findByPrenda", DetIncidencia.class)
+                    .setParameter("idEmpleado", idEmpleado)
+                    .setParameter("idSolicitud", idSolicitudPrenda)
+                    .getSingleResult();
+        } catch (Exception ex) {
+            log.error("Problema para obtener la incidencia por id empleado...", ex);
+        } finally {
+            close(emSGP);
+        }
+        
+        return model;
+    }
 
     public List<DetIncidencia> buscarPorIdEmpleadoArticulo(Integer idEmpleado) {
         List<DetIncidencia> modelList = null;
@@ -127,14 +187,16 @@ public class IncidenciaDAO extends BaseDAO<DetIncidencia, Integer> {
         return modelList;
     }
 
-    public synchronized void eliminaIncidenciaPorIdEmpleado(Integer idEmpleado) throws SGPException {
+    public synchronized void eliminaIncidenciaPorIdEmpleado(Integer idIncidencia, Integer idEmpleado, Integer idPermiso) throws SGPException {
         EntityManager em = null;
 
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Query resultado = em.createQuery("DELETE FROM DetIncidencia di WHERE di.idEmpleado.idEmpleado = :idEmpleado");
+            Query resultado = em.createQuery("DELETE FROM DetIncidencia di WHERE di.idIncidencia = :idIncidencia AND di.empleado.idEmpleado = :idEmpleado AND di.solPermiso.idSolicitud = :idPermiso");
+            resultado.setParameter("idIncidencia", idIncidencia);
             resultado.setParameter("idEmpleado", idEmpleado);
+            resultado.setParameter("idPermiso", idPermiso);
             resultado.executeUpdate();
             em.getTransaction().commit();
         } catch (Exception ex) {

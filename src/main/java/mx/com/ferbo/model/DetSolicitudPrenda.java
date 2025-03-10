@@ -27,42 +27,54 @@ import javax.persistence.TemporalType;
 @Table(name = "det_solicitud_prenda")
 @NamedQueries({
     @NamedQuery(name = "DetSolicitudPrenda.findAll", query = "SELECT d FROM DetSolicitudPrenda d"),
-    @NamedQuery(name = "DetSolicitudPrenda.findPrendasIdEmpleado", query = "SELECT dsp FROM DetSolicitudPrenda dsp INNER JOIN dsp.idEmpleadoSol e INNER JOIN dsp.idPrenda p INNER JOIN dsp.idTalla t WHERE e.idEmpleado = :numEmpl")
+    @NamedQuery(name = "DetSolicitudPrenda.findPrendasIdEmpleado", query = "SELECT dsp FROM DetSolicitudPrenda dsp INNER JOIN dsp.empleadoSol e INNER JOIN dsp.prenda p INNER JOIN dsp.talla t WHERE e.idEmpleado = :numEmpl")
 })
 public class DetSolicitudPrenda implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id_solicitud")
     private Integer idSolicitud;
+    
     @Basic(optional = false)
     @Column(name = "cantidad")
     private Integer cantidad;
-    @Column(name = "aprobada")
-    private Short aprobada;
+    
+    @JoinColumn(name = "aprobada", referencedColumnName = "id_est_solicitud")
+    @ManyToOne()
+    private CatEstatusSolicitud estatus;
+    
     @Basic(optional = false)
     @Column(name = "fecha_cap")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaCap;
+    
     @Column(name = "fecha_mod")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaMod;
-    @OneToMany(mappedBy = "idSolPrenda")
+    
+    @OneToMany(mappedBy = "solPrenda")
     private List<DetIncidencia> detIncidenciaList;
+    
     @JoinColumn(name = "id_prenda", referencedColumnName = "id_prenda")
     @ManyToOne(optional = false)
-    private CatPrenda idPrenda;
+    private CatPrenda prenda;
+    
     @JoinColumn(name = "id_empleado_rev", referencedColumnName = "id_empleado")
     @ManyToOne()
-    private DetEmpleado idEmpleadoRev;
+    private DetEmpleado empleadoRev;
+    
     @JoinColumn(name = "id_empleado_sol", referencedColumnName = "id_empleado")
     @ManyToOne(optional = false)
-    private DetEmpleado idEmpleadoSol;
+    private DetEmpleado empleadoSol;
+    
     @JoinColumn(name = "id_talla", referencedColumnName = "id_talla")
     @ManyToOne(optional = false)
-    private CatTalla idTalla;
+    private CatTalla talla;
+    
     @Column(name = "descripcion_rechazo")
     private String descripcionRechazo;
 
@@ -95,14 +107,14 @@ public class DetSolicitudPrenda implements Serializable {
         this.cantidad = cantidad;
     }
 
-    public Short getAprobada() {
-        return aprobada;
+    public CatEstatusSolicitud getEstatus() {
+        return estatus;
     }
 
-    public void setAprobada(Short aprobada) {
-        this.aprobada = aprobada;
+    public void setEstatus(CatEstatusSolicitud estatus) {
+        this.estatus = estatus;
     }
-
+    
     public Date getFechaCap() {
         return fechaCap;
     }
@@ -127,37 +139,37 @@ public class DetSolicitudPrenda implements Serializable {
         this.detIncidenciaList = detIncidenciaList;
     }
 
-    public CatPrenda getIdPrenda() {
-        return idPrenda;
+    public CatPrenda getPrenda() {
+        return prenda;
     }
 
-    public void setIdPrenda(CatPrenda idPrenda) {
-        this.idPrenda = idPrenda;
+    public void setPrenda(CatPrenda prenda) {
+        this.prenda = prenda;
     }
 
-    public DetEmpleado getIdEmpleadoRev() {
-        return idEmpleadoRev;
+    public DetEmpleado getEmpleadoRev() {
+        return empleadoRev;
     }
 
-    public void setIdEmpleadoRev(DetEmpleado idEmpleadoRev) {
-        this.idEmpleadoRev = idEmpleadoRev;
+    public void setEmpleadoRev(DetEmpleado empleadoRev) {
+        this.empleadoRev = empleadoRev;
     }
 
-    public DetEmpleado getIdEmpleadoSol() {
-        return idEmpleadoSol;
+    public DetEmpleado getEmpleadoSol() {
+        return empleadoSol;
     }
 
-    public void setIdEmpleadoSol(DetEmpleado idEmpleadoSol) {
-        this.idEmpleadoSol = idEmpleadoSol;
+    public void setEmpleadoSol(DetEmpleado empleadoSol) {
+        this.empleadoSol = empleadoSol;
     }
 
-    public CatTalla getIdTalla() {
-        return idTalla;
+    public CatTalla getTalla() {
+        return talla;
     }
 
-    public void setIdTalla(CatTalla idTalla) {
-        this.idTalla = idTalla;
-    }    
+    public void setTalla(CatTalla talla) {
+        this.talla = talla;
+    }  
 
     public String getDescripcionRechazo() {
         return descripcionRechazo;
@@ -191,7 +203,7 @@ public class DetSolicitudPrenda implements Serializable {
 
     @Override
     public String toString() {
-        return "DetSolicitudPrenda{" + "idSolicitud=" + idSolicitud + ", cantidad=" + cantidad + ", aprobada=" + aprobada + ", fechaCap=" + fechaCap + ", fechaMod=" + fechaMod + ", descripcionRechazo=" + descripcionRechazo + '}';
+        return "DetSolicitudPrenda[" + "idSolicitud=" + idSolicitud + ", cantidad=" + cantidad + ", aprobada=" + estatus.getClave() + ", fechaCap=" + fechaCap + ", fechaMod=" + fechaMod + ", descripcionRechazo=" + descripcionRechazo + ']';
     }
     
 }

@@ -13,11 +13,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import mx.com.ferbo.model.InfDatoEmpresa;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -864,6 +867,66 @@ public class DateUtil {
             }
 
             return fechas;
+        }
+        
+        public static List<Date> diasVacacionesSolicitados(List<Date> fechas, List<Date> diasAsueto, InfDatoEmpresa empleadoEmpresa) 
+        {
+            log.trace("Dias antes de festividades: {}", fechas.size());
+            List<Date> diasDeDescanso = DateUtil.diasLaborales(fechas, diasAsueto);
+            log.trace("Dias despues de festividades: {}", diasDeDescanso.size());
+
+            Map<DayOfWeek, Boolean> diasEmpleado = new HashMap<>();
+            diasEmpleado.put(DayOfWeek.MONDAY, empleadoEmpresa.getDiaLunes());
+            diasEmpleado.put(DayOfWeek.TUESDAY, empleadoEmpresa.getDiaMartes());
+            diasEmpleado.put(DayOfWeek.WEDNESDAY, empleadoEmpresa.getDiaMiercoles());
+            diasEmpleado.put(DayOfWeek.THURSDAY, empleadoEmpresa.getDiaJueves());
+            diasEmpleado.put(DayOfWeek.FRIDAY, empleadoEmpresa.getDiaViernes());
+            diasEmpleado.put(DayOfWeek.SATURDAY, empleadoEmpresa.getDiaSabado());
+            diasEmpleado.put(DayOfWeek.SUNDAY, empleadoEmpresa.getDiaDomingo());
+
+            List<Date> diasDeVacaciones = diasDeDescanso.stream()
+                    .filter(dia -> diasEmpleado.getOrDefault(DateUtil.toLocalDate(dia).getDayOfWeek(), true))
+                    .collect(Collectors.toList());
+
+            log.trace("Dias de descanso: {}", diasDeVacaciones.size());
+            log.trace("Y son: {}", diasDeVacaciones.toString());
+            return diasDeVacaciones;
+        }
+        
+        public static LocalDate inicializaFechaInicioAnioEnCurso(Integer anioEnCurso)
+        {
+            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT-06:00"), Locale.getDefault());
+            calendar.set(Calendar.DAY_OF_MONTH, 1);// Día 1
+            calendar.set(Calendar.MONTH, Calendar.JANUARY); // Mes Enero
+            calendar.set(Calendar.YEAR, anioEnCurso);// Año en curso
+            
+            LocalDate fecha = toLocalDate(calendar.getTime());
+            
+            return fecha;
+        }
+        
+        public static LocalDate inicializaFechaTerminoAnioEnCurso(Integer anioEnCurso)
+        {
+            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT-06:00"), Locale.getDefault());
+            calendar.set(Calendar.DAY_OF_MONTH, 31);// Día 31
+            calendar.set(Calendar.MONTH, Calendar.DECEMBER); // Mes Diciembre
+            calendar.set(Calendar.YEAR, anioEnCurso);// Año en curso
+            
+            LocalDate fecha = toLocalDate(calendar.getTime());
+            
+            return fecha;
+        }
+        
+        public static List<LocalDate> arregloLocalDate(LocalDate fechaInicio, LocalDate fechaFin)
+        {
+            List<LocalDate> arregloFechas = new ArrayList<>();
+            
+            for(LocalDate fecha = fechaInicio; !fecha.isAfter(fechaFin); fecha = fecha.plusDays(1))
+            {
+                arregloFechas.add(fecha);
+            }
+            
+            return arregloFechas;
         }
         
         public static List<Date> diasLaborales(List<Date> dias, List<Date> diasAsueto)

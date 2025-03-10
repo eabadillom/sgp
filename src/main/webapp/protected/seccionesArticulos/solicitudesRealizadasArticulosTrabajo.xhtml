@@ -10,32 +10,33 @@
                  reflow="true" styleClass="products-table"
                  rowKey="articuloOficina.idSolicitud">
         <p:column headerText="Articulo"
-                  sortBy="#{articuloOficina.idArticulo.idArticulo}" width="100px">
-            <h:outputText value="#{articuloOficina.idArticulo.descripcion}" />
+                  sortBy="#{articuloOficina.articulo.idArticulo}" width="100px">
+            <h:outputText value="#{articuloOficina.articulo.descripcion}" />
         </p:column>
         <p:column headerText="Imagen" width="100px">
-            <h:graphicImage name="images/articulos/#{articuloOficina.idArticulo.descripcion}.jpg" library="recursos" width="57" />
+            <h:graphicImage name="images/articulos/#{articuloOficina.articulo.descripcion}.jpg" library="recursos" width="57" />
         </p:column>
         <p:column headerText="Cantidad" sortBy="#{articuloOficina.cantidad}"
                   width="100px">
             <h:outputText value="#{articuloOficina.cantidad}" />
         </p:column>
-        <p:column headerText="Unidad" sortBy="#{articuloOficina.idArticulo.unidad}"
+        <p:column headerText="Unidad" sortBy="#{articuloOficina.articulo.unidad}"
                   width="100px">
-            <h:outputText value="#{articuloOficina.idArticulo.unidad}" />
+            <h:outputText value="#{articuloOficina.articulo.unidad}" />
         </p:column>
         <p:column headerText="Fecha" sortBy="#{articuloOficina.getFechaCap()}" sortOrder="descending" width="100px">
             <h:outputText value="#{articuloOficina.getFechaCap()}" >
                  <f:convertDateTime pattern="yyyy-MM-dd hh:mm a" timeZone="Mexico/General"/>
             </h:outputText>
         </p:column>
-        <p:column headerText="Estatus" sortBy="#{articuloOficina.aprobada}" width="100px">
-            <span class="customer-badge status-#{articuloOficinasBean.status.getStatusClass(articuloOficina.aprobada)}" style="display: block; width: 7rem">
-                #{articuloOficinasBean.status.getStatusText(articuloOficina.aprobada)}</span>
+        <p:column headerText="Estatus" sortBy="#{articuloOficina.estatus}" width="100px">
+            <span class="customer-badge status-#{articuloOficinasBean.status.getStatusClass(articuloOficina.estatus.clave)}" style="display: block; width: 7rem">
+                #{articuloOficinasBean.status.getStatusText(articuloOficina.estatus.clave)}</span>
         </p:column>
         <p:column width="100px">
-            <p:commandButton styleClass="rounded-button ui-button-warning" process="@this" icon="pi pi-bars"
-                             oncomplete="PF('dialogCambiarEstatus').show()" >
+            <p:commandButton icon="pi pi-bars" class="ui-button-success rounded-button m-1" styleClass="edit-button" process="@this"
+                             oncomplete="PF('dialogCambiarEstatus').show()" 
+                             actionListener="#{articuloOficinasBean.editarArticulo(articuloOficina)}" >
                 <f:setPropertyActionListener value="#{articuloOficina}" target="#{articuloOficinasBean.solicitud}" />
             </p:commandButton>
         </p:column>
@@ -46,19 +47,27 @@
         <p:outputPanel id="pnlCancelar" rendered="#{not empty articuloOficinasBean.solicitud}">
             <div class="formgrid grid">
                 <div class="field col">
-                    <p:outputLabel id="soArticulo" value="#{articuloOficinasBean.solicitud.idArticulo.descripcion}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
+                    <p:outputLabel id="soArticulo" value="#{articuloOficinasBean.solicitud.articulo.descripcion}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
                 </div>
             </div>
             <div class="formgrid grid">
                 <div class="field col">
-                    <h:graphicImage id="imgArticulo" name="images/articulos/#{articuloOficinasBean.solicitud.idArticulo.descripcion}.jpg" library="recursos" width="113" rendered="#{articuloOficinasBean.solicitud.idArticulo.descripcion ne null}" styleClass="product-image"/>
+                    <h:graphicImage id="imgArticulo" name="images/articulos/#{articuloOficinasBean.solicitud.articulo.descripcion}.jpg" library="recursos" width="113" rendered="#{articuloOficinasBean.solicitud.articulo.descripcion ne null}" styleClass="product-image"/>
                 </div>
             </div>
+            <h:panelGroup id="grupoRechazo" rendered="#{articuloOficinasBean.solicitud.descripcionRechazo ne null}" style="display:block ;font-size: 3rem;font-weight: 700;">
+                <div class="formgrid grid">
+                    <div class="field col">
+                        <p:outputLabel value="Descripcion Rechazo: " >
+                            <h:outputText id="descRechazo" value="#{articuloOficinasBean.solicitud.descripcionRechazo}" />
+                        </p:outputLabel>
+                    </div>
+                </div>
+            </h:panelGroup>
         </p:outputPanel>
         <f:facet name="footer">
-            <p:commandButton value="Cancelar" icon="pi pi-check" actionListener="#{articuloOficinasBean.actualizarRegistro()}"
-                             update="formActividadesArticulos:tabView:dt-articuloOficinas-sol" process="pnlCancelar @this"
-                             class="ui-button-warning" >
+            <p:commandButton value="Cancelar" icon="pi pi-check" class="ui-button-danger" actionListener="#{articuloOficinasBean.actualizarRegistro()}"
+                             update="formActividadesArticulos:tabView:dt-articuloOficinas-sol" process="pnlCancelar @this" >
             </p:commandButton>
             <p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dialogCambiarEstatus').hide()"
                 class="ui-button-secondary" type="button" />

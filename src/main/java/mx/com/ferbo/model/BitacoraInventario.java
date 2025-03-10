@@ -27,24 +27,29 @@ import javax.persistence.TemporalType;
 public class BitacoraInventario implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id_bitacora")
     private Integer idBitacora;
+    
     @Basic(optional = false)
     @Column(name = "fecha_captura")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaCaptura;
+    
     @JoinColumn(name = "id_tipo", referencedColumnName = "id_tipo")
     @ManyToOne(optional = false)
     private CatTipoBitacora idTipo;
+    
     @JoinColumn(name = "id_empleado", referencedColumnName = "id_empleado")
     @ManyToOne(optional = false)
     private DetEmpleado idEmpleado;
+    
     @JoinColumn(name = "id_inventario", referencedColumnName = "id_inventario")
     @ManyToOne(optional = false)
-    private DetInventario idInventario;
+    private DetInventario inventario;
 
     public BitacoraInventario() {
     }
@@ -90,11 +95,11 @@ public class BitacoraInventario implements Serializable {
         this.idEmpleado = idEmpleado;
     }
 
-    public DetInventario getIdInventario() {
-        return idInventario;
+    public DetInventario getInventario() {
+        return inventario;
     }
 
-    public void setIdInventario(DetInventario idInventario) {
-        this.idInventario = idInventario;
+    public void setInventario(DetInventario inventario) {
+        this.inventario = inventario;
     }
 }

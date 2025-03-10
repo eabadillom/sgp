@@ -47,7 +47,7 @@ public class SolicitudPermisoDAO extends BaseDAO<DetSolicitudPermiso, Integer>
             for(DetSolicitudPermiso aux: modelList)
             {
                 log.trace("Info Solicitud: {}", aux.toString());
-                log.trace("Info Cat Tipo Solicitud: {}", aux.getIdTipoSolicitud().toString());
+                log.trace("Info Cat Tipo Solicitud: {}", aux.getTipoSolicitud().toString());
             } 
             
         }catch(Exception ex) 
@@ -129,7 +129,7 @@ public class SolicitudPermisoDAO extends BaseDAO<DetSolicitudPermiso, Integer>
         return modelList;
     }
     
-    public List<DetSolicitudPermiso> buscarPorIdEmpleadoFechasClave(Integer idEmpleado, Date fechaIni, Date fechaFin, String clave1, String clave2)
+    public List<DetSolicitudPermiso> buscarPorIdEmpleadoFechasClave(Integer idEmpleado, Date fechaIni, Date fechaFin, String clave1, String clave2, String enviada, String aprobada)
     {
         List<DetSolicitudPermiso> modellist = null;
         EntityManager em = null;
@@ -143,6 +143,8 @@ public class SolicitudPermisoDAO extends BaseDAO<DetSolicitudPermiso, Integer>
                 .setParameter("fechaFin", fechaFin, TemporalType.TIMESTAMP)
                 .setParameter("clave1", clave1)
                 .setParameter("clave2", clave2)
+                .setParameter("enviada", enviada)
+                .setParameter("aprobada", aprobada)
                 .getResultList();
         }catch(Exception ex) 
         {
@@ -155,7 +157,7 @@ public class SolicitudPermisoDAO extends BaseDAO<DetSolicitudPermiso, Integer>
         return modellist;
     }
     
-    public List<DetSolicitudPermiso> buscarPorPeriodo (Integer idEmpleado, Date fechaIni, Date fechaFin)
+    public List<DetSolicitudPermiso> buscarPorPeriodo (Integer idEmpleado, Date fechaIni, Date fechaFin, String enviada, String aprobada)
     {
         List<DetSolicitudPermiso> modellist = null;
         EntityManager em = null;
@@ -167,6 +169,8 @@ public class SolicitudPermisoDAO extends BaseDAO<DetSolicitudPermiso, Integer>
                 .setParameter("idEmp", idEmpleado)
                 .setParameter("fechaInicio", fechaIni, TemporalType.TIMESTAMP)
                 .setParameter("fechaFin", fechaFin, TemporalType.TIMESTAMP)
+                .setParameter("enviada", enviada)
+                .setParameter("aprobada", aprobada)
                 .getResultList();
         }catch(Exception ex) 
         {
