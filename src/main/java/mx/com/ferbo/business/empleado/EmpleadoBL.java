@@ -25,8 +25,6 @@ public class EmpleadoBL {
 
     private static final Logger log = LogManager.getLogger(EmpleadoBL.class);
 
-    private static DiasDeDescansoObligatorioBL diasDescansoAnual = new DiasDeDescansoObligatorioBL();
-
     public static void validarDatosEmpleado(DetEmpleado empleadoporvalidar) {
 
         if (empleadoporvalidar == null) {
@@ -112,7 +110,7 @@ public class EmpleadoBL {
             DateUtil.setTime(nuevaFechaFin, 0, 0, 0, 0);
             nuevaFechaFin = DateUtil.addYear(nuevaFechaFin, 1);
             nuevaFechaFin = DateUtil.addDay(nuevaFechaFin, -1);
-            primerasVacaciones.setFechainicio(nuevaFechaInicio);
+            primerasVacaciones.setFechaInicio(nuevaFechaInicio);
             primerasVacaciones.setFechaFin(nuevaFechaFin);
             VacacionesDAO vacacionesDAO = new VacacionesDAO();
             vacacionesDAO.actualizar(primerasVacaciones);
@@ -178,7 +176,7 @@ public class EmpleadoBL {
 
             DetVacaciones ultimasvacaciones = new DetVacaciones();
 
-            ultimasvacaciones.setFechainicio(fechainicio);
+            ultimasvacaciones.setFechaInicio(fechainicio);
             ultimasvacaciones.setFechaFin(fechafin);
             ultimasvacaciones.setDiasTotales(dias);
             ultimasvacaciones.setEmpleado(empleado);
@@ -216,7 +214,7 @@ public class EmpleadoBL {
 
     public static boolean empleadoAsisteEnDiaDescanso(DetEmpleado empleado) {
         
-        List<CatDiaNoLaboral> diasDescanso = diasDescansoAnual.diasDescansoAnual();
+        List<CatDiaNoLaboral> diasDescanso = DiasDeDescansoObligatorioBL.diasDescansoAnual();
         List<String> diasLaboralesEmpleado = new ArrayList<String>();
         String diaLaborando = DateUtil.getDiaSemana(DateUtil.now());
         Date hoy = DateUtil.now();

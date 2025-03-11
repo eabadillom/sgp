@@ -77,7 +77,7 @@ public class VacacionesDAO extends BaseDAO<DetVacaciones, Integer> {
         try{
             log.info("Inicia el proceso para obtener los periodos vacacionales en base a una fecha.");
             em = getEntityManager();
-            TypedQuery<DetVacaciones> query = em.createQuery("select v from DetVacaciones v where v.empleado.idEmpleado = :idEmpleado and v.fechafin < :fechaSeleccionada", DetVacaciones.class);
+            TypedQuery<DetVacaciones> query = em.createQuery("select v from DetVacaciones v where v.empleado.idEmpleado = :idEmpleado and v.fechaFin < :fechaSeleccionada", DetVacaciones.class);
             query.setParameter("idEmpleado", idEmpleado);
             query.setParameter("fechaSeleccionada", fechaSeleccionada);
             periodos = query.getResultList();

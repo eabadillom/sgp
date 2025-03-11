@@ -7,8 +7,9 @@
 
     <p:toolbar styleClass="mb-4">
         <p:toolbarGroup>
-            <p:commandButton value="Agregar" icon="pi pi-plus" styleClass="ui-button-success" style="margin-right: .5rem" process="@this"
-                             onstart="PF('articuloOficinaDialog').show();" actionListener="#{articuloOficinasBean.inicializaArticulo()}"/>
+            <p:commandButton value="Agregar" icon="pi pi-plus" class="ui-button-success m-1" styleClass="edit-button" process="@this" 
+                             style="margin-right: .5rem" onstart="PF('articuloOficinaDialog').show();" 
+                             actionListener="#{articuloOficinasBean.inicializaArticulo()}"/>
         </p:toolbarGroup>
     </p:toolbar>
 
@@ -16,18 +17,18 @@
                  var="articuloOficina" value="#{articuloOficinasBean.lstSolicitudArticulos}"
                  reflow="true" styleClass="products-table"
                  rowKey="articuloOficina.idSolicitud">
-        <p:column headerText="Articulo" sortBy="#{articuloOficina.idArticulo.idArticulo}" width="22%">
-            <h:outputText value="#{articuloOficina.idArticulo.descripcion}" />
+        <p:column headerText="Articulo" sortBy="#{articuloOficina.articulo.idArticulo}" width="22%">
+            <h:outputText value="#{articuloOficina.articulo.descripcion}" />
         </p:column>
         <p:column headerText="Imagen" width="18%">
-            <h:graphicImage name="images/articulos/#{articuloOficina.idArticulo.descripcion}.jpg" library="recursos" width="57" />
+            <h:graphicImage name="images/articulos/#{articuloOficina.articulo.descripcion}.jpg" library="recursos" width="57" />
         </p:column>
         <p:column headerText="Cantidad" sortBy="#{articuloOficina.cantidad}" width="18%">
             <h:outputText value="#{articuloOficina.cantidad}" />
         </p:column>
-        <p:column headerText="Unidad" sortBy="#{articuloOficina.idArticulo.unidad}"
+        <p:column headerText="Unidad" sortBy="#{articuloOficina.articulo.unidad}"
                   width="100px">
-            <h:outputText value="#{articuloOficina.idArticulo.unidad}" />
+            <h:outputText value="#{articuloOficina.articulo.unidad}" />
         </p:column>
         <p:column width="6%">
             <p:commandButton class="ui-button-danger rounded-button m-1" icon="pi pi-trash" process="@this" title="Eliminar"
@@ -88,10 +89,14 @@
         </p:outputPanel>
         <f:facet name="footer">
             <p:commandButton value="Agregar" icon="pi pi-shopping-cart"
-                             actionListener="#{articuloOficinasBean.preRegistro()}" />
+                             actionListener="#{articuloOficinasBean.preRegistro()}" >
+                <p:resetInput target="formActividadesArticulos:tabView:pnlArticulos" />
+            </p:commandButton>
             <p:commandButton value="Cancelar" icon="pi pi-times"
                              onclick="PF('dialogComplementoArtiulo').hide()"
-                             class="ui-button-secondary" process="@this formActividadesArticulos:tabView:pnlArticulos"/>
+                class="ui-button-secondary" process="@this formActividadesArticulos:tabView:pnlArticulos">
+                <p:resetInput target="formActividadesArticulos:tabView:pnlArticulos" />
+            </p:commandButton>
         </f:facet>
     </p:dialog>
 

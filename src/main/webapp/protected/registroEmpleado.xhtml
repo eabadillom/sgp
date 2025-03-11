@@ -9,6 +9,7 @@
         <h:outputScript library="recursos" name="js/primefaces_locale.js" />
     </ui:define>
     <ui:define name="content">
+    	<f:event type="preRenderView" listener="#{registroEmpleadosBean.init()}" />
         <h:form id="formRegistroEmpleado">
             <p:growl id="messages" showDetail="true" life="2500"/>
             <p:dialog modal="true" widgetVar="statusInfoDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">

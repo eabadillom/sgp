@@ -53,7 +53,7 @@ public class CatTipoSolicitud implements Serializable {
     @Column(name = "activo")
     private Integer activo;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idTipoSolicitud")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "tipoSolicitud")
     private List<DetSolicitudPermiso> detSolicitudPermisoList;
 
     public CatTipoSolicitud() {

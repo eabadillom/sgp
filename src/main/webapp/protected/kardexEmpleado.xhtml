@@ -16,6 +16,7 @@
     <ui:insert name="css_styles">
     </ui:insert>
     <ui:define name="content">
+    	<f:event type="preRenderView" listener="#{kardexBean.init()}" />
         <h:form id="kardexEmpleado">
             <div class="grid">
                 <div class="col-12 card">

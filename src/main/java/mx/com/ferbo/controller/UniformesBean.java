@@ -1,6 +1,5 @@
 package mx.com.ferbo.controller;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,6 +11,8 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
+import mx.com.ferbo.business.incidencia.EstatusIncidenciaBL;
+import mx.com.ferbo.business.incidencia.EstatusSolicitudBL;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,7 +24,6 @@ import mx.com.ferbo.dao.n.TallaDAO;
 import mx.com.ferbo.dao.n.SolicitudPrendaDAO;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.IncidenciaDAO;
-import mx.com.ferbo.model.CatEstatusIncidencia;
 import mx.com.ferbo.model.CatPrenda;
 import mx.com.ferbo.model.CatTalla;
 import mx.com.ferbo.model.CatTipoIncidencia;
@@ -46,7 +46,6 @@ public class UniformesBean implements Serializable {
     private List<CatTalla> lstTallasActivas;
     private List<DetSolicitudPrenda> lstSolicitudPrendas;
     private List<DetSolicitudPrenda> lstSolicitudPrendasRealizadas;
-    private List<DetIncidencia> incidenciasBuscada;
     private List<ResponsiveOption> responsiveOptions;
     
     private DetEmpleado empleadoSelected;
@@ -68,7 +67,6 @@ public class UniformesBean implements Serializable {
     
     private DetIncidencia incidencia;
     private CatTipoIncidencia catTipoIncidencia;
-    private CatEstatusIncidencia catEstatusIncidencia;
 
     public UniformesBean() {
         lstPrendasActivas = new ArrayList<>();
@@ -95,7 +93,7 @@ public class UniformesBean implements Serializable {
     @PostConstruct
     public void init() {
         lstSolicitudPrendas = new ArrayList<>();
-        solicitud.setIdEmpleadoSol(empleadoSelected);
+        solicitud.setEmpleadoSol(empleadoSelected);
         actualizarListas();
         lstPrendasActivas = uniformesDAO.buscarTodosActivos();
         lstTallasActivas = tallaDAO.buscarTodosActivos();
@@ -109,8 +107,7 @@ public class UniformesBean implements Serializable {
     
     public void actualizarListas()
     {
-        lstSolicitudPrendasRealizadas = solicitudPrendaDAO.buscarPorIdEmpleado(solicitud.getIdEmpleadoSol().getIdEmpleado());
-        incidenciasBuscada = incidenciaDAO.buscarPorIdEmpleadoPrenda(solicitud.getIdEmpleadoSol().getIdEmpleado());
+        lstSolicitudPrendasRealizadas = solicitudPrendaDAO.buscarPorIdEmpleado(solicitud.getEmpleadoSol().getIdEmpleado());
     }
 
     public void seleccionarItem(CatPrenda item) {
@@ -120,118 +117,144 @@ public class UniformesBean implements Serializable {
     }
 
     public void preRegistro() {
-        if (solicitud.getCantidad() == 0) {
-            FacesContext.getCurrentInstance().addMessage(FacesContext.getCurrentInstance().getViewRoot().findComponent("formActividadesUniformes:tabView:spCantidad").getClientId(),
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, null, "Campo requerido"));
-            PrimeFaces.current().ajax().update("formActividadesUniformes:tabView:pnlPrendas");
-            return;
-        }
-        if (solicitud.getIdTalla().getIdTalla() == null) {
-            FacesContext.getCurrentInstance().addMessage(FacesContext.getCurrentInstance().getViewRoot().findComponent("formActividadesUniformes:tabView:soTalla").getClientId(),
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, null, "Campo requerido"));
-            PrimeFaces.current().ajax().update("formActividadesUniformes:tabView:pnlPrendas");
-            return;
-        }
-        solicitud.setFechaCap(new Date());
-        solicitud.setIdEmpleadoSol(empleadoSelected);
-        solicitud.setIdPrenda(prendaSelected);
-        lstSolicitudPrendas.add(solicitud);
-        PrimeFaces.current().executeInitScript("PF('dialogComplementoPrenda').hide()");
-        PrimeFaces.current().executeInitScript("PF('uniformeDialog').hide()");
-        PrimeFaces.current().ajax().update("formActividadesUniformes:messages", "formActividadesUniformes:tabView:dt-uniformes", "formActividadesUniformes:tabView:btnRegistro");
-
-    }
-
-    public void registro() throws IOException {
-        for (DetSolicitudPrenda detSolicitudPrenda : lstSolicitudPrendas) {
-            try {
-                detSolicitudPrenda.setAprobada((short) 1);
-                solicitudPrendaDAO.guardar(detSolicitudPrenda);
-                actualizarListas();
-                
-                incidencia = new DetIncidencia();
-                catTipoIncidencia = new CatTipoIncidencia();
-                catEstatusIncidencia = new CatEstatusIncidencia();
-                
-                catTipoIncidencia.setIdTipo(3);
-                catEstatusIncidencia.setIdEstatus(1);
-                
-                incidencia.setIdTipo(catTipoIncidencia);
-                incidencia.setIdEmpleado(empleadoSelected);
-                incidencia.setIdEstatus(catEstatusIncidencia);
-                incidencia.setVisible((short) 1);
-                incidencia.setIdSolPrenda(detSolicitudPrenda);
-                incidencia.setFechaCap(new Date());
-
-                incidenciaDAO.guardar(incidencia);
-            } catch (SGPException e) {
-                log.warn("EX-0032: " + e.getMessage() + ". Error al guardar el registro de la prenda del empleado: " + empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
-            }
-        }
-        FacesContext.getCurrentInstance().getExternalContext().redirect("uniformes.xhtml");
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Solicitud Registrada"));
-    }
-    
-    public void actualizarRegistro()
-    {
-        actualizarListas();
         FacesMessage message = null;
         FacesMessage.Severity severity = null;
         String mensaje = null;
         String titulo = "Uniforme";
         try
         {
-            if(incidenciasBuscada == null)
+            if (solicitud.getCantidad() == null) {
+                throw new SGPException("No se a agregado el número de piezas");
+            }
+            if (solicitud.getCantidad() == 0) {
+                throw new SGPException("No se puede pedir 0 piezas");
+            }
+            if (solicitud.getTalla() == null) {
+                throw new SGPException("No se a seleccionado la talla de la prenda");
+            }
+            solicitud.setFechaCap(new Date());
+            solicitud.setEmpleadoSol(empleadoSelected);
+            solicitud.setPrenda(prendaSelected);
+            lstSolicitudPrendas.add(solicitud);
+            mensaje = "Prenda agregada";
+            severity = FacesMessage.SEVERITY_INFO;
+            PrimeFaces.current().executeInitScript("PF('dialogComplementoPrenda').hide()");
+            PrimeFaces.current().executeInitScript("PF('uniformeDialog').hide()");
+        } catch (SGPException e){
+            log.warn("Error al guardar el registro de la prenda del empleado: {}", empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
+            log.warn("EX-0032: ", e);
+            mensaje = e.getMessage();
+            severity = FacesMessage.SEVERITY_ERROR;
+        }catch(Exception e){
+            log.warn("Error al guardar el registro del articulo del empleado: {}", empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
+            log.warn("EX-0032: ", e);
+            mensaje = "Consulte con su administrador de sistemas";
+            severity = FacesMessage.SEVERITY_ERROR;
+        }finally{
+            message = new FacesMessage(severity, titulo, mensaje);
+            FacesContext.getCurrentInstance().addMessage(null, message);
+            PrimeFaces.current().ajax().update("formActividadesUniformes:messages", "formActividadesUniformes:tabView:pnlPrendas", ":formActividadesUniformes:tabView:dt-uniformes", ":formActividadesUniformes:tabView:btnRegistro");
+        }
+    }
+    
+    public void editarUniforme(DetSolicitudPrenda solicitudPrenda)
+    {
+        solicitud = solicitudPrenda;
+    }
+
+    public void registro() {
+        FacesMessage message = null;
+        FacesMessage.Severity severity = null;
+        String mensaje = null;
+        String titulo = "Uniforme";
+        for (DetSolicitudPrenda detSolicitudPrenda : lstSolicitudPrendas) {
+            try {
+                detSolicitudPrenda.setEstatus(EstatusSolicitudBL.estatusEnviado());
+                incidencia = new DetIncidencia();
+                catTipoIncidencia = new CatTipoIncidencia();
+                catTipoIncidencia.setIdTipo(3);
+                
+                incidencia.setTipoIncidencia(catTipoIncidencia);
+                incidencia.setEmpleado(empleadoSelected);
+                incidencia.setEstatusIncidencia(EstatusIncidenciaBL.estatusEnviado());
+                incidencia.setVisible((short) 1);
+                incidencia.setSolPrenda(detSolicitudPrenda);
+                incidencia.setFechaCap(new Date());
+
+                incidenciaDAO.guardar(incidencia);
+                actualizarListas();
+                mensaje = "Solicitud Registrada";
+                severity = FacesMessage.SEVERITY_INFO;
+            } catch (SGPException e) 
             {
-                throw new SGPException("Error con la conexión a la base de datos!!!");
+                log.warn("Error al guardar el registro de la prenda del empleado: {}", empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
+                log.warn("EX-0032: ", e);
+                mensaje = e.getMessage();
+                severity = FacesMessage.SEVERITY_ERROR;
+            }catch(Exception e)
+            {
+                log.warn("Error al guardar el registro del articulo del empleado: {}", empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
+                log.warn("EX-0032: ", e);
+                mensaje = "Consulte con su administrador de sistemas";
+                severity = FacesMessage.SEVERITY_ERROR;
+            }
+        }
+        lstSolicitudPrendas.clear();
+        message = new FacesMessage(severity, titulo, mensaje);
+        FacesContext.getCurrentInstance().addMessage(null, message);
+        PrimeFaces.current().ajax().update(":formActividadesUniformes:messages", ":formActividadesUniformes:tabView:dt-uniformes", ":formActividadesUniformes:tabView:btnRegistro");
+    }
+    
+    public void actualizarRegistro()
+    {
+        FacesMessage message = null;
+        FacesMessage.Severity severity = null;
+        String mensaje = null;
+        String titulo = "Uniforme";
+        try
+        {
+            incidencia = incidenciaDAO.buscarPorPrenda(empleadoSelected.getIdEmpleado(), solicitud.getIdSolicitud());
+            if(incidencia == null)
+            {
+                throw new SGPException("Error al editar la solicitud, favor de contactar al administrador de sistemas");
             }
             
-            switch (solicitud.getAprobada().intValue()) 
+            switch (solicitud.getEstatus().getClave()) 
             {
-                case 2:
+                case "A":
                     throw new SGPException("No se puede modificar la prenda");
-                case 3:
+                case "R":
                     throw new SGPException("No se puede modificar la prenda");
-                case 4:
+                case "C":
                     throw new SGPException("No se puede modificar la prenda");
             }
             
-            for(DetIncidencia auxIncidenciaBuscada : incidenciasBuscada)
-            {
-                if(auxIncidenciaBuscada.getIdSolPrenda().getIdSolicitud().equals(solicitud.getIdSolicitud()))
-                {
-                    catEstatusIncidencia = new CatEstatusIncidencia();
-                    catEstatusIncidencia.setIdEstatus(4);
-            
-                    auxIncidenciaBuscada.setIdEstatus(catEstatusIncidencia);
-                    auxIncidenciaBuscada.setIdSolPrenda(solicitud);
-                    incidenciaDAO.actualizar(auxIncidenciaBuscada);                    
-                }
-            }
-            
-            solicitud.setAprobada((short) 4);
-            solicitudPrendaDAO.actualizar(solicitud);
+            solicitud.setEstatus(EstatusSolicitudBL.estatusCancelado());
+            incidencia.setSolPrenda(solicitud);
+            incidencia.setEstatusIncidencia(EstatusIncidenciaBL.estatusCancelado());
+            incidenciaDAO.actualizar(incidencia);
             actualizarListas();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Estatus Modificada"));
-            PrimeFaces.current().ajax().update("formActividadesUniformes:tabView:dt-uniformes-sol");
-            PrimeFaces.current().executeScript("PF('dialogCambiarEstatus').hide()");
+            mensaje = "Se actualizo la solicitud correctamente";
+            severity = FacesMessage.SEVERITY_INFO;
         }
         catch(SGPException e)
         {
+            log.warn("Error al actualizar el registro de la prenda del empleado: {}", empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
+            log.warn("EX-0032: ", e);
             mensaje = e.getMessage();
-            severity = FacesMessage.SEVERITY_INFO;
+            severity = FacesMessage.SEVERITY_ERROR;
         }catch(Exception e)
         {
-            log.warn("EX-0032: " + e.getMessage() + ". Error al actualizar el registro de la prenda del empleado: " + empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
+            log.warn("Error al actualizar el registro de la prenda del empleado: {}", empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
+            log.warn("EX-0032: ", e);
+            mensaje = "Consulte con el administrador de sistemas";
+            severity = FacesMessage.SEVERITY_ERROR;
         }finally
         {
-            if(severity != null)
-            {
-                message = new FacesMessage(severity, titulo, mensaje);
-                FacesContext.getCurrentInstance().addMessage(null, message);
-                PrimeFaces.current().ajax().update(":formActividadesUniformes:messages");
-                PrimeFaces.current().executeScript("PF('dialogCambiarEstatus').hide()");
-            }
+            message = new FacesMessage(severity, titulo, mensaje);
+            FacesContext.getCurrentInstance().addMessage(null, message);
+            PrimeFaces.current().ajax().update(":formActividadesUniformes:messages", ":formActividadesUniformes:tabView:dt-uniformes-sol");
+            PrimeFaces.current().executeScript("PF('dialogCambiarEstatus').hide()");
         }
     }
     
@@ -342,14 +365,6 @@ public class UniformesBean implements Serializable {
 
     public void setResponsiveOptions(List<ResponsiveOption> responsiveOptions) {
         this.responsiveOptions = responsiveOptions;
-    }
-    
-    public List<DetIncidencia> getIncidenciasBuscada() {
-        return incidenciasBuscada;
-    }
-
-    public void setIncidenciasBuscada(List<DetIncidencia> incidenciasBuscada) {
-        this.incidenciasBuscada = incidenciasBuscada;
     }
     
     public ManageStatus getStatus() {

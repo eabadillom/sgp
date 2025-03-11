@@ -1,5 +1,6 @@
 package mx.com.ferbo.controller;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -10,9 +11,12 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -86,6 +90,11 @@ public class RegistroEmpleadosBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private static final Logger log = LogManager.getLogger(RegistroEmpleadosBean.class);
+    
+    private HttpServletRequest request;
+    private FacesContext context;
+    private String contextPath = null;
+    private HttpSession session = null;
 
     private EmpresaDAO empresaDAO;
     private EmpleadoFotoDAO empleadoFotoDAO;
@@ -161,6 +170,11 @@ public class RegistroEmpleadosBean implements Serializable {
     private String texto;
 
     public RegistroEmpleadosBean() {
+    	
+    	this.context = FacesContext.getCurrentInstance();
+    	this.request = (HttpServletRequest) context.getExternalContext().getRequest();
+    	this.session = request.getSession(false);
+    	
         empleadoFotoDAO = new EmpleadoFotoDAO(DetEmpleadoFoto.class);
         prestamoDAO = new PrestamoDAO();
         percepcionEmpleadoDAO = new PercepcionEmpleadoDAO();
@@ -193,7 +207,10 @@ public class RegistroEmpleadosBean implements Serializable {
     public void init() {
         this.activo = false;
         this.inactivo = false;
+        
         try {
+        	this.redirigir();
+        	
             lstCatEmpresa = empresaDAO.buscarActivo();
             lstCatPerfil = perfilDAO.buscarActivo();
             lstCatPlanta = plantaDAO.buscarActivo();
@@ -213,11 +230,35 @@ public class RegistroEmpleadosBean implements Serializable {
 
             consultaEmpleados();
             prestamo = new DetPrestamo();
+            
         } catch (Exception ex) {
+        	ex.printStackTrace();
             log.warn("EX-0008: " + ex.getMessage() + ". Error al cargar init()");
         }
     }
-
+    
+    public void redirigir() {
+    	DetEmpleado empleadoSesion = null;
+    	String path = null;
+    	empleadoSesion = (DetEmpleado) session.getAttribute("empleado");
+    	contextPath = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
+    	ExternalContext context = null;
+    	
+    	try {
+    		if(empleadoSesion.getDatoEmpresa().getPerfil().getIdPerfil() == 1) {
+    			return;
+    		}
+    		
+	    	path = this.contextPath + "/unauthorized.xhtml";
+	    	log.info("Redirigiendo a {}", path);
+	    	context = FacesContext.getCurrentInstance().getExternalContext();
+	    	context.redirect(path);
+    	} catch (IOException e) {
+    		// TODO Auto-generated catch block
+    		e.printStackTrace();
+    	}
+    }
+    
     /*
      * Método para consultar a los empleados
      */

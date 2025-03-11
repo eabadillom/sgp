@@ -346,8 +346,15 @@ function registryServlet(objeto1, appPath) {
             location.href = myUrl;
         },
         error: function (jsonObj) {
-            $('#dialogSystem').dialog({title: "Aviso del sistema"});
-            freeze(1, 1, 4, "Notifique al admistrador de sistemas.", null, null, null);
+            if(jsonObj.responseJSON.codigo === 2) 
+            {
+                $('#dialogSystem').dialog({title: "Aviso del sistema"});
+                freeze(1, 1, 4, "Acceso Denegado", null, null, null);
+            }else if(jsonObj.responseJSON.codigo === 1)
+            {
+                $('#dialogSystem').dialog({title: "Aviso del sistema"});
+                freeze(1, 1, 4, "Notifique al admistrador de sistemas.", null, null, null);
+            }
         }
     });
 }

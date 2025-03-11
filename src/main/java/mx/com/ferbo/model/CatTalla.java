@@ -31,21 +31,25 @@ import javax.validation.constraints.Size;
 public class CatTalla implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id_talla")
     private Integer idTalla;
+    
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 45)
     @Column(name = "descripcion")
     private String descripcion;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "activo")
     private short activo;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idTalla")
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "talla")
     private List<DetSolicitudPrenda> detSolicitudPrendaList;
 
     public CatTalla() {

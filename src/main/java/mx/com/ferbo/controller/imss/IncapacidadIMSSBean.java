@@ -6,29 +6,31 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
+
 import mx.com.ferbo.business.dianolaboral.DiasDeDescansoObligatorioBL;
-import mx.com.ferbo.business.empleado.RegistroAsistenciaBL;
+import mx.com.ferbo.business.registro.RegistroBL;
+import mx.com.ferbo.business.incidencia.SolicitudPermisoBL;
+
 import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.EmpresaDAO;
 import mx.com.ferbo.dao.n.EstatusIncapacidadDAO;
-import mx.com.ferbo.dao.n.RegistroDAO;
-import mx.com.ferbo.dao.n.SolicitudPermisoDAO;
 import mx.com.ferbo.dao.n.imss.ControlIncapacidadIMSSDAO;
 import mx.com.ferbo.dao.n.imss.IncapacidadIMSSDAO;
 import mx.com.ferbo.dao.n.imss.RiesgoTrabajoIMSSDAO;
 import mx.com.ferbo.dao.n.imss.TipoIncapacidadIMSSDAO;
 import mx.com.ferbo.dao.n.imss.TipoRiesgoIMSSDAO;
 import mx.com.ferbo.dao.n.sat.TipoIncapacidadSATDAO;
+
 import mx.com.ferbo.model.CatEstatusIncapacidad;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetRegistro;
-import mx.com.ferbo.model.DetSolicitudPermiso;
 import mx.com.ferbo.model.InfDatoEmpresa;
 import mx.com.ferbo.model.imss.CatControlIncapacidadIMSS;
 import mx.com.ferbo.model.imss.CatRiesgoTrabajoIMSS;
@@ -36,9 +38,11 @@ import mx.com.ferbo.model.imss.CatTipoIncapacidadIMSS;
 import mx.com.ferbo.model.imss.CatTipoRiesgoIMSS;
 import mx.com.ferbo.model.imss.DetIncapacidad;
 import mx.com.ferbo.model.sat.CatTipoIncapacidadSAT;
+
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.ManageStatus;
 import mx.com.ferbo.util.SGPException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
@@ -55,8 +59,6 @@ public class IncapacidadIMSSBean implements Serializable
     private static Logger log = LogManager.getLogger(IncapacidadIMSSBean.class);
     
     private final HttpServletRequest httpServletRequest;
-    private RegistroAsistenciaBL empleadoAsistencia;
-    private DiasDeDescansoObligatorioBL diasDeDescansoObligatorio;
     
     private IncapacidadIMSSDAO registroIncapacidadDAO;
     private EmpleadoDAO empleadoDAO;
@@ -89,14 +91,7 @@ public class IncapacidadIMSSBean implements Serializable
     private Date auxIncapacidadFechaFin;
     private int diasIncapacidad;
     
-    private DetSolicitudPermiso solicitudPermisoSelected;
-    private SolicitudPermisoDAO solicitudPermisoDAO;
-    private List<DetSolicitudPermiso> lstSolicitudes;
-    private DetRegistro registroSelected;
-    private RegistroDAO registroDAO;
-    private List<DetRegistro> lstRegistros;
     private List<DetRegistro> lstAuxRegistros;
-    private List<Date> diasDeAsueto;
     
     private final String riesgoTrabajoSAT = "01";
     private final String accidenteTrabajo = "ATRB";
@@ -132,13 +127,8 @@ public class IncapacidadIMSSBean implements Serializable
         this.estatusSolicitudDAO = new EstatusIncapacidadDAO();
         this.incapacidadSATDAO = new TipoIncapacidadSATDAO();
         
-        this.solicitudPermisoDAO = new SolicitudPermisoDAO();
-        this.registroDAO = new RegistroDAO();
-        
         this.httpServletRequest = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         this.empleadoRev = (DetEmpleado) httpServletRequest.getSession(true).getAttribute("empleado");
-        this.empleadoAsistencia = new RegistroAsistenciaBL();
-        this.diasDeDescansoObligatorio = new DiasDeDescansoObligatorioBL();
     }
     
     @PostConstruct
@@ -163,7 +153,6 @@ public class IncapacidadIMSSBean implements Serializable
         this.riesgoIncapacidadDefuncion = this.riesgoTrabajoIMSSDAO.buscarPorClave(this.accidenteTrabajoDefuncion);
         this.tipoIncapacidadSAT = this.incapacidadSATDAO.buscarPorId(this.riesgoTrabajoSAT);
         this.tipoIncapacidadIMSS = this.tipoIncapacidadIMSSDAO.buscarPorClave(this.accidenteTrabajo);
-        this.diasDeAsueto = diasDeDescansoObligatorio.getDiasAsueto();
     }
     
     public void actualizarListaRegistroIncapacidades()
@@ -312,7 +301,7 @@ public class IncapacidadIMSSBean implements Serializable
         FacesMessage message = null;
         FacesMessage.Severity severity = null;
         String mensaje = null;
-        String titulo = "Guardar";
+        String titulo = "Incapacidad";
         boolean riesgoTrabajoDefuncion = false;
         try
         {
@@ -406,7 +395,7 @@ public class IncapacidadIMSSBean implements Serializable
             if(riesgoTrabajoDefuncion == false)
             {
                 //Guarda el registro de incapacidad en asistencia
-                this.empleadoAsistencia.guardarRegistroIncapacidad(this.registroIncapacidad.getIdEmpleadoInc(), this.registroIncapacidad.getFechaInicio(), this.registroIncapacidad.getFechaFin(), this.diasDeAsueto);
+                RegistroBL.guardarRegistroIncapacidad(this.registroIncapacidad.getIdEmpleadoInc(), this.registroIncapacidad.getFechaInicio(), this.registroIncapacidad.getFechaFin(), DiasDeDescansoObligatorioBL.diasDeAsueto());
             }
             
             this.registroIncapacidadDAO.guardar(this.registroIncapacidad);
@@ -441,7 +430,7 @@ public class IncapacidadIMSSBean implements Serializable
         FacesMessage message = null;
         FacesMessage.Severity severity = null;
         String mensaje = null;
-        String titulo = "Actualizar";
+        String titulo = "Incapacidad";
         
         try
         {
@@ -520,7 +509,7 @@ public class IncapacidadIMSSBean implements Serializable
         FacesMessage message = null;
         FacesMessage.Severity severity = null;
         String mensaje = null;
-        String titulo = "Cancelar";
+        String titulo = "Incapacidad";
         try
         {
             if(this.riesgoTrabajo == null && this.tipoIncapacidad.getIncapacidadSAT().getClave().matches(riesgoTrabajoSAT))
@@ -533,12 +522,13 @@ public class IncapacidadIMSSBean implements Serializable
             this.registroIncapacidad.setIdEmpleadoRev(this.empleadoRev);
             
             //Obtiene los registros de incapacidad que estan en asistencia(det_registro)
-            List<DetRegistro> listaRegistroIncapacidades = this.obtenerRegistroAsistencia(this.registroIncapacidad.getIdEmpleadoInc(), this.registroIncapacidad.getFechaInicio(), this.registroIncapacidad.getFechaFin());
+            String clave = "I";
+            List<DetRegistro> listaRegistroIncapacidades = RegistroBL.obtenerRegistroAsistencia(this.registroIncapacidad.getIdEmpleadoInc(), this.registroIncapacidad.getFechaInicio(), this.registroIncapacidad.getFechaFin(), clave);
             
             //Elimina registros de incapacidad en asistencia
             if(!listaRegistroIncapacidades.isEmpty())
             {
-                int registrosBorrados = this.cancelarRegistroIncapacidad(listaRegistroIncapacidades);
+                int registrosBorrados = RegistroBL.cancelarRegistroAsistencia(listaRegistroIncapacidades);
                 log.info("Registros eliminados del empleado {} en asistencia: {}", this.registroIncapacidad.getIdEmpleadoInc().getIdEmpleado(), registrosBorrados);
             }
             
@@ -618,85 +608,6 @@ public class IncapacidadIMSSBean implements Serializable
         return regDefuncion;
     }
     
-    //Valida si existe un periodo de permiso y/o vacaciones
-    public void validarPeriodoSolicitudPermiso(DetIncapacidad incapacidad) throws SGPException
-    {
-        log.info("Entrando a validar vacaciones y/o permisos");
-        Integer idEmpleadoInc = incapacidad.getIdEmpleadoInc().getIdEmpleado();
-        Date fechaInicio = incapacidad.getFechaInicio();
-        Date fechaFin = incapacidad.getFechaFin();
-        log.trace("Fecha Inicial: {} y Fecha Final: {} del Empleado: {}", fechaInicio, fechaFin, idEmpleadoInc);
-        
-        this.lstSolicitudes = this.solicitudPermisoDAO.buscarPorPeriodo(idEmpleadoInc, fechaInicio, fechaFin);
-        
-        if(!this.lstSolicitudes.isEmpty())
-        {
-            log.trace("Los registros de vacacione y/o permisos son: {}", this.lstSolicitudes.toString());
-            throw new SGPException("Ya existe un periodo de vacaciones y/o permiso");
-        }
-    }
-    
-    //Busca los registro de incapacidad uno por uno en la seccion de registro asistencia
-    public List<DetRegistro> obtenerRegistroAsistencia(DetEmpleado empleado, Date fechaInicio, Date fechaFin) throws SGPException
-    {
-        log.info("Buscando registros de incapacidad del empleado {} en asistencia", empleado.getIdEmpleado());
-        List<Date> listaFechasIncapacidades = DateUtil.generarArreglosFechas(fechaInicio, fechaFin);
-        listaFechasIncapacidades = this.empleadoAsistencia.diasVacacionesSolicitados(listaFechasIncapacidades, this.diasDeAsueto, empleado.getDatoEmpresa());
-        int totalFechasIncapacidades = listaFechasIncapacidades.size();
-        
-        String clave = "I";
-        List<DetRegistro> listaRegistroAsistencia = this.registroDAO.buscarPorEmpPeriodoSolicitud(empleado.getIdEmpleado(), clave, fechaInicio, fechaFin);
-        int totalRegistroIncapacidad = listaRegistroAsistencia.size();
-        Integer horaEntrada = 12;
-        
-        log.trace("Tamaño rango fechas {}, Tamaño rango registros incapacidad {}", totalFechasIncapacidades, totalRegistroIncapacidad);
-        
-        if(totalRegistroIncapacidad > 0)
-        {
-            listaRegistroAsistencia.clear();
-            for(Date aux : listaFechasIncapacidades)
-            {
-                Date auxFecha = DateUtil.getDate(DateUtil.getAnio(aux), DateUtil.getMes(aux), DateUtil.getDia(aux), horaEntrada, 0, 0);
-                this.registroSelected = this.registroDAO.buscarPorEstatus(empleado.getIdEmpleado(), auxFecha, clave);
-                if(this.registroSelected != null)
-                {
-                    listaRegistroAsistencia.add(this.registroSelected);
-                }
-            }
-            
-            log.info("El empleado {} tiene {} registros en asistencia", empleado.getIdEmpleado(), totalRegistroIncapacidad);
-            
-            if(listaRegistroAsistencia.isEmpty())
-            {
-                throw new SGPException("No se encontraron registros en asistencia");
-            }
-        }else
-        {
-            log.info("El empleado {} tiene {} registros en asistencia", empleado.getIdEmpleado(), totalRegistroIncapacidad);
-        }
-        
-        return listaRegistroAsistencia;
-    }
-    
-    //Quita los registros en asistencia de una incapacidad cancelada
-    public int cancelarRegistroIncapacidad(List<DetRegistro> listaRegistros) throws SGPException
-    {
-        int totalRegistros = 0;
-        try
-        {
-            for(DetRegistro auxRegistro : listaRegistros)
-            {
-                this.registroDAO.eliminar(auxRegistro);
-                totalRegistros = totalRegistros + 1;
-            }
-        }catch(SGPException ex)
-        {
-            log.info("Error al borrar un registo de asistencia: {}", ex);
-            throw new SGPException("Error al cancelar la incapacidad");
-        }
-        return totalRegistros;
-    }
-    
     //Valida si la solicitud es del tipo defuncion y modifica el 
     //registro del empleado y de asistencia de la anterior incapacidad
     public boolean validarSolicitudIncapacidad(DetIncapacidad incapacidad) throws SGPException
@@ -733,7 +644,7 @@ public class IncapacidadIMSSBean implements Serializable
             this.validarRegistroIncapacidad(this.registroIncapacidad);
 
             //Valida si hay una solicitud de permiso y/o vacaciones ya registrada en el periodo de la incapacidad
-            this.validarPeriodoSolicitudPermiso(this.registroIncapacidad);
+            SolicitudPermisoBL.validarPeriodoSolicitudPermiso(this.registroIncapacidad);
             regDefuncion = false;
         }
         
@@ -757,12 +668,13 @@ public class IncapacidadIMSSBean implements Serializable
             Date fechaIni = DateUtil.moverFechaUnDiaAdelante(fechaInicial);
             log.trace("Fecha adelantada: {}", fechaIni);
             
-            List<DetRegistro> listaRegistroIncapacidades = this.obtenerRegistroAsistencia(empleado, fechaIni, auxRegistroIncapacidad.getFechaFin());
+            String clave = "I";
+            List<DetRegistro> listaRegistroIncapacidades = RegistroBL.obtenerRegistroAsistencia(empleado, fechaIni, auxRegistroIncapacidad.getFechaFin(), clave);
             int numeroRegistrosIncapacidades = listaRegistroIncapacidades.size();
 
             if(numeroRegistrosIncapacidades > 0)
             {
-                int registrosBorrados = this.cancelarRegistroIncapacidad(listaRegistroIncapacidades);
+                int registrosBorrados = RegistroBL.cancelarRegistroAsistencia(listaRegistroIncapacidades);
                 log.info("Registros eliminados de asistencia: {}", registrosBorrados);
             }
             
@@ -800,7 +712,7 @@ public class IncapacidadIMSSBean implements Serializable
         {
             Date auxFecha = DateUtil.moverFechaUnDiaAdelante(auxiliarFecha);
             log.info("Fecha inicial: {} y Fecha final: {}", auxFecha, fechaFin);
-            this.empleadoAsistencia.guardarRegistroIncapacidad(empleadoIncapacidad, auxFecha, fechaFin, this.diasDeAsueto);
+            RegistroBL.guardarRegistroIncapacidad(empleadoIncapacidad, auxFecha, fechaFin, DiasDeDescansoObligatorioBL.diasDeAsueto());
         }
         
         if(incapacidad.getDiasAutorizados() < primerosDiasIncapacidad)
@@ -808,12 +720,13 @@ public class IncapacidadIMSSBean implements Serializable
             Date auxFecha = DateUtil.moverFechaUnDiaAdelante(fechaFin);
             log.info("Fecha inicial: {} y Fecha final: {}", auxFecha, auxiliarFecha);
             //Obtiene los registros de incapacidad que estan en asistencia(det_registro)
-            List<DetRegistro> listaRegistroIncapacidades = this.obtenerRegistroAsistencia(empleadoIncapacidad, auxFecha, auxiliarFecha);
+            String clave = "I";
+            List<DetRegistro> listaRegistroIncapacidades = RegistroBL.obtenerRegistroAsistencia(empleadoIncapacidad, auxFecha, auxiliarFecha, clave);
             
             //Elimina registros de incapacidad en asistencia
             if(!listaRegistroIncapacidades.isEmpty())
             {
-                int registrosBorrados = this.cancelarRegistroIncapacidad(listaRegistroIncapacidades);
+                int registrosBorrados = RegistroBL.cancelarRegistroAsistencia(listaRegistroIncapacidades);
                 log.info("Registros eliminados de asistencia: {}", registrosBorrados);
             }
         }
@@ -1090,42 +1003,6 @@ public class IncapacidadIMSSBean implements Serializable
 
     public void setEstatusSolicitud(CatEstatusIncapacidad estatusSolicitud) {
         this.estatusSolicitud = estatusSolicitud;
-    }
-
-    public DetSolicitudPermiso getSolicitudPermisoSelected() {
-        return solicitudPermisoSelected;
-    }
-
-    public void setSolicitudPermisoSelected(DetSolicitudPermiso solicitudPermisoSelected) {
-        this.solicitudPermisoSelected = solicitudPermisoSelected;
-    }
-    
-    public List<DetSolicitudPermiso> getLstSolicitudes() {
-        return lstSolicitudes;
-    }
-
-    public void setLstSolicitudes(List<DetSolicitudPermiso> lstSolicitudes) {
-        this.lstSolicitudes = lstSolicitudes;
-    }
-
-    public DetRegistro getRegistroSelected() {
-        return registroSelected;
-    }
-
-    public void setRegistroSelected(DetRegistro registroSelected) {
-        this.registroSelected = registroSelected;
-    }
-    
-    public List<DetRegistro> getLstRegistros() {
-        return lstRegistros;
-    }
-
-    public void setLstRegistros(List<DetRegistro> lstRegistros) {
-        this.lstRegistros = lstRegistros;
-    }
-    
-    public RegistroAsistenciaBL getEmpleadoAsistencia() {
-        return empleadoAsistencia;
     }
 
     public CatEstatusIncapacidad getEstatusSolicitudAprobada() {
