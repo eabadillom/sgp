@@ -9,6 +9,7 @@
         <h:outputScript library="recursos" name="js/primefaces_locale.js" />
     </ui:define>
     <ui:define name="content">
+    	<f:event type="preRenderView" listener="#{registroEmpleadosBean.init()}" />
         <h:form id="formRegistroEmpleado">
             <p:growl id="messages" showDetail="true" life="2500"/>
             <p:dialog modal="true" widgetVar="statusInfoDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
@@ -411,32 +412,32 @@
                                                  rowKey="#{vacacion.idVacaciones}" paginator="true" rows="6" rowSelectMode="add" 
                                                  paginatorPosition="bottom" lazy="true">
                                         <p:column headerText="Fecha de inicio" style="text-align: center;">
-                                            <p:outputLabel value="#{vacacion.fechainicio}">
+                                            <p:outputLabel value="#{vacacion.fechaInicio}">
                                                 <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
                                             </p:outputLabel>
                                         </p:column>
                                         <p:column headerText="Fecha de termino" style="text-align: center;">
-                                            <p:outputLabel value="#{vacacion.fechafin}">
+                                            <p:outputLabel value="#{vacacion.fechaFin}">
                                                 <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
                                             </p:outputLabel>
                                         </p:column>
                                         <p:column headerText="Dias al final del periodo" style="text-align: center;">
-                                            <h:outputText value="#{vacacion.diastotales}"/>
+                                            <h:outputText value="#{vacacion.diasTotales}"/>
                                         </p:column>
                                         <p:column headerText="Dias tomados" style="text-align: center;">
-                                            <h:outputText value="#{vacacion.diastomados}"/>
+                                            <h:outputText value="#{vacacion.diasTomados}"/>
                                         </p:column>
                                         <p:column headerText="Dias pagados" style="text-align: center;">
-                                            <h:outputText value="#{vacacion.diaspagados}"/>
+                                            <h:outputText value="#{vacacion.diasPagados}"/>
                                         </p:column>
                                         <p:column headerText="Dias restantes" style="text-align: center;">
-                                            <h:outputText value="#{(vacacion.diastotales - vacacion.diastomados - vacacion.diaspagados)}"/>
+                                            <h:outputText value="#{(vacacion.diasTotales - vacacion.diasTomados - vacacion.diasPagados)}"/>
                                         </p:column>
                                         <p:column headerText="Prima vacional Pagada" style="text-align: center;">
-                                            <p:commandButton disabled="true" styleClass="#{vacacion.primapagada ? 'ui-button-success' : 'ui-button-danger m-1'}" icon="#{vacacion.primapagada ? 'pi pi-check' : 'pi pi-times'}"/>
+                                            <p:commandButton disabled="true" styleClass="#{vacacion.primaPagada ? 'ui-button-success' : 'ui-button-danger m-1'}" icon="#{vacacion.primaPagada ? 'pi pi-check' : 'pi pi-times'}"/>
                                         </p:column>
                                         <p:column headerText="Dias pendientes pagados" style="text-align: center;">
-                                            <p:commandButton disabled="true" styleClass="#{vacacion.diaspendientespagados ? 'ui-button-success' : 'ui-button-danger m-1'}" icon="#{vacacion.diaspendientespagados ? 'pi pi-check' : 'pi pi-times'}"/>
+                                            <p:commandButton disabled="true" styleClass="#{vacacion.diasPendientesPagados ? 'ui-button-success' : 'ui-button-danger m-1'}" icon="#{vacacion.diasPendientesPagados ? 'pi pi-check' : 'pi pi-times'}"/>
                                         </p:column>
                                     </p:dataTable>
                                 </p:tab>

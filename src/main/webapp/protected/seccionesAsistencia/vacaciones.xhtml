@@ -61,7 +61,7 @@
                     <p:outputLabel value="#{asistenciaBean.formatoPeriodo(periodo)}" />
                 </p:column>
                 <p:column headerText="Dias permitidos" filterable="false" style="text-align: center; width: 100px;">
-                    <p:outputLabel value="#{periodo.diastotales - periodo.diastomados - periodo.diaspagados}"/>
+                    <p:outputLabel value="#{periodo.diasTotales - periodo.diasTomados - periodo.diasPagados}"/>
                 </p:column>    
             </p:dataTable>
             <p:outputLabel value="Total de dias disponibles: #{asistenciaBean.diasTotalesPermitidos}" style="text-align: right;" rendered="#{asistenciaBean.solicitudSelected.tipoSolicitud.idTipoSolicitud ne null 

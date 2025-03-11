@@ -57,11 +57,12 @@ public class VacacionesPercepcion extends AbstractPercepcion implements IPercepc
 			cantidad = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 		} finally {
 			percepcion = new DetNominaPercepcion();
-			percepcion.setKey(new DetNominaPercepcionPK(nomina, index));
-			percepcion.setClave(CVE_SUELDO);
+			percepcion.setClave(CVE_VACACIONES_EN_TIEMPO);
 			percepcion.setNombre("Vacaciones en tiempo");
-			percepcion.setCantidad(cantidad);
 			percepcion.setTipoPercepcion(tpSueldo);
+			percepcion.setKey(new DetNominaPercepcionPK(nomina, index));
+			
+			percepcion.setCantidad(cantidad);
 			percepcion.setImporteGravado(salarioVacaciones);
 			percepcion.setImporteExcento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
 			

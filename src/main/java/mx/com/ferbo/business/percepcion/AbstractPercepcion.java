@@ -8,7 +8,11 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import mx.com.ferbo.dao.n.PercepcionDAO;
+import mx.com.ferbo.model.CatPercepcion;
+import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
+import mx.com.ferbo.model.DetNominaPercepcionPK;
 import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.util.SGPException;
@@ -25,12 +29,37 @@ public class AbstractPercepcion {
 	public static final String P_BONO_PUNTUALIDAD = "010";
 	public static final String P_VALES_DESPENSA   = "029";
 	
-	public static final String CVE_SUELDO               = "001";
-	public static final String CVE_SEXTO_DIA            = "002";
-	public static final String CVE_SEPTIMO_DIA          = "003";
-	public static final String CVE_BONO_PUNTUALIDAD     = "015";
-	public static final String CVE_VACACIONES_EN_TIEMPO = "019";
-	public static final String CVE_VALES_DESPENSA       = "032";
+	//Con base en la tabla cat_percepcion
+	public static final String CVE_SUELDO                      = "001";
+	public static final String CVE_SEXTO_DIA                   = "002";
+	public static final String CVE_SEPTIMO_DIA                 = "003";
+	public static final String CVE_BONO_PUNTUALIDAD            = "015";
+	public static final String CVE_PRIMA_VACACIONES_EN_TIEMPO  = "020";
+	public static final String CVE_VACACIONES_REPORTADAS       = "021";
+	public static final String CVE_PRIMA_VACACIONES_REPORTADAS = "022";
+	public static final String CVE_AGUINALDO                   = "024";
+	public static final String CVE_VACACIONES_EN_TIEMPO        = "029";
+	public static final String CVE_VALES_DESPENSA              = "032";
+	
+	public DetNominaPercepcion build(DetNomina nomina, String clave) {
+		DetNominaPercepcion percepcion = null;
+		PercepcionDAO percepcionDAO = null;
+		CatPercepcion catPercepcion = null;
+		Integer index = null;
+		
+		percepcionDAO = new PercepcionDAO();
+		catPercepcion = percepcionDAO.buscarPorId(clave);
+		
+		index = this.nuevoIndiceDe(nomina.getPercepciones());
+		
+		percepcion = new DetNominaPercepcion();
+		percepcion.setKey(new DetNominaPercepcionPK(nomina, index));
+		percepcion.setClave(clave);
+		percepcion.setNombre(catPercepcion.getNombre());
+		percepcion.setTipoPercepcion(catPercepcion.getTipoPercepcion());
+		
+		return percepcion;
+	}
 	
 	public CatTipoPercepcion getTipoPercepcion(String clave) {
 		CatTipoPercepcion tipoPercepcion = null;

@@ -19,7 +19,7 @@ import javax.persistence.Table;
  * @author alberto
  */
 @Entity
-@Table(name = "cat_estatus_solicitud")
+@Table(name = "cat_st_solicitud")
 @NamedQueries({
     @NamedQuery(name = "CatEstatusSolicitud.findAll", query = "SELECT ces FROM CatEstatusSolicitud ces"),
     @NamedQuery(name = "CatEstatusSolicitud.findByClave", query = "SELECT ces FROM CatEstatusSolicitud ces WHERE ces.clave = :clave")
@@ -31,7 +31,7 @@ public class CatEstatusSolicitud implements Serializable
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "id_est_solicitud")
+    @Column(name = "cd_st_solicitud")
     private Integer id;
     
     @Basic(optional = false)

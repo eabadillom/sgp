@@ -43,7 +43,7 @@ public class DetSolicitudPrenda implements Serializable {
     @Column(name = "cantidad")
     private Integer cantidad;
     
-    @JoinColumn(name = "aprobada", referencedColumnName = "id_est_solicitud")
+    @JoinColumn(name = "aprobada", referencedColumnName = "cd_st_solicitud")
     @ManyToOne()
     private CatEstatusSolicitud estatus;
     

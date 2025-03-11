@@ -1,9 +1,12 @@
 package mx.com.ferbo.business.empleado;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import mx.com.ferbo.business.dianolaboral.DiasDeDescansoObligatorioBL;
 import mx.com.ferbo.dao.n.ParametroDAO;
 import mx.com.ferbo.dao.n.VacacionesDAO;
@@ -17,9 +20,6 @@ import mx.com.ferbo.model.DetVacaciones;
 import mx.com.ferbo.model.InfDatoEmpresa;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.SGPException;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class EmpleadoBL {
 
@@ -110,8 +110,8 @@ public class EmpleadoBL {
             DateUtil.setTime(nuevaFechaFin, 0, 0, 0, 0);
             nuevaFechaFin = DateUtil.addYear(nuevaFechaFin, 1);
             nuevaFechaFin = DateUtil.addDay(nuevaFechaFin, -1);
-            primerasVacaciones.setFechainicio(nuevaFechaInicio);
-            primerasVacaciones.setFechafin(nuevaFechaFin);
+            primerasVacaciones.setFechaInicio(nuevaFechaInicio);
+            primerasVacaciones.setFechaFin(nuevaFechaFin);
             VacacionesDAO vacacionesDAO = new VacacionesDAO();
             vacacionesDAO.actualizar(primerasVacaciones);
             log.info("Finaliza el proceso de recalcular el primer periodo vacacional del empleado");
@@ -138,7 +138,7 @@ public class EmpleadoBL {
         Date fechaaux = DateUtil.getDate(aniotmp, mestmp, diatmp);
 
         if (!empleado.getVacaciones().isEmpty()) {
-            fechaaux = empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getFechafin();
+            fechaaux = empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getFechaFin();
         }
 
         while (fechaaux.before(DateUtil.now())) {
@@ -156,8 +156,8 @@ public class EmpleadoBL {
                 String sDias = parametro.getValor();
                 dias = Integer.parseInt(sDias);
             } else {
-                dias = empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getDiastotales();
-                fechatmp = empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getFechafin();
+                dias = empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getDiasTotales();
+                fechatmp = empleado.getVacaciones().get(empleado.getVacaciones().size() - 1).getFechaFin();
                 fechainicio = DateUtil.addDay(fechatmp, 1);
                 fechafin = DateUtil.addYear(fechainicio, 1);
 
@@ -176,14 +176,14 @@ public class EmpleadoBL {
 
             DetVacaciones ultimasvacaciones = new DetVacaciones();
 
-            ultimasvacaciones.setFechainicio(fechainicio);
-            ultimasvacaciones.setFechafin(fechafin);
-            ultimasvacaciones.setDiastotales(dias);
+            ultimasvacaciones.setFechaInicio(fechainicio);
+            ultimasvacaciones.setFechaFin(fechafin);
+            ultimasvacaciones.setDiasTotales(dias);
             ultimasvacaciones.setEmpleado(empleado);
-            ultimasvacaciones.setDiastomados(0);
-            ultimasvacaciones.setDiaspagados(0);
-            ultimasvacaciones.setPrimapagada(Boolean.FALSE);
-            ultimasvacaciones.setDiaspendientespagados(Boolean.FALSE);
+            ultimasvacaciones.setDiasTomados(0);
+            ultimasvacaciones.setDiasPagados(0);
+            ultimasvacaciones.setPrimaPagada(Boolean.FALSE);
+            ultimasvacaciones.setDiasPendientesPagados(Boolean.FALSE);
 
             if (empleado.getVacaciones().isEmpty()) {
                 List<DetVacaciones> vacaciones = new ArrayList<DetVacaciones>();

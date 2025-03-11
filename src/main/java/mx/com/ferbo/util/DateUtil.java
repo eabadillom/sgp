@@ -790,45 +790,6 @@ public class DateUtil {
         return resultado;
     }
 
-    public static Date fechaVencimiento(Date fecha, int diasVencimiento, boolean esVigenciaNatural){
-        Date vencimiento = null;
-        Date fechaAux = null;
-
-        vencimiento = new Date(fecha.getTime());
-        fechaAux = new Date(fecha.getTime());
-
-        if(diasVencimiento == 30 && (esVigenciaNatural == false) ) {
-            log.trace("Vencimiento: 30 días.");
-            int diaDelMes = getDia(fecha);
-            if(diaDelMes >= 1 && diaDelMes <= 29) {
-                log.trace("Día del mes entre 1 y 29");
-                vencimiento = DateUtil.addMonth(vencimiento, 1);
-                vencimiento = DateUtil.addDay(vencimiento,-1);
-                log.trace("Vencimiento: {}", vencimiento);
-            } else {
-                log.trace("Día del mes entre 30, 31");
-                vencimiento = DateUtil.addMonth(vencimiento, 1);
-                log.trace("Vencimiento: {}", vencimiento);
-                if(getDia(vencimiento) == getDia(fechaAux)) {
-                    log.trace("Día de vencimiento igual a fecha auxiliar.");
-                    vencimiento = DateUtil.addDay(vencimiento, -1);
-                    log.trace("Vencimiento: {}", vencimiento);
-                }
-            }
-            if(getDia(fechaAux) == 29 && getMes(fechaAux) == 1) {
-                log.trace("día de fecha auxiliar = 29 y mes 1");
-                String f = String.format("%d-02-28", getAnio(fechaAux));
-                vencimiento = DateUtil.getDate(f, FORMATO_YYYY_MM_DD);
-                log.trace("Vencimiento: {}", vencimiento);
-            }
-            log.trace("Vencimiento: {}", vencimiento);
-        } else {
-            vencimiento = DateUtil.addDay(vencimiento, (diasVencimiento - 1));
-        }
-
-        return vencimiento;
-    }
-
     public static LocalDate toLocalDate(Date fecha) {
         LocalDate resultado = null;
         ZoneId systemDefault = null;

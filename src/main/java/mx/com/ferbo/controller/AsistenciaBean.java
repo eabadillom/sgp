@@ -94,7 +94,6 @@ public class AsistenciaBean implements Serializable {
     private final String permisos = "P";
     private final String vacaciones = "V";
     
-    @SuppressWarnings("OverridableMethodCallInConstructor")
     public AsistenciaBean() {
         this.diasDeAsueto = DiasDeDescansoObligatorioBL.diasDeAsueto();
         calendario = new DefaultScheduleModel();
@@ -361,9 +360,9 @@ public class AsistenciaBean implements Serializable {
             List<DetVacaciones> periodosTmp = vacacionesDAO.obtenerPeriodosPorFecha(empleadoSelected.getIdEmpleado(), DateUtil.now());
 
             for (DetVacaciones periodo : periodosTmp) {
-                if (periodo.getDiastomados() < periodo.getDiastotales() && (periodo.getDiaspagados() + periodo.getDiastomados()) < periodo.getDiastotales()) {
+                if (periodo.getDiasTomados() < periodo.getDiasTotales() && (periodo.getDiasPagados() + periodo.getDiasTomados()) < periodo.getDiasTotales()) {
                     periodos.add(periodo);
-                    this.diasTotalesPermitidos += (periodo.getDiastotales() - periodo.getDiaspagados() - periodo.getDiastomados());
+                    this.diasTotalesPermitidos += (periodo.getDiasTotales() - periodo.getDiasPagados() - periodo.getDiasTomados());
                 }
             }
         } catch (SGPException sgpEx) {
@@ -373,17 +372,19 @@ public class AsistenciaBean implements Serializable {
     }
 
     public String formatoPeriodo(DetVacaciones vacacion) {
-
-        String sfechaInicio = "";
-        sfechaInicio += vacacion.getFechainicio();
-
-        String sfechaFin = "";
-        sfechaFin += vacacion.getFechafin();
-
-        String resultado = "";
-
-        resultado = "Desde " + sfechaInicio + " al " + sfechaFin;
-        resultado = resultado.replaceAll(" 00:00:00.0", "");
+    	String resultado = null;
+    	String sFechaInicio = null;
+    	String sFechaFin = null;
+    	
+    	try {
+    		sFechaInicio = DateUtil.getString(vacacion.getFechaInicio(), DateUtil.FORMATO_DD_MM_YYYY);
+    		sFechaFin = DateUtil.getString(vacacion.getFechaFin(), DateUtil.FORMATO_DD_MM_YYYY);
+    		
+    		resultado = String.format("Desde %s al %s", sFechaInicio, sFechaFin);
+    	} catch(Exception ex) {
+    		log.error("Problema para generar convertir el periodo vacacional a string...", ex);
+    	}
+        
         return resultado;
     }
 

@@ -67,7 +67,7 @@ public class DetSolicitudPermiso implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaFin;
     
-    @JoinColumn(name = "aprobada", referencedColumnName = "id_est_solicitud")
+    @JoinColumn(name = "aprobada", referencedColumnName = "cd_st_solicitud")
     @ManyToOne()
     private CatEstatusSolicitud estatus;
     

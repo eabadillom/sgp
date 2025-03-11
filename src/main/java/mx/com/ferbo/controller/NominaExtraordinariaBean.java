@@ -94,6 +94,7 @@ public class NominaExtraordinariaBean implements Serializable {
     	this.periodicidad = periodicidadDAO.buscarPorId("99");
     	this.nomPercepcion = PercepcionBL.build();
     	this.percepciones = percepcionDAO.buscarTodos();
+    	this.nomina = NominaBL.build(NominaBL.TP_NOMINA_EXTRAORDINARIA, parametros, null);
     }
     
     public String statusNomina(DetNomina nomina) {
@@ -195,20 +196,21 @@ public class NominaExtraordinariaBean implements Serializable {
     }
     
     public void agregarPercepcion() {
-    	log.info("Agregando percepcion a los empleados seleccionados...");
-    	
-    	log.info("Percepcion: {}", this.nomPercepcion);
-    	this.nominaBO = new NominaExtraordinariaBL();
-    	
-    	for(DetNomina nomina : this.listaNominaSelected) {
-    		nomina.getPercepciones().add(nomPercepcion);
-    		log.info("Agreagndo percepción al empleado: {}", nomina.getReceptor().getNombre());
-    	}
-    	
-    	
-    	
+    	log.info("Agregando percepcion...");
     }
     
+    public void calcularPercepcion() {
+    	//TODO validar parametros del dialog de percepcion.
+    	
+    	log.info("Percepcion: {}", this.nomPercepcion);
+    	if(this.nominaBO == null)
+    		this.nominaBO = new NominaExtraordinariaBL();
+    	
+    	for(DetNomina nomina : this.listaNominaSelected) {
+    		log.info("Agreagndo percepción al empleado: {}", nomina.getReceptor().getNombre());
+    		this.nominaBO.calcular(nomina, parametros, this.nomPercepcion);
+    	}
+    }
     
     /***************GETTERS Y SETTERS***************/
 	public Integer getAnio() {

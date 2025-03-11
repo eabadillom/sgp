@@ -160,7 +160,7 @@ public abstract class NominaBL {
     		
     		periodoVacacional = vacacionesDAO.buscarPeriodoPorFecha(this.empleado.getIdEmpleado(), this.parametros.getPeriodoFin());
     		
-    		diasVacaciones = new BigDecimal(periodoVacacional.getDiastotales()).setScale(2, BigDecimal.ROUND_HALF_UP);
+    		diasVacaciones = new BigDecimal(periodoVacacional.getDiasTotales()).setScale(2, BigDecimal.ROUND_HALF_UP);
     		
     		primaVacacional = this.empleado.getDatoEmpresa().getPrimaVacacional().divide(cien).setScale(2, BigDecimal.ROUND_HALF_UP) ;
     		sueldoDiario = empleado.getDatoEmpresa().getSalarioDiario();
