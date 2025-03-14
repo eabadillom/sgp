@@ -1,5 +1,6 @@
 package mx.com.ferbo.business.percepcion;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -57,6 +58,17 @@ public class AbstractPercepcion {
 		percepcion.setClave(clave);
 		percepcion.setNombre(catPercepcion.getNombre());
 		percepcion.setTipoPercepcion(catPercepcion.getTipoPercepcion());
+		
+		return percepcion;
+	}
+	
+	public DetNominaPercepcion build(DetNomina nomina, String clave, BigDecimal cantidad, BigDecimal importeExento, BigDecimal importeGravado) {
+		DetNominaPercepcion percepcion = null;
+		
+		percepcion = this.build(nomina, clave);
+		percepcion.setCantidad(cantidad);
+		percepcion.setImporteExcento(importeExento);
+		percepcion.setImporteGravado(importeGravado);
 		
 		return percepcion;
 	}

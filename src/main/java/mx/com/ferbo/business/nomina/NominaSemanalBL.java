@@ -27,6 +27,7 @@ import mx.com.ferbo.business.percepcion.ValesDespensaPercepcion;
 import mx.com.ferbo.dao.n.NominaDAO;
 import mx.com.ferbo.dao.n.PercepcionEmpleadoDAO;
 import mx.com.ferbo.dao.n.RegistroDAO;
+import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.CatDiaNoLaboral;
 import mx.com.ferbo.model.CatEstatusRegistro;
 import mx.com.ferbo.model.DetEmpleado;
@@ -133,7 +134,7 @@ public class NominaSemanalBL extends NominaBL {
 			
 			/*-------------------------DEDUCCIONES-----------------------*/
     		Optional<DetNominaPercepcion> optSueldo = nomina.getPercepciones().stream().filter(p -> AbstractPercepcion.CVE_SUELDO.equalsIgnoreCase(p.getClave())).findFirst();
-    		salarioSemanal = optSueldo.isPresent() ? optSueldo.get().getImporteExcento().add(optSueldo.get().getImporteGravado()) : BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+    		salarioSemanal = optSueldo.isPresent() ? optSueldo.get().getImporteExento().add(optSueldo.get().getImporteGravado()) : BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
     		
 			if(salarioSemanal.compareTo(BigDecimal.ZERO) > 0) {
 				NominaSemanalBL.procesarISR(nomina, this.parametros);
@@ -143,7 +144,7 @@ public class NominaSemanalBL extends NominaBL {
 			
 			/*--------------------------RESUMEN--------------------------*/
 			for(DetNominaPercepcion p : percepciones) {
-				log.info("Percepcion: {} - {} - {}", p.getNombre(), p.getImporteExcento(), p.getImporteGravado());
+				log.info("Percepcion: {} - {} - {}", p.getNombre(), p.getImporteExento(), p.getImporteGravado());
 			}
 			
 			for(DetNominaOtroPago o : otrosPagos) {
@@ -281,6 +282,8 @@ public class NominaSemanalBL extends NominaBL {
 	 * @param diasVacaciones TODO
 	 */
 	public static synchronized void calcularSueldo(DetNomina nomina, ParametrosNomina parametros, BigDecimal diasLaborales, BigDecimal diasNoLaborales, BigDecimal diasTrabajados, BigDecimal diasVacaciones) {
+		DetNominaPercepcion  sueldo = null;
+		DetNominaPercepcion  vacaciones = null;
 		SueldoPercepcion     sueldoBO = null;
 		VacacionesPercepcion vacacionesBO = null;
 		SeptimoDiaPercepcion septimoDiaBO = null;
@@ -288,10 +291,15 @@ public class NominaSemanalBL extends NominaBL {
 		log.info("Asistencia: {} días, Vacaciones: {}, Descanso: {} días", diasTrabajados, diasVacaciones, diasNoLaborales);
 		
 		sueldoBO = new SueldoPercepcion(parametros, diasTrabajados);
-		sueldoBO.calcular(nomina);
+		sueldo = sueldoBO.calcular(nomina);
+		if(sueldo.getImporteExento().add(sueldo.getImporteGravado()).compareTo(ValoresBD.CERO.getValor()) > 0);
+			nomina.getPercepciones().add(sueldo);
 		
 		vacacionesBO = new VacacionesPercepcion(parametros, diasVacaciones);
-		vacacionesBO.calcular(nomina);
+		vacaciones = vacacionesBO.calcular(nomina);
+		
+		if(vacaciones.getImporteExento().add(vacaciones.getImporteGravado()).compareTo(ValoresBD.CERO.getValor()) > 0)
+			nomina.getPercepciones().add(vacaciones);
 		
 		//Para el séptimo día, se considera el salario diario (sin SDI), dividiendolo entre los días de la semana que se deben laborar,
 		//multiplicado por los días que si laboró el trabajador (parte proporcional de los días trabajados).
@@ -305,6 +313,7 @@ public class NominaSemanalBL extends NominaBL {
 		BigDecimal                salarioDiarioIntegrado = null;
 		BigDecimal                proporcionalSeptimoDia = null;
 		List<DetNominaPercepcion> percepciones           = null;
+		DetNominaPercepcion       percepcion             = null;
 		
 		percepciones = nomina.getPercepciones();
 		salarioDiarioIntegrado = nomina.getReceptor().getSalarioDiarioIntegrado();
@@ -331,7 +340,10 @@ public class NominaSemanalBL extends NominaBL {
 				diasTrabajados, salarioDiarioIntegrado, proporcionalSeptimoDia);
 		bonoPuntualidadBO.setProcesaRetardos(procesarRetardos);
 		bonoPuntualidadBO.setPercepcionesEmpleado(percepcionesEmpleado);
-		bonoPuntualidadBO.calcular(nomina);
+		percepcion = bonoPuntualidadBO.calcular(nomina);
+		
+		if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(BigDecimal.ZERO) > 0)
+			nomina.getPercepciones().add(percepcion);
 	}
 	
 	/**Preparación para el cálculo de vales de despensa. Depende de Sueldo y Septimo Día. Ambos se debe encontrar en el parámetro "nomina"
@@ -340,6 +352,7 @@ public class NominaSemanalBL extends NominaBL {
 	 * @param percepcionesEmpleado Lista de percepciones que se aplicarán al empleado y las restricciones que están configuradas desde el registro de empleados.
 	 */
 	private static void calcularValesDespensa(DetNomina nomina, ParametrosNomina parametros, List<DetPercepcionEmpleado> percepcionesEmpleado) {
+		DetNominaPercepcion       percepcion = null;
 		ValesDespensaPercepcion   valesDespensaBO = null;
 		List<DetNominaPercepcion> percepciones = null;
 		BigDecimal                diasTrabajados = null;
@@ -367,8 +380,10 @@ public class NominaSemanalBL extends NominaBL {
 		
 		valesDespensaBO = new ValesDespensaPercepcion(parametros.getTiposPercepcion(), diasTrabajados, parametros.getUma().getImporteDiario(), parametros.getValeDespensa(), diasPeriodo);
 		valesDespensaBO.setPercepcionesEmpleado(percepcionesEmpleado);
-		valesDespensaBO.calcular(nomina);
+		percepcion = valesDespensaBO.calcular(nomina);
 		
+		if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(ValoresBD.CERO.getValor()) > 0)
+			nomina.getPercepciones().add(percepcion);
 	}
 	
 	public static synchronized Boolean esUltimaSemanaMes(Date periodoInicio, Date periodoFin) {

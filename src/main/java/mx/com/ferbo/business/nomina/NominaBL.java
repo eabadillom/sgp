@@ -220,6 +220,8 @@ public abstract class NominaBL {
 			emisor.setCodigoPostal(empresa.getCodigoPostal());
 			emisor.setRegistroPatronal(empresa.getRegistroPatronal());
 			emisor.setRegimenFiscal(empresa.getRegimenFiscal());
+			
+			log.info("Emisor: {}", emisor.getNombre());
 		} catch(Exception ex) {
 			emisor = new DetNominaEmisor();
 			emisor.setNomina(nomina);
@@ -281,8 +283,10 @@ public abstract class NominaBL {
 			receptor.setEntidadFederativa(empleado.getDatoEmpresa().getEntidadFederativa());
 			//TODO pendiente revisar antiguedad
 			String sAntiguedad = antiguedadSemanas(empleado.getDatoEmpresa().getFechaIngreso(), parametros.getPeriodoFin());
-			log.info("Antiguedad: {}", sAntiguedad);
+			log.debug("Antiguedad: {}", sAntiguedad);
 			receptor.setAntiguedad(sAntiguedad);
+			
+			log.info("Receptor: {}", receptor.getNombre());
 			
 		} catch(Exception ex) {
 			log.error("Problema para generar el receptor...", ex);
@@ -346,16 +350,16 @@ public abstract class NominaBL {
 		if(nomina.getPercepciones() == null)
 			throw new SGPException("La lista de percepciones no está definida.");
 		
-		if(percepcion.getImporteExcento() == null && percepcion.getImporteGravado() == null)
+		if(percepcion.getImporteExento() == null && percepcion.getImporteGravado() == null)
 			throw new SGPException("Debe indicar un importe (excento o gravado).");
 		
-		if(percepcion.getImporteExcento() == null)
+		if(percepcion.getImporteExento() == null)
 			percepcion.setImporteExcento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
 		
 		if(percepcion.getImporteGravado() == null)
 			percepcion.setImporteGravado(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
 		
-		if(percepcion.getImporteExcento().compareTo(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP)) < 0
+		if(percepcion.getImporteExento().compareTo(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP)) < 0
 				&& percepcion.getImporteGravado().compareTo(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP)) < 0
 				)
 			throw new SGPException("Debe indicar un importe (excento o gravado).");
@@ -366,9 +370,19 @@ public abstract class NominaBL {
 		if(percepcion.getNombre().trim().equalsIgnoreCase(""))
 			throw new SGPException("Debe indicar una descripción para la percepción.");
 		
-		percepcion.setClave("FRB-" + percepcion.getTipoPercepcion().getClave() );
+		if(percepcion.getClave() == null)
+			throw new SGPException("Debe indicar una clave para la percepción.");
 		
-		maxP = Collections.max(nomina.getPercepciones(), Comparator.comparing(d -> d.getKey().getId()));
+		if(percepcion.getClave().trim().equalsIgnoreCase(""))
+			throw new SGPException("Debe indicar una clave para la percepción.");
+		
+		final String clave = percepcion.getClave();
+		
+		boolean removedPercepciones = nomina.getPercepciones().removeIf(p -> p.getClave().equalsIgnoreCase(clave));
+		if(removedPercepciones)
+			log.info("Se encontraron conceptos {}, los cuales fueron eliminados de la lista de percepciones.", clave);
+		
+		maxP = Collections.max(nomina.getPercepciones(), Comparator.comparing(p -> p.getKey().getId()));
 		
 		if(maxP.getKey().getId() == null)
 			throw new SGPException("Existen elementos de \"Percepciones\" que no tienen asignado un consecutivo");
@@ -528,7 +542,7 @@ public abstract class NominaBL {
     	
     	
     	totalPercepciones = nomina.getPercepciones().stream()
-				.map(item -> item.getImporteExcento().add(item.getImporteGravado()))
+				.map(item -> item.getImporteExento().add(item.getImporteGravado()))
 				.reduce(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP), BigDecimal :: add)
 		;
     	
@@ -573,7 +587,7 @@ public abstract class NominaBL {
     	
     	log.info("Actualizando {}", nomina);
 		totalPercepciones = nomina.getPercepciones().stream()
-				.map(item -> item.getImporteExcento().add(item.getImporteGravado()))
+				.map(item -> item.getImporteExento().add(item.getImporteGravado()))
 				.reduce(BigDecimal.ZERO, BigDecimal :: add);
 		
 		totalOtrosPagos = nomina.getOtrosPagos().stream()

@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
 import org.apache.logging.log4j.LogManager;
@@ -95,23 +96,44 @@ public class VacacionesDAO extends BaseDAO<DetVacaciones, Integer> {
         return periodos;
     }
     
-    public List<DetVacaciones> obtenerPorRfcFecha(String rfc, Date fecha) {
-    	List<DetVacaciones> modelList = null;
+    public DetVacaciones obtenerPorRfcFecha(String rfc, Date fecha) {
+    	DetVacaciones model = null;
     	EntityManager em = null;
+    	String sql = null;
     	
     	try {
+    		sql = "select * from det_vacaciones dv\n"
+    				+ "inner join\n"
+    				+ "(\n"
+    				+ "	select\n"
+    				+ "		v.id_empleado,\n"
+    				+ "		max(v.fh_fin) as fh_fin\n"
+    				+ "	from det_vacaciones v\n"
+    				+ "	inner join det_empleado e\n"
+    				+ "		on v.id_empleado = e.id_empleado\n"
+    				+ "	inner join inf_empleado_empresa ee\n"
+    				+ "		on e.id_empleado_empresa = ee.id_empleado_empresa\n"
+    				+ "	where (v.nu_dias_totales - v.nu_dias_tomados) > 0\n"
+    				+ "		and ee.nb_rfc = :rfc\n"
+    				+ "		and v.fh_fin < :fecha\n"
+    				+ "	group by id_empleado\n"
+    				+ ") t on dv.id_empleado = t.id_empleado and dv.fh_fin = t.fh_fin\n"
+    				;
+    		
     		em = this.getEntityManager();
-    		modelList = em.createNamedQuery("DetVacaciones.buscarPorRfcVencimiento", DetVacaciones.class)
+    		model = (DetVacaciones) em.createNativeQuery(sql, DetVacaciones.class)
     				.setParameter("rfc", rfc)
     				.setParameter("fecha", fecha)
-    				.getResultList()
+    				.getSingleResult()
     				;
-    	} catch(Exception ex) {
-    		log.error("Probleam para obtener la lista de periodos vacacionales...", ex);
+    	} catch(NoResultException ex) {
+    		log.warn("No se encontró información para la consulta: {}", ex.getMessage());
+    	}catch(Exception ex) {
+    		log.error("Problema para obtener la lista de periodos vacacionales...", ex);
     	} finally {
     		this.close(em);
     	}
     	
-    	return modelList;
+    	return model;
     }
 }

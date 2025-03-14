@@ -37,7 +37,7 @@ public class VacacionesReportadasPercepcion extends AbstractPercepcion implement
 	}
 
 	@Override
-	public void calcular(DetNomina nomina) {
+	public DetNominaPercepcion calcular(DetNomina nomina) {
 		DetNominaPercepcion percepcion = null;
 		List<DetNominaPercepcion> percepciones = null;
 		BigDecimal cantidad = null;
@@ -55,7 +55,7 @@ public class VacacionesReportadasPercepcion extends AbstractPercepcion implement
 			empleadoDAO = new EmpleadoDAO();
 			empleado = empleadoDAO.buscarPorRFC(nomina.getReceptor().getRfc());
 			vacacionesDAO = new VacacionesDAO();
-			listaPeriodos = vacacionesDAO.obtenerPorRfcFecha(nomina.getReceptor().getRfc(), parametros.getPeriodoFin());
+//			listaPeriodos = vacacionesDAO.obtenerPorRfcFecha(nomina.getReceptor().getRfc(), parametros.getPeriodoFin());
 			
 			if(listaPeriodos.size() == 0)
 				log.info("No se encontraron periodos vacacionales para el empleado.");
@@ -74,11 +74,10 @@ public class VacacionesReportadasPercepcion extends AbstractPercepcion implement
 			importeGravado = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 			importeExento = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 		} finally {
-			percepcion = this.build(nomina, CVE_VACACIONES_REPORTADAS);
-			percepcion.setCantidad(cantidad);
-			percepcion.setImporteGravado(importeGravado);
-			percepcion.setImporteExcento(importeExento);
+			percepcion = this.build(nomina, CVE_VACACIONES_REPORTADAS, cantidad, importeExento, importeGravado);
 		}
+		
+		return percepcion;
 	}
 
 	private BigDecimal calcularImporte(DetVacaciones periodo, BigDecimal salarioDiario) throws SGPException {

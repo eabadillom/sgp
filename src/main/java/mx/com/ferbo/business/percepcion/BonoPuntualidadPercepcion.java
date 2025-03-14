@@ -7,9 +7,9 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
-import mx.com.ferbo.model.DetNominaPercepcionPK;
 import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.DetRegistro;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
@@ -49,21 +49,14 @@ public class BonoPuntualidadPercepcion extends AbstractPercepcion implements IPe
 	}
 
 	@Override
-	public void calcular(DetNomina nomina) {
+	public DetNominaPercepcion calcular(DetNomina nomina) {
 		DetNominaPercepcion percepcion = null;
 		BigDecimal bono = null;
     	BigDecimal diasPeriodo = null;
     	
-    	CatTipoPercepcion tpBonoPuntualidad = null;
     	DetPercepcionEmpleado percepcionEmpleado = null;
     	
-    	Integer index = null;
-    	
     	try {
-    		index = this.nuevoIndiceDe(nomina.getPercepciones());
-    		
-    		tpBonoPuntualidad = this.getTipoPercepcion(P_BONO_PUNTUALIDAD);
-    		
     		//TODO VALIDAR PRIMERO SI NO HAY RETARDOS.
     		//En caso de existir retardos en el periodo de calculo, el bono de puntualidad es CERO.
     		if(this.diasTrabajados.compareTo(diasLaborales) < 0)
@@ -98,26 +91,10 @@ public class BonoPuntualidadPercepcion extends AbstractPercepcion implements IPe
     		log.warn("No es posible calcular el bono de puntualidad: {}", ex.getMessage());
     		bono = BigDecimal.ZERO;
     	} finally {
-    		percepcion = new DetNominaPercepcion();
-    		percepcion.setKey(new DetNominaPercepcionPK(nomina, index));
-    		percepcion.setClave(CVE_BONO_PUNTUALIDAD);
-    		percepcion.setNombre("Bono puntualidad");
-    		percepcion.setTipoPercepcion(tpBonoPuntualidad);
-    		percepcion.setImporteGravado(bono);
-    		percepcion.setImporteExcento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
-    		
-    		//Si el hay bono de puntualidad, se agrega a la lista de percepciones.
-    		if(percepcion.getImporteExcento().add(percepcion.getImporteGravado()).compareTo(BigDecimal.ZERO) > 0)
-    			nomina.getPercepciones().add(percepcion);
-    		
-    		this.tiposPercepcion = null;
-    		this.percepcionesEmpleado = null;
-    		this.mapAsistencias = null;
-    		this.tasaBono = null;
-    		this.diasTrabajados = null;
-    		this.salarioDiarioIntegrado = null;
-//    		this.proporcionalSeptimoDia = null;
+    		percepcion = this.build(nomina, CVE_BONO_PUNTUALIDAD, null, ValoresBD.CERO.getValor(), bono);
     	}
+    	
+    	return percepcion;
 	}
 
 	public void setProcesaRetardos(Boolean procesaRetardos) {

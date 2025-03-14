@@ -6,9 +6,9 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
-import mx.com.ferbo.model.DetNominaPercepcionPK;
 import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.util.SGPException;
@@ -33,24 +33,17 @@ public class ValesDespensaPercepcion extends AbstractPercepcion implements IPerc
 	}
 	
 	@Override
-	public void calcular(DetNomina nomina) {
+	public DetNominaPercepcion calcular(DetNomina nomina) {
 		DetNominaPercepcion percepcion = null;
 		BigDecimal importeVales = null;
 		
-		CatTipoPercepcion tpValeDespensa = null;
 		DetPercepcionEmpleado percepcionEmpleado = null;
-		
-		Integer index = null;
 		
 		BigDecimal limiteExcento = null;
 		BigDecimal importeGravado = null;
 		BigDecimal importeExento = null;
 		
 		try {
-			index = this.nuevoIndiceDe(nomina.getPercepciones());
-			
-			tpValeDespensa = this.getTipoPercepcion(P_VALES_DESPENSA);
-			
     		if(this.diasTrabajados.compareTo(BigDecimal.ZERO) == 0)
     			throw new SGPException("No es posible asignar vales de despensa.");
     		
@@ -88,23 +81,9 @@ public class ValesDespensaPercepcion extends AbstractPercepcion implements IPerc
     		importeExento = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 			importeGravado = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
     	} finally {
-    		percepcion = new DetNominaPercepcion();
-    		percepcion.setKey(new DetNominaPercepcionPK(nomina, index));
-			percepcion.setClave(CVE_VALES_DESPENSA);
-			percepcion.setNombre("Despensa");
-			percepcion.setTipoPercepcion(tpValeDespensa);
-			percepcion.setImporteGravado(importeGravado);
-			percepcion.setImporteExcento(importeExento);
-			
-			if(percepcion.getImporteExcento().add(percepcion.getImporteGravado()).compareTo(BigDecimal.ZERO) > 0)
-				nomina.getPercepciones().add(percepcion);
-			
-			this.tiposPercepcion = null;
-			this.percepcionesEmpleado = null;
-			this.diasTrabajados = null;
-			this.uma = null;
-			this.tasaVales = null;
-			this.diasPeriodo = null;
+    		percepcion = this.build(nomina, CVE_VALES_DESPENSA, ValoresBD.CERO.getValor(), importeExento, importeGravado);
     	}
+		
+		return percepcion;
 	}
 }

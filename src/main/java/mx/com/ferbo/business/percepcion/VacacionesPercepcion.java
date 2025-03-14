@@ -7,10 +7,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.nomina.ParametrosNomina;
+import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
-import mx.com.ferbo.model.DetNominaPercepcionPK;
-import mx.com.ferbo.model.sat.CatTipoPercepcion;
 
 public class VacacionesPercepcion extends AbstractPercepcion implements IPercepcion {
 	
@@ -24,15 +23,12 @@ public class VacacionesPercepcion extends AbstractPercepcion implements IPercepc
 	}
 
 	@Override
-	public void calcular(DetNomina nomina) {
+	public DetNominaPercepcion calcular(DetNomina nomina) {
 		DetNominaPercepcion percepcion = null;
 		BigDecimal salarioDiario = null;
 		BigDecimal cantidad = null;
 		BigDecimal salarioVacaciones = null;
-		CatTipoPercepcion tpSueldo = null;
 		List<DetNominaPercepcion> percepciones = null;
-		
-		Integer index = null;
 		
 		try {
 			percepciones = nomina.getPercepciones();
@@ -41,10 +37,6 @@ public class VacacionesPercepcion extends AbstractPercepcion implements IPercepc
 			boolean removedPercepciones = percepciones.removeIf(d -> CVE_VACACIONES_EN_TIEMPO.equalsIgnoreCase(d.getClave()));
 			if(removedPercepciones)
 				log.info("Se encontraron conceptos {}, los cuales fueron eliminados para el reproceso de SUELDO.", AbstractPercepcion.CVE_SUELDO);
-			
-			index = this.nuevoIndiceDe(nomina.getPercepciones());
-			
-			tpSueldo = this.getTipoPercepcion(P_SUELDO);
 			
 			salarioVacaciones = salarioDiario
 					.multiply(diasVacaciones)
@@ -56,22 +48,10 @@ public class VacacionesPercepcion extends AbstractPercepcion implements IPercepc
 			salarioVacaciones = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 			cantidad = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 		} finally {
-			percepcion = new DetNominaPercepcion();
-			percepcion.setClave(CVE_VACACIONES_EN_TIEMPO);
-			percepcion.setNombre("Vacaciones en tiempo");
-			percepcion.setTipoPercepcion(tpSueldo);
-			percepcion.setKey(new DetNominaPercepcionPK(nomina, index));
-			
-			percepcion.setCantidad(cantidad);
-			percepcion.setImporteGravado(salarioVacaciones);
-			percepcion.setImporteExcento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
-			
-			if(salarioVacaciones != null && salarioVacaciones.compareTo(BigDecimal.ZERO) > 0)
-				nomina.getPercepciones().add(percepcion);
-			
-			this.tiposPercepcion = null;
-			this.diasVacaciones = null;
+			percepcion = this.build(nomina, CVE_VACACIONES_EN_TIEMPO, cantidad, ValoresBD.CERO.getValor(), salarioVacaciones);
 		}
+		
+		return percepcion;
 
 	}
 

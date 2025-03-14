@@ -33,7 +33,9 @@ public class SeptimoDiaPercepcion extends AbstractPercepcion implements IPercepc
 	}
 
 	@Override
-	public void calcular(DetNomina nomina) {
+	public DetNominaPercepcion calcular(DetNomina nomina) {
+		DetNominaPercepcion percepcion = null;
+		
 		BigDecimal          salarioDiario = null;
 		BigDecimal          septimoDia = null;
 		BigDecimal          proporcionalSemanal = null;
@@ -72,16 +74,14 @@ public class SeptimoDiaPercepcion extends AbstractPercepcion implements IPercepc
 				this.percepcionDiaDescanso(nomina, CVE_SEPTIMO_DIA, sDiaDescanso, proporcionalSemanal, septimoDia);
 			}
 			
+			log.info("Sexto y septimo día se agregaron directamente al objeto nomina.percepciones");
 		} catch(Exception ex) {
 			log.error("Problema para obtener el cálculo del septimo día.",  ex);
 			septimoDia = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 			proporcionalSemanal = BigDecimal.ZERO.setScale(4, BigDecimal.ROUND_HALF_UP);
-		} finally {
-			this.tiposPercepcion = null;
-			this.diasLaborales = null;
-			this.diasTrabajados = null;
 		}
 		
+		return percepcion;
 	}
 	
 	private void percepcionDiaDescanso(DetNomina nomina, String clave, String nombre, BigDecimal proporcionalSemanal, BigDecimal septimoDia) {
@@ -101,7 +101,7 @@ public class SeptimoDiaPercepcion extends AbstractPercepcion implements IPercepc
 		percepcion.setImporteGravado(septimoDia);
 		percepcion.setImporteExcento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
 		
-		if(percepcion.getImporteExcento().add(percepcion.getImporteGravado()).compareTo(BigDecimal.ZERO) > 0)
+		if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(BigDecimal.ZERO) > 0)
 			nomina.getPercepciones().add(percepcion);
 	}
 }

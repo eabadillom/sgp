@@ -7,10 +7,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.nomina.ParametrosNomina;
+import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
-import mx.com.ferbo.model.DetNominaPercepcionPK;
-import mx.com.ferbo.model.sat.CatTipoPercepcion;
 
 public class SueldoPercepcion extends AbstractPercepcion implements IPercepcion {
 	
@@ -24,15 +23,12 @@ public class SueldoPercepcion extends AbstractPercepcion implements IPercepcion 
 	}
 
 	@Override
-	public void calcular(DetNomina nomina) {
+	public DetNominaPercepcion calcular(DetNomina nomina) {
 		DetNominaPercepcion percepcion = null;
 		BigDecimal salarioDiario = null;
 		BigDecimal cantidad = null;
 		BigDecimal salarioSemanal = null;
-		CatTipoPercepcion tpSueldo = null;
 		List<DetNominaPercepcion> percepciones = null;
-		
-		Integer index = null;
 		
 		try {
 			percepciones = nomina.getPercepciones();
@@ -41,10 +37,6 @@ public class SueldoPercepcion extends AbstractPercepcion implements IPercepcion 
 			boolean removedPercepciones = percepciones.removeIf(d -> CVE_SUELDO.equalsIgnoreCase(d.getClave()));
 			if(removedPercepciones)
 				log.info("Se encontraron conceptos {}, los cuales fueron eliminados para el reproceso de SUELDO.", AbstractPercepcion.CVE_SUELDO);
-			
-			index = this.nuevoIndiceDe(nomina.getPercepciones());
-			
-			tpSueldo = this.getTipoPercepcion(P_SUELDO);
 			
 			salarioSemanal = salarioDiario
 					.multiply(diasTrabajados)
@@ -56,20 +48,9 @@ public class SueldoPercepcion extends AbstractPercepcion implements IPercepcion 
 			salarioSemanal = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 			cantidad = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 		} finally {
-			percepcion = new DetNominaPercepcion();
-			percepcion.setKey(new DetNominaPercepcionPK(nomina, index));
-			percepcion.setClave(CVE_SUELDO);
-			percepcion.setNombre("Sueldo");
-			percepcion.setCantidad(cantidad);
-			percepcion.setTipoPercepcion(tpSueldo);
-			percepcion.setImporteGravado(salarioSemanal);
-			percepcion.setImporteExcento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
-			
-			if(salarioSemanal != null && salarioSemanal.compareTo(BigDecimal.ZERO) > 0)
-				nomina.getPercepciones().add(percepcion);
-			
-			this.tiposPercepcion = null;
-			this.diasTrabajados = null;
+			percepcion = this.build(nomina, CVE_SUELDO, cantidad, ValoresBD.CERO.getValor(), salarioSemanal);
 		}
+		
+		return percepcion;
 	}
 }
