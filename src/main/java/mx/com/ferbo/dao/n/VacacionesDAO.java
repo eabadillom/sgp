@@ -136,4 +136,45 @@ public class VacacionesDAO extends BaseDAO<DetVacaciones, Integer> {
     	
     	return model;
     }
+    
+    @SuppressWarnings("unchecked")
+	public List<DetVacaciones> buscarPorRfcFecha(String rfc, Date fecha) {
+    	List<DetVacaciones> modelList = null;
+    	EntityManager em = null;
+    	String sql = null;
+    	
+    	try {
+    		sql = "select * from det_vacaciones dv\n"
+    				+ "inner join\n"
+    				+ "(\n"
+    				+ "	select\n"
+    				+ "		v.id_empleado,\n"
+    				+ "		max(v.fh_fin) as fh_fin\n"
+    				+ "	from det_vacaciones v\n"
+    				+ "	inner join det_empleado e\n"
+    				+ "		on v.id_empleado = e.id_empleado\n"
+    				+ "	inner join inf_empleado_empresa ee\n"
+    				+ "		on e.id_empleado_empresa = ee.id_empleado_empresa\n"
+    				+ "	where (v.nu_dias_totales - v.nu_dias_tomados) > 0\n"
+    				+ "		and ee.nb_rfc = :rfc\n"
+    				+ "		and v.fh_fin < :fecha\n"
+    				+ "	group by id_empleado\n"
+    				+ ") t on dv.id_empleado = t.id_empleado and dv.fh_fin = t.fh_fin\n"
+    				;
+    		
+    		em = this.getEntityManager();
+    		modelList = (List<DetVacaciones>) em.createNativeQuery(sql, modelClass)
+    				.setParameter("rfc", rfc)
+    				.setParameter("fecha", fecha)
+    				.getResultList()
+    				;
+    		
+    	} catch(Exception ex) {
+    		log.error("Problema para obtener la lista de periodos vacacionales...", ex);
+    	} finally {
+    		this.close(em);
+    	}
+    	
+    	return modelList;
+    }
 }

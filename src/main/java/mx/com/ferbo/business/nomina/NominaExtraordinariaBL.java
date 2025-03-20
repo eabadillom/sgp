@@ -11,6 +11,7 @@ import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
+import mx.com.ferbo.model.DetVacaciones;
 
 public class NominaExtraordinariaBL extends NominaBL {
 	

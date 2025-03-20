@@ -247,6 +247,10 @@ public class NominaExtraordinariaBean implements Serializable {
     	this.nomPercepcion.setNombre(this.percepcion.getNombre());
     }
     
+    public void actualizarNomina() {
+    	log.info("Actualizando nomina...");
+    }
+    
     public void nuevaPercepcion() {
     	log.info("Agregando nueva percepcion...");
     	

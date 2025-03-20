@@ -176,7 +176,7 @@
 			</p:accordionPanel>
 			<p:dialog id="dlg-percepcion-all" widgetVar="dlgPercepcionAll" header="Agregar percepción" modal="true" responsive="true" position="center top" height="100%" resizable="false" showEffect="fade" hideEffect="fade">
 				
-				<p:outputPanel id="pnl-add-percepcion" styleClass="ui-fluid">
+				<p:outputPanel id="pnl-add-percepcion" styleClass="ui-fluid" rendered="#{nominaE.nomPercepcion ne null}">
 					<p:outputLabel value="Percepciones" />
 					<p:selectOneMenu id="percepcion" value="#{nominaE.percepcion}" filter="true" filterMatchMode="contains" filterPlaceholder="Concepto" converter="entityConverter">
 						<f:selectItem itemLabel="--Seleccione--" noSelectionOption="true" />
