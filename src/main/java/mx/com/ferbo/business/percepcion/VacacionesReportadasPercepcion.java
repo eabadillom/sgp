@@ -2,6 +2,7 @@ package mx.com.ferbo.business.percepcion;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,31 +41,42 @@ public class VacacionesReportadasPercepcion extends AbstractPercepcion implement
 		BigDecimal cantidad = null;
 		BigDecimal importeGravado = null;
 		BigDecimal importeExento = null;
+		BigDecimal importe = null;
 		
 		VacacionesDAO vacacionesDAO = null;
 		
 		Date vencimientoPeriodo = null;
-		DetVacaciones periodo = null;
+		List<DetVacaciones> periodos = null;
 		
 		try {
 			vencimientoPeriodo = DateUtil.addMonth(parametros.getPeriodoFin(), -6);
 			
 			vacacionesDAO = new VacacionesDAO();
-			periodo = vacacionesDAO.obtenerPorRfcFecha(nomina.getReceptor().getRfc(), vencimientoPeriodo);
+			periodos = vacacionesDAO.buscarPorRfcFecha(nomina.getReceptor().getRfc(), vencimientoPeriodo);
 			
-			if(periodo == null) {
-				log.info("No se encontraron periodos vacacionales para el empleado.");
-				throw new SGPException("No se encontraron periodos vacacionales reportados para el empleado.");
+			importeExento = ValoresBD.CERO.getValor();
+			importeGravado = ValoresBD.CERO.getValor();
+			
+			for(DetVacaciones periodo : periodos) {
+				if(periodo == null) {
+					log.info("No se encontraron periodos vacacionales para el empleado.");
+					throw new SGPException("No se encontraron periodos vacacionales reportados para el empleado.");
+				}
+				
+				log.info("Periodo: {} al {}, vencimiento del periodo vacacional: {}",
+						DateUtil.getString(periodo.getFechaInicio(), DateUtil.FORMATO_DD_MM_YYYY),
+						DateUtil.getString(periodo.getFechaFin(), DateUtil.FORMATO_DD_MM_YYYY),
+						DateUtil.getString(vencimientoPeriodo, DateUtil.FORMATO_DD_MM_YYYY)
+						);
+				
+				
+				importe = this.calcularImporte(periodo, nomina.getReceptor().getSalarioDiario());
+				importeGravado = importeGravado.add(importe) ;
+				
+				
+				
 			}
 			
-			log.info("Periodo: {} al {}, vencimiento del periodo vacacional: {}",
-					DateUtil.getString(periodo.getFechaInicio(), DateUtil.FORMATO_DD_MM_YYYY),
-					DateUtil.getString(periodo.getFechaFin(), DateUtil.FORMATO_DD_MM_YYYY),
-					DateUtil.getString(vencimientoPeriodo, DateUtil.FORMATO_DD_MM_YYYY)
-			);
-			
-			importeGravado = this.calcularImporte(periodo, nomina.getReceptor().getSalarioDiario());
-			importeExento = ValoresBD.CERO.getValor();
 			
 		} catch(Exception ex) {
 			cantidad = ValoresBD.CERO.getValor();

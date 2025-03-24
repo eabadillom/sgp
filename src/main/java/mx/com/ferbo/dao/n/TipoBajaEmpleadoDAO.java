@@ -10,15 +10,15 @@ import mx.com.ferbo.util.SGPException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class tipobajaempleadoDAO extends BaseDAO<CatTipoBajaEmpleado, Integer>{
+public class TipoBajaEmpleadoDAO extends BaseDAO<CatTipoBajaEmpleado, Integer>{
     
-    private static Logger log = LogManager.getLogger(tipobajaempleadoDAO.class);
+    private static Logger log = LogManager.getLogger(TipoBajaEmpleadoDAO.class);
     
-    public tipobajaempleadoDAO(Class<CatTipoBajaEmpleado> modelClass) {
+    public TipoBajaEmpleadoDAO(Class<CatTipoBajaEmpleado> modelClass) {
         super(modelClass);
     }
 
-    public tipobajaempleadoDAO() {
+    public TipoBajaEmpleadoDAO() {
         super(CatTipoBajaEmpleado.class);
     }
     

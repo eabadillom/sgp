@@ -13,6 +13,9 @@ import org.apache.logging.log4j.Logger;
 import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetEmpleadoFoto;
+import mx.com.ferbo.model.DetPercepcionEmpleado;
+import mx.com.ferbo.model.DetPrestamo;
+import mx.com.ferbo.model.DetVacaciones;
 import mx.com.ferbo.util.SGPException;
 
 public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
@@ -37,6 +40,26 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
             model = emSGP.find(this.modelClass, id);
             if (isFullInfo) {
                 log.info("id dato empresa: {}", model.getDatoEmpresa().getId() == null ? null : model.getDatoEmpresa().getId());
+                
+                log.info("Id Asentamiento: {}", model.getDomicilio().getAsentamiento().getKey().getId());
+                log.info("Id Localidad: {}", model.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getId());
+                log.info("Id Municipio: {}", model.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getMunicipio().getKey().getId());
+                log.info("Id Estado: {}", model.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getId());
+                log.info("Id Pais: {}", model.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getPais().getId());
+                
+                for(DetVacaciones v : model.getVacaciones()) {
+                	log.info("Periodo Vacacional: {}", v.getIdVacaciones());
+                }
+                
+                for(DetPercepcionEmpleado p : model.getPercepcionesEmpleado()) {
+                	log.info("Percepción del empleado: {}", p.getId());
+                }
+                
+                for(DetPrestamo p : model.getPrestamos()) {
+                	log.info("Préstamo del empleado: {}", p.getIdPrestamo());
+                }
+                
+                log.info("Id Empleado configuración: {}", model.getEmpleadoConfiguracion().getIdEmpleadoConf());
             }
 
             if (isGetFoto) {
@@ -196,7 +219,7 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
         try{
             log.info("Inicio el proceso de obtener los empleados por debajo del salario minimo de ZG");
             em = getEntityManager();
-            TypedQuery resultado = em.createQuery("select e from DetEmpleado e where e.datoEmpresa.salarioDiario < :salarioMinimo and (e.datoEmpresa.fechaBaja is null or e.datoEmpresa.fechaBaja > :hoy)", DetEmpleado.class);
+            TypedQuery<DetEmpleado> resultado = em.createQuery("select e from DetEmpleado e where e.datoEmpresa.salarioDiario < :salarioMinimo and (e.datoEmpresa.fechaBaja is null or e.datoEmpresa.fechaBaja > :hoy)", DetEmpleado.class);
             resultado.setParameter("salarioMinimo", salarioMinimo);
             resultado.setParameter("hoy", hoy);
             empleados = resultado.getResultList();
@@ -221,7 +244,7 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
         try{
             log.info("Inicio el proceso de obtener los empleados por debajo del salario minimo de ZF");
             em = getEntityManager();
-            TypedQuery resultado = em.createQuery("select e from DetEmpleado e where e.datoEmpresa.salarioDiario < :salarioMinimo and (e.datoEmpresa.fechaBaja is null or e.datoEmpresa.fechaBaja > :hoy)", DetEmpleado.class);
+            TypedQuery<DetEmpleado> resultado = em.createQuery("select e from DetEmpleado e where e.datoEmpresa.salarioDiario < :salarioMinimo and (e.datoEmpresa.fechaBaja is null or e.datoEmpresa.fechaBaja > :hoy)", DetEmpleado.class);
             resultado.setParameter("salarioMinimo", salarioMinimo);
             resultado.setParameter("hoy", hoy);
             empleados = resultado.getResultList();

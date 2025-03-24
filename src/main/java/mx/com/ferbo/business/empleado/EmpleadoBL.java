@@ -8,14 +8,19 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.dianolaboral.DiasDeDescansoObligatorioBL;
+import mx.com.ferbo.business.domicilio.DomicilioBL;
+import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.ParametroDAO;
 import mx.com.ferbo.dao.n.VacacionesDAO;
+import mx.com.ferbo.model.CatAsentamiento;
 import mx.com.ferbo.model.CatDiaNoLaboral;
 import mx.com.ferbo.model.CatParametro;
 import mx.com.ferbo.model.DetDomicilioEmpleado;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetEmpleadoConfiguracion;
 import mx.com.ferbo.model.DetEmpleadoFoto;
+import mx.com.ferbo.model.DetPercepcionEmpleado;
+import mx.com.ferbo.model.DetPrestamo;
 import mx.com.ferbo.model.DetVacaciones;
 import mx.com.ferbo.model.InfDatoEmpresa;
 import mx.com.ferbo.util.DateUtil;
@@ -24,6 +29,95 @@ import mx.com.ferbo.util.SGPException;
 public class EmpleadoBL {
 
     private static final Logger log = LogManager.getLogger(EmpleadoBL.class);
+    
+    public static DetEmpleado build() {
+    	DetEmpleado empleado = null;
+    	DetDomicilioEmpleado domicilio = null;
+    	
+    	empleado = new DetEmpleado();
+    	empleado.setActivo((short) 1);
+    	empleado.setDatoEmpresa(new InfDatoEmpresa());
+    	
+    	domicilio = DomicilioBL.build(empleado);
+    	empleado.setDomicilio(domicilio);
+    	empleado.getDomicilio().setEmpleado(empleado);
+    	
+    	empleado.setEmpleadoConfiguracion(new DetEmpleadoConfiguracion());
+    	empleado.getEmpleadoConfiguracion().setEmpleado(empleado);
+    	
+    	empleado.setVacaciones(new ArrayList<DetVacaciones>());
+    	
+    	return empleado;
+    }
+    
+    /**Debería usarse sólamente para cargar toda la informacíon completa del empleado, incluidos sus datos biométricos
+     * que se encuentran desacoplados en otras tablas.
+     * Se crea este método sólamente para su uso en el registro de empleados.
+     * @param idEmpleado
+     * @return
+     */
+    public static DetEmpleado load(Integer idEmpleado) throws SGPException {
+    	DetEmpleado empleado = null;
+    	EmpleadoDAO empleadoDAO = null;
+    	
+    	empleadoDAO = new EmpleadoDAO();
+    	
+    	try {
+    		empleado = empleadoDAO.buscarPorId(idEmpleado, true, true);
+    	} catch(Exception ex) {
+    		log.error("Problema para obtener el empleado solicitado: id = {}", idEmpleado);
+    		throw new SGPException("Ocurrió un problema al cargar la información del empleado: id = " + idEmpleado, ex);
+    	}
+    	
+    	try {
+    		log.info("id dato empresa: {}", empleado.getDatoEmpresa().getId());
+    	} catch(Exception ex) {
+    		empleado.setDatoEmpresa(new InfDatoEmpresa());
+    	}
+    	
+    	try {
+    		log.info("Id Asentamiento: {}", empleado.getDomicilio().getAsentamiento().getKey().getId());
+    		log.info("Id Localidad: {}", empleado.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getId());
+            log.info("Id Municipio: {}", empleado.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getMunicipio().getKey().getId());
+            log.info("Id Estado: {}", empleado.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getId());
+            log.info("Id Pais: {}", empleado.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getPais().getId());
+    	} catch(Exception ex) {
+    		empleado.setDomicilio(new DetDomicilioEmpleado());
+    		empleado.getDomicilio().setAsentamiento(new CatAsentamiento());
+    	}
+    	
+    	try {
+    		for(DetVacaciones v : empleado.getVacaciones()) {
+            	log.info("Periodo Vacacional: {}", v.getIdVacaciones());
+            }
+    	} catch(Exception ex) {
+    		empleado.setVacaciones(new ArrayList<DetVacaciones>());
+    	}
+    	
+    	try {
+    		for(DetPercepcionEmpleado p : empleado.getPercepcionesEmpleado()) {
+            	log.info("Percepción del empleado: {}", p.getId());
+            }
+    	} catch(Exception ex) {
+    		empleado.setPercepcionesEmpleado(new ArrayList<DetPercepcionEmpleado>());
+    	}
+    	
+    	try {
+    		for(DetPrestamo p : empleado.getPrestamos()) {
+            	log.info("Préstamo del empleado: {}", p.getIdPrestamo());
+            }
+    	} catch(Exception ex) {
+    		empleado.setPrestamos(new ArrayList<DetPrestamo>());
+    	}
+    	
+    	try {
+    		log.info("Id Empleado configuración: {}", empleado.getEmpleadoConfiguracion().getIdEmpleadoConf());
+    	} catch(Exception ex) {
+    		empleado.setEmpleadoConfiguracion(new DetEmpleadoConfiguracion());
+    	}
+    	
+    	return empleado;
+    }
 
     public static void validarDatosEmpleado(DetEmpleado empleadoporvalidar) {
 

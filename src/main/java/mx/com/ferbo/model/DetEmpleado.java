@@ -123,7 +123,7 @@ public class DetEmpleado implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "empleadoSol")
     private List<DetSolicitudPermiso> detSolicitudPermisoList;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idEmpleado")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "empleado")
     private List<DetBiometrico> detBiometricoList;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idEmpleado")
