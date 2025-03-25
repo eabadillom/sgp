@@ -33,19 +33,17 @@ import mx.com.ferbo.dao.n.EmpleadoFotoDAO;
 import mx.com.ferbo.dao.n.EmpresaDAO;
 import mx.com.ferbo.dao.n.EntidadFederativaDAO;
 import mx.com.ferbo.dao.n.ParametroDAO;
-import mx.com.ferbo.dao.n.PercepcionEmpleadoDAO;
 import mx.com.ferbo.dao.n.PerfilDAO;
 import mx.com.ferbo.dao.n.PeriodicidadPagoDAO;
 import mx.com.ferbo.dao.n.PlantaDAO;
-import mx.com.ferbo.dao.n.PrestamoDAO;
 import mx.com.ferbo.dao.n.PuestoDAO;
 import mx.com.ferbo.dao.n.RiesgoPuestoDAO;
+import mx.com.ferbo.dao.n.TipoBajaEmpleadoDAO;
 import mx.com.ferbo.dao.n.TipoContratoDAO;
 import mx.com.ferbo.dao.n.TipoJornadaDAO;
 import mx.com.ferbo.dao.n.TipoPercepcionDAO;
 import mx.com.ferbo.dao.n.TipoPrestamoDAO;
 import mx.com.ferbo.dao.n.TipoRegimenDAO;
-import mx.com.ferbo.dao.n.TipoBajaEmpleadoDAO;
 import mx.com.ferbo.dao.n.sat.BancoDAO;
 import mx.com.ferbo.model.CatArea;
 import mx.com.ferbo.model.CatAsentamiento;
@@ -60,7 +58,6 @@ import mx.com.ferbo.model.CatTipoPrestamo;
 import mx.com.ferbo.model.DetBiometrico;
 import mx.com.ferbo.model.DetDomicilioEmpleado;
 import mx.com.ferbo.model.DetEmpleado;
-import mx.com.ferbo.model.DetEmpleadoConfiguracion;
 import mx.com.ferbo.model.DetEmpleadoFoto;
 import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.DetPrestamo;
@@ -90,14 +87,14 @@ public class RegistroEmpleadosBean implements Serializable {
 
     private EmpresaDAO empresaDAO;
     private EmpleadoFotoDAO empleadoFotoDAO;
-    private PrestamoDAO prestamoDAO;
+//    private PrestamoDAO prestamoDAO;
     private TipoPrestamoDAO tipoPrestamoDAO;
     private PerfilDAO perfilDAO;
     private PlantaDAO plantaDAO;
     private PuestoDAO puestoDAO;
     private AreaDAO areaDAO;
     private EmpleadoDAO empleadoDAO;
-    private PercepcionEmpleadoDAO percepcionEmpleadoDAO;
+//    private PercepcionEmpleadoDAO percepcionEmpleadoDAO;
     private List<DetPercepcionEmpleado> percepcionesEmpleado;
     private InfDatoEmpresa datoEmpresa;
     private BiometricoDAO biometricoDAO;
@@ -151,7 +148,6 @@ public class RegistroEmpleadosBean implements Serializable {
     private String biometrico;
     private int numBiometrico;
     private DetPrestamo prestamo;
-//    private CatAsentamiento asentamientoSelected;
     private DetDomicilioEmpleado domicilioEmpleadoSelected;
 
     private String curp;
@@ -168,8 +164,6 @@ public class RegistroEmpleadosBean implements Serializable {
     	this.session = request.getSession(false);
     	
         empleadoFotoDAO = new EmpleadoFotoDAO(DetEmpleadoFoto.class);
-        prestamoDAO = new PrestamoDAO();
-        percepcionEmpleadoDAO = new PercepcionEmpleadoDAO();
         empresaDAO = new EmpresaDAO(CatEmpresa.class);
         perfilDAO = new PerfilDAO(CatPerfil.class);
         plantaDAO = new PlantaDAO(CatPlanta.class);
@@ -217,7 +211,6 @@ public class RegistroEmpleadosBean implements Serializable {
             tiposPercepcion = tipoPercepcionDAO.buscarTodos();
             tiposPrestamo = tipoPrestamoDAO.buscarTodos();
             tiposdebaja = tipoBajaEmpleadoDAO.obtenerTodos();
-//            this.domicilioEmpleadoSelected = DomicilioBL.build();
             lstBancos = bancoDAO.buscarTodos();
 
             consultaEmpleados();
@@ -246,8 +239,7 @@ public class RegistroEmpleadosBean implements Serializable {
 	    	context = FacesContext.getCurrentInstance().getExternalContext();
 	    	context.redirect(path);
     	} catch (IOException e) {
-    		// TODO Auto-generated catch block
-    		e.printStackTrace();
+    		log.error("Problem para redirigir a otra página...", e);
     	}
     }
     

@@ -46,6 +46,7 @@ import mx.com.ferbo.model.DetNominaDeduccion;
 import mx.com.ferbo.model.DetNominaOtroPago;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.DetNominaPeriodo;
+import mx.com.ferbo.model.DetVacaciones;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.ManageStatus;
@@ -285,6 +286,12 @@ public class NominaExtraordinariaBean implements Serializable {
     public void cargarNominaEmpleado(DetNomina nomina) {
     	this.nomina = nomina;
     	log.info("Nomina: {}", this.nomina);
+    	
+    	if(nomina.getEmpleado() != null && nomina.getEmpleado().getVacaciones() != null) {
+    		for(DetVacaciones periodo : nomina.getEmpleado().getVacaciones()) {
+    			log.info("Periodo vacacional: {}", periodo);
+    		}
+    	}
     }
     
     public void actualizar() {
