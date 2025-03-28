@@ -100,7 +100,7 @@ public class NominaSemanalBL extends NominaBL {
 			
 			log.info("#############################################################################");
 			log.info("Empleado: {} {} {}, Salario diario: {}", empleado.getNombre(), empleado.getPrimerAp(), empleado.getSegundoAp(), empleado.getDatoEmpresa().getSalarioDiario());
-			log.info("Ejecutando la nomina de la semana {} del año en curso...", this.parametros.getSemanaAnio());
+			log.info("Ejecutando la nomina de la semana {} del año en curso...", this.parametros.getPeriodo());
 			nomina =  NominaBL.build(TP_NOMINA_ORDINARIA, this.parametros, this.empleado);
 			percepciones = nomina.getPercepciones();
 			otrosPagos = nomina.getOtrosPagos();
@@ -172,7 +172,7 @@ public class NominaSemanalBL extends NominaBL {
 			nomina.setMoneda("MXN");
 			nomina.setMetodoPago(this.parametros.getMetodoPago());
 			nomina.setSerie(String.format("%d", this.parametros.getAnio()));
-			nomina.setFolio(String.format("%d", this.parametros.getSemanaAnio()));
+			nomina.setFolio(String.format("%d", this.parametros.getPeriodo()));
 			nomina.setLugarExpedicion(this.empleado.getDatoEmpresa().getEmpresa().getCodigoPostal());
 			nomina.setEjercicio(DateUtil.getAnio(this.fechaInicioAnio));
 			nomina.setDiasLaborados(diasTrabajados.intValue());
@@ -180,7 +180,7 @@ public class NominaSemanalBL extends NominaBL {
 			nomina.setDiasNoLaborados(ausencias.intValue());
 			//TODO Revisar los días no laborados.
 //			nomina.setDiasNoLaborados(diasLaboralesPeriodo.subtract(diasTrabajados).intValue());
-			nomina.setPeriodo(this.parametros.getSemanaAnio());
+			nomina.setPeriodo(this.parametros.getPeriodo());
 			nomina.setPeriodoInicio(this.periodoInicio.toInstant().atZone(ZoneId.of("GMT-6")).toLocalDate());
 			nomina.setPeriodoFin(this.periodoFin.toInstant().atZone(ZoneId.of("GMT-6")).toLocalDate());
 			

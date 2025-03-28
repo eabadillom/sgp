@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
@@ -18,9 +19,8 @@ import mx.com.ferbo.business.deduccion.AbstractDeduccion;
 import mx.com.ferbo.business.deduccion.AjusteAlNetoDeduccion;
 import mx.com.ferbo.business.otropago.AbstractOtroPago;
 import mx.com.ferbo.business.otropago.AjusteAlNetoOtroPago;
-import mx.com.ferbo.dao.n.ConceptoDAO;
-import mx.com.ferbo.dao.n.UnidadSATDAO;
 import mx.com.ferbo.dao.n.VacacionesDAO;
+import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.CatEmpresa;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetNomina;
@@ -46,7 +46,7 @@ public abstract class NominaBL {
 	
 	public static final String TP_NOMINA_ORDINARIA = "O";
 	public static final String TP_NOMINA_EXTRAORDINARIA = "E";
-	public static final String TP_COMPROBANTE_NOMINA = "N";
+	public static final String TP_COMPROBANTE_CFDI = "N";
 	
 	public static final int DIAS_ANIO = 365;
 	public static final BigDecimal cien = new BigDecimal(100).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -57,7 +57,6 @@ public abstract class NominaBL {
 	protected VacacionesDAO vacacionesDAO = null;
 	
 	public NominaBL() {
-		
 	}
 	
 	public NominaBL(DetEmpleado empleado, ParametrosNomina parametros, Map<String, DetRegistro> mapAsistencias) {
@@ -67,27 +66,25 @@ public abstract class NominaBL {
 		this.vacacionesDAO = new VacacionesDAO();
 	}
 	
-	public static synchronized DetNomina build(String tipoNomina, ParametrosNomina parametros, DetEmpleado empleado) {
-		DetNomina nomina = null;
+	public static synchronized DetNomina build(String tipoNomina, ParametrosNomina parametros, DetEmpleado empleado)
+	throws SGPException {
+		DetNomina                 nomina       = null;
+		DetNominaEmisor           emisor       = null;
+		DetNominaReceptor         receptor     = null;
+		DetNominaConcepto         concepto     = null;
+		CatConcepto               conceptoSAT  = null;
+		CatUnidadSAT              unidadSAT    = null;
 		
-		DetNominaEmisor emisor = null;
-		DetNominaReceptor receptor = null;
-		DetNominaConcepto concepto = null;
-		
-		CatConcepto conceptoSAT = null;
-		ConceptoDAO conceptoDAO = null;
-		
-		CatUnidadSAT unidadSAT = null;
-		UnidadSATDAO unidadSATDAO = null;
-		
-		List<DetNominaConcepto> conceptos = null;
+		List<DetNominaConcepto>   conceptos    = null;
 		List<DetNominaPercepcion> percepciones = null;
-		List<DetNominaOtroPago> otrosPagos = null;
-		List<DetNominaDeduccion> deducciones = null;
+		List<DetNominaOtroPago>   otrosPagos   = null;
+		List<DetNominaDeduccion>  deducciones  = null;
+		
+		if(parametros == null)
+			throw new SGPException("Los parámetros de nómina no están definidos.");
 		
 		try {
 			nomina = new DetNomina();
-			nomina.setTipoComprobante(TP_COMPROBANTE_NOMINA);
 			
 			if(empleado == null) {
 				emisor = new DetNominaEmisor();
@@ -102,17 +99,8 @@ public abstract class NominaBL {
 			otrosPagos = new ArrayList<>();
 			deducciones = new ArrayList<>();
 			
-			
-			if(parametros == null) {
-				conceptoDAO = new ConceptoDAO();
-				conceptoSAT = conceptoDAO.buscarPorId("84111505");
-				
-				unidadSATDAO = new UnidadSATDAO();
-				unidadSAT = unidadSATDAO.buscarPorId("ACT");
-			} else {
-				conceptoSAT = parametros.getConcepto();
-				unidadSAT = parametros.getUnidadSAT();
-			}
+			conceptoSAT = parametros.getConcepto();
+			unidadSAT = parametros.getUnidadSAT();
 			
 			concepto = new DetNominaConcepto();
 			concepto.setKey(new DetNominaConceptoPK(nomina, 0));
@@ -127,15 +115,28 @@ public abstract class NominaBL {
 				nomina.setTipoNomina(TP_NOMINA_ORDINARIA);
 			} else if(TP_NOMINA_EXTRAORDINARIA.equalsIgnoreCase(tipoNomina)) {
 				nomina.setTipoNomina(TP_NOMINA_EXTRAORDINARIA);
-			}
+			} else
+				throw new SGPException("El tipo de nómina no es válido: " + tipoNomina);
 			
+			nomina.setTipoComprobante(TP_COMPROBANTE_CFDI);
 			nomina.setEmisor(emisor);
 			nomina.setReceptor(receptor);
 			nomina.setConceptos(conceptos);
 			nomina.setPercepciones(percepciones);
 			nomina.setOtrosPagos(otrosPagos);
 			nomina.setDeducciones(deducciones);
-			
+			nomina.setEjercicio(parametros.getAnio());
+			nomina.setPeriodo(parametros.getPeriodo());
+			nomina.setDiasLaborados(0);
+			nomina.setDiasNoLaborados(0);
+			nomina.setDiasAsueto(0);
+			nomina.setDiasPagados(ValoresBD.CERO.getValor());
+			nomina.setSubtotal(ValoresBD.CERO.getValor());
+			nomina.setDescuento(ValoresBD.CERO.getValor());
+			nomina.setTotal(ValoresBD.CERO.getValor());
+		
+		} catch(SGPException ex){
+			throw ex;
 		} catch(Exception ex) {
 			log.error("Problema para generar la estructura básica de la nómina del empleado.");
 		}
@@ -246,9 +247,15 @@ public abstract class NominaBL {
 				throw new SGPException("El objeto DetEmpleado no esta definido.");
 			receptor.setNombre(String.format("%s %s %s", empleado.getNombre(), empleado.getPrimerAp(), empleado.getSegundoAp()).trim());
 			
+			log.info("Generando información del receptor {}", receptor.getNombre());
+			
 			if(empleado.getDatoEmpresa() == null)
 				throw new SGPException("El objeto DatoEmpresa de DetEmpleado no esta definido.");
 			receptor.setRfc(empleado.getDatoEmpresa().getRfc());
+			
+			if(empleado.getNumEmpleado() == null)
+				throw new SGPException("El número de empleado no está definido.");
+			receptor.setNumeroEmpleado(empleado.getNumEmpleado());
 			
 			if(empleado.getDomicilio() == null)
 				throw new SGPException("El objeto DetDomicilio de DetEmpleado no esta definido.");
@@ -265,28 +272,60 @@ public abstract class NominaBL {
 				throw new SGPException("El uso del CFDI del recpetor no esta definido.");
 			receptor.setUsoCfdi(parametros.getUsoCFDI());
 			
+			if(empleado.getCurp() == null)
+				throw new SGPException("La CURP del empleado no está definida.");
 			receptor.setCurp(empleado.getCurp());
 			
+			if(empleado.getDatoEmpresa().getNss() == null)
+				throw new SGPException("El número de seguridad social del empleado no está definido.");
 			receptor.setNss(empleado.getDatoEmpresa().getNss());
+			
+			if(empleado.getDatoEmpresa().getFechaIngreso() == null)
+				throw new SGPException("La fecha de ingreso del empleado no está definida");
 			receptor.setInicioRelacionLaboral(empleado.getDatoEmpresa().getFechaIngreso());
 			
+			if(empleado.getDatoEmpresa().getTipoContrato() == null)
+				throw new SGPException("El tipo de contrato del empleado no está definido.");
 			receptor.setTipoContrato(empleado.getDatoEmpresa().getTipoContrato());
+			
 			receptor.setSindicalizado(empleado.getDatoEmpresa().getSindicalizado());
+			
+			if(empleado.getDatoEmpresa().getTipoJornada() == null)
+				throw new SGPException("El tipo de jornada del empleado no está definido.");
 			receptor.setTipoJornada(empleado.getDatoEmpresa().getTipoJornada());
+			
+			if(empleado.getDatoEmpresa().getTipoRegimen() == null)
+				throw new SGPException("El tipo de régimen del empleado no está definido.");
 			receptor.setTipoRegimen(empleado.getDatoEmpresa().getTipoRegimen());
-			receptor.setNumeroEmpleado(empleado.getNumEmpleado());
+			
+			if(empleado.getDatoEmpresa().getArea() == null)
+				throw new SGPException("El área donde labora el empleado no está definida.");
 			receptor.setDepartamento(empleado.getDatoEmpresa().getArea().getDescripcion());
+			
+			if(empleado.getDatoEmpresa().getPuesto() == null)
+				throw new SGPException("El puesto donde labora el empleado no está definido.");
 			receptor.setPuesto(empleado.getDatoEmpresa().getPuesto().getDescripcion());
+			
+			if(empleado.getDatoEmpresa().getRiesgoPuesto() == null)
+				throw new SGPException("El riesgo laboral del puesto del empleado no está definido.");
 			receptor.setRiesgoPuesto(empleado.getDatoEmpresa().getRiesgoPuesto());
+			
+			if(empleado.getDatoEmpresa().getPeriodicidadPago() == null)
+				throw new SGPException("La periodicidad de pago del empleado no está definida.");
 			receptor.setPeriodicidadPago(empleado.getDatoEmpresa().getPeriodicidadPago());
+			
+			if(empleado.getDatoEmpresa().getSalarioDiario() == null)
+				throw new SGPException("El salario diario del empleado no está definido.");
 			receptor.setSalarioDiario(empleado.getDatoEmpresa().getSalarioDiario());
+			
+			if(empleado.getDatoEmpresa().getEntidadFederativa() == null)
+				throw new SGPException("La entidad federativa del empleado no está definida");
 			receptor.setEntidadFederativa(empleado.getDatoEmpresa().getEntidadFederativa());
+			
 			//TODO pendiente revisar antiguedad
 			String sAntiguedad = antiguedadSemanas(empleado.getDatoEmpresa().getFechaIngreso(), parametros.getPeriodoFin());
 			log.debug("Antiguedad: {}", sAntiguedad);
 			receptor.setAntiguedad(sAntiguedad);
-			
-			log.info("Receptor: {}", receptor.getNombre());
 			
 		} catch(Exception ex) {
 			log.error("Problema para generar el receptor...", ex);
@@ -343,6 +382,7 @@ public abstract class NominaBL {
 	throws SGPException {
 		Integer maxIndex = null;
 		DetNominaPercepcion maxP = null;
+		DetNominaPercepcionPK maxKey = null;
 		
 		if(nomina == null)
 			throw new SGPException("El objeto nómina no está definido.");
@@ -354,7 +394,7 @@ public abstract class NominaBL {
 			throw new SGPException("Debe indicar un importe (excento o gravado).");
 		
 		if(percepcion.getImporteExento() == null)
-			percepcion.setImporteExcento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
+			percepcion.setImporteExento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
 		
 		if(percepcion.getImporteGravado() == null)
 			percepcion.setImporteGravado(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
@@ -382,12 +422,17 @@ public abstract class NominaBL {
 		if(removedPercepciones)
 			log.info("Se encontraron conceptos {}, los cuales fueron eliminados de la lista de percepciones.", clave);
 		
-		maxP = Collections.max(nomina.getPercepciones(), Comparator.comparing(p -> p.getKey().getId()));
+		try {
+			maxP = Collections.max(nomina.getPercepciones(), Comparator.comparing(p -> p.getKey().getId()));
+			maxKey = maxP.getKey();
+		} catch(NoSuchElementException ex) {
+			maxKey = new DetNominaPercepcionPK(nomina, -1);
+		}
 		
-		if(maxP.getKey().getId() == null)
+		if(maxKey.getId() == null)
 			throw new SGPException("Existen elementos de \"Percepciones\" que no tienen asignado un consecutivo");
 		
-		maxIndex = maxP.getKey().getId() + 1;
+		maxIndex = maxKey.getId() + 1;
 		percepcion.getKey().setId(maxIndex);
 		nomina.getPercepciones().add(percepcion);
 	}

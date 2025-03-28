@@ -72,6 +72,42 @@ public class DetNominaPercepcion implements Serializable {
 	@Column(name = "nu_imp_exento", precision = 12, scale = 2)
 	@Basic(optional = false)
 	private BigDecimal importeExento;
+	
+	public DetNominaPercepcion() {
+	}
+	
+	public DetNominaPercepcion(DetNominaPercepcion percepcion) {
+		this.key = new DetNominaPercepcionPK(percepcion.getKey().getNomina(), percepcion.getKey().getId());
+		this.tipoPercepcion = percepcion.getTipoPercepcion();
+		this.clave = percepcion.getClave();
+		this.nombre = percepcion.getNombre();
+		this.cantidad = percepcion.getCantidad();
+		this.importeGravado = percepcion.getImporteGravado();
+		this.importeExento = percepcion.getImporteExento();
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(key);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DetNominaPercepcion other = (DetNominaPercepcion) obj;
+		return Objects.equals(key, other.key);
+	}
+
+	@Override
+	public String toString() {
+		return "DetNominaPercepcion [key=" + key + ", clavePercepcion=" + clave + ", nombrePercepcion="
+				+ nombre + ", importeGravado=" + importeGravado + ", importeExento=" + importeExento + "]";
+	}
 
 	public DetNominaPercepcionPK getKey() {
 		return key;
@@ -117,31 +153,8 @@ public class DetNominaPercepcion implements Serializable {
 		return importeExento;
 	}
 
-	public void setImporteExcento(BigDecimal importeExento) {
+	public void setImporteExento(BigDecimal importeExento) {
 		this.importeExento = importeExento;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(key);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		DetNominaPercepcion other = (DetNominaPercepcion) obj;
-		return Objects.equals(key, other.key);
-	}
-
-	@Override
-	public String toString() {
-		return "DetNominaPercepcion [key=" + key + ", clavePercepcion=" + clave + ", nombrePercepcion="
-				+ nombre + ", importeGravado=" + importeGravado + ", importeExento=" + importeExento + "]";
 	}
 
 	public BigDecimal getCantidad() {

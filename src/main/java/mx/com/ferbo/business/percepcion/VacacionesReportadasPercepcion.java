@@ -85,10 +85,8 @@ public class VacacionesReportadasPercepcion extends AbstractPercepcion implement
 				importe = this.calcularImporte(periodo, nomina.getReceptor().getSalarioDiario());
 				importeGravado = importeGravado.add(importe) ;
 				
-				this.agregarPeriodo(empleado, periodo);
+				this.agregarPeriodo(nomina, periodo);
 			}
-			
-			nomina.setEmpleado(empleado);
 			
 		} catch(Exception ex) {
 			cantidad = ValoresBD.CERO.getValor();
@@ -122,17 +120,11 @@ public class VacacionesReportadasPercepcion extends AbstractPercepcion implement
 		return importe;
 	}
 	
-	private void agregarPeriodo(DetEmpleado empleado, DetVacaciones periodo) {
-		try {
-			empleado.getVacaciones().size();
-		} catch(NullPointerException ex){
-			empleado.setVacaciones(new ArrayList<DetVacaciones>());
-		} catch(LazyInitializationException ex) {
-			empleado.setVacaciones(new ArrayList<DetVacaciones>());
-		} finally {
-			empleado.getVacaciones().add(periodo);
-			log.info("Lista de periodos: {}", empleado.getVacaciones().size());
-		}
+	private void agregarPeriodo(DetNomina nomina, DetVacaciones periodo) {
+		if(nomina.getVacaciones() == null)
+			nomina.setVacaciones(new ArrayList<DetVacaciones>());
+		
+		nomina.getVacaciones().add(periodo);
+		log.info("Lista de periodos: {}", nomina.getVacaciones().size());
 	}
-
 }

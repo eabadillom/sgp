@@ -20,6 +20,7 @@ public abstract class AbstractDeduccion {
 	protected List<CatTipoDeduccion> tiposDeduccion = null;
 	
 	public static final String D_ISR = "002";
+	public static final String D_ISR_LEY_174 = "002";
 	public static final String D_ISR_ANTES_DE_SUBSIDIO = "002";
 	public static final String D_AJUSTE_ISR_MENSUAL = "002";
 	public static final String D_AJUSTE_AL_SUBSIDIO = "107";
@@ -27,6 +28,7 @@ public abstract class AbstractDeduccion {
 	public static final String D_AJUSTE_AL_NETO = "004";
 	
 	public static final String CVE_ISR = "045";
+	public static final String CVE_ISR_LEY_174 = "043";
 	public static final String CVE_ISR_ANTES_DE_SUBSIDIO = "002A";
 	public static final String CVE_AJUSTE_ISR_MENSUAL = "104";
 	public static final String CVE_AJUSTE_AL_SUBSIDIO = "107";

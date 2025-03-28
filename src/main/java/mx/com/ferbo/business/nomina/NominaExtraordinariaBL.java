@@ -11,17 +11,10 @@ import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
-import mx.com.ferbo.model.DetVacaciones;
 
 public class NominaExtraordinariaBL extends NominaBL {
 	
 	private static Logger log = LogManager.getLogger(NominaExtraordinariaBL.class);
-	
-//	private Date periodoInicio = null;
-//	private Date periodoFin = null;
-//	private Date fechaInicioAnio = null;
-//	private Date fechafinAnio = null;
-//	private Integer anio = null;
 	
 	public NominaExtraordinariaBL() {
 		super();
@@ -29,10 +22,6 @@ public class NominaExtraordinariaBL extends NominaBL {
 
 	public NominaExtraordinariaBL(DetEmpleado empleado, ParametrosNomina parametros) {
 		super(empleado, parametros, null);
-//		this.periodoInicio = parametros.getPeriodoInicio();
-//		this.periodoFin = parametros.getPeriodoFin();
-//		this.fechaInicioAnio = null;
-//		this.fechafinAnio = null;
 	}
 	
 	public DetNomina calcular(DetNomina nomina, ParametrosNomina parametros, DetNominaPercepcion percepcion) {
@@ -57,6 +46,11 @@ public class NominaExtraordinariaBL extends NominaBL {
 				throw new UnsupportedOperationException("La percepción no está implementada.");
 			}
 			
+			
+			
+			
+			calcularTotales(nomina, parametros);
+			
 		} catch(Exception ex) {
 			log.error("Problema para calcular la percepcion: {} - {}", percepcion.getClave(), percepcion.getNombre());
 		}
@@ -64,7 +58,7 @@ public class NominaExtraordinariaBL extends NominaBL {
 		return nomina;
 	}
 	
-	/*-----------------------------------------------------------------------------------------------------------*/
+	/*--------------------------PERCEPCIONES----------------------------------------------------*/
 	
 	public static synchronized void calcularVacacionesReportadas(DetNomina nomina, ParametrosNomina parametros) {
 		DetNominaPercepcion percepcion = null;
@@ -109,5 +103,11 @@ public class NominaExtraordinariaBL extends NominaBL {
 		
 		if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(ValoresBD.CERO.getValor()) > 0)
 			nomina.getPercepciones().add(percepcion);
+	}
+	
+	/*--------------------------DEDUCCIONES-----------------------------------------------------*/
+	
+	public static synchronized void calcularISRL174(DetNomina nomina, ParametrosNomina parametros) {
+		
 	}
 }

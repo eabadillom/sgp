@@ -90,7 +90,7 @@ public class NominaDAO extends BaseDAO<DetNomina, Integer> {
 					;
 			
 		} catch(NoResultException ex) {
-			log.warn("Problema para obtener la lista de nomina del periodo solicitado...", ex.getMessage());
+			log.warn("No hay resultados para el periodo de nomina solicitado...", ex.getMessage());
 		} catch(Exception ex) {
 			log.error("Problema para obtener la lista de nomina del periodo solicitado...", ex);
 		} finally {

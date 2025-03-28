@@ -99,7 +99,7 @@ public class SeptimoDiaPercepcion extends AbstractPercepcion implements IPercepc
 		percepcion.setTipoPercepcion(tpSeptimoDia);
 		percepcion.setCantidad(proporcionalSemanal);
 		percepcion.setImporteGravado(septimoDia);
-		percepcion.setImporteExcento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
+		percepcion.setImporteExento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
 		
 		if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(BigDecimal.ZERO) > 0)
 			nomina.getPercepciones().add(percepcion);

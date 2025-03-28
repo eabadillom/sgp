@@ -12,7 +12,6 @@ import mx.com.ferbo.business.domicilio.DomicilioBL;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.ParametroDAO;
 import mx.com.ferbo.dao.n.VacacionesDAO;
-import mx.com.ferbo.model.CatAsentamiento;
 import mx.com.ferbo.model.CatDiaNoLaboral;
 import mx.com.ferbo.model.CatParametro;
 import mx.com.ferbo.model.DetDomicilioEmpleado;
@@ -59,6 +58,7 @@ public class EmpleadoBL {
     public static DetEmpleado load(Integer idEmpleado) throws SGPException {
     	DetEmpleado empleado = null;
     	EmpleadoDAO empleadoDAO = null;
+    	DetDomicilioEmpleado domicilio = null;
     	
     	empleadoDAO = new EmpleadoDAO();
     	
@@ -82,8 +82,8 @@ public class EmpleadoBL {
             log.info("Id Estado: {}", empleado.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getId());
             log.info("Id Pais: {}", empleado.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getPais().getId());
     	} catch(Exception ex) {
-    		empleado.setDomicilio(new DetDomicilioEmpleado());
-    		empleado.getDomicilio().setAsentamiento(new CatAsentamiento());
+    		domicilio = DomicilioBL.build(empleado);
+    		empleado.setDomicilio(domicilio);
     	}
     	
     	try {
@@ -113,6 +113,7 @@ public class EmpleadoBL {
     	try {
     		log.info("Id Empleado configuración: {}", empleado.getEmpleadoConfiguracion().getIdEmpleadoConf());
     	} catch(Exception ex) {
+    		log.info("El empleado no tiene configuración establecida, se creará un nuevo objeto de configuración.");
     		empleado.setEmpleadoConfiguracion(new DetEmpleadoConfiguracion());
     	}
     	

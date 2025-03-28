@@ -96,7 +96,11 @@ public class NominaSemanalBean implements Serializable {
 
         log.info("Inicio del periodo: {}", periodoFin);
         log.info("Fin del periodo: {}", periodoInicio);
-        this.nomina = NominaBL.build(NominaBL.TP_NOMINA_ORDINARIA, parametros, null);
+        try {
+			this.nomina = NominaBL.build(NominaBL.TP_NOMINA_ORDINARIA, parametros, null);
+		} catch (SGPException ex) {
+			log.info("Problema para generar el objeto nómina...", ex);
+		}
         this.percepcion = new DetNominaPercepcion();
         this.otroPago = new DetNominaOtroPago();
         this.deduccion = new DetNominaDeduccion();

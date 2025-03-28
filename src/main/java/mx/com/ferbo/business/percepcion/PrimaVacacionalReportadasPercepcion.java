@@ -3,6 +3,7 @@ package mx.com.ferbo.business.percepcion;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,7 +30,7 @@ public class PrimaVacacionalReportadasPercepcion extends AbstractPercepcion impl
 	@Override
 	public DetNominaPercepcion calcular(DetNomina nomina) {
 		DetNominaPercepcion       percepcion    = null;
-		DetVacaciones             periodo       = null;
+		List<DetVacaciones>       periodos      = null;
 		VacacionesDAO             vacacionesDAO = null;
 		
 		BigDecimal uma            = null;
@@ -38,24 +39,45 @@ public class PrimaVacacionalReportadasPercepcion extends AbstractPercepcion impl
 		BigDecimal importeGravado = null;
 		BigDecimal importeExento  = null;
 		BigDecimal importe        = null;
+		BigDecimal tasa           = null;
 		
-		Date fecha = null;
+		Date vencimientoPeriodo = null;
 		
 		try {
-			fecha = DateUtil.addYear(parametros.getPeriodoFin(), -1);
+			vencimientoPeriodo = DateUtil.addMonth(parametros.getPeriodoFin(), -6);
 			
 			vacacionesDAO = new VacacionesDAO();
-			periodo = vacacionesDAO.obtenerPorRfcFecha(nomina.getReceptor().getRfc(), fecha);
 			
-			if(periodo == null) {
-				log.info("No se encontraron periodos vacacionales para el empleado.");
-				throw new SGPException("El empleado no ha cumplido su aniversario laboral.");
+			periodos = vacacionesDAO.buscarReportadasPorRfcFecha(nomina.getReceptor().getRfc(), vencimientoPeriodo);
+			
+			cantidad       = ValoresBD.CERO.getValor();
+			importe        = ValoresBD.CERO.getValor();
+			importeExento  = ValoresBD.CERO.getValor();
+			importeGravado = ValoresBD.CERO.getValor();
+			
+			for(DetVacaciones periodo : periodos) {
+				if(periodo == null) {
+					log.info("No se encontraron periodos vacacionales para el empleado.");
+					throw new SGPException("No se encontraron periodos vacacionales reportados para el empleado.");
+				}
+				
+				log.info("Periodo: {} al {}, vencimiento del periodo vacacional reportado: {}",
+						DateUtil.getString(periodo.getFechaInicio(), DateUtil.FORMATO_DD_MM_YYYY),
+						DateUtil.getString(periodo.getFechaFin(), DateUtil.FORMATO_DD_MM_YYYY),
+						DateUtil.getString(vencimientoPeriodo, DateUtil.FORMATO_DD_MM_YYYY)
+						);
+				
+				tasa = this.calcularTasa(periodo, periodo.getEmpleado().getDatoEmpresa().getSalarioDiario());
+				cantidad = cantidad.add(tasa);
+				importe = importe.add(this.calcularImporte(nomina.getReceptor().getSalarioDiario(), cantidad));
+				
+				if(nomina.getVacaciones() == null)
+					nomina.setVacaciones(new ArrayList<DetVacaciones>());
+				
+				periodo.setDiasTomados(periodo.getDiasTotales());
+				periodo.setDiasPendientesPagados(true);
+				nomina.getVacaciones().add(periodo);
 			}
-			
-			log.info("El ultimo periodo de vacaciones registrado es: {} al {}", periodo.getFechaInicio(), periodo.getFechaFin());
-			
-			cantidad = this.calcularTasa(periodo, periodo.getEmpleado().getDatoEmpresa().getSalarioDiario());
-			importe = this.calcularImporte(nomina.getReceptor().getSalarioDiario(), cantidad);
 			
 			uma = parametros.getUma().getImporteDiario();
 			
@@ -70,15 +92,6 @@ public class PrimaVacacionalReportadasPercepcion extends AbstractPercepcion impl
 				importeGravado = ValoresBD.CERO.getValor();
 				importeExento = importe.setScale(2, BigDecimal.ROUND_HALF_UP);
 			}
-			
-			nomina.setEmpleado(periodo.getEmpleado());
-			
-			if(nomina.getEmpleado().getVacaciones() == null)
-				nomina.getEmpleado().setVacaciones(new ArrayList<DetVacaciones>());
-			
-			periodo.setDiasTomados(periodo.getDiasTotales());
-			periodo.setDiasPendientesPagados(true);
-			nomina.getEmpleado().getVacaciones().add(periodo);
 			
 		} catch(Exception ex) {
 			cantidad = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);

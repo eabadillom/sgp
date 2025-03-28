@@ -39,13 +39,87 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
             emSGP = getEntityManager();
             model = emSGP.find(this.modelClass, id);
             if (isFullInfo) {
+            	
                 log.info("id dato empresa: {}", model.getDatoEmpresa().getId() == null ? null : model.getDatoEmpresa().getId());
+                if(model.getDatoEmpresa().getPerfil() == null)
+                	log.info("El empleado no tiene definido el objeto empresa.");
+                else
+                	log.info("Id perfil: {}", model.getDatoEmpresa().getPerfil().getIdPerfil());
                 
-                log.info("Id Asentamiento: {}", model.getDomicilio().getAsentamiento().getKey().getId());
-                log.info("Id Localidad: {}", model.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getId());
-                log.info("Id Municipio: {}", model.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getMunicipio().getKey().getId());
-                log.info("Id Estado: {}", model.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getId());
-                log.info("Id Pais: {}", model.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getPais().getId());
+                if(model.getDatoEmpresa().getEmpresa() == null)
+                	log.info("El empleado no tiene asignada una empresa");
+                else
+                	log.info("Id empresa: {}", model.getDatoEmpresa().getEmpresa().getIdEmpresa());
+                
+                if(model.getDatoEmpresa().getPlanta() == null)
+                	log.info("El empleado no tiene asignada una planta.");
+                else
+                	log.info("Id planta: {}", model.getDatoEmpresa().getPlanta().getIdPlanta());
+                
+                if(model.getDatoEmpresa().getArea() == null)
+                	log.info("El empleado no tiene asignada una área laboral.");
+                else
+                	log.info("Id area: {}", model.getDatoEmpresa().getArea().getIdArea());
+                
+                if(model.getDatoEmpresa().getPuesto() == null)
+                	log.info("El empleado no tiene asignado un puesto laboral.");
+                else
+                	log.info("Id puesto: {}", model.getDatoEmpresa().getPuesto().getIdPuesto());
+                
+                if(model.getDatoEmpresa().getTipoContrato() == null)
+                	log.info("El empleado no tiene asignado un tipo de contrato.");
+                else
+                	log.info("Id tipo contrato: {}", model.getDatoEmpresa().getTipoContrato().getClave());
+                
+                if(model.getDatoEmpresa().getTipoJornada() == null)
+                	log.info("El empleado no tiene asignado un tipo de jornada");
+                else
+                	log.info("Id tipo jornada: {}", model.getDatoEmpresa().getTipoJornada().getClave());
+                
+                if(model.getDatoEmpresa().getTipoRegimen() == null)
+                	log.info("El empleado no tiene asignado un tipo de régimen.");
+                else
+                	log.info("Id tipo régimen: {}", model.getDatoEmpresa().getTipoRegimen().getClave());
+                
+                if(model.getDatoEmpresa().getEntidadFederativa() == null)
+                	log.info("El empleado no tiene asignada una entidad federativa.");
+                else
+                	log.info("Id entidad federativa: {}", model.getDatoEmpresa().getEntidadFederativa().getClave());
+                
+                if(model.getDatoEmpresa().getRiesgoPuesto() == null)
+                	log.info("El empleado no tiene asignado un riesgo de puesto laboral.");
+                else
+                	log.info("Id riesgo puesto: {}", model.getDatoEmpresa().getRiesgoPuesto().getClave());
+                
+                if(model.getDatoEmpresa().getPeriodicidadPago() == null)
+                	log.info("El empleado no tiene asignada una periodicidad de pago.");
+                else
+                	log.info("Id periodicidad pago: {}", model.getDatoEmpresa().getPeriodicidadPago().getPeriodicidad());
+                
+                if(model.getDatoEmpresa().getTipodebaja() == null)
+                	log.info("El empleado no tiene asignado un tipo de baja.");
+                else
+                	log.info("Id tipo de baja: {}", model.getDatoEmpresa().getTipodebaja().getTipodebaja());
+                
+                if(model.getDatoEmpresa().getBanco() == null)
+                	log.info("El empleado no tiene asignado un banco.");
+                else
+                	log.info("Id banco: {}", model.getDatoEmpresa().getBanco().getIdBanco());
+                
+                if(model.getDomicilio() == null)
+                	log.info("El empleado no tiene asignado un domicilio");
+                else
+                	log.info("Id domicilio: {}", model.getDomicilio().getId());
+                
+                if(model.getDomicilio() != null && model.getDomicilio().getAsentamiento() == null) {
+                	log.info("El empleado no tiene asignada la información de su domicilio (asentamiento).");
+                } else if(model.getDomicilio() != null && model.getDomicilio().getAsentamiento() != null) {
+                	log.info("Id Asentamiento: {}", model.getDomicilio().getAsentamiento().getKey().getId());
+                	log.info("Id Localidad: {}", model.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getId());
+                	log.info("Id Municipio: {}", model.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getMunicipio().getKey().getId());
+                	log.info("Id Estado: {}", model.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getId());
+                	log.info("Id Pais: {}", model.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getPais().getId());
+                }
                 
                 for(DetVacaciones v : model.getVacaciones()) {
                 	log.info("Periodo Vacacional: {}", v.getIdVacaciones());
@@ -59,7 +133,10 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
                 	log.info("Préstamo del empleado: {}", p.getIdPrestamo());
                 }
                 
-                log.info("Id Empleado configuración: {}", model.getEmpleadoConfiguracion().getIdEmpleadoConf());
+                if(model.getEmpleadoConfiguracion() == null)
+                	log.info("El empleado no tiene asignado un objeto de configuración de nómina.");
+                else
+                	log.info("Id Empleado configuración: {}", model.getEmpleadoConfiguracion().getIdEmpleadoConf());
             }
 
             if (isGetFoto) {

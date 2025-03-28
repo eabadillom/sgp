@@ -169,7 +169,7 @@ public class DetNomina implements Serializable {
     private List<DetNominaDeduccion> deducciones;
     
     @Transient
-    private DetEmpleado empleado;
+    private List<DetVacaciones> vacaciones;
     
     @Override
 	public int hashCode() {
@@ -450,11 +450,11 @@ public class DetNomina implements Serializable {
 		this.tipoNomina = tipoNomina;
 	}
 
-	public DetEmpleado getEmpleado() {
-		return empleado;
+	public List<DetVacaciones> getVacaciones() {
+		return vacaciones;
 	}
 
-	public void setEmpleado(DetEmpleado empleado) {
-		this.empleado = empleado;
+	public void setVacaciones(List<DetVacaciones> vacaciones) {
+		this.vacaciones = vacaciones;
 	}
 }

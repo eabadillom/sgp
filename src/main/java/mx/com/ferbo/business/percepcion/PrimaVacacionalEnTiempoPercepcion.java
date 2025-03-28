@@ -76,9 +76,8 @@ public class PrimaVacacionalEnTiempoPercepcion extends AbstractPercepcion implem
 			}
 			
 			periodo.setPrimaPagada(true);
-			nomina.setEmpleado(periodo.getEmpleado());
-			nomina.getEmpleado().setVacaciones(new ArrayList<DetVacaciones>());
-			nomina.getEmpleado().getVacaciones().add(periodo);
+			nomina.setVacaciones(new ArrayList<DetVacaciones>());
+			nomina.getVacaciones().add(periodo);
 			
 		} catch(Exception ex) {
 			cantidad = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);

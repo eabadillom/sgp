@@ -67,7 +67,7 @@ public class AbstractPercepcion {
 		
 		percepcion = this.build(nomina, clave);
 		percepcion.setCantidad(cantidad);
-		percepcion.setImporteExcento(importeExento);
+		percepcion.setImporteExento(importeExento);
 		percepcion.setImporteGravado(importeGravado);
 		
 		return percepcion;

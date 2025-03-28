@@ -91,7 +91,7 @@
 				</div>
 				<div class="field col-12 md:col-2">
 					<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
-					<p:commandButton value="Calcular" process="@this" update="form:acc" actionListener="#{nominaE.calcularNomina()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
+					<p:commandButton value="Empleados" process="@this" update="form:acc" actionListener="#{nominaE.calcularNomina()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
 				</div>
 			</div>
 			
@@ -135,21 +135,21 @@
 								<p:column style="text-align:right;" footerText="Total:"/>
 								<p:column style="text-align:right;">
 									<f:facet name="footer">
-										<h:outputText value="#{nominaE.listaNomina.stream().map(item -> item.subtotal).sum()}">
+										<h:outputText value="#{nominaE.nominaSubtotal()}">
 											<f:convertNumber pattern="$ #,##0.00" />
 										</h:outputText>
 									</f:facet>
 								</p:column>
 								<p:column style="text-align:right;">
 									<f:facet name="footer">
-										<h:outputText value="#{nominaE.listaNomina.stream().map(item -> item.descuento).sum()}">
+										<h:outputText value="#{nominaE.nominaDescuentos()}">
 											<f:convertNumber pattern="$ #,##0.00" />
 										</h:outputText>
 									</f:facet>
 								</p:column>
 								<p:column style="text-align:right;">
 									<f:facet name="footer">
-										<p:outputLabel value="#{nominE.listaNomina.stream().map(item -> item.total).sum()}">
+										<p:outputLabel value="#{nominaE.nominaTotal()}">
 											<f:convertNumber pattern="$ #,##0.00" />
 										</p:outputLabel>
 									</f:facet>
@@ -181,7 +181,7 @@
 					<p:selectOneMenu id="percepcion" value="#{nominaE.percepcion}" filter="true" filterMatchMode="contains" filterPlaceholder="Concepto" converter="entityConverter">
 						<f:selectItem itemLabel="--Seleccione--" noSelectionOption="true" />
 						<f:selectItems value="#{nominaE.percepciones}" var="percepcion" itemLabel="#{percepcion.nombre}" itemValue="#{percepcion}" />
-						<p:ajax process="@this" event="change" update="tipoPercepcion nombrePercepcion" listener="#{nominaE.setTipoPercepcion()}"/>
+						<p:ajax process="@this" event="change" update="tipoPercepcion nombrePercepcion cantidad importeExento importeGravado" listener="#{nominaE.setTipoPercepcion()}"/>
 					</p:selectOneMenu>
 					<p:separator/>
 					<p:outputLabel value="Descripción" />
@@ -194,18 +194,25 @@
 						<f:selectItem itemLabel="--Seleccione--" noSelectionOption="true" />
 						<f:selectItems value="#{nominaE.tiposPercepcion}" var="tipoPercepcion" itemLabel="#{tipoPercepcion.clave} - #{tipoPercepcion.descripcion}" itemValue="#{percepcion}" />
 					</p:selectOneMenu>
-					<p:outputLabel value="Importe excento" />
-					<p:inputNumber value="#{nominaE.nomPercepcion.importeExento}" decimalPlaces="2" decimalSeparator="." symbol="$ " symbolPosition="p" placeholder="importe excento" emptyValue="null" minValue="0.00">
+					
+					<p:outputLabel value="Cantidad" />
+					<p:inputNumber id="cantidad" value="#{nominaE.nomPercepcion.cantidad}" decimalPlaces="4" decimalSeparator="." placeholder="cantidad" emptyValue="null" minValue="0.0000" >
 						<p:ajax process="@this" />
 					</p:inputNumber>
+					
+					<p:outputLabel value="Importe exento" />
+					<p:inputNumber id="importeExento" value="#{nominaE.nomPercepcion.importeExento}" decimalPlaces="2" decimalSeparator="." symbol="$ " symbolPosition="p" placeholder="importe exento" emptyValue="null" minValue="0.00">
+						<p:ajax process="@this" />
+					</p:inputNumber>
+					
 					<p:outputLabel value="Importe gravado" />
-					<p:inputNumber value="#{nominaE.nomPercepcion.importeGravado}" decimalPlaces="2" decimalSeparator="." symbol="$ " symbolPosition="p" placeholder="importe gravado" emptyValue="null" minValue="0.00">
+					<p:inputNumber id="importeGravado" value="#{nominaE.nomPercepcion.importeGravado}" decimalPlaces="2" decimalSeparator="." symbol="$ " symbolPosition="p" placeholder="importe gravado" emptyValue="null" minValue="0.00">
 						<p:ajax process="@this" />
 					</p:inputNumber>
 				</p:outputPanel>
 				<f:facet name="footer">
-					<p:commandButton value="Agregar" icon="pi pi-check" process="@this" actionListener="#{nominaE.agregarPercepcion()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
-					<p:commandButton value="Calcular" icon="fas fa-light fa-calculator" process="@this form:acc:dtNomina" actionListener="#{nominaE.calcularPercepcion()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
+					<p:commandButton value="Agregar" icon="pi pi-check" update="form:acc:dtNomina" process="@this" actionListener="#{nominaE.agregarPercepcion()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
+					<p:commandButton value="Calcular" icon="fas fa-light fa-calculator" update="form:acc:dtNomina" process="@this form:acc:dtNomina" actionListener="#{nominaE.calcularPercepcion()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
 					<p:commandButton value="Cancelar" icon="pi pi-times" styleClass="ui-button-outlined ui-button-secondary" oncomplete="PF('dlgPercepcionAll').hide();" />
 				</f:facet>
 				
@@ -218,12 +225,16 @@
 					<p:tab title="General">
 						<div class="ui-fluid formgrid grid">
 							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Tipo de nómina" />
+								<p:inputText value="#{nominaE.nomina.tipoNomina eq 'E' ? 'Extraordinaria' : 'Ordinaria'}" readonly="true" style="text-align: right;"/>
+							</div>
+							<div class="field col-12 md:col-3">
 								<p:outputLabel value="Ejercicio"/>
 								<p:inputText value="#{nominaE.nomina.ejercicio}" readonly="true" style="text-align: right;"/>
 							</div>
 							<div class="field col-12 md:col-3">
 								<p:outputLabel value="Periodo"/>
-								<p:inputText value="Semana #{nominaE.nomina.periodo}" readonly="true" style="text-align: right;"/>
+								<p:inputText value="Periodo #{nominaE.nomina.periodo}" readonly="true" style="text-align: right;"/>
 							</div>
 							<div class="field col-12 md:col-3">
 								<p:outputLabel value="Dias laborados"/>
@@ -237,6 +248,8 @@
 								<p:outputLabel value="Dias pagados"/>
 								<p:inputNumber value="#{nominaE.nomina.diasPagados}" symbol=" días" symbolPosition="s" inputStyle="text-align: right"/>
 							</div>
+						</div>
+						<div class="ui-fluid formgrid grid">
 							<div class="field col-12 md:col-3">
 								<p:outputLabel value="Subtotal"/>
 								<p:inputNumber value="#{nominaE.nomina.subtotal}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," readonly="true" inputStyle="text-align: right"/>
