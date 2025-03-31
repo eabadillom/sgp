@@ -58,16 +58,40 @@ public class EmpleadoBL {
     public static DetEmpleado load(Integer idEmpleado) throws SGPException {
     	DetEmpleado empleado = null;
     	EmpleadoDAO empleadoDAO = null;
-    	DetDomicilioEmpleado domicilio = null;
-    	
-    	empleadoDAO = new EmpleadoDAO();
     	
     	try {
-    		empleado = empleadoDAO.buscarPorId(idEmpleado, true, true);
+    		empleadoDAO = new EmpleadoDAO();
+    		empleado = empleadoDAO.buscarPorId(idEmpleado, true);
     	} catch(Exception ex) {
     		log.error("Problema para obtener el empleado solicitado: id = {}", idEmpleado);
     		throw new SGPException("Ocurrió un problema al cargar la información del empleado: id = " + idEmpleado, ex);
     	}
+    	
+    	loadDetail(empleado);
+    	
+    	return empleado;
+    }
+    
+    public static DetEmpleado load(String rfc) throws SGPException {
+    	DetEmpleado empleado = null;
+    	EmpleadoDAO empleadoDAO = null;
+    	
+    	empleadoDAO = new EmpleadoDAO();
+    	
+    	try {
+    		empleado = empleadoDAO.buscarPorRFC(rfc, true);
+    	} catch(Exception ex) {
+    		log.error("Problema para obtener el empleado solicitado: RFC = {}", rfc);
+    		throw new SGPException("Ocurrió un problema al cargar la información del empleado: RFC = " + rfc, ex);
+    	}
+    	
+    	loadDetail(empleado);
+    	
+    	return empleado;
+    }
+    
+    private static void loadDetail(DetEmpleado empleado) {
+    	DetDomicilioEmpleado domicilio = null;
     	
     	try {
     		log.info("id dato empresa: {}", empleado.getDatoEmpresa().getId());
@@ -116,8 +140,6 @@ public class EmpleadoBL {
     		log.info("El empleado no tiene configuración establecida, se creará un nuevo objeto de configuración.");
     		empleado.setEmpleadoConfiguracion(new DetEmpleadoConfiguracion());
     	}
-    	
-    	return empleado;
     }
 
     public static void validarDatosEmpleado(DetEmpleado empleadoporvalidar) {

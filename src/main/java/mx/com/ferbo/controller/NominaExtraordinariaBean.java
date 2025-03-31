@@ -252,15 +252,15 @@ public class NominaExtraordinariaBean implements Serializable {
     }
     
     public BigDecimal nominaSubtotal() {
-    	return this.listaNomina.stream().map(item -> item.getSubtotal()).reduce(ValoresBD.CERO.getValor(), BigDecimal :: add);
+    	return this.listaNomina.stream().map(item -> item.getSubtotal()).reduce(ValoresBD._CERO.getValor(), BigDecimal :: add);
     }
     
     public BigDecimal nominaDescuentos() {
-    	return this.listaNomina.stream().map(item -> item.getDescuento()).reduce(ValoresBD.CERO.getValor(), BigDecimal :: add);
+    	return this.listaNomina.stream().map(item -> item.getDescuento()).reduce(ValoresBD._CERO.getValor(), BigDecimal :: add);
     }
     
     public BigDecimal nominaTotal() {
-    	return this.listaNomina.stream().map(item -> item.getTotal()).reduce(ValoresBD.CERO.getValor(), BigDecimal :: add);
+    	return this.listaNomina.stream().map(item -> item.getTotal()).reduce(ValoresBD._CERO.getValor(), BigDecimal :: add);
     }
     
     

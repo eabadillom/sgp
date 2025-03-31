@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.LazyInitializationException;
 
 import mx.com.ferbo.business.nomina.ParametrosNomina;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
@@ -63,9 +62,9 @@ public class VacacionesReportadasPercepcion extends AbstractPercepcion implement
 			vacacionesDAO = new VacacionesDAO();
 			periodos = vacacionesDAO.buscarReportadasPorRfcFecha(nomina.getReceptor().getRfc(), vencimientoPeriodo);
 			
-			cantidad = ValoresBD.CERO.getValor();
-			importeExento = ValoresBD.CERO.getValor();
-			importeGravado = ValoresBD.CERO.getValor();
+			cantidad = ValoresBD._CERO.getValor();
+			importeExento = ValoresBD._CERO.getValor();
+			importeGravado = ValoresBD._CERO.getValor();
 			
 			for(DetVacaciones periodo : periodos) {
 				if(periodo == null) {
@@ -89,9 +88,9 @@ public class VacacionesReportadasPercepcion extends AbstractPercepcion implement
 			}
 			
 		} catch(Exception ex) {
-			cantidad = ValoresBD.CERO.getValor();
-			importeGravado = ValoresBD.CERO.getValor();
-			importeExento = ValoresBD.CERO.getValor();
+			cantidad = ValoresBD._CERO.getValor();
+			importeGravado = ValoresBD._CERO.getValor();
+			importeExento = ValoresBD._CERO.getValor();
 		} finally {
 			percepcion = this.build(nomina, CVE_VACACIONES_REPORTADAS, cantidad, importeExento, importeGravado);
 		}

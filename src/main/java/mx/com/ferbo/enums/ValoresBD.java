@@ -5,10 +5,13 @@ import java.util.Arrays;
 
 public enum ValoresBD {
 	
-	CERO(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP)),
-	QUINCE(new BigDecimal("15.00").setScale(2, BigDecimal.ROUND_HALF_UP)),
-    TREINTA(new BigDecimal("30.00").setScale(2, BigDecimal.ROUND_HALF_UP)),
-    CIEN(new BigDecimal("100.00").setScale(2, BigDecimal.ROUND_HALF_UP));
+	_CERO(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP)),
+	_15(new BigDecimal("15.00").setScale(2, BigDecimal.ROUND_HALF_UP)),
+    _30(new BigDecimal("30.00").setScale(2, BigDecimal.ROUND_HALF_UP)),
+    _30_4(new BigDecimal("30.40").setScale(2, BigDecimal.ROUND_HALF_UP)),
+    _100(new BigDecimal("100.00").setScale(2, BigDecimal.ROUND_HALF_UP)),
+    _DIAS_ANIO(new BigDecimal("365").setScale(2, BigDecimal.ROUND_HALF_UP))
+    ;
 
     private final BigDecimal valor;
 
@@ -28,7 +31,7 @@ public enum ValoresBD {
     }
 
     public static void main(String[] args) {
-        System.out.println(ValoresBD.QUINCE.getValor()); // 15.00
+        System.out.println(ValoresBD._15.getValor()); // 15.00
         System.out.println(ValoresBD.fromString("CIEN").getValor()); // 100.00
     }
 }

@@ -130,10 +130,10 @@ public abstract class NominaBL {
 			nomina.setDiasLaborados(0);
 			nomina.setDiasNoLaborados(0);
 			nomina.setDiasAsueto(0);
-			nomina.setDiasPagados(ValoresBD.CERO.getValor());
-			nomina.setSubtotal(ValoresBD.CERO.getValor());
-			nomina.setDescuento(ValoresBD.CERO.getValor());
-			nomina.setTotal(ValoresBD.CERO.getValor());
+			nomina.setDiasPagados(ValoresBD._CERO.getValor());
+			nomina.setSubtotal(ValoresBD._CERO.getValor());
+			nomina.setDescuento(ValoresBD._CERO.getValor());
+			nomina.setTotal(ValoresBD._CERO.getValor());
 		
 		} catch(SGPException ex){
 			throw ex;

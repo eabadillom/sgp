@@ -290,15 +290,20 @@ public class NominaSemanalBL extends NominaBL {
 		
 		log.info("Asistencia: {} días, Vacaciones: {}, Descanso: {} días", diasTrabajados, diasVacaciones, diasNoLaborales);
 		
+		//Eliminar cualquier percepción de tipo "Vacaciones" de la lista de percepciones.
+		boolean removedPercepciones = nomina.getPercepciones().removeIf(d -> AbstractPercepcion.CVE_VACACIONES_EN_TIEMPO.equalsIgnoreCase(d.getClave()));
+		if(removedPercepciones)
+			log.info("Se encontraron conceptos {}, los cuales fueron eliminados para el reproceso de SUELDO.", AbstractPercepcion.CVE_SUELDO);
+		
 		sueldoBO = new SueldoPercepcion(parametros, diasTrabajados);
 		sueldo = sueldoBO.calcular(nomina);
-		if(sueldo.getImporteExento().add(sueldo.getImporteGravado()).compareTo(ValoresBD.CERO.getValor()) > 0);
+		if(sueldo.getImporteExento().add(sueldo.getImporteGravado()).compareTo(ValoresBD._CERO.getValor()) > 0);
 			nomina.getPercepciones().add(sueldo);
 		
 		vacacionesBO = new VacacionesPercepcion(parametros, diasVacaciones);
 		vacaciones = vacacionesBO.calcular(nomina);
 		
-		if(vacaciones.getImporteExento().add(vacaciones.getImporteGravado()).compareTo(ValoresBD.CERO.getValor()) > 0)
+		if(vacaciones.getImporteExento().add(vacaciones.getImporteGravado()).compareTo(ValoresBD._CERO.getValor()) > 0)
 			nomina.getPercepciones().add(vacaciones);
 		
 		//Para el séptimo día, se considera el salario diario (sin SDI), dividiendolo entre los días de la semana que se deben laborar,
@@ -382,7 +387,7 @@ public class NominaSemanalBL extends NominaBL {
 		valesDespensaBO.setPercepcionesEmpleado(percepcionesEmpleado);
 		percepcion = valesDespensaBO.calcular(nomina);
 		
-		if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(ValoresBD.CERO.getValor()) > 0)
+		if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(ValoresBD._CERO.getValor()) > 0)
 			nomina.getPercepciones().add(percepcion);
 	}
 	

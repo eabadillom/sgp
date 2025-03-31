@@ -50,10 +50,10 @@ public class PrimaVacacionalReportadasPercepcion extends AbstractPercepcion impl
 			
 			periodos = vacacionesDAO.buscarReportadasPorRfcFecha(nomina.getReceptor().getRfc(), vencimientoPeriodo);
 			
-			cantidad       = ValoresBD.CERO.getValor();
-			importe        = ValoresBD.CERO.getValor();
-			importeExento  = ValoresBD.CERO.getValor();
-			importeGravado = ValoresBD.CERO.getValor();
+			cantidad       = ValoresBD._CERO.getValor();
+			importe        = ValoresBD._CERO.getValor();
+			importeExento  = ValoresBD._CERO.getValor();
+			importeGravado = ValoresBD._CERO.getValor();
 			
 			for(DetVacaciones periodo : periodos) {
 				if(periodo == null) {
@@ -81,7 +81,7 @@ public class PrimaVacacionalReportadasPercepcion extends AbstractPercepcion impl
 			
 			uma = parametros.getUma().getImporteDiario();
 			
-			limiteExento = ValoresBD.QUINCE.getValor().multiply(uma).setScale(2, BigDecimal.ROUND_HALF_UP);
+			limiteExento = ValoresBD._15.getValor().multiply(uma).setScale(2, BigDecimal.ROUND_HALF_UP);
 			
 			if(importe.compareTo(limiteExento) > 0) {
 				//La prima vacacional NO está excenta de ISR.
@@ -89,14 +89,14 @@ public class PrimaVacacionalReportadasPercepcion extends AbstractPercepcion impl
 				importeExento = limiteExento.setScale(2, BigDecimal.ROUND_HALF_UP);
 			} else {
 				//La prima vacacional SI está excenta de ISR.
-				importeGravado = ValoresBD.CERO.getValor();
+				importeGravado = ValoresBD._CERO.getValor();
 				importeExento = importe.setScale(2, BigDecimal.ROUND_HALF_UP);
 			}
 			
 		} catch(Exception ex) {
 			cantidad = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
-			importeGravado = ValoresBD.CERO.getValor();
-			importeExento = ValoresBD.CERO.getValor();
+			importeGravado = ValoresBD._CERO.getValor();
+			importeExento = ValoresBD._CERO.getValor();
 		} finally {
 			percepcion = this.build(nomina, CVE_PRIMA_VACACIONES_REPORTADAS, cantidad, importeExento, importeGravado);
 		}
@@ -112,7 +112,7 @@ public class PrimaVacacionalReportadasPercepcion extends AbstractPercepcion impl
 		BigDecimal dias = null;
 		
 		primaVacacional = periodo.getEmpleado().getDatoEmpresa().getPrimaVacacional();
-		primaVacacional = primaVacacional.divide(ValoresBD.CIEN.getValor(), 4, BigDecimal.ROUND_HALF_UP);
+		primaVacacional = primaVacacional.divide(ValoresBD._100.getValor(), 4, BigDecimal.ROUND_HALF_UP);
 		
 		diasTotales = new BigDecimal(periodo.getDiasTotales()).setScale(2, BigDecimal.ROUND_HALF_UP);
 		diasTomados = new BigDecimal(periodo.getDiasTomados()).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -129,7 +129,7 @@ public class PrimaVacacionalReportadasPercepcion extends AbstractPercepcion impl
 		try {
 			importe = salarioDiario.multiply(tasa).setScale(2, BigDecimal.ROUND_HALF_UP);
 		} catch(Exception ex) {
-			importe = ValoresBD.CERO.getValor();
+			importe = ValoresBD._CERO.getValor();
 		}
 		
 		return importe;

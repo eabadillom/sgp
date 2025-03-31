@@ -1,16 +1,24 @@
 package mx.com.ferbo.business.nomina;
 
+import java.math.BigDecimal;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import mx.com.ferbo.business.deduccion.AbstractDeduccion;
+import mx.com.ferbo.business.deduccion.isr.ISRL174Deduccion;
+import mx.com.ferbo.business.empleado.EmpleadoBL;
 import mx.com.ferbo.business.percepcion.AbstractPercepcion;
+import mx.com.ferbo.business.percepcion.AguinaldoPercepcion;
 import mx.com.ferbo.business.percepcion.PrimaVacacionalEnTiempoPercepcion;
 import mx.com.ferbo.business.percepcion.PrimaVacacionalReportadasPercepcion;
 import mx.com.ferbo.business.percepcion.VacacionesReportadasPercepcion;
 import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetNomina;
+import mx.com.ferbo.model.DetNominaDeduccion;
 import mx.com.ferbo.model.DetNominaPercepcion;
+import mx.com.ferbo.util.SGPException;
 
 public class NominaExtraordinariaBL extends NominaBL {
 	
@@ -42,12 +50,16 @@ public class NominaExtraordinariaBL extends NominaBL {
 			case AbstractPercepcion.CVE_PRIMA_VACACIONES_REPORTADAS:
 				calcularPrimaVacacionesReportadas(nomina, parametros);
 				break;
+			
+			case AbstractPercepcion.CVE_AGUINALDO:
+				calcularAguinaldo(nomina, parametros);
+				break;
 			default:
 				throw new UnsupportedOperationException("La percepción no está implementada.");
 			}
 			
 			
-			
+			calcularISRL174(nomina, parametros);
 			
 			calcularTotales(nomina, parametros);
 			
@@ -70,7 +82,7 @@ public class NominaExtraordinariaBL extends NominaBL {
 		VacacionesReportadasPercepcion vacacionesBO = new VacacionesReportadasPercepcion(parametros);
 		percepcion = vacacionesBO.calcular(nomina);
 		
-		if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(ValoresBD.CERO.getValor()) > 0)
+		if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(ValoresBD._CERO.getValor()) > 0)
 			nomina.getPercepciones().add(percepcion);
 	}
 	
@@ -85,7 +97,7 @@ public class NominaExtraordinariaBL extends NominaBL {
 		PrimaVacacionalEnTiempoPercepcion primaBO = new PrimaVacacionalEnTiempoPercepcion(parametros);
 		percepcion = primaBO.calcular(nomina);
 		
-		if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(ValoresBD.CERO.getValor()) > 0)
+		if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(ValoresBD._CERO.getValor()) > 0)
 			nomina.getPercepciones().add(percepcion);
 	}
 	
@@ -93,21 +105,63 @@ public class NominaExtraordinariaBL extends NominaBL {
 		DetNominaPercepcion percepcion = null;
 		
 		final String clave = AbstractPercepcion.CVE_PRIMA_VACACIONES_REPORTADAS;
-		boolean removePercepciones = nomina.getPercepciones().removeIf( p -> p.getClave().equalsIgnoreCase(clave));
+		boolean removedPercepciones = nomina.getPercepciones().removeIf( p -> p.getClave().equalsIgnoreCase(clave));
 		
-		if(removePercepciones)
+		if(removedPercepciones)
 			log.info("Se encontraron conceptos {}, los cuales fueron eliminados de la lista de percepciones.", clave);
 		
 		PrimaVacacionalReportadasPercepcion primaBO = new PrimaVacacionalReportadasPercepcion(parametros);
 		percepcion = primaBO.calcular(nomina);
 		
-		if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(ValoresBD.CERO.getValor()) > 0)
+		if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(ValoresBD._CERO.getValor()) > 0)
 			nomina.getPercepciones().add(percepcion);
+	}
+	
+	public static synchronized void calcularAguinaldo(DetNomina nomina, ParametrosNomina parametros) {
+		DetNominaPercepcion percepcion = null;
+		
+		DetEmpleado empleado = null;
+		AguinaldoPercepcion aguinaldoBO = null;
+		
+		try {
+			final String clave = AbstractPercepcion.CVE_AGUINALDO;
+			boolean removedPercepciones = nomina.getPercepciones().removeIf( p -> p.getClave().equalsIgnoreCase(clave));
+					
+			if(removedPercepciones)
+				log.info("Se encontraron conceptos {}, los cuales fueron eliminados de la lista de percepciones.", clave);
+			
+			empleado = EmpleadoBL.load(nomina.getReceptor().getRfc());
+			
+			//TODO FALTA PROCESAR LAS AUSENCIAS DEL AÑO COMPLETO.
+			
+			aguinaldoBO = new AguinaldoPercepcion(parametros, empleado.getDatoEmpresa().getDiasAguinaldo(), ValoresBD._CERO.getValor());
+			
+			percepcion = aguinaldoBO.calcular(nomina);
+			
+			if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(ValoresBD._CERO.getValor()) > 0)
+				nomina.getPercepciones().add(percepcion);
+			
+		} catch (SGPException ex) {
+			log.error("Problema para generar la percepción...", ex);
+		}
 	}
 	
 	/*--------------------------DEDUCCIONES-----------------------------------------------------*/
 	
 	public static synchronized void calcularISRL174(DetNomina nomina, ParametrosNomina parametros) {
+		DetNominaDeduccion deduccion = null;
+		ISRL174Deduccion isrBO = null;
+		BigDecimal importeGravado = null;
 		
+		
+		final String clave = AbstractDeduccion.CVE_ISR_LEY_174;
+		boolean removedPercepciones = nomina.getPercepciones().removeIf( p -> p.getClave().equalsIgnoreCase(clave));
+		
+		if(removedPercepciones)
+			log.info("Se encontraron conceptos {}, los cuales fueron eliminados de la lista de percepciones.", clave);
+		
+		isrBO = new ISRL174Deduccion(parametros, importeGravado);
+		
+		isrBO.procesar(nomina);
 	}
 }
