@@ -91,7 +91,7 @@ public class BonoPuntualidadPercepcion extends AbstractPercepcion implements IPe
     		log.warn("No es posible calcular el bono de puntualidad: {}", ex.getMessage());
     		bono = BigDecimal.ZERO;
     	} finally {
-    		percepcion = this.build(nomina, CVE_BONO_PUNTUALIDAD, null, ValoresBD._CERO.getValor(), bono);
+    		percepcion = this.build(nomina, CVE_BONO_PUNTUALIDAD, null, ValoresBD._CERO.get(), bono);
     	}
     	
     	return percepcion;

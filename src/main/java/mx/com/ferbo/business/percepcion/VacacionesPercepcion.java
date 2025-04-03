@@ -44,7 +44,7 @@ public class VacacionesPercepcion extends AbstractPercepcion implements IPercepc
 			salarioVacaciones = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 			cantidad = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 		} finally {
-			percepcion = this.build(nomina, CVE_VACACIONES_EN_TIEMPO, cantidad, ValoresBD._CERO.getValor(), salarioVacaciones);
+			percepcion = this.build(nomina, CVE_VACACIONES_EN_TIEMPO, cantidad, ValoresBD._CERO.get(), salarioVacaciones);
 		}
 		
 		return percepcion;

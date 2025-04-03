@@ -27,7 +27,7 @@ public class DiasDeDescansoObligatorioBL implements Serializable {
         Date fechaFin = DateUtil.inicializaFechaTerminoAnioCurso(anioEnCurso + 1);
         DiaNoLaboralDAO diaNoLaboralDAO = new DiaNoLaboralDAO();
         List<CatDiaNoLaboral> diasNoLaboral = diaNoLaboralDAO.buscarPorPeriodo("MX", fechaInicio, fechaFin);
-        List<Date> diasDeAsueto = new ArrayList();
+        List<Date> diasDeAsueto = new ArrayList<Date>();
 
         for (CatDiaNoLaboral aux : diasNoLaboral) 
         {

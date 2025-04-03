@@ -81,7 +81,7 @@ public class ValesDespensaPercepcion extends AbstractPercepcion implements IPerc
     		importeExento = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 			importeGravado = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
     	} finally {
-    		percepcion = this.build(nomina, CVE_VALES_DESPENSA, ValoresBD._CERO.getValor(), importeExento, importeGravado);
+    		percepcion = this.build(nomina, CVE_VALES_DESPENSA, ValoresBD._CERO.get(), importeExento, importeGravado);
     	}
 		
 		return percepcion;

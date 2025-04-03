@@ -6,6 +6,9 @@ import java.util.Arrays;
 public enum ValoresBD {
 	
 	_CERO(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP)),
+	_1(BigDecimal.ONE.setScale(2, BigDecimal.ROUND_HALF_UP)),
+	_3(new BigDecimal("3.00").setScale(2, BigDecimal.ROUND_HALF_UP)),
+	_7(new BigDecimal("7.00").setScale(2, BigDecimal.ROUND_HALF_UP)),
 	_15(new BigDecimal("15.00").setScale(2, BigDecimal.ROUND_HALF_UP)),
     _30(new BigDecimal("30.00").setScale(2, BigDecimal.ROUND_HALF_UP)),
     _30_4(new BigDecimal("30.40").setScale(2, BigDecimal.ROUND_HALF_UP)),
@@ -19,7 +22,7 @@ public enum ValoresBD {
         this.valor = valor;
     }
 
-    public BigDecimal getValor() {
+    public BigDecimal get() {
         return valor;
     }
 
@@ -28,10 +31,5 @@ public enum ValoresBD {
                 .filter(e -> e.name().equalsIgnoreCase(nombre))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("No existe el valor: " + nombre));
-    }
-
-    public static void main(String[] args) {
-        System.out.println(ValoresBD._15.getValor()); // 15.00
-        System.out.println(ValoresBD.fromString("CIEN").getValor()); // 100.00
     }
 }

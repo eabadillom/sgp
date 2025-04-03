@@ -24,8 +24,8 @@ public class PercepcionBL {
 		percepcion = new DetNominaPercepcion();
 		percepcion.setKey(new DetNominaPercepcionPK(nomina, -1));
 		percepcion.setCantidad(null);
-		percepcion.setImporteExento(ValoresBD._CERO.getValor());
-		percepcion.setImporteGravado(ValoresBD._CERO.getValor());
+		percepcion.setImporteExento(ValoresBD._CERO.get());
+		percepcion.setImporteGravado(ValoresBD._CERO.get());
 		return percepcion;
 	}
 

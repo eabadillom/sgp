@@ -1,5 +1,7 @@
 package mx.com.ferbo.controller;
 
+import static mx.com.ferbo.enums.ValoresBD._CERO;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -35,7 +37,6 @@ import mx.com.ferbo.dao.n.EmpresaDAO;
 import mx.com.ferbo.dao.n.NominaDAO;
 import mx.com.ferbo.dao.n.PercepcionDAO;
 import mx.com.ferbo.dao.n.PeriodicidadPagoDAO;
-import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.CatEmpresa;
 import mx.com.ferbo.model.CatPercepcion;
 import mx.com.ferbo.model.CatPeriodicidadPago;
@@ -252,15 +253,15 @@ public class NominaExtraordinariaBean implements Serializable {
     }
     
     public BigDecimal nominaSubtotal() {
-    	return this.listaNomina.stream().map(item -> item.getSubtotal()).reduce(ValoresBD._CERO.getValor(), BigDecimal :: add);
+    	return this.listaNomina.stream().map(item -> item.getSubtotal()).reduce(_CERO.get(), BigDecimal :: add);
     }
     
     public BigDecimal nominaDescuentos() {
-    	return this.listaNomina.stream().map(item -> item.getDescuento()).reduce(ValoresBD._CERO.getValor(), BigDecimal :: add);
+    	return this.listaNomina.stream().map(item -> item.getDescuento()).reduce(_CERO.get(), BigDecimal :: add);
     }
     
     public BigDecimal nominaTotal() {
-    	return this.listaNomina.stream().map(item -> item.getTotal()).reduce(ValoresBD._CERO.getValor(), BigDecimal :: add);
+    	return this.listaNomina.stream().map(item -> item.getTotal()).reduce(_CERO.get(), BigDecimal :: add);
     }
     
     
@@ -303,16 +304,19 @@ public class NominaExtraordinariaBean implements Serializable {
     	log.info("Todos los elementos seleccionados: {}", event.isSelected());
     }
     
-    public void calcularPercepcion() {
+    public void calcularPercepciones() {
     	//TODO validar parametros del dialog de percepcion.
+    	try {
+    		log.info("Percepcion: {}", this.nomPercepcion);
+    		if(this.nominaBO == null)
+    			this.nominaBO = new NominaExtraordinariaBL(this.parametros);
     	
-    	log.info("Percepcion: {}", this.nomPercepcion);
-    	if(this.nominaBO == null)
-    		this.nominaBO = new NominaExtraordinariaBL();
-    	
-    	for(DetNomina nomina : this.listaNominaSelected) {
-    		log.info("Agreagndo percepción al empleado: {}", nomina.getReceptor().getNombre());
-    		this.nominaBO.calcular(nomina, parametros, this.nomPercepcion);
+	    	for(DetNomina nomina : this.listaNominaSelected) {
+	    		log.info("Agregando percepción al empleado: {}", nomina.getReceptor().getNombre());
+	    		this.nominaBO.calcular(nomina, this.nomPercepcion);
+	    	}
+    	} catch (Exception ex) {
+    		log.error("Ocurrió un problema al calcular la nómina de los empleados seleccionados...", ex);
     	}
     }
     

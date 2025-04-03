@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.deduccion.IDeduccion;
 import mx.com.ferbo.business.nomina.ParametrosNomina;
+import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.CatCuotaIMSS;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
@@ -20,9 +21,9 @@ import mx.com.ferbo.util.SGPException;
  * 
  * Ausencias e incapacidades. Fundamento legal: Art. 31 LEY DEL SEGURO SOCIAL
  */
-public class IMSSEnfMatEnEspecieDeduccion extends AbstractIMSSDeduccion implements IDeduccion {
+public class IMSSEnfMatEnEspecieDBL extends AbstractIMSSDBL implements IDeduccion {
 	
-	private static Logger log = LogManager.getLogger(IMSSEnfMatEnEspecieDeduccion.class);
+	private static Logger log = LogManager.getLogger(IMSSEnfMatEnEspecieDBL.class);
 	
 	private BigDecimal diasTrabajados = null;
 	private BigDecimal ausencias = null;
@@ -36,7 +37,7 @@ public class IMSSEnfMatEnEspecieDeduccion extends AbstractIMSSDeduccion implemen
 	 * @param uma Unidad de Medida y Actualización (proporcionada por el INEGI)
 	 * @param sdi Salario Diario Integrado.
 	 */
-	public IMSSEnfMatEnEspecieDeduccion(ParametrosNomina parametros, BigDecimal diasTrabajados, BigDecimal ausencias, BigDecimal incapacidades, BigDecimal sdi) {
+	public IMSSEnfMatEnEspecieDBL(ParametrosNomina parametros, BigDecimal diasTrabajados, BigDecimal ausencias, BigDecimal incapacidades, BigDecimal sdi) {
 		this.cuotasIMSS = parametros.getCuotasIMSS();
 		this.tiposDeduccion = parametros.getTiposDeduccion();
 		this.diasTrabajados = diasTrabajados;
@@ -47,18 +48,17 @@ public class IMSSEnfMatEnEspecieDeduccion extends AbstractIMSSDeduccion implemen
 	}
 
 	@Override
-	public DetNominaDeduccion calcular(DetNomina nomina, Integer index) {
-		DetNominaDeduccion deduccion = null;
-		BigDecimal cuotaFija         = null;
-		BigDecimal cuotaExcedente    = null;
-		BigDecimal cuota             = null;
-		BigDecimal cero              = null;
-		BigDecimal tres              = null;
-		BigDecimal limiteUMAs        = null;
-		BigDecimal excedente         = null;
-		BigDecimal tarifa            = null;
-		CatCuotaIMSS tarifaIMSS      = null;
-		CatTipoDeduccion tdIMSS      = null;
+	public DetNominaDeduccion calcular(DetNomina nomina) {
+		DetNominaDeduccion deduccion      = null;
+		BigDecimal         cuotaFija      = null;
+		BigDecimal         cuotaExcedente = null;
+		BigDecimal         cuota          = null;
+		BigDecimal         limiteUMAs     = null;
+		BigDecimal         excedente      = null;
+		BigDecimal         tarifa         = null;
+		CatCuotaIMSS       tarifaIMSS     = null;
+		CatTipoDeduccion   tdIMSS         = null;
+		Integer            index          = null;
 		try {
 			if(this.cuotasIMSS == null)
 				throw new SGPException("No se establecio la lista de cuotas del IMSS.");
@@ -72,13 +72,9 @@ public class IMSSEnfMatEnEspecieDeduccion extends AbstractIMSSDeduccion implemen
 			if(this.tiposDeduccion.size() <= 0)
 				throw new SGPException("No se establecio la lista de tipos de deduccion.");
 			
-			tdIMSS = this.getTipoDeduccion("001");
+			tdIMSS = this.getTipoDeduccion(TD_IMSS);
 			
-			//Constantes necesarias para el cálculo de Enfermedad y Maternidad.
-			cero = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
-			tres = new BigDecimal("3.00").setScale(2, BigDecimal.ROUND_HALF_UP);
-			cuotaExcedente = cero;
-			
+			cuotaExcedente = ValoresBD._CERO.get();
 			
 			tarifaIMSS = this.getCuotaIMSS("O", "EM1", 0);
 			//Fundamento legal: Art. 106 LEY DEL SEGURO SOCIAL Fracción I. Transitorio Art. Decimo noveno Parrafo 1 de la LSS
@@ -90,7 +86,7 @@ public class IMSSEnfMatEnEspecieDeduccion extends AbstractIMSSDeduccion implemen
 					;
 			log.info("Enfermedad y Maternidad SDI: {} - UMA: {} - Tarifa Cuota fija: {}", this.sdi, this.uma, tarifaIMSS.getCuota());
 			
-			limiteUMAs = this.uma.multiply(tres).setScale(2, BigDecimal.ROUND_HALF_UP);
+			limiteUMAs = this.uma.multiply(ValoresBD._3.get()).setScale(2, BigDecimal.ROUND_HALF_UP);
 			
 			//Fundamento legal: Art. 106 LEY DEL SEGURO SOCIAL Fracción II. Transitorio Art. Decimo noveno Parrafo 2 de la LSS
 			excedente = this.sdi.subtract(limiteUMAs);
@@ -106,7 +102,7 @@ public class IMSSEnfMatEnEspecieDeduccion extends AbstractIMSSDeduccion implemen
 				
 				log.info("Enfermedad y Maternidad SDI: {} - UMA: {} - Excedente: {}, Tarifa: {}", this.sdi, this.uma, excedente, tarifa);
 			} else {
-				cuotaExcedente = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+				cuotaExcedente = ValoresBD._CERO.get();
 			}
 			
 			cuota = cuotaFija.add(cuotaExcedente).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -115,16 +111,19 @@ public class IMSSEnfMatEnEspecieDeduccion extends AbstractIMSSDeduccion implemen
 			
 		} catch(Exception ex) {
 			log.warn("No fue posible calcular el excedente por Enfermedad y Maternidad.", ex);
-			cuota = new BigDecimal("0.00").setScale(2, BigDecimal.ROUND_HALF_UP);
+			cuota = ValoresBD._CERO.get();
 		} finally {
-			deduccion = new DetNominaDeduccion();
-			deduccion.setKey(new DetNominaDeduccionPK(nomina, index));
-			deduccion.setTipoDeduccion(tdIMSS);
-			deduccion.setClave("001");
-			deduccion.setNombre("I.M.S.S. (Enfermedad y Maternidad)");
-			deduccion.setImporte(cuota);
-			deduccion.setInformar(false);
-			deduccion.setProcesar(false);
+			index = this.nuevoIndiceDe(nomina.getDeducciones());
+			
+			deduccion = new DetNominaDeduccion.Builder()
+					.key(new DetNominaDeduccionPK(nomina, index))
+					.tipoDeduccion(tdIMSS)
+					.clave(CVE_IMSS)
+					.nombre("I.M.S.S. (Enfermedad y Maternidad)")
+					.importe(cuota)
+					.informar(false)
+					.procesar(false)
+					.build();
 		}
 		
 		return deduccion;

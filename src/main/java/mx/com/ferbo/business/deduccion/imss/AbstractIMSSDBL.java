@@ -8,12 +8,12 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.business.deduccion.AbstractDeduccion;
+import mx.com.ferbo.business.deduccion.AbstractDBL;
 import mx.com.ferbo.model.CatCuotaIMSS;
 import mx.com.ferbo.util.SGPException;
 
-public class AbstractIMSSDeduccion extends AbstractDeduccion {
-	private static Logger log = LogManager.getLogger(AbstractIMSSDeduccion.class);
+public abstract class AbstractIMSSDBL extends AbstractDBL {
+	private static Logger log = LogManager.getLogger(AbstractIMSSDBL.class);
 	protected List<CatCuotaIMSS> cuotasIMSS = null;
 	
 	public CatCuotaIMSS getCuotaIMSS(String tipoCuota, String clave, Date fechaInicio, Date fechaFin, BigDecimal base) {

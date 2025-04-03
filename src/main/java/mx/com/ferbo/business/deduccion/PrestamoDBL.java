@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.dao.n.PrestamoDAO;
+import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
@@ -16,15 +17,15 @@ import mx.com.ferbo.model.DetNominaDeduccionPK;
 import mx.com.ferbo.model.DetPrestamo;
 import mx.com.ferbo.util.SGPException;
 
-public class PrestamoDeduccion extends AbstractDeduccion implements IDeducciones {
+public class PrestamoDBL extends AbstractDBL implements IDeducciones {
 	
-	private static Logger log = LogManager.getLogger(PrestamoDeduccion.class);
+	private static Logger log = LogManager.getLogger(PrestamoDBL.class);
 	
 	private DetEmpleado empleado = null;
 	private PrestamoDAO prestamoDAO = null;
 	private Date fecha = null;
 	
-	public PrestamoDeduccion(DetEmpleado empleado) {
+	public PrestamoDBL(DetEmpleado empleado) {
 		this.empleado = empleado;
 		this.prestamoDAO = new PrestamoDAO();
 	}
@@ -47,7 +48,7 @@ public class PrestamoDeduccion extends AbstractDeduccion implements IDeducciones
 			if(prestamos.size() <= 0)
 				throw new SGPException("No hay préstamos para el empleado.");
 			
-			totalPrestamos = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+			totalPrestamos = ValoresBD._CERO.get();
 			
 			for(DetPrestamo prestamo : prestamos) {
 				deduccion = new DetNominaDeduccion();
@@ -66,8 +67,8 @@ public class PrestamoDeduccion extends AbstractDeduccion implements IDeducciones
 			
 			nomina.getDeducciones().addAll(prestamosDeduccion);
 		} catch(Exception ex) {
-			log.error("Problema para procesar los préstamos del empleado");
-			totalPrestamos = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+			log.error("Problema para procesar los préstamos del empleado...", ex);
+			totalPrestamos = ValoresBD._CERO.get();
 		}
 	}
 

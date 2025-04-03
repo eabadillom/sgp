@@ -212,7 +212,7 @@
 				</p:outputPanel>
 				<f:facet name="footer">
 					<p:commandButton value="Agregar" icon="pi pi-check" update="form:acc:dtNomina" process="@this" actionListener="#{nominaE.agregarPercepcion()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
-					<p:commandButton value="Calcular" icon="fas fa-light fa-calculator" update="form:acc:dtNomina" process="@this form:acc:dtNomina" actionListener="#{nominaE.calcularPercepcion()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
+					<p:commandButton value="Calcular" icon="fas fa-light fa-calculator" update="form:acc:dtNomina" process="@this form:acc:dtNomina" actionListener="#{nominaE.calcularPercepciones()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
 					<p:commandButton value="Cancelar" icon="pi pi-times" styleClass="ui-button-outlined ui-button-secondary" oncomplete="PF('dlgPercepcionAll').hide();" />
 				</f:facet>
 				

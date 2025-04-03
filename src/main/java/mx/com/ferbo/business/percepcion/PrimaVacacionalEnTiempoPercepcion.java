@@ -63,7 +63,7 @@ public class PrimaVacacionalEnTiempoPercepcion extends AbstractPercepcion implem
 			
 			uma = parametros.getUma().getImporteDiario();
 			
-			limiteExento = ValoresBD._15.getValor().multiply(uma).setScale(2, BigDecimal.ROUND_HALF_UP);
+			limiteExento = ValoresBD._15.get().multiply(uma).setScale(2, BigDecimal.ROUND_HALF_UP);
 			
 			if(importe.compareTo(limiteExento) > 0) {
 				//La prima vacacional NO está exenta de ISR.
@@ -71,7 +71,7 @@ public class PrimaVacacionalEnTiempoPercepcion extends AbstractPercepcion implem
 				importeExento = limiteExento.setScale(2, BigDecimal.ROUND_HALF_UP);
 			} else {
 				//La prima vacacional SI está exenta de ISR.
-				importeGravado = ValoresBD._CERO.getValor();
+				importeGravado = ValoresBD._CERO.get();
 				importeExento = importe.setScale(2, BigDecimal.ROUND_HALF_UP);
 			}
 			
@@ -81,8 +81,8 @@ public class PrimaVacacionalEnTiempoPercepcion extends AbstractPercepcion implem
 			
 		} catch(Exception ex) {
 			cantidad = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
-			importeGravado = ValoresBD._CERO.getValor();
-			importeExento = ValoresBD._CERO.getValor();
+			importeGravado = ValoresBD._CERO.get();
+			importeExento = ValoresBD._CERO.get();
 		} finally {
 			percepcion = this.build(nomina, CVE_PRIMA_VACACIONES_EN_TIEMPO, cantidad, importeExento, importeGravado);
 			log.info("Percepcion agregada: {}", percepcion);
@@ -97,7 +97,7 @@ public class PrimaVacacionalEnTiempoPercepcion extends AbstractPercepcion implem
 		BigDecimal diasTotales     = null;
 		
 		primaVacacional = periodo.getEmpleado().getDatoEmpresa().getPrimaVacacional();
-		primaVacacional = primaVacacional.divide(ValoresBD._100.getValor(), 4, BigDecimal.ROUND_HALF_UP);
+		primaVacacional = primaVacacional.divide(ValoresBD._100.get(), 4, BigDecimal.ROUND_HALF_UP);
 		
 		diasTotales = new BigDecimal(periodo.getDiasTotales()).setScale(2, BigDecimal.ROUND_HALF_UP);
 		
@@ -112,7 +112,7 @@ public class PrimaVacacionalEnTiempoPercepcion extends AbstractPercepcion implem
 		try {
 			importe = salarioDiario.multiply(tasa).setScale(2, BigDecimal.ROUND_HALF_UP);
 		} catch(Exception ex) {
-			importe = ValoresBD._CERO.getValor();
+			importe = ValoresBD._CERO.get();
 		}
 		
 		return importe;

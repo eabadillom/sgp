@@ -62,9 +62,9 @@ public class VacacionesReportadasPercepcion extends AbstractPercepcion implement
 			vacacionesDAO = new VacacionesDAO();
 			periodos = vacacionesDAO.buscarReportadasPorRfcFecha(nomina.getReceptor().getRfc(), vencimientoPeriodo);
 			
-			cantidad = ValoresBD._CERO.getValor();
-			importeExento = ValoresBD._CERO.getValor();
-			importeGravado = ValoresBD._CERO.getValor();
+			cantidad = ValoresBD._CERO.get();
+			importeExento = ValoresBD._CERO.get();
+			importeGravado = ValoresBD._CERO.get();
 			
 			for(DetVacaciones periodo : periodos) {
 				if(periodo == null) {
@@ -88,9 +88,9 @@ public class VacacionesReportadasPercepcion extends AbstractPercepcion implement
 			}
 			
 		} catch(Exception ex) {
-			cantidad = ValoresBD._CERO.getValor();
-			importeGravado = ValoresBD._CERO.getValor();
-			importeExento = ValoresBD._CERO.getValor();
+			cantidad = ValoresBD._CERO.get();
+			importeGravado = ValoresBD._CERO.get();
+			importeExento = ValoresBD._CERO.get();
 		} finally {
 			percepcion = this.build(nomina, CVE_VACACIONES_REPORTADAS, cantidad, importeExento, importeGravado);
 		}

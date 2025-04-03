@@ -59,7 +59,7 @@ public class AguinaldoPercepcion extends AbstractPercepcion implements IPercepci
 			
 			diasTrabajados = diasPeriodo.subtract(ausencias)
 					.setScale(2, BigDecimal.ROUND_HALF_UP)
-					.divide(ValoresBD._DIAS_ANIO.getValor(), 2, BigDecimal.ROUND_HALF_UP);
+					.divide(ValoresBD._DIAS_ANIO.get(), 2, BigDecimal.ROUND_HALF_UP);
 			
 			proporcionAguinaldo = diasTrabajados
 					.multiply(diasAguinaldo)
@@ -70,7 +70,7 @@ public class AguinaldoPercepcion extends AbstractPercepcion implements IPercepci
 			
 			uma = parametros.getUma().getImporteDiario();
 			
-			limiteExento = ValoresBD._30.getValor()
+			limiteExento = ValoresBD._30.get()
 					.multiply(uma).setScale(2, BigDecimal.ROUND_HALF_UP);
 			
 			if(aguinaldo.compareTo(limiteExento) > 0) {
@@ -79,16 +79,16 @@ public class AguinaldoPercepcion extends AbstractPercepcion implements IPercepci
 				importeExento = limiteExento.setScale(2, BigDecimal.ROUND_HALF_UP);
 			} else {
 				//El importe de aguinaldo SI está exento de ISR.
-				importeGravado = ValoresBD._CERO.getValor();
+				importeGravado = ValoresBD._CERO.get();
 				importeExento = aguinaldo.setScale(2, BigDecimal.ROUND_HALF_UP);
 			}
 			
 			cantidad = proporcionAguinaldo.setScale(2, BigDecimal.ROUND_HALF_UP);
 			
 		} catch(Exception ex) {
-			cantidad = ValoresBD._CERO.getValor();
-			importeExento = ValoresBD._CERO.getValor();
-			importeGravado = ValoresBD._CERO.getValor();
+			cantidad = ValoresBD._CERO.get();
+			importeExento = ValoresBD._CERO.get();
+			importeGravado = ValoresBD._CERO.get();
 		} finally {
 			percepcion = this.build(nomina, CVE_AGUINALDO, cantidad, importeExento, importeGravado);
 			log.info("Percepcion agregada: {}", percepcion);

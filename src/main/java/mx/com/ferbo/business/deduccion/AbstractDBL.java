@@ -15,26 +15,47 @@ import mx.com.ferbo.model.DetNominaDeduccionPK;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.util.SGPException;
 
-public abstract class AbstractDeduccion {
-	private static Logger log = LogManager.getLogger(AbstractDeduccion.class);
+/**Abstract Deduccion Business Logic
+ * 
+ */
+public abstract class AbstractDBL {
+	private static Logger log = LogManager.getLogger(AbstractDBL.class);
 	protected List<CatTipoDeduccion> tiposDeduccion = null;
 	
-	public static final String D_ISR = "002";
-	public static final String D_ISR_LEY_174 = "002";
-	public static final String D_ISR_ANTES_DE_SUBSIDIO = "002";
-	public static final String D_AJUSTE_ISR_MENSUAL = "002";
-	public static final String D_AJUSTE_AL_SUBSIDIO = "107";
-	public static final String D_IMSS = "001";
-	public static final String D_AJUSTE_AL_NETO = "004";
+	public static final String TD_IMSS                   = "001";
+	public static final String TD_ISR                    = "002";
+	public static final String TD_ISR_LEY_174            = "002";
+	public static final String TD_ISR_ANTES_DE_SUBSIDIO  = "002";
+	public static final String TD_AJUSTE_ISR_MENSUAL     = "002";
+	public static final String TD_AJUSTE_AL_SUBSIDIO     = "107";
+	public static final String TD_AJUSTE_AL_NETO         = "004";
 	
-	public static final String CVE_ISR = "045";
-	public static final String CVE_ISR_LEY_174 = "043";
+	public static final String CVE_ISR                   = "045";
+	public static final String CVE_ISR_LEY_174           = "043";
 	public static final String CVE_ISR_ANTES_DE_SUBSIDIO = "002A";
-	public static final String CVE_AJUSTE_ISR_MENSUAL = "104";
-	public static final String CVE_AJUSTE_AL_SUBSIDIO = "107";
-	public static final String CVE_IMSS = "052";
-	public static final String CVE_AJUSTE_AL_NETO = "099";
-	public static final String CVE_PRESTAMO_FONACOT = "061";
+	public static final String CVE_AJUSTE_ISR_MENSUAL    = "104";
+	public static final String CVE_AJUSTE_AL_SUBSIDIO    = "107";
+	public static final String CVE_IMSS                  = "052";
+	public static final String CVE_AJUSTE_AL_NETO        = "099";
+	public static final String CVE_PRESTAMO_FONACOT      = "061";
+	
+	public DetNominaDeduccion build(DetNomina nomina, String clave, String nombre, BigDecimal importe, CatTipoDeduccion tipoDeduccion, Boolean informar, Boolean procesar) {
+		DetNominaDeduccion deduccion = null;
+		Integer index = null;
+		
+		index = this.nuevoIndiceDe(nomina.getDeducciones());
+		
+		deduccion = new DetNominaDeduccion();
+		deduccion.setKey(new DetNominaDeduccionPK(nomina, index));
+		deduccion.setClave(clave);
+		deduccion.setNombre(nombre);
+		deduccion.setImporte(importe);
+		deduccion.setTipoDeduccion(tipoDeduccion);
+		deduccion.setInformar(informar);
+		deduccion.setProcesar(procesar);
+		
+		return deduccion;
+	}
 	
 	
 	public CatTipoDeduccion getTipoDeduccion(String clave) {

@@ -12,15 +12,16 @@ import mx.com.ferbo.dao.n.SubsidioDAO;
 import mx.com.ferbo.model.CatSubsidio;
 import mx.com.ferbo.util.SGPException;
 
-public class TarifaSubsidioDeduccion1 implements ISubsidioEmpleo {
+@Deprecated
+public class TarifaSubsidioDBL1 implements ISubsidioEmpleo {
 	
-	private static Logger log = LogManager.getLogger(TarifaSubsidioDeduccion1.class);
+	private static Logger log = LogManager.getLogger(TarifaSubsidioDBL1.class);
 	
 	private SubsidioDAO subsidioDAO = null;
 	private List<CatSubsidio> tablaSubsidio = null;
 	private LocalDate fecha = null;
 	
-	public TarifaSubsidioDeduccion1(LocalDate fecha) {
+	public TarifaSubsidioDBL1(LocalDate fecha) {
 		subsidioDAO = new SubsidioDAO();
 		this.fecha = fecha;
 	}

@@ -5,8 +5,8 @@ import java.math.BigDecimal;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.business.deduccion.AbstractDeduccion;
-import mx.com.ferbo.business.deduccion.isr.ISRL174Deduccion;
+import mx.com.ferbo.business.deduccion.AbstractDBL;
+import mx.com.ferbo.business.deduccion.isr.ISRL174DBL;
 import mx.com.ferbo.business.empleado.EmpleadoBL;
 import mx.com.ferbo.business.percepcion.AbstractPercepcion;
 import mx.com.ferbo.business.percepcion.AguinaldoPercepcion;
@@ -27,40 +27,42 @@ public class NominaExtraordinariaBL extends NominaBL {
 	public NominaExtraordinariaBL() {
 		super();
 	}
+	
+	public NominaExtraordinariaBL(ParametrosNomina parametros) {
+		this.parametros = parametros;
+	}
 
 	public NominaExtraordinariaBL(DetEmpleado empleado, ParametrosNomina parametros) {
 		super(empleado, parametros, null);
 	}
 	
-	public DetNomina calcular(DetNomina nomina, ParametrosNomina parametros, DetNominaPercepcion percepcion) {
+	public DetNomina calcular(DetNomina nomina, DetNominaPercepcion percepcion) {
 		String clavePercepcion = null;
 		
 		try {
 			clavePercepcion = percepcion.getClave();
 			
 			switch (clavePercepcion) {
-			case AbstractPercepcion.CVE_VACACIONES_REPORTADAS:
-				calcularVacacionesReportadas(nomina, parametros);
-				break;
+				case AbstractPercepcion.CVE_VACACIONES_REPORTADAS:
+					calcularVacacionesReportadas(nomina, parametros);
+					break;
+					
+				case AbstractPercepcion.CVE_PRIMA_VACACIONES_EN_TIEMPO:
+					calcularPrimaVacacionesEnTiempo(nomina, parametros);
+					break;
+					
+				case AbstractPercepcion.CVE_PRIMA_VACACIONES_REPORTADAS:
+					calcularPrimaVacacionesReportadas(nomina, parametros);
+					break;
 				
-			case AbstractPercepcion.CVE_PRIMA_VACACIONES_EN_TIEMPO:
-				calcularPrimaVacacionesEnTiempo(nomina, parametros);
-				break;
-				
-			case AbstractPercepcion.CVE_PRIMA_VACACIONES_REPORTADAS:
-				calcularPrimaVacacionesReportadas(nomina, parametros);
-				break;
-			
-			case AbstractPercepcion.CVE_AGUINALDO:
-				calcularAguinaldo(nomina, parametros);
-				break;
-			default:
-				throw new UnsupportedOperationException("La percepción no está implementada.");
+				case AbstractPercepcion.CVE_AGUINALDO:
+					calcularAguinaldo(nomina, parametros);
+					break;
+				default:
+					throw new UnsupportedOperationException("La percepción no está implementada.");
 			}
 			
-			
 			calcularISRL174(nomina, parametros);
-			
 			calcularTotales(nomina, parametros);
 			
 		} catch(Exception ex) {
@@ -82,7 +84,7 @@ public class NominaExtraordinariaBL extends NominaBL {
 		VacacionesReportadasPercepcion vacacionesBO = new VacacionesReportadasPercepcion(parametros);
 		percepcion = vacacionesBO.calcular(nomina);
 		
-		if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(ValoresBD._CERO.getValor()) > 0)
+		if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(ValoresBD._CERO.get()) > 0)
 			nomina.getPercepciones().add(percepcion);
 	}
 	
@@ -97,7 +99,7 @@ public class NominaExtraordinariaBL extends NominaBL {
 		PrimaVacacionalEnTiempoPercepcion primaBO = new PrimaVacacionalEnTiempoPercepcion(parametros);
 		percepcion = primaBO.calcular(nomina);
 		
-		if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(ValoresBD._CERO.getValor()) > 0)
+		if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(ValoresBD._CERO.get()) > 0)
 			nomina.getPercepciones().add(percepcion);
 	}
 	
@@ -113,7 +115,7 @@ public class NominaExtraordinariaBL extends NominaBL {
 		PrimaVacacionalReportadasPercepcion primaBO = new PrimaVacacionalReportadasPercepcion(parametros);
 		percepcion = primaBO.calcular(nomina);
 		
-		if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(ValoresBD._CERO.getValor()) > 0)
+		if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(ValoresBD._CERO.get()) > 0)
 			nomina.getPercepciones().add(percepcion);
 	}
 	
@@ -134,11 +136,11 @@ public class NominaExtraordinariaBL extends NominaBL {
 			
 			//TODO FALTA PROCESAR LAS AUSENCIAS DEL AÑO COMPLETO.
 			
-			aguinaldoBO = new AguinaldoPercepcion(parametros, empleado.getDatoEmpresa().getDiasAguinaldo(), ValoresBD._CERO.getValor());
+			aguinaldoBO = new AguinaldoPercepcion(parametros, empleado.getDatoEmpresa().getDiasAguinaldo(), ValoresBD._CERO.get());
 			
 			percepcion = aguinaldoBO.calcular(nomina);
 			
-			if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(ValoresBD._CERO.getValor()) > 0)
+			if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(ValoresBD._CERO.get()) > 0)
 				nomina.getPercepciones().add(percepcion);
 			
 		} catch (SGPException ex) {
@@ -150,18 +152,26 @@ public class NominaExtraordinariaBL extends NominaBL {
 	
 	public static synchronized void calcularISRL174(DetNomina nomina, ParametrosNomina parametros) {
 		DetNominaDeduccion deduccion = null;
-		ISRL174Deduccion isrBO = null;
+		ISRL174DBL isrBO = null;
 		BigDecimal importeGravado = null;
 		
 		
-		final String clave = AbstractDeduccion.CVE_ISR_LEY_174;
-		boolean removedPercepciones = nomina.getPercepciones().removeIf( p -> p.getClave().equalsIgnoreCase(clave));
+		final String clave = AbstractDBL.CVE_ISR_LEY_174;
+		boolean removedPercepciones = nomina.getDeducciones().removeIf( p -> p.getClave().equalsIgnoreCase(clave));
 		
 		if(removedPercepciones)
 			log.info("Se encontraron conceptos {}, los cuales fueron eliminados de la lista de percepciones.", clave);
 		
-		isrBO = new ISRL174Deduccion(parametros, importeGravado);
+		//Obtener la suma de los importes gravados de las percepciones.
+		importeGravado = nomina.getPercepciones().stream()
+				.map(d -> d.getImporteGravado())
+				.reduce(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP), BigDecimal :: add)
+				;
 		
-		isrBO.procesar(nomina);
+		isrBO = new ISRL174DBL(parametros, importeGravado);
+		
+		deduccion = isrBO.calcular(nomina);
+		
+		nomina.getDeducciones().add(deduccion);
 	}
 }

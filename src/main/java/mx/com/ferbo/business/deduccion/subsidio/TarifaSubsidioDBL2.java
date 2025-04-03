@@ -1,5 +1,9 @@
 package mx.com.ferbo.business.deduccion.subsidio;
 
+import static mx.com.ferbo.enums.ValoresBD._30_4;
+import static mx.com.ferbo.enums.ValoresBD._7;
+import static mx.com.ferbo.enums.ValoresBD._CERO;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -21,18 +25,16 @@ import mx.com.ferbo.util.SGPException;
  * por compatibilidad hacia atrás con la lógica anterior y con el resto de código para
  * el cálculo de ISR después del subsidio al empleo.
  */
-public class TarifaSubsidioDeduccion2 implements ISubsidioEmpleo {
+public class TarifaSubsidioDBL2 implements ISubsidioEmpleo {
 	
-	private static Logger log = LogManager.getLogger(TarifaSubsidioDeduccion2.class);
+	private static Logger log = LogManager.getLogger(TarifaSubsidioDBL2.class);
 	
-	private BigDecimal isrAntesDeSubsidio = null;
-	private LocalDate fecha = null;
-	private Subsidio2DAO subsidioDAO = null;
-	private UMADAO umaDAO = null;
-	private BigDecimal factorMes = new BigDecimal("30.4").setScale(2, BigDecimal.ROUND_HALF_UP);
-	private BigDecimal diasSemana = new BigDecimal("7").setScale(0, BigDecimal.ROUND_HALF_UP);
+	private BigDecimal   isrAntesDeSubsidio = null;
+	private LocalDate    fecha              = null;
+	private Subsidio2DAO subsidioDAO        = null;
+	private UMADAO       umaDAO             = null;
 	
-	public TarifaSubsidioDeduccion2(LocalDate fecha, BigDecimal isrAntesDeSubsidio) {
+	public TarifaSubsidioDBL2(LocalDate fecha, BigDecimal isrAntesDeSubsidio) {
 		this.fecha = fecha;
 		this.isrAntesDeSubsidio = isrAntesDeSubsidio;
 		this.subsidioDAO = new Subsidio2DAO();
@@ -41,9 +43,9 @@ public class TarifaSubsidioDeduccion2 implements ISubsidioEmpleo {
 	
 	@Override
 	public BigDecimal calcular(String periodo, BigDecimal baseISR) throws SGPException {
-		BigDecimal importeSubsidio = null;
-		CatSubsidio2 tarifaSubsidio = null;
-		CatUMA uma = null;
+		BigDecimal   importeSubsidio = null;
+		CatSubsidio2 tarifaSubsidio  = null;
+		CatUMA       uma             = null;
 		log.info("Calculando subsidio al empleo 2024...");
 		
 		if(baseISR == null)
@@ -79,29 +81,28 @@ public class TarifaSubsidioDeduccion2 implements ISubsidioEmpleo {
 	
 	private BigDecimal calcularSemanal(CatSubsidio2 tarifa, CatUMA uma, BigDecimal baseISR) {
 		BigDecimal importeSubsidio = null;
-		BigDecimal diasPeriodo = new BigDecimal(7).setScale(0, BigDecimal.ROUND_HALF_UP);
 		BigDecimal tasaSubsidio = null;
 		BigDecimal importeUMA = null;
 		BigDecimal importeMaximoSemanal = null;
 		
-		tasaSubsidio = tarifa.getTasa();
-		importeUMA = uma.getImporteDiario();
+		tasaSubsidio         = tarifa.getTasa();
+		importeUMA           = uma.getImporteDiario();
 		importeMaximoSemanal = tarifa.getImporteMaximo()
-				.divide(this.factorMes, BigDecimal.ROUND_HALF_UP)
-				.multiply(this.diasSemana)
+				.divide(_30_4.get(), BigDecimal.ROUND_HALF_UP)
+				.multiply(_7.get())
 				;
 		
 		importeSubsidio = tasaSubsidio
 				.multiply(importeUMA).setScale(2, BigDecimal.ROUND_HALF_UP)
-				.multiply(diasPeriodo).setScale(2, BigDecimal.ROUND_HALF_UP)
+				.multiply(_7.get()).setScale(2, BigDecimal.ROUND_HALF_UP)
 				;
 		
 		if(baseISR.compareTo(importeMaximoSemanal) > 0) {
-			importeSubsidio = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+			importeSubsidio = _CERO.get();
 		}
 		
 		if(this.isrAntesDeSubsidio.compareTo(importeSubsidio) < 0) {
-			importeSubsidio = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP)
+			importeSubsidio = _CERO.get()
 					.add(isrAntesDeSubsidio.setScale(2, BigDecimal.ROUND_HALF_UP));
 		}
 		
@@ -111,9 +112,9 @@ public class TarifaSubsidioDeduccion2 implements ISubsidioEmpleo {
 	}
 	
 	private BigDecimal calcularMensual(CatSubsidio2 tarifa, CatUMA uma, BigDecimal baseISR) {
-		BigDecimal importeSubsidio = null;
-		BigDecimal tasaSubsidio = null;
-		BigDecimal importeUMA = null;
+		BigDecimal importeSubsidio      = null;
+		BigDecimal tasaSubsidio         = null;
+		BigDecimal importeUMA           = null;
 		BigDecimal importeMaximoMensual = null;
 		
 		tasaSubsidio = tarifa.getTasa();
@@ -126,7 +127,7 @@ public class TarifaSubsidioDeduccion2 implements ISubsidioEmpleo {
 		
 		log.info("Subsidio mensual (preliminar): {}", importeSubsidio);
 		if(baseISR.compareTo(importeMaximoMensual) > 0) {
-			importeSubsidio = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+			importeSubsidio = _CERO.get();
 		}
 		
 		log.info("Subsidio mensual: {}", importeSubsidio);

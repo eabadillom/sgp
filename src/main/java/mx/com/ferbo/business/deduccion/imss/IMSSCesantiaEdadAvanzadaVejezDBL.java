@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.deduccion.IDeduccion;
 import mx.com.ferbo.business.nomina.ParametrosNomina;
+import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.CatCuotaIMSS;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
@@ -21,9 +22,9 @@ import mx.com.ferbo.util.SGPException;
  * DECRETO por el que se reforman, adicionan y derogan diversas disposiciones de la
  * Ley del Seguro Social y de la Ley de los Sistemas de Ahorro para el Retiro, Art. Segundo.
  */
-public class IMSSCesantiaEdadAvanzadaVejezDeduccion extends AbstractIMSSDeduccion implements IDeduccion {
+public class IMSSCesantiaEdadAvanzadaVejezDBL extends AbstractIMSSDBL implements IDeduccion {
 	
-	private static Logger log = LogManager.getLogger(IMSSCesantiaEdadAvanzadaVejezDeduccion.class);
+	private static Logger log = LogManager.getLogger(IMSSCesantiaEdadAvanzadaVejezDBL.class);
 	
 	private Date fechaInicioAnio = null;
 	private Date fechaFinAnio = null;
@@ -32,7 +33,7 @@ public class IMSSCesantiaEdadAvanzadaVejezDeduccion extends AbstractIMSSDeduccio
 	private BigDecimal incapacidades = null;
 	private BigDecimal sdi = null;
 	
-	public IMSSCesantiaEdadAvanzadaVejezDeduccion(ParametrosNomina parametros, BigDecimal diasTrabajados, BigDecimal ausencias, BigDecimal incapacidades,  BigDecimal sdi) {
+	public IMSSCesantiaEdadAvanzadaVejezDBL(ParametrosNomina parametros, BigDecimal diasTrabajados, BigDecimal ausencias, BigDecimal incapacidades,  BigDecimal sdi) {
 		this.cuotasIMSS = parametros.getCuotasIMSS();
 		this.tiposDeduccion = parametros.getTiposDeduccion();
 		this.diasTrabajados = diasTrabajados;
@@ -42,12 +43,13 @@ public class IMSSCesantiaEdadAvanzadaVejezDeduccion extends AbstractIMSSDeduccio
 	}
 	
 	@Override
-	public DetNominaDeduccion calcular(DetNomina nomina, Integer index) {
+	public DetNominaDeduccion calcular(DetNomina nomina) {
 		DetNominaDeduccion deduccion = null;
 		
 		BigDecimal cuota = null;
 		CatCuotaIMSS tarifaIMSS = null;
 		CatTipoDeduccion tdIMSS = null;
+		Integer index = null;
 		
 		try {
 			if(this.cuotasIMSS == null)
@@ -62,7 +64,7 @@ public class IMSSCesantiaEdadAvanzadaVejezDeduccion extends AbstractIMSSDeduccio
 			if(this.tiposDeduccion.size() <= 0)
 				throw new SGPException("No se establecio la lista de tipos de deduccion.");
 			
-			tdIMSS = this.getTipoDeduccion("001");
+			tdIMSS = this.getTipoDeduccion(TD_IMSS);
 			//TODO La prima del IMSS para CEAV debe obtenerse con base en la tabla del transitorio art. segundo de la LSS.
 			//1.0 SM 3.150% de 2023 a 2030
 			//1.01 SM a 1.50 UMA ...
@@ -78,15 +80,19 @@ public class IMSSCesantiaEdadAvanzadaVejezDeduccion extends AbstractIMSSDeduccio
 					;
 		} catch(Exception ex) {
 			log.error("No es posible calcular la cuota por cesantía en edad avanzada y vejez...", ex);
+			cuota = ValoresBD._CERO.get();
 		} finally {
-			deduccion = new DetNominaDeduccion();
-			deduccion.setKey(new DetNominaDeduccionPK(nomina, index));
-			deduccion.setTipoDeduccion(tdIMSS);
-			deduccion.setClave("001");
-			deduccion.setNombre("I.M.S.S. (Cesantía en edad avanzada y vejez)");
-			deduccion.setImporte(cuota);
-			deduccion.setInformar(false);
-			deduccion.setProcesar(false);
+			index = this.nuevoIndiceDe(nomina.getDeducciones());
+			
+			deduccion = new DetNominaDeduccion.Builder()
+					.key(new DetNominaDeduccionPK(nomina, index))
+					.clave(CVE_IMSS)
+					.nombre("I.M.S.S. (Cesantía en edad avanzada y vejez)")
+					.tipoDeduccion(tdIMSS)
+					.importe(cuota)
+					.informar(false)
+					.procesar(false)
+					.build();
 		}
 		
 		return deduccion;

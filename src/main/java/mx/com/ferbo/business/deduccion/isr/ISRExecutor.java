@@ -28,28 +28,27 @@ public class ISRExecutor {
 	
 	private NominaFormulaDAO formulaDAO = null;
 	
-	private Date periodoInicio = null;
-	private Date periodoFin = null;
-	private List<DetNomina> nominaMensual = null;
+	private Date                   periodoInicio  = null;
+	private Date                   periodoFin     = null;
+	private List<DetNomina>        nominaMensual  = null;
 	private List<CatTipoDeduccion> tiposDeduccion = null;
-	private List<CatTipoOtroPago> tiposOtroPago = null;
-	private List<CatTarifaISR> tablaISR = null;
+	private List<CatTipoOtroPago>  tiposOtroPago  = null;
+	private List<CatTarifaISR>     tablaISR       = null;
 	
 	public ISRExecutor(Date periodoInicio, Date periodoFin, List<CatTipoDeduccion> tiposDeduccion, List<CatTipoOtroPago> tiposOtroPago, List<CatTarifaISR> tablaISR, List<DetNomina> nominaMensual) {
-		this.periodoInicio = periodoInicio;
-		this.periodoFin = periodoFin;
+		this.periodoInicio  = periodoInicio;
+		this.periodoFin     = periodoFin;
 		this.tiposDeduccion = tiposDeduccion;
-		this.tiposOtroPago = tiposOtroPago;
-		this.tablaISR = tablaISR;
-		this.nominaMensual = nominaMensual;
+		this.tiposOtroPago  = tiposOtroPago;
+		this.tablaISR       = tablaISR;
+		this.nominaMensual  = nominaMensual;
 	}
 	
 	public IDeducciones loadClass(String clave, LocalDate fecha) {
-		IDeducciones instance = null;
-		Class<?> clazz = null;
+		IDeducciones   instance    = null;
+		Class<?>       clazz       = null;
 		Constructor<?> constructor = null;
-		
-		NominaFormula formula = null;
+		NominaFormula  formula     = null;
 		
 		try {
 			if(formulaDAO == null)
@@ -69,5 +68,4 @@ public class ISRExecutor {
 		
 		return instance;
 	}
-
 }

@@ -10,14 +10,14 @@ import org.apache.logging.log4j.Logger;
 import mx.com.ferbo.model.CatTarifaISR;
 import mx.com.ferbo.util.SGPException;
 
-public class TarifaISRDeduccion {
+public class TarifaISRBL {
 	
-	private static Logger log = LogManager.getLogger(TarifaISRDeduccion.class);
+	private static Logger log = LogManager.getLogger(TarifaISRBL.class);
 	
 	private List<CatTarifaISR> tablaISRSemanal = null;
 	private BigDecimal baseISR = null;
 	
-	public TarifaISRDeduccion(List<CatTarifaISR> tablaISRSemanal, BigDecimal baseISR) {
+	public TarifaISRBL(List<CatTarifaISR> tablaISRSemanal, BigDecimal baseISR) {
 		this.tablaISRSemanal = tablaISRSemanal;
 		this.baseISR = baseISR;
 	}

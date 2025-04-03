@@ -40,103 +40,103 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
             model = emSGP.find(this.modelClass, id);
             if (isFullInfo) {
             	
-                log.info("id dato empresa: {}", model.getDatoEmpresa().getId() == null ? null : model.getDatoEmpresa().getId());
+                log.debug("id dato empresa: {}", model.getDatoEmpresa().getId() == null ? null : model.getDatoEmpresa().getId());
                 if(model.getDatoEmpresa().getPerfil() == null)
-                	log.info("El empleado no tiene definido el objeto empresa.");
+                	log.debug("El empleado no tiene definido el objeto empresa.");
                 else
-                	log.info("Id perfil: {}", model.getDatoEmpresa().getPerfil().getIdPerfil());
+                	log.debug("Id perfil: {}", model.getDatoEmpresa().getPerfil().getIdPerfil());
                 
                 if(model.getDatoEmpresa().getEmpresa() == null)
-                	log.info("El empleado no tiene asignada una empresa");
+                	log.debug("El empleado no tiene asignada una empresa");
                 else
-                	log.info("Id empresa: {}", model.getDatoEmpresa().getEmpresa().getIdEmpresa());
+                	log.debug("Id empresa: {}", model.getDatoEmpresa().getEmpresa().getIdEmpresa());
                 
                 if(model.getDatoEmpresa().getPlanta() == null)
-                	log.info("El empleado no tiene asignada una planta.");
+                	log.debug("El empleado no tiene asignada una planta.");
                 else
-                	log.info("Id planta: {}", model.getDatoEmpresa().getPlanta().getIdPlanta());
+                	log.debug("Id planta: {}", model.getDatoEmpresa().getPlanta().getIdPlanta());
                 
                 if(model.getDatoEmpresa().getArea() == null)
-                	log.info("El empleado no tiene asignada una área laboral.");
+                	log.debug("El empleado no tiene asignada una área laboral.");
                 else
-                	log.info("Id area: {}", model.getDatoEmpresa().getArea().getIdArea());
+                	log.debug("Id area: {}", model.getDatoEmpresa().getArea().getIdArea());
                 
                 if(model.getDatoEmpresa().getPuesto() == null)
-                	log.info("El empleado no tiene asignado un puesto laboral.");
+                	log.debug("El empleado no tiene asignado un puesto laboral.");
                 else
-                	log.info("Id puesto: {}", model.getDatoEmpresa().getPuesto().getIdPuesto());
+                	log.debug("Id puesto: {}", model.getDatoEmpresa().getPuesto().getIdPuesto());
                 
                 if(model.getDatoEmpresa().getTipoContrato() == null)
-                	log.info("El empleado no tiene asignado un tipo de contrato.");
+                	log.debug("El empleado no tiene asignado un tipo de contrato.");
                 else
-                	log.info("Id tipo contrato: {}", model.getDatoEmpresa().getTipoContrato().getClave());
+                	log.debug("Id tipo contrato: {}", model.getDatoEmpresa().getTipoContrato().getClave());
                 
                 if(model.getDatoEmpresa().getTipoJornada() == null)
-                	log.info("El empleado no tiene asignado un tipo de jornada");
+                	log.debug("El empleado no tiene asignado un tipo de jornada");
                 else
-                	log.info("Id tipo jornada: {}", model.getDatoEmpresa().getTipoJornada().getClave());
+                	log.debug("Id tipo jornada: {}", model.getDatoEmpresa().getTipoJornada().getClave());
                 
                 if(model.getDatoEmpresa().getTipoRegimen() == null)
-                	log.info("El empleado no tiene asignado un tipo de régimen.");
+                	log.debug("El empleado no tiene asignado un tipo de régimen.");
                 else
-                	log.info("Id tipo régimen: {}", model.getDatoEmpresa().getTipoRegimen().getClave());
+                	log.debug("Id tipo régimen: {}", model.getDatoEmpresa().getTipoRegimen().getClave());
                 
                 if(model.getDatoEmpresa().getEntidadFederativa() == null)
-                	log.info("El empleado no tiene asignada una entidad federativa.");
+                	log.debug("El empleado no tiene asignada una entidad federativa.");
                 else
-                	log.info("Id entidad federativa: {}", model.getDatoEmpresa().getEntidadFederativa().getClave());
+                	log.debug("Id entidad federativa: {}", model.getDatoEmpresa().getEntidadFederativa().getClave());
                 
                 if(model.getDatoEmpresa().getRiesgoPuesto() == null)
-                	log.info("El empleado no tiene asignado un riesgo de puesto laboral.");
+                	log.debug("El empleado no tiene asignado un riesgo de puesto laboral.");
                 else
-                	log.info("Id riesgo puesto: {}", model.getDatoEmpresa().getRiesgoPuesto().getClave());
+                	log.debug("Id riesgo puesto: {}", model.getDatoEmpresa().getRiesgoPuesto().getClave());
                 
                 if(model.getDatoEmpresa().getPeriodicidadPago() == null)
-                	log.info("El empleado no tiene asignada una periodicidad de pago.");
+                	log.debug("El empleado no tiene asignada una periodicidad de pago.");
                 else
-                	log.info("Id periodicidad pago: {}", model.getDatoEmpresa().getPeriodicidadPago().getPeriodicidad());
+                	log.debug("Id periodicidad pago: {}", model.getDatoEmpresa().getPeriodicidadPago().getPeriodicidad());
                 
                 if(model.getDatoEmpresa().getTipodebaja() == null)
-                	log.info("El empleado no tiene asignado un tipo de baja.");
+                	log.debug("El empleado no tiene asignado un tipo de baja.");
                 else
-                	log.info("Id tipo de baja: {}", model.getDatoEmpresa().getTipodebaja().getTipodebaja());
+                	log.debug("Id tipo de baja: {}", model.getDatoEmpresa().getTipodebaja().getTipodebaja());
                 
                 if(model.getDatoEmpresa().getBanco() == null)
-                	log.info("El empleado no tiene asignado un banco.");
+                	log.debug("El empleado no tiene asignado un banco.");
                 else
-                	log.info("Id banco: {}", model.getDatoEmpresa().getBanco().getIdBanco());
+                	log.debug("Id banco: {}", model.getDatoEmpresa().getBanco().getIdBanco());
                 
                 if(model.getDomicilio() == null)
-                	log.info("El empleado no tiene asignado un domicilio");
+                	log.debug("El empleado no tiene asignado un domicilio");
                 else
-                	log.info("Id domicilio: {}", model.getDomicilio().getId());
+                	log.debug("Id domicilio: {}", model.getDomicilio().getId());
                 
                 if(model.getDomicilio() != null && model.getDomicilio().getAsentamiento() == null) {
-                	log.info("El empleado no tiene asignada la información de su domicilio (asentamiento).");
+                	log.debug("El empleado no tiene asignada la información de su domicilio (asentamiento).");
                 } else if(model.getDomicilio() != null && model.getDomicilio().getAsentamiento() != null) {
-                	log.info("Id Asentamiento: {}", model.getDomicilio().getAsentamiento().getKey().getId());
-                	log.info("Id Localidad: {}", model.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getId());
-                	log.info("Id Municipio: {}", model.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getMunicipio().getKey().getId());
-                	log.info("Id Estado: {}", model.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getId());
-                	log.info("Id Pais: {}", model.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getPais().getId());
+                	log.debug("Id Asentamiento: {}", model.getDomicilio().getAsentamiento().getKey().getId());
+                	log.debug("Id Localidad: {}", model.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getId());
+                	log.debug("Id Municipio: {}", model.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getMunicipio().getKey().getId());
+                	log.debug("Id Estado: {}", model.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getId());
+                	log.debug("Id Pais: {}", model.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getPais().getId());
                 }
                 
                 for(DetVacaciones v : model.getVacaciones()) {
-                	log.info("Periodo Vacacional: {}", v.getIdVacaciones());
+                	log.debug("Periodo Vacacional: {}", v.getIdVacaciones());
                 }
                 
                 for(DetPercepcionEmpleado p : model.getPercepcionesEmpleado()) {
-                	log.info("Percepción del empleado: {}", p.getId());
+                	log.debug("Percepción del empleado: {}", p.getId());
                 }
                 
                 for(DetPrestamo p : model.getPrestamos()) {
-                	log.info("Préstamo del empleado: {}", p.getIdPrestamo());
+                	log.debug("Préstamo del empleado: {}", p.getIdPrestamo());
                 }
                 
                 if(model.getEmpleadoConfiguracion() == null)
-                	log.info("El empleado no tiene asignado un objeto de configuración de nómina.");
+                	log.debug("El empleado no tiene asignado un objeto de configuración de nómina.");
                 else
-                	log.info("Id Empleado configuración: {}", model.getEmpleadoConfiguracion().getIdEmpleadoConf());
+                	log.debug("Id Empleado configuración: {}", model.getEmpleadoConfiguracion().getIdEmpleadoConf());
             }
 
         } catch (Exception ex) {
@@ -177,103 +177,103 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
     		
     		if (isFullInfo) {
             	
-                log.info("id dato empresa: {}", model.getDatoEmpresa().getId() == null ? null : model.getDatoEmpresa().getId());
+                log.debug("id dato empresa: {}", model.getDatoEmpresa().getId() == null ? null : model.getDatoEmpresa().getId());
                 if(model.getDatoEmpresa().getPerfil() == null)
-                	log.info("El empleado no tiene definido el objeto empresa.");
+                	log.debug("El empleado no tiene definido el objeto empresa.");
                 else
-                	log.info("Id perfil: {}", model.getDatoEmpresa().getPerfil().getIdPerfil());
+                	log.debug("Id perfil: {}", model.getDatoEmpresa().getPerfil().getIdPerfil());
                 
                 if(model.getDatoEmpresa().getEmpresa() == null)
-                	log.info("El empleado no tiene asignada una empresa");
+                	log.debug("El empleado no tiene asignada una empresa");
                 else
-                	log.info("Id empresa: {}", model.getDatoEmpresa().getEmpresa().getIdEmpresa());
+                	log.debug("Id empresa: {}", model.getDatoEmpresa().getEmpresa().getIdEmpresa());
                 
                 if(model.getDatoEmpresa().getPlanta() == null)
-                	log.info("El empleado no tiene asignada una planta.");
+                	log.debug("El empleado no tiene asignada una planta.");
                 else
-                	log.info("Id planta: {}", model.getDatoEmpresa().getPlanta().getIdPlanta());
+                	log.debug("Id planta: {}", model.getDatoEmpresa().getPlanta().getIdPlanta());
                 
                 if(model.getDatoEmpresa().getArea() == null)
-                	log.info("El empleado no tiene asignada una área laboral.");
+                	log.debug("El empleado no tiene asignada una área laboral.");
                 else
-                	log.info("Id area: {}", model.getDatoEmpresa().getArea().getIdArea());
+                	log.debug("Id area: {}", model.getDatoEmpresa().getArea().getIdArea());
                 
                 if(model.getDatoEmpresa().getPuesto() == null)
-                	log.info("El empleado no tiene asignado un puesto laboral.");
+                	log.debug("El empleado no tiene asignado un puesto laboral.");
                 else
-                	log.info("Id puesto: {}", model.getDatoEmpresa().getPuesto().getIdPuesto());
+                	log.debug("Id puesto: {}", model.getDatoEmpresa().getPuesto().getIdPuesto());
                 
                 if(model.getDatoEmpresa().getTipoContrato() == null)
-                	log.info("El empleado no tiene asignado un tipo de contrato.");
+                	log.debug("El empleado no tiene asignado un tipo de contrato.");
                 else
-                	log.info("Id tipo contrato: {}", model.getDatoEmpresa().getTipoContrato().getClave());
+                	log.debug("Id tipo contrato: {}", model.getDatoEmpresa().getTipoContrato().getClave());
                 
                 if(model.getDatoEmpresa().getTipoJornada() == null)
-                	log.info("El empleado no tiene asignado un tipo de jornada");
+                	log.debug("El empleado no tiene asignado un tipo de jornada");
                 else
-                	log.info("Id tipo jornada: {}", model.getDatoEmpresa().getTipoJornada().getClave());
+                	log.debug("Id tipo jornada: {}", model.getDatoEmpresa().getTipoJornada().getClave());
                 
                 if(model.getDatoEmpresa().getTipoRegimen() == null)
-                	log.info("El empleado no tiene asignado un tipo de régimen.");
+                	log.debug("El empleado no tiene asignado un tipo de régimen.");
                 else
-                	log.info("Id tipo régimen: {}", model.getDatoEmpresa().getTipoRegimen().getClave());
+                	log.debug("Id tipo régimen: {}", model.getDatoEmpresa().getTipoRegimen().getClave());
                 
                 if(model.getDatoEmpresa().getEntidadFederativa() == null)
-                	log.info("El empleado no tiene asignada una entidad federativa.");
+                	log.debug("El empleado no tiene asignada una entidad federativa.");
                 else
-                	log.info("Id entidad federativa: {}", model.getDatoEmpresa().getEntidadFederativa().getClave());
+                	log.debug("Id entidad federativa: {}", model.getDatoEmpresa().getEntidadFederativa().getClave());
                 
                 if(model.getDatoEmpresa().getRiesgoPuesto() == null)
-                	log.info("El empleado no tiene asignado un riesgo de puesto laboral.");
+                	log.debug("El empleado no tiene asignado un riesgo de puesto laboral.");
                 else
-                	log.info("Id riesgo puesto: {}", model.getDatoEmpresa().getRiesgoPuesto().getClave());
+                	log.debug("Id riesgo puesto: {}", model.getDatoEmpresa().getRiesgoPuesto().getClave());
                 
                 if(model.getDatoEmpresa().getPeriodicidadPago() == null)
-                	log.info("El empleado no tiene asignada una periodicidad de pago.");
+                	log.debug("El empleado no tiene asignada una periodicidad de pago.");
                 else
-                	log.info("Id periodicidad pago: {}", model.getDatoEmpresa().getPeriodicidadPago().getPeriodicidad());
+                	log.debug("Id periodicidad pago: {}", model.getDatoEmpresa().getPeriodicidadPago().getPeriodicidad());
                 
                 if(model.getDatoEmpresa().getTipodebaja() == null)
-                	log.info("El empleado no tiene asignado un tipo de baja.");
+                	log.debug("El empleado no tiene asignado un tipo de baja.");
                 else
-                	log.info("Id tipo de baja: {}", model.getDatoEmpresa().getTipodebaja().getTipodebaja());
+                	log.debug("Id tipo de baja: {}", model.getDatoEmpresa().getTipodebaja().getTipodebaja());
                 
                 if(model.getDatoEmpresa().getBanco() == null)
-                	log.info("El empleado no tiene asignado un banco.");
+                	log.debug("El empleado no tiene asignado un banco.");
                 else
-                	log.info("Id banco: {}", model.getDatoEmpresa().getBanco().getIdBanco());
+                	log.debug("Id banco: {}", model.getDatoEmpresa().getBanco().getIdBanco());
                 
                 if(model.getDomicilio() == null)
-                	log.info("El empleado no tiene asignado un domicilio");
+                	log.debug("El empleado no tiene asignado un domicilio");
                 else
-                	log.info("Id domicilio: {}", model.getDomicilio().getId());
+                	log.debug("Id domicilio: {}", model.getDomicilio().getId());
                 
                 if(model.getDomicilio() != null && model.getDomicilio().getAsentamiento() == null) {
-                	log.info("El empleado no tiene asignada la información de su domicilio (asentamiento).");
+                	log.debug("El empleado no tiene asignada la información de su domicilio (asentamiento).");
                 } else if(model.getDomicilio() != null && model.getDomicilio().getAsentamiento() != null) {
-                	log.info("Id Asentamiento: {}", model.getDomicilio().getAsentamiento().getKey().getId());
-                	log.info("Id Localidad: {}", model.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getId());
-                	log.info("Id Municipio: {}", model.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getMunicipio().getKey().getId());
-                	log.info("Id Estado: {}", model.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getId());
-                	log.info("Id Pais: {}", model.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getPais().getId());
+                	log.debug("Id Asentamiento: {}", model.getDomicilio().getAsentamiento().getKey().getId());
+                	log.debug("Id Localidad: {}", model.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getId());
+                	log.debug("Id Municipio: {}", model.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getMunicipio().getKey().getId());
+                	log.debug("Id Estado: {}", model.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getId());
+                	log.debug("Id Pais: {}", model.getDomicilio().getAsentamiento().getKey().getLocalidad().getKey().getMunicipio().getKey().getEstado().getKey().getPais().getId());
                 }
                 
                 for(DetVacaciones v : model.getVacaciones()) {
-                	log.info("Periodo Vacacional: {}", v.getIdVacaciones());
+                	log.debug("Periodo Vacacional: {}", v.getIdVacaciones());
                 }
                 
                 for(DetPercepcionEmpleado p : model.getPercepcionesEmpleado()) {
-                	log.info("Percepción del empleado: {}", p.getId());
+                	log.debug("Percepción del empleado: {}", p.getId());
                 }
                 
                 for(DetPrestamo p : model.getPrestamos()) {
-                	log.info("Préstamo del empleado: {}", p.getIdPrestamo());
+                	log.debug("Préstamo del empleado: {}", p.getIdPrestamo());
                 }
                 
                 if(model.getEmpleadoConfiguracion() == null)
-                	log.info("El empleado no tiene asignado un objeto de configuración de nómina.");
+                	log.debug("El empleado no tiene asignado un objeto de configuración de nómina.");
                 else
-                	log.info("Id Empleado configuración: {}", model.getEmpleadoConfiguracion().getIdEmpleadoConf());
+                	log.debug("Id Empleado configuración: {}", model.getEmpleadoConfiguracion().getIdEmpleadoConf());
             }
 
     	} catch(Exception ex) {

@@ -26,11 +26,10 @@ public class SubsidioEmpleoExecutor {
 	}
 	
 	public ISubsidioEmpleo loadClass(String clave, LocalDate fecha) {
-		ISubsidioEmpleo instance = null;
-		Class<?> clazz = null;
-		Constructor<?> constructor = null;
-		
-		NominaFormula formula = null;
+		ISubsidioEmpleo instance    = null;
+		Class<?>        clazz       = null;
+		Constructor<?>  constructor = null;
+		NominaFormula   formula     = null;
 		
 		try {
 			if(formulaDAO == null)
@@ -52,11 +51,10 @@ public class SubsidioEmpleoExecutor {
 	}
 	
 	public ISubsidioEmpleo loadClass(String clave, LocalDate fecha, BigDecimal isrAntesDeSubsidio) {
-		ISubsidioEmpleo instance = null;
-		Class<?> clazz = null;
-		Constructor<?> constructor = null;
-		
-		NominaFormula formula = null;
+		ISubsidioEmpleo instance    = null;
+		Class<?>        clazz       = null;
+		Constructor<?>  constructor = null;
+		NominaFormula   formula     = null;
 		
 		try {
 			if(formulaDAO == null)

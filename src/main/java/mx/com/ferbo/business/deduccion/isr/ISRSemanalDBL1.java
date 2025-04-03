@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.business.deduccion.AbstractDeduccion;
+import mx.com.ferbo.business.deduccion.AbstractDBL;
 import mx.com.ferbo.business.deduccion.IDeducciones;
 import mx.com.ferbo.business.deduccion.subsidio.ISubsidioEmpleo;
 import mx.com.ferbo.business.deduccion.subsidio.SubsidioEmpleoExecutor;
@@ -29,9 +29,10 @@ import mx.com.ferbo.util.SGPException;
 
 /**Cálculo del ISR, conforme a la reforma de diciembre de 2013.
  */
-public class ISRSemanalDeduccion1 extends AbstractDeduccion implements IDeducciones {
+@Deprecated
+public class ISRSemanalDBL1 extends AbstractDBL implements IDeducciones {
 	
-	private static Logger log = LogManager.getLogger(ISRSemanalDeduccion1.class);
+	private static Logger log = LogManager.getLogger(ISRSemanalDBL1.class);
 	
 	private SubsidioEmpleoExecutor subsidioExecutor = null;
 	private ISubsidioEmpleo tarifaSubsidioBO = null;
@@ -49,7 +50,7 @@ public class ISRSemanalDeduccion1 extends AbstractDeduccion implements IDeduccio
 	private List<CatTarifaISR> tablaISRSemanal = null;
 	private List<CatTarifaISR> tablaISRMensual = null;
 	
-	public ISRSemanalDeduccion1(Date periodoInicio, Date periodoFin, List<CatTipoDeduccion> tiposDeduccion, List<CatTipoOtroPago> tiposOtroPago, List<CatTarifaISR> tablaISR, List<DetNomina> nominaMensual)
+	public ISRSemanalDBL1(Date periodoInicio, Date periodoFin, List<CatTipoDeduccion> tiposDeduccion, List<CatTipoOtroPago> tiposOtroPago, List<CatTarifaISR> tablaISR, List<DetNomina> nominaMensual)
 	throws SGPException {
 		try {
 			this.setPeriodo(periodoInicio, periodoFin);
@@ -95,17 +96,17 @@ public class ISRSemanalDeduccion1 extends AbstractDeduccion implements IDeduccio
 	public void procesar(DetNomina nomina) {
 		List<DetNominaDeduccion> deduccionesISR = null;
 		List<DetNominaPercepcion> percepciones = null;
-		ISRBaseDeduccion baseISRBO = null;
-		TarifaISRDeduccion tarifaISRBO = null;
+		ISRBaseDBL baseISRBO = null;
+		TarifaISRBL tarifaISRBO = null;
 		
 		DetNominaDeduccion dBaseISR = null;
 		CatTarifaISR tarifaISR = null;
 		
 		BigDecimal importeSubsidio = null;
 		
-		ISRAntesSubsidioDeduccion isrPreSubsidioBO = null;
+		ISRAntesSubsidioDBL isrPreSubsidioBO = null;
 		
-		ISRAntesSubsidioDeduccion isrPreSubsidioMensualBO = null;
+		ISRAntesSubsidioDBL isrPreSubsidioMensualBO = null;
 		DetNominaDeduccion dISRAntesSubsidio = null;
 		DetNominaDeduccion dISR = null;
 		DetNominaOtroPago opISR = null;
@@ -130,15 +131,15 @@ public class ISRSemanalDeduccion1 extends AbstractDeduccion implements IDeduccio
 			
 			//1. Obtener la base para el ISR (semanal)
 			//Para el cálculo del ISR a retener al empleado se deben sumar las percepciones que gravan para ISR
-			baseISRBO = new ISRBaseDeduccion(percepciones);
+			baseISRBO = new ISRBaseDBL(percepciones);
 			baseISRBO.setTiposDeduccion(this.tiposDeduccion);
-			dBaseISR = baseISRBO.calcular(nomina, idxDeduccion++);
+			dBaseISR = baseISRBO.calcular(nomina);
 			
-			tarifaISRBO = new TarifaISRDeduccion(this.tablaISRSemanal, dBaseISR.getImporte());
+			tarifaISRBO = new TarifaISRBL(this.tablaISRSemanal, dBaseISR.getImporte());
 			tarifaISR = tarifaISRBO.calcular();
 			
-			isrPreSubsidioBO = new ISRAntesSubsidioDeduccion(dBaseISR.getImporte(), tarifaISR);
-			dISRAntesSubsidio = isrPreSubsidioBO.calcular(nomina, idxDeduccion++);
+			isrPreSubsidioBO = new ISRAntesSubsidioDBL(dBaseISR.getImporte(), tarifaISR);
+			dISRAntesSubsidio = isrPreSubsidioBO.calcular(nomina);
 			deduccionesISR.add(dISRAntesSubsidio);
 			isrAntesDeSubsidio = dISRAntesSubsidio.getImporte();
 			
@@ -161,11 +162,11 @@ public class ISRSemanalDeduccion1 extends AbstractDeduccion implements IDeduccio
 				baseISRMensual = this.calcularBaseISRAcumulado(dBaseISR.getImporte(), isrDespuesDeSubsidio);
 				log.info("Base ISR (mensual): {}", baseISRMensual);
 				
-				tarifaISRBO = new TarifaISRDeduccion(tablaISRMensual, baseISRMensual);
+				tarifaISRBO = new TarifaISRBL(tablaISRMensual, baseISRMensual);
 				tarifaISR = tarifaISRBO.calcular();
 				
-				isrPreSubsidioMensualBO = new ISRAntesSubsidioDeduccion(baseISRMensual, tarifaISR);
-				dISRAntesSubsidioMensual = isrPreSubsidioMensualBO.calcular(nomina, idxDeduccion++);
+				isrPreSubsidioMensualBO = new ISRAntesSubsidioDBL(baseISRMensual, tarifaISR);
+				dISRAntesSubsidioMensual = isrPreSubsidioMensualBO.calcular(nomina);
 				isrAntesDeSubsidio = dISRAntesSubsidioMensual.getImporte();
 				log.info("ISR antes de subsidio al empleo: {}", isrAntesDeSubsidio);
 				
@@ -186,7 +187,7 @@ public class ISRSemanalDeduccion1 extends AbstractDeduccion implements IDeduccio
 				log.info("Agregando ISR como Deduccion...");
 				dISR = new DetNominaDeduccion();
 				dISR.setKey(new DetNominaDeduccionPK(nomina, idxDeduccion++));
-				tdISR = this.getTipoDeduccion(D_ISR);
+				tdISR = this.getTipoDeduccion(TD_ISR);
 				dISR.setTipoDeduccion(tdISR);
 				dISR.setClave(CVE_ISR);
 				dISR.setNombre("I.S.R.");

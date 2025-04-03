@@ -48,7 +48,7 @@ public class SueldoPercepcion extends AbstractPercepcion implements IPercepcion 
 			salarioSemanal = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 			cantidad = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 		} finally {
-			percepcion = this.build(nomina, CVE_SUELDO, cantidad, ValoresBD._CERO.getValor(), salarioSemanal);
+			percepcion = this.build(nomina, CVE_SUELDO, cantidad, ValoresBD._CERO.get(), salarioSemanal);
 		}
 		
 		return percepcion;
