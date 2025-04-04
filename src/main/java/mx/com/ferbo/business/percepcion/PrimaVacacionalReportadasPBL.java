@@ -17,13 +17,13 @@ import mx.com.ferbo.model.DetVacaciones;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.SGPException;
 
-public class PrimaVacacionalReportadasPercepcion extends AbstractPercepcion implements IPercepcion {
+public class PrimaVacacionalReportadasPBL extends AbstractPBL implements IPercepcion {
 	
-	private static Logger log = LogManager.getLogger(PrimaVacacionalReportadasPercepcion.class);
+	private static Logger log = LogManager.getLogger(PrimaVacacionalReportadasPBL.class);
 	
 	private ParametrosNomina parametros = null;
 	
-	public PrimaVacacionalReportadasPercepcion(ParametrosNomina parametros) {
+	public PrimaVacacionalReportadasPBL(ParametrosNomina parametros) {
 		this.parametros = parametros;
 	}
 	

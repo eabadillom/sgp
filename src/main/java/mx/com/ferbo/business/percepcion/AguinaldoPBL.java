@@ -12,16 +12,16 @@ import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.util.DateUtil;
 
-public class AguinaldoPercepcion extends AbstractPercepcion implements IPercepcion {
+public class AguinaldoPBL extends AbstractPBL implements IPercepcion {
 	
-	private static Logger log = LogManager.getLogger(AguinaldoPercepcion.class);
+	private static Logger log = LogManager.getLogger(AguinaldoPBL.class);
 	
 	private ParametrosNomina parametros = null;
 	private BigDecimal diasAguinaldo = null;
 	private BigDecimal ausencias = null;
 	
 	
-	public AguinaldoPercepcion(ParametrosNomina parametros, BigDecimal diasAguinaldo, BigDecimal ausencias) {
+	public AguinaldoPBL(ParametrosNomina parametros, BigDecimal diasAguinaldo, BigDecimal ausencias) {
 		this.parametros = parametros;
 		this.tiposPercepcion = parametros.getTiposPercepcion();
 		this.diasAguinaldo = diasAguinaldo;

@@ -11,13 +11,13 @@ import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
 
-public class VacacionesPercepcion extends AbstractPercepcion implements IPercepcion {
+public class VacacionesPBL extends AbstractPBL implements IPercepcion {
 	
-	private static Logger log = LogManager.getLogger(VacacionesPercepcion.class);
+	private static Logger log = LogManager.getLogger(VacacionesPBL.class);
 	
 	private BigDecimal diasVacaciones = null;
 	
-	public VacacionesPercepcion(ParametrosNomina parametros, BigDecimal diasVacaciones) {
+	public VacacionesPBL(ParametrosNomina parametros, BigDecimal diasVacaciones) {
 		this.tiposPercepcion = parametros.getTiposPercepcion();
 		this.diasVacaciones = diasVacaciones;
 	}

@@ -20,9 +20,9 @@ import mx.com.ferbo.util.SGPException;
  * En caso de exceder el 10%, se considerará como parte del SBC.
  * 
  */
-public class BonoPuntualidadPercepcion extends AbstractPercepcion implements IPercepcion {
+public class BonoPuntualidadPBL extends AbstractPBL implements IPercepcion {
 	
-	private static Logger log = LogManager.getLogger(BonoPuntualidadPercepcion.class);
+	private static Logger log = LogManager.getLogger(BonoPuntualidadPBL.class);
 	
 	private Map<String, DetRegistro> mapAsistencias = null;
 	
@@ -34,7 +34,7 @@ public class BonoPuntualidadPercepcion extends AbstractPercepcion implements IPe
 	
 	private Boolean    procesaRetardos        = null;
 	
-	public BonoPuntualidadPercepcion(
+	public BonoPuntualidadPBL(
 			List<CatTipoPercepcion> tiposPercepcion, BigDecimal tasaBono, Map<String, DetRegistro> mapAsistencias, 
 			BigDecimal diasLaborales, BigDecimal diasNoLaborales, BigDecimal diasTrabajados, BigDecimal salarioDiarioIntegrado,
 			BigDecimal proporcionalSeptimoDia

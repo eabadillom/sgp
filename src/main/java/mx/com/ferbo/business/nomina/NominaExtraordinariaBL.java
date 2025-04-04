@@ -8,11 +8,11 @@ import org.apache.logging.log4j.Logger;
 import mx.com.ferbo.business.deduccion.AbstractDBL;
 import mx.com.ferbo.business.deduccion.isr.ISRL174DBL;
 import mx.com.ferbo.business.empleado.EmpleadoBL;
-import mx.com.ferbo.business.percepcion.AbstractPercepcion;
-import mx.com.ferbo.business.percepcion.AguinaldoPercepcion;
-import mx.com.ferbo.business.percepcion.PrimaVacacionalEnTiempoPercepcion;
-import mx.com.ferbo.business.percepcion.PrimaVacacionalReportadasPercepcion;
-import mx.com.ferbo.business.percepcion.VacacionesReportadasPercepcion;
+import mx.com.ferbo.business.percepcion.AbstractPBL;
+import mx.com.ferbo.business.percepcion.AguinaldoPBL;
+import mx.com.ferbo.business.percepcion.PrimaVacacionalEnTiempoPBL;
+import mx.com.ferbo.business.percepcion.PrimaVacacionalReportadasPBL;
+import mx.com.ferbo.business.percepcion.VacacionesReportadasPBL;
 import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetNomina;
@@ -43,19 +43,19 @@ public class NominaExtraordinariaBL extends NominaBL {
 			clavePercepcion = percepcion.getClave();
 			
 			switch (clavePercepcion) {
-				case AbstractPercepcion.CVE_VACACIONES_REPORTADAS:
+				case AbstractPBL.CVE_VACACIONES_REPORTADAS:
 					calcularVacacionesReportadas(nomina, parametros);
 					break;
 					
-				case AbstractPercepcion.CVE_PRIMA_VACACIONES_EN_TIEMPO:
+				case AbstractPBL.CVE_PRIMA_VACACIONES_EN_TIEMPO:
 					calcularPrimaVacacionesEnTiempo(nomina, parametros);
 					break;
 					
-				case AbstractPercepcion.CVE_PRIMA_VACACIONES_REPORTADAS:
+				case AbstractPBL.CVE_PRIMA_VACACIONES_REPORTADAS:
 					calcularPrimaVacacionesReportadas(nomina, parametros);
 					break;
 				
-				case AbstractPercepcion.CVE_AGUINALDO:
+				case AbstractPBL.CVE_AGUINALDO:
 					calcularAguinaldo(nomina, parametros);
 					break;
 				default:
@@ -76,12 +76,12 @@ public class NominaExtraordinariaBL extends NominaBL {
 	
 	public static synchronized void calcularVacacionesReportadas(DetNomina nomina, ParametrosNomina parametros) {
 		DetNominaPercepcion percepcion = null;
-		final String clave = AbstractPercepcion.CVE_VACACIONES_REPORTADAS;
+		final String clave = AbstractPBL.CVE_VACACIONES_REPORTADAS;
 		boolean removedPercepciones = nomina.getPercepciones().removeIf(p -> p.getClave().equalsIgnoreCase(clave));
 		if(removedPercepciones)
 			log.info("Se encontraron conceptos {}, los cuales fueron eliminados de la lista de percepciones.", clave);
 		
-		VacacionesReportadasPercepcion vacacionesBO = new VacacionesReportadasPercepcion(parametros);
+		VacacionesReportadasPBL vacacionesBO = new VacacionesReportadasPBL(parametros);
 		percepcion = vacacionesBO.calcular(nomina);
 		
 		if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(ValoresBD._CERO.get()) > 0)
@@ -90,13 +90,13 @@ public class NominaExtraordinariaBL extends NominaBL {
 	
 	public static synchronized void calcularPrimaVacacionesEnTiempo(DetNomina nomina, ParametrosNomina parametros) {
 		DetNominaPercepcion percepcion = null;
-		final String clave = AbstractPercepcion.CVE_PRIMA_VACACIONES_EN_TIEMPO;
+		final String clave = AbstractPBL.CVE_PRIMA_VACACIONES_EN_TIEMPO;
 		boolean removePercepciones = nomina.getPercepciones().removeIf( p -> p.getClave().equalsIgnoreCase(clave));
 		
 		if(removePercepciones)
 			log.info("Se encontraron conceptos {}, los cuales fueron eliminados de la lista de percepciones.", clave);
 		
-		PrimaVacacionalEnTiempoPercepcion primaBO = new PrimaVacacionalEnTiempoPercepcion(parametros);
+		PrimaVacacionalEnTiempoPBL primaBO = new PrimaVacacionalEnTiempoPBL(parametros);
 		percepcion = primaBO.calcular(nomina);
 		
 		if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(ValoresBD._CERO.get()) > 0)
@@ -106,13 +106,13 @@ public class NominaExtraordinariaBL extends NominaBL {
 	public static synchronized void calcularPrimaVacacionesReportadas(DetNomina nomina, ParametrosNomina parametros) {
 		DetNominaPercepcion percepcion = null;
 		
-		final String clave = AbstractPercepcion.CVE_PRIMA_VACACIONES_REPORTADAS;
+		final String clave = AbstractPBL.CVE_PRIMA_VACACIONES_REPORTADAS;
 		boolean removedPercepciones = nomina.getPercepciones().removeIf( p -> p.getClave().equalsIgnoreCase(clave));
 		
 		if(removedPercepciones)
 			log.info("Se encontraron conceptos {}, los cuales fueron eliminados de la lista de percepciones.", clave);
 		
-		PrimaVacacionalReportadasPercepcion primaBO = new PrimaVacacionalReportadasPercepcion(parametros);
+		PrimaVacacionalReportadasPBL primaBO = new PrimaVacacionalReportadasPBL(parametros);
 		percepcion = primaBO.calcular(nomina);
 		
 		if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(ValoresBD._CERO.get()) > 0)
@@ -123,10 +123,10 @@ public class NominaExtraordinariaBL extends NominaBL {
 		DetNominaPercepcion percepcion = null;
 		
 		DetEmpleado empleado = null;
-		AguinaldoPercepcion aguinaldoBO = null;
+		AguinaldoPBL aguinaldoBO = null;
 		
 		try {
-			final String clave = AbstractPercepcion.CVE_AGUINALDO;
+			final String clave = AbstractPBL.CVE_AGUINALDO;
 			boolean removedPercepciones = nomina.getPercepciones().removeIf( p -> p.getClave().equalsIgnoreCase(clave));
 					
 			if(removedPercepciones)
@@ -136,7 +136,7 @@ public class NominaExtraordinariaBL extends NominaBL {
 			
 			//TODO FALTA PROCESAR LAS AUSENCIAS DEL AÑO COMPLETO.
 			
-			aguinaldoBO = new AguinaldoPercepcion(parametros, empleado.getDatoEmpresa().getDiasAguinaldo(), ValoresBD._CERO.get());
+			aguinaldoBO = new AguinaldoPBL(parametros, empleado.getDatoEmpresa().getDiasAguinaldo(), ValoresBD._CERO.get());
 			
 			percepcion = aguinaldoBO.calcular(nomina);
 			

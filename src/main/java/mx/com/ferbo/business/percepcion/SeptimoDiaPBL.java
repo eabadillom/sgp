@@ -13,9 +13,9 @@ import mx.com.ferbo.model.DetNominaPercepcionPK;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.util.FormatUtil;
 
-public class SeptimoDiaPercepcion extends AbstractPercepcion implements IPercepcion {
+public class SeptimoDiaPBL extends AbstractPBL implements IPercepcion {
 	
-	private static Logger log = LogManager.getLogger(SeptimoDiaPercepcion.class);
+	private static Logger log = LogManager.getLogger(SeptimoDiaPBL.class);
 	
 	private ParametrosNomina parametros = null;
 	private BigDecimal diasLaborales    = null;
@@ -23,7 +23,7 @@ public class SeptimoDiaPercepcion extends AbstractPercepcion implements IPercepc
 	private BigDecimal diasVacaciones   = null;
 	private BigDecimal diasTrabajados   = null;
 	
-	public SeptimoDiaPercepcion(ParametrosNomina parametros, BigDecimal diasLaborales, BigDecimal diasNoLaborales, BigDecimal diasTrabajados, BigDecimal diasVacaciones) {
+	public SeptimoDiaPBL(ParametrosNomina parametros, BigDecimal diasLaborales, BigDecimal diasNoLaborales, BigDecimal diasTrabajados, BigDecimal diasVacaciones) {
 		this.parametros = parametros;
 		this.tiposPercepcion = parametros.getTiposPercepcion();
 		this.diasLaborales = diasLaborales;

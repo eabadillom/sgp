@@ -13,9 +13,9 @@ import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.util.SGPException;
 
-public class ValesDespensaPercepcion extends AbstractPercepcion implements IPercepcion {
+public class ValesDespensaPBL extends AbstractPBL implements IPercepcion {
 	
-	private static Logger log = LogManager.getLogger(ValesDespensaPercepcion.class);
+	private static Logger log = LogManager.getLogger(ValesDespensaPBL.class);
 	
 	private BigDecimal siete = new BigDecimal("7.00").setScale(2, BigDecimal.ROUND_HALF_UP);
 	
@@ -24,7 +24,7 @@ public class ValesDespensaPercepcion extends AbstractPercepcion implements IPerc
 	private BigDecimal tasaVales = null;
 	private BigDecimal diasPeriodo = null;
 	
-	public ValesDespensaPercepcion(List<CatTipoPercepcion> tiposPercepcion, BigDecimal diasTrabajados, BigDecimal uma, BigDecimal tasaVales, BigDecimal diasPeriodo) {
+	public ValesDespensaPBL(List<CatTipoPercepcion> tiposPercepcion, BigDecimal diasTrabajados, BigDecimal uma, BigDecimal tasaVales, BigDecimal diasPeriodo) {
 		this.tiposPercepcion = tiposPercepcion;
 		this.diasTrabajados = diasTrabajados;
 		this.uma = uma;

@@ -11,13 +11,13 @@ import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
 
-public class SueldoPercepcion extends AbstractPercepcion implements IPercepcion {
+public class SueldoBL extends AbstractPBL implements IPercepcion {
 	
-	private static Logger log = LogManager.getLogger(SueldoPercepcion.class);
+	private static Logger log = LogManager.getLogger(SueldoBL.class);
 	
 	private BigDecimal diasTrabajados = null;
 	
-	public SueldoPercepcion(ParametrosNomina parametros, BigDecimal diasTrabajados) {
+	public SueldoBL(ParametrosNomina parametros, BigDecimal diasTrabajados) {
 		this.tiposPercepcion = parametros.getTiposPercepcion();
 		this.diasTrabajados = diasTrabajados;
 	}
@@ -36,7 +36,7 @@ public class SueldoPercepcion extends AbstractPercepcion implements IPercepcion 
 			
 			boolean removedPercepciones = percepciones.removeIf(d -> CVE_SUELDO.equalsIgnoreCase(d.getClave()));
 			if(removedPercepciones)
-				log.info("Se encontraron conceptos {}, los cuales fueron eliminados para el reproceso de SUELDO.", AbstractPercepcion.CVE_SUELDO);
+				log.info("Se encontraron conceptos {}, los cuales fueron eliminados para el reproceso de SUELDO.", AbstractPBL.CVE_SUELDO);
 			
 			salarioSemanal = salarioDiario
 					.multiply(diasTrabajados)

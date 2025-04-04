@@ -1,5 +1,7 @@
 package mx.com.ferbo.business.percepcion;
 
+import static mx.com.ferbo.enums.ValoresBD._CERO;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -9,10 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.nomina.ParametrosNomina;
-import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.VacacionesDAO;
-import mx.com.ferbo.enums.ValoresBD;
-import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.DetVacaciones;
@@ -28,12 +27,12 @@ import mx.com.ferbo.util.SGPException;
  * al finalizar dicho periodo, tiene derecho a exigir el pago de las vacaciones no disfrutadas.
  * */
 
-public class VacacionesReportadasPercepcion extends AbstractPercepcion implements IPercepcion {
+public class VacacionesReportadasPBL extends AbstractPBL implements IPercepcion {
 	
-	private static Logger log = LogManager.getLogger(VacacionesReportadasPercepcion.class);
+	private static Logger log = LogManager.getLogger(VacacionesReportadasPBL.class);
 	private ParametrosNomina parametros = null;
 	
-	public VacacionesReportadasPercepcion(ParametrosNomina parametros) {
+	public VacacionesReportadasPBL(ParametrosNomina parametros) {
 		this.tiposPercepcion = parametros.getTiposPercepcion();
 		this.parametros = parametros;
 	}
@@ -46,8 +45,6 @@ public class VacacionesReportadasPercepcion extends AbstractPercepcion implement
 		BigDecimal importeExento = null;
 		BigDecimal importe = null;
 		
-		DetEmpleado empleado = null;
-		EmpleadoDAO empleadoDAO = null;
 		VacacionesDAO vacacionesDAO = null;
 		
 		Date vencimientoPeriodo = null;
@@ -57,14 +54,12 @@ public class VacacionesReportadasPercepcion extends AbstractPercepcion implement
 		try {
 			vencimientoPeriodo = DateUtil.addMonth(parametros.getPeriodoFin(), -6);
 			
-			empleadoDAO = new EmpleadoDAO();
-			empleado = empleadoDAO.buscarPorRFC(nomina.getReceptor().getRfc());
 			vacacionesDAO = new VacacionesDAO();
 			periodos = vacacionesDAO.buscarReportadasPorRfcFecha(nomina.getReceptor().getRfc(), vencimientoPeriodo);
 			
-			cantidad = ValoresBD._CERO.get();
-			importeExento = ValoresBD._CERO.get();
-			importeGravado = ValoresBD._CERO.get();
+			cantidad       = _CERO.get();
+			importeExento  = _CERO.get();
+			importeGravado = _CERO.get();
 			
 			for(DetVacaciones periodo : periodos) {
 				if(periodo == null) {
@@ -88,9 +83,9 @@ public class VacacionesReportadasPercepcion extends AbstractPercepcion implement
 			}
 			
 		} catch(Exception ex) {
-			cantidad = ValoresBD._CERO.get();
-			importeGravado = ValoresBD._CERO.get();
-			importeExento = ValoresBD._CERO.get();
+			cantidad = _CERO.get();
+			importeGravado = _CERO.get();
+			importeExento = _CERO.get();
 		} finally {
 			percepcion = this.build(nomina, CVE_VACACIONES_REPORTADAS, cantidad, importeExento, importeGravado);
 		}
@@ -114,7 +109,9 @@ public class VacacionesReportadasPercepcion extends AbstractPercepcion implement
 				DateUtil.getString(periodo.getFechaFin(), DateUtil.FORMATO_DD_MM_YYYY),
 				diasPendientes);
 		
-		importe = diasPendientes.multiply(salarioDiario);
+		importe = diasPendientes
+				.multiply(salarioDiario)
+				.setScale(2, BigDecimal.ROUND_HALF_UP);
 		
 		return importe;
 	}

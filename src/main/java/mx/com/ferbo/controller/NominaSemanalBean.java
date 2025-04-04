@@ -25,7 +25,7 @@ import mx.com.ferbo.business.nomina.AsistenciaBL;
 import mx.com.ferbo.business.nomina.NominaBL;
 import mx.com.ferbo.business.nomina.NominaSemanalBL;
 import mx.com.ferbo.business.nomina.ParametrosNomina;
-import mx.com.ferbo.business.percepcion.AbstractPercepcion;
+import mx.com.ferbo.business.percepcion.AbstractPBL;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.EmpresaDAO;
 import mx.com.ferbo.dao.n.NominaDAO;
@@ -363,7 +363,7 @@ public class NominaSemanalBean implements Serializable {
 			diasNoLaboralesEmpleado = new BigDecimal(listaDiasNoLaboralesEmpleado.size()).setScale(2, BigDecimal.ROUND_HALF_UP);
 			diasTrabajados = percepcion.getCantidad();
 			
-			if(percepcion.getCantidad() != null && AbstractPercepcion.CVE_SUELDO.equalsIgnoreCase(percepcion.getClave())) {
+			if(percepcion.getCantidad() != null && AbstractPBL.CVE_SUELDO.equalsIgnoreCase(percepcion.getClave())) {
 				NominaSemanalBL.calcularSueldo(nomina, parametros,  diasLaboralesEmpleado, diasNoLaboralesEmpleado, diasTrabajados, null);
 			}
 			NominaSemanalBL.procesarISR(nomina, parametros);

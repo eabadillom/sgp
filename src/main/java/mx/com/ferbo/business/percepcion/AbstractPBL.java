@@ -18,8 +18,8 @@ import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.util.SGPException;
 
-public class AbstractPercepcion {
-	private static Logger log = LogManager.getLogger(AbstractPercepcion.class);
+public class AbstractPBL {
+	private static Logger log = LogManager.getLogger(AbstractPBL.class);
 	
 	protected List<CatTipoPercepcion> tiposPercepcion = null;
 	protected List<DetPercepcionEmpleado> percepcionesEmpleado = null;
