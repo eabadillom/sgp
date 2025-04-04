@@ -9,18 +9,18 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.business.deduccion.AbstractDeduccion;
-import mx.com.ferbo.business.deduccion.AjusteAlNetoDeduccion;
+import mx.com.ferbo.business.deduccion.AbstractDBL;
+import mx.com.ferbo.business.deduccion.AjusteAlNetoDBL;
 import mx.com.ferbo.business.otropago.AbstractOtroPago;
 import mx.com.ferbo.business.otropago.AjusteAlNetoOtroPago;
-import mx.com.ferbo.dao.n.ConceptoDAO;
-import mx.com.ferbo.dao.n.UnidadSATDAO;
 import mx.com.ferbo.dao.n.VacacionesDAO;
+import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.CatEmpresa;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetNomina;
@@ -46,7 +46,7 @@ public abstract class NominaBL {
 	
 	public static final String TP_NOMINA_ORDINARIA = "O";
 	public static final String TP_NOMINA_EXTRAORDINARIA = "E";
-	public static final String TP_COMPROBANTE_NOMINA = "N";
+	public static final String TP_COMPROBANTE_CFDI = "N";
 	
 	public static final int DIAS_ANIO = 365;
 	public static final BigDecimal cien = new BigDecimal(100).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -54,40 +54,35 @@ public abstract class NominaBL {
 	protected DetEmpleado empleado = null;
 	protected ParametrosNomina parametros = null;
 	protected Map<String, DetRegistro> mapAsistencias = null;
-	protected VacacionesDAO vacacionesDAO = null;
 	
 	public NominaBL() {
-		
 	}
 	
 	public NominaBL(DetEmpleado empleado, ParametrosNomina parametros, Map<String, DetRegistro> mapAsistencias) {
 		this.empleado = empleado;
 		this.parametros = parametros;
 		this.mapAsistencias = mapAsistencias;
-		this.vacacionesDAO = new VacacionesDAO();
 	}
 	
-	public static synchronized DetNomina build(String tipoNomina, ParametrosNomina parametros, DetEmpleado empleado) {
-		DetNomina nomina = null;
+	public static synchronized DetNomina build(String tipoNomina, ParametrosNomina parametros, DetEmpleado empleado)
+	throws SGPException {
+		DetNomina                 nomina       = null;
+		DetNominaEmisor           emisor       = null;
+		DetNominaReceptor         receptor     = null;
+		DetNominaConcepto         concepto     = null;
+		CatConcepto               conceptoSAT  = null;
+		CatUnidadSAT              unidadSAT    = null;
 		
-		DetNominaEmisor emisor = null;
-		DetNominaReceptor receptor = null;
-		DetNominaConcepto concepto = null;
-		
-		CatConcepto conceptoSAT = null;
-		ConceptoDAO conceptoDAO = null;
-		
-		CatUnidadSAT unidadSAT = null;
-		UnidadSATDAO unidadSATDAO = null;
-		
-		List<DetNominaConcepto> conceptos = null;
+		List<DetNominaConcepto>   conceptos    = null;
 		List<DetNominaPercepcion> percepciones = null;
-		List<DetNominaOtroPago> otrosPagos = null;
-		List<DetNominaDeduccion> deducciones = null;
+		List<DetNominaOtroPago>   otrosPagos   = null;
+		List<DetNominaDeduccion>  deducciones  = null;
+		
+		if(parametros == null)
+			throw new SGPException("Los parámetros de nómina no están definidos.");
 		
 		try {
 			nomina = new DetNomina();
-			nomina.setTipoComprobante(TP_COMPROBANTE_NOMINA);
 			
 			if(empleado == null) {
 				emisor = new DetNominaEmisor();
@@ -102,22 +97,13 @@ public abstract class NominaBL {
 			otrosPagos = new ArrayList<>();
 			deducciones = new ArrayList<>();
 			
-			
-			if(parametros == null) {
-				conceptoDAO = new ConceptoDAO();
-				conceptoSAT = conceptoDAO.buscarPorId("84111505");
-				
-				unidadSATDAO = new UnidadSATDAO();
-				unidadSAT = unidadSATDAO.buscarPorId("ACT");
-			} else {
-				conceptoSAT = parametros.getConcepto();
-				unidadSAT = parametros.getUnidadSAT();
-			}
+			conceptoSAT = parametros.getConcepto();
+			unidadSAT = parametros.getUnidadSAT();
 			
 			concepto = new DetNominaConcepto();
 			concepto.setKey(new DetNominaConceptoPK(nomina, 0));
 			concepto.setConcepto(conceptoSAT);
-			concepto.setCantidad(BigDecimal.ONE.setScale(2, BigDecimal.ROUND_HALF_UP));
+			concepto.setCantidad(ValoresBD._1.get());
 			concepto.setUnidad(unidadSAT);
 			concepto.setNombreConcepto("Pago de nómina");
 			concepto.setObjetoImpuesto("01");
@@ -127,15 +113,28 @@ public abstract class NominaBL {
 				nomina.setTipoNomina(TP_NOMINA_ORDINARIA);
 			} else if(TP_NOMINA_EXTRAORDINARIA.equalsIgnoreCase(tipoNomina)) {
 				nomina.setTipoNomina(TP_NOMINA_EXTRAORDINARIA);
-			}
+			} else
+				throw new SGPException("El tipo de nómina no es válido: " + tipoNomina);
 			
+			nomina.setTipoComprobante(TP_COMPROBANTE_CFDI);
 			nomina.setEmisor(emisor);
 			nomina.setReceptor(receptor);
 			nomina.setConceptos(conceptos);
 			nomina.setPercepciones(percepciones);
 			nomina.setOtrosPagos(otrosPagos);
 			nomina.setDeducciones(deducciones);
-			
+			nomina.setEjercicio(parametros.getAnio());
+			nomina.setPeriodo(parametros.getPeriodo());
+			nomina.setDiasLaborados(0);
+			nomina.setDiasNoLaborados(0);
+			nomina.setDiasAsueto(0);
+			nomina.setDiasPagados(ValoresBD._CERO.get());
+			nomina.setSubtotal(ValoresBD._CERO.get());
+			nomina.setDescuento(ValoresBD._CERO.get());
+			nomina.setTotal(ValoresBD._CERO.get());
+		
+		} catch(SGPException ex){
+			throw ex;
 		} catch(Exception ex) {
 			log.error("Problema para generar la estructura básica de la nómina del empleado.");
 		}
@@ -143,27 +142,37 @@ public abstract class NominaBL {
 		return nomina;
 	}
 	
-	public BigDecimal calculoSDI(DetEmpleado empleado) {
-		BigDecimal sdi = null;
+	public static BigDecimal calculoSDI(DetEmpleado empleado, ParametrosNomina parametros) {
+		BigDecimal salarioDiarioIntegrado = null;
     	BigDecimal diasAguinaldo = null;
     	BigDecimal diasVacaciones = null;
     	BigDecimal primaVacacional = null;
     	BigDecimal diasAnio = null;
-    	BigDecimal sueldoDiario = null;
+    	BigDecimal salarioDiario = null;
     	BigDecimal factorSDI = null;
     	
+    	VacacionesDAO vacacionesDAO = null;
     	DetVacaciones periodoVacacional = null;
     	
     	try {
-    		diasAnio = new BigDecimal(DIAS_ANIO).setScale(2, BigDecimal.ROUND_HALF_UP);
-    		diasAguinaldo = this.empleado.getDatoEmpresa().getDiasAguinaldo();
+    		diasAnio          = ValoresBD._DIAS_ANIO.get();
+    		diasAguinaldo     = empleado.getDatoEmpresa().getDiasAguinaldo();
+    		log.info("Dias aguinaldo: {}", diasAguinaldo);
     		
-    		periodoVacacional = vacacionesDAO.buscarPeriodoPorFecha(this.empleado.getIdEmpleado(), this.parametros.getPeriodoFin());
+    		vacacionesDAO     = new VacacionesDAO();
+    		periodoVacacional = vacacionesDAO.buscarPeriodoPorFecha(empleado.getIdEmpleado(), parametros.getPeriodoFin());
+    		diasVacaciones    = new BigDecimal(periodoVacacional.getDiasTotales())
+    				.setScale(2, BigDecimal.ROUND_HALF_UP)
+    				;
+    		log.info("Dias de vacaciones: {}", diasVacaciones);
     		
-    		diasVacaciones = new BigDecimal(periodoVacacional.getDiasTotales()).setScale(2, BigDecimal.ROUND_HALF_UP);
+    		primaVacacional   = empleado.getDatoEmpresa().getPrimaVacacional()
+    				.divide(ValoresBD._100.get())
+    				.setScale(2, BigDecimal.ROUND_HALF_UP)
+    				;
     		
-    		primaVacacional = this.empleado.getDatoEmpresa().getPrimaVacacional().divide(cien).setScale(2, BigDecimal.ROUND_HALF_UP) ;
-    		sueldoDiario = empleado.getDatoEmpresa().getSalarioDiario();
+    		salarioDiario = empleado.getDatoEmpresa().getSalarioDiario();
+    		log.info("Salario diario: {}", salarioDiario);
     		
     		factorSDI = primaVacacional
     				.multiply(diasVacaciones).setScale(4, BigDecimal.ROUND_HALF_UP)
@@ -172,13 +181,16 @@ public abstract class NominaBL {
     				.divide(diasAnio, 5, BigDecimal.ROUND_HALF_UP)
     				;
     		log.info("Factor de integración: {}", factorSDI);
-    		sdi = sueldoDiario.multiply(factorSDI).setScale(2, BigDecimal.ROUND_HALF_UP);
-    		log.info("Salario Diario Integrado: {}", sdi);
+    		
+    		salarioDiarioIntegrado = salarioDiario.multiply(factorSDI).setScale(2, BigDecimal.ROUND_HALF_UP);
+    		log.info("Salario Diario Integrado: {}", salarioDiarioIntegrado);
+    		
     	} catch(Exception ex) {
-    		sdi = BigDecimal.ZERO;
+    		log.warn("No es posible calcular el Salario Diario Integrado: {}", ex.getMessage());
+    		salarioDiarioIntegrado = ValoresBD._CERO.get();
     	}
     	
-        return sdi;
+        return salarioDiarioIntegrado;
 	}
 	
 	public static String antiguedadPeriodo(Date fechaInicio, Date fechaFin) {
@@ -220,6 +232,8 @@ public abstract class NominaBL {
 			emisor.setCodigoPostal(empresa.getCodigoPostal());
 			emisor.setRegistroPatronal(empresa.getRegistroPatronal());
 			emisor.setRegimenFiscal(empresa.getRegimenFiscal());
+			
+			log.info("Emisor: {}", emisor.getNombre());
 		} catch(Exception ex) {
 			emisor = new DetNominaEmisor();
 			emisor.setNomina(nomina);
@@ -244,9 +258,15 @@ public abstract class NominaBL {
 				throw new SGPException("El objeto DetEmpleado no esta definido.");
 			receptor.setNombre(String.format("%s %s %s", empleado.getNombre(), empleado.getPrimerAp(), empleado.getSegundoAp()).trim());
 			
+			log.info("Generando información del receptor {}", receptor.getNombre());
+			
 			if(empleado.getDatoEmpresa() == null)
 				throw new SGPException("El objeto DatoEmpresa de DetEmpleado no esta definido.");
 			receptor.setRfc(empleado.getDatoEmpresa().getRfc());
+			
+			if(empleado.getNumEmpleado() == null)
+				throw new SGPException("El número de empleado no está definido.");
+			receptor.setNumeroEmpleado(empleado.getNumEmpleado());
 			
 			if(empleado.getDomicilio() == null)
 				throw new SGPException("El objeto DetDomicilio de DetEmpleado no esta definido.");
@@ -263,25 +283,61 @@ public abstract class NominaBL {
 				throw new SGPException("El uso del CFDI del recpetor no esta definido.");
 			receptor.setUsoCfdi(parametros.getUsoCFDI());
 			
+			if(empleado.getCurp() == null)
+				throw new SGPException("La CURP del empleado no está definida.");
 			receptor.setCurp(empleado.getCurp());
 			
+			if(empleado.getDatoEmpresa().getNss() == null)
+				throw new SGPException("El número de seguridad social del empleado no está definido.");
 			receptor.setNss(empleado.getDatoEmpresa().getNss());
+			
+			if(empleado.getDatoEmpresa().getFechaIngreso() == null)
+				throw new SGPException("La fecha de ingreso del empleado no está definida");
 			receptor.setInicioRelacionLaboral(empleado.getDatoEmpresa().getFechaIngreso());
 			
+			if(empleado.getDatoEmpresa().getTipoContrato() == null)
+				throw new SGPException("El tipo de contrato del empleado no está definido.");
 			receptor.setTipoContrato(empleado.getDatoEmpresa().getTipoContrato());
+			
 			receptor.setSindicalizado(empleado.getDatoEmpresa().getSindicalizado());
+			
+			if(empleado.getDatoEmpresa().getTipoJornada() == null)
+				throw new SGPException("El tipo de jornada del empleado no está definido.");
 			receptor.setTipoJornada(empleado.getDatoEmpresa().getTipoJornada());
+			
+			if(empleado.getDatoEmpresa().getTipoRegimen() == null)
+				throw new SGPException("El tipo de régimen del empleado no está definido.");
 			receptor.setTipoRegimen(empleado.getDatoEmpresa().getTipoRegimen());
-			receptor.setNumeroEmpleado(empleado.getNumEmpleado());
+			
+			if(empleado.getDatoEmpresa().getArea() == null)
+				throw new SGPException("El área donde labora el empleado no está definida.");
 			receptor.setDepartamento(empleado.getDatoEmpresa().getArea().getDescripcion());
+			
+			if(empleado.getDatoEmpresa().getPuesto() == null)
+				throw new SGPException("El puesto donde labora el empleado no está definido.");
 			receptor.setPuesto(empleado.getDatoEmpresa().getPuesto().getDescripcion());
+			
+			if(empleado.getDatoEmpresa().getRiesgoPuesto() == null)
+				throw new SGPException("El riesgo laboral del puesto del empleado no está definido.");
 			receptor.setRiesgoPuesto(empleado.getDatoEmpresa().getRiesgoPuesto());
+			
+			if(empleado.getDatoEmpresa().getPeriodicidadPago() == null)
+				throw new SGPException("La periodicidad de pago del empleado no está definida.");
 			receptor.setPeriodicidadPago(empleado.getDatoEmpresa().getPeriodicidadPago());
+			
+			if(empleado.getDatoEmpresa().getSalarioDiario() == null)
+				throw new SGPException("El salario diario del empleado no está definido.");
 			receptor.setSalarioDiario(empleado.getDatoEmpresa().getSalarioDiario());
+			
+			if(empleado.getDatoEmpresa().getEntidadFederativa() == null)
+				throw new SGPException("La entidad federativa del empleado no está definida");
 			receptor.setEntidadFederativa(empleado.getDatoEmpresa().getEntidadFederativa());
+			
+			receptor.setSalarioDiarioIntegrado(calculoSDI(empleado, parametros));
+			
 			//TODO pendiente revisar antiguedad
 			String sAntiguedad = antiguedadSemanas(empleado.getDatoEmpresa().getFechaIngreso(), parametros.getPeriodoFin());
-			log.info("Antiguedad: {}", sAntiguedad);
+			log.debug("Antiguedad: {}", sAntiguedad);
 			receptor.setAntiguedad(sAntiguedad);
 			
 		} catch(Exception ex) {
@@ -339,6 +395,7 @@ public abstract class NominaBL {
 	throws SGPException {
 		Integer maxIndex = null;
 		DetNominaPercepcion maxP = null;
+		DetNominaPercepcionPK maxKey = null;
 		
 		if(nomina == null)
 			throw new SGPException("El objeto nómina no está definido.");
@@ -346,16 +403,16 @@ public abstract class NominaBL {
 		if(nomina.getPercepciones() == null)
 			throw new SGPException("La lista de percepciones no está definida.");
 		
-		if(percepcion.getImporteExcento() == null && percepcion.getImporteGravado() == null)
+		if(percepcion.getImporteExento() == null && percepcion.getImporteGravado() == null)
 			throw new SGPException("Debe indicar un importe (excento o gravado).");
 		
-		if(percepcion.getImporteExcento() == null)
-			percepcion.setImporteExcento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
+		if(percepcion.getImporteExento() == null)
+			percepcion.setImporteExento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
 		
 		if(percepcion.getImporteGravado() == null)
 			percepcion.setImporteGravado(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
 		
-		if(percepcion.getImporteExcento().compareTo(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP)) < 0
+		if(percepcion.getImporteExento().compareTo(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP)) < 0
 				&& percepcion.getImporteGravado().compareTo(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP)) < 0
 				)
 			throw new SGPException("Debe indicar un importe (excento o gravado).");
@@ -366,14 +423,29 @@ public abstract class NominaBL {
 		if(percepcion.getNombre().trim().equalsIgnoreCase(""))
 			throw new SGPException("Debe indicar una descripción para la percepción.");
 		
-		percepcion.setClave("FRB-" + percepcion.getTipoPercepcion().getClave() );
+		if(percepcion.getClave() == null)
+			throw new SGPException("Debe indicar una clave para la percepción.");
 		
-		maxP = Collections.max(nomina.getPercepciones(), Comparator.comparing(d -> d.getKey().getId()));
+		if(percepcion.getClave().trim().equalsIgnoreCase(""))
+			throw new SGPException("Debe indicar una clave para la percepción.");
 		
-		if(maxP.getKey().getId() == null)
+		final String clave = percepcion.getClave();
+		
+		boolean removedPercepciones = nomina.getPercepciones().removeIf(p -> p.getClave().equalsIgnoreCase(clave));
+		if(removedPercepciones)
+			log.info("Se encontraron conceptos {}, los cuales fueron eliminados de la lista de percepciones.", clave);
+		
+		try {
+			maxP = Collections.max(nomina.getPercepciones(), Comparator.comparing(p -> p.getKey().getId()));
+			maxKey = maxP.getKey();
+		} catch(NoSuchElementException ex) {
+			maxKey = new DetNominaPercepcionPK(nomina, -1);
+		}
+		
+		if(maxKey.getId() == null)
 			throw new SGPException("Existen elementos de \"Percepciones\" que no tienen asignado un consecutivo");
 		
-		maxIndex = maxP.getKey().getId() + 1;
+		maxIndex = maxKey.getId() + 1;
 		percepcion.getKey().setId(maxIndex);
 		nomina.getPercepciones().add(percepcion);
 	}
@@ -501,12 +573,12 @@ public abstract class NominaBL {
 		AjusteAlNetoOtroPago opAjusteNetoBO = null;
 		DetNominaOtroPago opAjusteAlNeto = null;
 		
-		AjusteAlNetoDeduccion dAjusteNetoBO = null;
+		AjusteAlNetoDBL dAjusteNetoBO = null;
 		DetNominaDeduccion dAjusteAlNeto = null;
     	
     	//Buscar el ajuste al neto (como Otro pago o Deduccion).
     	Optional<DetNominaDeduccion> dOpt = nomina.getDeducciones().stream()
-    			.filter(d -> AbstractDeduccion.CVE_AJUSTE_AL_NETO.equalsIgnoreCase(d.getClave()))
+    			.filter(d -> AbstractDBL.CVE_AJUSTE_AL_NETO.equalsIgnoreCase(d.getClave()))
     			.findFirst()
     			;
     	
@@ -528,38 +600,46 @@ public abstract class NominaBL {
     	
     	
     	totalPercepciones = nomina.getPercepciones().stream()
-				.map(item -> item.getImporteExcento().add(item.getImporteGravado()))
-				.reduce(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP), BigDecimal :: add)
+				.map(item -> item.getImporteExento().add(item.getImporteGravado()))
+				.reduce(ValoresBD._CERO.get(), BigDecimal :: add)
 		;
     	
     	totalOtrosPagos = nomina.getOtrosPagos().stream()
 				.filter(o -> o.getProcesar())
 				.map(item -> item.getImporte())
-				.reduce(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP), BigDecimal :: add)
+				.reduce(ValoresBD._CERO.get(), BigDecimal :: add)
 				;
     	
     	totalDeducciones = nomina.getDeducciones().stream()
 				.filter(d -> d.getProcesar())
 				.map(item -> item.getImporte())
-				.reduce(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP), BigDecimal::add)
+				.reduce(ValoresBD._CERO.get(), BigDecimal::add)
 				;
     	
-    	previoNeto = totalPercepciones.add(totalOtrosPagos).subtract(totalDeducciones).setScale(1, BigDecimal.ROUND_HALF_UP).setScale(2, BigDecimal.ROUND_HALF_UP);
-		neto = totalPercepciones.add(totalOtrosPagos).subtract(totalDeducciones).setScale(2, BigDecimal.ROUND_HALF_UP);
+    	previoNeto = totalPercepciones
+    			.add(totalOtrosPagos)
+    			.subtract(totalDeducciones)
+    			//IMPORTANTE REDONDEAR A 1 DECIMAL
+    			.setScale(1, BigDecimal.ROUND_HALF_UP).setScale(2, BigDecimal.ROUND_HALF_UP);
+		
+    	neto = totalPercepciones
+    			.add(totalOtrosPagos)
+    			.subtract(totalDeducciones)
+    			//IMPORTANTE REDONDEAR A 2 DECIMALES.
+    			.setScale(2, BigDecimal.ROUND_HALF_UP);
 		ajusteAlNeto = previoNeto.subtract(neto);
 		
 		total = neto.add(ajusteAlNeto);
 		
-		if(ajusteAlNeto.compareTo(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP)) < 0 ) {
+		if(ajusteAlNeto.compareTo(ValoresBD._CERO.get()) < 0 ) {
 			
-			DetNominaDeduccion maxD = Collections.max(nomina.getDeducciones(), Comparator.comparing(d -> d.getKey().getId()));
-			dAjusteNetoBO = new AjusteAlNetoDeduccion(ajusteAlNeto.abs());
+			dAjusteNetoBO = new AjusteAlNetoDBL(ajusteAlNeto.abs());
 			dAjusteNetoBO.setTiposDeduccion(parametros.getTiposDeduccion());
-			dAjusteAlNeto = dAjusteNetoBO.calcular(nomina, maxD.getKey().getId() + 1);
+			dAjusteAlNeto = dAjusteNetoBO.calcular(nomina);
 			nomina.getDeducciones().add(dAjusteAlNeto);
 			log.info("Aplicando ajuste al neto como deduccion: {}", dAjusteAlNeto);
 			
-		} else if(ajusteAlNeto.compareTo(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP)) > 0) {
+		} else if(ajusteAlNeto.compareTo(ValoresBD._CERO.get()) > 0) {
 			
 			Integer index = null;
 			opAjusteNetoBO = new AjusteAlNetoOtroPago(ajusteAlNeto);
@@ -573,21 +653,21 @@ public abstract class NominaBL {
     	
     	log.info("Actualizando {}", nomina);
 		totalPercepciones = nomina.getPercepciones().stream()
-				.map(item -> item.getImporteExcento().add(item.getImporteGravado()))
-				.reduce(BigDecimal.ZERO, BigDecimal :: add);
+				.map(item -> item.getImporteExento().add(item.getImporteGravado()))
+				.reduce(ValoresBD._CERO.get(), BigDecimal :: add);
 		
 		totalOtrosPagos = nomina.getOtrosPagos().stream()
 				.filter(o -> o.getProcesar())
 				.map(item -> item.getImporte())
-				.reduce(BigDecimal.ZERO, BigDecimal :: add);
+				.reduce(ValoresBD._CERO.get(), BigDecimal :: add);
 		
 		totalDeducciones = nomina.getDeducciones().stream()
 				.filter(d -> d.getProcesar())
 				.map(item -> item.getImporte())
-				.reduce(BigDecimal.ZERO, BigDecimal :: add);
+				.reduce(ValoresBD._CERO.get(), BigDecimal :: add);
 		
-		subtotal = BigDecimal.ZERO.add(totalPercepciones).add(totalOtrosPagos);
-		descuentos = BigDecimal.ZERO.add(totalDeducciones);
+		subtotal = ValoresBD._CERO.get().add(totalPercepciones).add(totalOtrosPagos);
+		descuentos = ValoresBD._CERO.get().add(totalDeducciones);
 		total = subtotal.subtract(descuentos);
 		
 		log.info("Subtotal recalculado: {}", subtotal);

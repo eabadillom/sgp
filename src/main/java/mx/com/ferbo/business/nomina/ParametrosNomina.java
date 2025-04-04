@@ -20,10 +20,12 @@ import mx.com.ferbo.dao.n.UsoCFDIDAO;
 import mx.com.ferbo.dao.n.sat.TipoPercepcionDAO;
 import mx.com.ferbo.model.CatCuotaIMSS;
 import mx.com.ferbo.model.CatDiaNoLaboral;
+import mx.com.ferbo.model.CatEmpresa;
 import mx.com.ferbo.model.CatEstatusRegistro;
 import mx.com.ferbo.model.CatPeriodicidadPago;
 import mx.com.ferbo.model.CatTarifaISR;
 import mx.com.ferbo.model.CatUMA;
+import mx.com.ferbo.model.DetNominaPeriodo;
 import mx.com.ferbo.model.sat.CatConcepto;
 import mx.com.ferbo.model.sat.CatMetodoPago;
 import mx.com.ferbo.model.sat.CatRegimenFiscal;
@@ -37,7 +39,7 @@ import mx.com.ferbo.util.DateUtil;
 public class ParametrosNomina {
 	
 	private Integer anio         = null;
-	private Integer semanaAnio   = null;
+	private Integer periodo      = null;
 	private Integer diasPeriodo  = null;
 	
 	private Date periodoInicio   = null;
@@ -45,6 +47,7 @@ public class ParametrosNomina {
 	private Date fechaInicioAnio = null;
 	private Date fechaFinAnio    = null;
 	
+	private CatEmpresa               empresa                = null;
 	private CatUMA                   uma                    = null;
 	private CatMetodoPago            metodoPago             = null;
 	private CatConcepto              concepto               = null;
@@ -99,23 +102,58 @@ public class ParametrosNomina {
 		this.statusRegistroDAO = new EstatusRegistroDAO();
 	}
 	
-	public void cargar(Date periodoInicio, Date periodoFin) {
-		//Cálculo de fechas importantes del periodo de pago de nómina.
-		this.anio            = DateUtil.getAnio(periodoFin);
+	public void cargar(DetNominaPeriodo nominaPeriodo) {
+		this.periodoInicio = DateUtil.toDate(nominaPeriodo.getPeriodoInicio());
+		this.periodoFin = DateUtil.toDate(nominaPeriodo.getPeriodoFin());
 		this.fechaInicioAnio = DateUtil.getFirstDayOfyear(periodoFin);
 		this.fechaFinAnio    = DateUtil.getLastDayOfYear(periodoFin);
-		this.periodoInicio   = new Date(periodoInicio.getTime());
-		this.periodoFin      = new Date(periodoFin.getTime());
-		this.diasNoLaborales = this.diaNLDAO.buscarPorPeriodo("MX", periodoInicio, periodoFin);
-		this.semanaAnio      = DateUtil.getSemanaAnio(this.periodoInicio);
+		
+		this.anio            = nominaPeriodo.getKey().getAnio();
+		this.periodo         = nominaPeriodo.getKey().getPeriodo();
 		this.diasPeriodo     = DateUtil.daysDiff(periodoInicio, periodoFin);
+		this.diasNoLaborales = this.diaNLDAO.buscarPorPeriodo("MX", periodoInicio, periodoFin);
+		this.empresa         = nominaPeriodo.getKey().getEmpresa();
 		
 		//Catálogos SAT
+		this.periodicidad    = nominaPeriodo.getKey().getPeriodicidad();
 		this.tablaISR               = this.tarifaISRDAO.buscar(this.fechaInicioAnio, this.fechaFinAnio);
 		this.metodoPago             = this.metodoPagoDAO.buscarPorId("PUE");
 		this.concepto               = this.conceptoDAO.buscarPorId("84111505");
 		this.unidadSAT              = this.unidadSATDAO.buscarPorId("ACT");
+		this.regimenFiscalReceptor  = this.regimenFiscalDAO.buscarPorId("605");
+		this.usoCFDI                = this.usoCfdiDAO.buscarPorId("CN01");
+		this.tiposPercepcion        = this.tipoPercepcionDAO.buscarTodos();
+		this.tiposDeduccion         = this.tipoDeduccionDAO.buscarTodos();
+		this.cuotasIMSS             = this.cuotasIMSSDAO.buscarPorPeriodo(periodoFin);
+		this.tiposOtroPago          = this.tipoOtroPagoDAO.buscarTodos();
+		this.uma                    = this.umaDAO.buscarVigentePorFecha(DateUtil.toLocalDate(periodoFin));
+		
+		//Status de registro de asistencia
+		this.statusRegistros        = this.statusRegistroDAO.buscarTodos();
+		
+		//TODO Temporalmente se movieron las tasas de bono de puntualidad y vales de despensa a esta clase, sin embargo, deben parametrizarse en otro lugar.
+		this.bonoPuntualidad        = new BigDecimal("0.1").setScale(2, BigDecimal.ROUND_HALF_UP);
+		this.valeDespensa           = new BigDecimal("0.4").setScale(2, BigDecimal.ROUND_HALF_UP);
+	}
+	
+	public void cargar(Date periodoInicio, Date periodoFin) {
+		//Cálculo de fechas importantes del periodo de pago de nómina.
+		this.periodoInicio   = new Date(periodoInicio.getTime());
+		this.periodoFin      = new Date(periodoFin.getTime());
+		this.fechaInicioAnio = DateUtil.getFirstDayOfyear(periodoFin);
+		this.fechaFinAnio    = DateUtil.getLastDayOfYear(periodoFin);
+		
+		this.anio            = DateUtil.getAnio(periodoFin);
+		this.periodo         = DateUtil.getSemanaAnio(this.periodoInicio);
+		this.diasPeriodo     = DateUtil.daysDiff(periodoInicio, periodoFin);
+		this.diasNoLaborales = this.diaNLDAO.buscarPorPeriodo("MX", periodoInicio, periodoFin);
+		
+		//Catálogos SAT
 		this.periodicidad           = this.periodicidadDAO.buscarPorId("02");
+		this.tablaISR               = this.tarifaISRDAO.buscar(this.fechaInicioAnio, this.fechaFinAnio);
+		this.metodoPago             = this.metodoPagoDAO.buscarPorId("PUE");
+		this.concepto               = this.conceptoDAO.buscarPorId("84111505");
+		this.unidadSAT              = this.unidadSATDAO.buscarPorId("ACT");
 		this.regimenFiscalReceptor  = this.regimenFiscalDAO.buscarPorId("605");
 		this.usoCFDI                = this.usoCfdiDAO.buscarPorId("CN01");
 		this.tiposPercepcion        = this.tipoPercepcionDAO.buscarTodos();
@@ -204,8 +242,8 @@ public class ParametrosNomina {
 		return anio;
 	}
 
-	public Integer getSemanaAnio() {
-		return semanaAnio;
+	public Integer getPeriodo() {
+		return periodo;
 	}
 
 	public Integer getDiasPeriodo() {
@@ -218,6 +256,10 @@ public class ParametrosNomina {
 	
 	public BigDecimal getBonoPuntualidad() {
 		return bonoPuntualidad;
+	}
+
+	public CatEmpresa getEmpresa() {
+		return empresa;
 	}
 	
 }

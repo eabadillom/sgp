@@ -11,7 +11,7 @@ public class NominaPercepcion {
 	private String clave;
 	private String nombre;
 	private BigDecimal importeGravado;
-	private BigDecimal importeExcento;
+	private BigDecimal importeExento;
 	
 	public NominaPercepcionPK getKey() {
 		return key;
@@ -44,11 +44,11 @@ public class NominaPercepcion {
 	public void setImporteGravado(BigDecimal importeGravado) {
 		this.importeGravado = importeGravado;
 	}
-	public BigDecimal getImporteExcento() {
-		return importeExcento;
+	public BigDecimal getImporteExento() {
+		return importeExento;
 	}
-	public void setImporteExcento(BigDecimal importeExcento) {
-		this.importeExcento = importeExcento;
+	public void setImporteExento(BigDecimal importeExento) {
+		this.importeExento = importeExento;
 	}
 	@Override
 	public int hashCode() {
@@ -68,6 +68,6 @@ public class NominaPercepcion {
 	@Override
 	public String toString() {
 		return "NominaPercepcionDTO [key=" + key + ", clave=" + clave + ", nombre=" + nombre + ", importeGravado="
-				+ importeGravado + ", importeExcento=" + importeExcento + "]";
+				+ importeGravado + ", importeExcento=" + importeExento + "]";
 	}
 }

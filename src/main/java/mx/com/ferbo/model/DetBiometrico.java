@@ -23,8 +23,8 @@ import javax.persistence.TemporalType;
 @Table(name = "det_biometrico")
 @NamedQueries({
     @NamedQuery(name = "DetBiometrico.findAll", query = "SELECT d FROM DetBiometrico d"),
-    @NamedQuery(name = "DetBiometrico.findByNumeroEmpleado", query = "SELECT d FROM DetBiometrico d INNER JOIN d.idEmpleado e WHERE e.numEmpleado = :numeroEmpleado"),
-    @NamedQuery(name = "DetBiometrico.findByIdEmpleado", query = "SELECT d FROM DetBiometrico d WHERE d.idEmpleado.idEmpleado = :idEmpleado")
+    @NamedQuery(name = "DetBiometrico.findByNumeroEmpleado", query = "SELECT d FROM DetBiometrico d INNER JOIN d.empleado e WHERE e.numEmpleado = :numeroEmpleado"),
+    @NamedQuery(name = "DetBiometrico.findByIdEmpleado", query = "SELECT d FROM DetBiometrico d WHERE d.empleado.idEmpleado = :idEmpleado")
 })
 public class DetBiometrico implements Serializable {
 
@@ -50,7 +50,7 @@ public class DetBiometrico implements Serializable {
     
     @JoinColumn(name = "id_empleado", referencedColumnName = "id_empleado")
     @OneToOne(optional = false)
-    private DetEmpleado idEmpleado;
+    private DetEmpleado empleado;
 
     public DetBiometrico() {
     }
@@ -106,12 +106,12 @@ public class DetBiometrico implements Serializable {
         this.huella2 = huella2;
     }
 
-    public DetEmpleado getIdEmpleado() {
-        return idEmpleado;
+    public DetEmpleado getEmpleado() {
+        return empleado;
     }
 
-    public void setIdEmpleado(DetEmpleado idEmpleado) {
-        this.idEmpleado = idEmpleado;
+    public void setEmpleado(DetEmpleado empleado) {
+        this.empleado = empleado;
     }
 
 	@Override

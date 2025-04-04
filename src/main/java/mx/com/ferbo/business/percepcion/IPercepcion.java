@@ -4,5 +4,5 @@ import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
 
 public interface IPercepcion {
-	public void calcular(DetNomina nomina);
+	public DetNominaPercepcion calcular(DetNomina nomina);
 }

@@ -1,0 +1,54 @@
+package mx.com.ferbo.business.percepcion;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import mx.com.ferbo.business.nomina.ParametrosNomina;
+import mx.com.ferbo.enums.ValoresBD;
+import mx.com.ferbo.model.DetNomina;
+import mx.com.ferbo.model.DetNominaPercepcion;
+
+public class VacacionesPBL extends AbstractPBL implements IPercepcion {
+	
+	private static Logger log = LogManager.getLogger(VacacionesPBL.class);
+	
+	private BigDecimal diasVacaciones = null;
+	
+	public VacacionesPBL(ParametrosNomina parametros, BigDecimal diasVacaciones) {
+		this.tiposPercepcion = parametros.getTiposPercepcion();
+		this.diasVacaciones = diasVacaciones;
+	}
+
+	@Override
+	public DetNominaPercepcion calcular(DetNomina nomina) {
+		DetNominaPercepcion percepcion = null;
+		BigDecimal salarioDiario = null;
+		BigDecimal cantidad = null;
+		BigDecimal salarioVacaciones = null;
+		List<DetNominaPercepcion> percepciones = null;
+		
+		try {
+			percepciones = nomina.getPercepciones();
+			salarioDiario = nomina.getReceptor().getSalarioDiario();
+			
+			salarioVacaciones = salarioDiario
+					.multiply(diasVacaciones)
+					.setScale(2, BigDecimal.ROUND_HALF_UP);
+			
+			cantidad = diasVacaciones.setScale(2, BigDecimal.ROUND_HALF_UP);
+			
+		} catch(Exception ex) {
+			salarioVacaciones = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+			cantidad = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+		} finally {
+			percepcion = this.build(nomina, CVE_VACACIONES_EN_TIEMPO, cantidad, ValoresBD._CERO.get(), salarioVacaciones);
+		}
+		
+		return percepcion;
+
+	}
+
+}
