@@ -85,7 +85,7 @@
                                 <h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{empleado.nombre}" />
                             </p:column>
                             <p:column width="6rem">
-                                <p:commandButton styleClass="edit-button m-1" action="#{registroEmpleadosBean.editar}" process="@this" update=":form:panelDialogEmpleado form:panelDialogEmpleado:previewFingerprint1" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dialogEmpleado').show();" icon="pi pi-pencil">
+                                <p:commandButton styleClass="edit-button m-1" action="#{registroEmpleadosBean.editar}" process="@this" update="form:panelDialogEmpleado form:panelDialogEmpleado:previewFingerprint1" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dialogEmpleado').show();" icon="pi pi-pencil">
                                     <f:setPropertyActionListener value="#{empleado}" target="#{registroEmpleadosBean.empleado}" />
                                 </p:commandButton>
                                 <p:commandButton class="ui-button-danger m-1" icon="pi pi-times" process="@this" actionListener="#{registroEmpleadosBean.validarEmpleado(empleado)}" oncomplete="PF('dg-eliminarEmpleado').show()" update=":form:dg-eliminarEmpleado" >
