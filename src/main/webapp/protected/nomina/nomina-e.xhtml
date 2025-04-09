@@ -91,10 +91,21 @@
 				</div>
 				<div class="field col-12 md:col-2">
 					<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
-					<p:commandButton value="Empleados" process="@this" update="form:acc" actionListener="#{nominaE.calcularNomina()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
+					<p:commandButton value="Empleados" process="@this" update="form:acc" actionListener="#{nominaE.cargarEmpleados()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
 				</div>
 			</div>
-			
+			<div style="padding-top: 0.5rem; padding-bottom: 0.5rem;">
+				<p:toolbar>
+					<p:toolbarGroup>
+						<div style="padding-left: 0.5rem; padding-right: 0.5rem;">
+							<p:commandButton icon="pi pi-plus" value="Percepciones" process="@this" actionListener="#{nominaE.nuevaPercepcion()}" update="form:pnl-add-percepcion" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dlgPercepcionAll').show();"/>
+						</div>
+						<div style="padding-left: 0.5rem; padding-right: 0.5rem;">
+							<p:commandButton icon="pi pi-minus" value="Deducciones" />
+						</div>
+					</p:toolbarGroup>
+				</p:toolbar>
+			</div>
 			<p:accordionPanel id="acc">
 				
 				<p:tab title="Lista de empleados (#{nominaE.listaNomina.size()})">
@@ -163,27 +174,18 @@
 						</p:columnGroup>
 					</p:dataTable>
 				</p:tab>
-				<p:tab id="toolbar" title="Configurar conceptos">
-					<div class="ui-fluid formgrid grid align-items-left">
-						<div class="field col-12 md:col-2">
-							<p:commandButton icon="pi pi-plus" value="Percepciones" process="@this" actionListener="#{nominaE.nuevaPercepcion()}" update="form:pnl-add-percepcion" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dlgPercepcionAll').show();"/>
-						</div>
-						<div class="field col-12 md:col-2">
-							<p:commandButton icon="pi pi-minus" value="Deducciones" />
-						</div>
-					</div>
-				</p:tab>
 			</p:accordionPanel>
 			<p:dialog id="dlg-percepcion-all" widgetVar="dlgPercepcionAll" header="Agregar percepción" modal="true" responsive="true" position="center top" height="100%" resizable="false" showEffect="fade" hideEffect="fade">
 				
 				<p:outputPanel id="pnl-add-percepcion" styleClass="ui-fluid" rendered="#{nominaE.nomPercepcion ne null}">
-					<p:outputLabel value="Percepciones" />
+					<p:outputLabel value="Catálogo de percepciones" />
 					<p:selectOneMenu id="percepcion" value="#{nominaE.percepcion}" filter="true" filterMatchMode="contains" filterPlaceholder="Concepto" converter="entityConverter">
 						<f:selectItem itemLabel="--Seleccione--" noSelectionOption="true" />
 						<f:selectItems value="#{nominaE.percepciones}" var="percepcion" itemLabel="#{percepcion.nombre}" itemValue="#{percepcion}" />
 						<p:ajax process="@this" event="change" update="tipoPercepcion nombrePercepcion cantidad importeExento importeGravado" listener="#{nominaE.setTipoPercepcion()}"/>
 					</p:selectOneMenu>
-					<p:separator/>
+					<p:separator />
+					<p:separator />
 					<p:outputLabel value="Descripción" />
 					<p:inputText id="nombrePercepcion" value="#{nominaE.nomPercepcion.nombre}">
 						<p:ajax process="@this" />
@@ -339,6 +341,35 @@
 								</div>
 							</div>
 						</p:outputPanel>
+					</p:tab>
+					<p:tab title="Periodos vacacionales">
+						<p:dataTable value="#{nominaE.nomina.vacaciones}" var="periodo" paginator="true" rows="5" paginatorPosition="bottom">
+							<p:column headerText="Inicio">
+								<p:outputLabel value="#{periodo.fechaInicio}">
+									<f:convertDateTime pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6" />
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Fin">
+								<p:outputLabel value="#{periodo.fechaFin}">
+									<f:convertDateTime pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6" />
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Dias totales">
+								<p:outputLabel value="#{periodo.diasTotales}" />
+							</p:column>
+							<p:column headerText="Dias tomados">
+								<p:outputLabel value="#{periodo.diasTomados}" />
+							</p:column>
+							<p:column headerText="Dias pendientes">
+								<p:outputLabel value="#{periodo.diasTotales - periodo.diasPagados}" />
+							</p:column>
+							<p:column headerText="Prima vacacional">
+								<p:outputLabel value="#{periodo.primaPagada ? 'SI' : 'NO'}" />
+							</p:column>
+							<p:column headerText="Vac. Reportadas">
+								<p:outputLabel value="#{periodo.diasPendientesPagados ? 'SI' : 'NO'}" />
+							</p:column>
+						</p:dataTable>
 					</p:tab>
 					<p:tab title="Percepciones">
 						<!-- <p:toolbar>

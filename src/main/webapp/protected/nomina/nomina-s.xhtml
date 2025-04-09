@@ -263,6 +263,18 @@
 									<p:inputText value="#{nominaS.nomina.receptor.codigoPostal}" readonly="true"/>
 								</div>
 								<div class="field col-12 md:col-3">
+									<p:outputLabel value="Dias de vacaciones" />
+									<p:inputNumber value="#{nominaS.nomina.receptor.diasVacaciones}" symbol=" días" symbolPosition="s" inputStyle="text-align: right" readonly="true"/>
+								</div>
+								<div class="field col-12 md:col-3">
+									<p:outputLabel value="Prima vacacional" />
+									<p:inputNumber value="#{nominaS.nomina.receptor.primaVacacional}" symbol=" %" symbolPosition="s" inputStyle="text-align: right" readonly="true"/>
+								</div>
+								<div class="field col-12 md:col-3">
+									<p:outputLabel value="Dias de aguinaldo" />
+									<p:inputNumber value="#{nominaS.nomina.receptor.diasAguinaldo}" symbol=" días" symbolPosition="s" inputStyle="text-align: right" readonly="true"/>
+								</div>
+								<div class="field col-12 md:col-3">
 									<p:outputLabel value="Salario diario" />
 									<p:inputNumber value="#{nominaS.nomina.receptor.salarioDiario}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," inputStyle="text-align: right" readonly="true"/>
 								</div>

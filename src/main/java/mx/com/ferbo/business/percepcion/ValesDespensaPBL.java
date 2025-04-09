@@ -13,6 +13,11 @@ import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.util.SGPException;
 
+/** Esta implementación del cálculo de vales de despensa tiene como base la UMA, para determinar de manera
+ * general a todos los trabajadores la misma cantidad otorgada como apoyo de vales de despensa.
+ * Se otorga el 40% de la UMA diaria, por cada día trabajado de la semana + el proporcional del septimo día.
+*
+*/
 public class ValesDespensaPBL extends AbstractPBL implements IPercepcion {
 	
 	private static Logger log = LogManager.getLogger(ValesDespensaPBL.class);
@@ -44,6 +49,22 @@ public class ValesDespensaPBL extends AbstractPBL implements IPercepcion {
 		BigDecimal importeExento = null;
 		
 		try {
+			/* El importe de los vales de despensa estarán excluidos del
+			 * cálculo del Salario Base de Cotización (IMSS) siempre y cuando
+			 * no superen el 40% de la UMA mensual (se debe revisar el ajuste
+			 * a UMA diaria o semanal, para una correcta aplicación del
+			 * criterio).
+			 * 
+			 * En caso de exceder el valor deL 40% de la UMA, la diferencia
+			 * se calculará de manera diaria y se sumará al SBC.
+			 * */
+			//TODO Pendiente aplicar criterio de excención para SBC.
+			
+			
+			
+			
+			
+			//Cálculo de importes exento y gravado (para LISR, Art. 93, parrafo penultimo).
     		if(this.diasTrabajados.compareTo(BigDecimal.ZERO) == 0)
     			throw new SGPException("No es posible asignar vales de despensa.");
     		

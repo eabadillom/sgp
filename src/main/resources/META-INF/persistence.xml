@@ -8,7 +8,6 @@
         <class>mx.com.ferbo.model.CatEmpresa</class>
         <class>mx.com.ferbo.model.CatEstatusIncidencia</class>
         <class>mx.com.ferbo.model.CatEstatusRegistro</class>
-        <class>mx.com.ferbo.model.CatImssCuotas</class>
         <class>mx.com.ferbo.model.CatPerfil</class>
         <class>mx.com.ferbo.model.CatPlanta</class>
         <class>mx.com.ferbo.model.CatPrenda</class>

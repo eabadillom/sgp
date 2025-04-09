@@ -163,7 +163,10 @@ public class NominaExtraordinariaBean implements Serializable {
     	if(nomina == null)
     		return "";
     	
-        return ManageStatus.getEstadoEmpleadoEmpresa((nomina.getId() == null ? (short) 2 : (short) 1));
+    	if(nomina.getPercepciones().size() > 0)
+    		return ManageStatus.getEstadoEmpleadoEmpresa((short) 1);
+    	
+    	return ManageStatus.getEstadoEmpleadoEmpresa((short) 2);
     }
     
     public void calculaPeriodo() {
@@ -186,7 +189,7 @@ public class NominaExtraordinariaBean implements Serializable {
 		}
     }
     
-    public void calcularNomina() {
+    public void cargarEmpleados() {
     	FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
@@ -277,7 +280,7 @@ public class NominaExtraordinariaBean implements Serializable {
     
     public void nuevaPercepcion() {
     	log.info("Agregando nueva percepcion...");
-    	
+    	this.percepcion = null;
     	this.nomPercepcion = PercepcionBL.build();
     	log.info("Percepcion: {}", this.nomPercepcion);
     	
@@ -305,8 +308,27 @@ public class NominaExtraordinariaBean implements Serializable {
     }
     
     public void calcularPercepciones() {
-    	//TODO validar parametros del dialog de percepcion.
+    	FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Nómina";
+    	
+    	
     	try {
+    		//TODO validar parametros del dialog de percepcion.
+    		
+    		if(this.listaNominaSelected.size() == 0)
+    			throw new SGPException("Debe seleccionar al menos un empleado.");
+    		
+    		if(this.percepcion == null)
+    			throw new SGPException("Debe seleccionar una percepción");
+    		
+    		if(this.percepcion.getClave() == null)
+    			throw new SGPException("Debe indicar la clave de la percepción");
+    		
+    		if(this.percepcion.getNombre() == null)
+    			throw new SGPException("Debe indicar el nombre de la percepción");
+    		
     		log.info("Percepcion: {}", this.nomPercepcion);
     		if(this.nominaBO == null)
     			this.nominaBO = new NominaExtraordinariaBL(this.parametros);
@@ -315,8 +337,21 @@ public class NominaExtraordinariaBean implements Serializable {
 	    		log.info("Agregando percepción al empleado: {}", nomina.getReceptor().getNombre());
 	    		this.nominaBO.calcular(nomina, this.nomPercepcion);
 	    	}
+	    	
+	    	
+	    	mensaje = "La percepción se agregó a los empleados seleccionados.";
+    		severity = FacesMessage.SEVERITY_INFO;
+    	} catch (SGPException ex) {
+    		mensaje = ex.getMessage();
+    		severity = FacesMessage.SEVERITY_WARN;
     	} catch (Exception ex) {
     		log.error("Ocurrió un problema al calcular la nómina de los empleados seleccionados...", ex);
+    		mensaje = "Hay un problema para procesar la nómina.";
+    		severity = FacesMessage.SEVERITY_ERROR;
+    	} finally {
+    		message = new FacesMessage(severity, titulo, mensaje);
+    		FacesContext.getCurrentInstance().addMessage(null, message);
+    		PrimeFaces.current().ajax().update(":form:messages", "form:add:dtNomina");
     	}
     }
     

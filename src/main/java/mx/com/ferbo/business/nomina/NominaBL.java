@@ -142,43 +142,41 @@ public abstract class NominaBL {
 		return nomina;
 	}
 	
-	public static BigDecimal calculoSDI(DetEmpleado empleado, ParametrosNomina parametros) {
-		BigDecimal salarioDiarioIntegrado = null;
-    	BigDecimal diasAguinaldo = null;
-    	BigDecimal diasVacaciones = null;
-    	BigDecimal primaVacacional = null;
-    	BigDecimal diasAnio = null;
-    	BigDecimal salarioDiario = null;
-    	BigDecimal factorSDI = null;
-    	
-    	VacacionesDAO vacacionesDAO = null;
+	public static BigDecimal calculoVacacionesSDI(DetEmpleado empleado, ParametrosNomina parametros) {
+		BigDecimal diasVacaciones = null;
+		
+		VacacionesDAO vacacionesDAO = null;
     	DetVacaciones periodoVacacional = null;
     	
     	try {
-    		diasAnio          = ValoresBD._DIAS_ANIO.get();
-    		diasAguinaldo     = empleado.getDatoEmpresa().getDiasAguinaldo();
-    		log.info("Dias aguinaldo: {}", diasAguinaldo);
-    		
     		vacacionesDAO     = new VacacionesDAO();
     		periodoVacacional = vacacionesDAO.buscarPeriodoPorFecha(empleado.getIdEmpleado(), parametros.getPeriodoFin());
     		diasVacaciones    = new BigDecimal(periodoVacacional.getDiasTotales())
     				.setScale(2, BigDecimal.ROUND_HALF_UP)
     				;
     		log.info("Dias de vacaciones: {}", diasVacaciones);
+    	} catch(Exception ex) {
     		
-    		primaVacacional   = empleado.getDatoEmpresa().getPrimaVacacional()
-    				.divide(ValoresBD._100.get())
-    				.setScale(2, BigDecimal.ROUND_HALF_UP)
-    				;
+    	}
+		
+		return diasVacaciones;
+	}
+		
+	
+	public static BigDecimal calculoSDI(BigDecimal salarioDiario, BigDecimal diasAguinaldo, BigDecimal diasVacaciones, BigDecimal primaVacacional) {
+		BigDecimal salarioDiarioIntegrado = null;
+    	BigDecimal factorSDI = null;
+    	
+    	try {
+    		log.info("Dias aguinaldo: {}", diasAguinaldo);
     		
-    		salarioDiario = empleado.getDatoEmpresa().getSalarioDiario();
     		log.info("Salario diario: {}", salarioDiario);
     		
     		factorSDI = primaVacacional
     				.multiply(diasVacaciones).setScale(4, BigDecimal.ROUND_HALF_UP)
     				.add(diasAguinaldo)
-    				.add(diasAnio)
-    				.divide(diasAnio, 5, BigDecimal.ROUND_HALF_UP)
+    				.add(ValoresBD._DIAS_ANIO.get())
+    				.divide(ValoresBD._DIAS_ANIO.get(), 5, BigDecimal.ROUND_HALF_UP)
     				;
     		log.info("Factor de integración: {}", factorSDI);
     		
@@ -244,6 +242,12 @@ public abstract class NominaBL {
 	
 	public static DetNominaReceptor getReceptor(DetNomina nomina, ParametrosNomina parametros, DetEmpleado empleado) {
 		DetNominaReceptor receptor = null;
+		BigDecimal salarioDiario = null;
+		BigDecimal diasAguinaldo = null;
+		BigDecimal diasVacaciones = null;
+		BigDecimal primaVacacional = null;
+		BigDecimal sdi = null;
+		
 		try {
 			if(nomina == null)
 				throw new SGPException("El objeto DetNomina no esta definido.");
@@ -259,6 +263,13 @@ public abstract class NominaBL {
 			receptor.setNombre(String.format("%s %s %s", empleado.getNombre(), empleado.getPrimerAp(), empleado.getSegundoAp()).trim());
 			
 			log.info("Generando información del receptor {}", receptor.getNombre());
+			
+			salarioDiario = empleado.getDatoEmpresa().getSalarioDiario();
+			diasAguinaldo = empleado.getDatoEmpresa().getDiasAguinaldo();
+			diasVacaciones = calculoVacacionesSDI(empleado, parametros);
+			primaVacacional = empleado.getDatoEmpresa().getPrimaVacacional()
+					.divide(ValoresBD._100.get())
+					.setScale(2, BigDecimal.ROUND_HALF_UP);
 			
 			if(empleado.getDatoEmpresa() == null)
 				throw new SGPException("El objeto DatoEmpresa de DetEmpleado no esta definido.");
@@ -292,7 +303,7 @@ public abstract class NominaBL {
 			receptor.setNss(empleado.getDatoEmpresa().getNss());
 			
 			if(empleado.getDatoEmpresa().getFechaIngreso() == null)
-				throw new SGPException("La fecha de ingreso del empleado no está definida");
+				throw new SGPException("La fecha de ingreso del empleado no está definida.");
 			receptor.setInicioRelacionLaboral(empleado.getDatoEmpresa().getFechaIngreso());
 			
 			if(empleado.getDatoEmpresa().getTipoContrato() == null)
@@ -327,18 +338,29 @@ public abstract class NominaBL {
 			
 			if(empleado.getDatoEmpresa().getSalarioDiario() == null)
 				throw new SGPException("El salario diario del empleado no está definido.");
-			receptor.setSalarioDiario(empleado.getDatoEmpresa().getSalarioDiario());
+			receptor.setSalarioDiario(salarioDiario);
 			
 			if(empleado.getDatoEmpresa().getEntidadFederativa() == null)
 				throw new SGPException("La entidad federativa del empleado no está definida");
 			receptor.setEntidadFederativa(empleado.getDatoEmpresa().getEntidadFederativa());
 			
-			receptor.setSalarioDiarioIntegrado(calculoSDI(empleado, parametros));
+			if(empleado.getDatoEmpresa().getDiasAguinaldo() == null)
+				throw new  SGPException("Los días de aguianldo del empleado no están definidos.");
+			receptor.setDiasAguinaldo(empleado.getDatoEmpresa().getDiasAguinaldo().intValue());
+			
+			receptor.setDiasVacaciones(diasVacaciones.intValue());
+			
+			receptor.setPrimaVacacional(empleado.getDatoEmpresa().getPrimaVacacional());
+			
+			sdi = calculoSDI(salarioDiario, diasAguinaldo, diasVacaciones, primaVacacional);
+			receptor.setSalarioDiarioIntegrado(sdi);
 			
 			//TODO pendiente revisar antiguedad
 			String sAntiguedad = antiguedadSemanas(empleado.getDatoEmpresa().getFechaIngreso(), parametros.getPeriodoFin());
 			log.debug("Antiguedad: {}", sAntiguedad);
 			receptor.setAntiguedad(sAntiguedad);
+			
+			//TODO pendiente revisar días de vacaciones.
 			
 		} catch(Exception ex) {
 			log.error("Problema para generar el receptor...", ex);
