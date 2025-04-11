@@ -63,11 +63,11 @@ public class VacacionesReportadasPBL extends AbstractPBL implements IPercepcion 
 			
 			for(DetVacaciones periodo : periodos) {
 				if(periodo == null) {
-					log.info("No se encontraron periodos vacacionales para el empleado.");
+					log.info("[UI] No se encontraron periodos vacacionales para el empleado.");
 					throw new SGPException("No se encontraron periodos vacacionales reportados para el empleado.");
 				}
 				
-				log.info("Periodo: {} al {}, vencimiento del periodo vacacional reportado: {}",
+				log.info("[UI] Periodo: {} al {}, vencimiento del periodo vacacional reportado: {}",
 						DateUtil.getString(periodo.getFechaInicio(), DateUtil.FORMATO_DD_MM_YYYY),
 						DateUtil.getString(periodo.getFechaFin(), DateUtil.FORMATO_DD_MM_YYYY),
 						DateUtil.getString(vencimientoPeriodo, DateUtil.FORMATO_DD_MM_YYYY)
@@ -77,7 +77,10 @@ public class VacacionesReportadasPBL extends AbstractPBL implements IPercepcion 
 				
 				cantidad = cantidad.add(new BigDecimal(diasReportadas).setScale(2, BigDecimal.ROUND_HALF_UP));
 				importe = this.calcularImporte(periodo, nomina.getReceptor().getSalarioDiario());
-				importeGravado = importeGravado.add(importe) ;
+				importeGravado = importeGravado.add(importe);
+				
+				log.info("[UI] Importe gravado al 100%");
+				log.info("[UI] Importe exento = {}, Importe gravado = {}", importeExento, importeGravado);
 				
 				this.agregarPeriodo(nomina, periodo);
 			}
@@ -104,14 +107,14 @@ public class VacacionesReportadasPBL extends AbstractPBL implements IPercepcion 
 		
 		diasPendientes = diasTotales.subtract(diasTomados);
 		
-		log.info("Periodo vacacional: {} al {} - Días no disfrutados: {}",
-				DateUtil.getString(periodo.getFechaInicio(), DateUtil.FORMATO_DD_MM_YYYY),
-				DateUtil.getString(periodo.getFechaFin(), DateUtil.FORMATO_DD_MM_YYYY),
-				diasPendientes);
-		
 		importe = diasPendientes
 				.multiply(salarioDiario)
 				.setScale(2, BigDecimal.ROUND_HALF_UP);
+		
+		log.info("[UI] Periodo vacacional: {} al {} - Días no disfrutados: {}, Importe = {} * {}",
+				DateUtil.getString(periodo.getFechaInicio(), DateUtil.FORMATO_DD_MM_YYYY),
+				DateUtil.getString(periodo.getFechaFin(), DateUtil.FORMATO_DD_MM_YYYY),
+				diasPendientes, salarioDiario, diasPendientes);
 		
 		return importe;
 	}
@@ -120,7 +123,13 @@ public class VacacionesReportadasPBL extends AbstractPBL implements IPercepcion 
 		if(nomina.getVacaciones() == null)
 			nomina.setVacaciones(new ArrayList<DetVacaciones>());
 		
-		nomina.getVacaciones().add(periodo);
-		log.info("Lista de periodos: {}", nomina.getVacaciones().size());
+		if(nomina.getVacaciones().contains(periodo)) {
+			int index = nomina.getVacaciones().indexOf(periodo);
+			periodo = nomina.getVacaciones().get(index);
+		} else {
+			nomina.getVacaciones().add(periodo);
+		}
+		
+		periodo.setDiasPendientesPagados(true);
 	}
 }

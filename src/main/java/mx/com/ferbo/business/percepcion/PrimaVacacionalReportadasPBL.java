@@ -61,7 +61,7 @@ public class PrimaVacacionalReportadasPBL extends AbstractPBL implements IPercep
 					throw new SGPException("No se encontraron periodos vacacionales reportados para el empleado.");
 				}
 				
-				log.info("Periodo: {} al {}, vencimiento del periodo vacacional reportado: {}",
+				log.info("[UI] Periodo: {} al {}, vencimiento del periodo vacacional reportado: {}",
 						DateUtil.getString(periodo.getFechaInicio(), DateUtil.FORMATO_DD_MM_YYYY),
 						DateUtil.getString(periodo.getFechaFin(), DateUtil.FORMATO_DD_MM_YYYY),
 						DateUtil.getString(vencimientoPeriodo, DateUtil.FORMATO_DD_MM_YYYY)
@@ -71,12 +71,7 @@ public class PrimaVacacionalReportadasPBL extends AbstractPBL implements IPercep
 				cantidad = cantidad.add(tasa);
 				importe = importe.add(this.calcularImporte(nomina.getReceptor().getSalarioDiario(), cantidad));
 				
-				if(nomina.getVacaciones() == null)
-					nomina.setVacaciones(new ArrayList<DetVacaciones>());
-				
-				periodo.setDiasTomados(periodo.getDiasTotales());
-				periodo.setDiasPendientesPagados(true);
-				nomina.getVacaciones().add(periodo);
+				this.agregarPeriodo(nomina, periodo);
 			}
 			
 			uma = parametros.getUma().getImporteDiario();
@@ -93,12 +88,22 @@ public class PrimaVacacionalReportadasPBL extends AbstractPBL implements IPercep
 				importeExento = importe.setScale(2, BigDecimal.ROUND_HALF_UP);
 			}
 			
+			log.info("[UI] Limite exento = {} * {} = {}", ValoresBD._15.get(), uma, limiteExento);
+			log.info("[UI] Importe exento = {}, Importe gravado = {}", importeExento, importeGravado);
+			
+		} catch(SGPException ex) {
+			log.warn("[UI] {}", ex.getMessage());
+			cantidad = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+			importeGravado = ValoresBD._CERO.get();
+			importeExento = ValoresBD._CERO.get();
 		} catch(Exception ex) {
+			log.error("Problema para generar la percepción...", ex);
 			cantidad = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 			importeGravado = ValoresBD._CERO.get();
 			importeExento = ValoresBD._CERO.get();
 		} finally {
 			percepcion = this.build(nomina, CVE_PRIMA_VACACIONES_REPORTADAS, cantidad, importeExento, importeGravado);
+			log.info("Percepcion agregada: {}", percepcion);
 		}
 		
 		return percepcion;
@@ -119,6 +124,7 @@ public class PrimaVacacionalReportadasPBL extends AbstractPBL implements IPercep
 		
 		dias = diasTotales.subtract(diasTomados).setScale(2, BigDecimal.ROUND_HALF_UP);
 		tasa = primaVacacional.multiply(dias).setScale(2, BigDecimal.ROUND_HALF_UP);
+		log.info("[UI] Tasa prima vacacional = {} * {}", primaVacacional, dias);
 		
 		return tasa;
 	}
@@ -128,11 +134,29 @@ public class PrimaVacacionalReportadasPBL extends AbstractPBL implements IPercep
 		
 		try {
 			importe = salarioDiario.multiply(tasa).setScale(2, BigDecimal.ROUND_HALF_UP);
+			log.info("[UI] Importe = ({} * {})", salarioDiario, tasa);
 		} catch(Exception ex) {
 			importe = ValoresBD._CERO.get();
 		}
 		
 		return importe;
+	}
+	
+	private void agregarPeriodo(DetNomina nomina, DetVacaciones periodo) {
+		
+		if(nomina.getVacaciones() == null)
+			nomina.setVacaciones(new ArrayList<DetVacaciones>());
+		
+		if(nomina.getVacaciones().contains(periodo)) {
+			int index = nomina.getVacaciones().indexOf(periodo);
+			periodo = nomina.getVacaciones().get(index);
+		} else {
+			nomina.getVacaciones().add(periodo);
+		}
+		
+		//periodo.setDiasTomados(periodo.getDiasTotales());
+		periodo.setPrimaPagada(true);
+		
 	}
 
 }

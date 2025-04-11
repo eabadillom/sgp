@@ -46,11 +46,11 @@ public class PrimaVacacionalEnTiempoPBL extends AbstractPBL implements IPercepci
 			periodo = vacacionesDAO.obtenerPorRfcFecha(nomina.getReceptor().getRfc(), parametros.getPeriodoFin());
 			
 			if(periodo == null) {
-				log.info("No se encontraron periodos vacacionales para el empleado.");
+				log.info("[UI] No se encontraron periodos vacacionales para el empleado.");
 				throw new SGPException("El empleado no ha cumplido su aniversario laboral.");
 			}
 			
-			log.info("El ultimo periodo de vacaciones registrado es: {}", periodo);
+			log.info("[UI] El ultimo periodo de vacaciones registrado es: {}", periodo);
 			
 			diferenciaEnDias = DateUtil.daysDiff(periodo.getFechaFin(), parametros.getPeriodoFin());
 			
@@ -75,11 +75,19 @@ public class PrimaVacacionalEnTiempoPBL extends AbstractPBL implements IPercepci
 				importeExento = importe.setScale(2, BigDecimal.ROUND_HALF_UP);
 			}
 			
+			log.info("[UI] Limite exento = {} * {} = {}", ValoresBD._15.get(), uma, limiteExento);
+			log.info("[UI] Importe exento = {}, Importe gravado = {}", importeExento, importeGravado);
+			
 			periodo.setPrimaPagada(true);
 			nomina.setVacaciones(new ArrayList<DetVacaciones>());
 			nomina.getVacaciones().add(periodo);
-			
+		} catch(SGPException ex) {
+			log.warn("[UI] {}", ex.getMessage());
+			cantidad = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+			importeGravado = ValoresBD._CERO.get();
+			importeExento = ValoresBD._CERO.get();
 		} catch(Exception ex) {
+			log.error("Problema para generar la percepción...", ex);
 			cantidad = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 			importeGravado = ValoresBD._CERO.get();
 			importeExento = ValoresBD._CERO.get();
@@ -102,6 +110,7 @@ public class PrimaVacacionalEnTiempoPBL extends AbstractPBL implements IPercepci
 		diasTotales = new BigDecimal(periodo.getDiasTotales()).setScale(2, BigDecimal.ROUND_HALF_UP);
 		
 		tasa = primaVacacional.multiply(diasTotales).setScale(2, BigDecimal.ROUND_HALF_UP);
+		log.info("[UI] Tasa prima vacacional = {} * {}", primaVacacional, diasTotales);
 		
 		return tasa;
 	}
@@ -111,6 +120,7 @@ public class PrimaVacacionalEnTiempoPBL extends AbstractPBL implements IPercepci
 		
 		try {
 			importe = salarioDiario.multiply(tasa).setScale(2, BigDecimal.ROUND_HALF_UP);
+			log.info("[UI] Importe = ({} * {})", salarioDiario, tasa);
 		} catch(Exception ex) {
 			importe = ValoresBD._CERO.get();
 		}

@@ -38,6 +38,7 @@ import mx.com.ferbo.model.DetRegistro;
 import mx.com.ferbo.model.DetVacaciones;
 import mx.com.ferbo.model.sat.CatConcepto;
 import mx.com.ferbo.model.sat.CatUnidadSAT;
+import mx.com.ferbo.util.BitacoraUIAppender;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.SGPException;
 
@@ -85,11 +86,11 @@ public abstract class NominaBL {
 			nomina = new DetNomina();
 			
 			if(empleado == null) {
-				emisor = new DetNominaEmisor();
 				receptor = new DetNominaReceptor();
+				emisor   = new DetNominaEmisor();
 			} else {
-				emisor = getEmisor(nomina, empleado.getDatoEmpresa().getEmpresa());
 				receptor = getReceptor(nomina, parametros, empleado);
+				emisor   = getEmisor(nomina, empleado.getDatoEmpresa().getEmpresa());
 			}
 			
 			conceptos = new ArrayList<>();
@@ -154,7 +155,6 @@ public abstract class NominaBL {
     		diasVacaciones    = new BigDecimal(periodoVacacional.getDiasTotales())
     				.setScale(2, BigDecimal.ROUND_HALF_UP)
     				;
-    		log.info("Dias de vacaciones: {}", diasVacaciones);
     	} catch(Exception ex) {
     		
     	}
@@ -168,9 +168,9 @@ public abstract class NominaBL {
     	BigDecimal factorSDI = null;
     	
     	try {
-    		log.info("Dias aguinaldo: {}", diasAguinaldo);
+    		log.info("Calculando Salario Diario Integrado...");
     		
-    		log.info("Salario diario: {}", salarioDiario);
+    		log.info("Salario diario: {}, Dias aguinaldo: {}, Dias de vacaciones: {}, Prima vacacional: {}", salarioDiario, diasAguinaldo, diasVacaciones, primaVacacional);
     		
     		factorSDI = primaVacacional
     				.multiply(diasVacaciones).setScale(4, BigDecimal.ROUND_HALF_UP)
@@ -262,7 +262,7 @@ public abstract class NominaBL {
 				throw new SGPException("El objeto DetEmpleado no esta definido.");
 			receptor.setNombre(String.format("%s %s %s", empleado.getNombre(), empleado.getPrimerAp(), empleado.getSegundoAp()).trim());
 			
-			log.info("Generando información del receptor {}", receptor.getNombre());
+			log.info("[UI] Generando información del receptor {}", receptor.getNombre());
 			
 			salarioDiario = empleado.getDatoEmpresa().getSalarioDiario();
 			diasAguinaldo = empleado.getDatoEmpresa().getDiasAguinaldo();
@@ -354,10 +354,13 @@ public abstract class NominaBL {
 			
 			sdi = calculoSDI(salarioDiario, diasAguinaldo, diasVacaciones, primaVacacional);
 			receptor.setSalarioDiarioIntegrado(sdi);
+			log.info("[UI] SDI = (({} + {} + ({} * {})) / {}) * {}",
+					ValoresBD._DIAS_ANIO.get(), diasAguinaldo, diasVacaciones, primaVacacional, ValoresBD._DIAS_ANIO.get(), salarioDiario);
+			
 			
 			//TODO pendiente revisar antiguedad
 			String sAntiguedad = antiguedadSemanas(empleado.getDatoEmpresa().getFechaIngreso(), parametros.getPeriodoFin());
-			log.debug("Antiguedad: {}", sAntiguedad);
+			log.info("[UI] Antiguedad: {}", sAntiguedad);
 			receptor.setAntiguedad(sAntiguedad);
 			
 			//TODO pendiente revisar días de vacaciones.

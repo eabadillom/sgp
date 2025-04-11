@@ -2,7 +2,9 @@ package mx.com.ferbo.controller;
 
 import static mx.com.ferbo.enums.ValoresBD._CERO;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -24,6 +26,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.ToggleSelectEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 
 import mx.com.ferbo.business.nomina.NominaBL;
 import mx.com.ferbo.business.nomina.NominaExtraordinariaBL;
@@ -48,6 +52,7 @@ import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.DetNominaPeriodo;
 import mx.com.ferbo.model.DetVacaciones;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
+import mx.com.ferbo.util.BitacoraUIAppender;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.ManageStatus;
 import mx.com.ferbo.util.SGPException;
@@ -96,6 +101,8 @@ public class NominaExtraordinariaBean implements Serializable {
 	private List<CatTipoPercepcion> tiposPercepcion = null;
 	
 	private Boolean detalle = true;
+	private String bitacora = null;
+	private StreamedContent file;
 
     public NominaExtraordinariaBean() {
     	this.context = FacesContext.getCurrentInstance();
@@ -112,14 +119,16 @@ public class NominaExtraordinariaBean implements Serializable {
     
     @PostConstruct
     public void init() {
+    	byte bytes[] = {};
     	
     	try {
     		
 //    		if(this.redirigir())
 //    			return;
     		
-    		log.info("====================== Entrada a nómina extraordinaria ======================");
-    		
+    		BitacoraUIAppender.limpiar();
+    		log.info("[UI] ====================== Nómina extraordinaria {} ======================",
+    				DateUtil.getString(DateUtil.now(), DateUtil.FORMATO_ISO_Z));
     		this.empresas = empresaDAO.buscarActivo();
     		this.listaNomina = new ArrayList<DetNomina>();
     		this.listaNominaSelected = new ArrayList<DetNomina>();
@@ -128,6 +137,13 @@ public class NominaExtraordinariaBean implements Serializable {
     		this.periodicidad = periodicidadDAO.buscarPorId("99");
     		this.nomPercepcion = PercepcionBL.build();
     		this.percepciones = percepcionDAO.buscarTodos();
+    		
+    		this.file = DefaultStreamedContent.builder()
+    				.contentType("text/plain")
+    				.contentLength(bytes.length)
+					.name("bitacora.txt").stream(() -> new ByteArrayInputStream(bytes))
+					.build();
+    		
     	} catch(Exception ex) {
     		log.error("Problema cargar la nómina extraordinaria...", ex);
     	}
@@ -315,8 +331,6 @@ public class NominaExtraordinariaBean implements Serializable {
     	
     	
     	try {
-    		//TODO validar parametros del dialog de percepcion.
-    		
     		if(this.listaNominaSelected.size() == 0)
     			throw new SGPException("Debe seleccionar al menos un empleado.");
     		
@@ -329,15 +343,15 @@ public class NominaExtraordinariaBean implements Serializable {
     		if(this.percepcion.getNombre() == null)
     			throw new SGPException("Debe indicar el nombre de la percepción");
     		
-    		log.info("Percepcion: {}", this.nomPercepcion);
+    		log.info("[UI] ===> PROCESANDO PERCEPCION: {}", this.nomPercepcion.getNombre());
     		if(this.nominaBO == null)
     			this.nominaBO = new NominaExtraordinariaBL(this.parametros);
     	
 	    	for(DetNomina nomina : this.listaNominaSelected) {
-	    		log.info("Agregando percepción al empleado: {}", nomina.getReceptor().getNombre());
+	    		log.info("[UI] -------Agregando percepción al empleado: {}", nomina.getReceptor().getNombre());
 	    		this.nominaBO.calcular(nomina, this.nomPercepcion);
+	    		log.info("[UI] -------Percepción agregada----------");
 	    	}
-	    	
 	    	
 	    	mensaje = "La percepción se agregó a los empleados seleccionados.";
     		severity = FacesMessage.SEVERITY_INFO;
@@ -351,8 +365,14 @@ public class NominaExtraordinariaBean implements Serializable {
     	} finally {
     		message = new FacesMessage(severity, titulo, mensaje);
     		FacesContext.getCurrentInstance().addMessage(null, message);
-    		PrimeFaces.current().ajax().update(":form:messages", "form:add:dtNomina");
+    		PrimeFaces.current().ajax().update("form:messages", "form:acc:dtNomina");
     	}
+    }
+    
+    public void cerrarDialogoPercepcion() {
+    	this.nomPercepcion = null;
+    	this.percepcion = null;
+    	log.info("Nomina: {}", this.nomina);
     }
     
     public void cargarNominaEmpleado(DetNomina nomina) {
@@ -544,6 +564,25 @@ public class NominaExtraordinariaBean implements Serializable {
 		}
     }
     
+    public void cargarBitacora() {
+    	this.bitacora = BitacoraUIAppender.getMensajes().stream()
+    			.collect(Collectors.joining());
+    }
+    
+    public void descargarBitacora() {
+    	this.bitacora = BitacoraUIAppender.getMensajes().stream()
+    			.collect(Collectors.joining());
+    	
+    	byte bytes[] = this.bitacora.getBytes();
+    	InputStream input = new ByteArrayInputStream(bytes);
+    	this.file = DefaultStreamedContent.builder()
+    			.contentType("text/plain")
+    			.name("Bitacora.txt")
+				.stream(() -> input)
+				.build();
+    	
+    }
+    
     /***************GETTERS Y SETTERS***************/
 	public Integer getAnio() {
 		return anio;
@@ -671,5 +710,21 @@ public class NominaExtraordinariaBean implements Serializable {
 
 	public void setFechaPago(Date fechaPago) {
 		this.fechaPago = fechaPago;
+	}
+
+	public String getBitacora() {
+		return bitacora;
+	}
+
+	public void setBitacora(String bitacora) {
+		this.bitacora = bitacora;
+	}
+
+	public StreamedContent getFile() {
+		return file;
+	}
+
+	public void setFile(StreamedContent file) {
+		this.file = file;
 	}
 }

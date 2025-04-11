@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import mx.com.ferbo.dao.n.ConceptoDAO;
 import mx.com.ferbo.dao.n.CuotaIMSSDAO;
 import mx.com.ferbo.dao.n.DiaNoLaboralDAO;
@@ -35,8 +38,11 @@ import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.model.sat.CatUnidadSAT;
 import mx.com.ferbo.model.sat.CatUsoCFDI;
 import mx.com.ferbo.util.DateUtil;
+import mx.com.ferbo.util.SGPException;
 
 public class ParametrosNomina {
+	
+	private static Logger log = LogManager.getLogger(ParametrosNomina.class);
 	
 	private Integer anio         = null;
 	private Integer periodo      = null;
@@ -134,6 +140,15 @@ public class ParametrosNomina {
 		//TODO Temporalmente se movieron las tasas de bono de puntualidad y vales de despensa a esta clase, sin embargo, deben parametrizarse en otro lugar.
 		this.bonoPuntualidad        = new BigDecimal("0.1").setScale(2, BigDecimal.ROUND_HALF_UP);
 		this.valeDespensa           = new BigDecimal("0.4").setScale(2, BigDecimal.ROUND_HALF_UP);
+		
+		try {
+			log.info("[UI] Año: {}, Periodo {}: del {} al {}, ",
+					this.anio, nominaPeriodo.getKey().getPeriodo(), DateUtil.getString(this.periodoInicio, DateUtil.FORMATO_DD_MM_YYYY), DateUtil.getString(this.periodoFin, DateUtil.FORMATO_DD_MM_YYYY));
+			log.info("EMISOR: {}", this.empresa.getRazonSocial());
+			
+		} catch (SGPException e) {
+			log.error("Problema para generar el objeto de parámetros para nómina...", e);
+		}
 	}
 	
 	public void cargar(Date periodoInicio, Date periodoFin) {

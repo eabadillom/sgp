@@ -9,11 +9,31 @@
 	<ui:define name="head">
 		<h:outputStylesheet library="webjars" name="font-awesome/5.12.0/css/all.min-jsf.css" />
 		<h:outputStylesheet library="webjars" name="font-awesome/5.12.0/css/v4-shims.min-jsf.css" />
-	</ui:define>
-	<ui:define name="content">
+		<h:outputScript>
+		    function copiarBitacora() {
+		        const texto = document.getElementById('bitacoraTexto').innerText;
 		
-		<script>
-			PrimeFaces.locales['es'] = {
+		        if (!texto.trim()) {
+		            mostrarGrowl('warn', 'Bitácora vacía', 'No hay contenido para copiar.');
+		            return;
+		        }
+		
+		        navigator.clipboard.writeText(texto).then(function() {
+		            mostrarGrowl('info', 'Copiado al portapapeles', 'El contenido fue copiado exitosamente.');
+		        }, function(err) {
+		            mostrarGrowl('error', 'Error al copiar', err);
+		        });
+		    }
+		
+		    function mostrarGrowl(severidad, resumen, detalle) {
+		        PF('messages').show([{
+		            severity: severidad,
+		            summary: resumen,
+		            detail: detalle
+		        }]);
+		    }
+		    
+		    PrimeFaces.locales['es'] = {
 				monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
 				monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
 				dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
@@ -44,9 +64,11 @@
 				   next: 'Siguiente',
 				}
 			};
-		</script>
-		<h:form id="form">
-			<p:growl id="messages" showDetail="true" life="3000"/>
+		</h:outputScript>
+	</ui:define>
+	<ui:define name="content">
+		<h:form id="form" enctype="multipart/form-data">
+			<p:growl id="messages" widgetVar="messages" showDetail="true" life="3000"/>
 			<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="30rem">
 				<p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes ui-button-primary" icon="pi pi-check"/>
 				<p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-outlined ui-button-secondary" icon="pi pi-times" />
@@ -96,24 +118,35 @@
 			</div>
 			<div style="padding-top: 0.5rem; padding-bottom: 0.5rem;">
 				<p:toolbar>
-					<p:toolbarGroup>
+					<p:toolbarGroup align="left">
 						<div style="padding-left: 0.5rem; padding-right: 0.5rem;">
-							<p:commandButton icon="pi pi-plus" value="Percepciones" process="@this" actionListener="#{nominaE.nuevaPercepcion()}" update="form:pnl-add-percepcion" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dlgPercepcionAll').show();"/>
+							<p:commandButton icon="pi pi-plus" value="Percepciones" title="Percepciones" process="@this" actionListener="#{nominaE.nuevaPercepcion()}" update="form:pnl-add-percepcion" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dlgPercepcionAll').show();"/>
 						</div>
 						<div style="padding-left: 0.5rem; padding-right: 0.5rem;">
-							<p:commandButton icon="pi pi-minus" value="Deducciones" />
+							<p:commandButton icon="pi pi-minus" value="Deducciones" title="Deducciones" />
+						</div>
+					</p:toolbarGroup>
+					<p:toolbarGroup align="left">
+						<div style="padding-left: 0.5rem; padding-right: 0.5rem;">
+							<p:commandButton icon="pi pi-book" title="Ver bitácora" onstart="PF('statusInfoDialog').show();" actionListener="#{nominaE.cargarBitacora()}" oncomplete="PF('statusInfoDialog').hide();PF('dgBitacora').show();" update="form:pnl-bitacora"></p:commandButton>
+						</div>
+						<div style="padding-left: 0.5rem; padding-right: 0.5rem;">
+							<p:commandButton icon="pi pi-save" title="Guardar"></p:commandButton>
+						</div>
+						
+						<div style="padding-left: 0.5rem; padding-right: 0.5rem;">
+							<p:commandButton icon="pi pi-qrcode" title="Timbrar"></p:commandButton>
 						</div>
 					</p:toolbarGroup>
 				</p:toolbar>
 			</div>
 			<p:accordionPanel id="acc">
-				
 				<p:tab title="Lista de empleados (#{nominaE.listaNomina.size()})">
 					<p:dataTable id="dtNomina" emptyMessage="No se encontró información" var="nomina" value="#{nominaE.listaNomina}" selection="#{nominaE.listaNominaSelected}" rowKey="#{nomina.id}">
 						<p:ajax event="rowSelectCheckbox" process="@this"/>
 						<p:ajax event="rowUnselectCheckbox" process="@this"/>
 						<p:ajax event="toggleSelect" global="true" process="@this" listener="#{nominaE.seleccionarTodos}"/>
-						<p:column selectionMode="multiple" />
+						<p:column selectionMode="multiple" width="1rem" />
 						<p:column headerText="Num" width="4rem">
 							<h:outputText value="#{nomina.receptor.numeroEmpleado}" styleClass="customer-badge status-#{nominaE.statusNomina(nomina)}" />
 						</p:column>
@@ -135,8 +168,14 @@
 								<f:convertNumber pattern="$ #,##0.00" />
 							</p:outputLabel>
 						</p:column>
-						<p:column width="3rem" style="text-align: right;">
+						<p:column width="1.5rem" style="text-align: right;">
 							<p:commandButton icon="pi pi-bars" process="@this" update="form:dg-empleado" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide(); PF('dgEmpleado').show();" actionListener="#{nominaE.cargarNominaEmpleado(nomina)}" />
+						</p:column>
+						<p:column width="1.5rem" style="text-align: right;">
+							<p:commandButton icon="pi pi-save" styleClass="ui-button-outlined" rendered="#{nomina.id ne null and nomina.id > 0}"/>
+						</p:column>
+						<p:column width="1.5rem" style="text-align: right;">
+							<p:commandButton icon="pi pi-qrcode" styleClass="ui-button-outlined" rendered="#{nomina.uuid ne null }"/>
 						</p:column>
 						
 						<p:columnGroup type="footer">
@@ -170,59 +209,71 @@
 										<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
 									</f:facet>
 								</p:column>
+								<p:column footerText="." style="color: rgba(255, 255, 255, 0);" />
+								<p:column footerText="." style="color: rgba(255, 255, 255, 0);" />
 							</p:row>
 						</p:columnGroup>
 					</p:dataTable>
 				</p:tab>
 			</p:accordionPanel>
 			<p:dialog id="dlg-percepcion-all" widgetVar="dlgPercepcionAll" header="Agregar percepción" modal="true" responsive="true" position="center top" height="100%" resizable="false" showEffect="fade" hideEffect="fade">
-				
+				<p:ajax event="close" listener="#{nominaE.cerrarDialogoPercepcion()}" />
 				<p:outputPanel id="pnl-add-percepcion" styleClass="ui-fluid" rendered="#{nominaE.nomPercepcion ne null}">
-					<p:outputLabel value="Catálogo de percepciones" />
-					<p:selectOneMenu id="percepcion" value="#{nominaE.percepcion}" filter="true" filterMatchMode="contains" filterPlaceholder="Concepto" converter="entityConverter">
-						<f:selectItem itemLabel="--Seleccione--" noSelectionOption="true" />
-						<f:selectItems value="#{nominaE.percepciones}" var="percepcion" itemLabel="#{percepcion.nombre}" itemValue="#{percepcion}" />
-						<p:ajax process="@this" event="change" update="tipoPercepcion nombrePercepcion cantidad importeExento importeGravado" listener="#{nominaE.setTipoPercepcion()}"/>
-					</p:selectOneMenu>
+					<div style="padding-bottom: 3rem;">
+						<p:outputLabel value="Catálogo de percepciones" />
+						<p:selectOneMenu id="percepcion" value="#{nominaE.percepcion}" filter="true" filterMatchMode="contains" filterPlaceholder="Concepto" converter="entityConverter">
+							<f:selectItem itemLabel="--Seleccione--" noSelectionOption="true" />
+							<f:selectItems value="#{nominaE.percepciones}" var="percepcion" itemLabel="#{percepcion.nombre}" itemValue="#{percepcion}" />
+							<p:ajax process="@this" event="change" update="tipoPercepcion nombrePercepcion cantidad importeExento importeGravado" listener="#{nominaE.setTipoPercepcion()}"/>
+						</p:selectOneMenu>
+					</div>
 					<p:separator />
-					<p:separator />
-					<p:outputLabel value="Descripción" />
-					<p:inputText id="nombrePercepcion" value="#{nominaE.nomPercepcion.nombre}">
-						<p:ajax process="@this" />
-					</p:inputText>
-					
-					<p:outputLabel value="Tipo percepción (SAT)" />
-					<p:selectOneMenu id="tipoPercepcion" value="#{nominaE.nomPercepcion.tipoPercepcion}" filter="true" filterMatchMode="contains" converter="entityConverter">
-						<f:selectItem itemLabel="--Seleccione--" noSelectionOption="true" />
-						<f:selectItems value="#{nominaE.tiposPercepcion}" var="tipoPercepcion" itemLabel="#{tipoPercepcion.clave} - #{tipoPercepcion.descripcion}" itemValue="#{percepcion}" />
-					</p:selectOneMenu>
-					
-					<p:outputLabel value="Cantidad" />
-					<p:inputNumber id="cantidad" value="#{nominaE.nomPercepcion.cantidad}" decimalPlaces="4" decimalSeparator="." placeholder="cantidad" emptyValue="null" minValue="0.0000" >
-						<p:ajax process="@this" />
-					</p:inputNumber>
-					
-					<p:outputLabel value="Importe exento" />
-					<p:inputNumber id="importeExento" value="#{nominaE.nomPercepcion.importeExento}" decimalPlaces="2" decimalSeparator="." symbol="$ " symbolPosition="p" placeholder="importe exento" emptyValue="null" minValue="0.00">
-						<p:ajax process="@this" />
-					</p:inputNumber>
-					
-					<p:outputLabel value="Importe gravado" />
-					<p:inputNumber id="importeGravado" value="#{nominaE.nomPercepcion.importeGravado}" decimalPlaces="2" decimalSeparator="." symbol="$ " symbolPosition="p" placeholder="importe gravado" emptyValue="null" minValue="0.00">
-						<p:ajax process="@this" />
-					</p:inputNumber>
+					<div class="ui-fluid formgrid grid">
+						<div class="field col-12 md:col-6">
+							<p:outputLabel value="Descripción" />
+							<p:inputText id="nombrePercepcion" value="#{nominaE.nomPercepcion.nombre}">
+								<p:ajax process="@this" />
+							</p:inputText>
+						</div>
+						<div class="field col-12 md:col-6">
+							<p:outputLabel value="Tipo percepción (SAT)" />
+							<p:selectOneMenu id="tipoPercepcion" value="#{nominaE.nomPercepcion.tipoPercepcion}" filter="true" filterMatchMode="contains" converter="entityConverter" autoWidth="false">
+								<f:selectItem itemLabel="--Seleccione--" noSelectionOption="true" />
+								<f:selectItems value="#{nominaE.tiposPercepcion}" var="tipoPercepcion" itemLabel="#{tipoPercepcion.clave} - #{tipoPercepcion.descripcion}" itemValue="#{percepcion}" />
+							</p:selectOneMenu>
+						</div>
+						<div class="field col-12 md:col-3">
+							<p:outputLabel value="Cantidad" />
+							<p:inputNumber id="cantidad" value="#{nominaE.nomPercepcion.cantidad}" decimalPlaces="4" decimalSeparator="." placeholder="cantidad" emptyValue="null" minValue="0.0000" >
+								<p:ajax process="@this" />
+							</p:inputNumber>
+						</div>
+						<div class="field col-12 md:col-3">
+							<p:outputLabel value="Importe exento" />
+							<p:inputNumber id="importeExento" value="#{nominaE.nomPercepcion.importeExento}" decimalPlaces="2" decimalSeparator="." symbol="$ " symbolPosition="p" placeholder="importe exento" emptyValue="null" minValue="0.00">
+								<p:ajax process="@this" />
+							</p:inputNumber>
+						</div>
+						<div class="field col-12 md:col-3">
+							<p:outputLabel value="Importe gravado" />
+							<p:inputNumber id="importeGravado" value="#{nominaE.nomPercepcion.importeGravado}" decimalPlaces="2" decimalSeparator="." symbol="$ " symbolPosition="p" placeholder="importe gravado" emptyValue="null" minValue="0.00">
+								<p:ajax process="@this" />
+							</p:inputNumber>
+						</div>
+					</div>
 				</p:outputPanel>
 				<f:facet name="footer">
 					<p:commandButton value="Agregar" icon="pi pi-check" update="form:acc:dtNomina" process="@this" actionListener="#{nominaE.agregarPercepcion()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
-					<p:commandButton value="Calcular" icon="fas fa-light fa-calculator" update="form:acc:dtNomina" process="@this form:acc:dtNomina" actionListener="#{nominaE.calcularPercepciones()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
-					<p:commandButton value="Cancelar" icon="pi pi-times" styleClass="ui-button-outlined ui-button-secondary" oncomplete="PF('dlgPercepcionAll').hide();" />
+					<p:commandButton value="Calcular" icon="fas fa-light fa-calculator" update="form:acc:dtNomina" process="@this form:acc:dtNomina" actionListener="#{nominaE.calcularPercepciones()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();">
+						<p:confirm header="Calcular percepción" message="¿Está seguro que desea calcular la percepcion para los empleados seleccionados?" icon="pi pi-exclamation-triangle" />
+					</p:commandButton>
+					<p:commandButton value="Cerrar" icon="pi pi-times" styleClass="ui-button-outlined ui-button-secondary" oncomplete="PF('dlgPercepcionAll').hide();" update="form:dg-empleado" />
 				</f:facet>
-				
 			</p:dialog>
 			
 			
 			<p:dialog id="dg-empleado" widgetVar="dgEmpleado" header="#{nominaE.nomina.receptor.nombre}" modal="true" responsive="true" position="center top" height="100%" resizable="false" showEffect="fade" hideEffect="fade">
-				<p:tabView id="tv-nomina" class="ui-fluid" dynamic="true" cache="true" effect="drop">
+				<p:tabView id="tv-nomina" class="ui-fluid" dynamic="true" cache="true" effect="drop" rendered="#{nominaE.nomina ne null}">
 					<p:ajax event="tabChange" oncomplete="PF('dgEmpleado').initPosition();"/>
 					<p:tab title="General">
 						<div class="ui-fluid formgrid grid">
@@ -342,31 +393,31 @@
 							</div>
 						</p:outputPanel>
 					</p:tab>
-					<p:tab title="Periodos vacacionales">
+					<p:tab title="Vacaciones">
 						<p:dataTable value="#{nominaE.nomina.vacaciones}" var="periodo" paginator="true" rows="5" paginatorPosition="bottom">
-							<p:column headerText="Inicio">
+							<p:column headerText="Inicio" style="text-align: center;">
 								<p:outputLabel value="#{periodo.fechaInicio}">
 									<f:convertDateTime pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6" />
 								</p:outputLabel>
 							</p:column>
-							<p:column headerText="Fin">
+							<p:column headerText="Fin" style="text-align: center;">
 								<p:outputLabel value="#{periodo.fechaFin}">
 									<f:convertDateTime pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6" />
 								</p:outputLabel>
 							</p:column>
-							<p:column headerText="Dias totales">
+							<p:column headerText="Dias totales" style="text-align: center;">
 								<p:outputLabel value="#{periodo.diasTotales}" />
 							</p:column>
-							<p:column headerText="Dias tomados">
+							<p:column headerText="Dias tomados" style="text-align: center;">
 								<p:outputLabel value="#{periodo.diasTomados}" />
 							</p:column>
-							<p:column headerText="Dias pendientes">
-								<p:outputLabel value="#{periodo.diasTotales - periodo.diasPagados}" />
+							<p:column headerText="Dias pendientes" style="text-align: center;">
+								<p:outputLabel value="#{periodo.diasTotales - periodo.diasTomados}" />
 							</p:column>
-							<p:column headerText="Prima vacacional">
+							<p:column headerText="Prima vacacional" style="text-align: center;">
 								<p:outputLabel value="#{periodo.primaPagada ? 'SI' : 'NO'}" />
 							</p:column>
-							<p:column headerText="Vac. Reportadas">
+							<p:column headerText="Vac. Reportadas" style="text-align: center;">
 								<p:outputLabel value="#{periodo.diasPendientesPagados ? 'SI' : 'NO'}" />
 							</p:column>
 						</p:dataTable>
@@ -516,6 +567,20 @@
 					<span style="padding-left: 0.5rem; padding-right: 0.5rem;">
 						<p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dgEmpleado').hide();" styleClass="ui-button-outlined ui-button-secondary" />
 					</span>
+				</f:facet>
+			</p:dialog>
+			<p:dialog widgetVar="dgBitacora" header="Bitácora de operaciones" modal="true" responsive="true" position="center top" height="100%" width="100%" resizable="false" showEffect="fade" hideEffect="fade">
+				<p:outputPanel id="pnl-bitacora"
+				               style="overflow:auto; height:30rem; width:100%; background-color:#f4f4f4; border:1px solid #ccc;">
+				    <pre id="bitacoraTexto" style="font-family: monospace;">#{nominaE.bitacora}</pre>
+				</p:outputPanel>
+				<f:facet name="footer">
+					<span style="padding-left: 0.5rem; padding-right: 0.5rem;">
+					</span>
+					<p:commandButton id="descargarBitacora" value="Descargar" actionListener="#{nominaE.descargarBitacora()}" icon="pi pi-file-o" styleClass="edit-button" ajax="false">
+						<p:fileDownload value="#{nominaE.file}" />
+					</p:commandButton>
+					<p:commandButton icon="pi pi-copy" value="Copiar Bitácora" type="button" onclick="copiarBitacora();" />
 				</f:facet>
 			</p:dialog>
         </h:form>

@@ -42,6 +42,8 @@ public class NominaExtraordinariaBL extends NominaBL {
 		try {
 			clavePercepcion = percepcion.getClave();
 			
+			log.info("[UI] Calculando {} para {}", percepcion.getNombre(), nomina.getReceptor().getNombre());
+			
 			switch (clavePercepcion) {
 				case AbstractPBL.CVE_VACACIONES_REPORTADAS:
 					calcularVacacionesReportadas(nomina, parametros);

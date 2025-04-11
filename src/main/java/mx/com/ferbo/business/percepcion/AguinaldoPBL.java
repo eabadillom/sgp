@@ -85,6 +85,9 @@ public class AguinaldoPBL extends AbstractPBL implements IPercepcion {
 			
 			cantidad = proporcionAguinaldo.setScale(2, BigDecimal.ROUND_HALF_UP);
 			
+			log.info("[UI] Limite exento = {} * {} = {}", ValoresBD._30.get(), uma, limiteExento);
+			log.info("[UI] Importe exento = {}, Importe gravado = {}", importeExento, importeGravado);
+			
 		} catch(Exception ex) {
 			cantidad = ValoresBD._CERO.get();
 			importeExento = ValoresBD._CERO.get();
