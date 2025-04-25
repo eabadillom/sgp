@@ -1,18 +1,17 @@
 package mx.com.ferbo.business.percepcion;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import mx.com.ferbo.business.nomina.ParametrosNomina;
 import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.DetRegistro;
-import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.util.SGPException;
 
 /**Clase para el cálculo del Bono de puntualidad.<br>
@@ -20,7 +19,7 @@ import mx.com.ferbo.util.SGPException;
  * En caso de exceder el 10%, se considerará como parte del SBC.
  * 
  */
-public class BonoPuntualidadPBL extends AbstractPBL implements IPercepcion {
+public class BonoPuntualidadPBL extends AbstractPBL {
 	
 	private static Logger log = LogManager.getLogger(BonoPuntualidadPBL.class);
 	
@@ -30,68 +29,54 @@ public class BonoPuntualidadPBL extends AbstractPBL implements IPercepcion {
 	private BigDecimal diasLaborales          = null;
 	private BigDecimal diasNoLaborales        = null;
 	private BigDecimal diasTrabajados         = null;
-	private BigDecimal salarioDiarioIntegrado = null;
 	
 	private Boolean    procesaRetardos        = null;
 	
 	public BonoPuntualidadPBL(
-			List<CatTipoPercepcion> tiposPercepcion, BigDecimal tasaBono, Map<String, DetRegistro> mapAsistencias, 
+			ParametrosNomina parametros, BigDecimal tasaBono, Map<String, DetRegistro> mapAsistencias, 
 			BigDecimal diasLaborales, BigDecimal diasNoLaborales, BigDecimal diasTrabajados, BigDecimal salarioDiarioIntegrado,
 			BigDecimal proporcionalSeptimoDia
 	) {
-		this.tiposPercepcion = tiposPercepcion;
+		super(parametros);
 		this.mapAsistencias = mapAsistencias;
 		this.tasaBono = tasaBono;
 		this.diasLaborales = diasLaborales;
 		this.diasNoLaborales = diasNoLaborales;
 		this.diasTrabajados = diasTrabajados;
-		this.salarioDiarioIntegrado = salarioDiarioIntegrado;
 	}
-
+	
 	@Override
-	public DetNominaPercepcion calcular(DetNomina nomina) {
+	public DetNominaPercepcion procesar(DetNomina nomina) {
 		DetNominaPercepcion percepcion = null;
-		BigDecimal bono = null;
-    	BigDecimal diasPeriodo = null;
-    	
     	DetPercepcionEmpleado percepcionEmpleado = null;
     	
     	try {
-    		//TODO VALIDAR PRIMERO SI NO HAY RETARDOS.
-    		//En caso de existir retardos en el periodo de calculo, el bono de puntualidad es CERO.
-    		if(this.diasTrabajados.compareTo(diasLaborales) < 0)
-    			throw new SGPException("El empleado tiene ausencias, por lo que no se otorgará el bono de puntualidad.");
+    		this.baseCalculo = nomina.getReceptor().getSalarioDiarioIntegrado();
     		
-    		if(this.procesaRetardos == null)
-    			this.procesaRetardos = new Boolean(false);
     		
-    		for(Map.Entry<String, DetRegistro> entry : this.mapAsistencias.entrySet()) {
-    			log.info("Entry: {}", entry);
-    			String claveStatusRegistro = entry.getValue().getIdEstatus().getCodigo();
-    			if(procesaRetardos.booleanValue() && ("R".equalsIgnoreCase(claveStatusRegistro) || "F".equalsIgnoreCase(claveStatusRegistro)) )
-    				throw new SGPException("Existen dias con retardo no justificados o faltas para el empleado.");
-    		}
+//    		importe = salarioDiarioIntegrado.multiply(this.tasaBono).setScale(5, BigDecimal.ROUND_HALF_UP);
+//    		importe = importe.multiply(diasPeriodo).setScale(2, BigDecimal.ROUND_HALF_UP);
     		
-    		diasPeriodo = this.diasTrabajados.add(this.diasNoLaborales).setScale(2, BigDecimal.ROUND_HALF_UP);
-    		
-    		bono = salarioDiarioIntegrado.multiply(this.tasaBono).setScale(5, BigDecimal.ROUND_HALF_UP);
-    		bono = bono.multiply(diasPeriodo).setScale(2, BigDecimal.ROUND_HALF_UP);
+    		this.cantidad = this.calcularCantidad(nomina);
+    		this.importe = this.calcularImporte(this.cantidad, this.baseCalculo);
     		
     		percepcionEmpleado = this.buscaPercepcionEmpleado(P_BONO_PUNTUALIDAD);
     		
     		if(    (percepcionEmpleado != null)
     			&& (percepcionEmpleado.getActivo())
 				&& (percepcionEmpleado.getImporteMaximo() != null)
-				&& (bono.compareTo(percepcionEmpleado.getImporteMaximo()) > 0) ) {
+				&& (importe.compareTo(percepcionEmpleado.getImporteMaximo()) > 0) ) {
     			
-    			bono = percepcionEmpleado.getImporteMaximo();
+    			importe = percepcionEmpleado.getImporteMaximo();
     		}
+    		
+    		this.calcularExentoGravado();
     		
     	} catch(Exception ex) {
     		log.warn("No es posible calcular el bono de puntualidad: {}", ex.getMessage());
-    		bono = BigDecimal.ZERO;
+    		importe = BigDecimal.ZERO;
     	} finally {
-    		percepcion = this.build(nomina, CVE_BONO_PUNTUALIDAD, null, ValoresBD._CERO.get(), bono);
+    		percepcion = this.build(nomina, CVE_BONO_PUNTUALIDAD, null, ValoresBD._CERO.get(), importe);
     	}
     	
     	return percepcion;
@@ -100,4 +85,39 @@ public class BonoPuntualidadPBL extends AbstractPBL implements IPercepcion {
 	public void setProcesaRetardos(Boolean procesaRetardos) {
 		this.procesaRetardos = procesaRetardos;
 	}
+	
+	@Override
+	protected BigDecimal calcularCantidad(DetNomina nomina)
+	throws SGPException {
+		BigDecimal diasPeriodo = null;
+		BigDecimal cantidad = null;
+		
+		//TODO VALIDAR PRIMERO SI NO HAY RETARDOS.
+		//En caso de existir retardos en el periodo de calculo, el bono de puntualidad es CERO.
+		if(this.diasTrabajados.compareTo(this.diasLaborales) < 0)
+			throw new SGPException("El empleado tiene ausencias, por lo que no se otorgará el bono de puntualidad.");
+		
+		if(this.procesaRetardos == null)
+			this.procesaRetardos = new Boolean(false);
+		
+		for(Map.Entry<String, DetRegistro> entry : this.mapAsistencias.entrySet()) {
+			log.info("Entry: {}", entry);
+			String claveStatusRegistro = entry.getValue().getIdEstatus().getCodigo();
+			if(procesaRetardos.booleanValue() && ("R".equalsIgnoreCase(claveStatusRegistro) || "F".equalsIgnoreCase(claveStatusRegistro)) )
+				throw new SGPException("Existen dias con retardo no justificados o faltas para el empleado.");
+		}
+		
+		diasPeriodo = this.diasTrabajados.add(this.diasNoLaborales).setScale(2, BigDecimal.ROUND_HALF_UP);
+		
+		cantidad = this.tasaBono.multiply(diasPeriodo).setScale(5, BigDecimal.ROUND_HALF_UP);
+		
+		return cantidad ;
+	}
+
+	@Override
+	public BigDecimal calcularLimiteExento() {
+		return ValoresBD._CERO.get();
+	}
+
+	
 }

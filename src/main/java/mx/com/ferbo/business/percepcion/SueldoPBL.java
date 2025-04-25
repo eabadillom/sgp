@@ -8,20 +8,19 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.nomina.ParametrosNomina;
-import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.util.SGPException;
 
-public class VacacionesPBL extends AbstractPBL {
+public class SueldoPBL extends AbstractPBL {
 	
-	private static Logger log = LogManager.getLogger(VacacionesPBL.class);
+	private static Logger log = LogManager.getLogger(SueldoPBL.class);
 	
-	private BigDecimal diasVacaciones = null;
+	private BigDecimal diasTrabajados = null;
 	
-	public VacacionesPBL(ParametrosNomina parametros, BigDecimal diasVacaciones) {
+	public SueldoPBL(ParametrosNomina parametros, BigDecimal diasTrabajados) {
 		super(parametros);
-		this.diasVacaciones = diasVacaciones;
+		this.diasTrabajados = diasTrabajados;
 	}
 
 	@Override
@@ -36,26 +35,27 @@ public class VacacionesPBL extends AbstractPBL {
 			this.calcularExentoGravado();
 			
 		} catch(Exception ex) {
-			importe = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
-			cantidad = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+			cantidad       = _CERO.get();
+			importeExento  = _CERO.get();
+			importeGravado = _CERO.get();
 		} finally {
-			percepcion = this.build(nomina, CVE_VACACIONES_EN_TIEMPO, cantidad, ValoresBD._CERO.get(), importe);
+			percepcion = this.build(nomina, CVE_SUELDO, cantidad, importeExento, importeGravado);
 		}
 		
 		return percepcion;
-
 	}
 	
 	@Override
 	protected BigDecimal calcularCantidad(DetNomina nomina) throws SGPException {
-		return diasVacaciones.setScale(2, BigDecimal.ROUND_HALF_UP);
+		BigDecimal cantidad = null;
+		cantidad = this.diasTrabajados.setScale(2, BigDecimal.ROUND_HALF_UP);
+		log.info("[UI] dias trabajados = {}", this.diasTrabajados);
+		return cantidad;
 	}
 
 	@Override
 	public BigDecimal calcularLimiteExento() {
+		log.info("[UI] Limite exento = {}", _CERO.get());
 		return _CERO.get();
 	}
-
-	
-
 }

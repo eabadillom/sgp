@@ -1,5 +1,7 @@
 package mx.com.ferbo.business.percepcion;
 
+import static mx.com.ferbo.enums.ValoresBD._CERO;
+
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Comparator;
@@ -9,6 +11,7 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import mx.com.ferbo.business.nomina.ParametrosNomina;
 import mx.com.ferbo.dao.n.PercepcionDAO;
 import mx.com.ferbo.model.CatPercepcion;
 import mx.com.ferbo.model.DetNomina;
@@ -18,11 +21,24 @@ import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.util.SGPException;
 
-public class AbstractPBL {
+/**
+ * 
+ */
+public abstract class AbstractPBL {
 	private static Logger log = LogManager.getLogger(AbstractPBL.class);
 	
+	protected ParametrosNomina parametros = null;
+	protected DetNomina nomina = null;
 	protected List<CatTipoPercepcion> tiposPercepcion = null;
 	protected List<DetPercepcionEmpleado> percepcionesEmpleado = null;
+	
+	protected BigDecimal cantidad = null;
+	protected BigDecimal baseCalculo = null;
+	protected BigDecimal limiteExento = null;
+	protected BigDecimal importe = null;
+	protected BigDecimal importeExento = null;
+	protected BigDecimal importeGravado = null;
+	
 	
 	public static final String P_SUELDO           = "001";
 	public static final String P_SEXTO_DIA        = "001";
@@ -41,6 +57,94 @@ public class AbstractPBL {
 	public static final String CVE_AGUINALDO                   = "024";
 	public static final String CVE_VACACIONES_EN_TIEMPO        = "029";
 	public static final String CVE_VALES_DESPENSA              = "032";
+	
+	@Deprecated
+	public AbstractPBL(ParametrosNomina parametros) {
+		this.parametros = parametros;
+		log.info("Parametros nomina: {}", parametros);
+		this.tiposPercepcion = parametros.getTiposPercepcion();
+	}
+	
+	public AbstractPBL(ParametrosNomina parametros, DetNomina nomina) {
+		this.parametros = parametros;
+		log.info("Parametros nomina: {}", parametros);
+		this.nomina = nomina;
+		log.info("Nomina: {}", nomina);
+		
+		this.cantidad       = _CERO.get();
+		this.importe        = _CERO.get();
+		this.importeExento  = _CERO.get();
+		this.importeGravado = _CERO.get();
+		
+		this.tiposPercepcion = parametros.getTiposPercepcion();
+	}
+	
+	/** Cada percepción debe calcularse con base en una "cantidad" multiplicada por
+	 * una base de cálculo. Por ejemplo, en el sueldo semanal, la cantidad son los
+	 * días laborados por el empleado, mientras que la base de cálculo es el salario
+	 * diario.<br><br>
+	 * Por ejemplo, el salario semanal se calcula como:<br><br>
+	 * salarioDiario = cantidad x baseCalculo = 5 dias x $300.00<br><br>
+	 * En otros casos, la "cantidad" lleva otros cálculos, como en el caso de el
+	 * el aguinaldo, el cual depende de:<br><br>
+	 * Los días laborados del empleado desde su ingreso hasta el último día del año
+	 * en curso (o bien, los 365 días del año cuando su ingreso fue en años anteriores).<br><br>
+	 * Las ausencias<br><br>
+	 * Los días de aguinaldo que el patrón otorga al empleado.
+	 * <br><br>
+	 * De tal manera que la cantidad depende siempre de otros factores que dependen
+	 * completamente de la percepción que se está analizando. 
+	 * @param nomina
+	 * @return
+	 */
+	protected abstract BigDecimal calcularCantidad(DetNomina nomina) throws SGPException;
+	
+	/**Las percepciones en general se deberían calcular a partir de una "cantidad" y una
+	 * base de cargo. Por ejemplo, El salario se calcula a partir de los días trabajados
+	 * (cantidad) y el salario diario (base de cargo).<br>
+	 * Para otras percepciones (p. e. Aguinaldo), la cantidad se obtiene a partir de otros
+	 * datos (como los días de aguinaldo, las ausencias en el año, etc), mientras que la
+	 * base de cargo puede tener otro dato como origen (p. e. Para el bono de puntualidad,
+	 * la base de cargo es el salario diario integrado).
+	 * @param cantidad De acuerdo con el anexo 1.2 de Nómina (CFDI 4.0) se indica la cantidad
+	 * a multiplicar por la base de cargo.
+	 * @param baseCalculo Base de cargo a multiplicar por la cantidad.
+	 * @return Importe.
+	 */
+	protected BigDecimal calcularImporte(BigDecimal cantidad, BigDecimal baseCalculo) {
+		BigDecimal importe = null;
+		importe = cantidad.multiply(baseCalculo).setScale(2, BigDecimal.ROUND_HALF_UP);
+		log.info("[UI] Importe = ({} * {})", cantidad, baseCalculo);
+		return importe;
+	}
+	
+	/**Todas las percepciones deben tener un límite de importe exento y gravado.
+	 * En el caso de las percepciones gravadas al 100% (p. e. Sueldo, Aguinaldo, etc)
+	 * El limite de exento debe ser 0.00. En el caso de otras percepciones, el
+	 * límite de exento varía de acuerdo a lo publicado por la LISR vigente.
+	 * @return
+	 */
+	protected abstract BigDecimal calcularLimiteExento();
+	
+	/**A partir del límite de exención para la percepción, se calcula el importe exento
+	 * y el importe gravado. Todos los datos se obtienen de los atributos internos
+	 * "importe" y "cantidad", que debieron ser previamente calculados.
+	 */
+	protected void calcularExentoGravado() {
+		limiteExento = this.calcularLimiteExento();
+		
+		if(importe.compareTo(limiteExento) > 0) {
+			//El importe NO está exento de ISR.
+			importeGravado = importe.subtract(limiteExento);
+			importeExento = limiteExento.setScale(2, BigDecimal.ROUND_HALF_UP);
+		} else {
+			//El importe SI está exento de ISR.
+			importeGravado = _CERO.get();
+			importeExento = importe.setScale(2, BigDecimal.ROUND_HALF_UP);
+		}
+	}
+	
+	public abstract DetNominaPercepcion procesar(DetNomina nomina); 
 	
 	public DetNominaPercepcion build(DetNomina nomina, String clave) {
 		DetNominaPercepcion percepcion = null;
@@ -130,8 +234,7 @@ public class AbstractPBL {
 		
 		return maxIndex;
 	}
-
-
+	
 	public void setTiposPercepcion(List<CatTipoPercepcion> tiposPercepcion) {
 		this.tiposPercepcion = tiposPercepcion;
 	}
@@ -139,5 +242,53 @@ public class AbstractPBL {
 
 	public void setPercepcionesEmpleado(List<DetPercepcionEmpleado> percepcionesEmpleado) {
 		this.percepcionesEmpleado = percepcionesEmpleado;
+	}
+
+	public BigDecimal getCantidad() {
+		return cantidad;
+	}
+
+	public void setCantidad(BigDecimal cantidad) {
+		this.cantidad = cantidad;
+	}
+
+	public BigDecimal getLimiteExento() {
+		return limiteExento;
+	}
+
+	public void setLimiteExento(BigDecimal limiteExento) {
+		this.limiteExento = limiteExento;
+	}
+
+	public BigDecimal getImporte() {
+		return importe;
+	}
+
+	public void setImporte(BigDecimal importe) {
+		this.importe = importe;
+	}
+
+	public BigDecimal getImporteExento() {
+		return importeExento;
+	}
+
+	public void setImporteExento(BigDecimal importeExento) {
+		this.importeExento = importeExento;
+	}
+
+	public BigDecimal getImporteGravado() {
+		return importeGravado;
+	}
+
+	public void setImporteGravado(BigDecimal importeGravado) {
+		this.importeGravado = importeGravado;
+	}
+
+	public BigDecimal getBaseCalculo() {
+		return baseCalculo;
+	}
+
+	public void setBaseCalculo(BigDecimal baseCalculo) {
+		this.baseCalculo = baseCalculo;
 	}
 }

@@ -51,48 +51,46 @@
 					<i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
 				</div>
 			</p:dialog>
-			<p:panel>
-				<div class="ui-fluid formgrid grid align-items-left">
-					<div class="field col-12 md:col-2">
-						<p:outputLabel value="Año" />
-						<p:spinner id="anio" value="#{nominaS.anio}" buttons="horizontal">
-							<p:ajax event="change" process="@this" update="semana dp-periodo-inicio dp-periodo-fin" listener="#{nominaS.calculaSemanas()}"></p:ajax>
-						</p:spinner>
-					</div>
-					<div class="field col-12 md:col-2">
-						<p:outputLabel value="Periodo" />
-						<p:selectOneMenu id="semana" value="#{nominaS.semana}" filter="true" filterMatchMode="contains" filterPlaceholder="Número de semana">
-							<f:selectItem itemLabel="--Seleccione--" noSelectionOption="true"/>
-							<f:selectItems  value="#{nominaS.semanasDelAnio}" var="periodo" itemLabel="Semana #{periodo}" itemValue="#{periodo}" />
-							<p:ajax event="change"  update="anio semana dp-periodo-inicio dp-periodo-fin" process="@this" listener="#{nominaS.calculaFechasPeriodo()}"/>
-						</p:selectOneMenu>
-					</div>
-					<div class="field col-12 md:col-2">
-						<p:outputLabel value="Inicio periodo" />
-						<p:datePicker id="dp-periodo-inicio" value="#{nominaS.periodoInicio}" placeholder="Periodo Inicio" showIcon="true" pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6" readonly="true">
-							<p:ajax process="@this" listener="#{nominaS.calculaFechaFin}" update="dp-periodo-fin anio semana" />
-						</p:datePicker>
-					</div>
-					<div class="field col-12 md:col-2">
-						<p:outputLabel value="Fin periodo" />
-						<p:datePicker id="dp-periodo-fin" value="#{nominaS.periodoFin}" placeholder="Periodo Fin" showIcon="true" pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6" readonly="true">
-							<p:ajax process="@this" listener="#{nominaS.calculaFechaInicio}" update="dp-periodo-inicio anio semana" />
-						</p:datePicker>
-					</div>
-					<div class="field col-12 md:col-2">
-						<p:outputLabel value="Emisor" />
-						<p:selectOneMenu id="soEmpresa" value="#{nominaS.empresaSelected}" autoWidth="false" converter="entityConverter">
-							<f:selectItem itemLabel="--Seleccione--"/>
-							<f:selectItems value="#{nominaS.lstEmpresas}" var="empresa" itemValue="#{empresa}" itemLabel="#{empresa.descripcion}"/>
-							<p:ajax process="@this"/>
-						</p:selectOneMenu>
-					</div>
-					<div class="field col-12 md:col-2">
-						<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
-						<p:commandButton value="Calcular" process="@this" update="dtNomina" actionListener="#{nominaS.calculandoNomina()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
-					</div>
+			<div class="ui-fluid formgrid grid align-items-left">
+				<div class="field col-12 md:col-2">
+					<p:outputLabel value="Emisor" />
+					<p:selectOneMenu id="soEmpresa" value="#{nominaS.empresaSelected}" autoWidth="false" converter="entityConverter">
+						<f:selectItem itemLabel="--Seleccione--"/>
+						<f:selectItems value="#{nominaS.lstEmpresas}" var="empresa" itemValue="#{empresa}" itemLabel="#{empresa.descripcion}"/>
+						<p:ajax event="change" process="@this" listener="#{nominaS.calculaPeriodo()}" update="anio semana dp-periodo-inicio dp-periodo-fin"/>
+					</p:selectOneMenu>
 				</div>
-			</p:panel>
+				<div class="field col-12 md:col-2">
+					<p:outputLabel value="Año" />
+					<p:spinner id="anio" value="#{nominaS.anio}" buttons="horizontal">
+						<p:ajax event="change" process="@this" update="semana dp-periodo-inicio dp-periodo-fin" listener="#{nominaS.calculaSemanas()}"></p:ajax>
+					</p:spinner>
+				</div>
+				<div class="field col-12 md:col-2">
+					<p:outputLabel value="Periodo" />
+					<p:selectOneMenu id="semana" value="#{nominaS.semana}" filter="true" filterMatchMode="contains" filterPlaceholder="Número de semana">
+						<f:selectItem itemLabel="--Seleccione--" noSelectionOption="true"/>
+						<f:selectItems  value="#{nominaS.semanasDelAnio}" var="periodo" itemLabel="Semana #{periodo}" itemValue="#{periodo}" />
+						<p:ajax event="change"  update="anio semana dp-periodo-inicio dp-periodo-fin" process="@this" listener="#{nominaS.calculaPeriodo()}"/>
+					</p:selectOneMenu>
+				</div>
+				<div class="field col-12 md:col-2">
+					<p:outputLabel value="Del" />
+					<p:datePicker id="dp-periodo-inicio" value="#{nominaS.periodoInicio}" placeholder="Periodo Inicio" showIcon="true" pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6" readonly="true">
+						<p:ajax process="@this" listener="#{nominaS.calculaFechaFin}" update="dp-periodo-fin anio semana" />
+					</p:datePicker>
+				</div>
+				<div class="field col-12 md:col-2">
+					<p:outputLabel value="al" />
+					<p:datePicker id="dp-periodo-fin" value="#{nominaS.periodoFin}" placeholder="Periodo Fin" showIcon="true" pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6" readonly="true">
+						<p:ajax process="@this" listener="#{nominaS.calculaFechaInicio}" update="dp-periodo-inicio anio semana" />
+					</p:datePicker>
+				</div>
+				<div class="field col-12 md:col-2">
+					<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+					<p:commandButton value="Calcular" process="@this" update="dtNomina" actionListener="#{nominaS.calculandoNomina()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
+				</div>
+			</div>
 			<div style="padding-top: 1rem;">
 				<p:dataTable id="dtNomina" widgetVar="dt-Nomina" var="nomina" value="#{nominaS.listaNomina}" lazy="true" reflow="true" paginatorPosition="bottom">
 					<p:column headerText="Num" width="4rem">

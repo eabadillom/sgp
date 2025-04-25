@@ -69,13 +69,13 @@ public class DetNominaReceptor implements Serializable {
 	private String antiguedad;
 	
 	@Column(name = "nu_dias_vacaciones")
-	private Integer diasVacaciones;
+	private BigDecimal diasVacaciones;
 	
 	@Column(name = "nu_prima_vacacional")
 	private BigDecimal primaVacacional;
 	
 	@Column(name = "nu_dias_aguinaldo")
-	private Integer diasAguinaldo;
+	private BigDecimal diasAguinaldo;
 	
 	@JoinColumn(name = "cd_tp_contrato")
 	@OneToOne
@@ -324,19 +324,19 @@ public class DetNominaReceptor implements Serializable {
 				+ ", salarioDiarioIntegrado=" + salarioDiarioIntegrado + "]";
 	}
 
-	public Integer getDiasVacaciones() {
+	public BigDecimal getDiasVacaciones() {
 		return diasVacaciones;
 	}
 
-	public void setDiasVacaciones(Integer diasVacaciones) {
+	public void setDiasVacaciones(BigDecimal diasVacaciones) {
 		this.diasVacaciones = diasVacaciones;
 	}
 
-	public Integer getDiasAguinaldo() {
+	public BigDecimal getDiasAguinaldo() {
 		return diasAguinaldo;
 	}
 
-	public void setDiasAguinaldo(Integer diasAguinaldo) {
+	public void setDiasAguinaldo(BigDecimal diasAguinaldo) {
 		this.diasAguinaldo = diasAguinaldo;
 	}
 

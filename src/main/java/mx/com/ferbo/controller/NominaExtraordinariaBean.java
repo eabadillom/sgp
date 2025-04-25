@@ -41,6 +41,7 @@ import mx.com.ferbo.dao.n.EmpresaDAO;
 import mx.com.ferbo.dao.n.NominaDAO;
 import mx.com.ferbo.dao.n.PercepcionDAO;
 import mx.com.ferbo.dao.n.PeriodicidadPagoDAO;
+import mx.com.ferbo.dao.n.VacacionesDAO;
 import mx.com.ferbo.model.CatEmpresa;
 import mx.com.ferbo.model.CatPercepcion;
 import mx.com.ferbo.model.CatPeriodicidadPago;
@@ -50,6 +51,7 @@ import mx.com.ferbo.model.DetNominaDeduccion;
 import mx.com.ferbo.model.DetNominaOtroPago;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.DetNominaPeriodo;
+import mx.com.ferbo.model.DetNominaPeriodoPK;
 import mx.com.ferbo.model.DetVacaciones;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.util.BitacoraUIAppender;
@@ -92,6 +94,7 @@ public class NominaExtraordinariaBean implements Serializable {
 	private List<DetNomina> listaNomina = null;
 	private List<DetNomina> listaNominaSelected = null;
 	private ParametrosNomina parametros = null;
+	private VacacionesDAO vacacionesDAO = null;
 	
 	private CatPercepcion percepcion = null;
 	private List<CatPercepcion> percepciones = null;
@@ -103,6 +106,8 @@ public class NominaExtraordinariaBean implements Serializable {
 	private Boolean detalle = true;
 	private String bitacora = null;
 	private StreamedContent file;
+	
+	private Boolean calculoAutomatico = false;
 
     public NominaExtraordinariaBean() {
     	this.context = FacesContext.getCurrentInstance();
@@ -115,6 +120,7 @@ public class NominaExtraordinariaBean implements Serializable {
     	empleadoDAO = new EmpleadoDAO();
     	nominaDAO = new NominaDAO();
     	percepcionDAO = new PercepcionDAO();
+    	vacacionesDAO = new VacacionesDAO();
 	}
     
     @PostConstruct
@@ -195,6 +201,7 @@ public class NominaExtraordinariaBean implements Serializable {
     			anio = DateUtil.getAnio(DateUtil.now());
     		else
     			anio = this.nominaPeriodo.getKey().getAnio();
+    		
     		this.nominaPeriodo = NominaPeriodoBL.build(this.empresa, NominaBL.TP_NOMINA_EXTRAORDINARIA, this.periodicidad, anio);
     		this.nominaPeriodo.setPeriodoInicio(DateUtil.setAnio(this.nominaPeriodo.getPeriodoInicio(), anio));
     		this.nominaPeriodo.setPeriodoFin(DateUtil.setAnio(this.nominaPeriodo.getPeriodoFin(), anio));
@@ -203,6 +210,34 @@ public class NominaExtraordinariaBean implements Serializable {
     	} catch (SGPException ex) {
 			log.error("Problema para generar el periodo...", ex);
 		}
+    }
+    
+    public void cargarPeriodo() {
+    	DetNominaPeriodo nominaPeriodo = null;
+    	
+    	try {
+    		log.info("CARGANDO PERIODO...");
+    		nominaPeriodo = NominaPeriodoBL.cargar(
+    				new DetNominaPeriodoPK(this.empresa, NominaBL.TP_NOMINA_EXTRAORDINARIA, this.periodicidad, this.nominaPeriodo.getKey().getAnio(), this.nominaPeriodo.getKey().getPeriodo()));
+    		
+    		if(nominaPeriodo == null) {
+        		this.nominaPeriodo = NominaPeriodoBL.build(
+        				this.empresa, NominaBL.TP_NOMINA_EXTRAORDINARIA, this.periodicidad, this.nominaPeriodo.getKey().getAnio());
+        		this.listaNomina.clear();
+        		this.fechaPeriodo = null;
+        		this.fechaPago = null;
+        	} else {
+        		this.nominaPeriodo = nominaPeriodo;
+        		this.fechaPeriodo = DateUtil.toDate(this.nominaPeriodo.getPeriodoFin());
+        		this.fechaPago = DateUtil.toDate(this.nominaPeriodo.getFechaPago());
+        		this.cargarEmpleados();
+        	}
+    		
+    	} catch(Exception ex) {
+    		log.error("Problema para obtener el periodo de nómina solicitado.", ex);
+    	} finally {
+    		PrimeFaces.current().ajax().update("form:acc:dtNomina");
+    	}
     }
     
     public void cargarEmpleados() {
@@ -214,13 +249,38 @@ public class NominaExtraordinariaBean implements Serializable {
 		List<DetEmpleado> listaEmpleados = null;
 		
 		try {
+			if(this.empresa == null)
+				throw new SGPException("Debe indicar una empresa.");
+			
+			if(this.nominaPeriodo.getKey().getAnio() == null)
+				throw new SGPException("Debe indicar un año.");
+			
+			if(this.nominaPeriodo.getKey().getPeriodo() == null)
+				throw new SGPException("Debe indicar un periodo.");
+			
+			if(this.fechaPeriodo == null)
+				throw new SGPException("Debe indicar un periodo.");
+			
+			if(this.fechaPago == null)
+				throw new SGPException("Debe indicar una fecha de pago.");
+			
 			this.listaNomina.clear();
+			
+    		this.nominaPeriodo.setPeriodoFin(DateUtil.toLocalDate(this.fechaPeriodo));
+    		this.nominaPeriodo.setPeriodoInicio(DateUtil.toLocalDate(this.fechaPeriodo));
+    		this.nominaPeriodo.setFechaPago(DateUtil.toLocalDate(this.fechaPago));
+	    	
 			listaEmpleados = this.empleadoDAO.buscarActivoEmpresaIngreso(empresa.getIdEmpresa(), DateUtil.toDate(this.nominaPeriodo.getPeriodoInicio()), DateUtil.toDate(this.nominaPeriodo.getPeriodoFin()));
 			this.procesaListaEmpleados(listaEmpleados);
 			mensaje = "Nomina cargada correctamente.";
     		severity = FacesMessage.SEVERITY_INFO;
+    		
+		} catch(SGPException ex){
+			log.warn("Problema para procesar la nómina: {}", ex.getMessage());
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
     	} catch(Exception ex) {
-    		log.error("Problema para procesar la nómina.");
+    		log.error("Problema para procesar la nómina.", ex);
     		mensaje = "Hay un problema para procesar la nómina.";
     		severity = FacesMessage.SEVERITY_ERROR;
     	} finally {
@@ -238,11 +298,6 @@ public class NominaExtraordinariaBean implements Serializable {
     	DetNomina nomina = null;
     	Integer idNominaTmp = -1;
     	
-		this.nominaPeriodo = NominaPeriodoBL.build(empresa, NominaBL.TP_NOMINA_EXTRAORDINARIA, periodicidad, this.nominaPeriodo.getKey().getAnio());
-		this.nominaPeriodo.setPeriodoInicio(DateUtil.toLocalDate(this.fechaPeriodo));
-		this.nominaPeriodo.setPeriodoFin(DateUtil.toLocalDate(this.fechaPeriodo));
-		this.nominaPeriodo.setFechaPago(DateUtil.toLocalDate(this.fechaPago));
-    	
     	this.parametros = new ParametrosNomina();
     	this.parametros.cargar(this.nominaPeriodo);
     	
@@ -250,7 +305,7 @@ public class NominaExtraordinariaBean implements Serializable {
     	
     	for(DetEmpleado empleado : listaEmpleados) {
     		log.info("Cargando empleado {} {} {}...", empleado.getNombre(), empleado.getPrimerAp(), empleado.getSegundoAp());
-    		nomina = nominaDAO.buscar(this.empresa.getRfc(), this.nominaPeriodo.getKey().getTipoNomina(), this.nominaPeriodo.getKey().getAnio(), this.nominaPeriodo.getKey().getPeriodo(), empleado.getRfc());
+    		nomina = nominaDAO.buscar(this.empresa.getRfc(), this.nominaPeriodo.getKey().getTipoNomina(), this.nominaPeriodo.getKey().getAnio(), this.nominaPeriodo.getKey().getPeriodo(), empleado.getDatoEmpresa().getRfc());
     		
     		if(nomina == null) {
     			nomina = this.procesaEmpleado(empleado);
@@ -294,13 +349,44 @@ public class NominaExtraordinariaBean implements Serializable {
     	log.info("Actualizando nomina...");
     }
     
+    
+    /**El método nuevaPercepcion está pensado para configurar una percepción que se calculará automáticamente
+     * para los empleados seleccionados (listaNominaSelected).
+     */
     public void nuevaPercepcion() {
-    	log.info("Agregando nueva percepcion...");
-    	this.percepcion = null;
-    	this.nomPercepcion = PercepcionBL.build();
-    	log.info("Percepcion: {}", this.nomPercepcion);
+    	FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Nómina";
     	
-    	PrimeFaces.current().ajax().update("form:dlg-percepcion-all");
+    	try {
+    		if(this.listaNominaSelected.size() <= 0)
+    			throw new SGPException("Debe seleccionar al menos un empleado.");
+    		
+    		log.info("Agregando nueva percepcion...");
+        	this.percepcion = null;
+        	this.nomPercepcion = PercepcionBL.build();
+        	log.info("Percepcion: {}", this.nomPercepcion);
+        	this.calculoAutomatico = true;
+        	
+        	PrimeFaces.current().executeScript("PF('dlgPercepcionAll').show();");
+        	PrimeFaces.current().ajax().update("form:dlg-percepcion-all");
+    	} catch(SGPException ex){
+			log.warn("Problema para procesar la nómina: {}", ex.getMessage());
+			mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+			message = new FacesMessage(severity, titulo, mensaje);
+    		FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update("form:messages");
+    	} catch(Exception ex) {
+    		log.error("Problema para procesar la nómina.", ex);
+    		mensaje = "Hay un problema para procesar la nómina.";
+    		severity = FacesMessage.SEVERITY_ERROR;
+    		message = new FacesMessage(severity, titulo, mensaje);
+    		FacesContext.getCurrentInstance().addMessage(null, message);
+    		PrimeFaces.current().ajax().update("form:messages");
+    	}
+    	
     }
     
 	public void agregarPercepcion() {
@@ -329,7 +415,6 @@ public class NominaExtraordinariaBean implements Serializable {
 		String mensaje = null;
 		String titulo = "Nómina";
     	
-    	
     	try {
     		if(this.listaNominaSelected.size() == 0)
     			throw new SGPException("Debe seleccionar al menos un empleado.");
@@ -349,6 +434,12 @@ public class NominaExtraordinariaBean implements Serializable {
     	
 	    	for(DetNomina nomina : this.listaNominaSelected) {
 	    		log.info("[UI] -------Agregando percepción al empleado: {}", nomina.getReceptor().getNombre());
+	    		
+	    		if(nomina.getId() != null && nomina.getId() > 0) {
+	    			log.info("[UI] El empleado ya tiene calculada su nómina en un proceso anterior. Se omitirá el cálculo solicitado.");
+	    			continue;
+	    		}
+	    		
 	    		this.nominaBO.calcular(nomina, this.nomPercepcion);
 	    		log.info("[UI] -------Percepción agregada----------");
 	    	}
@@ -411,26 +502,12 @@ public class NominaExtraordinariaBean implements Serializable {
 		Severity severity = null;
 		String mensaje = null;
 		String titulo = "Percepción";
-		List<String> listaDiasLaboralesEmpleado = null;
-		BigDecimal diasLaboralesEmpleado = null;
-		List<String> listaDiasNoLaboralesEmpleado = null;
-		BigDecimal diasNoLaboralesEmpleado = null;
-		BigDecimal diasTrabajados = null;
-		DetEmpleado empleado = null;
+		NominaExtraordinariaBL nominaBO = null;
 		
 		try {
-			empleado = empleadoDAO.buscarPorRFC(this.nomina.getReceptor().getRfc());
 			
-			listaDiasLaboralesEmpleado = NominaSemanalBL.getDiasLaboralesPorSemana(empleado);
-			listaDiasNoLaboralesEmpleado = NominaSemanalBL.getDiasNoLaboralesPorSemana(empleado);
-			diasLaboralesEmpleado   = new BigDecimal(listaDiasLaboralesEmpleado.size()).setScale(2, BigDecimal.ROUND_HALF_UP);
-			diasNoLaboralesEmpleado = new BigDecimal(listaDiasNoLaboralesEmpleado.size()).setScale(2, BigDecimal.ROUND_HALF_UP);
-			diasTrabajados = percepcion.getCantidad();
-			
-			if(percepcion.getCantidad() != null && AbstractPBL.CVE_SUELDO.equalsIgnoreCase(percepcion.getClave())) {
-				NominaSemanalBL.calcularSueldo(nomina, parametros,  diasLaboralesEmpleado, diasNoLaboralesEmpleado, diasTrabajados, null);
-			}
-			NominaSemanalBL.procesarISR(nomina, parametros);
+			nominaBO = new NominaExtraordinariaBL(this.parametros);
+			nominaBO.calcular(nomina, percepcion);
 			
 			this.actualizar();
 			
@@ -489,14 +566,14 @@ public class NominaExtraordinariaBean implements Serializable {
 			
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update("formNomina:messages");
+			PrimeFaces.current().ajax().update("form:messages");
 		} catch(Exception ex) {
 			mensaje = "Hay un problema para crear el pago.";
 			severity = FacesMessage.SEVERITY_ERROR;
 			
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update("formNomina:messages");
+			PrimeFaces.current().ajax().update("form:messages");
 		}
     }
     
@@ -526,14 +603,14 @@ public class NominaExtraordinariaBean implements Serializable {
 			
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update("formNomina:messages");
+			PrimeFaces.current().ajax().update("form:messages");
 		} catch(Exception ex) {
 			mensaje = "Hay un problema para crear la deducción.";
 			severity = FacesMessage.SEVERITY_ERROR;
 			
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update("formNomina:messages");
+			PrimeFaces.current().ajax().update("form:messages");
 		}
     }
     
@@ -560,8 +637,76 @@ public class NominaExtraordinariaBean implements Serializable {
 		} finally {
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update("formNomina:messages", "formNomina:tv-nomina");
+			PrimeFaces.current().ajax().update("form:messages", "form:tv-nomina");
 		}
+    }
+    
+    public void guardarNominaEmpleado() {
+		FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Nómina";
+    	
+    	try {
+    		log.info("Guardando nomina...");
+    		
+    		if(this.listaNominaSelected == null)
+    			throw new SGPException("No hay información de nómina.");
+    	
+    		if(this.listaNominaSelected.size() <= 0)
+    			throw new SGPException("No hay información de nómina.");
+    		
+    		for(DetNomina nomina : this.listaNominaSelected) {
+    			log.info("[UI] Guardando información del empleado {}", nomina.getReceptor().getNombre());
+    			
+    			if(nomina.getId() != null && nomina.getId() > 0) {
+    				log.info("[UI] La información del empleado ya se encuentra registrada en la nómina.");
+    				continue;
+    			}
+    			
+    			if(nomina.getId() < 0)
+    				nomina.setId(null);
+    			
+    			nomina.setFechaEmision(new Date());
+    			
+    			if(nomina.getId() == null || nomina.getId() < 0)
+    				nominaDAO.guardar(nomina);
+    			else
+    				nominaDAO.actualizar(nomina);
+    			
+    			for(DetVacaciones periodoVac : nomina.getVacaciones()) {
+    				log.info("[UI] Actualizando periodo vacacional: {}", periodoVac);
+    				vacacionesDAO.actualizar(periodoVac);
+    			}
+    			
+    			
+    			log.info("[UI] La información del empleado se guardó correctamente.");
+    		}
+    		
+    		DetNominaPeriodo result = NominaPeriodoBL.cargar(this.nominaPeriodo.getKey());
+    		
+    		if(result == null) {
+    			NominaPeriodoBL.guardar(this.nominaPeriodo);
+    		} else {
+    			NominaPeriodoBL.actualizar(this.nominaPeriodo);
+    		}
+    		
+    		log.info("Nomina guardada correctamente.");
+    		
+    		mensaje = "La información se guardó correctamente.";
+    		severity = FacesMessage.SEVERITY_INFO;
+    	} catch(SGPException ex) {
+    		mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+    	} catch(Exception ex) {
+    		log.error("Problema para guardar la nómina...", ex);
+			mensaje = "Hay un problema para guardar nómina.";
+			severity = FacesMessage.SEVERITY_ERROR;
+    	} finally {
+    		message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update("form:messages", "form:tv-nomina");
+    	}
     }
     
     public void cargarBitacora() {
@@ -726,5 +871,13 @@ public class NominaExtraordinariaBean implements Serializable {
 
 	public void setFile(StreamedContent file) {
 		this.file = file;
+	}
+
+	public Boolean getCalculoAutomatico() {
+		return calculoAutomatico;
+	}
+
+	public void setCalculoAutomatico(Boolean calculoAutomatico) {
+		this.calculoAutomatico = calculoAutomatico;
 	}
 }

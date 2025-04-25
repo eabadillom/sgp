@@ -52,6 +52,7 @@ public class ParametrosNomina {
 	private Date periodoFin      = null;
 	private Date fechaInicioAnio = null;
 	private Date fechaFinAnio    = null;
+	private Date fechaEmision    = null;
 	
 	private CatEmpresa               empresa                = null;
 	private CatUMA                   uma                    = null;
@@ -105,7 +106,8 @@ public class ParametrosNomina {
 		this.tipoDeduccionDAO   = new TipoDeduccionDAO();
 		this.cuotasIMSSDAO      = new CuotaIMSSDAO();
 		this.umaDAO             = new UMADAO();
-		this.statusRegistroDAO = new EstatusRegistroDAO();
+		this.statusRegistroDAO  = new EstatusRegistroDAO();
+		this.fechaEmision       = new Date();
 	}
 	
 	public void cargar(DetNominaPeriodo nominaPeriodo) {
@@ -140,6 +142,7 @@ public class ParametrosNomina {
 		//TODO Temporalmente se movieron las tasas de bono de puntualidad y vales de despensa a esta clase, sin embargo, deben parametrizarse en otro lugar.
 		this.bonoPuntualidad        = new BigDecimal("0.1").setScale(2, BigDecimal.ROUND_HALF_UP);
 		this.valeDespensa           = new BigDecimal("0.4").setScale(2, BigDecimal.ROUND_HALF_UP);
+		this.fechaEmision           = new Date();
 		
 		try {
 			log.info("[UI] Año: {}, Periodo {}: del {} al {}, ",
@@ -151,6 +154,7 @@ public class ParametrosNomina {
 		}
 	}
 	
+	@Deprecated
 	public void cargar(Date periodoInicio, Date periodoFin) {
 		//Cálculo de fechas importantes del periodo de pago de nómina.
 		this.periodoInicio   = new Date(periodoInicio.getTime());
@@ -275,6 +279,10 @@ public class ParametrosNomina {
 
 	public CatEmpresa getEmpresa() {
 		return empresa;
+	}
+
+	public Date getFechaEmision() {
+		return fechaEmision;
 	}
 	
 }

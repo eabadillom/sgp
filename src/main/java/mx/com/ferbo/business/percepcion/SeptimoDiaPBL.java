@@ -7,25 +7,25 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.nomina.ParametrosNomina;
+import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.DetNominaPercepcionPK;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.util.FormatUtil;
+import mx.com.ferbo.util.SGPException;
 
-public class SeptimoDiaPBL extends AbstractPBL implements IPercepcion {
+public class SeptimoDiaPBL extends AbstractPBL {
 	
 	private static Logger log = LogManager.getLogger(SeptimoDiaPBL.class);
 	
-	private ParametrosNomina parametros = null;
 	private BigDecimal diasLaborales    = null;
 	private BigDecimal diasNoLaborales  = null;
 	private BigDecimal diasVacaciones   = null;
 	private BigDecimal diasTrabajados   = null;
 	
 	public SeptimoDiaPBL(ParametrosNomina parametros, BigDecimal diasLaborales, BigDecimal diasNoLaborales, BigDecimal diasTrabajados, BigDecimal diasVacaciones) {
-		this.parametros = parametros;
-		this.tiposPercepcion = parametros.getTiposPercepcion();
+		super(parametros);
 		this.diasLaborales = diasLaborales;
 		this.diasNoLaborales = diasNoLaborales;
 		this.diasTrabajados = diasTrabajados;
@@ -33,7 +33,7 @@ public class SeptimoDiaPBL extends AbstractPBL implements IPercepcion {
 	}
 
 	@Override
-	public DetNominaPercepcion calcular(DetNomina nomina) {
+	public DetNominaPercepcion procesar(DetNomina nomina) {
 		DetNominaPercepcion percepcion = null;
 		
 		BigDecimal          salarioDiario = null;
@@ -98,10 +98,25 @@ public class SeptimoDiaPBL extends AbstractPBL implements IPercepcion {
 		percepcion.setNombre(nombre);
 		percepcion.setTipoPercepcion(tpSeptimoDia);
 		percepcion.setCantidad(proporcionalSemanal);
+		percepcion.setImporteExento(ValoresBD._CERO.get());
 		percepcion.setImporteGravado(septimoDia);
-		percepcion.setImporteExento(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP));
 		
 		if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(BigDecimal.ZERO) > 0)
 			nomina.getPercepciones().add(percepcion);
 	}
+	
+	@Override
+	protected BigDecimal calcularCantidad(DetNomina nomina) throws SGPException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**El septimo dia está gravado al 100% con ISR.
+	 */
+	@Override
+	public BigDecimal calcularLimiteExento() {
+		return ValoresBD._CERO.get();
+	}
+
+	
 }

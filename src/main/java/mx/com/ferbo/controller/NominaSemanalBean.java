@@ -23,24 +23,29 @@ import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.business.nomina.AsistenciaBL;
 import mx.com.ferbo.business.nomina.NominaBL;
+import mx.com.ferbo.business.nomina.NominaPeriodoBL;
 import mx.com.ferbo.business.nomina.NominaSemanalBL;
 import mx.com.ferbo.business.nomina.ParametrosNomina;
 import mx.com.ferbo.business.percepcion.AbstractPBL;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.EmpresaDAO;
 import mx.com.ferbo.dao.n.NominaDAO;
+import mx.com.ferbo.dao.n.PeriodicidadPagoDAO;
 import mx.com.ferbo.dto.ui.Asistencia;
 import mx.com.ferbo.model.CatEmpresa;
+import mx.com.ferbo.model.CatPeriodicidadPago;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
 import mx.com.ferbo.model.DetNominaOtroPago;
 import mx.com.ferbo.model.DetNominaPercepcion;
+import mx.com.ferbo.model.DetNominaPeriodo;
 import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.DetRegistro;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.model.sat.CatTipoOtroPago;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
+import mx.com.ferbo.util.BitacoraUIAppender;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.ManageStatus;
 import mx.com.ferbo.util.SGPException;
@@ -68,6 +73,10 @@ public class NominaSemanalBean implements Serializable {
     private DetNominaOtroPago otroPago;
     private DetNominaDeduccion deduccion;
     
+    private DetNominaPeriodo nominaPeriodo;
+    private CatPeriodicidadPago periodicidad = null;
+    private PeriodicidadPagoDAO periodicidadDAO = null;
+    
     private Integer anio;
     private Date fecha;
     private Date periodoInicio;
@@ -81,26 +90,25 @@ public class NominaSemanalBean implements Serializable {
     private Boolean detalle = true;
 
 	public NominaSemanalBean() {
-		listaNomina = new ArrayList<>();
+		listaNomina     = new ArrayList<>();
 
-		empleadoDAO = new EmpleadoDAO(DetEmpleado.class);
-		empresaDAO = new EmpresaDAO(CatEmpresa.class);
-		nominaDAO = new NominaDAO(DetNomina.class);
+		empleadoDAO     = new EmpleadoDAO();
+		empresaDAO      = new EmpresaDAO();
+		nominaDAO       = new NominaDAO();
+		periodicidadDAO = new PeriodicidadPagoDAO();
 	}
     
     @PostConstruct
     public void init() {
+    	BitacoraUIAppender.limpiar();
         log.info("====================== entrada init NominaSemanalBean ======================");
         this.configuraPeriodo();
         lstEmpresas = empresaDAO.buscarActivo();
 
         log.info("Inicio del periodo: {}", periodoFin);
         log.info("Fin del periodo: {}", periodoInicio);
-        try {
-			this.nomina = NominaBL.build(NominaBL.TP_NOMINA_ORDINARIA, parametros, null);
-		} catch (SGPException ex) {
-			log.info("Problema para generar el objeto nómina...", ex);
-		}
+        
+        this.periodicidad = periodicidadDAO.buscarPorId("02");
         this.percepcion = new DetNominaPercepcion();
         this.otroPago = new DetNominaOtroPago();
         this.deduccion = new DetNominaDeduccion();
@@ -133,6 +141,29 @@ public class NominaSemanalBean implements Serializable {
         periodoInicio = cal.getTime();
         
         
+    }
+    
+    public void calculaPeriodo() {
+    	
+    	try {
+    		if(this.empresaSelected == null)
+    			throw new SGPException("Debe seleccionar una empresa");
+    		
+    		if(this.nominaPeriodo == null)
+    			this.anio = DateUtil.getAnio(DateUtil.now());
+    		else
+    			this.nominaPeriodo.getKey().setAnio(this.anio);
+    		
+    		this.nominaPeriodo = NominaPeriodoBL.build(this.empresaSelected, NominaBL.TP_NOMINA_ORDINARIA, this.periodicidad, anio);
+    		this.calculaFechasPeriodo();
+    		this.nominaPeriodo.setPeriodoInicio(DateUtil.toLocalDate(this.periodoInicio));
+    		this.nominaPeriodo.setPeriodoFin(DateUtil.toLocalDate(this.periodoFin));
+    		this.nominaPeriodo.setFechaPago(DateUtil.toLocalDate(this.fecha));
+    		
+    			
+    	} catch(SGPException ex) {
+    		log.error("Probleam para generar el periodo...", ex);
+    	}
     }
     
     public void calculaSemanas() {
@@ -209,7 +240,8 @@ public class NominaSemanalBean implements Serializable {
     	DetNomina nomina = null;
     	try {
     		this.parametros = new ParametrosNomina();
-    		this.parametros.cargar(periodoInicio, periodoFin);
+    		this.parametros.cargar(nominaPeriodo);
+//    		this.parametros.cargar(periodoInicio, periodoFin);
     		
     		this.tiposPercepcion = this.parametros.getTiposPercepcion();
     		this.tiposOtroPago = this.parametros.getTiposOtroPago();
