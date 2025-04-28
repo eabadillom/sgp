@@ -1,6 +1,7 @@
 package mx.com.ferbo.business.percepcion;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -54,18 +55,18 @@ public class SeptimoDiaPBL extends AbstractPBL {
 				log.info("Se encontraron conceptos {}, los cuales fueron eliminados para el reproceso de SEPTIMO DIA.", CVE_SEPTIMO_DIA);
 			
 			t = new BigDecimal(parametros.getDiasPeriodo())
-					.setScale(2, BigDecimal.ROUND_HALF_UP)
+					.setScale(2, RoundingMode.HALF_UP)
 					.subtract(diasNoLaborales)
-					.setScale(2, BigDecimal.ROUND_HALF_UP);
+					.setScale(2, RoundingMode.HALF_UP);
 			
 			proporcionalSemanal = diasTrabajados
 					.add(diasVacaciones)
-					.divide(t, 4, BigDecimal.ROUND_HALF_UP)
+					.divide(t, 4, RoundingMode.HALF_UP)
 					;
 			
 			septimoDia = salarioDiario
 					.multiply(proporcionalSemanal)
-					.setScale(2, BigDecimal.ROUND_HALF_UP);
+					.setScale(2, RoundingMode.HALF_UP);
 			
 			for(int i = 0; i < diasNoLaborales.intValue(); i++) {
 				diaDescanso = diasLaborales.add(new BigDecimal(i+1)).intValue();
@@ -77,11 +78,17 @@ public class SeptimoDiaPBL extends AbstractPBL {
 			log.info("Sexto y septimo día se agregaron directamente al objeto nomina.percepciones");
 		} catch(Exception ex) {
 			log.error("Problema para obtener el cálculo del septimo día.",  ex);
-			septimoDia = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
-			proporcionalSemanal = BigDecimal.ZERO.setScale(4, BigDecimal.ROUND_HALF_UP);
+			septimoDia = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+			proporcionalSemanal = BigDecimal.ZERO.setScale(4, RoundingMode.HALF_UP);
 		}
 		
 		return percepcion;
+	}
+	
+	@Override
+	public DetNominaPercepcion procesar(DetNomina nomina, BigDecimal cantidad) throws SGPException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	private void percepcionDiaDescanso(DetNomina nomina, String clave, String nombre, BigDecimal proporcionalSemanal, BigDecimal septimoDia) {
@@ -117,6 +124,4 @@ public class SeptimoDiaPBL extends AbstractPBL {
 	public BigDecimal calcularLimiteExento() {
 		return ValoresBD._CERO.get();
 	}
-
-	
 }

@@ -1,6 +1,7 @@
 package mx.com.ferbo.business.percepcion;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,6 +31,8 @@ public class ValesDespensaPBL extends AbstractPBL {
 	
 	public ValesDespensaPBL(ParametrosNomina parametros, BigDecimal diasTrabajados, BigDecimal uma, BigDecimal tasaVales, BigDecimal diasPeriodo) {
 		super(parametros);
+		this.baseCalculo = this.uma;
+		
 		this.diasTrabajados = diasTrabajados;
 		this.uma = uma;
 		this.tasaVales = tasaVales;
@@ -37,12 +40,37 @@ public class ValesDespensaPBL extends AbstractPBL {
 	}
 	
 	@Override
-	public DetNominaPercepcion procesar(DetNomina nomina) {
+	public DetNominaPercepcion procesar(DetNomina nomina) throws SGPException {
+		DetNominaPercepcion percepcion = null;
+		
+		/* El importe de los vales de despensa estarán excluidos del
+		 * cálculo del Salario Base de Cotización (IMSS) siempre y cuando
+		 * no superen el 40% de la UMA mensual (se debe revisar el ajuste
+		 * a UMA diaria o semanal, para una correcta aplicación del
+		 * criterio).
+		 * 
+		 * En caso de exceder el valor deL 40% de la UMA, la diferencia
+		 * se calculará de manera diaria y se sumará al SBC.
+		 * */
+		//TODO Pendiente aplicar criterio de exención para SBC.
+		
+		
+		//Cálculo de importes exento y gravado (para LISR, Art. 93, parrafo penultimo).
+		if(this.diasTrabajados.compareTo(_CERO.get()) == 0)
+			throw new SGPException("No es posible asignar vales de despensa.");
+		
+		this.cantidad = this.calcularCantidad(nomina);
+		percepcion = this.procesar(nomina, this.cantidad);
+		
+		return percepcion;
+	}
+	
+	@Override
+	public DetNominaPercepcion procesar(DetNomina nomina, BigDecimal cantidad) throws SGPException {
 		DetNominaPercepcion percepcion = null;
 		DetPercepcionEmpleado percepcionEmpleado = null;
 		
 		try {
-			this.baseCalculo = this.uma;
 			
 			/* El importe de los vales de despensa estarán excluidos del
 			 * cálculo del Salario Base de Cotización (IMSS) siempre y cuando
@@ -55,14 +83,6 @@ public class ValesDespensaPBL extends AbstractPBL {
 			 * */
 			//TODO Pendiente aplicar criterio de exención para SBC.
 			
-			
-			//Cálculo de importes exento y gravado (para LISR, Art. 93, parrafo penultimo).
-    		if(this.diasTrabajados.compareTo(_CERO.get()) == 0)
-    			throw new SGPException("No es posible asignar vales de despensa.");
-    		
-//    		importe = uma.multiply(tasaVales).setScale(4, BigDecimal.ROUND_HALF_UP);
-//    		importe = importe.multiply(diasPeriodo).setScale(2, BigDecimal.ROUND_HALF_UP);
-    		
     		this.cantidad = this.calcularCantidad(nomina);
     		this.importe = this.calcularImporte(this.cantidad, this.baseCalculo);
     		
@@ -78,15 +98,20 @@ public class ValesDespensaPBL extends AbstractPBL {
     		
     		this.calcularExentoGravado();
     		
-		} catch(SGPException ex){
-			log.warn("No es posible calcular los vales de despensa: {}", ex.getMessage());
-			importeExento = _CERO.get();
-			importeGravado = _CERO.get();
-    	} catch(Exception ex) {
-    		log.error("No es posible calcular los vales de despensa...", ex);
-    		importeExento = ValoresBD._CERO.get();
-			importeGravado = ValoresBD._CERO.get();
-    	} finally {
+		} catch(SGPException ex) {
+			log.warn("[UI] {}", ex.getMessage());
+			this.cantidad       = ValoresBD._CERO.get();
+			this.importe        = ValoresBD._CERO.get();
+			this.importeExento  = ValoresBD._CERO.get();
+			this.importeGravado = ValoresBD._CERO.get();
+			throw ex;
+		} catch(Exception ex) {
+			log.error("Problema para generar la percepción...", ex);
+			this.cantidad       = ValoresBD._CERO.get();
+			this.importe        = ValoresBD._CERO.get();
+			this.importeExento  = ValoresBD._CERO.get();
+			this.importeGravado = ValoresBD._CERO.get();
+		} finally {
     		percepcion = this.build(nomina, CVE_VALES_DESPENSA, _CERO.get(), importeExento, importeGravado);
     	}
 		
@@ -95,7 +120,7 @@ public class ValesDespensaPBL extends AbstractPBL {
 	
 	@Override
 	protected BigDecimal calcularCantidad(DetNomina nomina) throws SGPException {
-		return this.tasaVales.setScale(4, BigDecimal.ROUND_HALF_UP)
+		return this.tasaVales.setScale(4, RoundingMode.HALF_UP)
 				.multiply(this.diasPeriodo);
 	}
 
@@ -105,6 +130,6 @@ public class ValesDespensaPBL extends AbstractPBL {
 		 */
 		return this.uma
 				.multiply(_7.get())
-				.setScale(2, BigDecimal.ROUND_HALF_UP);
+				.setScale(2, RoundingMode.HALF_UP);
 	}
 }

@@ -443,7 +443,7 @@
 									<p:ajax process="@this" update="form:tv-nomina" event="change" listener="#{nominaE.actualizarPercepcion(percepcion)}"/>
 								</p:inputNumber>
 							</p:column>
-							<p:column headerText="Importe excento" width="8rem">
+							<p:column headerText="Importe exento" width="8rem">
 								<p:inputNumber value="#{percepcion.importeExento}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," inputStyle="text-align: right" readonly="#{nominaE.nomina.id ne null}">
 									<p:ajax process="@this" update="form:tv-nomina" event="change" listener="#{nominaE.actualizar()}"/>
 								</p:inputNumber>

@@ -35,7 +35,6 @@ import mx.com.ferbo.business.nomina.NominaPeriodoBL;
 import mx.com.ferbo.business.nomina.NominaSemanalBL;
 import mx.com.ferbo.business.nomina.ParametrosNomina;
 import mx.com.ferbo.business.nomina.PercepcionBL;
-import mx.com.ferbo.business.percepcion.AbstractPBL;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.EmpresaDAO;
 import mx.com.ferbo.dao.n.NominaDAO;
@@ -440,7 +439,7 @@ public class NominaExtraordinariaBean implements Serializable {
 	    			continue;
 	    		}
 	    		
-	    		this.nominaBO.calcular(nomina, this.nomPercepcion);
+	    		this.nominaBO.calcular(nomina, this.nomPercepcion.getClave());
 	    		log.info("[UI] -------Percepción agregada----------");
 	    	}
 	    	
@@ -493,7 +492,7 @@ public class NominaExtraordinariaBean implements Serializable {
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
     	} finally {
-    		PrimeFaces.current().ajax().update(":form:messages", ":form:dtNomina");
+    		PrimeFaces.current().ajax().update(":form:messages", "form:acc:dtNomina");
     	}
     }
     
@@ -503,14 +502,15 @@ public class NominaExtraordinariaBean implements Serializable {
 		String mensaje = null;
 		String titulo = "Percepción";
 		NominaExtraordinariaBL nominaBO = null;
+		BigDecimal cantidad = null;
+		String     clavePercepcion = null;
 		
 		try {
-			
+			clavePercepcion = percepcion.getClave();
+			cantidad = percepcion.getCantidad();
 			nominaBO = new NominaExtraordinariaBL(this.parametros);
-			nominaBO.calcular(nomina, percepcion);
-			
+			nominaBO.calcular(nomina, clavePercepcion, cantidad);
 			this.actualizar();
-			
 		} catch(Exception ex) {
 			log.error("Problema para agregar la percepcion...", ex);
     		mensaje = "Hay un problema para agregar la percepción.";
@@ -531,7 +531,7 @@ public class NominaExtraordinariaBean implements Serializable {
 		
 		try {
 			NominaBL.eliminarPercepcion(nomina, percepcion);
-			NominaSemanalBL.procesarISR(nomina, parametros);
+			NominaExtraordinariaBL.calcularISRL174(nomina, parametros);
 			this.actualizar();
 			
 			mensaje = "Percepción eliminada correctamente.";

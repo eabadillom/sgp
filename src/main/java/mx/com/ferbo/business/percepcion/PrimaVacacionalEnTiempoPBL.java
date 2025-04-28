@@ -5,6 +5,7 @@ import static mx.com.ferbo.enums.ValoresBD._15;
 import static mx.com.ferbo.enums.ValoresBD._CERO;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 
 import org.apache.logging.log4j.LogManager;
@@ -28,37 +29,41 @@ public class PrimaVacacionalEnTiempoPBL extends AbstractPBL {
 	}
 
 	@Override
-	public DetNominaPercepcion procesar(DetNomina nomina) {
+	public DetNominaPercepcion procesar(DetNomina nomina) throws SGPException {
+		DetNominaPercepcion       percepcion    = null;
+		
+		this.cantidad = this.calcularCantidad(nomina);
+		percepcion = this.procesar(nomina, this.cantidad);
+		
+		return percepcion;
+	}
+	
+	@Override
+	public DetNominaPercepcion procesar(DetNomina nomina, BigDecimal cantidad) {
 		DetNominaPercepcion       percepcion    = null;
 		
 		try {
+			if(cantidad == null)
+				throw new SGPException("No se indicó el valor (cantidad).");
 			
-			this.cantidad = this.calcularCantidad(nomina);
 			this.importe = this.calcularImporte(cantidad, this.baseCalculo);
-			
 			this.calcularExentoGravado();
 			
 			log.info("[UI] Limite exento = {} * {} = {}", _15.get(), parametros.getUma().getImporteDiario(), limiteExento);
 			log.info("[UI] Importe exento = {}, Importe gravado = {}", importeExento, importeGravado);
-			
 		} catch(SGPException ex) {
 			log.warn("[UI] {}", ex.getMessage());
 			cantidad       = _CERO.get();
-			importeGravado = _CERO.get();
 			importeExento  = _CERO.get();
-			
+			importeGravado = _CERO.get();
 		} catch(Exception ex) {
-			
 			log.error("Problema para generar la percepción...", ex);
 			cantidad       = _CERO.get();
-			importeGravado = _CERO.get();
 			importeExento  = _CERO.get();
-			
+			importeGravado = _CERO.get();
 		} finally {
-			
 			percepcion = this.build(nomina, CVE_PRIMA_VACACIONES_EN_TIEMPO, cantidad, importeExento, importeGravado);
 			log.info("Percepcion agregada: {}", percepcion);
-			
 		}
 		
 		return percepcion;
@@ -98,11 +103,11 @@ public class PrimaVacacionalEnTiempoPBL extends AbstractPBL {
 		BigDecimal diasTotales     = null;
 		
 		primaVacacional = periodo.getEmpleado().getDatoEmpresa().getPrimaVacacional();
-		primaVacacional = primaVacacional.divide(_100.get(), 4, BigDecimal.ROUND_HALF_UP);
+		primaVacacional = primaVacacional.divide(_100.get(), 4, RoundingMode.HALF_UP);
 		
-		diasTotales = new BigDecimal(periodo.getDiasTotales()).setScale(2, BigDecimal.ROUND_HALF_UP);
+		diasTotales = new BigDecimal(periodo.getDiasTotales()).setScale(2, RoundingMode.HALF_UP);
 		
-		tasa = primaVacacional.multiply(diasTotales).setScale(2, BigDecimal.ROUND_HALF_UP);
+		tasa = primaVacacional.multiply(diasTotales).setScale(2, RoundingMode.HALF_UP);
 		log.info("[UI] Tasa prima vacacional = {} * {}", primaVacacional, diasTotales);
 		
 		return tasa;
@@ -112,6 +117,6 @@ public class PrimaVacacionalEnTiempoPBL extends AbstractPBL {
 	public BigDecimal calcularLimiteExento() {
 		return _15.get()
 				.multiply(this.parametros.getUma().getImporteDiario())
-				.setScale(2, BigDecimal.ROUND_HALF_UP);
+				.setScale(2, RoundingMode.HALF_UP);
 	}
 }

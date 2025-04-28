@@ -34,25 +34,20 @@ public class NominaExtraordinariaBL extends NominaBL {
 		super(empleado, parametros, null);
 	}
 	
-	public DetNomina calcular(DetNomina nomina, DetNominaPercepcion percepcion)
+	public DetNomina calcular(DetNomina nomina, String clavePercepcion)
 	throws SGPException {
 		AbstractPBL percepcionBO = null;
-		DetNominaPercepcion p = null;
+		DetNominaPercepcion percepcion = null;
 		
 		try {
-			final String clavePercepcion = percepcion.getClave();
-			
 			log.info("[UI] Calculando para el empleado {}", nomina.getReceptor().getNombre());
-			
 			percepcionBO = NominaExtraordinariaBL.getPercepcionBusinessLogic(parametros, nomina, clavePercepcion);
-			p = percepcionBO.procesar(nomina);
-			
-			agregarPercepcion(nomina, p);
-			
+			percepcion = percepcionBO.procesar(nomina);
+			agregarPercepcion(nomina, percepcion);
 		} catch(UnsupportedOperationException ex) {
 			throw new SGPException("El cálculo de la percepción no está implementado para la nómina extraordinaria");
 		} catch(Exception ex) {
-			log.error("Problema para calcular la percepcion: {} - {}", percepcion.getClave(), percepcion.getNombre());
+			log.error("Problema para calcular la percepcion: {}", clavePercepcion);
 		} finally {
 			calcularISRL174(nomina, parametros);
 			calcularTotales(nomina, parametros);
@@ -61,17 +56,37 @@ public class NominaExtraordinariaBL extends NominaBL {
 		return nomina;
 	}
 	
+	public void calcular(DetNomina nomina, String clavePercepcion, BigDecimal cantidad)
+	throws SGPException {
+		AbstractPBL percepcionBO = null;
+		DetNominaPercepcion nuevaPercepcion = null;
+		
+		try {
+			log.info("[UI] Recalculando para el empleado {}", nomina.getReceptor().getNombre());
+			percepcionBO = NominaExtraordinariaBL.getPercepcionBusinessLogic(parametros, nomina, clavePercepcion);
+			nuevaPercepcion = percepcionBO.procesar(nomina, cantidad);
+			agregarPercepcion(nomina, nuevaPercepcion);
+		} catch(UnsupportedOperationException ex) {
+			throw new SGPException("El cálculo de la percepción no está implementado para la nómina extraordinaria");
+		} catch(Exception ex) {
+			log.error("Problema para calcular la percepcion: {}", clavePercepcion);
+		} finally {
+			calcularISRL174(nomina, parametros);
+			calcularTotales(nomina, parametros);
+		}
+	}
+	
 	/*--------------------------PERCEPCIONES----------------------------------------------------*/
 	public static AbstractPBL getPercepcionBusinessLogic(ParametrosNomina parametros, DetNomina nomina, String clavePercepcion) {
 		AbstractPBL percepcionBO = null;
 		
 		switch (clavePercepcion) {
-			case AbstractPBL.CVE_VACACIONES_REPORTADAS:
-				percepcionBO = new VacacionesReportadasPBL(parametros, nomina);
+		case AbstractPBL.CVE_PRIMA_VACACIONES_EN_TIEMPO:
+				percepcionBO = new PrimaVacacionalEnTiempoPBL(parametros, nomina);
 				break;
 				
-			case AbstractPBL.CVE_PRIMA_VACACIONES_EN_TIEMPO:
-				percepcionBO = new PrimaVacacionalEnTiempoPBL(parametros, nomina);
+			case AbstractPBL.CVE_VACACIONES_REPORTADAS:
+				percepcionBO = new VacacionesReportadasPBL(parametros, nomina);
 				break;
 				
 			case AbstractPBL.CVE_PRIMA_VACACIONES_REPORTADAS:
@@ -81,6 +96,7 @@ public class NominaExtraordinariaBL extends NominaBL {
 			case AbstractPBL.CVE_AGUINALDO:
 				percepcionBO = new AguinaldoPBL(parametros, nomina);
 				break;
+				
 			default:
 				log.info("[UI] La percepción solicitada no está considerada para la nómina extraordinaria o no está implementada.");
 				throw new UnsupportedOperationException("La percepción no está implementada.");

@@ -3,6 +3,7 @@ package mx.com.ferbo.business.percepcion;
 import static mx.com.ferbo.enums.ValoresBD._CERO;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -111,9 +112,9 @@ public abstract class AbstractPBL {
 	 * @param baseCalculo Base de cargo a multiplicar por la cantidad.
 	 * @return Importe.
 	 */
-	protected BigDecimal calcularImporte(BigDecimal cantidad, BigDecimal baseCalculo) {
+	public BigDecimal calcularImporte(BigDecimal cantidad, BigDecimal baseCalculo) {
 		BigDecimal importe = null;
-		importe = cantidad.multiply(baseCalculo).setScale(2, BigDecimal.ROUND_HALF_UP);
+		importe = cantidad.multiply(baseCalculo).setScale(2, RoundingMode.HALF_UP);
 		log.info("[UI] Importe = ({} * {})", cantidad, baseCalculo);
 		return importe;
 	}
@@ -121,7 +122,9 @@ public abstract class AbstractPBL {
 	/**Todas las percepciones deben tener un límite de importe exento y gravado.
 	 * En el caso de las percepciones gravadas al 100% (p. e. Sueldo, Aguinaldo, etc)
 	 * El limite de exento debe ser 0.00. En el caso de otras percepciones, el
-	 * límite de exento varía de acuerdo a lo publicado por la LISR vigente.
+	 * límite de exento varía de acuerdo a lo publicado por la LISR vigente.<br>
+	 * Cada clase que herede de AbstractPBL debe implementar el cálculo del
+	 * límite exento.
 	 * @return
 	 */
 	protected abstract BigDecimal calcularLimiteExento();
@@ -130,21 +133,47 @@ public abstract class AbstractPBL {
 	 * y el importe gravado. Todos los datos se obtienen de los atributos internos
 	 * "importe" y "cantidad", que debieron ser previamente calculados.
 	 */
-	protected void calcularExentoGravado() {
+	public void calcularExentoGravado() {
 		limiteExento = this.calcularLimiteExento();
 		
 		if(importe.compareTo(limiteExento) > 0) {
 			//El importe NO está exento de ISR.
 			importeGravado = importe.subtract(limiteExento);
-			importeExento = limiteExento.setScale(2, BigDecimal.ROUND_HALF_UP);
+			importeExento = limiteExento.setScale(2, RoundingMode.HALF_UP);
 		} else {
 			//El importe SI está exento de ISR.
 			importeGravado = _CERO.get();
-			importeExento = importe.setScale(2, BigDecimal.ROUND_HALF_UP);
+			importeExento = importe.setScale(2, RoundingMode.HALF_UP);
 		}
 	}
 	
-	public abstract DetNominaPercepcion procesar(DetNomina nomina); 
+	/**Este método debe implementar todos los pasos para realizar el cálculo de una
+	 * percepción:<br>
+	 * 1. Obtener el calculo del concepto "Cantidad" y los sub pasos que implica dicho cálculo.<br>
+	 * 2. Obtener el cálculo del concepto "Importe".<br>
+	 * 3. Obtener el cálculo de los conceptos "Importe exento" e "Importe gravado".<br>
+	 * 4. Generar el objeto DetNominaPercepcion.<br>
+	 * <br>
+	 * <br>
+	 * Depende de la implmenetación de:<br>
+	 * - BigDecimal calcularCantidad(DetNomina);<br>
+	 * - BigDecimal calcularImporte(DetNomina);<br>
+	 * - BigDecimal calcularLimiteExento();<br>
+	 * - void calcularExentoGravado();<br>
+	 * @param nomina
+	 * @return
+	 */
+	public abstract DetNominaPercepcion procesar(DetNomina nomina) throws SGPException;
+	
+	
+	/**Este método debe implementar sólo el reproceso del cálculo de una percepción, asumiento
+	 * que el concepto "Cantidad" es diferente al que se obtiene de manera automática por la
+	 * implementación de la percepción {@link #procesar(DetNomina)}
+	 * @param nomina
+	 * @param cantidad
+	 * @return
+	 */
+	public abstract DetNominaPercepcion procesar(DetNomina nomina, BigDecimal cantidad) throws SGPException;
 	
 	public DetNominaPercepcion build(DetNomina nomina, String clave) {
 		DetNominaPercepcion percepcion = null;

@@ -1,6 +1,7 @@
 package mx.com.ferbo.business.percepcion;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
@@ -43,43 +44,53 @@ public class BonoPuntualidadPBL extends AbstractPBL {
 		this.diasLaborales = diasLaborales;
 		this.diasNoLaborales = diasNoLaborales;
 		this.diasTrabajados = diasTrabajados;
+		
+		this.baseCalculo = nomina.getReceptor().getSalarioDiarioIntegrado();
 	}
 	
 	@Override
 	public DetNominaPercepcion procesar(DetNomina nomina) {
 		DetNominaPercepcion percepcion = null;
-    	DetPercepcionEmpleado percepcionEmpleado = null;
     	
-    	try {
-    		this.baseCalculo = nomina.getReceptor().getSalarioDiarioIntegrado();
-    		
-    		
-//    		importe = salarioDiarioIntegrado.multiply(this.tasaBono).setScale(5, BigDecimal.ROUND_HALF_UP);
-//    		importe = importe.multiply(diasPeriodo).setScale(2, BigDecimal.ROUND_HALF_UP);
-    		
-    		this.cantidad = this.calcularCantidad(nomina);
-    		this.importe = this.calcularImporte(this.cantidad, this.baseCalculo);
-    		
-    		percepcionEmpleado = this.buscaPercepcionEmpleado(P_BONO_PUNTUALIDAD);
-    		
-    		if(    (percepcionEmpleado != null)
-    			&& (percepcionEmpleado.getActivo())
-				&& (percepcionEmpleado.getImporteMaximo() != null)
-				&& (importe.compareTo(percepcionEmpleado.getImporteMaximo()) > 0) ) {
-    			
-    			importe = percepcionEmpleado.getImporteMaximo();
-    		}
-    		
-    		this.calcularExentoGravado();
-    		
+		try {
+			this.cantidad = this.calcularCantidad(nomina);
+			this.procesar(nomina, this.cantidad);
+		} catch (SGPException e) {
+			log.error("Problema para obtener la percepción...", e);
+		}
+    	
+    	return percepcion;
+	}
+	
+	@Override
+	public DetNominaPercepcion procesar(DetNomina nomina, BigDecimal cantidad) {
+		DetNominaPercepcion percepcion = null;
+		DetPercepcionEmpleado percepcionEmpleado = null;
+		
+		try {
+			this.cantidad = cantidad;
+			this.importe = this.calcularImporte(this.cantidad, this.baseCalculo);
+			
+			percepcionEmpleado = this.buscaPercepcionEmpleado(P_BONO_PUNTUALIDAD);
+			
+			if(    (percepcionEmpleado != null)
+					&& (percepcionEmpleado.getActivo())
+					&& (percepcionEmpleado.getImporteMaximo() != null)
+					&& (importe.compareTo(percepcionEmpleado.getImporteMaximo()) > 0) ) {
+				
+				importe = percepcionEmpleado.getImporteMaximo();
+			}
+			
+			this.calcularExentoGravado();
+			
     	} catch(Exception ex) {
     		log.warn("No es posible calcular el bono de puntualidad: {}", ex.getMessage());
-    		importe = BigDecimal.ZERO;
+    		importe = ValoresBD._CERO.get();
     	} finally {
     		percepcion = this.build(nomina, CVE_BONO_PUNTUALIDAD, null, ValoresBD._CERO.get(), importe);
     	}
-    	
-    	return percepcion;
+		
+		return percepcion;
 	}
 
 	public void setProcesaRetardos(Boolean procesaRetardos) {
@@ -98,7 +109,7 @@ public class BonoPuntualidadPBL extends AbstractPBL {
 			throw new SGPException("El empleado tiene ausencias, por lo que no se otorgará el bono de puntualidad.");
 		
 		if(this.procesaRetardos == null)
-			this.procesaRetardos = new Boolean(false);
+			this.procesaRetardos = Boolean.FALSE;
 		
 		for(Map.Entry<String, DetRegistro> entry : this.mapAsistencias.entrySet()) {
 			log.info("Entry: {}", entry);
@@ -107,9 +118,9 @@ public class BonoPuntualidadPBL extends AbstractPBL {
 				throw new SGPException("Existen dias con retardo no justificados o faltas para el empleado.");
 		}
 		
-		diasPeriodo = this.diasTrabajados.add(this.diasNoLaborales).setScale(2, BigDecimal.ROUND_HALF_UP);
+		diasPeriodo = this.diasTrabajados.add(this.diasNoLaborales).setScale(2, RoundingMode.HALF_UP);
 		
-		cantidad = this.tasaBono.multiply(diasPeriodo).setScale(5, BigDecimal.ROUND_HALF_UP);
+		cantidad = this.tasaBono.multiply(diasPeriodo).setScale(5, RoundingMode.HALF_UP);
 		
 		return cantidad ;
 	}
@@ -118,6 +129,4 @@ public class BonoPuntualidadPBL extends AbstractPBL {
 	public BigDecimal calcularLimiteExento() {
 		return ValoresBD._CERO.get();
 	}
-
-	
 }
