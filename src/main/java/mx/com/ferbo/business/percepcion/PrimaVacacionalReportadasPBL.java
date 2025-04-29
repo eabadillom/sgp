@@ -66,7 +66,7 @@ public class PrimaVacacionalReportadasPBL extends AbstractPBL {
 			this.importeExento  = ValoresBD._CERO.get();
 			this.importeGravado = ValoresBD._CERO.get();
 		} finally {
-			percepcion = this.build(nomina, CVE_PRIMA_VACACIONES_REPORTADAS, cantidad, importeExento, importeGravado);
+			percepcion = this.build(nomina, CVE_PRIMA_VACACIONES_REPORTADAS, this.cantidad, this.importeExento, this.importeGravado);
 			log.info("Percepcion agregada: {}", percepcion);
 		}
 		

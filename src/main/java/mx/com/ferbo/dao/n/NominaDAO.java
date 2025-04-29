@@ -101,15 +101,18 @@ public class NominaDAO extends BaseDAO<DetNomina, Integer> {
 		return model;
 	}
 	
-	public List<DetNomina> buscarPorSemanaRfc(Integer semanaInicio, Integer semanaFin, String rfc) {
+	public List<DetNomina> buscarNominasDelMes(String tipoNomina, String periodicidadPago, Integer ejercicio, Integer periodoInicio, Integer periodoFin, String rfc) {
 		List<DetNomina> modelList = null;
 		EntityManager em = null;
 		
 		try {
 			em = this.getEntityManager();
-			modelList = em.createNamedQuery("DetNomina.findBySemanaRfc", modelClass)
-					.setParameter("semanaInicio", semanaInicio)
-					.setParameter("semanaFin", semanaFin)
+			modelList = em.createNamedQuery("DetNomina.findNominasDelMes", modelClass)
+					.setParameter("tipoNomina", tipoNomina)
+					.setParameter("periodicidad", periodicidadPago)
+					.setParameter("ejercicio", ejercicio)
+					.setParameter("periodoInicio", periodoInicio)
+					.setParameter("periodoFin", periodoFin)
 					.setParameter("rfc", rfc)
 					.getResultList()
 					;

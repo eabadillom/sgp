@@ -5,6 +5,7 @@ import static mx.com.ferbo.enums.ValoresBD._CERO;
 import static mx.com.ferbo.enums.ValoresBD._DIAS_ANIO;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -76,6 +77,7 @@ public class ISRL174DBL extends AbstractDBL implements IDeduccion {
 		
 		
 		try {
+			tipoDeduccion = this.getTipoDeduccion(TD_ISR_LEY_174);
 			
 			salarioDiario = nomina.getReceptor().getSalarioDiario();
 			
@@ -89,9 +91,9 @@ public class ISRL174DBL extends AbstractDBL implements IDeduccion {
 			 * La remuneración de que se trate se dividirá entre 365 y el resultado se multiplicará por 30.4
 			 * */
 			remuneracionMensual = importeGravado
-					.divide(_DIAS_ANIO.get(), 2, BigDecimal.ROUND_HALF_UP)
+					.divide(_DIAS_ANIO.get(), 2, RoundingMode.HALF_UP)
 					.multiply(_30_4.get())
-					.setScale(2, BigDecimal.ROUND_HALF_UP)
+					.setScale(2, RoundingMode.HALF_UP)
 					;
 			log.info("[UI] Fracción I - Remuneración mensual = {} / {} * {} = {}",
 					importeGravado, _DIAS_ANIO.get(), _30_4.get(), remuneracionMensual);
@@ -104,14 +106,14 @@ public class ISRL174DBL extends AbstractDBL implements IDeduccion {
 			 * */
 			ingresoGravadoMensual = salarioDiario
 					.multiply(_30_4.get())
-					.setScale(2, BigDecimal.ROUND_HALF_UP);
+					.setScale(2, RoundingMode.HALF_UP);
 			log.info("[UI] Fracción II - Ingreso gravado mensual = {} * {} = {}",
 					salarioDiario, _30_4.get(),
 					ingresoGravadoMensual);
 			
 			baseISRMensualFraccion2 = ingresoGravadoMensual
 					.add(remuneracionMensual)
-					.setScale(2, BigDecimal.ROUND_HALF_UP);
+					.setScale(2, RoundingMode.HALF_UP);
 			log.info("[UI] Fraccion II - Base ISR = {} + {} = {}",
 					ingresoGravadoMensual, remuneracionMensual, baseISRMensualFraccion2);
 			
@@ -140,7 +142,7 @@ public class ISRL174DBL extends AbstractDBL implements IDeduccion {
 			log.info("[UI] Fracción III - ISR: {}", isrCausadoFraccion3);
 			diferenciaISRaRetener = isrCausadoFraccion2
 					.subtract(isrCausadoFraccion3)
-					.setScale(2, BigDecimal.ROUND_HALF_UP);
+					.setScale(2, RoundingMode.HALF_UP);
 			log.info("[UI] Fraccion III - Diferencia de ISR a Retener Fraccion II vs Fraccion III = {} - {} = {}",
 					isrCausadoFraccion2, isrCausadoFraccion3, diferenciaISRaRetener);
 			
@@ -159,17 +161,17 @@ public class ISRL174DBL extends AbstractDBL implements IDeduccion {
 			
 			//Aplicando primero Fracción V:
 			tasaISRFraccion5 = diferenciaISRaRetener
-					.divide(remuneracionMensual, 4, BigDecimal.ROUND_HALF_UP);
+					.divide(remuneracionMensual, 4, RoundingMode.HALF_UP);
 			log.info("[UI] Fraccion V - Tasa ISR = {} / {} = {}",
 					diferenciaISRaRetener, remuneracionMensual, tasaISRFraccion5);
 			
 			//Aplicando después Fracción IV:
 			isrCausadoFraccion4 = this.importeGravado
 					.multiply(tasaISRFraccion5)
-					.setScale(2, BigDecimal.ROUND_HALF_UP);
+					.setScale(2, RoundingMode.HALF_UP);
 			log.info("[UI] Fraccion IV - ISR = {} * {} = {}", importeGravado, tasaISRFraccion5, isrCausadoFraccion4);
 			
-			tipoDeduccion = this.getTipoDeduccion(TD_ISR_LEY_174);
+			
 		} catch(SGPException ex) {
 			log.warn("Problema para generar el cálculo de ISR R. Art. 174, {}", ex.getMessage());
 			isrCausadoFraccion4 = _CERO.get();

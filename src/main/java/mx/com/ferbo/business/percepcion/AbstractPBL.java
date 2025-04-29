@@ -59,13 +59,6 @@ public abstract class AbstractPBL {
 	public static final String CVE_VACACIONES_EN_TIEMPO        = "029";
 	public static final String CVE_VALES_DESPENSA              = "032";
 	
-	@Deprecated
-	public AbstractPBL(ParametrosNomina parametros) {
-		this.parametros = parametros;
-		log.info("Parametros nomina: {}", parametros);
-		this.tiposPercepcion = parametros.getTiposPercepcion();
-	}
-	
 	public AbstractPBL(ParametrosNomina parametros, DetNomina nomina) {
 		this.parametros = parametros;
 		log.info("Parametros nomina: {}", parametros);

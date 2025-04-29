@@ -32,7 +32,6 @@ import org.primefaces.model.StreamedContent;
 import mx.com.ferbo.business.nomina.NominaBL;
 import mx.com.ferbo.business.nomina.NominaExtraordinariaBL;
 import mx.com.ferbo.business.nomina.NominaPeriodoBL;
-import mx.com.ferbo.business.nomina.NominaSemanalBL;
 import mx.com.ferbo.business.nomina.ParametrosNomina;
 import mx.com.ferbo.business.nomina.PercepcionBL;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
@@ -705,7 +704,7 @@ public class NominaExtraordinariaBean implements Serializable {
     	} finally {
     		message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update("form:messages", "form:tv-nomina");
+			PrimeFaces.current().ajax().update("form:messages", "form:tv-nomina", "form:acc:dtNomina");
     	}
     }
     

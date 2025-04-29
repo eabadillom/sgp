@@ -1,6 +1,7 @@
 package mx.com.ferbo.business.deduccion.isr;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -13,6 +14,7 @@ import mx.com.ferbo.business.deduccion.AbstractDBL;
 import mx.com.ferbo.business.deduccion.IDeducciones;
 import mx.com.ferbo.business.deduccion.subsidio.ISubsidioEmpleo;
 import mx.com.ferbo.business.deduccion.subsidio.SubsidioEmpleoExecutor;
+import mx.com.ferbo.business.nomina.ParametrosNomina;
 import mx.com.ferbo.business.otropago.AbstractOtroPago;
 import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.CatTarifaISR;
@@ -48,6 +50,7 @@ public class ISRSemanalDBL2 extends AbstractDBL implements IDeducciones {
 	private List<CatTarifaISR>     tablaISRSemanal = null;
 	private List<CatTarifaISR>     tablaISRMensual = null;
 	
+	@Deprecated
 	public ISRSemanalDBL2(Date periodoInicio, Date periodoFin, List<CatTipoDeduccion> tiposDeduccion, List<CatTipoOtroPago> tiposOtroPago, List<CatTarifaISR> tablaISR, List<DetNomina> nominaMensual)
 	throws SGPException {
 		try {
@@ -69,6 +72,30 @@ public class ISRSemanalDBL2 extends AbstractDBL implements IDeducciones {
 		} catch(Exception ex) {
 			throw new SGPException("Problema al iniciar el objeto de cálculo de ISR semanal...", ex);
 		}
+	}
+	
+	public ISRSemanalDBL2(ParametrosNomina parametros, List<DetNomina> nominaMensual)
+	throws SGPException {
+		try {
+			this.setPeriodo(periodoInicio, periodoFin);
+			this.tiposDeduccion = parametros.getTiposDeduccion();
+			this.tiposOtroPago = parametros.getTiposOtroPago();
+			this.tablaISR = parametros.getTablaISR();
+			this.listaNominaMes = nominaMensual;
+			
+			this.tablaISRSemanal = this.tablaISR.stream()
+					.filter(t -> "s".equalsIgnoreCase(t.getTipo()))
+					.collect(Collectors.toList())
+					;
+			
+			this.tablaISRMensual = this.tablaISR.stream()
+					.filter(t -> "m".equalsIgnoreCase(t.getTipo()))
+					.collect(Collectors.toList())
+					;
+		} catch(Exception ex) {
+			throw new SGPException("Problema al iniciar el objeto de cálculo de ISR semanal...", ex);
+		}
+		
 	}
 	
 	private void setPeriodo(Date periodoInicio, Date periodoFin) {
@@ -204,13 +231,13 @@ public class ISRSemanalDBL2 extends AbstractDBL implements IDeducciones {
 					.subtract(importeSubsidioAcumulado)
 					.compareTo(ValoresBD._CERO.get()) < 0) {
 					
-					ajusteISRMensual = importeSubsidioAcumulado.setScale(2, BigDecimal.ROUND_HALF_UP);
+					ajusteISRMensual = importeSubsidioAcumulado.setScale(2, RoundingMode.HALF_UP);
 					dAjusteISRMensual = this.getDeduccion(nomina, idx++, TD_AJUSTE_ISR_MENSUAL, CVE_AJUSTE_ISR_MENSUAL, "ISR de ajuste mensual", true, true, ajusteISRMensual);
 					
-					ajusteAlSubsidioCausado = importeSubsidioAcumulado.setScale(2, BigDecimal.ROUND_HALF_UP);
+					ajusteAlSubsidioCausado = importeSubsidioAcumulado.setScale(2, RoundingMode.HALF_UP);
 					dAjusteAlSubsidioCausado = this.getDeduccion(nomina, idx++, TD_AJUSTE_AL_SUBSIDIO, CVE_AJUSTE_AL_SUBSIDIO, "Ajuste al subsidio causado", true, false, ajusteAlSubsidioCausado);
 					
-					isrAjustadoPorSubsidio = importeSubsidioAcumulado.setScale(2, BigDecimal.ROUND_HALF_UP);
+					isrAjustadoPorSubsidio = importeSubsidioAcumulado.setScale(2, RoundingMode.HALF_UP);
 					this.procesaISRAjustadoPorSubsidio(nomina, isrAjustadoPorSubsidio);
 				}
 			}
@@ -221,7 +248,7 @@ public class ISRSemanalDBL2 extends AbstractDBL implements IDeducciones {
 			if(isrDespuesDeSubsidioSemanal.compareTo(ValoresBD._CERO.get()) < 0) {
 				importe = ValoresBD._CERO.get();
 			} else {
-				importe = isrDespuesDeSubsidioSemanal.setScale(2, BigDecimal.ROUND_HALF_UP);
+				importe = isrDespuesDeSubsidioSemanal.setScale(2, RoundingMode.HALF_UP);
 			}
 			
 			dISR = new DetNominaDeduccion.Builder()
@@ -426,7 +453,7 @@ public class ISRSemanalDBL2 extends AbstractDBL implements IDeducciones {
 			log.info("Base ISR mensual: {}", baseISRAcumulado);
 			
 		} catch(Exception ex) {
-			baseISRAcumulado = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+			baseISRAcumulado = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
 		}
 		
 		return baseISRAcumulado;
@@ -446,7 +473,7 @@ public class ISRSemanalDBL2 extends AbstractDBL implements IDeducciones {
 			//PRIMERO SE VERIFICA SI EL INICIO DE LA SEMANA COINCIDE CON EL PRIMER DIA DEL MES. 
 			diaInicioMes = DateUtil.getDia(periodoInicio);
 			
-			if(diaInicioMes.compareTo(new Integer(1)) == 0)
+			if(diaInicioMes.compareTo(Integer.valueOf(1)) == 0)
 				throw new SGPException("La semana en curso es la primera del mes.");
 			
 			//SI NO, SE VERIFICA SI EL MES DEL PRIMER DIA DE LA SEMANA EN CURSO ES DIFERENTE AL MES DEL ÚLTIMO DIA DE LA SEMANA EN CURSO.
@@ -465,13 +492,13 @@ public class ISRSemanalDBL2 extends AbstractDBL implements IDeducciones {
 			mesSiguienteFin = DateUtil.getMes(periodoSiguienteFin);
 			
 			if(mesSiguienteInicio.compareTo(mesSiguienteFin) != 0) {
-				ultimaSemanaMes = new Boolean(true);
+				ultimaSemanaMes = Boolean.TRUE;
 			} else {
-				ultimaSemanaMes = new Boolean(false);
+				ultimaSemanaMes = Boolean.FALSE;
 			}
 			
 		} catch(Exception ex) {
-			ultimaSemanaMes = new Boolean(false);
+			ultimaSemanaMes = Boolean.FALSE;
 		}
 		
 		return ultimaSemanaMes;

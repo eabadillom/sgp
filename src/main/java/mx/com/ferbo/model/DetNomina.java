@@ -36,7 +36,7 @@ import mx.com.ferbo.model.sat.CatMetodoPago;
     @NamedQuery(name = "DetNomina.findByPeriodo", query = "SELECT n FROM DetNomina n WHERE n.periodoInicio = :periodoInicio AND n.periodoFin = :periodoFin"),
     @NamedQuery(name = "DetNomina.findByPeriodoRfc", query = "SELECT n FROM DetNomina n WHERE n.periodoInicio = :periodoInicio AND n.periodoFin = :periodoFin AND n.receptor.rfc = :rfc"),
     @NamedQuery(name = "DetNomina.findByEmisorTipoNominaAnioPeriodoReceptor", query = "SELECT n FROM DetNomina n WHERE n.emisor.rfc = :rfcEmisor AND n.tipoNomina = :tipoNomina and n.ejercicio = :anio and n.periodo = :periodo and n.receptor.rfc = :rfcReceptor"),
-    @NamedQuery(name = "DetNomina.findBySemanaRfc", query = "SELECT n FROM DetNomina n WHERE n.periodo between :semanaInicio AND :semanaFin AND n.receptor.rfc = :rfc")
+    @NamedQuery(name = "DetNomina.findNominasDelMes", query = "SELECT n FROM DetNomina n WHERE n.tipoNomina = :tipoNomina AND n.receptor.periodicidadPago = :periodicidad AND n.ejercicio = :ejercicio AND n.periodo between :periodoInicio AND :periodoFin AND n.receptor.rfc = :rfc ")
 })
 public class DetNomina implements Serializable {
 

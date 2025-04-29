@@ -25,8 +25,8 @@ public class SeptimoDiaPBL extends AbstractPBL {
 	private BigDecimal diasVacaciones   = null;
 	private BigDecimal diasTrabajados   = null;
 	
-	public SeptimoDiaPBL(ParametrosNomina parametros, BigDecimal diasLaborales, BigDecimal diasNoLaborales, BigDecimal diasTrabajados, BigDecimal diasVacaciones) {
-		super(parametros);
+	public SeptimoDiaPBL(ParametrosNomina parametros, DetNomina nomina, BigDecimal diasLaborales, BigDecimal diasNoLaborales, BigDecimal diasTrabajados, BigDecimal diasVacaciones) {
+		super(parametros, nomina);
 		this.diasLaborales = diasLaborales;
 		this.diasNoLaborales = diasNoLaborales;
 		this.diasTrabajados = diasTrabajados;

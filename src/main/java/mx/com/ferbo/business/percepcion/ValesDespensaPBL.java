@@ -29,9 +29,9 @@ public class ValesDespensaPBL extends AbstractPBL {
 	private BigDecimal tasaVales = null;
 	private BigDecimal diasPeriodo = null;
 	
-	public ValesDespensaPBL(ParametrosNomina parametros, BigDecimal diasTrabajados, BigDecimal uma, BigDecimal tasaVales, BigDecimal diasPeriodo) {
-		super(parametros);
-		this.baseCalculo = this.uma;
+	public ValesDespensaPBL(ParametrosNomina parametros, DetNomina nomina, BigDecimal diasTrabajados, BigDecimal uma, BigDecimal tasaVales, BigDecimal diasPeriodo) {
+		super(parametros, nomina);
+		this.baseCalculo = uma;
 		
 		this.diasTrabajados = diasTrabajados;
 		this.uma = uma;

@@ -20,9 +20,9 @@ public class SueldoPBL extends AbstractPBL {
 	
 	private BigDecimal diasTrabajados = null;
 	
-	public SueldoPBL(ParametrosNomina parametros, BigDecimal diasTrabajados) {
-		super(parametros);
-		this.baseCalculo = nomina.getReceptor().getSalarioDiario();
+	public SueldoPBL(ParametrosNomina parametros, DetNomina nomina, BigDecimal diasTrabajados) {
+		super(parametros, nomina);
+		this.baseCalculo = this.nomina.getReceptor().getSalarioDiario();
 		this.diasTrabajados = diasTrabajados;
 	}
 

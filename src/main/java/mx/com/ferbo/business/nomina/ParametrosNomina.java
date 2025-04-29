@@ -1,6 +1,7 @@
 package mx.com.ferbo.business.nomina;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 import java.util.List;
 
@@ -140,8 +141,8 @@ public class ParametrosNomina {
 		this.statusRegistros        = this.statusRegistroDAO.buscarTodos();
 		
 		//TODO Temporalmente se movieron las tasas de bono de puntualidad y vales de despensa a esta clase, sin embargo, deben parametrizarse en otro lugar.
-		this.bonoPuntualidad        = new BigDecimal("0.1").setScale(2, BigDecimal.ROUND_HALF_UP);
-		this.valeDespensa           = new BigDecimal("0.4").setScale(2, BigDecimal.ROUND_HALF_UP);
+		this.bonoPuntualidad        = new BigDecimal("0.1").setScale(2, RoundingMode.HALF_UP);
+		this.valeDespensa           = new BigDecimal("0.4").setScale(2, RoundingMode.HALF_UP);
 		this.fechaEmision           = new Date();
 		
 		try {
@@ -154,40 +155,40 @@ public class ParametrosNomina {
 		}
 	}
 	
-	@Deprecated
-	public void cargar(Date periodoInicio, Date periodoFin) {
-		//Cálculo de fechas importantes del periodo de pago de nómina.
-		this.periodoInicio   = new Date(periodoInicio.getTime());
-		this.periodoFin      = new Date(periodoFin.getTime());
-		this.fechaInicioAnio = DateUtil.getFirstDayOfyear(periodoFin);
-		this.fechaFinAnio    = DateUtil.getLastDayOfYear(periodoFin);
-		
-		this.anio            = DateUtil.getAnio(periodoFin);
-		this.periodo         = DateUtil.getSemanaAnio(this.periodoInicio);
-		this.diasPeriodo     = DateUtil.daysDiff(periodoInicio, periodoFin);
-		this.diasNoLaborales = this.diaNLDAO.buscarPorPeriodo("MX", periodoInicio, periodoFin);
-		
-		//Catálogos SAT
-		this.periodicidad           = this.periodicidadDAO.buscarPorId("02");
-		this.tablaISR               = this.tarifaISRDAO.buscar(this.fechaInicioAnio, this.fechaFinAnio);
-		this.metodoPago             = this.metodoPagoDAO.buscarPorId("PUE");
-		this.concepto               = this.conceptoDAO.buscarPorId("84111505");
-		this.unidadSAT              = this.unidadSATDAO.buscarPorId("ACT");
-		this.regimenFiscalReceptor  = this.regimenFiscalDAO.buscarPorId("605");
-		this.usoCFDI                = this.usoCfdiDAO.buscarPorId("CN01");
-		this.tiposPercepcion        = this.tipoPercepcionDAO.buscarTodos();
-		this.tiposDeduccion         = this.tipoDeduccionDAO.buscarTodos();
-		this.cuotasIMSS             = this.cuotasIMSSDAO.buscarPorPeriodo(periodoFin);
-		this.tiposOtroPago          = this.tipoOtroPagoDAO.buscarTodos();
-		this.uma                    = this.umaDAO.buscarVigentePorFecha(DateUtil.toLocalDate(periodoFin));
-		
-		//Status de registro de asistencia
-		this.statusRegistros        = this.statusRegistroDAO.buscarTodos();
-		
-		//TODO Temporalmente se movieron las tasas de bono de puntualidad y vales de despensa a esta clase, sin embargo, deben parametrizarse en otro lugar.
-		this.bonoPuntualidad        = new BigDecimal("0.1").setScale(2, BigDecimal.ROUND_HALF_UP);
-		this.valeDespensa           = new BigDecimal("0.4").setScale(2, BigDecimal.ROUND_HALF_UP);
-	}
+//	@Deprecated
+//	public void cargar(Date periodoInicio, Date periodoFin) {
+//		//Cálculo de fechas importantes del periodo de pago de nómina.
+//		this.periodoInicio   = new Date(periodoInicio.getTime());
+//		this.periodoFin      = new Date(periodoFin.getTime());
+//		this.fechaInicioAnio = DateUtil.getFirstDayOfyear(periodoFin);
+//		this.fechaFinAnio    = DateUtil.getLastDayOfYear(periodoFin);
+//		
+//		this.anio            = DateUtil.getAnio(periodoFin);
+//		this.periodo         = DateUtil.getSemanaAnio(this.periodoInicio);
+//		this.diasPeriodo     = DateUtil.daysDiff(periodoInicio, periodoFin);
+//		this.diasNoLaborales = this.diaNLDAO.buscarPorPeriodo("MX", periodoInicio, periodoFin);
+//		
+//		//Catálogos SAT
+//		this.periodicidad           = this.periodicidadDAO.buscarPorId("02");
+//		this.tablaISR               = this.tarifaISRDAO.buscar(this.fechaInicioAnio, this.fechaFinAnio);
+//		this.metodoPago             = this.metodoPagoDAO.buscarPorId("PUE");
+//		this.concepto               = this.conceptoDAO.buscarPorId("84111505");
+//		this.unidadSAT              = this.unidadSATDAO.buscarPorId("ACT");
+//		this.regimenFiscalReceptor  = this.regimenFiscalDAO.buscarPorId("605");
+//		this.usoCFDI                = this.usoCfdiDAO.buscarPorId("CN01");
+//		this.tiposPercepcion        = this.tipoPercepcionDAO.buscarTodos();
+//		this.tiposDeduccion         = this.tipoDeduccionDAO.buscarTodos();
+//		this.cuotasIMSS             = this.cuotasIMSSDAO.buscarPorPeriodo(periodoFin);
+//		this.tiposOtroPago          = this.tipoOtroPagoDAO.buscarTodos();
+//		this.uma                    = this.umaDAO.buscarVigentePorFecha(DateUtil.toLocalDate(periodoFin));
+//		
+//		//Status de registro de asistencia
+//		this.statusRegistros        = this.statusRegistroDAO.buscarTodos();
+//		
+//		//TODO Temporalmente se movieron las tasas de bono de puntualidad y vales de despensa a esta clase, sin embargo, deben parametrizarse en otro lugar.
+//		this.bonoPuntualidad        = new BigDecimal("0.1").setScale(2, RoundingMode.HALF_UP);
+//		this.valeDespensa           = new BigDecimal("0.4").setScale(2, RoundingMode.HALF_UP);
+//	}
 	
 	public CatMetodoPago getMetodoPago() {
 		return metodoPago;

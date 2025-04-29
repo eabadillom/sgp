@@ -34,32 +34,24 @@ public class BonoPuntualidadPBL extends AbstractPBL {
 	private Boolean    procesaRetardos        = null;
 	
 	public BonoPuntualidadPBL(
-			ParametrosNomina parametros, BigDecimal tasaBono, Map<String, DetRegistro> mapAsistencias, 
-			BigDecimal diasLaborales, BigDecimal diasNoLaborales, BigDecimal diasTrabajados, BigDecimal salarioDiarioIntegrado,
-			BigDecimal proporcionalSeptimoDia
+			ParametrosNomina parametros, DetNomina nomina, BigDecimal tasaBono, 
+			Map<String, DetRegistro> mapAsistencias, BigDecimal diasLaborales, BigDecimal diasNoLaborales, BigDecimal diasTrabajados,
+			BigDecimal salarioDiarioIntegrado, BigDecimal proporcionalSeptimoDia
 	) {
-		super(parametros);
-		this.mapAsistencias = mapAsistencias;
-		this.tasaBono = tasaBono;
-		this.diasLaborales = diasLaborales;
+		super(parametros, nomina);
+		this.baseCalculo     = this.nomina.getReceptor().getSalarioDiarioIntegrado();
+		this.mapAsistencias  = mapAsistencias;
+		this.tasaBono        = tasaBono;
+		this.diasLaborales   = diasLaborales;
 		this.diasNoLaborales = diasNoLaborales;
-		this.diasTrabajados = diasTrabajados;
+		this.diasTrabajados  = diasTrabajados;
 		
-		this.baseCalculo = nomina.getReceptor().getSalarioDiarioIntegrado();
 	}
 	
 	@Override
-	public DetNominaPercepcion procesar(DetNomina nomina) {
-		DetNominaPercepcion percepcion = null;
-    	
-		try {
-			this.cantidad = this.calcularCantidad(nomina);
-			this.procesar(nomina, this.cantidad);
-		} catch (SGPException e) {
-			log.error("Problema para obtener la percepción...", e);
-		}
-    	
-    	return percepcion;
+	public DetNominaPercepcion procesar(DetNomina nomina) throws SGPException {
+		this.cantidad = this.calcularCantidad(nomina);
+		return this.procesar(nomina, this.cantidad);
 	}
 	
 	@Override
@@ -85,9 +77,12 @@ public class BonoPuntualidadPBL extends AbstractPBL {
 			
     	} catch(Exception ex) {
     		log.warn("No es posible calcular el bono de puntualidad: {}", ex.getMessage());
-    		importe = ValoresBD._CERO.get();
+    		this.cantidad       = ValoresBD._CERO.get();
+    		this.importe        = ValoresBD._CERO.get();
+    		this.importeExento  = ValoresBD._CERO.get();
+    		this.importeGravado = ValoresBD._CERO.get();
     	} finally {
-    		percepcion = this.build(nomina, CVE_BONO_PUNTUALIDAD, null, ValoresBD._CERO.get(), importe);
+    		percepcion = this.build(nomina, CVE_BONO_PUNTUALIDAD, this.cantidad, this.importeExento, this.importeGravado);
     	}
 		
 		return percepcion;

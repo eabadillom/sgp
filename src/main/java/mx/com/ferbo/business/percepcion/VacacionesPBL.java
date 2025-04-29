@@ -20,9 +20,9 @@ public class VacacionesPBL extends AbstractPBL {
 	
 	private BigDecimal diasVacaciones = null;
 	
-	public VacacionesPBL(ParametrosNomina parametros, BigDecimal diasVacaciones) {
-		super(parametros);
-		this.baseCalculo = nomina.getReceptor().getSalarioDiario();
+	public VacacionesPBL(ParametrosNomina parametros, DetNomina nomina, BigDecimal diasVacaciones) {
+		super(parametros, nomina);
+		this.baseCalculo    = nomina.getReceptor().getSalarioDiario();
 		this.diasVacaciones = diasVacaciones;
 	}
 

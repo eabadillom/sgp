@@ -1,6 +1,7 @@
 package mx.com.ferbo.business.nomina;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -124,7 +125,7 @@ public class NominaExtraordinariaBL extends NominaBL {
 		//Obtener la suma de los importes gravados de las percepciones.
 		importeGravado = nomina.getPercepciones().stream()
 				.map(d -> d.getImporteGravado())
-				.reduce(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP), BigDecimal :: add)
+				.reduce(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP), BigDecimal :: add)
 				;
 		
 		isrBO = new ISRL174DBL(parametros, importeGravado);

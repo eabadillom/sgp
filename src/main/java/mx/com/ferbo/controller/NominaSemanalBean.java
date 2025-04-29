@@ -355,7 +355,7 @@ public class NominaSemanalBean implements Serializable {
 		
 		try {
 			NominaSemanalBL.agregarPercepcion(this.nomina, this.percepcion);
-			NominaSemanalBL.procesarISR(this.nomina, this.parametros);
+			NominaSemanalBL.procesarISR(this.parametros, this.nomina);
 			
 			this.percepcion = new DetNominaPercepcion();
 			this.actualizar();
@@ -398,7 +398,7 @@ public class NominaSemanalBean implements Serializable {
 			if(percepcion.getCantidad() != null && AbstractPBL.CVE_SUELDO.equalsIgnoreCase(percepcion.getClave())) {
 				NominaSemanalBL.calcularSueldo(nomina, parametros,  diasLaboralesEmpleado, diasNoLaboralesEmpleado, diasTrabajados, null);
 			}
-			NominaSemanalBL.procesarISR(nomina, parametros);
+			NominaSemanalBL.procesarISR(parametros, nomina);
 			
 			this.actualizar();
 			
@@ -422,7 +422,7 @@ public class NominaSemanalBean implements Serializable {
 		
 		try {
 			NominaBL.eliminarPercepcion(nomina, percepcion);
-			NominaSemanalBL.procesarISR(nomina, parametros);
+			NominaSemanalBL.procesarISR(parametros, nomina);
 			this.actualizar();
 			
 			mensaje = "Percepción eliminada correctamente.";
