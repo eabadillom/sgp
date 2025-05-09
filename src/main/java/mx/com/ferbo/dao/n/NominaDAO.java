@@ -101,13 +101,13 @@ public class NominaDAO extends BaseDAO<DetNomina, Integer> {
 		return model;
 	}
 	
-	public List<DetNomina> buscarNominasDelMes(String tipoNomina, String periodicidadPago, Integer ejercicio, Integer periodoInicio, Integer periodoFin, String rfc) {
+	public List<DetNomina> buscarNominasDelMesPorNumeroPeriodo(String tipoNomina, String periodicidadPago, Integer ejercicio, Integer periodoInicio, Integer periodoFin, String rfc) {
 		List<DetNomina> modelList = null;
 		EntityManager em = null;
 		
 		try {
 			em = this.getEntityManager();
-			modelList = em.createNamedQuery("DetNomina.findNominasDelMes", modelClass)
+			modelList = em.createNamedQuery("DetNomina.findNominasDelMesPorNumeroPeriodo", modelClass)
 					.setParameter("tipoNomina", tipoNomina)
 					.setParameter("periodicidad", periodicidadPago)
 					.setParameter("ejercicio", ejercicio)
@@ -126,6 +126,32 @@ public class NominaDAO extends BaseDAO<DetNomina, Integer> {
 		
 		return modelList;
 	}
+	
+	public List<DetNomina> buscarNominasDelMesPorFechaPeriodo(String tipoNomina, String periodicidadPago, Integer ejercicio, LocalDate periodoInicio, LocalDate periodoFin, String rfc) {
+		List<DetNomina> modelList = null;
+		EntityManager em = null;
+		
+		try {
+			em = this.getEntityManager();
+			modelList = em.createNamedQuery("DetNomina.findNominasDelMesPorFechaPeriodo", modelClass)
+					.setParameter("tipoNomina", tipoNomina)
+					.setParameter("ejercicio", ejercicio)
+					.setParameter("periodoInicio", periodoInicio)
+					.setParameter("periodoFin", periodoFin)
+					.setParameter("rfc", rfc)
+					.getResultList()
+					;
+			log.debug("periodo inicio {}, periodo fin {}, rfc {}");
+			
+		} catch(Exception ex) {
+			log.error("Problema para obtener la lista de nomina del periodo solicitado...", ex);
+		} finally {
+			this.close(em);
+		}
+		
+		return modelList;
+	}
+	
 	
 	@Override
 	public DetNomina buscarPorId(Integer id) {

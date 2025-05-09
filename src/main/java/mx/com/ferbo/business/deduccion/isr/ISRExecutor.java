@@ -48,7 +48,7 @@ public class ISRExecutor {
 	}
 	
 	public ISRExecutor(ParametrosNomina parametros, List<DetNomina> nominaMensual) {
-		
+		this.parametros     = parametros;
 		this.periodoInicio  = parametros.getPeriodoInicio();
 		this.periodoFin     = parametros.getPeriodoFin();
 		this.tiposDeduccion = parametros.getTiposDeduccion();

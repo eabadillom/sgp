@@ -3,7 +3,6 @@ package mx.com.ferbo.business.percepcion;
 import static mx.com.ferbo.enums.ValoresBD._CERO;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,6 +23,17 @@ public class SueldoPBL extends AbstractPBL {
 		super(parametros, nomina);
 		this.baseCalculo = this.nomina.getReceptor().getSalarioDiario();
 		this.diasTrabajados = diasTrabajados;
+	}
+	
+	public SueldoPBL(ParametrosNomina parametros, DetNomina nomina) {
+		super(parametros, nomina);
+		this.baseCalculo = this.nomina.getReceptor().getSalarioDiario();
+	}
+	
+	@Override
+	public BigDecimal calcularLimiteExento() {
+		log.info("[UI] Limite exento = {}", _CERO.get());
+		return _CERO.get();
 	}
 
 	@Override
@@ -70,14 +80,9 @@ public class SueldoPBL extends AbstractPBL {
 	@Override
 	protected BigDecimal calcularCantidad(DetNomina nomina) throws SGPException {
 		BigDecimal cantidad = null;
-		cantidad = this.diasTrabajados.setScale(2, RoundingMode.HALF_UP);
+		cantidad = nomina.getDiasLaborados();
+//		cantidad = this.diasTrabajados.setScale(2, RoundingMode.HALF_UP);
 		log.info("[UI] dias trabajados = {}", this.diasTrabajados);
 		return cantidad;
-	}
-
-	@Override
-	public BigDecimal calcularLimiteExento() {
-		log.info("[UI] Limite exento = {}", _CERO.get());
-		return _CERO.get();
 	}
 }

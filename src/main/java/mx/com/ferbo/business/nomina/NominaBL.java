@@ -138,14 +138,14 @@ public abstract class NominaBL {
 			nomina.setPeriodo(parametros.getPeriodo());
 			nomina.setPeriodoInicio(parametros.getPeriodoInicio().toInstant().atZone(ZoneId.of("GMT-6")).toLocalDate());
 			nomina.setPeriodoFin(parametros.getPeriodoFin().toInstant().atZone(ZoneId.of("GMT-6")).toLocalDate());
-			nomina.setDiasLaborados(0);
-			nomina.setDiasNoLaborados(0);
-			nomina.setDiasAsueto(0);
+			nomina.setDiasLaborados(ValoresBD._CERO.get());
+			nomina.setDiasNoLaborados(ValoresBD._CERO.get());
+			nomina.setDiasAsueto(ValoresBD._CERO.get());
 			nomina.setDiasPagados(ValoresBD._CERO.get());
 			nomina.setSubtotal(ValoresBD._CERO.get());
 			nomina.setDescuento(ValoresBD._CERO.get());
 			nomina.setTotal(ValoresBD._CERO.get());
-		
+			
 		} catch(SGPException ex){
 			log.warn("Problema para generar el objeto nómina del empleado...", ex);
 			throw ex;
@@ -431,9 +431,6 @@ public abstract class NominaBL {
 	
 	public static synchronized void agregarPercepcion(DetNomina nomina, DetNominaPercepcion percepcion)
 	throws SGPException {
-//		Integer maxIndex = null;
-//		DetNominaPercepcion maxP = null;
-//		DetNominaPercepcionPK maxKey = null;
 		
 		if(nomina == null)
 			throw new SGPException("El objeto nómina no está definido.");
@@ -445,13 +442,13 @@ public abstract class NominaBL {
 			throw new SGPException("Debe indicar un importe (excento o gravado).");
 		
 		if(percepcion.getImporteExento() == null)
-			percepcion.setImporteExento(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP));
+			percepcion.setImporteExento(ValoresBD._CERO.get());
 		
 		if(percepcion.getImporteGravado() == null)
-			percepcion.setImporteGravado(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP));
+			percepcion.setImporteGravado(ValoresBD._CERO.get());
 		
-		if(percepcion.getImporteExento().compareTo(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP)) < 0
-				&& percepcion.getImporteGravado().compareTo(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP)) < 0
+		if(percepcion.getImporteExento().compareTo(ValoresBD._CERO.get()) < 0
+				&& percepcion.getImporteGravado().compareTo(ValoresBD._CERO.get()) < 0
 				)
 			throw new SGPException("Debe indicar un importe (excento o gravado).");
 		
@@ -472,19 +469,6 @@ public abstract class NominaBL {
 		boolean removedPercepciones = nomina.getPercepciones().removeIf(p -> p.getClave().equalsIgnoreCase(clave));
 		if(removedPercepciones)
 			log.info("Se encontraron conceptos {}, los cuales fueron eliminados de la lista de percepciones.", clave);
-		
-//		try {
-//			maxP = Collections.max(nomina.getPercepciones(), Comparator.comparing(p -> p.getKey().getId()));
-//			maxKey = maxP.getKey();
-//		} catch(NoSuchElementException ex) {
-//			maxKey = new DetNominaPercepcionPK(nomina, -1);
-//		}
-//		
-//		if(maxKey.getId() == null)
-//			throw new SGPException("Existen elementos de \"Percepciones\" que no tienen asignado un consecutivo");
-//		
-//		maxIndex = maxKey.getId() + 1;
-//		percepcion.getKey().setId(maxIndex);
 		
 		if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(ValoresBD._CERO.get()) > 0)
 			nomina.getPercepciones().add(percepcion);
