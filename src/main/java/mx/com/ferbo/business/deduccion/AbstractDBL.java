@@ -69,6 +69,8 @@ public abstract class AbstractDBL {
 			
 			if(collect.size() > 0)
 				tipoDeduccion = collect.get(0);
+			
+			log.info("Tipo de deducción (SAT) asignado: {}", tipoDeduccion);
 		} catch(Exception ex) {
 			log.warn("No es posible determinar el tipo de deducción: " + clave, ex);
 		}

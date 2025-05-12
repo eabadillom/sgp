@@ -61,7 +61,7 @@ public class DetNominaPercepcion implements Serializable {
 	@Size(max = 150)
 	private String nombre;
 	
-	@Column(name = "nu_cantidad", precision = 6, scale = 2)
+	@Column(name = "nu_cantidad", precision = 6, scale = 3)
 	@Basic(optional = true)
 	private BigDecimal cantidad = null;
 	

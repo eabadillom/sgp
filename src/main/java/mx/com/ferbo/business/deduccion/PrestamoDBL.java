@@ -66,6 +66,9 @@ public class PrestamoDBL extends AbstractDBL implements IDeducciones {
 			
 			
 			nomina.getDeducciones().addAll(prestamosDeduccion);
+		} catch(SGPException  ex){
+			log.warn(ex.getMessage());
+			totalPrestamos = ValoresBD._CERO.get();
 		} catch(Exception ex) {
 			log.error("Problema para procesar los préstamos del empleado...", ex);
 			totalPrestamos = ValoresBD._CERO.get();

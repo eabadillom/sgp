@@ -14,6 +14,9 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "det_nomina_periodo")
+@NamedQueries({
+	@NamedQuery(name = "DetNominaPeriodo.buscarPorEmpresaTipoNominaPeriodicidadAnio", query = "SELECT p FROM DetNominaPeriodo p WHERE p.key.empresa.idEmpresa = :idEmpresa AND p.key.tipoNomina = :tipoNomina AND p.key.periodicidad.periodicidad = :periodicidad AND p.key.anio = :anio ")
+})
 public class DetNominaPeriodo implements Serializable {
 
 	private static final long serialVersionUID = 564324600227136846L;
@@ -32,6 +35,16 @@ public class DetNominaPeriodo implements Serializable {
 	@Column(name = "fh_pago")
 	@Basic(optional = false)
 	private LocalDate fechaPago;
+	
+	public DetNominaPeriodo() {
+	}
+	
+	public DetNominaPeriodo(Builder builder) {
+		this.key = builder.key;
+		this.periodoInicio = builder.periodoInicio;
+		this.periodoFin = builder.periodoFin;
+		this.fechaPago = builder.fechaPago;
+	}
 
 	public DetNominaPeriodoPK getKey() {
 		return key;
@@ -86,5 +99,76 @@ public class DetNominaPeriodo implements Serializable {
 	public String toString() {
 		return "CatNominaPeriodo [key=" + key + ", periodoInicio=" + periodoInicio + ", periodoFin=" + periodoFin
 				+ ", fechaPago=" + fechaPago + "]";
+	}
+	
+	public static class Builder {
+		private DetNominaPeriodoPK key;
+		private LocalDate periodoInicio;
+		private LocalDate periodoFin;
+		private LocalDate fechaPago;
+		
+		public DetNominaPeriodo.Builder key(DetNominaPeriodoPK key) {
+			this.key = key;
+			return this;
+		}
+		
+		public DetNominaPeriodo.Builder empresa(CatEmpresa empresa) {
+			if(this.key == null)
+				this.key = new DetNominaPeriodoPK();
+			
+			this.key.setEmpresa(empresa);
+			return this;
+		}
+		
+		public DetNominaPeriodo.Builder tipoNomina(String tipoNomina) {
+			if(this.key == null)
+				this.key = new DetNominaPeriodoPK();
+			
+			this.key.setTipoNomina(tipoNomina);
+			return this;
+		}
+		
+		public DetNominaPeriodo.Builder periodicidad(CatPeriodicidadPago periodicidad) {
+			if(this.key == null)
+				this.key = new DetNominaPeriodoPK();
+			
+			this.key.setPeriodicidad(periodicidad);
+			return this;
+		}
+		
+		public DetNominaPeriodo.Builder anio(Integer anio) {
+			if(this.key == null)
+				this.key = new DetNominaPeriodoPK();
+			this.key.setAnio(anio);
+			return this;
+		}
+		
+		public DetNominaPeriodo.Builder periodo(Integer periodo) {
+			if(this.key == null)
+				this.key = new DetNominaPeriodoPK();
+			
+			this.key.setPeriodo(periodo);
+			return this;
+		}
+		
+		public DetNominaPeriodo.Builder periodoInicio(LocalDate periodoInicio) {
+			this.periodoInicio = periodoInicio;
+			return this;
+		}
+		
+		public DetNominaPeriodo.Builder periodoFin(LocalDate periodoFin) {
+			this.periodoFin = periodoFin;
+			return this;
+		}
+		
+		public DetNominaPeriodo.Builder fechaPago(LocalDate fechaPago) {
+			this.fechaPago = fechaPago;
+			return this;
+		}
+		
+		public DetNominaPeriodo build() {
+			return new DetNominaPeriodo(this);
+		}
+		
 	}
 }

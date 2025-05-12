@@ -1,6 +1,7 @@
 package mx.com.ferbo.business.deduccion.isr;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -57,7 +58,7 @@ public class ISRAntesSubsidioDBL extends AbstractDBL implements IDeduccion {
 			isrPreSubsidio = this.isrPrevio.add(tarifaISR.getCuotaFija());
 		} catch(Exception ex) {
 			log.error("Problema para obtener el ISR antes del subsidio al empleo...", ex);
-			isrPreSubsidio = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+			isrPreSubsidio = BigDecimal.ZERO.setScale(2,  RoundingMode.HALF_UP);
 		} finally {
 			index = this.nuevoIndiceDe(nomina.getDeducciones());
 			deduccion = new DetNominaDeduccion.Builder()
@@ -85,9 +86,9 @@ public class ISRAntesSubsidioDBL extends AbstractDBL implements IDeduccion {
 			if(porcentajeExcedente.compareTo(ValoresBD._100.get()) >= 0)
 				porcentaje = porcentajeExcedente;
 			else
-				porcentaje = porcentajeExcedente.divide(ValoresBD._100.get(), 5, BigDecimal.ROUND_HALF_UP);
+				porcentaje = porcentajeExcedente.divide(ValoresBD._100.get(), 5, RoundingMode.HALF_UP);
 			
-			isrPrevio = this.excedente.multiply(porcentaje).setScale(2, BigDecimal.ROUND_HALF_UP);
+			isrPrevio = this.excedente.multiply(porcentaje).setScale(2, RoundingMode.HALF_UP);
 		} catch(Exception ex) {
 			log.error("Problema para obtener el ISR previo", ex);
 			isrPrevio = ValoresBD._CERO.get();

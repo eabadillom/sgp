@@ -1,5 +1,7 @@
 package mx.com.ferbo.dao.n;
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 
@@ -20,6 +22,27 @@ public class NominaPeriodoDAO extends BaseDAO<DetNominaPeriodo, DetNominaPeriodo
 	
 	public NominaPeriodoDAO() {
 		super(DetNominaPeriodo.class);
+	}
+	
+	public List<DetNominaPeriodo>  buscar(Integer idEmpresa, String tipoNomina, String periodicidad, Integer anio) {
+		List<DetNominaPeriodo> modelList = null;
+		EntityManager em = null;
+		try {
+			em = this.getEntityManager();
+			modelList = em.createNamedQuery("DetNominaPeriodo.buscarPorEmpresaTipoNominaPeriodicidadAnio", modelClass)
+					.setParameter("idEmpresa", idEmpresa)
+					.setParameter("tipoNomina", tipoNomina)
+					.setParameter("periodicidad", periodicidad)
+					.setParameter("anio", anio)
+					.getResultList()
+					;
+		} catch(Exception ex) {
+			log.error("Problema para obtener la lista de periodos de nómina...", ex);
+		} finally {
+			this.close(em);
+		}
+		
+		return modelList;
 	}
 	
 	public DetNominaPeriodo buscarUltimo(Integer idEmpresa, String tipoNomina, String periodicidad, Integer anio) {

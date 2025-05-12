@@ -20,6 +20,18 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "cat_periodicidad_pago")
 public class CatPeriodicidadPago implements Serializable {
+	
+	public static final String P_DIARIO = "01";
+	public static final String P_SEMANAL = "02";
+	public static final String P_CATORCENAL = "03";
+	public static final String P_QUINCENAL = "04";
+	public static final String P_MENSUAL = "05";
+	public static final String P_BIMESTRAL = "06";
+	public static final String P_UNIDAD_OBRA = "07";
+	public static final String P_COMISION = "08";
+	public static final String p_PRECIO_ALZADO = "09";
+	public static final String P_DECENAL = "10";
+	public static final String P_OTRA_PERIODICIDAD = "99";
 
     private static final long serialVersionUID = 1890135287600496909L;
 

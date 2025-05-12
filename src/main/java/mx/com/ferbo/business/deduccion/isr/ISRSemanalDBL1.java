@@ -13,6 +13,7 @@ import mx.com.ferbo.business.deduccion.AbstractDBL;
 import mx.com.ferbo.business.deduccion.IDeducciones;
 import mx.com.ferbo.business.deduccion.subsidio.ISubsidioEmpleo;
 import mx.com.ferbo.business.deduccion.subsidio.SubsidioEmpleoExecutor;
+import mx.com.ferbo.business.nomina.ParametrosNomina;
 import mx.com.ferbo.business.otropago.AbstractOtroPago;
 import mx.com.ferbo.business.otropago.ReintegroISROtroPago;
 import mx.com.ferbo.model.CatTarifaISR;
@@ -57,6 +58,29 @@ public class ISRSemanalDBL1 extends AbstractDBL implements IDeducciones {
 			this.tiposDeduccion = tiposDeduccion;
 			this.tiposOtroPago = tiposOtroPago;
 			this.tablaISR = tablaISR;
+			this.listaNominaMes = nominaMensual;
+			
+			this.tablaISRSemanal = this.tablaISR.stream()
+					.filter(t -> "s".equalsIgnoreCase(t.getTipo()))
+					.collect(Collectors.toList())
+					;
+			
+			this.tablaISRMensual = this.tablaISR.stream()
+					.filter(t -> "m".equalsIgnoreCase(t.getTipo()))
+					.collect(Collectors.toList())
+					;
+		} catch(Exception ex) {
+			throw new SGPException("Problema al iniciar el objeto de cálculo de ISR semanal...", ex);
+		}
+	}
+	
+	public ISRSemanalDBL1(ParametrosNomina parametros, List<DetNomina> nominaMensual)
+	throws SGPException {
+		try {
+			this.setPeriodo(parametros.getPeriodoInicio(), parametros.getPeriodoFin());
+			this.tiposDeduccion = parametros.getTiposDeduccion();
+			this.tiposOtroPago = parametros.getTiposOtroPago();
+			this.tablaISR = parametros.getTablaISR();
 			this.listaNominaMes = nominaMensual;
 			
 			this.tablaISRSemanal = this.tablaISR.stream()

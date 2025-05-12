@@ -16,8 +16,9 @@ public class DetNominaPeriodoPK implements Serializable {
 
 	private static final long serialVersionUID = -4217587598012942767L;
 	
-	@Column(name = "id_empresa")
-	@Basic(optional = false)
+	@JoinColumn(name = "id_empresa")
+	@ManyToOne
+	@NotNull
 	private CatEmpresa empresa;
 	
 	@Column(name = "tp_nomina")

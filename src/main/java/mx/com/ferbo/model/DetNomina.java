@@ -36,7 +36,8 @@ import mx.com.ferbo.model.sat.CatMetodoPago;
     @NamedQuery(name = "DetNomina.findByPeriodo", query = "SELECT n FROM DetNomina n WHERE n.periodoInicio = :periodoInicio AND n.periodoFin = :periodoFin"),
     @NamedQuery(name = "DetNomina.findByPeriodoRfc", query = "SELECT n FROM DetNomina n WHERE n.periodoInicio = :periodoInicio AND n.periodoFin = :periodoFin AND n.receptor.rfc = :rfc"),
     @NamedQuery(name = "DetNomina.findByEmisorTipoNominaAnioPeriodoReceptor", query = "SELECT n FROM DetNomina n WHERE n.emisor.rfc = :rfcEmisor AND n.tipoNomina = :tipoNomina and n.ejercicio = :anio and n.periodo = :periodo and n.receptor.rfc = :rfcReceptor"),
-    @NamedQuery(name = "DetNomina.findBySemanaRfc", query = "SELECT n FROM DetNomina n WHERE n.periodo between :semanaInicio AND :semanaFin AND n.receptor.rfc = :rfc")
+    @NamedQuery(name = "DetNomina.findNominasDelMesPorNumeroPeriodo", query = "SELECT n FROM DetNomina n WHERE n.tipoNomina = :tipoNomina AND n.receptor.periodicidadPago.periodicidad = :periodicidad AND n.ejercicio = :ejercicio AND n.periodo between :periodoInicio AND :periodoFin AND n.receptor.rfc = :rfc "),
+    @NamedQuery(name = "DetNomina.findNominasDelMesPorFechaPeriodo", query = "SELECT n FROM DetNomina n WHERE n.tipoNomina = :tipoNomina AND n.ejercicio = :ejercicio AND n.periodoFin between :periodoInicio and :periodoFin AND n.receptor.rfc = :rfc") 
 })
 public class DetNomina implements Serializable {
 
@@ -130,21 +131,25 @@ public class DetNomina implements Serializable {
     @Basic(optional = true)
   	private Integer periodo;
     
-    @Column(name = "nu_dias_laborados")
+    @Column(name = "nu_dias_laborados", precision = 6, scale = 2)
     @Basic(optional = true)
-  	private Integer diasLaborados;
+  	private BigDecimal diasLaborados;
+    
+    @Column(name = "nu_dias_no_laborados", precision = 6, scale = 2)
+    @Basic(optional = true)
+    private BigDecimal diasNoLaborados;
+    
+    @Column(name = "nu_dias_vacaciones", precision = 6, scale = 2)
+    @Basic(optional = true)
+    private BigDecimal diasVacaciones;
     
     @Column(name = "nu_dias_pagados", precision = 6, scale = 2)
     @Basic(optional = true)
-  	private BigDecimal diasPagados;
+    private BigDecimal diasPagados;
     
-    @Column(name = "nu_dias_asueto")
+    @Column(name = "nu_dias_asueto", precision = 6, scale = 2)
     @Basic(optional = true)
-  	private Integer diasAsueto;
-    
-    @Column(name = "nu_dias_no_laborados")
-    @Basic(optional = true)
-  	private Integer diasNoLaborados;
+    private BigDecimal diasAsueto;
     
     @OneToOne(mappedBy = "nomina", cascade = CascadeType.PERSIST)
     private DetNominaEmisor emisor;
@@ -386,11 +391,11 @@ public class DetNomina implements Serializable {
 		this.periodo = periodo;
 	}
 
-	public Integer getDiasLaborados() {
+	public BigDecimal getDiasLaborados() {
 		return diasLaborados;
 	}
 
-	public void setDiasLaborados(Integer diasLaborados) {
+	public void setDiasLaborados(BigDecimal diasLaborados) {
 		this.diasLaborados = diasLaborados;
 	}
 
@@ -402,19 +407,19 @@ public class DetNomina implements Serializable {
 		this.diasPagados = diasPagados;
 	}
 
-	public Integer getDiasAsueto() {
+	public BigDecimal getDiasAsueto() {
 		return diasAsueto;
 	}
 
-	public void setDiasAsueto(Integer diasAsueto) {
+	public void setDiasAsueto(BigDecimal diasAsueto) {
 		this.diasAsueto = diasAsueto;
 	}
 
-	public Integer getDiasNoLaborados() {
+	public BigDecimal getDiasNoLaborados() {
 		return diasNoLaborados;
 	}
 
-	public void setDiasNoLaborados(Integer diasNoLaborados) {
+	public void setDiasNoLaborados(BigDecimal diasNoLaborados) {
 		this.diasNoLaborados = diasNoLaborados;
 	}
 
@@ -456,5 +461,13 @@ public class DetNomina implements Serializable {
 
 	public void setVacaciones(List<DetVacaciones> vacaciones) {
 		this.vacaciones = vacaciones;
+	}
+
+	public BigDecimal getDiasVacaciones() {
+		return diasVacaciones;
+	}
+
+	public void setDiasVacaciones(BigDecimal diasVacaciones) {
+		this.diasVacaciones = diasVacaciones;
 	}
 }

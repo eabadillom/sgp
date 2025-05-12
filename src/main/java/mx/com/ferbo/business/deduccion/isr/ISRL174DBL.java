@@ -5,6 +5,7 @@ import static mx.com.ferbo.enums.ValoresBD._CERO;
 import static mx.com.ferbo.enums.ValoresBD._DIAS_ANIO;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -76,23 +77,26 @@ public class ISRL174DBL extends AbstractDBL implements IDeduccion {
 		
 		
 		try {
+			tipoDeduccion = this.getTipoDeduccion(TD_ISR_LEY_174);
 			
 			salarioDiario = nomina.getReceptor().getSalarioDiario();
 			
 			if(this.importeGravado.compareTo(_CERO.get()) == 0)
 				throw new SGPException("El importe gravado debe ser mayor a cero.");
 			
-			log.info("Remuneración gravada anual: {}", this.importeGravado);
+			log.info("[UI] Cálculo ISR Art. 174: Remuneración gravada = {}", this.importeGravado);
 			
 			/*
 			 * Artículo 174 Reglamento LISR, Fracción I.
 			 * La remuneración de que se trate se dividirá entre 365 y el resultado se multiplicará por 30.4
 			 * */
 			remuneracionMensual = importeGravado
-					.divide(_DIAS_ANIO.get(), 2, BigDecimal.ROUND_HALF_UP)
-					.multiply(_30_4.get()).setScale(2, BigDecimal.ROUND_HALF_UP)
+					.divide(_DIAS_ANIO.get(), 2, RoundingMode.HALF_UP)
+					.multiply(_30_4.get())
+					.setScale(2, RoundingMode.HALF_UP)
 					;
-			log.info("Fracción I - Remuneración mensual: {}", remuneracionMensual);
+			log.info("[UI] Fracción I - Remuneración mensual = {} / {} * {} = {}",
+					importeGravado, _DIAS_ANIO.get(), _30_4.get(), remuneracionMensual);
 			
 			/* Artículo 174 Reglamento LISR, Fracción II.
 			   A la cantidad que se obtenga conforme a la fracción anterior, se le adicionará el ingreso
@@ -102,21 +106,25 @@ public class ISRL174DBL extends AbstractDBL implements IDeduccion {
 			 * */
 			ingresoGravadoMensual = salarioDiario
 					.multiply(_30_4.get())
-					.setScale(2, BigDecimal.ROUND_HALF_UP);
-			log.info("Fracción II - Ingreso gravado mensual: {}", ingresoGravadoMensual);
+					.setScale(2, RoundingMode.HALF_UP);
+			log.info("[UI] Fracción II - Ingreso gravado mensual = {} * {} = {}",
+					salarioDiario, _30_4.get(),
+					ingresoGravadoMensual);
 			
 			baseISRMensualFraccion2 = ingresoGravadoMensual
 					.add(remuneracionMensual)
-					.setScale(2, BigDecimal.ROUND_HALF_UP);
-			log.info("Fraccion II - Base ISR: {}", baseISRMensualFraccion2);
+					.setScale(2, RoundingMode.HALF_UP);
+			log.info("[UI] Fraccion II - Base ISR = {} + {} = {}",
+					ingresoGravadoMensual, remuneracionMensual, baseISRMensualFraccion2);
 			
 			   //Cálculo mensual de ISR necesario para L174
 			tarifaISRBOFraccion2 = new TarifaISRBL(this.tablaISRMensual, baseISRMensualFraccion2);
 			tarifaISRFraccion2 = tarifaISRBOFraccion2.calcular();
+			log.info("[UI] Fracción II - Tarifa ISR: {}", tarifaISRFraccion2);
 			isrFraccion2BO = new ISRAntesSubsidioDBL(baseISRMensualFraccion2, tarifaISRFraccion2);
 			dISRCausadoFraccion2 = isrFraccion2BO.calcular(nomina);
 			isrCausadoFraccion2 = dISRCausadoFraccion2.getImporte();
-			log.info("Fracción II - ISR: {}", isrCausadoFraccion2);
+			log.info("[UI] Fracción II - ISR: {}", isrCausadoFraccion2);
 			
 			/* Artículo 174 Reglamento LISR, Fracción III.
 			 * El Impuesto que se obtenga conforme a la fracción anterior se disminuirá con el Impuesto que
@@ -124,16 +132,19 @@ public class ISRL174DBL extends AbstractDBL implements IDeduccion {
 			   se refiere dicha fracción, calculando este último sin considerar las demás remuneraciones
 			   mencionadas en este artículo;
 			 * */
+			log.info("[UI] Fracción III - Base ISR: {}", ingresoGravadoMensual);
 			tarifaISRBOFraccion3 = new TarifaISRBL(this.tablaISRMensual, ingresoGravadoMensual);
 			tarifaISRFraccion3 = tarifaISRBOFraccion3.calcular();
+			log.info("[UI] Fracción III - Tarifa ISR: {}", tarifaISRFraccion3);
 			isrFraccion3BO = new ISRAntesSubsidioDBL(ingresoGravadoMensual, tarifaISRFraccion3);
 			dISRCausadoFraccion3 = isrFraccion3BO.calcular(nomina);
 			isrCausadoFraccion3 = dISRCausadoFraccion3.getImporte();
-			log.info("Fracción III - ISR: {}", isrCausadoFraccion3);
+			log.info("[UI] Fracción III - ISR: {}", isrCausadoFraccion3);
 			diferenciaISRaRetener = isrCausadoFraccion2
 					.subtract(isrCausadoFraccion3)
-					.setScale(2, BigDecimal.ROUND_HALF_UP);
-			log.info("Fraccion III - Diferencia de ISR a Retener Fraccion II vs Fraccion III: {}", diferenciaISRaRetener);
+					.setScale(2, RoundingMode.HALF_UP);
+			log.info("[UI] Fraccion III - Diferencia de ISR a Retener Fraccion II vs Fraccion III = {} - {} = {}",
+					isrCausadoFraccion2, isrCausadoFraccion3, diferenciaISRaRetener);
 			
 			/* Artículo 174 Reglamento LISR, Fraccion IV
 			 * El Impuesto a retener será el que resulte de aplicar a las remuneraciones a que se refiere este
@@ -150,14 +161,17 @@ public class ISRL174DBL extends AbstractDBL implements IDeduccion {
 			
 			//Aplicando primero Fracción V:
 			tasaISRFraccion5 = diferenciaISRaRetener
-					.divide(remuneracionMensual, 4, BigDecimal.ROUND_HALF_UP);
-			log.info("Fraccion V - Tasa ISR: {}", tasaISRFraccion5);
+					.divide(remuneracionMensual, 4, RoundingMode.HALF_UP);
+			log.info("[UI] Fraccion V - Tasa ISR = {} / {} = {}",
+					diferenciaISRaRetener, remuneracionMensual, tasaISRFraccion5);
 			
 			//Aplicando después Fracción IV:
-			isrCausadoFraccion4 = this.importeGravado.multiply(tasaISRFraccion5).setScale(2, BigDecimal.ROUND_HALF_UP);
-			log.info("Fraccion IV - ISR: {}", isrCausadoFraccion4);
+			isrCausadoFraccion4 = this.importeGravado
+					.multiply(tasaISRFraccion5)
+					.setScale(2, RoundingMode.HALF_UP);
+			log.info("[UI] Fraccion IV - ISR = {} * {} = {}", importeGravado, tasaISRFraccion5, isrCausadoFraccion4);
 			
-			tipoDeduccion = this.getTipoDeduccion(TD_ISR_LEY_174);
+			
 		} catch(SGPException ex) {
 			log.warn("Problema para generar el cálculo de ISR R. Art. 174, {}", ex.getMessage());
 			isrCausadoFraccion4 = _CERO.get();

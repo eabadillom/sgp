@@ -1,31 +1,38 @@
 package mx.com.ferbo.business.percepcion;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.math.RoundingMode;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import static mx.com.ferbo.enums.ValoresBD.*;
+
+import mx.com.ferbo.business.nomina.ParametrosNomina;
 import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.DetPercepcionEmpleado;
-import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.util.SGPException;
 
-public class ValesDespensaPBL extends AbstractPBL implements IPercepcion {
+/** Esta implementación del cálculo de vales de despensa tiene como base la UMA, para determinar de manera
+ * general a todos los trabajadores la misma cantidad otorgada como apoyo de vales de despensa.
+ * Se otorga el 40% de la UMA diaria, por cada día trabajado de la semana + el proporcional del septimo día.
+*
+*/
+public class ValesDespensaPBL extends AbstractPBL {
 	
 	private static Logger log = LogManager.getLogger(ValesDespensaPBL.class);
-	
-	private BigDecimal siete = new BigDecimal("7.00").setScale(2, BigDecimal.ROUND_HALF_UP);
 	
 	private BigDecimal diasTrabajados = null;
 	private BigDecimal uma = null;
 	private BigDecimal tasaVales = null;
 	private BigDecimal diasPeriodo = null;
 	
-	public ValesDespensaPBL(List<CatTipoPercepcion> tiposPercepcion, BigDecimal diasTrabajados, BigDecimal uma, BigDecimal tasaVales, BigDecimal diasPeriodo) {
-		this.tiposPercepcion = tiposPercepcion;
+	public ValesDespensaPBL(ParametrosNomina parametros, DetNomina nomina, BigDecimal diasTrabajados, BigDecimal uma, BigDecimal tasaVales, BigDecimal diasPeriodo) {
+		super(parametros, nomina);
+		this.baseCalculo = uma;
+		
 		this.diasTrabajados = diasTrabajados;
 		this.uma = uma;
 		this.tasaVales = tasaVales;
@@ -33,57 +40,96 @@ public class ValesDespensaPBL extends AbstractPBL implements IPercepcion {
 	}
 	
 	@Override
-	public DetNominaPercepcion calcular(DetNomina nomina) {
+	public DetNominaPercepcion procesar(DetNomina nomina) throws SGPException {
 		DetNominaPercepcion percepcion = null;
-		BigDecimal importeVales = null;
 		
+		/* El importe de los vales de despensa estarán excluidos del
+		 * cálculo del Salario Base de Cotización (IMSS) siempre y cuando
+		 * no superen el 40% de la UMA mensual (se debe revisar el ajuste
+		 * a UMA diaria o semanal, para una correcta aplicación del
+		 * criterio).
+		 * 
+		 * En caso de exceder el valor deL 40% de la UMA, la diferencia
+		 * se calculará de manera diaria y se sumará al SBC.
+		 * */
+		//TODO Pendiente aplicar criterio de exención para SBC.
+		
+		
+		//Cálculo de importes exento y gravado (para LISR, Art. 93, parrafo penultimo).
+		if(this.diasTrabajados.compareTo(_CERO.get()) == 0)
+			throw new SGPException("No es posible asignar vales de despensa.");
+		
+		this.cantidad = this.calcularCantidad(nomina);
+		percepcion = this.procesar(nomina, this.cantidad);
+		
+		return percepcion;
+	}
+	
+	@Override
+	public DetNominaPercepcion procesar(DetNomina nomina, BigDecimal cantidad) throws SGPException {
+		DetNominaPercepcion percepcion = null;
 		DetPercepcionEmpleado percepcionEmpleado = null;
 		
-		BigDecimal limiteExcento = null;
-		BigDecimal importeGravado = null;
-		BigDecimal importeExento = null;
-		
 		try {
-    		if(this.diasTrabajados.compareTo(BigDecimal.ZERO) == 0)
-    			throw new SGPException("No es posible asignar vales de despensa.");
-    		
-    		importeVales = uma.multiply(tasaVales).setScale(4, BigDecimal.ROUND_HALF_UP);
-    		importeVales = importeVales.multiply(diasPeriodo).setScale(2, BigDecimal.ROUND_HALF_UP);
+			
+			/* El importe de los vales de despensa estarán excluidos del
+			 * cálculo del Salario Base de Cotización (IMSS) siempre y cuando
+			 * no superen el 40% de la UMA mensual (se debe revisar el ajuste
+			 * a UMA diaria o semanal, para una correcta aplicación del
+			 * criterio).
+			 * 
+			 * En caso de exceder el valor deL 40% de la UMA, la diferencia
+			 * se calculará de manera diaria y se sumará al SBC.
+			 * */
+			//TODO Pendiente aplicar criterio de exención para SBC.
+			
+    		this.cantidad = this.calcularCantidad(nomina);
+    		this.importe = this.calcularImporte(this.cantidad, this.baseCalculo);
     		
 			percepcionEmpleado = this.buscaPercepcionEmpleado(P_VALES_DESPENSA);
     		
     		if(    (percepcionEmpleado != null) 
     			&& (percepcionEmpleado.getActivo())
 				&& (percepcionEmpleado.getImporteMaximo() != null)
-				&& (importeVales.compareTo(percepcionEmpleado.getImporteMaximo()) > 0) ) {
+				&& (importe.compareTo(percepcionEmpleado.getImporteMaximo()) > 0) ) {
     			
-    			importeVales = percepcionEmpleado.getImporteMaximo();
+    			importe = percepcionEmpleado.getImporteMaximo();
     		}
     		
-    		/* Los vales de despensa están exentos de ISR hasta por 7 veces la UMA diaria.
-    		 */
-    		limiteExcento = this.uma.multiply(siete).setScale(2, BigDecimal.ROUND_HALF_UP);
+    		this.calcularExentoGravado();
     		
-    		if(importeVales.compareTo(limiteExcento) > 0) {
-    			importeGravado = importeVales.subtract(limiteExcento);
-    			importeExento = limiteExcento.setScale(2, BigDecimal.ROUND_HALF_UP);
-    		} else {
-    			importeGravado = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
-    			importeExento = importeVales.setScale(2, BigDecimal.ROUND_HALF_UP);
-    		}
-    		
-		} catch(SGPException ex){
-			log.warn("No es posible calcular los vales de despensa: {}", ex.getMessage());
-			importeExento = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
-			importeGravado = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
-    	} catch(Exception ex) {
-    		log.error("No es posible calcular los vales de despensa...", ex);
-    		importeExento = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
-			importeGravado = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
-    	} finally {
-    		percepcion = this.build(nomina, CVE_VALES_DESPENSA, ValoresBD._CERO.get(), importeExento, importeGravado);
+		} catch(SGPException ex) {
+			log.warn("[UI] {}", ex.getMessage());
+			this.cantidad       = ValoresBD._CERO.get();
+			this.importe        = ValoresBD._CERO.get();
+			this.importeExento  = ValoresBD._CERO.get();
+			this.importeGravado = ValoresBD._CERO.get();
+			throw ex;
+		} catch(Exception ex) {
+			log.error("Problema para generar la percepción...", ex);
+			this.cantidad       = ValoresBD._CERO.get();
+			this.importe        = ValoresBD._CERO.get();
+			this.importeExento  = ValoresBD._CERO.get();
+			this.importeGravado = ValoresBD._CERO.get();
+		} finally {
+    		percepcion = this.build(nomina, CVE_VALES_DESPENSA, _CERO.get(), importeExento, importeGravado);
     	}
 		
 		return percepcion;
+	}
+	
+	@Override
+	protected BigDecimal calcularCantidad(DetNomina nomina) throws SGPException {
+		return this.tasaVales.setScale(4, RoundingMode.HALF_UP)
+				.multiply(this.diasPeriodo);
+	}
+
+	@Override
+	public BigDecimal calcularLimiteExento() {
+		/* Los vales de despensa están exentos de ISR hasta por 7 veces la UMA diaria.
+		 */
+		return this.uma
+				.multiply(_7.get())
+				.setScale(2, RoundingMode.HALF_UP);
 	}
 }
