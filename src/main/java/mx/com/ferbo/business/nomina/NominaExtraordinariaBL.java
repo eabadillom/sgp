@@ -98,6 +98,7 @@ public class NominaExtraordinariaBL extends NominaBL {
 				percepcionBO = new AguinaldoPBL(parametros, nomina);
 				break;
 				
+			case AbstractPBL.CVE_PTU:
 			default:
 				log.info("[UI] La percepción solicitada no está considerada para la nómina extraordinaria o no está implementada.");
 				throw new UnsupportedOperationException("La percepción no está implementada.");
