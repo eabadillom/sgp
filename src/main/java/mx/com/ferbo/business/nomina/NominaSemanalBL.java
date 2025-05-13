@@ -2,7 +2,6 @@ package mx.com.ferbo.business.nomina;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -171,22 +170,7 @@ public class NominaSemanalBL extends NominaBL {
 				.reduce(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP), BigDecimal :: add)
 				;
 			
-//			nomina.setFechaEmision(new Date());
-//			nomina.setClaveExportacion("01");
-//			nomina.setTipoComprobante("N");
-//			nomina.setMoneda("MXN");
-//			nomina.setMetodoPago(this.parametros.getMetodoPago());
-//			nomina.setSerie(String.format("%d", this.parametros.getAnio()));
-//			nomina.setFolio(String.format("%d", this.parametros.getPeriodo()));
-//			nomina.setLugarExpedicion(this.empleado.getDatoEmpresa().getEmpresa().getCodigoPostal());
-//			nomina.setEjercicio(DateUtil.getAnio(this.fechaInicioAnio));
 			nomina.setDiasPagados(diasPagados);
-			//TODO Revisar los días no laborados.
-//			nomina.setDiasNoLaborados(diasLaboralesPeriodo.subtract(diasTrabajados).intValue());
-//			nomina.setPeriodo(this.parametros.getPeriodo());
-//			nomina.setPeriodoInicio(this.periodoInicio.toInstant().atZone(ZoneId.of("GMT-6")).toLocalDate());
-//			nomina.setPeriodoFin(this.periodoFin.toInstant().atZone(ZoneId.of("GMT-6")).toLocalDate());
-			
 			
 			log.info("Emisor: {}", nomina.getEmisor().getNombre());
 			
