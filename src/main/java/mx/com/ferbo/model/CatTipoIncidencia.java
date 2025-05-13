@@ -20,7 +20,9 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "cat_tipo_incidencia")
 @NamedQueries({
-    @NamedQuery(name = "CatTipoIncidencia.findAll", query = "SELECT c FROM CatTipoIncidencia c")})
+    @NamedQuery(name = "CatTipoIncidencia.findAll", query = "SELECT c FROM CatTipoIncidencia c"),
+    @NamedQuery(name = "CatTipoIncidencia.findByClave", query = "SELECT c FROM CatTipoIncidencia c WHERE c.clave = :clave")
+})
 public class CatTipoIncidencia implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -29,9 +31,14 @@ public class CatTipoIncidencia implements Serializable {
     @Basic(optional = false)
     @Column(name = "id_tipo")
     private Integer idTipo;
+    
     @Column(name = "descripcion")
     private String descripcion;
-    @OneToMany(mappedBy = "idTipo")
+    
+    @Column(name = "clave")
+    private String clave;
+    
+    @OneToMany(mappedBy = "tipoIncidencia")
     private List<DetIncidencia> detIncidenciaList;
 
     public CatTipoIncidencia() {
@@ -55,6 +62,14 @@ public class CatTipoIncidencia implements Serializable {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
+    }
+
+    public String getClave() {
+        return clave;
+    }
+
+    public void setClave(String clave) {
+        this.clave = clave;
     }
 
     public List<DetIncidencia> getDetIncidenciaList() {
@@ -87,7 +102,7 @@ public class CatTipoIncidencia implements Serializable {
 
     @Override
     public String toString() {
-        return "mx.com.ferbo.model.CatTipoIncidencia[ idTipo=" + idTipo + " ]";
+        return "CatTipoIncidencia[" + "idTipo=" + idTipo + ", descripcion=" + descripcion + ", clave=" + clave + ']';
     }
     
 }

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -48,13 +49,68 @@ public class NominaDAO extends BaseDAO<DetNomina, Integer> {
 		return modelList;
 	}
 	
-	public List<DetNomina> buscarPorPeriodoEmpleado(LocalDate periodoInicio, LocalDate periodoFin, String rfc) {
+	public DetNomina buscarPorPeriodoEmpleado(LocalDate periodoInicio, LocalDate periodoFin, String rfc) {
+		DetNomina model = null;
+		EntityManager em = null;
+		
+		try {
+			em = this.getEntityManager();
+			model = em.createNamedQuery("DetNomina.findByPeriodoRfc", modelClass)
+					.setParameter("periodoInicio", periodoInicio)
+					.setParameter("periodoFin", periodoFin)
+					.setParameter("rfc", rfc)
+					.getSingleResult()
+					;
+			log.debug("periodo inicio {}, periodo fin {}, rfc {}");
+			
+		} catch(NoResultException ex) {
+			log.warn("Problema para obtener la lista de nomina del periodo solicitado...", ex.getMessage());
+		} catch(Exception ex) {
+			log.error("Problema para obtener la lista de nomina del periodo solicitado...", ex);
+		} finally {
+			this.close(em);
+		}
+		
+		return model;
+	}
+	
+	public DetNomina buscar(String rfcEmisor, String tipoNomina, Integer anio, Integer periodo, String rfcReceptor) {
+		DetNomina model = null;
+		EntityManager em = null;
+		
+		try {
+			em = this.getEntityManager();
+			model = em.createNamedQuery("DetNomina.findByEmisorTipoNominaAnioPeriodoReceptor", this.modelClass)
+					.setParameter("rfcEmisor", rfcEmisor)
+					.setParameter("tipoNomina", tipoNomina)
+					.setParameter("anio", anio)
+					.setParameter("periodo", periodo)
+					.setParameter("rfcReceptor", rfcReceptor)
+					.getSingleResult()
+					;
+			
+		} catch(NoResultException ex) {
+			log.warn("No hay resultados para el periodo de nomina solicitado...", ex.getMessage());
+		} catch(Exception ex) {
+			log.error("Problema para obtener la lista de nomina del periodo solicitado...", ex);
+		} finally {
+			this.close(em);
+		}
+		
+		
+		return model;
+	}
+	
+	public List<DetNomina> buscarNominasDelMesPorNumeroPeriodo(String tipoNomina, String periodicidadPago, Integer ejercicio, Integer periodoInicio, Integer periodoFin, String rfc) {
 		List<DetNomina> modelList = null;
 		EntityManager em = null;
 		
 		try {
 			em = this.getEntityManager();
-			modelList = em.createNamedQuery("DetNomina.findByPeriodoRfc", modelClass)
+			modelList = em.createNamedQuery("DetNomina.findNominasDelMesPorNumeroPeriodo", modelClass)
+					.setParameter("tipoNomina", tipoNomina)
+					.setParameter("periodicidad", periodicidadPago)
+					.setParameter("ejercicio", ejercicio)
 					.setParameter("periodoInicio", periodoInicio)
 					.setParameter("periodoFin", periodoFin)
 					.setParameter("rfc", rfc)
@@ -71,15 +127,17 @@ public class NominaDAO extends BaseDAO<DetNomina, Integer> {
 		return modelList;
 	}
 	
-	public List<DetNomina> buscarPorSemanaRfc(Integer semanaInicio, Integer semanaFin, String rfc) {
+	public List<DetNomina> buscarNominasDelMesPorFechaPeriodo(String tipoNomina, String periodicidadPago, Integer ejercicio, LocalDate periodoInicio, LocalDate periodoFin, String rfc) {
 		List<DetNomina> modelList = null;
 		EntityManager em = null;
 		
 		try {
 			em = this.getEntityManager();
-			modelList = em.createNamedQuery("DetNomina.findBySemanaRfc", modelClass)
-					.setParameter("semanaInicio", semanaInicio)
-					.setParameter("semanaFin", semanaFin)
+			modelList = em.createNamedQuery("DetNomina.findNominasDelMesPorFechaPeriodo", modelClass)
+					.setParameter("tipoNomina", tipoNomina)
+					.setParameter("ejercicio", ejercicio)
+					.setParameter("periodoInicio", periodoInicio)
+					.setParameter("periodoFin", periodoFin)
 					.setParameter("rfc", rfc)
 					.getResultList()
 					;
@@ -93,6 +151,7 @@ public class NominaDAO extends BaseDAO<DetNomina, Integer> {
 		
 		return modelList;
 	}
+	
 	
 	@Override
 	public DetNomina buscarPorId(Integer id) {

@@ -61,7 +61,7 @@ public class DetNominaPercepcion implements Serializable {
 	@Size(max = 150)
 	private String nombre;
 	
-	@Column(name = "nu_cantidad", precision = 6, scale = 2)
+	@Column(name = "nu_cantidad", precision = 6, scale = 3)
 	@Basic(optional = true)
 	private BigDecimal cantidad = null;
 	
@@ -71,7 +71,43 @@ public class DetNominaPercepcion implements Serializable {
 	
 	@Column(name = "nu_imp_exento", precision = 12, scale = 2)
 	@Basic(optional = false)
-	private BigDecimal importeExcento;
+	private BigDecimal importeExento;
+	
+	public DetNominaPercepcion() {
+	}
+	
+	public DetNominaPercepcion(DetNominaPercepcion percepcion) {
+		this.key = new DetNominaPercepcionPK(percepcion.getKey().getNomina(), percepcion.getKey().getId());
+		this.tipoPercepcion = percepcion.getTipoPercepcion();
+		this.clave = percepcion.getClave();
+		this.nombre = percepcion.getNombre();
+		this.cantidad = percepcion.getCantidad();
+		this.importeGravado = percepcion.getImporteGravado();
+		this.importeExento = percepcion.getImporteExento();
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(key);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DetNominaPercepcion other = (DetNominaPercepcion) obj;
+		return Objects.equals(key, other.key);
+	}
+
+	@Override
+	public String toString() {
+		return "DetNominaPercepcion [key=" + key + ", clavePercepcion=" + clave + ", nombrePercepcion="
+				+ nombre + ", importeGravado=" + importeGravado + ", importeExento=" + importeExento + "]";
+	}
 
 	public DetNominaPercepcionPK getKey() {
 		return key;
@@ -113,35 +149,12 @@ public class DetNominaPercepcion implements Serializable {
 		this.importeGravado = importeGravado;
 	}
 
-	public BigDecimal getImporteExcento() {
-		return importeExcento;
+	public BigDecimal getImporteExento() {
+		return importeExento;
 	}
 
-	public void setImporteExcento(BigDecimal importeExcento) {
-		this.importeExcento = importeExcento;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(key);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		DetNominaPercepcion other = (DetNominaPercepcion) obj;
-		return Objects.equals(key, other.key);
-	}
-
-	@Override
-	public String toString() {
-		return "DetNominaPercepcion [key=" + key + ", clavePercepcion=" + clave + ", nombrePercepcion="
-				+ nombre + ", importeGravado=" + importeGravado + ", importeExcento=" + importeExcento + "]";
+	public void setImporteExento(BigDecimal importeExento) {
+		this.importeExento = importeExento;
 	}
 
 	public BigDecimal getCantidad() {

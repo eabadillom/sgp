@@ -1,104 +1,227 @@
 <ui:composition
-	xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:p="http://primefaces.org/ui"
-	template="/WEB-INF/plantillas/template.xhtml">
-	<ui:define name="title">Emisores (Empresas)</ui:define>
-	<ui:define name="content">
-		<h:form id="form">
-			<p:growl id="messages" showDetail="true" life="4000"/>
-			<p:dialog modal="true" widgetVar="statusDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
-				<div align="center">
-		              <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
-				</div>
-			</p:dialog>
-			<p:toolbar>
-		    	<p:toolbarGroup>
-		    		<p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{empresasBean.nuevo()}" oncomplete="PF('dgEmpresa').show();" process="@this" update="form:dg-empresa"/>
-		    	</p:toolbarGroup>
-		    </p:toolbar>
-		    <div style="padding-top: 1rem">
-		    	<p:dataTable id="dt-empresa" widgetVar="dtEmpresa" value="#{empresasBean.empresas}" var="empresa" allowUnsorting="true" sortMode="single">
-		    		<p:column headerText="Nombre">
-		    			<p:outputLabel value="#{empresa.descripcion}"></p:outputLabel>
-		    		</p:column>
-		    		<p:column headerText="Razon Social">
-		    			<p:outputLabel value="#{empresa.razonSocial}"></p:outputLabel>
-		    		</p:column>
-		    		<p:column>
-		    			<p:commandButton icon="pi pi-bars" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dgEmpresa').show();" actionListener="#{empresasBean.editar}" process="@this dt-empresa" update="form:dg-empresa">
-		    				<f:setPropertyActionListener value="#{empresa}" target="#{empresasBean.empresa}" />
-		    			</p:commandButton>
-		    		</p:column>
-		    	</p:dataTable>
-		    </div>
-		    <p:dialog id="dg-empresa" widgetVar="dgEmpresa" header="Empresa" showEffect="hide" modal="true">
-		    	<p:outputPanel class="ui-fluid">
-		    		<div class="p-field">
-		    			<p:outputLabel value="Nombre"></p:outputLabel>
-		    			<p:inputText value="#{empresasBean.empresa.descripcion}"></p:inputText>
-		    		</div>
-		    		<div class="p-field">
-		    			<div style="padding-top: 0.5rem;">
-			    			<p:selectBooleanCheckbox value="#{empresasBean.empresa.activo}" itemLabel="Activo"></p:selectBooleanCheckbox>
-		    			</div>
-		    		</div>
-		    		<div class="p-field">
-		    			<p:outputLabel value="Razón Social"></p:outputLabel>
-		    			<p:inputText value="#{empresasBean.empresa.razonSocial}"></p:inputText>
-		    		</div>
-		    		<div class="p-field">
-		    			<p:selectOneRadio value="#{empresasBean.empresa.tipoPersona}">
-		    				<f:selectItem itemLabel="Persona Física" itemValue="F"/>
-            				<f:selectItem itemLabel="Persona Moral" itemValue="M"/>
-		    			</p:selectOneRadio>
-		    		</div>
-		    		<div class="p-field">
-		    			<p:outputLabel value="Régimen Capital"></p:outputLabel>
-		    			<p:inputText value="#{empresasBean.empresa.regimenCapital}" />
-		    		</div>
-		    		<div class="p-field">
-		    			<p:outputLabel value="RFC"></p:outputLabel>
-		    			<p:inputText value="#{empresasBean.empresa.rfc}"></p:inputText>
-		    		</div>
-		    		<div class="p-field">
-		    			<p:outputLabel value="Régimen Fiscal"></p:outputLabel>
-		    			<p:selectOneMenu value="#{empresasBean.empresa.regimenFiscal}" converter="entityConverter">
-		    				<f:selectItem itemLabel="Seleccione un régimen fiscal" noSelectionOption="true"></f:selectItem>
-		    				<f:selectItems value="#{empresasBean.regimenes}" var="regimen" itemLabel="#{regimen.nombre}" itemValue="#{regimen}" ></f:selectItems>
-		    			</p:selectOneMenu>
-		    		</div>
-		    		<div class="p-field">
-		    			<p:outputLabel value="Fecha inicio de operaciones"></p:outputLabel>
-		    			<p:datePicker value="#{empresasBean.empresa.fechaInicioOperacion}" showIcon="true" yearNavigator="true" monthNavigator="true"></p:datePicker>
-		    		</div>
-		    		<div class="p-field">
-		    			<p:outputLabel value="Fecha ultimo cambio"></p:outputLabel>
-		    			<p:datePicker value="#{empresasBean.empresa.fechaUltimoCambio}" showIcon="true" yearNavigator="true" monthNavigator="true"></p:datePicker>
-		    		</div>
-		    		<div class="p-field">
-		    			<p:outputLabel value="Status en el padrón"></p:outputLabel>
-		    			<p:selectOneRadio value="#{empresasBean.empresa.statusPadron}">
-		    				<f:selectItem itemLabel="Activo" itemValue="A"></f:selectItem>
-		    				<f:selectItem itemLabel="Baja" itemValue="B"></f:selectItem>
-		    			</p:selectOneRadio>
-		    		</div>
-		    		<div class="p-field">
-		    			<p:outputLabel value="Codigo Postal" />
-		    			<p:inputMask value="#{empresasBean.empresa.codigoPostal}" maxlength="5" mask="99999" validateMask="true"/>
-		    		</div>
-		    		<div class="p-field">
-		    			<p:outputLabel value="Registro Patronal" />
-		    			<p:inputText value="#{empresasBean.empresa.registroPatronal}" maxlength="20"/>
-		    		</div>
-		    	</p:outputPanel>
-	    		<f:facet name="footer">
-	    			<p:commandButton value="Guardar" actionListener="#{empresasBean.guardar}" process="dg-empresa @this" update="dt-empresa">
-	    			</p:commandButton>
-	    		</f:facet>
-		    </p:dialog>
-		</h:form>
-	</ui:define>
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/plantillas/template.xhtml">
+    <ui:define name="title">Emisores (Empresas)</ui:define>
+    <ui:define name="content">
+        <h:form id="form" enctype="multipart/form-data">
+            <p:growl id="messages" showDetail="true" life="4000"/>
+            <p:dialog modal="true" widgetVar="statusDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
+                <div align="center">
+                    <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+                </div>
+            </p:dialog>
+            <p:toolbar>
+                <p:toolbarGroup>
+                    <p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{empresasBean.nuevo()}" oncomplete="PF('dgEmpresa').show();" process="@this" update="form:dg-empresa"/>
+                </p:toolbarGroup>
+            </p:toolbar>
+            <div style="padding-top: 1rem">
+                <p:dataTable id="dt-empresa" widgetVar="dtEmpresa" value="#{empresasBean.empresas}" var="empresa" allowUnsorting="true" sortMode="single">
+                    <p:column headerText="Nombre">
+                        <p:outputLabel value="#{empresa.razonSocial}"></p:outputLabel>
+                    </p:column>
+                    <p:column headerText="RFC" width="6rem" style="text-align: center;">
+                        <p:outputLabel value="#{empresa.rfc}"></p:outputLabel>
+                    </p:column>
+                    <p:column headerText="Inicio operacion" width="7rem" style="text-align: center;">
+                        <p:outputLabel value="#{empresa.fechaInicioOperacion}">
+                            <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+                        </p:outputLabel>
+                    </p:column>
+                    <p:column headerText="Actualizacion" width="7rem" style="text-align: center;">
+                        <p:outputLabel value="#{empresa.fechaUltimoCambio}">
+                            <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+                        </p:outputLabel>
+                    </p:column>
+                    <p:column headerText="Estatus" width="5rem" style="text-align: center;">
+                        <p:outputLabel value="#{empresa.statusPadron}"></p:outputLabel>
+                    </p:column>
+                    <p:column width="2rem" style="text-align: center;">
+                        <p:commandButton icon="pi pi-pencil" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dgEmpresa').show();" actionListener="#{empresasBean.editar}" process="@this dt-empresa" update="form:dg-empresa">
+                            <f:setPropertyActionListener value="#{empresa}" target="#{empresasBean.empresa}" />
+                        </p:commandButton>
+                    </p:column>
+                    <p:column width="5rem" style="text-align: center;">
+                        <p:commandButton value="CSD" styleClass="ui-button-raised ui-button-secondary" action="#{empresasBean.cargaDeArchivos()}" oncomplete="PF('dialogCarga').show()" 
+                                         icon="pi pi-upload" process="dt-empresa @this" update=":form:dialogCarga">
+                            <f:setPropertyActionListener value="#{empresa}" target="#{empresasBean.empresa}" />
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </div>
+            <p:dialog id="dg-empresa" widgetVar="dgEmpresa" header="Empresa" showEffect="fade" modal="true" responsive="true" width="800" height="400" resizable="false">
+                <div class="ui-fluid formgrid grid">
+                    <div class="field col-12 md:col-6">
+                        <p:outputLabel value="Tipo Persona"/>
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <p:selectOneRadio id="selTpPersona" value="#{empresasBean.empresa.tipoPersona}" layout="grid" columns="3">
+                                <f:selectItem itemLabel="Persona Moral" itemValue="M"/>
+                                <f:selectItem itemLabel="Persona Fisica" itemValue="F"/>
+                                <p:ajax listener="#{emisoresCFDISBean.regimenSelect}" process="@this" update="txtRegimenCapital" />
+                            </p:selectOneRadio>
+                        </div>
+                    </div>
+                    <div class="field col-12 md:col-6">
+                        <p:outputLabel value="Nombre o Razon social"/>
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <p:inputText value="#{empresasBean.empresa.descripcion}"/>
+                        </div>
+                    </div>
+                    <div class="field col-12 md:col-6">
+                        <p:outputLabel value="RFC"/>
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <p:inputText id="RFC" value="#{empresasBean.empresa.rfc}"/>
+                        </div>
+                    </div>
+                    <div class="field col-12 md:col-6">
+                        <p:outputLabel value="Regimen Capital"/>
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <p:inputText id="txtRegimenCapital" value="#{empresasBean.empresa.regimenCapital}" placeholder="p. e. SOCIEDAD ANONIMA DE CAPITAL VARIABLE" disabled="#{emisoresCFDISBean.estado}"/>
+                        </div>
+                    </div>
+                    <div class="field col-12 md:col-6">
+                        <p:outputLabel value="Régimen Fiscal"/>
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <p:selectOneMenu id="regimenFiscal" value="#{empresasBean.empresa.regimenFiscal}" converter="entityConverter" autoWidth="false">
+                                <f:selectItem itemLabel="---SELECCIONE---" noSelectionOption="true"/>
+                                <f:selectItems value="#{empresasBean.regimenes}" var="regimenFiscal" itemLabel="#{regimenFiscal.clave} - #{regimenFiscal.nombre}" itemValue="#{regimenFiscal}" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="field col-12 md:col-6">
+                        <p:outputLabel value="Inicio de operaciones"/>
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <p:datePicker value="#{empresasBean.empresa.fechaInicioOperacion}" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6" yearNavigator="true" monthNavigator="true">
+                                <p:ajax process="@this" />
+                            </p:datePicker>
+                        </div>
+                    </div>
+                    <div class="field col-12 md:col-6">
+                        <p:outputLabel  value="Ultimo cambio en el SAT"/>
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <p:datePicker value="#{empresasBean.empresa.fechaUltimoCambio}" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6" yearNavigator="true" monthNavigator="true">
+                                <p:ajax process="@this" />
+                            </p:datePicker>
+                        </div>
+                    </div>
+                    <div class="field col-12 md:col-6">
+                        <p:outputLabel value="Status en el padrón del SAT"/>
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <p:selectOneMenu id="statusPadron" value="#{empresasBean.empresa.statusPadron}" converter="entityConverter">
+                                <f:selectItem itemLabel="---SELECCIONE---" itemValue="" noSelectionOption="true"/>
+                                <f:selectItem itemLabel="Activo" itemValue="A" />
+                                <f:selectItem itemLabel="Baja" itemValue="B" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="field col-12 md:col-6">
+                        <p:outputLabel value="Tipo de riesgo"/>
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <p:selectOneMenu value="#{empresasBean.empresa.riesgo}" converter="entityConverter">
+                                <f:selectItem itemLabel="--Seleccione--" itemValue="#{null}"/>
+                                <f:selectItems value="#{empresasBean.riesgos}" var="riesgo" itemLabel="#{riesgo.descripcion}" itemValue="#{riesgo}"/>
+                                <p:ajax process="@this" />
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="field col-12 md:col-6">
+                        <p:outputLabel value="Prima"/>
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <p:inputNumber value="#{empresasBean.empresa.prima}" symbol="%" symbolPosition="s" emptyValue="always"/>
+                        </div>
+                    </div>
+
+                </div>
+                <f:facet name="footer">
+                    <p:commandButton value="Guardar" actionListener="#{empresasBean.guardar}" process="dg-empresa @this" update="dt-empresa">
+                    </p:commandButton>
+                </f:facet>
+            </p:dialog>
+            <p:dialog id="dialogCarga" header="Carga/Descarga de archivos" showEffect="fade" modal="true" widgetVar="dialogCarga" responsive="true" width="600" height="500"> 
+                    <p:outputPanel id="pnlCarga" class="ui-fluid">
+                        <p:outputPanel>
+                            <div class="p-grid">
+
+                                <p:divider align="left">
+                                    <div class="inline-flex align-items-center">
+                                        <b>Archivo de certificado digital (.cer)</b>
+                                    </div>
+                                </p:divider>
+
+                                <div class="p-col-12 p-md-6 p-lg-4">
+                                    <p:fileUpload value="#{empresasBean.certificadoFile}" accept=".cer" allowTypes="/(\.|\/)(cer)$/" mode="simple" skinSimple="true" />
+                                </div>
+
+                                <p:divider align="left">
+                                    <div class="inline-flex align-items-center">
+                                        <b>Archivo de llave privada (.key)</b>
+                                    </div>
+                                </p:divider>
+
+                                <div class="p-col-12 p-md-6 p-lg-4">
+                                    <p:fileUpload value="#{empresasBean.llavePrivadaFile}" accept=".key" allowTypes="/(\.|\/)(key)$/" mode="simple" skinSimple="true"/>
+                                </div>
+
+                                <p:divider align="left">
+                                    <div class="inline-flex align-items-center">
+                                        <b>Password requerida para llave primaria</b>
+                                    </div>
+                                </p:divider>
+                                <div class="p-col-12 p-md-6 p-lg-4">
+                                    <p:outputLabel for="@next" value="Contraseña key" />
+                                    <p:inputTextarea rows="1" cols="25" widgetVar="llaveP-new" id="llaveP-new" value="#{empresasBean.password}" />
+                                </div>
+                                <p:divider align="left">
+                                    <div class="inline-flex align-items-center">
+                                        <b></b>
+                                    </div>
+                                </p:divider>
+
+                                <p:fieldset legend="Header" toggleable="true" toggleSpeed="500">
+                                    <p:ajax event="toggle" />
+                                    <p class="m-0">
+                                        <p:divider align="left">
+                                            <div class="inline-flex align-items-center">
+                                                <b>Descarga de archivos .cer y .key</b>
+                                            </div>
+                                        </p:divider>
+
+                                        <p:commandButton value="Archivo .cer" ajax="false" onclick="PF('dialogCarga').hide()" icon="pi pi-arrow-down" styleClass="ui-button-outlined ui-button-secondary">
+                                            <p:fileDownload value="#{empresasBean.fileDownloadCer}"/>
+                                        </p:commandButton>    
+
+                                        <p:commandButton value="Archivo .key" ajax="false" onclick="PF('dialogCarga').hide()" icon="pi pi-arrow-down" styleClass="ui-button-outlined ui-button-secondary">
+                                            <p:fileDownload value="#{empresasBean.fileDownloadKey}"/>
+                                        </p:commandButton>
+
+                                        <p:divider align="left">
+                                            <div class="inline-flex align-items-center">
+                                                <b>Datos almacenados</b>
+                                            </div>
+                                        </p:divider>
+
+                                        <p:outputLabel for="contraseña-new" value="Contraseña" />
+                                        <p:inputTextarea id="contraseña-new" rows="1" cols="25" value="#{empresasBean.certificado.password}" readonly="true"/>					
+
+
+                                        <p:outputLabel for="@next" value="Fecha de registro"/>
+                                        <p:datePicker  widgetVar="f-new" id="f-new" value="#{empresasBean.certificado.fechaAlta}" disabled="true">
+                                            <p:ajax process="@this" />
+                                            <f:convertDateTime locale="es" timeZone="GMT-6:00"/>
+                                        </p:datePicker>
+                                    </p>
+                                </p:fieldset>
+                            </div>
+                        </p:outputPanel>
+                    </p:outputPanel>
+                    <p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{empresasBean.guardarCertificado}"  process="@this pnlCarga" update="form:dialogCarga"/>
+                    <p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-secondary" onclick="PF('dialogCarga').hide()" process="@this" />
+
+            </p:dialog>
+        </h:form>
+    </ui:define>
 </ui:composition>

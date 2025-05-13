@@ -14,7 +14,9 @@ import javax.persistence.Table;
 @Table (name = "cat_tipo_baja_empleado")
 public class CatTipoBajaEmpleado implements Serializable{
     
-    @Id
+    private static final long serialVersionUID = -5531873424150004816L;
+
+	@Id
     @Column (name = "tp_baja")
     private String tipodebaja;
     

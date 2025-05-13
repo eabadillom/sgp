@@ -16,32 +16,32 @@
     <p:dataTable id="dtPrendasSolicitados" widgetVar="dtPrendasSolicitados" lazy="false" value="#{incidenciaBean.listaPrendas}" 
                  var="prendas" rowKey="#{prendas.idIncidencia}" paginator="true" rows="5" paginatorPosition="bottom" >
         <p:column headerText="Nombre" width="8rem">
-            <p:outputLabel value="#{prendas.idEmpleado.nombre} #{prendas.idEmpleado.primerAp} #{prendas.idEmpleado.segundoAp}"/>
+            <p:outputLabel value="#{prendas.empleado.nombre} #{prendas.empleado.primerAp} #{prendas.empleado.segundoAp}"/>
         </p:column>
         <p:column headerText="Prendas" width="5rem">
-            <p:outputLabel value="#{prendas.idTipo.idTipo eq 3 ? prendas.idSolPrenda.idPrenda.descripcion :''}"/>
+            <p:outputLabel value="#{(prendas.tipoIncidencia.clave.matches('PR')) ? prendas.solPrenda.prenda.descripcion :''}"/>
         </p:column>
         <p:column headerText="Imagen" width="5rem">
-            <h:graphicImage name="images/prendas/#{prendas.idSolPrenda.idPrenda.descripcion}.jpg" library="recursos" width="57" />
+            <h:graphicImage name="images/prendas/#{prendas.solPrenda.prenda.descripcion}.jpg" library="recursos" width="57" />
         </p:column>
         <p:column headerText="Cantidad" width="5rem">
-            <p:outputLabel value="#{prendas.idTipo.idTipo eq 3 ? prendas.idSolPrenda.cantidad :''}"/>
+            <p:outputLabel value="#{(prendas.tipoIncidencia.clave.matches('PR')) ? prendas.solPrenda.cantidad : ''}"/>
         </p:column>
         <p:column headerText="Talla" width="5rem">
-            <p:outputLabel value="#{prendas.idTipo.idTipo eq 3 ? prendas.idSolPrenda.idTalla.descripcion :''}"/>
+            <p:outputLabel value="#{(prendas.tipoIncidencia.clave.matches('PR')) ? prendas.solPrenda.talla.descripcion : ''}"/>
         </p:column>
         <p:column headerText="Captura" width="5rem">
-            <p:outputLabel value="#{prendas.idTipo.idTipo eq 3 ? prendas.fechaCap :''}">
+            <p:outputLabel value="#{(prendas.tipoIncidencia.clave.matches('PR')) ? prendas.fechaCap : ''}">
                 <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
             </p:outputLabel>
         </p:column>
         <p:column headerText="Estatus" width="5rem">
-            <p:outputLabel class="customer-badge status-#{incidenciaBean.status.getStatusClass(prendas.idEstatus.idEstatus)}"
-                           value="#{prendas.idEstatus.descripcion}" style="display: block; width: 7rem"/>
+            <p:outputLabel class="customer-badge status-#{incidenciaBean.status.getStatusClass(prendas.estatusIncidencia.clave)}"
+                           value="#{prendas.estatusIncidencia.descripcion}" style="display: block; width: 7rem"/>
         </p:column>
         <p:column exportable="false" style="text-align: center" width="5rem">
-            <p:commandButton icon="pi pi-search" styleClass="rounded-button ui-button-secondary mr-2 mb-2"  process="@this"
-                             action="#{incidenciaBean.visualizaDialog()}" update="formIncidencias:tabViewI:dialogPrendas">
+            <p:commandButton icon="pi pi-bars" class="ui-button-success rounded-button m-1" styleClass="edit-button" process="@this" 
+                             action="#{incidenciaBean.visualizaDialog(prendas)}" update="formIncidencias:tabViewI:dialogPrendas">
                 <f:setPropertyActionListener value="#{prendas}" target="#{incidenciaBean.incidenciaSelected}" for="@previous"/>
             </p:commandButton>
         </p:column>
@@ -52,26 +52,26 @@
         <p:outputPanel id="pnlPrendas" rendered="#{not empty incidenciaBean.incidenciaSelected}">
             <div class="formgrid grid">
                 <div class="field col">
-                    <p:outputLabel id="soPrenda" value="#{incidenciaBean.incidenciaSelected.idSolPrenda.idPrenda.descripcion}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
+                    <p:outputLabel id="soPrenda" value="#{incidenciaBean.incidenciaSelected.solPrenda.prenda.descripcion}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
                 </div>
             </div>
             <div class="formgrid grid">
                 <div class="field col">
-                    <h:graphicImage id="imgPrenda" name="images/prendas/#{incidenciaBean.incidenciaSelected.idSolPrenda.idPrenda.descripcion}.jpg" library="recursos" width="113" rendered="#{incidenciaBean.incidenciaSelected.idSolPrenda.idPrenda.descripcion ne null}" styleClass="product-image"/>
+                    <h:graphicImage id="imgPrenda" name="images/prendas/#{incidenciaBean.incidenciaSelected.solPrenda.prenda.descripcion}.jpg" library="recursos" width="113" rendered="#{incidenciaBean.incidenciaSelected.solPrenda.prenda.descripcion ne null}" styleClass="product-image"/>
                 </div>
             </div>
             <div class="formgrid grid">
                 <div class="field col">
-                    <p:outputLabel id="soCantidadTalla" value="Cantidad: #{incidenciaBean.incidenciaSelected.idSolPrenda.cantidad} #{incidenciaBean.incidenciaSelected.idSolPrenda.idTalla.descripcion}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
+                    <p:outputLabel id="soCantidadTalla" value="Cantidad: #{incidenciaBean.incidenciaSelected.solPrenda.cantidad} #{incidenciaBean.incidenciaSelected.solPrenda.talla.descripcion}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
                 </div>
             </div>
         </p:outputPanel>
         <f:facet name="footer">
             <p:commandButton value="Aprobar" icon="pi pi-check" class="ui-button-success" process="pnlPrendas @this"
                              actionListener="#{incidenciaBean.guardarEstatusPrenda(true)}" 
-                             disabled="#{incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 2 or incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 3 or incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 4}"/>
+                             disabled="#{incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 2 or incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 3 or incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 4}"/>
             <p:commandButton value="Rechazar" icon="pi pi-times" class="ui-button-danger" process="pnlPrendas @this"
-                             disabled="#{incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 2 or incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 3 or incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 4}"
+                             disabled="#{incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 2 or incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 3 or incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 4}"
                              oncomplete="PF('dialogRechazarPrendas').show()"/>
         </f:facet>
     </p:dialog>
@@ -82,7 +82,7 @@
             <div class="formgrid grid">
                 <div class="field col">
                     <p:outputLabel for="txtRechazoPrendas" value="Descripción de rechazo"/>
-                    <p:inputTextarea id="txtRechazoPrendas" value="#{incidenciaBean.incidenciaSelected.idSolPrenda.descripcionRechazo}"/>
+                    <p:inputTextarea id="txtRechazoPrendas" value="#{incidenciaBean.incidenciaSelected.solPrenda.descripcionRechazo}"/>
                 </div>
             </div>
         </p:outputPanel>

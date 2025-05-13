@@ -1,6 +1,7 @@
 package mx.com.ferbo.model.sat;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -8,8 +9,10 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
+import mx.com.ferbo.model.imss.CatTipoIncapacidadIMSS;
 
 @Entity
 @Table(name = "cat_tipo_incapacidad")
@@ -28,6 +31,9 @@ public class CatTipoIncapacidadSAT implements Serializable{
     @Size(max = 80)
     @Basic(optional = false)
     private String descripcion;
+    
+    @OneToMany(mappedBy = "incapacidadSAT")
+    private List<CatTipoIncapacidadIMSS> tipoIncapacidadIMSS;
 
     public CatTipoIncapacidadSAT(){
 
@@ -47,7 +53,15 @@ public class CatTipoIncapacidadSAT implements Serializable{
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
-    }    
+    }
+
+    public List<CatTipoIncapacidadIMSS> getTipoIncapacidadIMSS() {
+        return tipoIncapacidadIMSS;
+    }
+
+    public void setTipoIncapacidadIMSS(List<CatTipoIncapacidadIMSS> tipoIncapacidadIMSS) {
+        this.tipoIncapacidadIMSS = tipoIncapacidadIMSS;
+    }
 
     @Override
     public String toString() {

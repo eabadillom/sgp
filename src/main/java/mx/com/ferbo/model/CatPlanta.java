@@ -19,20 +19,8 @@ import javax.persistence.Table;
 @Table(name = "cat_planta")
 @NamedQueries({
 	@NamedQuery(name = "CatPlanta.findActive", query = "SELECT c FROM CatPlanta c WHERE c.activo = 1"),
-    @NamedQuery(name = "CatPlanta.findAll", query = "SELECT new mx.com.ferbo.dto.CatPlantaDTO("
-            + " c.idPlanta,"
-            + " c.descripcion,"
-            + " c.activo"
-            + ")"
-            + " FROM CatPlanta c"),
-    @NamedQuery(name = "CatPlanta.getAll", query = "SELECT p FROM CatPlanta p ORDER BY p.descripcion"),
-    @NamedQuery(name = "CatPlanta.findByActive", query = "SELECT new mx.com.ferbo.dto.CatPlantaDTO("
-            + " c.idPlanta,"
-            + " c.descripcion,"
-            + " c.activo"
-            + ")"
-            + " FROM CatPlanta c"
-            + " WHERE c.activo = 1")})
+    @NamedQuery(name = "CatPlanta.getAll", query = "SELECT p FROM CatPlanta p ORDER BY p.descripcion")
+})
 public class CatPlanta implements Serializable {
 
     private static final long serialVersionUID = 1L;

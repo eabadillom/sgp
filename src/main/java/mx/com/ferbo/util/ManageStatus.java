@@ -7,10 +7,12 @@ package mx.com.ferbo.util;
 
 enum StatusClass 
 {
-    QUALIFIED,
-    UNQUALIFIED,
-    PROPOSAL,
-    NEGOTIATION;
+    QUALIFIED, //Verde
+    UNQUALIFIED, //Rojo
+    PROPOSAL, //Melon
+    NEGOTIATION,//Amarillo
+    NEW, //Azul
+    RENEWAL; //Morado 
 }
 
 enum StatusText 
@@ -28,43 +30,43 @@ public class ManageStatus
     {
     }
     
-    public String getStatusClass(short uniforme) 
+    public String getStatusClass(String uniforme) 
     {
         String mensaje = "";
         
         switch(uniforme)
         {
-            case 1:
+            case "E":
                 mensaje = StatusClass.PROPOSAL.toString().toLowerCase();
                 break;
-            case 2:
+            case "A":
                 mensaje = StatusClass.QUALIFIED.toString().toLowerCase();
                 break;
-            case 3:
+            case "R":
                 mensaje = StatusClass.UNQUALIFIED.toString().toLowerCase();
                 break;
-            case 4:
+            case "C":
                 mensaje = StatusClass.UNQUALIFIED.toString().toLowerCase();
                 break;
         }
         return mensaje;
     }
     
-    public String getStatusText(short uniforme) 
+    public String getStatusText(String uniforme) 
     {
         String mensaje = "";
         switch(uniforme)
         {
-            case 1:
+            case "E":
                 mensaje = StatusText.ENVIADA.toString().toLowerCase();
                 break;
-            case 2:
+            case "A":
                 mensaje = StatusText.APROBADA.toString().toLowerCase();
                 break;
-            case 3:
+            case "R":
                 mensaje = StatusText.RECHAZADA.toString().toLowerCase();
                 break;
-            case 4:
+            case "C":
                 mensaje = StatusText.CANCELADA.toString().toLowerCase();
                 break;
         }
@@ -87,6 +89,46 @@ public class ManageStatus
                 mensaje = StatusClass.NEGOTIATION.toString().toLowerCase();
                 break;
         }
+        return mensaje;
+    }
+    
+    public String getEstatusIncapacidad(String clave)
+    {
+        String mensaje = "";
+        
+        switch(clave)
+        {
+            case "A":
+                mensaje = StatusClass.QUALIFIED.toString().toLowerCase();
+                break;
+            case "C":
+                mensaje = StatusClass.UNQUALIFIED.toString().toLowerCase();
+                break;
+        }
+        
+        return mensaje;
+    }
+    
+    public String getEstatusRegistro(String clave)
+    {
+        String mensaje = "";
+        
+        switch(clave)
+        {
+            case "T":
+                mensaje = StatusClass.QUALIFIED.toString().toLowerCase();//A tiempo
+                break;
+            case "R":
+                mensaje = StatusClass.NEGOTIATION.toString().toLowerCase();//Retardo
+                break;
+            case "J":
+                mensaje = StatusClass.PROPOSAL.toString().toLowerCase();//Retardo
+                break;
+            case "F":
+                mensaje = StatusClass.UNQUALIFIED.toString().toLowerCase();//Falta
+                break;
+        }
+        
         return mensaje;
     }
 }

@@ -3,7 +3,8 @@
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:jsf="http://xmlns.jcp.org/jsf"
-                xmlns:h="http://xmlns.jcp.org/jsf/html">
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
     <p:toolbar styleClass="mb-4">
         <p:toolbarGroup id="grupoBotones" align="center">
@@ -30,22 +31,10 @@
                         <p:outputLabel value="Vacaciones" />
                     </div>
                     <div class="field col-12 md:col-3">
-                        <p:selectBooleanButton id="idIncCorta" value="#{incidenciaBean.incidenciaIncapacidadCorta}" onIcon="pi pi-check" offIcon="pi pi-times" widgetVar="idIncCorta" style="width:2rem" >
-                            <p:ajax event="change" update="dtIncidencias" process="@this" />
-                        </p:selectBooleanButton>
-                        <p:outputLabel value="Inc. Corta" />
-                    </div>
-                    <div class="field col-12 md:col-3">
-                        <p:selectBooleanButton id="idIncLarga" value="#{incidenciaBean.incidenciaIncapacidadLarga}" onIcon="pi pi-check" offIcon="pi pi-times" widgetVar="idIncLarga" style="width:2rem" >
-                            <p:ajax event="change" update="dtIncidencias" process="@this" />
-                        </p:selectBooleanButton>
-                        <p:outputLabel value="Inc. Larga"/>
-                    </div>
-                    <div class="field col-12 md:col-3">
                         <p:selectBooleanButton id="idPermiso" value="#{incidenciaBean.incidenciaPermiso}" onIcon="pi pi-check" offIcon="pi pi-times" widgetVar="idPermiso" style="width:2rem" >
                             <p:ajax event="change" update="dtIncidencias" process="@this" />
                         </p:selectBooleanButton>
-                        <p:outputLabel value="Permiso" />
+                        <p:outputLabel value="Permisos" />
                     </div>
                 </div>
                 <div class="formgrid grid">
@@ -53,25 +42,13 @@
                         <p:selectBooleanButton id="idEstatusAceptado" value="#{incidenciaBean.estatusAceptado}" onIcon="pi pi-check" offIcon="pi pi-times" style="width:2rem" >
                             <p:ajax event="change" update="dtIncidencias" process="@this"/>
                         </p:selectBooleanButton>
-                        <p:outputLabel value="Aceptado" />
-                    </div>
-                    <div class="field col-12 md:col-3">
-                        <p:selectBooleanButton id="idEstatusRechazado" value="#{incidenciaBean.estatusRechazado}" onIcon="pi pi-check" offIcon="pi pi-times" style="width:2rem" >
-                            <p:ajax event="change" update="dtIncidencias" process="@this"/>
-                        </p:selectBooleanButton>
-                        <p:outputLabel value="Rechazado" />
-                    </div>
-                    <div class="field col-12 md:col-3">
-                        <p:selectBooleanButton id="idEstatusCancelado" value="#{incidenciaBean.estatusCancelado}" onIcon="pi pi-check" offIcon="pi pi-times" style="width:2rem" >
-                            <p:ajax event="change" update="dtIncidencias" process="@this"/>
-                        </p:selectBooleanButton>
-                        <p:outputLabel value="Cancelado" />
+                        <p:outputLabel value="Aceptadas" />
                     </div>
                     <div class="field col-12 md:col-3" >
                         <p:selectBooleanButton id="idEstatusEnviado" value="#{incidenciaBean.estatusEnviado}" onIcon="pi pi-check" offIcon="pi pi-times" style="width:2rem" >
                             <p:ajax event="change" update="dtIncidencias" process="@this"/>
                         </p:selectBooleanButton>
-                        <p:outputLabel value="Enviada" />
+                        <p:outputLabel value="Pendientes" />
                     </div>
                 </div>
             </div>
@@ -82,43 +59,37 @@
             </p:commandButton>
         </p:toolbarGroup>
     </p:toolbar>
-    
+
     <p:dataTable id="dtIncidencias" widgetVar="dtIncidencias" value="#{incidenciaBean.consultarTipoPermisos()}" selection="#{incidenciaBean.listaPermisosFiltrada}"
                  var="incidencia" rowKey="#{incidencia.idIncidencia}" paginator="true" rows="5" paginatorPosition="bottom" reflow="true">
         <p:column headerText="Nombre" width="8rem">
-            <p:outputLabel value="#{incidencia.idEmpleado.nombre} #{incidencia.idEmpleado.primerAp} #{incidencia.idEmpleado.segundoAp}"/>
+            <p:outputLabel value="#{incidencia.empleado.nombre} #{incidencia.empleado.primerAp} #{incidencia.empleado.segundoAp}"/>
         </p:column>
         <p:column headerText="Tipo Incidencia" width="5rem">
-            <p:outputLabel value="#{(incidencia.idTipo.idTipo eq 1 || incidencia.idTipo.idTipo eq 2) ? incidencia.idSolPermiso.idTipoSolicitud.descripcion :'' }"/>
+            <p:outputLabel value="#{(incidencia.tipoIncidencia.idTipo eq 1 || incidencia.tipoIncidencia.idTipo eq 2) ? incidencia.solPermiso.tipoSolicitud.descripcion :'' }"/>
         </p:column>
         <p:column headerText="Inicio" width="5rem">
-            <p:outputLabel value="#{(incidencia.idTipo.idTipo eq 1 || incidencia.idTipo.idTipo eq 2) ? incidencia.idSolPermiso.fechaInicio :''}">
+            <p:outputLabel value="#{(incidencia.tipoIncidencia.idTipo eq 1 || incidencia.tipoIncidencia.idTipo eq 2) ? incidencia.solPermiso.fechaInicio :''}">
                 <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
             </p:outputLabel>
         </p:column>
         <p:column headerText="Fin" width="5rem">
-            <p:outputLabel value="#{(incidencia.idTipo.idTipo eq 1 || incidencia.idTipo.idTipo eq 2) ? incidencia.idSolPermiso.fechaFin :''}">
+            <p:outputLabel value="#{(incidencia.tipoIncidencia.idTipo eq 1 || incidencia.tipoIncidencia.idTipo eq 2) ? incidencia.solPermiso.fechaFin :''}">
                 <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
             </p:outputLabel>
         </p:column>
         <p:column headerText="Captura" width="5rem">
-            <p:outputLabel value="#{(incidencia.idTipo.idTipo eq 1 || incidencia.idTipo.idTipo eq 2) ? incidencia.fechaCap :''}">
+            <p:outputLabel value="#{(incidencia.tipoIncidencia.idTipo eq 1 || incidencia.tipoIncidencia.idTipo eq 2) ? incidencia.fechaCap :''}">
                 <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
             </p:outputLabel>
         </p:column>
         <p:column headerText="Estatus" width="5rem">
-            <p:outputLabel class="customer-badge status-#{incidenciaBean.status.getStatusClass(incidencia.idEstatus.idEstatus)}"
-                           value="#{incidencia.idEstatus.descripcion}" style="display: block; width: 7rem"/>
+            <p:outputLabel class="customer-badge status-#{incidenciaBean.status.getStatusClass(incidencia.estatusIncidencia.clave)}"
+                           value="#{incidencia.estatusIncidencia.descripcion}" style="display: block; width: 7rem"/>
         </p:column>
-        <!-- 
-        <p:column exportable="false">
-            <p:button icon="pi pi-check" styleClass="rounded-button ui-button-success mr-2 mb-2" />
-            <p:button icon="pi pi-times" styleClass="rounded-button ui-button-danger mr-2 mb-2" />
-        </p:column> 
-        -->
         <p:column exportable="false" style="text-align: center" width="20px">
-            <p:commandButton icon="pi pi-search" styleClass="rounded-button ui-button-secondary mr-2 mb-2"  process="@this"
-                             action="#{incidenciaBean.visualizaDialog()}" update="formIncidencias:tabViewI:dialogPermisos">
+            <p:commandButton icon="pi pi-bars" class="ui-button-success rounded-button m-1"  process="@this" styleClass="edit-button"
+                             action="#{incidenciaBean.visualizaDialog(incidencia)}" update="formIncidencias:tabViewI:dialogPermisos">
                 <f:setPropertyActionListener value="#{incidencia}" target="#{incidenciaBean.incidenciaSelected}" for="@previous"/>
             </p:commandButton>
         </p:column>
@@ -132,7 +103,7 @@
             <div class="formgrid grid">
                 <div class="field col">
                     <p:outputLabel for="soTipoPermiso" value="Tipo"/>
-                    <p:selectOneMenu id="soTipoPermiso" autoWidth="false" value="#{incidenciaBean.incidenciaSelected.idSolPermiso.idTipoSolicitud.idTipoSolicitud}" 
+                    <p:selectOneMenu id="soTipoPermiso" autoWidth="false" value="#{incidenciaBean.incidenciaSelected.solPermiso.tipoSolicitud.idTipoSolicitud}" 
                                      disabled="true">
                         <f:selectItems value="#{incidenciaBean.lstTipoSol}" var="tipoV" itemLabel="#{tipoV.descripcion}" itemValue="#{tipoV.idTipoSolicitud}"/>
                     </p:selectOneMenu>
@@ -140,14 +111,14 @@
             </div>
             <div class="formgrid grid" >
                 <div class="field col" >
-                    <p:outputLabel value="Dias de #{incidenciaBean.incidenciaSelected.idSolPermiso.idTipoSolicitud.descripcion} Solicitados"/>
+                    <p:outputLabel value="Dias de #{incidenciaBean.incidenciaSelected.solPermiso.tipoSolicitud.descripcion} Solicitados"/>
                     <p:inputText value="#{incidenciaBean.diasVacacionesSolicitados}" disabled="true"/>
                 </div>
             </div>
             <div class="formgrid grid">
                 <div class="field col">
                     <p:outputLabel for="soEstatusView" value="Estatus"/>
-                    <p:selectOneMenu id="soEstatusView" autoWidth="false" value="#{incidenciaBean.incidenciaSelected.idSolPermiso.aprobada}" 
+                    <p:selectOneMenu id="soEstatusView" autoWidth="false" value="#{incidenciaBean.incidenciaSelected.solPermiso.estatus.id}" 
                                      disabled="true">
                         <f:selectItem itemLabel="ENVIADA" itemValue="1"/>
                         <f:selectItem itemLabel="APROBADA" itemValue="2"/>
@@ -159,45 +130,53 @@
             <div class="formgrid grid" >
                 <div class="field col" style="width: 5rem" >
                     <p:outputLabel value="Inicio de Vacaciones"/>
-                    <p:inputText value="#{incidenciaBean.incidenciaSelected.idSolPermiso.fechaInicio}" disabled="true" >
+                    <p:inputText value="#{incidenciaBean.incidenciaSelected.solPermiso.fechaInicio}" disabled="true" >
                         <f:convertDateTime type="date" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
                     </p:inputText>
                 </div>
                 <div class="field col" style="width: 5rem" >
                     <p:outputLabel value="Termino de Vacaciones" />
-                    <p:inputText value="#{incidenciaBean.incidenciaSelected.idSolPermiso.fechaFin}" disabled="true">
+                    <p:inputText value="#{incidenciaBean.incidenciaSelected.solPermiso.fechaFin}" disabled="true">
                         <f:convertDateTime type="date" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6"/>
                     </p:inputText>
                 </div>
             </div>
-            <p:datePicker id="dpRangoView" rendered="#{incidenciaBean.incidenciaSelected.idSolPermiso.idTipoSolicitud.idTipoSolicitud ne null 
-                                                       and (incidenciaBean.incidenciaSelected.idSolPermiso.idTipoSolicitud.idTipoSolicitud eq 2 
-                                                       or incidenciaBean.incidenciaSelected.idSolPermiso.idTipoSolicitud.idTipoSolicitud eq 4)}" 
+            <div class="formgrid grid">
+                <p:panel visible="#{incidenciaBean.incidenciaSelected.empleado.empleadoConfiguracion.goceSueldo and incidenciaBean.incidenciaSelected.solPermiso.tipoSolicitud.idTipoSolicitud eq 1}">
+                    <div class="field col" style="width: 15rem" >
+                        <p:outputLabel value="Con goce de sueldo: "/>
+                        <p:spinner id="conGoceSueldo" value="#{incidenciaBean.sGoceSueldo}" min="0" max="100" suffix="%"  stepFactor="0.1"/>
+                    </div>
+                </p:panel>
+            </div>
+            <p:datePicker id="dpRangoView" rendered="#{incidenciaBean.incidenciaSelected.solPermiso.tipoSolicitud.idTipoSolicitud ne null 
+                                                       and (incidenciaBean.incidenciaSelected.solPermiso.tipoSolicitud.idTipoSolicitud eq 2 
+                                                       or incidenciaBean.incidenciaSelected.solPermiso.tipoSolicitud.idTipoSolicitud eq 4)}" 
                           styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" locale="es" disabled="false" 
                           showIcon="true" readonlyInput="true" value="#{incidenciaBean.lstRangoRegistro}" showMinMaxRange="true" 
-                          mindate="#{incidenciaBean.incidenciaSelected.idSolPermiso.fechaInicio}" maxdate="#{incidenciaBean.incidenciaSelected.idSolPermiso.fechaFin}"
+                          mindate="#{incidenciaBean.incidenciaSelected.solPermiso.fechaInicio}" maxdate="#{incidenciaBean.incidenciaSelected.solPermiso.fechaFin}"
                           inline="true" selectionMode="range" disabledDays="#{incidenciaBean.invalidDays}"
-                          disabledDates="#{incidenciaBean.diasDeDescansoObligatorio.diasAsueto}"/>
-            <p:datePicker id="dpSimpleView" rendered="#{incidenciaBean.incidenciaSelected.idSolPermiso.idTipoSolicitud.idTipoSolicitud ne null 
-                                                        and (incidenciaBean.incidenciaSelected.idSolPermiso.idTipoSolicitud.idTipoSolicitud eq 1 
-                                                        or incidenciaBean.incidenciaSelected.idSolPermiso.idTipoSolicitud.idTipoSolicitud eq 3)}" 
+                          disabledDates="#{incidenciaBean.diasDeAsueto}"/>
+            <p:datePicker id="dpSimpleView" rendered="#{incidenciaBean.incidenciaSelected.solPermiso.tipoSolicitud.idTipoSolicitud ne null 
+                                                        and (incidenciaBean.incidenciaSelected.solPermiso.tipoSolicitud.idTipoSolicitud eq 1 
+                                                        or incidenciaBean.incidenciaSelected.solPermiso.tipoSolicitud.idTipoSolicitud eq 3)}" 
                           styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" locale="es" disabled="false"
                           pattern="dd-MM-yyyy" showIcon="true" readonlyInput="true" value="#{incidenciaBean.fechaSeleccionada}"
                           showMinMaxRange="true" mindate="#{incidenciaBean.fechaSeleccionada}" maxdate="#{incidenciaBean.fechaSeleccionada}"
                           inline="true" disabledDays="#{incidenciaBean.invalidDays}"
-                          disabledDates="#{incidenciaBean.diasDeDescansoObligatorio.diasAsueto}"/>
+                          disabledDates="#{incidenciaBean.diasDeAsueto}"/>
 
         </p:outputPanel>
         <f:facet name="footer">
             <p:commandButton value="Aprobar" icon="pi pi-check" class="ui-button-success" process="pnlDetalleSolicitudPermiso @this"
-                             actionListener="#{incidenciaBean.guardarEstatusIncidencia(true)}" 
-                             disabled="#{incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 2 or incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 3 or incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 4}"/>
+                             actionListener="#{incidenciaBean.aprobarIncidencia()}" 
+                             disabled="#{incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 2 or incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 3 or incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 4}"/>
             <p:commandButton value="Rechazar" icon="pi pi-times" class="ui-button-danger" process="pnlDetalleSolicitudPermiso @this" 
-                             disabled="#{incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 2 or incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 3 or incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 4}"
-                             oncomplete="PF('dialogRechazar').show()"/>
+                             disabled="#{incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 2 or incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 3 or incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 4}"
+                             oncomplete="PF('dialogPermisos').hide(); PF('dialogRechazar').show()"/>
             <p:commandButton value="Cancelar" icon="pi pi-trash" class="ui-button-danger" process="pnlDetalleSolicitudPermiso @this" 
-                             rendered="#{incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 2}"
-                             actionListener="#{incidenciaBean.actualizarEstatusIncidencia()}"/>
+                             rendered="#{incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 2}"
+                             oncomplete="PF('dialogPermisos').hide(); PF('dialogoCancelar').show()"/> 
         </f:facet>
     </p:dialog>
     <p:dialog widgetVar="dialogRechazar" header="Detalle rechazo" showEffect="fade" responsive="true" modal="true" 
@@ -206,17 +185,26 @@
             <div class="formgrid grid">
                 <div class="field col">
                     <p:outputLabel for="txtRechazo" value="Descripción de rechazo"/>
-                    <p:inputTextarea id="txtRechazo" value="#{incidenciaBean.incidenciaSelected.idSolPermiso.descripcionRechazo}"/>
+                    <p:inputTextarea id="txtRechazo" value="#{incidenciaBean.descripcionRechazo}"/>
                 </div>
             </div>
         </p:outputPanel>
         <f:facet name="footer">
             <p:commandButton value="Aceptar" icon="pi pi-check" class="ui-button-success" process="pnlDetalleRechazo @this"
-                             actionListener="#{incidenciaBean.guardarEstatusIncidencia(false)}" oncomplete="PF('dialogRechazar').hide()"/>
-            <p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-secondary" process="@this" 
-                             oncomplete="PF('dialogRechazar').hide()"/>
+                             actionListener="#{incidenciaBean.rechazarIncidencia()}" oncomplete="PF('dialogRechazar').hide()" />
         </f:facet>
     </p:dialog>
+    <p:confirmDialog widgetVar="dialogoCancelar" showEffect="fade" width="300" 
+                     message="Cancelar Incapacidad?" header="Confirmar" severity="warn">
+        <p:commandButton value="Si" icon="pi pi-check" actionListener="#{incidenciaBean.cancelarIncidencia()}"
+            process="@this" oncomplete="PF('dialogPermisos').hide()" >
+            <p:resetInput target="formIncidencias:tabViewI:pnlDetalleSolicitudPermiso" />
+        </p:commandButton>
+        <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+            onclick="PF('dialogoCancelar').hide()" >
+            <p:resetInput target="formIncidencias:tabViewI:pnlDetalleSolicitudPermiso" />
+        </p:commandButton>
+    </p:confirmDialog>
     <style>
         .ferbo-datePicker .ui-datepicker-calendar td a.ui-state-active{
             background: #77ff00 !important;

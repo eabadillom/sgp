@@ -16,29 +16,29 @@
     <p:dataTable id="dtArticulosSolicitados" widgetVar="dtArticulosSolicitados" lazy="false" value="#{incidenciaBean.listaArticulos}" 
                  var="articulos" rowKey="#{articulos.idIncidencia}" paginator="true" rows="5" paginatorPosition="bottom">
         <p:column headerText="Nombre" width="8rem">
-            <p:outputLabel value="#{articulos.idEmpleado.nombre} #{articulos.idEmpleado.primerAp} #{articulos.idEmpleado.segundoAp}"/>
+            <p:outputLabel value="#{articulos.empleado.nombre} #{articulos.empleado.primerAp} #{articulos.empleado.segundoAp}"/>
         </p:column>
         <p:column headerText="Articulos" width="5rem">
-            <p:outputLabel value="#{articulos.idTipo.idTipo eq 4 ? articulos.idSolArticulo.idArticulo.descripcion :''}"/>
+            <p:outputLabel value="#{articulos.tipoIncidencia.idTipo eq 4 ? articulos.solArticulo.articulo.descripcion :''}"/>
         </p:column>
         <p:column headerText="Imagen" width="5rem">
-            <h:graphicImage name="images/articulos/#{articulos.idSolArticulo.idArticulo.descripcion}.jpg" library="recursos" width="57" />
+            <h:graphicImage name="images/articulos/#{articulos.solArticulo.articulo.descripcion}.jpg" library="recursos" width="57" />
         </p:column>
         <p:column headerText="Cantidad / Unidad" width="5rem">
-            <p:outputLabel value="#{articulos.idTipo.idTipo eq 4 ? articulos.idSolArticulo.cantidad :''} #{articulos.idTipo.idTipo eq 4 ? articulos.idSolArticulo.idArticulo.unidad :''}"/>
+            <p:outputLabel value="#{articulos.tipoIncidencia.idTipo eq 4 ? articulos.solArticulo.cantidad :''} #{articulos.tipoIncidencia.idTipo eq 4 ? articulos.solArticulo.articulo.unidad :''}"/>
         </p:column>
         <p:column headerText="Captura" width="5rem">
-            <p:outputLabel value="#{articulos.idTipo.idTipo eq 4 ? articulos.fechaCap :''}">
+            <p:outputLabel value="#{articulos.tipoIncidencia.idTipo eq 4 ? articulos.fechaCap :''}">
                 <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
             </p:outputLabel>
         </p:column>
         <p:column headerText="Estatus" width="5rem">
-            <p:outputLabel class="customer-badge status-#{incidenciaBean.status.getStatusClass(articulos.idEstatus.idEstatus)}"
-                           value="#{articulos.idEstatus.descripcion}" style="display: block; width: 7rem"/>
+            <p:outputLabel class="customer-badge status-#{incidenciaBean.status.getStatusClass(articulos.estatusIncidencia.clave)}"
+                           value="#{articulos.estatusIncidencia.descripcion}" style="display: block; width: 7rem"/>
         </p:column>
         <p:column exportable="false" style="text-align: center" width="5rem">
-            <p:commandButton icon="pi pi-search" styleClass="rounded-button ui-button-secondary mr-2 mb-2"  process="@this"
-                             action="#{incidenciaBean.visualizaDialog()}" update="formIncidencias:tabViewI:dialogArticulos">
+            <p:commandButton icon="pi pi-bars" class="ui-button-success rounded-button m-1" styleClass="edit-button" process="@this"
+                             action="#{incidenciaBean.visualizaDialog(articulos)}" update="formIncidencias:tabViewI:dialogArticulos">
                 <f:setPropertyActionListener value="#{articulos}" target="#{incidenciaBean.incidenciaSelected}" for="@previous"/>
             </p:commandButton>
         </p:column>
@@ -49,27 +49,27 @@
         <p:outputPanel id="pnlArticulos" rendered="#{not empty incidenciaBean.incidenciaSelected}">
             <div class="formgrid grid">
                 <div class="field col">
-                    <p:outputLabel value="#{incidenciaBean.incidenciaSelected.idSolArticulo.idArticulo.descripcion}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
+                    <p:outputLabel value="#{incidenciaBean.incidenciaSelected.solArticulo.articulo.descripcion}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
                 </div>
             </div>
             <div class="formgrid grid">
                 <div class="field col">
-                    <h:graphicImage id="imgArticulo" name="images/articulos/#{incidenciaBean.incidenciaSelected.idSolArticulo.idArticulo.descripcion}.jpg" library="recursos" width="113" rendered="#{incidenciaBean.incidenciaSelected.idSolArticulo.idArticulo.descripcion ne null}" styleClass="product-image"/>
+                    <h:graphicImage id="imgArticulo" name="images/articulos/#{incidenciaBean.incidenciaSelected.solArticulo.articulo.descripcion}.jpg" library="recursos" width="113" rendered="#{incidenciaBean.incidenciaSelected.solArticulo.articulo.descripcion ne null}" styleClass="product-image"/>
                 </div>
             </div>
             <div class="formgrid grid">
                 <div class="field col">
-                    <p:outputLabel value="Cantidad: #{incidenciaBean.incidenciaSelected.idSolArticulo.cantidad} #{incidenciaBean.incidenciaSelected.idSolArticulo.idArticulo.unidad}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
+                    <p:outputLabel value="Cantidad: #{incidenciaBean.incidenciaSelected.solArticulo.cantidad} #{incidenciaBean.incidenciaSelected.solArticulo.articulo.unidad}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
                 </div>
             </div>
         </p:outputPanel>
         <f:facet name="footer">
             <p:commandButton value="Aprobar" icon="pi pi-check" class="ui-button-success" process="pnlArticulos @this"
                              actionListener="#{incidenciaBean.guardarEstatusArticulo(true)}" 
-                             disabled="#{incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 2 or incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 3 or incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 4}"/>
+                             disabled="#{incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 2 or incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 3 or incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 4}"/>
             <p:commandButton value="Rechazar" icon="pi pi-times" class="ui-button-danger" process="pnlArticulos @this"
                              onclick="PF('dialogArticulos').hide()"
-                             disabled="#{incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 2 or incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 3 or incidenciaBean.incidenciaSelected.idEstatus.idEstatus eq 4}"
+                             disabled="#{incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 2 or incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 3 or incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 4}"
                              oncomplete="PF('dialogRechazarArticulo').show()"/>
         </f:facet>
     </p:dialog>
@@ -80,7 +80,7 @@
             <div class="formgrid grid">
                 <div class="field col">
                     <p:outputLabel for="txtRechazoArticulo" value="Descripción de rechazo"/>
-                    <p:inputTextarea id="txtRechazoArticulo" value="#{incidenciaBean.incidenciaSelected.idSolArticulo.descripcionRechazo}"/>
+                    <p:inputTextarea id="txtRechazoArticulo" value="#{incidenciaBean.incidenciaSelected.solArticulo.descripcionRechazo}"/>
                 </div>
             </div>
         </p:outputPanel>

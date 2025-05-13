@@ -21,7 +21,7 @@ import org.primefaces.PrimeFaces;
  *
  * @author alberto
  */
-@Named(value = "tipoIncapacidadIMSS")
+@Named(value = "tipoIncapacidadIMSSBean")
 @ViewScoped
 public class TipoIncapacidadIMSSBean implements Serializable
 {
@@ -122,6 +122,16 @@ public class TipoIncapacidadIMSSBean implements Serializable
                 throw new SGPException("Debes seleccionar el tipo de incapacidad del SAT");
             }
             
+            if(this.tipoIncapacidadSelected.getSemanasCotizadas() == null)
+            {
+                throw new SGPException("Debes ingreaar las semanas cotizadas");
+            }
+            
+            if(this.tipoIncapacidadSelected.getPeriodoCotAnterior() == null)
+            {
+                throw new SGPException("Debes ingreaar el periodo de cotizacion anterior");
+            }
+            
             if(verificarClave(this.tipoIncapacidadSelected.getClave()))
             {
                 throw new SGPException("La clave ya se encuentra registrada");
@@ -137,13 +147,13 @@ public class TipoIncapacidadIMSSBean implements Serializable
             titulo = "Error";
             mensaje = ex.getMessage();
             severity = FacesMessage.SEVERITY_ERROR;
-            log.info("Error al registrar la solicitud de incapacidad: {}", ex.getMessage());
+            log.info("Error al registrar la solicitud de incapacidad: {}", ex);
         }catch (Exception e) 
         {
             titulo = "Error";
             mensaje = "Consulte al administrador de sistemas";
             severity = FacesMessage.SEVERITY_ERROR;
-            log.info("ERROR, {}", e.getMessage());
+            log.info("ERROR, {}", e);
         }finally
         {
             actualizarListaIncapacidades();
@@ -202,13 +212,13 @@ public class TipoIncapacidadIMSSBean implements Serializable
             titulo = "Error";
             mensaje = ex.getMessage();
             severity = FacesMessage.SEVERITY_ERROR;
-            log.info("Error al registrar la solicitud de incapacidad: {}", ex.getMessage());
+            log.info("Error al registrar la solicitud de incapacidad: {}", ex);
         }catch (Exception e) 
         {
             titulo = "Error";
             mensaje = "Consulte al administrador de sistemas";
             severity = FacesMessage.SEVERITY_ERROR;
-            log.info("ERROR, {}", e.getMessage());
+            log.info("ERROR, {}", e);
         }finally
         {
             actualizarListaIncapacidades();
