@@ -19,8 +19,7 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "det_fp_client")
 @NamedQueries({
-    @NamedQuery(name = "DetFpClient.findByAll", query = "SELECT fpC FROM DetFpClient fpC"),
-    @NamedQuery(name = "DetFpClient.findById", query = "SELECT NEW mx.com.ferbo.dto.DetFpClientDTO( fpC.idFpClient, fpC.password) FROM DetFpClient fpC WHERE fpC.idFpClient = :id")
+    @NamedQuery(name = "DetFpClient.findByAll", query = "SELECT fpC FROM DetFpClient fpC")
 })
 public class DetFpClient implements Serializable {
 

@@ -1,6 +1,7 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -28,52 +29,69 @@ import javax.validation.constraints.NotNull;
 @Table(name = "det_solicitud_permiso")
 @NamedQueries({
     @NamedQuery(name = "DetSolicitudPermiso.findAll", query = "SELECT d FROM DetSolicitudPermiso d"),
-    @NamedQuery(name = "DetSolicitudPermiso.findByIdEmp", query = "SELECT dsp FROM DetSolicitudPermiso dsp INNER JOIN dsp.idEmpleadoSol de INNER JOIN dsp.idTipoSolicitud cts WHERE de.idEmpleado = :idEmp ORDER BY dsp.fechaCap"),
-    @NamedQuery(name = "DetSolicitudPermiso.findByClave", query = "SELECT dsp FROM DetSolicitudPermiso dsp INNER JOIN dsp.idEmpleadoSol de INNER JOIN dsp.idTipoSolicitud cts WHERE de.idEmpleado = :idEmp AND cts.clave = :clave"),
-    @NamedQuery(name = "DetSolicitudPermiso.findByTipoSolicitud", query = "SELECT dsp FROM DetSolicitudPermiso dsp INNER JOIN dsp.idEmpleadoSol de INNER JOIN dsp.idTipoSolicitud cts WHERE de.idEmpleado = :idEmp AND (cts.clave = :clavePermiso OR cts.clave = :claveVacaciones)"),
-    @NamedQuery(name = "DetSolicitudPermiso.findByCriterios", query = "SELECT dsp FROM DetSolicitudPermiso dsp INNER JOIN dsp.idEmpleadoSol de INNER JOIN dsp.idTipoSolicitud ts WHERE de.idEmpleado = :idEmp AND (:fechaInicio BETWEEN dsp.fechaInicio AND dsp.fechaFin OR :fechaFin BETWEEN dsp.fechaInicio AND dsp.fechaFin OR dsp.fechaInicio BETWEEN :fechaInicio AND :fechaFin OR dsp.fechaFin BETWEEN :fechaInicio AND :fechaFin) AND (ts.clave = :clave1 OR ts.clave = :clave2) and dsp.aprobada in (1,2)")
+    @NamedQuery(name = "DetSolicitudPermiso.findByIdEmp", query = "SELECT dsp FROM DetSolicitudPermiso dsp INNER JOIN dsp.empleadoSol de INNER JOIN dsp.tipoSolicitud cts WHERE de.idEmpleado = :idEmp ORDER BY dsp.fechaCap"),
+    @NamedQuery(name = "DetSolicitudPermiso.findByClave", query = "SELECT dsp FROM DetSolicitudPermiso dsp INNER JOIN dsp.empleadoSol de INNER JOIN dsp.tipoSolicitud cts WHERE de.idEmpleado = :idEmp AND cts.clave = :clave"),
+    @NamedQuery(name = "DetSolicitudPermiso.findByTipoSolicitud", query = "SELECT dsp FROM DetSolicitudPermiso dsp INNER JOIN dsp.empleadoSol de INNER JOIN dsp.tipoSolicitud cts WHERE de.idEmpleado = :idEmp AND (cts.clave = :clavePermiso OR cts.clave = :claveVacaciones)"),
+    @NamedQuery(name = "DetSolicitudPermiso.findByCriterios", query = "SELECT dsp FROM DetSolicitudPermiso dsp INNER JOIN dsp.empleadoSol de INNER JOIN dsp.tipoSolicitud ts INNER JOIN dsp.estatus es WHERE de.idEmpleado = :idEmp AND (:fechaInicio BETWEEN dsp.fechaInicio AND dsp.fechaFin OR :fechaFin BETWEEN dsp.fechaInicio AND dsp.fechaFin OR dsp.fechaInicio BETWEEN :fechaInicio AND :fechaFin OR dsp.fechaFin BETWEEN :fechaInicio AND :fechaFin) AND (ts.clave = :clave1 OR ts.clave = :clave2) AND (es.clave = :enviada OR es.clave = :aprobada)"),
+    @NamedQuery(name = "DetSolicitudPermiso.findByPeriodo", query = "SELECT dsp FROM DetSolicitudPermiso dsp INNER JOIN dsp.empleadoSol de INNER JOIN dsp.estatus es WHERE de.idEmpleado = :idEmp AND ((:fechaInicio = dsp.fechaInicio AND :fechaFin = dsp.fechaFin) OR ((:fechaInicio = dsp.fechaFin) OR (:fechaFin = dsp.fechaInicio)) OR ((:fechaInicio BETWEEN dsp.fechaInicio AND dsp.fechaFin) OR (:fechaFin BETWEEN dsp.fechaInicio AND dsp.fechaFin)) OR ((dsp.fechaInicio BETWEEN :fechaInicio AND :fechaFin) OR (dsp.fechaFin BETWEEN :fechaInicio AND :fechaFin))) AND (es.clave = :enviada OR es.clave = :aprobada)")
 })
 public class DetSolicitudPermiso implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id_solicitud")
     private Integer idSolicitud;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "fecha_cap")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaCap;
+    
     @Column(name = "fecha_mod")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaMod;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "fecha_inicio")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaInicio;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "fecha_fin")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaFin;
-    @Column(name = "aprobada")
-    private Short aprobada;
+    
+    @JoinColumn(name = "aprobada", referencedColumnName = "cd_st_solicitud")
+    @ManyToOne()
+    private CatEstatusSolicitud estatus;
+    
     @Column(name = "descripcion_rechazo")
     private String descripcionRechazo;
-    @OneToMany(mappedBy = "idSolPermiso")
+    
+    @OneToMany(mappedBy = "solPermiso")
     private List<DetIncidencia> detIncidenciaList;
+    
     @JoinColumn(name = "id_tipo_solicitud", referencedColumnName = "id_tipo_solicitud")
     @ManyToOne(optional = false)
-    private CatTipoSolicitud idTipoSolicitud;
+    private CatTipoSolicitud tipoSolicitud;
+    
     @JoinColumn(name = "id_empleado_sol", referencedColumnName = "id_empleado")
     @ManyToOne(optional = false)
-    private DetEmpleado idEmpleadoSol;
+    private DetEmpleado empleadoSol;
+    
     @JoinColumn(name = "id_empleado_rev", referencedColumnName = "id_empleado")
     @ManyToOne
-    private DetEmpleado idEmpleadoRev;
+    private DetEmpleado empleadoRev;
+    
+    @Basic(optional = true)
+    @Column(name = "pc_goce_sueldo")
+    private BigDecimal goceSueldo;
 
     public DetSolicitudPermiso() {
     }
@@ -129,14 +147,14 @@ public class DetSolicitudPermiso implements Serializable {
         this.fechaFin = fechaFin;
     }
 
-    public Short getAprobada() {
-        return aprobada;
+    public CatEstatusSolicitud getEstatus() {
+        return estatus;
     }
 
-    public void setAprobada(Short aprobada) {
-        this.aprobada = aprobada;
+    public void setEstatus(CatEstatusSolicitud estatus) {
+        this.estatus = estatus;
     }
-
+    
     public List<DetIncidencia> getDetIncidenciaList() {
         return detIncidenciaList;
     }
@@ -145,28 +163,28 @@ public class DetSolicitudPermiso implements Serializable {
         this.detIncidenciaList = detIncidenciaList;
     }
 
-    public CatTipoSolicitud getIdTipoSolicitud() {
-        return idTipoSolicitud;
+    public CatTipoSolicitud getTipoSolicitud() {
+        return tipoSolicitud;
     }
 
-    public void setIdTipoSolicitud(CatTipoSolicitud idTipoSolicitud) {
-        this.idTipoSolicitud = idTipoSolicitud;
+    public void setTipoSolicitud(CatTipoSolicitud tipoSolicitud) {
+        this.tipoSolicitud = tipoSolicitud;
     }
 
-    public DetEmpleado getIdEmpleadoSol() {
-        return idEmpleadoSol;
+    public DetEmpleado getEmpleadoSol() {
+        return empleadoSol;
     }
 
-    public void setIdEmpleadoSol(DetEmpleado idEmpleadoSol) {
-        this.idEmpleadoSol = idEmpleadoSol;
+    public void setEmpleadoSol(DetEmpleado empleadoSol) {
+        this.empleadoSol = empleadoSol;
     }
 
-    public DetEmpleado getIdEmpleadoRev() {
-        return idEmpleadoRev;
+    public DetEmpleado getEmpleadoRev() {
+        return empleadoRev;
     }
 
-    public void setIdEmpleadoRev(DetEmpleado idEmpleadoRev) {
-        this.idEmpleadoRev = idEmpleadoRev;
+    public void setEmpleadoRev(DetEmpleado empleadoRev) {
+        this.empleadoRev = empleadoRev;
     }
 
     public String getDescripcionRechazo() {
@@ -177,6 +195,14 @@ public class DetSolicitudPermiso implements Serializable {
         this.descripcionRechazo = descripcionRechazo;
     }
 
+    public BigDecimal getGoceSueldo() {
+        return goceSueldo;
+    }
+
+    public void setGoceSueldo(BigDecimal goceSueldo) {
+        this.goceSueldo = goceSueldo;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 3;
@@ -201,7 +227,7 @@ public class DetSolicitudPermiso implements Serializable {
 
     @Override
     public String toString() {
-        return "DetSolicitudPermiso{" + "idSolicitud=" + idSolicitud + ", fechaCap=" + fechaCap + ", fechaMod=" + fechaMod + ", fechaInicio=" + fechaInicio + ", fechaFin=" + fechaFin + ", aprobada=" + aprobada + ", descripcionRechazo=" + descripcionRechazo + '}';
+        return "DetSolicitudPermiso[" + "idSolicitud=" + idSolicitud + ", fechaCap=" + fechaCap + ", fechaMod=" + fechaMod + ", fechaInicio=" + fechaInicio + ", fechaFin=" + fechaFin + ", aprobada=" + estatus.getClave() + ", descripcionRechazo=" + descripcionRechazo + ']';
     }
-    
+
 }

@@ -30,31 +30,39 @@ import javax.persistence.TemporalType;
 public class DetInventario implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id_inventario")
     private Integer idInventario;
+    
     @Basic(optional = false)
     @Column(name = "cantidad")
     private int cantidad;
+    
     @Basic(optional = false)
     @Column(name = "activo")
     private short activo;
+    
     @Basic(optional = false)
     @Column(name = "visible")
     private short visible;
+    
     @Basic(optional = false)
     @Column(name = "fecha_captura")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaCaptura;
+    
     @JoinColumn(name = "id_articulo", referencedColumnName = "id_articulo")
     @ManyToOne
-    private CatArticulo idArticulo;
+    private CatArticulo articulo;
+    
     @JoinColumn(name = "id_prenda", referencedColumnName = "id_prenda")
     @ManyToOne
-    private CatPrenda idPrenda;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idInventario")
+    private CatPrenda prendaInv;
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "inventario")
     private List<BitacoraInventario> bitacoraInventarioList;
 
     public DetInventario() {
@@ -112,22 +120,22 @@ public class DetInventario implements Serializable {
         this.fechaCaptura = fechaCaptura;
     }
 
-    public CatArticulo getIdArticulo() {
-        return idArticulo;
+    public CatArticulo getArticulo() {
+        return articulo;
     }
 
-    public void setIdArticulo(CatArticulo idArticulo) {
-        this.idArticulo = idArticulo;
+    public void setArticulo(CatArticulo articulo) {
+        this.articulo = articulo;
     }
 
-    public CatPrenda getIdPrenda() {
-        return idPrenda;
+    public CatPrenda getPrendaInv() {
+        return prendaInv;
     }
 
-    public void setIdPrenda(CatPrenda idPrenda) {
-        this.idPrenda = idPrenda;
+    public void setPrendaInv(CatPrenda prendaInv) {
+        this.prendaInv = prendaInv;
     }
-
+    
     public List<BitacoraInventario> getBitacoraInventarioList() {
         return bitacoraInventarioList;
     }

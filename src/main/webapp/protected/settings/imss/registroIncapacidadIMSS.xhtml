@@ -1,0 +1,276 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/plantillas/template.xhtml">
+    <ui:define name="title">Registro de Incapacidades</ui:define>
+    <ui:define name="content">
+        <h:form id="form">
+            <p:growl id="messages" showDetail="true" />
+            <p:toolbarGroup>
+                <p:commandButton value="Registrar" icon="pi pi-plus" oncomplete="PF('dialogoRegistoIncapacidad').show();" update="pnlRegistoIncapacidad" 
+                                 actionListener="#{registroIncBean.incializarSolicitud()}" process="@this" style="margin-right: .5rem" >
+                    <p:resetInput target="form:pnlRegistoIncapacidad" />
+                </p:commandButton>
+                <div class="ui-fluid" >
+                    <div class="formgrid grid">
+                        <div class="field col-12 md:col-3">
+                            <p:outputLabel for="@next" value="Periodo Inicio" />
+                            <p:datePicker value="#{registroIncBean.periodoInicio}" showIcon="true" locale="es" timeZone="GMT-6" pattern="dd/MM/yyyy"
+                                          styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel">
+                                <p:ajax update="dtRegistroIncapacidad" process="@this" />
+                            </p:datePicker>
+                        </div>
+                        <div class="field col-12 md:col-3">
+                            <p:outputLabel for="@next" value="Periodo Fin" />
+                            <p:datePicker value="#{registroIncBean.periodoFin}" showIcon="true" locale="es" timeZone="GMT-6" pattern="dd/MM/yyyy"
+                                          styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel">
+                                <p:ajax update="dtRegistroIncapacidad" process="@this" />
+                            </p:datePicker>
+                        </div>
+                    </div>
+                    <div class="formgrid grid">
+                        <div class="field col-12 md:col-3">
+                            <p:selectBooleanButton id="idEstatusAprovado" value="#{registroIncBean.estatusAprobado}" onIcon="pi pi-check" offIcon="pi pi-times" style="width:2rem" >
+                                <p:ajax event="change" update="dtRegistroIncapacidad" process="@this"/>
+                            </p:selectBooleanButton>
+                            <p:outputLabel value="Aceptado" />
+                        </div>
+                        <div class="field col-12 md:col-3">
+                            <p:selectBooleanButton id="idEstatusCancelado" value="#{registroIncBean.estatusCancelado}" onIcon="pi pi-check" offIcon="pi pi-times" style="width:2rem" >
+                                <p:ajax event="change" update="dtRegistroIncapacidad" process="@this"/>
+                            </p:selectBooleanButton>
+                            <p:outputLabel value="Cancelado" />
+                        </div>
+                    </div>
+                </div>
+            </p:toolbarGroup>
+            <p:dataTable id="dtRegistroIncapacidad" widgetVar="dtRegistroIncapacidad" var="incapacidad" reflow="true"
+                         value="#{registroIncBean.consultarIncapacidades()}" selection="#{registroIncBean.listaRegistroFiltrada}" 
+                         paginator="true" rows="10" paginatorPosition="bottom" >
+                <p:column headerText="Empleado" style="text-align: center;" width="12rem">
+                    <h:outputText value="#{incapacidad.idEmpleadoInc.nombre} #{incapacidad.idEmpleadoInc.primerAp} #{incapacidad.idEmpleadoInc.segundoAp}" />
+                </p:column>
+                <p:column headerText="Incapacidad" style="text-align: center;" width="5rem">
+                    <h:outputText value="#{incapacidad.tipoIncapacidad.descripcion}" />
+                </p:column>
+                <p:column headerText="Periodo" style="text-align: center;" width="5rem" >
+                    <h:outputText value="#{incapacidad.fechaInicio}" >
+                        <f:convertDateTime type="date" pattern="dd/MM/yyyy" timeZone="GMT-6" />
+                    </h:outputText>
+                    <p:outputLabel value=" - " />
+                    <h:outputText value="#{incapacidad.fechaFin}" >
+                        <f:convertDateTime type="date" pattern="dd/MM/yyyy" timeZone="GMT-6"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Estatus" style="text-align: center;" width="3rem">
+                    <p:outputLabel class="customer-badge status-#{registroIncBean.status.getEstatusIncapacidad(incapacidad.estatusSolicitud.clave)}"
+                        value="#{incapacidad.estatusSolicitud.descripcion}" style="width: 12rem"/>
+                </p:column>
+                <p:column exportable="false" ariaHeaderText="Actions" width="4rem">
+                    <p:commandButton class="ui-button-success rounded-button m-1" icon="pi pi-bars" update="form:pnlRegistoIncapacidad" 
+                        oncomplete="PF('dialogoRegistoIncapacidad').show()" styleClass="edit-button" process="@this"
+                        actionListener="#{registroIncBean.editarSolicitud(incapacidad)}" >
+                        <f:setPropertyActionListener value="#{incapacidad}" target="#{registroIncBean.registroIncapacidad}" />
+                    </p:commandButton>
+                    <p:commandButton class="ui-button-danger m-1" icon="pi pi-times" update="form:pnlRegistoIncapacidad" 
+                        oncomplete="PF('dialogoRegistoIncapacidad').show()" process="@this"
+                        actionListener="#{registroIncBean.cancelarSolicitud(incapacidad)}" >
+                        <f:setPropertyActionListener value="#{incapacidad}" target="#{registroIncBean.registroIncapacidad}" />
+                    </p:commandButton>
+                </p:column>
+                
+            </p:dataTable>
+            <p:dialog header="#{registroIncBean.accionBoton} Registro Incapacidad" id="dialogoRegistoIncapacidad" showEffect="fade" modal="true" 
+                      widgetVar="dialogoRegistoIncapacidad" responsive="true" draggable="true" resizable="false" dynamic="true" style="margin: auto">
+                <p:outputPanel id="pnlRegistoIncapacidad" styleClass="ui-fluid">
+                    <div class="formgrid grid">
+                        <div class="field col">
+                            <p:outputLabel for="@next" value="Empleado"/>
+                            <p:selectOneMenu id="empleado" autoWidth="false" converter="entityConverter" value="#{registroIncBean.empleadoInc}"
+                                             disabled="#{registroIncBean.registroIncapacidad.estatusSolicitud.clave.matches('C') eq true 
+                                                        or registroIncBean.registroIncapacidad.idEmpleadoInc.idEmpleado ne null}" 
+                                             filter="true" filterMatchMode="contains" styleClass="custom-style">
+                                <f:selectItem itemLabel="--Seleccione--"/>
+                                <f:selectItems value="#{registroIncBean.listaEmpleados}" var="tipoV" itemLabel="#{tipoV.nombre} #{tipoV.primerAp} #{tipoV.segundoAp}" itemValue="#{empleadoInc}"/>
+                                <p:ajax event="change" update="pnlRegistoIncapacidad" process="@this" resetValues="true"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="field col">
+                            <p:outputLabel for="@next" value="Tipo Incapacidad"/>
+                            <p:selectOneMenu id="tipoIncapacidad" autoWidth="false" converter="entityConverter" value="#{registroIncBean.tipoIncapacidad}"
+                                disabled="#{registroIncBean.registroIncapacidad.estatusSolicitud.equals(registroIncBean.estatusSolicitudCancelada) eq true 
+                                            or registroIncBean.tpIncapacidadSelecciondado eq true 
+                                            or registroIncBean.registroIncapacidad.controlIncapacidad.clave.matches('D') eq true}" >
+                                <f:selectItem itemLabel="--Seleccione--"/>
+                                <f:selectItems value="#{registroIncBean.listaIncapacidadesIMSS}" var="tipoV" itemLabel="#{tipoV.descripcion}" itemValue="#{tipoIncapacidad}"/>
+                                <p:ajax event="change" update="pnlRegistoIncapacidad" process="@this" resetValues="true"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="formgrid grid">
+                        <div class="field col">
+                            <p:outputLabel for="@next" value="Control Incapacidad"/>
+                            <p:selectOneMenu id="controlIncapacidad" autoWidth="false" converter="entityConverter" value="#{registroIncBean.controlIncapacidad}"
+                                disabled="#{registroIncBean.registroIncapacidad.estatusSolicitud.equals(registroIncapacidad.estatusSolicitudCancelada) eq true 
+                                            or registroIncBean.tpIncapacidadSelecciondado eq true 
+                                            or registroIncBean.registroIncapacidad.controlIncapacidad.clave.matches('D') eq true}" >
+                                <f:selectItem itemLabel="--Seleccione--"/>
+                                <f:selectItems value="#{registroIncBean.listaControlIncapacidadIMSS}" var="tipoV" itemLabel="#{tipoV.descripcion}" itemValue="#{controlIncapacidad}"/>
+                                <p:ajax event="change" update="pnlRegistoIncapacidad" process="@this" resetValues="true"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="field col">
+                            <p:outputLabel for="@next" value="Riesgo Trabajo"/>
+                            <p:selectOneMenu id="riesgoTrabajo" autoWidth="false" converter="entityConverter" value="#{registroIncBean.riesgoTrabajo}" 
+                                             disabled="#{registroIncBean.tpIncapacidadSelecciondado eq true 
+                                            or registroIncBean.registroIncapacidad.estatusSolicitud.equals(registroIncBean.estatusSolicitudCancelada) eq true 
+                                            or registroIncBean.registroIncapacidad.secuelaRiesgoTrabajo.equals(registroIncBean.riesgoIncapacidadDefuncion) eq true 
+                                            or registroIncBean.tipoIncapacidad.incapacidadSAT.clave.matches('01') 
+                                            eq false or registroIncBean.registroIncapacidad.controlIncapacidad.clave.matches('D') eq true}" >
+                                <f:selectItem itemLabel="--Seleccione--"/>
+                                <f:selectItems value="#{registroIncBean.listaRiesgoTrabajo}" var="tipoV" itemLabel="#{tipoV.descripcion}" itemValue="#{riesgoTrabajo}"/>
+                                <p:ajax event="change" update="pnlRegistoIncapacidad" process="@this" resetValues="true"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="field col">
+                            <p:outputLabel for="@next" value="Tipo de Riesgo de Trabajo"/>
+                            <p:selectOneMenu id="tipoRiesgoTrabajo" autoWidth="false" converter="entityConverter" value="#{registroIncBean.tipoRiesgo}" 
+                                disabled="#{registroIncBean.tpIncapacidadSelecciondado eq true 
+                                            or registroIncBean.registroIncapacidad.estatusSolicitud.equals(registroIncBean.estatusSolicitudCancelada) eq true 
+                                            or registroIncBean.registroIncapacidad.secuelaRiesgoTrabajo.equals(registroIncBean.riesgoIncapacidadDefuncion) eq true
+                                            or registroIncBean.tipoIncapacidad.incapacidadSAT.clave.matches('01') eq false 
+                                            or registroIncBean.registroIncapacidad.controlIncapacidad.clave.matches('D') eq true}" >
+                                <f:selectItem itemLabel="--Seleccione--"/>
+                                <f:selectItems value="#{registroIncBean.listaTipoRiesgoIMSS}" var="tipoV" itemLabel="#{tipoV.descripcion}" itemValue="#{tipoRiesgo}"/>
+                                <p:ajax event="change" update="pnlRegistoIncapacidad" process="@this" resetValues="true"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                    <div class="formgrid grid">
+                        <div class="field col">
+                            <p:outputLabel for="@next" value="Dias Autorizados"/>
+                            <p:inputNumber id="diasAutorizados" value="#{registroIncBean.registroIncapacidad.diasAutorizados}" 
+                                disabled="#{registroIncBean.registroIncapacidad.estatusSolicitud.equals(registroIncBean.estatusSolicitudCancelada) eq true 
+                                            or registroIncBean.tpIncapacidadSelecciondado eq true 
+                                            or registroIncBean.registroIncapacidad.controlIncapacidad.clave.matches('D') eq true}">
+                                <p:ajax process="@this"/>
+                            </p:inputNumber>
+                        </div>
+                        <div class="field col">
+                            <p:outputLabel for="@next" value="Fecha Inicio" />
+                            <p:datePicker id="fechaInicio" value="#{registroIncBean.registroIncapacidad.fechaInicio}" showIcon="true" pattern="dd/MM/yyyy" locale="es" 
+                                          styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" timeZone="GMT-6" 
+                                          disabled="#{registroIncBean.registroIncapacidad.estatusSolicitud.equals(registroIncBean.estatusSolicitudCancelada) eq true 
+                                            or registroIncBean.tpIncapacidadSelecciondado eq true 
+                                            or registroIncBean.registroIncapacidad.controlIncapacidad.clave.matches('D') eq true}" >
+                                <p:ajax process="@this"/>
+                            </p:datePicker>
+                        </div>
+                        <h:panelGroup id="fechaFinPanel" rendered="#{registroIncBean.registroIncapacidad.fechaFin ne null}">
+                            <div class="field col">
+                                <p:outputLabel for="@next" value="Fecha Fin" />
+                                <p:datePicker id="fechaFin" value="#{registroIncBean.registroIncapacidad.fechaFin}" showIcon="true" pattern="dd/MM/yyyy" locale="es" 
+                                              styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" timeZone="GMT-6" 
+                                              disabled="#{registroIncBean.registroIncapacidad.estatusSolicitud.equals(registroIncBean.estatusSolicitudCancelada) eq true 
+                                                or registroIncBean.tpIncapacidadSelecciondado eq true 
+                                                or registroIncBean.registroIncapacidad.controlIncapacidad.clave.matches('D') eq true}" >
+                                    <p:ajax process="@this"/>
+                                </p:datePicker>
+                            </div>
+                        </h:panelGroup>
+                    </div>
+                    <div class="formgrid grid">
+                        <div class="field col">
+                            <p:outputLabel for="@next" value="Folio"/>
+                            <p:inputText id="folio" value="#{registroIncBean.registroIncapacidad.folio}"
+                                disabled="#{registroIncBean.registroIncapacidad.estatusSolicitud.equals(registroIncBean.estatusSolicitudCancelada) eq true 
+                                            or registroIncBean.tpIncapacidadSelecciondado eq true 
+                                            or registroIncBean.registroIncapacidad.controlIncapacidad.clave.matches('D') eq true}" >
+                                <p:ajax process="@this"/>
+                            </p:inputText>
+                        </div>
+                        <div class="field col">
+                            <p:outputLabel for="@next" value="Descripcion"/>
+                            <p:inputText id="descripcion" value="#{registroIncBean.registroIncapacidad.descripcion}" 
+                                disabled="#{registroIncBean.registroIncapacidad.estatusSolicitud.equals(registroIncBean.estatusSolicitudCancelada) eq true 
+                                            or registroIncBean.tpIncapacidadSelecciondado eq true 
+                                            or registroIncBean.registroIncapacidad.controlIncapacidad.clave.matches('D') eq true}">
+                                <p:ajax process="@this"/>
+                            </p:inputText>
+                        </div>
+                    </div>
+                </p:outputPanel>
+                <f:facet name="footer">
+                    <p:commandButton value="#{registroIncBean.accionBoton}" icon="#{registroIncBean.iconoBoton}" class="#{registroIncBean.diseñoBoton}" 
+                                     actionListener="#{registroIncBean.metodoBoton()}" process="pnlRegistoIncapacidad @this" 
+                                     update="pnlRegistoIncapacidad dtRegistroIncapacidad" rendered="#{registroIncBean.estadoAccionBoton ne 3}"
+                                     disabled="#{registroIncBean.registroIncapacidad.estatusSolicitud.equals(registroIncBean.estatusSolicitudCancelada) eq true 
+                                                 or registroIncBean.tpIncapacidadSelecciondado eq true 
+                                                 or registroIncBean.registroIncapacidad.controlIncapacidad.clave.matches('D') eq true}" >
+                        <p:resetInput target="form:pnlRegistoIncapacidad" />
+                    </p:commandButton>
+                    <p:commandButton value="#{registroIncBean.accionBoton}" icon="#{registroIncBean.iconoBoton}" class="#{registroIncBean.diseñoBoton}" 
+                                     process="pnlRegistoIncapacidad @this" update="pnlRegistoIncapacidad dtRegistroIncapacidad" 
+                                     rendered="#{registroIncBean.estadoAccionBoton eq 3}" oncomplete="PF('dialogoBorrarIncapacidad').show()"
+                                     disabled="#{registroIncBean.registroIncapacidad.estatusSolicitud.equals(registroIncBean.estatusSolicitudCancelada) eq true 
+                                                 or registroIncBean.registroIncapacidad.secuelaRiesgoTrabajo.equals(registroIncBean.riesgoIncapacidadDefuncion) eq true 
+                                                 or registroIncBean.registroIncapacidad.controlIncapacidad.clave.matches('D') eq true}" >
+                        <p:resetInput target="form:pnlRegistoIncapacidad" />
+                    </p:commandButton>
+                    <p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dialogoRegistoIncapacidad').hide()" 
+                                     class="ui-button-secondary" actionListener="#{registroIncBean.incializarSolicitud()}" >
+                        <p:resetInput target="form:pnlRegistoIncapacidad" />
+                    </p:commandButton>
+                </f:facet>
+            </p:dialog>
+            <p:confirmDialog widgetVar="dialogoBorrarIncapacidad" showEffect="fade" width="300"
+                message="Cancelar Incapacidad?" header="Confirmar" severity="warn">
+                <p:commandButton value="Si" icon="pi pi-check" actionListener="#{registroIncBean.metodoBoton()}"
+                    process="@this" oncomplete="PF('dialogoBorrarIncapacidad').hide()" >
+                    <p:resetInput target="form:pnlRegistoIncapacidad" />
+                </p:commandButton>
+                <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+                    onclick="PF('dialogoBorrarIncapacidad').hide()" >
+                    <p:resetInput target="form:pnlRegistoIncapacidad" />
+                </p:commandButton>
+            </p:confirmDialog>
+            <script>
+                PrimeFaces.locales['es'] = 
+                {
+                    monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+                    monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                    dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+                    dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
+                    dayNamesMin: ['D', 'L', 'M', 'X', 'J', 'V', 'S'],
+                    weekHeader: 'Semana',
+                    firstDay: 0,
+                    isRTL: false,
+                    showMonthAfterYear: false,
+                    yearSuffix: '',
+                    timeOnlyTitle: 'Sólo hora',
+                    timeText: 'Tiempo',
+                    hourText: 'Hora',
+                    minuteText: 'Minuto',
+                    secondText: 'Segundo',
+                    millisecondText: 'Milisegundo',
+                    ampm: false,
+                    month: 'Mes',
+                    week: 'Semana',
+                    day: 'Día',
+                    allDayText: 'Todo el día',
+                    today: 'Hoy',
+                    now: 'Ahora',
+                    clear: 'Limpiar',
+                    aria: {
+                       close: 'Cerrar',
+                       previous: 'Anterior',
+                       next: 'Siguiente'
+                   }
+                };
+            </script>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -10,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.deduccion.IDeducciones;
+import mx.com.ferbo.business.nomina.ParametrosNomina;
 import mx.com.ferbo.dao.n.NominaFormulaDAO;
 import mx.com.ferbo.model.CatTarifaISR;
 import mx.com.ferbo.model.DetNomina;
@@ -28,28 +29,39 @@ public class ISRExecutor {
 	
 	private NominaFormulaDAO formulaDAO = null;
 	
-	private Date periodoInicio = null;
-	private Date periodoFin = null;
-	private List<DetNomina> nominaMensual = null;
+	private ParametrosNomina       parametros     = null;
+	private Date                   periodoInicio  = null;
+	private Date                   periodoFin     = null;
+	private List<DetNomina>        nominaMensual  = null;
 	private List<CatTipoDeduccion> tiposDeduccion = null;
-	private List<CatTipoOtroPago> tiposOtroPago = null;
-	private List<CatTarifaISR> tablaISR = null;
+	private List<CatTipoOtroPago>  tiposOtroPago  = null;
+	private List<CatTarifaISR>     tablaISR       = null;
 	
+	@Deprecated
 	public ISRExecutor(Date periodoInicio, Date periodoFin, List<CatTipoDeduccion> tiposDeduccion, List<CatTipoOtroPago> tiposOtroPago, List<CatTarifaISR> tablaISR, List<DetNomina> nominaMensual) {
-		this.periodoInicio = periodoInicio;
-		this.periodoFin = periodoFin;
+		this.periodoInicio  = periodoInicio;
+		this.periodoFin     = periodoFin;
 		this.tiposDeduccion = tiposDeduccion;
-		this.tiposOtroPago = tiposOtroPago;
-		this.tablaISR = tablaISR;
-		this.nominaMensual = nominaMensual;
+		this.tiposOtroPago  = tiposOtroPago;
+		this.tablaISR       = tablaISR;
+		this.nominaMensual  = nominaMensual;
+	}
+	
+	public ISRExecutor(ParametrosNomina parametros, List<DetNomina> nominaMensual) {
+		this.parametros     = parametros;
+		this.periodoInicio  = parametros.getPeriodoInicio();
+		this.periodoFin     = parametros.getPeriodoFin();
+		this.tiposDeduccion = parametros.getTiposDeduccion();
+		this.tiposOtroPago  = parametros.getTiposOtroPago();
+		this.tablaISR       = parametros.getTablaISR();
+		this.nominaMensual  = nominaMensual;
 	}
 	
 	public IDeducciones loadClass(String clave, LocalDate fecha) {
-		IDeducciones instance = null;
-		Class<?> clazz = null;
+		IDeducciones   instance    = null;
+		Class<?>       clazz       = null;
 		Constructor<?> constructor = null;
-		
-		NominaFormula formula = null;
+		NominaFormula  formula     = null;
 		
 		try {
 			if(formulaDAO == null)
@@ -57,8 +69,10 @@ public class ISRExecutor {
 			formula = formulaDAO.buscarVigente(clave, fecha);
 			
 			clazz = Class.forName(formula.getClase());
-			constructor = clazz.getDeclaredConstructor(Date.class, Date.class, List.class, List.class, List.class, List.class);
-			instance = (IDeducciones) constructor.newInstance(this.periodoInicio, this.periodoFin, this.tiposDeduccion, this.tiposOtroPago, this.tablaISR, this.nominaMensual);
+//			constructor = clazz.getDeclaredConstructor(Date.class, Date.class, List.class, List.class, List.class, List.class);
+			constructor = clazz.getDeclaredConstructor(ParametrosNomina.class, List.class);
+//			instance = (IDeducciones) constructor.newInstance(this.periodoInicio, this.periodoFin, this.tiposDeduccion, this.tiposOtroPago, this.tablaISR, this.nominaMensual);
+			instance = (IDeducciones) constructor.newInstance(this.parametros, this.nominaMensual);
 			
 			log.info("Clase para cálculo de ISR: {}", formula.getClase());
 		} catch(ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
@@ -69,5 +83,4 @@ public class ISRExecutor {
 		
 		return instance;
 	}
-
 }

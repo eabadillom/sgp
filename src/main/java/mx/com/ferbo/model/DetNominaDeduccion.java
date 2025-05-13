@@ -66,13 +66,38 @@ public class DetNominaDeduccion implements Serializable {
 			return false;
 		DetNominaDeduccion other = (DetNominaDeduccion) obj;
 		return this.key.equals(other.key);
-//		return Objects.equals(key, other.key);
 	}
 
 	@Override
 	public String toString() {
 		return "DetNominaDeduccion [key=" + key + ", claveDeduccion=" + clave + ", nombreDeduccion="
 				+ nombre + ", importe=" + importe + "]";
+	}
+	
+	public DetNominaDeduccion() {
+		
+	}
+	
+	public DetNominaDeduccion(Builder builder) {
+		this.key = builder.key;
+		this.tipoDeduccion = builder.tipoDeduccion;
+		this.clave = builder.clave;
+		this.nombre = builder.nombre;
+		this.importe = builder.importe;
+		this.informar = builder.informar;
+		this.procesar = builder.procesar;
+	}
+
+	public DetNominaDeduccion(DetNominaDeduccionPK key, CatTipoDeduccion tipoDeduccion, @Size(max = 5) String clave,
+			@Size(max = 150) String nombre, BigDecimal importe, Boolean informar, Boolean procesar) {
+		super();
+		this.key = key;
+		this.tipoDeduccion = tipoDeduccion;
+		this.clave = clave;
+		this.nombre = nombre;
+		this.importe = importe;
+		this.informar = informar;
+		this.procesar = procesar;
 	}
 
 	public DetNominaDeduccionPK getKey() {
@@ -129,5 +154,55 @@ public class DetNominaDeduccion implements Serializable {
 
 	public void setInformar(Boolean informar) {
 		this.informar = informar;
+	}
+	
+	public static class Builder {
+		private DetNominaDeduccionPK key;
+		private CatTipoDeduccion tipoDeduccion;
+		private String clave;
+		private String nombre;
+		private BigDecimal importe;
+		private Boolean informar;
+		private Boolean procesar;
+		
+		public DetNominaDeduccion.Builder key(DetNominaDeduccionPK key) {
+			this.key = key;
+			return this;
+		}
+		
+		public DetNominaDeduccion.Builder clave(String clave) {
+			this.clave = clave;
+			return this;
+		}
+		
+		public DetNominaDeduccion.Builder tipoDeduccion(CatTipoDeduccion tipoDeduccion) {
+			this.tipoDeduccion = tipoDeduccion;
+			return this;
+		}
+
+		public DetNominaDeduccion.Builder nombre(String nombre) {
+			this.nombre = nombre;
+			return this;
+		}
+
+		public DetNominaDeduccion.Builder importe(BigDecimal importe) {
+			this.importe = importe;
+			return this;
+		}
+
+		public DetNominaDeduccion.Builder procesar(Boolean procesar) {
+			this.procesar = procesar;
+			return this;
+		}
+
+		public DetNominaDeduccion.Builder informar(Boolean informar) {
+			this.informar = informar;
+			return this;
+		}
+		
+		public DetNominaDeduccion build() {
+			return new DetNominaDeduccion(this);
+		}
+
 	}
 }

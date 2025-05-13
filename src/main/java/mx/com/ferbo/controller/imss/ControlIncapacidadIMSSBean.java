@@ -79,9 +79,9 @@ public class ControlIncapacidadIMSSBean implements Serializable
                 throw new SGPException("Debes ingresar la clave");
             }
             
-            if(this.controlIncapacidadSelected.getClave().length() > 2)
+            if(this.controlIncapacidadSelected.getClave().length() > 3)
             {
-                throw new SGPException("La clave debe contener 1 o 2 caracteres");
+                throw new SGPException("La clave debe contener 1 y 3 caracteres");
             }
             
             if(this.controlIncapacidadSelected.getDescripcion() == null)
@@ -103,13 +103,13 @@ public class ControlIncapacidadIMSSBean implements Serializable
             titulo = "Error";
             mensaje = ex.getMessage();
             severity = FacesMessage.SEVERITY_ERROR;
-            log.info("Error al registrar la solicitud de control de incapacidad: {}", ex.getMessage());
+            log.info("Error al registrar la solicitud de control de incapacidad: {}", ex);
         }catch (Exception e) 
         {
             titulo = "Error";
             mensaje = "Consulte al administrador de sistemas";
             severity = FacesMessage.SEVERITY_ERROR;
-            log.info("ERROR, {}", e.getMessage());
+            log.info("ERROR, {}", e);
         }finally
         {
             actualizarListaControlIncapacidades();
@@ -133,9 +133,9 @@ public class ControlIncapacidadIMSSBean implements Serializable
                 throw new SGPException("Debes ingresar la clave");
             }
             
-            if(this.controlIncapacidadSelected.getClave().length() > 2)
+            if(this.controlIncapacidadSelected.getClave().length() > 3)
             {
-                throw new SGPException("La clave debe ser igual a 1 o 2 caracteres");
+                throw new SGPException("La clave debe ser igual a 1 y 3 caracteres");
             }
             
             if(this.controlIncapacidadSelected.getDescripcion() == null)
@@ -152,13 +152,13 @@ public class ControlIncapacidadIMSSBean implements Serializable
             titulo = "Error";
             mensaje = ex.getMessage();
             severity = FacesMessage.SEVERITY_ERROR;
-            log.info("Error al registrar la solicitud de control de incapacidad: {}", ex.getMessage());
+            log.info("Error al registrar la solicitud de control de incapacidad: {}", ex);
         }catch (Exception e) 
         {
             titulo = "Error";
             mensaje = "Consulte al administrador de sistemas";
             severity = FacesMessage.SEVERITY_ERROR;
-            log.info("ERROR, {}", e.getMessage());
+            log.info("ERROR, {}", e);
         }finally
         {
             actualizarListaControlIncapacidades();

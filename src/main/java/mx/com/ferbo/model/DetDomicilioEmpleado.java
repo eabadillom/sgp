@@ -2,8 +2,8 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.Objects;
+
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ForeignKey;
@@ -12,8 +12,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
-import javax.persistence.JoinTable;
-import javax.persistence.MapsId;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
@@ -66,32 +64,7 @@ public class DetDomicilioEmpleado implements Serializable
     @NotNull
     @JoinColumn(name = "id_empleado")
     private DetEmpleado empleado;
-    /*
-    @Basic
-    @Null
-    @Column(name = "cd_asentamiento")
-    private Integer asentamiento;
-    
-    @Basic
-    @Null
-    @Column(name = "cd_localidad")
-    private Integer localidad;
-    
-    @Basic
-    @Null
-    @Column(name = "cd_municipio")
-    private Integer municipio;
-    
-    @Basic
-    @Null
-    @Column(name = "cd_estado")
-    private Integer estado;
-    
-    @Basic
-    @Null
-    @Column(name = "cd_pais")
-    private Integer pais;
-    */
+
     @OneToOne
     @Null
     @JoinColumns(value = {
@@ -121,20 +94,6 @@ public class DetDomicilioEmpleado implements Serializable
         this.numeroInterior = numeroInterior;
     }
 
-    /*public DetDomicilioEmpleado(Integer id, DetEmpleado empleado, Integer asentamiento, Integer localidad, Integer municipio, Integer estado, Integer pais, String calle, String numeroExterior, String numeroInterior) 
-    {
-        this.id = id;
-        this.calle = calle;
-        this.numeroExterior = numeroExterior;
-        this.numeroInterior = numeroInterior;
-        this.empleado = empleado;
-        this.asentamiento = asentamiento;
-        this.localidad = localidad;
-        this.municipio = municipio;
-        this.estado = estado;
-        this.pais = pais;
-    }*/
-    
     public Integer getId() 
     {
         return id;
@@ -185,46 +144,6 @@ public class DetDomicilioEmpleado implements Serializable
         this.empleado = empleado;
     }
 
-    /*public Integer getAsentamiento() {
-        return asentamiento;
-    }
-
-    public void setAsentamiento(Integer asentamiento) {
-        this.asentamiento = asentamiento;
-    }
-
-    public Integer getLocalidad() {
-        return localidad;
-    }
-
-    public void setLocalidad(Integer localidad) {
-        this.localidad = localidad;
-    }
-
-    public Integer getMunicipio() {
-        return municipio;
-    }
-
-    public void setMunicipio(Integer municipio) {
-        this.municipio = municipio;
-    }
-
-    public Integer getEstado() {
-        return estado;
-    }
-
-    public void setEstado(Integer estado) {
-        this.estado = estado;
-    }
-
-    public Integer getPais() {
-        return pais;
-    }
-
-    public void setPais(Integer pais) {
-        this.pais = pais;
-    }*/
-    
     public CatAsentamiento getAsentamiento() 
     {
         return asentamiento;

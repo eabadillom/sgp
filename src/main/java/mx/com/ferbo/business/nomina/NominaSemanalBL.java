@@ -1,10 +1,11 @@
 package mx.com.ferbo.business.nomina;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -12,25 +13,31 @@ import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.business.deduccion.AbstractDeduccion;
+import mx.com.ferbo.business.deduccion.AbstractDBL;
 import mx.com.ferbo.business.deduccion.IDeducciones;
-import mx.com.ferbo.business.deduccion.PrestamoDeduccion;
-import mx.com.ferbo.business.deduccion.imss.IMSSDeduccion;
+import mx.com.ferbo.business.deduccion.PrestamoDBL;
+import mx.com.ferbo.business.deduccion.imss.IMSSDeduccionesBL;
 import mx.com.ferbo.business.deduccion.isr.ISRExecutor;
 import mx.com.ferbo.business.otropago.AbstractOtroPago;
-import mx.com.ferbo.business.percepcion.AbstractPercepcion;
-import mx.com.ferbo.business.percepcion.BonoPuntualidadPercepcion;
-import mx.com.ferbo.business.percepcion.SeptimoDiaPercepcion;
-import mx.com.ferbo.business.percepcion.SueldoPercepcion;
-import mx.com.ferbo.business.percepcion.ValesDespensaPercepcion;
+import mx.com.ferbo.business.percepcion.AbstractPBL;
+import mx.com.ferbo.business.percepcion.AguinaldoPBL;
+import mx.com.ferbo.business.percepcion.BonoPuntualidadPBL;
+import mx.com.ferbo.business.percepcion.PrimaVacacionalEnTiempoPBL;
+import mx.com.ferbo.business.percepcion.PrimaVacacionalReportadasPBL;
+import mx.com.ferbo.business.percepcion.SeptimoDiaPBL;
+import mx.com.ferbo.business.percepcion.SueldoPBL;
+import mx.com.ferbo.business.percepcion.VacacionesPBL;
+import mx.com.ferbo.business.percepcion.VacacionesReportadasPBL;
+import mx.com.ferbo.business.percepcion.ValesDespensaPBL;
 import mx.com.ferbo.dao.n.NominaDAO;
 import mx.com.ferbo.dao.n.PercepcionEmpleadoDAO;
 import mx.com.ferbo.dao.n.RegistroDAO;
+import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.CatDiaNoLaboral;
+import mx.com.ferbo.model.CatEstatusRegistro;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
-import mx.com.ferbo.model.DetNominaEmisor;
 import mx.com.ferbo.model.DetNominaOtroPago;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.DetPercepcionEmpleado;
@@ -46,14 +53,11 @@ public class NominaSemanalBL extends NominaBL {
 	private Date fechaInicioAnio = null;
 	private Date fechafinAnio = null;
 	
-	//PERCEPCIONES
-	private BigDecimal valesDespensa = null;
-	
     private static final int SEPTIMO_DIA = 1;
     private static final int DIAS_LABORALES_POR_PERIODO = 6;
     
 	private Integer anio = null;
-	private PercepcionEmpleadoDAO percepcionEmpleadoDAO = null;
+	private PercepcionEmpleadoDAO       percepcionEmpleadoDAO = null;
 	private List<DetPercepcionEmpleado> percepcionesEmpleado = null;
 	private List<String> listaDiasLaboralesEmpleado = null;
 	private List<String> listaDiasNoLaboralesEmpleado = null;
@@ -62,20 +66,18 @@ public class NominaSemanalBL extends NominaBL {
 	
 	public NominaSemanalBL(DetEmpleado empleado, ParametrosNomina parametros, Map<String, DetRegistro> mapAsistencias) {
 		super(empleado, parametros, mapAsistencias);
-		this.periodoInicio  = parametros.getPeriodoInicio();
-		this.periodoFin     = parametros.getPeriodoFin();
-		
 		this.percepcionEmpleadoDAO = new PercepcionEmpleadoDAO();
 		
-		this.anio = parametros.getAnio();
+		this.periodoInicio   = parametros.getPeriodoInicio();
+		this.periodoFin      = parametros.getPeriodoFin();
+		this.anio            = parametros.getAnio();
 		this.fechaInicioAnio = parametros.getFechaInicioAnio();
-		DateUtil.setTime(this.fechaInicioAnio, 0, 0, 0, 0);
+		this.fechafinAnio    = parametros.getFechaFinAnio();
+		percepcionesEmpleado = percepcionEmpleadoDAO.buscarPorEmpleado(this.empleado.getIdEmpleado());
 		
-		this.fechafinAnio = parametros.getFechaFinAnio();
+		DateUtil.setTime(this.fechaInicioAnio, 0, 0, 0, 0);
 		DateUtil.setTime(this.fechafinAnio, 23, 59, 59, 000);
 		
-		
-		percepcionesEmpleado = percepcionEmpleadoDAO.buscarPorEmpleado(this.empleado.getIdEmpleado());
 	}
 	
 	public DetNomina calcular() {
@@ -83,6 +85,7 @@ public class NominaSemanalBL extends NominaBL {
 		BigDecimal diasLaboralesEmpleado   = null;
 		BigDecimal diasNolaboralesEmpleado = null;
 		BigDecimal diasTrabajados          = null;
+		BigDecimal diasVacaciones          = null;
 		BigDecimal ausencias               = null;
 		BigDecimal incapacidades           = null;
 		BigDecimal salarioSemanal          = null;
@@ -95,12 +98,12 @@ public class NominaSemanalBL extends NominaBL {
 		
 		try {
 			//DIAS TOTALES DEL PERIODO = 7
-			diasPeriodo = new BigDecimal(DIAS_LABORALES_POR_PERIODO + SEPTIMO_DIA).setScale(2, BigDecimal.ROUND_HALF_UP);
+			diasPeriodo = new BigDecimal(DIAS_LABORALES_POR_PERIODO + SEPTIMO_DIA).setScale(2, RoundingMode.HALF_UP);
 			
 			log.info("#############################################################################");
 			log.info("Empleado: {} {} {}, Salario diario: {}", empleado.getNombre(), empleado.getPrimerAp(), empleado.getSegundoAp(), empleado.getDatoEmpresa().getSalarioDiario());
-			log.info("Ejecutando la nomina de la semana {} del año en curso...", this.parametros.getSemanaAnio());
-			nomina =  NominaBL.build(TP_NOMINA_ORDINARIA, this.parametros, this.empleado);
+			log.info("Ejecutando la nomina de la semana {} del año en curso...", this.parametros.getPeriodo());
+			nomina =  NominaSemanalBL.build(TP_NOMINA_ORDINARIA, this.parametros, this.empleado);
 			percepciones = nomina.getPercepciones();
 			otrosPagos = nomina.getOtrosPagos();
 			deducciones = nomina.getDeducciones();
@@ -111,38 +114,42 @@ public class NominaSemanalBL extends NominaBL {
 			//o bien, una semana laboral de Lunes a Sábado, con Domingo de descanso.
 			listaDiasLaboralesEmpleado = NominaSemanalBL.getDiasLaboralesPorSemana(this.empleado);
 			listaDiasNoLaboralesEmpleado = NominaSemanalBL.getDiasNoLaboralesPorSemana(this.empleado);
-			diasLaboralesEmpleado   = new BigDecimal(listaDiasLaboralesEmpleado.size()).setScale(2, BigDecimal.ROUND_HALF_UP);
-			diasNolaboralesEmpleado = new BigDecimal(listaDiasNoLaboralesEmpleado.size()).setScale(2, BigDecimal.ROUND_HALF_UP);
+			diasLaboralesEmpleado   = new BigDecimal(listaDiasLaboralesEmpleado.size()).setScale(2, RoundingMode.HALF_UP);
+			diasNolaboralesEmpleado = new BigDecimal(listaDiasNoLaboralesEmpleado.size()).setScale(2, RoundingMode.HALF_UP);
 			
 			//Para los días trabajados, se debe considerar el periodo inicio y fin de cálculo de la nómina y validar si de los 6 días que
 			//al trabajador le corresponde laborar, tuvo alguna falta.
 			diasTrabajados = this.getDiasTrabajados(listaDiasLaboralesEmpleado, mapAsistencias, this.parametros);
-			ausencias = this.getAusencias(listaDiasLaboralesEmpleado, mapAsistencias, this.parametros);
+			diasVacaciones = this.getDiasVacaciones(listaDiasLaboralesEmpleado, mapAsistencias, this.parametros);
+			ausencias      = this.getAusencias(listaDiasLaboralesEmpleado, mapAsistencias, this.parametros);
 			incapacidades = this.getIncapacidades(mapAsistencias, diasLaboralesEmpleado);
 			
+			nomina.setDiasLaborados(diasTrabajados);
+			nomina.setDiasVacaciones(diasVacaciones);
+			nomina.setDiasNoLaborados(ausencias);
 			
-			
-    		nomina.getReceptor().setSalarioDiarioIntegrado(this.calculoSDI(this.empleado));
-    		
     		/*---------------------------PERCEPCIONES------------------------------*/
-    		NominaSemanalBL.calcularSueldo(nomina, this.parametros, diasLaboralesEmpleado, diasNolaboralesEmpleado, diasTrabajados);
+    		NominaSemanalBL.calcularSueldo(nomina, this.parametros, diasLaboralesEmpleado, diasNolaboralesEmpleado, diasTrabajados, diasVacaciones);
     		NominaSemanalBL.calcularBonoPuntualidad(nomina, this.parametros, this.percepcionesEmpleado, this.mapAsistencias, 
     				this.empleado.getEmpleadoConfiguracion().getRetardo(), diasLaboralesEmpleado, diasNolaboralesEmpleado, diasTrabajados);
     		NominaSemanalBL.calcularValesDespensa(nomina, this.parametros, percepcionesEmpleado);
 			
-			/*-------------------------DEDUCCIONES-----------------------*/
-    		Optional<DetNominaPercepcion> optSueldo = nomina.getPercepciones().stream().filter(p -> AbstractPercepcion.CVE_SUELDO.equalsIgnoreCase(p.getClave())).findFirst();
-    		salarioSemanal = optSueldo.isPresent() ? optSueldo.get().getImporteExcento().add(optSueldo.get().getImporteGravado()) : BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
     		
-			if(salarioSemanal.compareTo(BigDecimal.ZERO) > 0) {
-				NominaSemanalBL.procesarISR(nomina, this.parametros);
+    		
+    		/*-------------------------DEDUCCIONES-----------------------*/
+    		Optional<DetNominaPercepcion> optSueldo = nomina.getPercepciones().stream().filter(p -> AbstractPBL.CVE_SUELDO.equalsIgnoreCase(p.getClave())).findFirst();
+    		salarioSemanal = optSueldo.isPresent() ? optSueldo.get().getImporteExento().add(optSueldo.get().getImporteGravado()) : ValoresBD._CERO.get();
+    		
+			if(salarioSemanal.compareTo(ValoresBD._CERO.get()) > 0) {
+				NominaSemanalBL.procesarISR(this.parametros, nomina);
 				NominaSemanalBL.procesarIMSS(nomina, this.parametros, diasPeriodo, ausencias, incapacidades);
 				NominaSemanalBL.procesarPrestamos(nomina, this.parametros, this.empleado);
 			}
 			
+			
 			/*--------------------------RESUMEN--------------------------*/
 			for(DetNominaPercepcion p : percepciones) {
-				log.info("Percepcion: {} - {} - {}", p.getNombre(), p.getImporteExcento(), p.getImporteGravado());
+				log.info("Percepcion: {} - {} - {}", p.getNombre(), p.getImporteExento(), p.getImporteGravado());
 			}
 			
 			for(DetNominaOtroPago o : otrosPagos) {
@@ -156,44 +163,74 @@ public class NominaSemanalBL extends NominaBL {
 			NominaSemanalBL.calcularTotales(nomina, this.parametros);
 			
 			diasPagados = nomina.getPercepciones().stream()
-				.filter(p -> AbstractPercepcion.CVE_SUELDO.equalsIgnoreCase(p.getClave())
-						|| AbstractPercepcion.CVE_SEXTO_DIA.equalsIgnoreCase(p.getClave())
-						||  AbstractPercepcion.CVE_SEPTIMO_DIA.equalsIgnoreCase(p.getClave())
+				.filter(p -> AbstractPBL.CVE_SUELDO.equalsIgnoreCase(p.getClave())
+						|| AbstractPBL.CVE_SEXTO_DIA.equalsIgnoreCase(p.getClave())
+						||  AbstractPBL.CVE_SEPTIMO_DIA.equalsIgnoreCase(p.getClave())
 				)
 				.map(p -> p.getCantidad())
-				.reduce(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP), BigDecimal :: add)
+				.reduce(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP), BigDecimal :: add)
 				;
 			
-			nomina.setFechaEmision(new Date());
-			nomina.setClaveExportacion("01");
-			nomina.setTipoComprobante("N");
-			nomina.setMoneda("MXN");
-			nomina.setMetodoPago(this.parametros.getMetodoPago());
-			nomina.setSerie(String.format("%d", this.parametros.getAnio()));
-			nomina.setFolio(String.format("%d", this.parametros.getSemanaAnio()));
-			nomina.setLugarExpedicion(this.empleado.getDatoEmpresa().getEmpresa().getCodigoPostal());
-			nomina.setEjercicio(DateUtil.getAnio(this.fechaInicioAnio));
-			nomina.setDiasLaborados(diasTrabajados.intValue());
-			nomina.setDiasPagados(diasPagados.setScale(2, BigDecimal.ROUND_HALF_UP));
-			nomina.setDiasNoLaborados(ausencias.intValue());
+//			nomina.setFechaEmision(new Date());
+//			nomina.setClaveExportacion("01");
+//			nomina.setTipoComprobante("N");
+//			nomina.setMoneda("MXN");
+//			nomina.setMetodoPago(this.parametros.getMetodoPago());
+//			nomina.setSerie(String.format("%d", this.parametros.getAnio()));
+//			nomina.setFolio(String.format("%d", this.parametros.getPeriodo()));
+//			nomina.setLugarExpedicion(this.empleado.getDatoEmpresa().getEmpresa().getCodigoPostal());
+//			nomina.setEjercicio(DateUtil.getAnio(this.fechaInicioAnio));
+			nomina.setDiasPagados(diasPagados);
 			//TODO Revisar los días no laborados.
 //			nomina.setDiasNoLaborados(diasLaboralesPeriodo.subtract(diasTrabajados).intValue());
-			nomina.setPeriodo(this.parametros.getSemanaAnio());
-			nomina.setPeriodoInicio(this.periodoInicio.toInstant().atZone(ZoneId.of("GMT-6")).toLocalDate());
-			nomina.setPeriodoFin(this.periodoFin.toInstant().atZone(ZoneId.of("GMT-6")).toLocalDate());
+//			nomina.setPeriodo(this.parametros.getPeriodo());
+//			nomina.setPeriodoInicio(this.periodoInicio.toInstant().atZone(ZoneId.of("GMT-6")).toLocalDate());
+//			nomina.setPeriodoFin(this.periodoFin.toInstant().atZone(ZoneId.of("GMT-6")).toLocalDate());
 			
 			
-			DetNominaEmisor emisor = getEmisor(nomina, this.empleado.getDatoEmpresa().getEmpresa());
-			log.info("Emisor: {}", emisor.getNombre());
+			log.info("Emisor: {}", nomina.getEmisor().getNombre());
 			
 		} catch(Exception ex) {
-			log.error("Problema para obtener el cálculo de la nómina del empleado {} {} {}", empleado.getNombre(), empleado.getPrimerAp(), empleado.getSegundoAp() );
-			log.error(ex);
+			log.error("Problema para obtener el cálculo de la nómina del empleado {} {} {}... {}", empleado.getNombre(), empleado.getPrimerAp(), empleado.getSegundoAp(), ex);
+			log.error("", ex);
 		} finally {
 			log.info("-----------------------------------------------------------------------------");
 		}
 		
 		return nomina;
+	}
+	
+	public static AbstractPBL getPercepcionBusinessLogic(ParametrosNomina parametros, DetNomina nomina, String clavePercepcion) {
+		AbstractPBL percepcionBO = null;
+		
+		switch (clavePercepcion) {
+		case AbstractPBL.CVE_PRIMA_VACACIONES_EN_TIEMPO:
+				percepcionBO = new PrimaVacacionalEnTiempoPBL(parametros, nomina);
+				break;
+				
+			case AbstractPBL.CVE_VACACIONES_REPORTADAS:
+				percepcionBO = new VacacionesReportadasPBL(parametros, nomina);
+				break;
+				
+			case AbstractPBL.CVE_PRIMA_VACACIONES_REPORTADAS:
+				percepcionBO = new PrimaVacacionalReportadasPBL(parametros, nomina);
+				break;
+			
+			case AbstractPBL.CVE_AGUINALDO:
+				percepcionBO = new AguinaldoPBL(parametros, nomina);
+				break;
+				
+			case AbstractPBL.CVE_SUELDO:
+				percepcionBO = new SueldoPBL(parametros, nomina);
+				break;
+				
+			default:
+				log.info("[UI] La percepción solicitada no está considerada para la nómina extraordinaria o no está implementada.");
+				throw new UnsupportedOperationException("La percepción no está implementada.");
+		}
+		log.info("[UI] Tipo Percepcion (SAT): {} - {}", clavePercepcion, percepcionBO.getTipoPercepcion(clavePercepcion));
+		
+		return percepcionBO;
 	}
 	
 	public static List<String> getDiasLaboralesPorSemana(DetEmpleado empleado) throws SGPException {
@@ -277,32 +314,58 @@ public class NominaSemanalBL extends NominaBL {
 	 * @param nomina
 	 * @param parametros
 	 * @param diasTrabajados
+	 * @param diasVacaciones TODO
 	 */
-	public static synchronized void calcularSueldo(DetNomina nomina, ParametrosNomina parametros, BigDecimal diasLaborales, BigDecimal diasNoLaborales, BigDecimal diasTrabajados) {
-		SueldoPercepcion     sueldoBO = null;
-		SeptimoDiaPercepcion septimoDiaBO = null;
+	public static synchronized void calcularSueldo(DetNomina nomina, ParametrosNomina parametros, BigDecimal diasLaborales, BigDecimal diasNoLaborales, BigDecimal diasTrabajados, BigDecimal diasVacaciones)
+	throws SGPException {
+		DetNominaPercepcion  sueldo       = null;
+		DetNominaPercepcion  vacaciones   = null;
+		AbstractPBL          sueldoBO     = null;
+		AbstractPBL          vacacionesBO = null;
+		AbstractPBL          septimoDiaBO = null;
 		
-		sueldoBO = new SueldoPercepcion(parametros, diasTrabajados);
-		sueldoBO.calcular(nomina);
-		log.info("Asistencia: {} días, Descanso: {} días", diasTrabajados, diasNoLaborales);
+		log.info("Asistencia: {} días, Vacaciones: {}, Descanso: {} días", diasTrabajados, diasVacaciones, diasNoLaborales);
+		
+		//Eliminar cualquier percepción de tipo "Vacaciones" de la lista de percepciones.
+		boolean removedPercepciones = nomina.getPercepciones().removeIf(d -> AbstractPBL.CVE_VACACIONES_EN_TIEMPO.equalsIgnoreCase(d.getClave()));
+		if(removedPercepciones)
+			log.info("Se encontraron conceptos {}, los cuales fueron eliminados para el reproceso de SUELDO.", AbstractPBL.CVE_SUELDO);
+		
+		
+		removedPercepciones = nomina.getPercepciones().removeIf(d -> AbstractPBL.CVE_SUELDO.equalsIgnoreCase(d.getClave()));
+		if(removedPercepciones)
+			log.info("Se encontraron conceptos {}, los cuales fueron eliminados para el reproceso de SUELDO.", AbstractPBL.CVE_SUELDO);
+		
+		sueldoBO = getPercepcionBusinessLogic(parametros, nomina, AbstractPBL.CVE_SUELDO);
+		sueldo = sueldoBO.procesar(nomina);
+		if(sueldo.getImporteExento().add(sueldo.getImporteGravado()).compareTo(ValoresBD._CERO.get()) > 0);
+			nomina.getPercepciones().add(sueldo);
+		
+		vacacionesBO = new VacacionesPBL(parametros, nomina, diasVacaciones);
+		vacaciones = vacacionesBO.procesar(nomina);
+		
+		if(vacaciones.getImporteExento().add(vacaciones.getImporteGravado()).compareTo(ValoresBD._CERO.get()) > 0)
+			nomina.getPercepciones().add(vacaciones);
+		
 		//Para el séptimo día, se considera el salario diario (sin SDI), dividiendolo entre los días de la semana que se deben laborar,
 		//multiplicado por los días que si laboró el trabajador (parte proporcional de los días trabajados).
-		septimoDiaBO = new SeptimoDiaPercepcion(parametros, diasLaborales, diasNoLaborales, diasTrabajados);
-		septimoDiaBO.calcular(nomina);
+		septimoDiaBO = new SeptimoDiaPBL(parametros, nomina, diasLaborales, diasNoLaborales, diasTrabajados, diasVacaciones);
+		septimoDiaBO.procesar(nomina);
 	}
 	
 	private static void calcularBonoPuntualidad(DetNomina nomina, ParametrosNomina parametros, List<DetPercepcionEmpleado> percepcionesEmpleado, Map<String, DetRegistro> mapAsistencias, Boolean procesarRetardos, BigDecimal diasLaborales, BigDecimal diasNoLaborales, BigDecimal diasTrabajados) {
-		BonoPuntualidadPercepcion bonoPuntualidadBO      = null;
+		BonoPuntualidadPBL        bonoPuntualidadBO      = null;
 		BigDecimal                tasaBonoPuntualidad    = null;
 		BigDecimal                salarioDiarioIntegrado = null;
 		BigDecimal                proporcionalSeptimoDia = null;
 		List<DetNominaPercepcion> percepciones           = null;
+		DetNominaPercepcion       percepcion             = null;
 		
 		percepciones = nomina.getPercepciones();
 		salarioDiarioIntegrado = nomina.getReceptor().getSalarioDiarioIntegrado();
 		
 		Optional<DetPercepcionEmpleado> optPercepcion010 = percepcionesEmpleado.stream()
-				.filter(p -> p.getTipoPercepcion().getClave().equalsIgnoreCase(AbstractPercepcion.CVE_BONO_PUNTUALIDAD))
+				.filter(p -> p.getTipoPercepcion().getClave().equalsIgnoreCase(AbstractPBL.CVE_BONO_PUNTUALIDAD))
 				.findFirst()
 				;
 		
@@ -311,19 +374,25 @@ public class NominaSemanalBL extends NominaBL {
 		}
 		
 		Optional<DetNominaPercepcion> optSeptimoDia = percepciones.stream()
-				.filter(p -> AbstractPercepcion.CVE_SEPTIMO_DIA.equalsIgnoreCase(p.getClave()))
+				.filter(p -> AbstractPBL.CVE_SEPTIMO_DIA.equalsIgnoreCase(p.getClave()))
 				.findFirst()
 				;
 		
-		proporcionalSeptimoDia = optSeptimoDia.isPresent() ? optSeptimoDia.get().getCantidad() : BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
-		
-		tasaBonoPuntualidad = parametros.getParametrosPercepciones().getBonoPuntualidad();
-		bonoPuntualidadBO = new BonoPuntualidadPercepcion(
-				parametros.getTiposPercepcion(), tasaBonoPuntualidad, mapAsistencias, diasLaborales, diasNoLaborales,
-				diasTrabajados, salarioDiarioIntegrado, proporcionalSeptimoDia);
-		bonoPuntualidadBO.setProcesaRetardos(procesarRetardos);
-		bonoPuntualidadBO.setPercepcionesEmpleado(percepcionesEmpleado);
-		bonoPuntualidadBO.calcular(nomina);
+		try {
+			proporcionalSeptimoDia = optSeptimoDia.isPresent() ? optSeptimoDia.get().getCantidad() : ValoresBD._CERO.get();
+			tasaBonoPuntualidad = parametros.getBonoPuntualidad();
+			bonoPuntualidadBO = new BonoPuntualidadPBL(
+					parametros, nomina, tasaBonoPuntualidad, mapAsistencias, diasLaborales,
+					diasNoLaborales, diasTrabajados, salarioDiarioIntegrado, proporcionalSeptimoDia);
+			bonoPuntualidadBO.setProcesaRetardos(procesarRetardos);
+			bonoPuntualidadBO.setPercepcionesEmpleado(percepcionesEmpleado);
+			percepcion = bonoPuntualidadBO.procesar(nomina);
+			
+			if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(ValoresBD._CERO.get()) > 0)
+				nomina.getPercepciones().add(percepcion);
+		} catch(SGPException ex) {
+			log.warn("BONO DE PUNTUALIDAD: {}", ex.getMessage());
+		}
 	}
 	
 	/**Preparación para el cálculo de vales de despensa. Depende de Sueldo y Septimo Día. Ambos se debe encontrar en el parámetro "nomina"
@@ -331,13 +400,15 @@ public class NominaSemanalBL extends NominaBL {
 	 * @param parametros Parametros de nómina (Tipos de percepciones, deducciones, etc).
 	 * @param percepcionesEmpleado Lista de percepciones que se aplicarán al empleado y las restricciones que están configuradas desde el registro de empleados.
 	 */
-	private static void calcularValesDespensa(DetNomina nomina, ParametrosNomina parametros, List<DetPercepcionEmpleado> percepcionesEmpleado) {
-		ValesDespensaPercepcion   valesDespensaBO = null;
+	private static void calcularValesDespensa(DetNomina nomina, ParametrosNomina parametros, List<DetPercepcionEmpleado> percepcionesEmpleado)
+	throws SGPException {
+		DetNominaPercepcion       percepcion = null;
+		ValesDespensaPBL          valesDespensaBO = null;
 		List<DetNominaPercepcion> percepciones = null;
 		BigDecimal                diasTrabajados = null;
 		BigDecimal                diasPeriodo = null;
 		
-		diasPeriodo = new BigDecimal(DateUtil.daysDiff(parametros.getPeriodoInicio(), parametros.getPeriodoFin())).setScale(2, BigDecimal.ROUND_HALF_UP);
+		diasPeriodo = new BigDecimal(DateUtil.daysDiff(parametros.getPeriodoInicio(), parametros.getPeriodoFin())).setScale(2, RoundingMode.HALF_UP);
 		
 		percepciones = nomina.getPercepciones();
 		
@@ -351,16 +422,38 @@ public class NominaSemanalBL extends NominaBL {
 		}
 		
 		Optional<DetNominaPercepcion> optSueldo = percepciones.stream()
-				.filter(p -> AbstractPercepcion.CVE_SUELDO.equalsIgnoreCase(p.getClave()))
+				.filter(p -> AbstractPBL.CVE_SUELDO.equalsIgnoreCase(p.getClave()))
 				.findFirst()
 				;
 		
-		diasTrabajados = optSueldo.isPresent() ? optSueldo.get().getCantidad() : BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+		diasTrabajados = optSueldo.isPresent() ? optSueldo.get().getCantidad() : ValoresBD._CERO.get();
 		
-		valesDespensaBO = new ValesDespensaPercepcion(parametros.getTiposPercepcion(), diasTrabajados, parametros.getUma().getImporteDiario(), parametros.getParametrosPercepciones().getValeDespensa(), diasPeriodo);
+		valesDespensaBO = new ValesDespensaPBL(parametros, nomina, diasTrabajados, parametros.getUma().getImporteDiario(), parametros.getValeDespensa(), diasPeriodo);
 		valesDespensaBO.setPercepcionesEmpleado(percepcionesEmpleado);
-		valesDespensaBO.calcular(nomina);
+		percepcion = valesDespensaBO.procesar(nomina);
 		
+		if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(ValoresBD._CERO.get()) > 0)
+			nomina.getPercepciones().add(percepcion);
+	}
+	
+	public void calcular(DetNomina nomina, String clavePercepcion, BigDecimal cantidad)
+	throws SGPException {
+		AbstractPBL percepcionBO = null;
+		DetNominaPercepcion nuevaPercepcion = null;
+		
+		try {
+			log.info("[UI] Recalculando para el empleado {}", nomina.getReceptor().getNombre());
+			percepcionBO = NominaSemanalBL.getPercepcionBusinessLogic(parametros, nomina, clavePercepcion);
+			nuevaPercepcion = percepcionBO.procesar(nomina, cantidad);
+			agregarPercepcion(nomina, nuevaPercepcion);
+		} catch(UnsupportedOperationException ex) {
+			throw new SGPException("El cálculo de la percepción no está implementado para la nómina extraordinaria");
+		} catch(Exception ex) {
+			log.error("Problema para calcular la percepcion: {}", clavePercepcion);
+		} finally {
+			procesarISR(parametros, nomina);
+			calcularTotales(nomina, parametros);
+		}
 	}
 	
 	public static synchronized Boolean esUltimaSemanaMes(Date periodoInicio, Date periodoFin) {
@@ -377,7 +470,7 @@ public class NominaSemanalBL extends NominaBL {
 			//PRIMERO SE VERIFICA SI EL INICIO DE LA SEMANA COINCIDE CON EL PRIMER DIA DEL MES. 
 			diaInicioMes = DateUtil.getDia(periodoInicio);
 			
-			if(diaInicioMes.compareTo(new Integer(1)) == 0)
+			if(diaInicioMes.compareTo(Integer.valueOf(1)) == 0)
 				throw new SGPException("La semana en curso es la primera del mes.");
 			
 			//SI NO, SE VERIFICA SI EL MES DEL PRIMER DIA DE LA SEMANA EN CURSO ES DIFERENTE AL MES DEL ÚLTIMO DIA DE LA SEMANA EN CURSO.
@@ -396,24 +489,26 @@ public class NominaSemanalBL extends NominaBL {
 			mesSiguienteFin = DateUtil.getMes(periodoSiguienteFin);
 			
 			if(mesSiguienteInicio.compareTo(mesSiguienteFin) != 0) {
-				ultimaSemanaMes = new Boolean(true);
+				ultimaSemanaMes = Boolean.TRUE;
 				log.info("ULTIMA SEMANA DEL MES: {} - {}", periodoInicio, periodoFin);
 			} else {
-				ultimaSemanaMes = new Boolean(false);
+				ultimaSemanaMes = Boolean.FALSE;
 			}
 			
 		} catch(Exception ex) {
-			ultimaSemanaMes = new Boolean(false);
+			ultimaSemanaMes = Boolean.FALSE;
 		}
 		
 		return ultimaSemanaMes;
 	}
 	
-	public static List<DetNomina> procesaNominaDelMes(Date periodoInicio, String rfc) {
-		List<DetNomina> listaNominaDelMes = null;
-		Date dPeriodoInicio = new Date(periodoInicio.getTime());
-		Date dPeriodoAnteriorFin = null;
+	public static List<DetNomina> procesaNominaDelMes(ParametrosNomina parametros, Date periodoInicio, String rfc) {
+		List<DetNomina> listaNominaDelMes = new ArrayList<DetNomina>();
+		List<DetNomina> listaNominaSemanal = null;
+		List<DetNomina> listaNominaExtraordinaria = null;
+		Date dPeriodoInicio         = new Date(parametros.getPeriodoInicio().getTime());
 		Date dPeriodoAnteriorInicio = null;
+		Date dPeriodoAnteriorFin    = null;
 		
 		Integer mesActual = null;
 		Integer mesAnterior = null;
@@ -452,20 +547,34 @@ public class NominaSemanalBL extends NominaBL {
 		
 		log.info("Búsqueda de la semana {} a {}", semanaInicio, semanaFin);
 		
-		listaNominaDelMes = nominaDAO.buscarPorSemanaRfc(semanaInicio, semanaFin, rfc);
+		listaNominaSemanal = nominaDAO.buscarNominasDelMesPorNumeroPeriodo(TP_NOMINA_ORDINARIA, parametros.getPeriodicidad().getPeriodicidad(), parametros.getAnio(), semanaInicio, semanaFin, rfc);
+		listaNominaDelMes.addAll(listaNominaSemanal);
+		
+		listaNominaExtraordinaria = nominaDAO.buscarNominasDelMesPorFechaPeriodo(TP_NOMINA_EXTRAORDINARIA, "99", parametros.getAnio(), DateUtil.toLocalDate(dPeriodoAnteriorInicio), DateUtil.toLocalDate(dPeriodoAnteriorFin), rfc);
+		listaNominaDelMes.addAll(listaNominaExtraordinaria);
 		
 		return listaNominaDelMes;
 	}
 	
 	public static Map<String, DetRegistro> getAsistencias(DetEmpleado empleado, ParametrosNomina parametros) {
-		Map<String, DetRegistro> mapAsistencias = null;
-		List<DetRegistro> listaAsistencias = null;
-		RegistroDAO registroDAO = null;
-		String diaSemana = null;
-		Date diaNLEntrada = null;
-		Date diaNLSalida = null;
+		Map<String, DetRegistro> mapAsistencias   = null;
+		List<DetRegistro>        listaAsistencias = null;
+		List<CatEstatusRegistro> statusRegistros  = null;
 		
-		mapAsistencias = new HashMap<String, DetRegistro>();
+		RegistroDAO              registroDAO      = null;
+		String                   diaSemana        = null;
+		Date                     diaNLEntrada     = null;
+		Date                     diaNLSalida      = null;
+		CatEstatusRegistro       statusDescanso   = null;
+		
+		statusRegistros = parametros.getStatusRegistros();
+		
+		statusDescanso = statusRegistros.stream()
+				.filter(s -> "D".equalsIgnoreCase(s.getCodigo()))
+				.findFirst()
+				.get();
+		
+		mapAsistencias = new LinkedHashMap<String, DetRegistro>();
 		registroDAO = new RegistroDAO();
 		listaAsistencias = registroDAO.buscar(empleado.getIdEmpleado(), parametros.getPeriodoInicio(), parametros.getPeriodoFin());
 		for(DetRegistro registro : listaAsistencias) {
@@ -475,6 +584,8 @@ public class NominaSemanalBL extends NominaBL {
 			mapAsistencias.put(diaSemana, registro);
 		}
 		
+		
+		//Revisión de días no laborables.
 		for(CatDiaNoLaboral dia : parametros.getDiasNoLaborales()) {
 			log.info("Dia no laboral encontrado: {}", dia);
 			diaSemana = DateUtil.getDiaSemana(dia.getFecha());
@@ -486,7 +597,7 @@ public class NominaSemanalBL extends NominaBL {
 			diaNLEntrada = new Date(dia.getFecha().getTime());
 			diaNLSalida = new Date(dia.getFecha().getTime());
 			
-			mapAsistencias.put(diaSemana, new DetRegistro(null, diaNLEntrada, diaNLSalida, -1, "DIA NO LABORAL"));
+			mapAsistencias.put(diaSemana, new DetRegistro(null, diaNLEntrada, diaNLSalida, statusDescanso));
 		}
 		
 		log.info("Mapa de asistencias: {}", mapAsistencias);
@@ -507,7 +618,7 @@ public class NominaSemanalBL extends NominaBL {
 	 */
 	private BigDecimal getDiasTrabajados(List<String> listaDiasLaboralesEmpleado, Map<String, DetRegistro> mapAsistencias, ParametrosNomina parametros) {
 		BigDecimal  diasTrabajados        = null;
-		Integer     iDias                 = new Integer(0);
+		Integer     iDias                 = Integer.valueOf(0);
 		DetRegistro registro              = null;
 		for(String sDia : listaDiasLaboralesEmpleado) {
 			registro = mapAsistencias.get(sDia);
@@ -515,12 +626,39 @@ public class NominaSemanalBL extends NominaBL {
 			if(registro == null)
 				continue;
 			
+			if(        "T".equalsIgnoreCase(registro.getIdEstatus().getCodigo()) == true //Asistencia "En tiempo"
+					|| "R".equalsIgnoreCase(registro.getIdEstatus().getCodigo()) == true //Asistencia con "Retardo"
+					|| "J".equalsIgnoreCase(registro.getIdEstatus().getCodigo()) == true //Asistencia con ausencia "Justificada"
+					|| "D".equalsIgnoreCase(registro.getIdEstatus().getCodigo()) == true //Día de descanso.
+			)
+				iDias++;
+		}
+		
+		diasTrabajados = new BigDecimal(iDias).setScale(2, RoundingMode.HALF_UP);
+		
+		return diasTrabajados;
+	}
+	
+	private BigDecimal getDiasVacaciones(List<String> listaDiasLaboralesEmpleado, Map<String, DetRegistro> mapAsistencias, ParametrosNomina parametros) {
+		BigDecimal  diasVacaciones = null;
+		Integer     iDias          = Integer.valueOf(0);
+		DetRegistro registro       = null;
+		
+		for(String sDia : listaDiasLaboralesEmpleado) {
+			registro = mapAsistencias.get(sDia);
+			
+			if(registro == null)
+				continue;
+			
+			if("V".equalsIgnoreCase(registro.getIdEstatus().getCodigo()) == false)
+				continue;
+			
 			iDias++;
 		}
 		
-		diasTrabajados = new BigDecimal(iDias).setScale(2, BigDecimal.ROUND_HALF_UP);
+		diasVacaciones = new BigDecimal(iDias).setScale(2, RoundingMode.HALF_UP);
 		
-		return diasTrabajados;
+		return diasVacaciones;
 	}
 	
 	private BigDecimal getAusencias(List<String> listaDiasLaboralesEmpleado, Map<String, DetRegistro> mapAsistencias, ParametrosNomina parametros) {
@@ -541,7 +679,7 @@ public class NominaSemanalBL extends NominaBL {
 			iAusencias--;
 		}
 		
-		ausencias = new BigDecimal(iAusencias).setScale(2, BigDecimal.ROUND_HALF_UP);
+		ausencias = new BigDecimal(iAusencias).setScale(2, RoundingMode.HALF_UP);
 		
 		return ausencias;
 	}
@@ -552,43 +690,53 @@ public class NominaSemanalBL extends NominaBL {
 	 * @return
 	 */
 	private BigDecimal getIncapacidades(Map<String, DetRegistro> mapAsistencias, BigDecimal diasLaboralesPorPeriodo) {
-		return BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
+		return ValoresBD._CERO.get();
 	}
 	
-	public static synchronized void procesarISR(DetNomina nomina, ParametrosNomina parametros) {
+	public static synchronized void procesarISR(ParametrosNomina parametros, DetNomina nomina) {
 		Boolean esUltimaSemanaMes = false;
 		List<DetNomina> nominaMensual = null;
 		
 		esUltimaSemanaMes = NominaSemanalBL.esUltimaSemanaMes(parametros.getPeriodoInicio(), parametros.getPeriodoFin());
+		
 		if(esUltimaSemanaMes)
-			nominaMensual = NominaSemanalBL.procesaNominaDelMes(parametros.getPeriodoInicio(), nomina.getReceptor().getRfc());
+			nominaMensual = NominaSemanalBL.procesaNominaDelMes(parametros, parametros.getPeriodoInicio(), nomina.getReceptor().getRfc());
 		
 		log.info("Procesando cálculo de ISR...");
 		//Primero se debe buscar en "nomina" si ya existen registros de ISR y Subsidio al salario y eliminarlos.
 		List<DetNominaDeduccion> deducciones = nomina.getDeducciones();
-		boolean removedDeducciones = deducciones.removeIf(d -> AbstractDeduccion.D_ISR.equalsIgnoreCase(d.getTipoDeduccion().getClave()));
+		boolean removedDeducciones = deducciones.removeIf(d -> AbstractDBL.TD_ISR.equalsIgnoreCase(d.getTipoDeduccion().getClave()));
 		if(removedDeducciones)
-			log.info("Se encontraron conceptos {}, los cuales fueron eliminados para el reproceso de ISR", AbstractDeduccion.D_ISR);
+			log.info("Se encontraron conceptos {}, los cuales fueron eliminados para el reproceso de ISR", AbstractDBL.TD_ISR);
+		
+		removedDeducciones = deducciones.removeIf(d -> AbstractDBL.TD_AJUSTE_AL_SUBSIDIO.equalsIgnoreCase(d.getTipoDeduccion().getClave()));
+		if(removedDeducciones)
+			log.info("Se encontraron conceptos {}, los cuales fueron eliminados para el reproceso de ISR", AbstractDBL.TD_AJUSTE_AL_SUBSIDIO);
 		
 		List<DetNominaOtroPago> otrosPagos = nomina.getOtrosPagos();
 		boolean removedOtrosPagos = otrosPagos.removeIf(o -> AbstractOtroPago.OP_SUBSIDIO_AL_SALARIO.equalsIgnoreCase(o.getTipoOtroPago().getClave()));
 		if(removedOtrosPagos)
 			log.info("Se encontraron conceptos {}, los cuales fueron eliminados para el reproceso de Subsidio al empleo.", AbstractOtroPago.OP_SUBSIDIO_AL_SALARIO);
 		
-		ISRExecutor isrExecutor = new ISRExecutor(parametros.getPeriodoInicio(), parametros.getPeriodoFin(), parametros.getTiposDeduccion(), parametros.getTiposOtroPago(), parametros.getTablaISR(), nominaMensual);
+		removedOtrosPagos = otrosPagos.removeIf(o -> AbstractOtroPago.OP_ISR_AJUSTADO_POR_SUBSIDIO.equalsIgnoreCase(o.getTipoOtroPago().getClave()));
+		if(removedOtrosPagos)
+			log.info("Se encontraron conceptos {}, los cuales fueron eliminados para el reproceso de Subsidio al empleo.", AbstractOtroPago.OP_ISR_AJUSTADO_POR_SUBSIDIO);
+		
+		ISRExecutor isrExecutor = new ISRExecutor(parametros, nominaMensual);
 		IDeducciones isrBO = isrExecutor.loadClass("ISRS", DateUtil.toLocalDate(parametros.getPeriodoFin()));
 		isrBO.procesar(nomina);
+		
 	}
 	
 	private static void procesarIMSS(DetNomina nomina, ParametrosNomina parametros, BigDecimal diasTrabajados, BigDecimal ausencias, BigDecimal incapacidades) {
-		IMSSDeduccion imssBO = null;
-		imssBO = new IMSSDeduccion(parametros, diasTrabajados, ausencias, incapacidades);
+		IMSSDeduccionesBL imssBO = null;
+		imssBO = new IMSSDeduccionesBL(parametros, diasTrabajados, ausencias, incapacidades);
 		imssBO.procesar(nomina);
 	}
 	
 	private static void procesarPrestamos(DetNomina nomina, ParametrosNomina parametros, DetEmpleado empleado) {
-		PrestamoDeduccion prestamosBO = null;
-		prestamosBO = new PrestamoDeduccion(empleado);
+		PrestamoDBL prestamosBO = null;
+		prestamosBO = new PrestamoDBL(empleado);
 		prestamosBO.setFecha(parametros.getPeriodoFin());
 		prestamosBO.procesar(nomina);
 	}
@@ -599,14 +747,6 @@ public class NominaSemanalBL extends NominaBL {
 
 	public void setEmpleado(DetEmpleado empleado) {
 		this.empleado = empleado;
-	}
-
-	public BigDecimal getValesDespensa() {
-		return valesDespensa;
-	}
-
-	public void setValesDespensa(BigDecimal valesDespensa) {
-		this.valesDespensa = valesDespensa;
 	}
 
 	public Date getPeriodoInicio() {

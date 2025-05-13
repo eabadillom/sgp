@@ -61,7 +61,7 @@ public abstract class BaseDAO<MODEL, PK> {
 		} catch(Exception ex) {
 			rollback(em);
 			log.error("Problema para guardar el objeto: " + model, ex);
-                        throw new SGPException("Error al guardar en la base de datos.");
+			throw new SGPException("Error al guardar en la base de datos.");
 		} finally {
 			close(em);
 		}
@@ -79,7 +79,7 @@ public abstract class BaseDAO<MODEL, PK> {
 		} catch(Exception ex) {
 			rollback(em);
 			log.error("Problema para actualizar el objeto: " + model, ex);
-                        throw new SGPException("Error al actualizar en la base de datos.");
+			throw new SGPException("Error al actualizar en la base de datos.");
 		} finally {
 			close(em);
 		}

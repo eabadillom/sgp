@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
 import org.apache.logging.log4j.LogManager;
@@ -14,7 +15,7 @@ import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.model.DetVacaciones;
 import mx.com.ferbo.util.SGPException;
 
-public class VacacionesDAO extends BaseDAO {
+public class VacacionesDAO extends BaseDAO<DetVacaciones, Integer> {
     
     private static Logger log = LogManager.getLogger(VacacionesDAO.class);
     
@@ -26,30 +27,6 @@ public class VacacionesDAO extends BaseDAO {
         super(DetVacaciones.class);
     }
     
-    public synchronized DetVacaciones buscarPorId(Integer id) throws SGPException{
-        DetVacaciones vacaciones = null;
-        EntityManager em = null;
-        
-        try{
-            log.info("Inicia el proceso de obtener las vaciones por id");
-            em = super.getEntityManager();
-            em.getTransaction().begin();
-            vacaciones = em.find(DetVacaciones.class, id);
-            em.getTransaction().commit();
-            log.info("Finaliza el proceso de obtener las vacaciones por id");
-        }
-        catch(Exception ex){
-            log.warn("Hubo algn probleman al obtener las vacaciones por id: {}", ex);
-            super.rollback(em);
-            throw new SGPException("Hubo algun problema al obtener las vacaciones");
-        }
-        finally{
-            super.close(em);
-        }
-        
-        return vacaciones;
-    }
-    
     public synchronized List<DetVacaciones> obtenerTodos() throws SGPException{
         List<DetVacaciones> todasvacaciones = null;
         EntityManager  em = null;
@@ -58,7 +35,7 @@ public class VacacionesDAO extends BaseDAO {
             log.info("Inicia el proceso de obtener todas las vacaciones del empleado");
             em = super.getEntityManager();
             em.getTransaction().begin();
-            TypedQuery resultado = em.createQuery("select e from DetVacaciones e", DetVacaciones.class);
+            TypedQuery<DetVacaciones> resultado = em.createQuery("select e from DetVacaciones e", DetVacaciones.class);
             todasvacaciones = resultado.getResultList();
             log.info("Finaliza el proceso de obtener todas las vacaciones del empleado");
         }
@@ -101,7 +78,7 @@ public class VacacionesDAO extends BaseDAO {
         try{
             log.info("Inicia el proceso para obtener los periodos vacacionales en base a una fecha.");
             em = getEntityManager();
-            TypedQuery query = em.createQuery("select v from DetVacaciones v where v.empleado.idEmpleado = :idEmpleado and v.fechafin < :fechaSeleccionada", DetVacaciones.class);
+            TypedQuery<DetVacaciones> query = em.createQuery("select v from DetVacaciones v where v.empleado.idEmpleado = :idEmpleado and v.fechaFin < :fechaSeleccionada", DetVacaciones.class);
             query.setParameter("idEmpleado", idEmpleado);
             query.setParameter("fechaSeleccionada", fechaSeleccionada);
             periodos = query.getResultList();
@@ -117,5 +94,81 @@ public class VacacionesDAO extends BaseDAO {
         }
         
         return periodos;
+    }
+    
+    public DetVacaciones obtenerPorRfcFecha(String rfc, Date fecha) {
+    	DetVacaciones model = null;
+    	EntityManager em = null;
+    	String sql = null;
+    	
+    	try {
+    		sql = "select * from det_vacaciones dv\n"
+    				+ "inner join\n"
+    				+ "(\n"
+    				+ "	select\n"
+    				+ "		v.id_empleado,\n"
+    				+ "		max(v.fh_fin) as fh_fin\n"
+    				+ "	from det_vacaciones v\n"
+    				+ "	inner join det_empleado e\n"
+    				+ "		on v.id_empleado = e.id_empleado\n"
+    				+ "	inner join inf_empleado_empresa ee\n"
+    				+ "		on e.id_empleado_empresa = ee.id_empleado_empresa\n"
+    				+ "	where (v.nu_dias_totales - v.nu_dias_tomados) > 0\n"
+    				+ "		and ee.nb_rfc = :rfc\n"
+    				+ "		and v.fh_fin < :fecha\n"
+    				+ "	group by id_empleado\n"
+    				+ ") t on dv.id_empleado = t.id_empleado and dv.fh_fin = t.fh_fin\n"
+    				;
+    		
+    		em = this.getEntityManager();
+    		model = (DetVacaciones) em.createNativeQuery(sql, DetVacaciones.class)
+    				.setParameter("rfc", rfc)
+    				.setParameter("fecha", fecha)
+    				.getSingleResult()
+    				;
+    	} catch(NoResultException ex) {
+    		log.warn("No se encontró información para la consulta: {}", ex.getMessage());
+    	}catch(Exception ex) {
+    		log.error("Problema para obtener la lista de periodos vacacionales...", ex);
+    	} finally {
+    		this.close(em);
+    	}
+    	
+    	return model;
+    }
+    
+    @SuppressWarnings("unchecked")
+	public List<DetVacaciones> buscarReportadasPorRfcFecha(String rfc, Date fecha) {
+    	List<DetVacaciones> modelList = null;
+    	EntityManager em = null;
+    	String sql = null;
+    	
+    	try {
+    		sql = "select\n"
+    				+ "	*\n"
+    				+ "from det_vacaciones v\n"
+    				+ "inner join det_empleado e\n"
+    				+ "	on v.id_empleado = e.id_empleado\n"
+    				+ "inner join inf_empleado_empresa ee\n"
+    				+ "	on e.id_empleado_empresa = ee.id_empleado_empresa\n"
+    				+ "where (v.nu_dias_totales - v.nu_dias_tomados) > 0\n"
+    				+ "	and ee.nb_rfc = :rfc\n"
+    				+ "	and v.fh_fin < :fecha\n"
+    				;
+    		
+    		em = this.getEntityManager();
+    		modelList = (List<DetVacaciones>) em.createNativeQuery(sql, modelClass)
+    				.setParameter("rfc", rfc)
+    				.setParameter("fecha", fecha)
+    				.getResultList()
+    				;
+    		
+    	} catch(Exception ex) {
+    		log.error("Problema para obtener la lista de periodos vacacionales...", ex);
+    	} finally {
+    		this.close(em);
+    	}
+    	
+    	return modelList;
     }
 }

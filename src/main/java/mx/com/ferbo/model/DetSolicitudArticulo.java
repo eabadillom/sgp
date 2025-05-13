@@ -27,39 +27,50 @@ import javax.persistence.TemporalType;
 @Table(name = "det_solicitud_articulo")
 @NamedQueries({
     @NamedQuery(name = "DetSolicitudArticulo.findAll", query = "SELECT d FROM DetSolicitudArticulo d"),
-    @NamedQuery(name = "DetSolicitudArticulo.findArticulosIdEmpleado", query = "SELECT dsa FROM DetSolicitudArticulo dsa INNER JOIN dsa.idEmpleadoSol e INNER JOIN dsa.idArticulo a WHERE e.idEmpleado = :numEmpl")
+    @NamedQuery(name = "DetSolicitudArticulo.findArticulosIdEmpleado", query = "SELECT dsa FROM DetSolicitudArticulo dsa INNER JOIN dsa.empleadoSol e INNER JOIN dsa.articulo a WHERE e.idEmpleado = :numEmpl")
 })
 public class DetSolicitudArticulo implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id_solicitud")
     private Integer idSolicitud;
+    
     @Basic(optional = false)
     @Column(name = "cantidad")
     private Integer cantidad;
-    @Column(name = "aprobada")
-    private Short aprobada;
+    
+    @JoinColumn(name = "aprobada", referencedColumnName = "cd_st_solicitud")
+    @ManyToOne()
+    private CatEstatusSolicitud estatus;
+    
     @Basic(optional = false)
     @Column(name = "fecha_cap")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaCap;
+    
     @Column(name = "fecha_mod")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaMod;
-    @OneToMany(mappedBy = "idSolArticulo")
+    
+    @OneToMany(mappedBy = "solArticulo")
     private List<DetIncidencia> detIncidenciaList;
+    
     @JoinColumn(name = "id_articulo", referencedColumnName = "id_articulo")
     @ManyToOne(optional = false)
-    private CatArticulo idArticulo;
+    private CatArticulo articulo;
+    
     @JoinColumn(name = "id_empleado_sol", referencedColumnName = "id_empleado")
     @ManyToOne(optional = false)
-    private DetEmpleado idEmpleadoSol;
+    private DetEmpleado empleadoSol;
+    
     @JoinColumn(name = "id_empleado_rev", referencedColumnName = "id_empleado")
     @ManyToOne
-    private DetEmpleado idEmpleadoRev;
+    private DetEmpleado empleadoRev;
+    
     @Column(name = "descripcion_rechazo")
     private String descripcionRechazo;
 
@@ -92,14 +103,13 @@ public class DetSolicitudArticulo implements Serializable {
         this.cantidad = cantidad;
     }
 
-    public Short getAprobada() {
-        return aprobada;
+    public CatEstatusSolicitud getEstatus() {
+        return estatus;
     }
 
-    public void setAprobada(Short aprobada) {
-        this.aprobada = aprobada;
+    public void setEstatus(CatEstatusSolicitud estatus) {
+        this.estatus = estatus;
     }
-
     public Date getFechaCap() {
         return fechaCap;
     }
@@ -124,28 +134,28 @@ public class DetSolicitudArticulo implements Serializable {
         this.detIncidenciaList = detIncidenciaList;
     }
 
-    public CatArticulo getIdArticulo() {
-        return idArticulo;
+    public CatArticulo getArticulo() {
+        return articulo;
     }
 
-    public void setIdArticulo(CatArticulo idArticulo) {
-        this.idArticulo = idArticulo;
+    public void setArticulo(CatArticulo articulo) {
+        this.articulo = articulo;
     }
 
-    public DetEmpleado getIdEmpleadoSol() {
-        return idEmpleadoSol;
+    public DetEmpleado getEmpleadoSol() {
+        return empleadoSol;
     }
 
-    public void setIdEmpleadoSol(DetEmpleado idEmpleadoSol) {
-        this.idEmpleadoSol = idEmpleadoSol;
+    public void setEmpleadoSol(DetEmpleado empleadoSol) {
+        this.empleadoSol = empleadoSol;
     }
 
-    public DetEmpleado getIdEmpleadoRev() {
-        return idEmpleadoRev;
+    public DetEmpleado getEmpleadoRev() {
+        return empleadoRev;
     }
 
-    public void setIdEmpleadoRev(DetEmpleado idEmpleadoRev) {
-        this.idEmpleadoRev = idEmpleadoRev;
+    public void setEmpleadoRev(DetEmpleado empleadoRev) {
+        this.empleadoRev = empleadoRev;
     }
 
     public String getDescripcionRechazo() {
@@ -180,7 +190,7 @@ public class DetSolicitudArticulo implements Serializable {
 
     @Override
     public String toString() {
-        return "DetSolicitudArticulo{" + "idSolicitud=" + idSolicitud + ", cantidad=" + cantidad + ", aprobada=" + aprobada + ", fechaCap=" + fechaCap + ", fechaMod=" + fechaMod + ", descripcionRechazo=" + descripcionRechazo + '}';
+        return "DetSolicitudArticulo[" + "idSolicitud=" + idSolicitud + ", cantidad=" + cantidad + ", aprobada=" + estatus.getClave() + ", fechaCap=" + fechaCap + ", fechaMod=" + fechaMod + ", descripcionRechazo=" + descripcionRechazo + ']';
     }
     
 }

@@ -2,6 +2,7 @@ package mx.com.ferbo.business.deduccion.subsidio;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import org.apache.logging.log4j.LogManager;
@@ -25,11 +26,10 @@ public class SubsidioEmpleoExecutor {
 	}
 	
 	public ISubsidioEmpleo loadClass(String clave, LocalDate fecha) {
-		ISubsidioEmpleo instance = null;
-		Class<?> clazz = null;
-		Constructor<?> constructor = null;
-		
-		NominaFormula formula = null;
+		ISubsidioEmpleo instance    = null;
+		Class<?>        clazz       = null;
+		Constructor<?>  constructor = null;
+		NominaFormula   formula     = null;
 		
 		try {
 			if(formulaDAO == null)
@@ -39,6 +39,31 @@ public class SubsidioEmpleoExecutor {
 			clazz = Class.forName(formula.getClase());
 			constructor = clazz.getDeclaredConstructor(LocalDate.class);
 			instance = (ISubsidioEmpleo) constructor.newInstance(fecha);
+			
+			log.info("Clase para cálculo de subsidio al empleo: {}", formula.getClase());
+		} catch(ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
+			log.error("Problema para obtener el objeto de cálculo para subsidio al empleo...", ex);
+		} catch(Exception ex) {
+			log.error("Problema para obtener el objeto de cálculo para subsidio al empleo...", ex);
+		}
+		
+		return instance;
+	}
+	
+	public ISubsidioEmpleo loadClass(String clave, LocalDate fecha, BigDecimal isrAntesDeSubsidio) {
+		ISubsidioEmpleo instance    = null;
+		Class<?>        clazz       = null;
+		Constructor<?>  constructor = null;
+		NominaFormula   formula     = null;
+		
+		try {
+			if(formulaDAO == null)
+				formulaDAO = new NominaFormulaDAO();
+			formula = formulaDAO.buscarVigente(clave, fecha);
+			
+			clazz = Class.forName(formula.getClase());
+			constructor = clazz.getDeclaredConstructor(LocalDate.class, BigDecimal.class);
+			instance = (ISubsidioEmpleo) constructor.newInstance(fecha, isrAntesDeSubsidio);
 			
 			log.info("Clase para cálculo de subsidio al empleo: {}", formula.getClase());
 		} catch(ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
