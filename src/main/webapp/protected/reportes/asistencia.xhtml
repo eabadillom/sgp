@@ -81,7 +81,7 @@
                         </p:outputLabel>
                     </p:column>
                     <p:column style="width: 10rem; text-align: right;">
-                        <p:commandButton icon="pi pi-bars" actionListener="#{repAsistenciaBean.editarRegistro(registro)}" oncomplete="PF('dgEditarRegistro').show()" ajax="true" update="form:dgEditarRegistro form:EstatusRegistro" process="@this"/>
+                        <p:commandButton icon="pi pi-bars" actionListener="#{repAsistenciaBean.editarRegistro(registro)}" oncomplete="PF('dgEditarRegistro').show()" update="form:dgEditarRegistro form:EstatusRegistro" process="@this"/>
                     </p:column>
                 </p:dataTable>
             </div>
@@ -100,7 +100,7 @@
                 </p:panel>
             </div>
             <p:dialog header="Editar asistencia" id="dgEditarRegistro" widgetVar="dgEditarRegistro" showEffect="fade" modal="true" responsive="true" draggable="true" resizable="false" dynamic="true">
-                <p:outputPanel class="ui-fluid">
+                <p:outputPanel class="ui-fluid" rendered="#{repAsistenciaBean.registroSelected ne null}">
                     <div class="p-field">
                         <p:outputLabel for="@next" value="Fecha de ingreso"/>
                         <p:datePicker id="fechaEntrada" value="#{repAsistenciaBean.registroSelected.fechaEntrada}" 
@@ -110,7 +110,7 @@
                     <div class="p-field">
                         <p:outputLabel for="@next" value="Estatus del registro"/>
                         <p:selectOneMenu id="EstatusRegistro" value="#{repAsistenciaBean.registroSelected.idEstatus}" converter="entityConverter">
-                            <f:selectItems value="#{repAsistenciaBean.lstEstatus}" var="estatusregistro" itemLabel="#{estatusregistro.descripcion}" itemValue="#{estatusregistro}"/>
+                            <f:selectItems value="#	{repAsistenciaBean.lstEstatus}" var="estatusregistro" itemLabel="#{estatusregistro.descripcion}" itemValue="#{estatusregistro}"/>
                             <p:ajax process="@this"/>
                         </p:selectOneMenu>
                     </div>

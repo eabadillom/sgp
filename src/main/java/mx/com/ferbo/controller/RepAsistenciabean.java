@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -20,7 +19,6 @@ import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import mx.com.ferbo.dao.n.EstatusRegistroDAO;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,11 +26,11 @@ import org.primefaces.PrimeFaces;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 
+import mx.com.ferbo.dao.n.EstatusRegistroDAO;
 import mx.com.ferbo.dao.n.PlantaDAO;
 import mx.com.ferbo.dao.n.RegistroDAO;
 import mx.com.ferbo.model.CatEstatusRegistro;
 import mx.com.ferbo.model.CatPlanta;
-import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetRegistro;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
@@ -66,26 +64,34 @@ public class RepAsistenciabean implements Serializable {
     private List<Date> diasDesabilitados;
 
     public RepAsistenciabean() {
-        plantaDAO = new PlantaDAO(CatPlanta.class);
-        registroDAO = new RegistroDAO(DetRegistro.class);
-        estatusRegistroDAO = new EstatusRegistroDAO(CatEstatusRegistro.class);
+    	try {
+    		plantaDAO = new PlantaDAO(CatPlanta.class);
+    		registroDAO = new RegistroDAO(DetRegistro.class);
+    		estatusRegistroDAO = new EstatusRegistroDAO(CatEstatusRegistro.class);
+    	} catch(Exception ex) {
+    		log.error("Problema para inicializar el reporte de asistencia...", ex);
+    	}
     }
 
     @PostConstruct
     public void init() {
-        plantas = plantaDAO.buscarTodos();
-        lstEstatus = estatusRegistroDAO.buscarTodos();
-        this.fechaInicio = new Date();
-        this.fechaFin = new Date();
-        this.badgeColor = "";
-
-        byte[] bytes = {};
-
-        pdfFile = DefaultStreamedContent.builder().contentType("application/pdf").contentLength(bytes.length)
-                .name("ReporteAsistencia.pdf").stream(() -> new ByteArrayInputStream(bytes)).build();
-
-        xlsFile = DefaultStreamedContent.builder().contentType("application/vnd.ms-excel").contentLength(bytes.length)
-                .name("ReporteAsistencia.xlsx").stream(() -> new ByteArrayInputStream(bytes)).build();
+    	try {
+    		plantas = plantaDAO.buscarTodos();
+    		lstEstatus = estatusRegistroDAO.buscarTodos();
+    		this.fechaInicio = new Date();
+    		this.fechaFin = new Date();
+    		this.badgeColor = "";
+    		
+    		byte[] bytes = {};
+    		
+    		pdfFile = DefaultStreamedContent.builder().contentType("application/pdf").contentLength(bytes.length)
+    				.name("ReporteAsistencia.pdf").stream(() -> new ByteArrayInputStream(bytes)).build();
+    		
+    		xlsFile = DefaultStreamedContent.builder().contentType("application/vnd.ms-excel").contentLength(bytes.length)
+    				.name("ReporteAsistencia.xlsx").stream(() -> new ByteArrayInputStream(bytes)).build();
+    	} catch(Exception ex) {
+    		log.error("Problema para entrar al reporte de inventario...", ex);
+    	}
     }
 
     public void cargaInfo() {
@@ -129,8 +135,12 @@ public class RepAsistenciabean implements Serializable {
     }
 
     public void ajustaHoras() {
-        DateUtil.setTime(fechaInicio, 0, 0, 0, 0);
-        DateUtil.setTime(fechaFin, 23, 59, 59, 0);
+    	try {
+    		DateUtil.setTime(fechaInicio, 0, 0, 0, 0);
+    		DateUtil.setTime(fechaFin, 23, 59, 59, 0);
+    	} catch(Exception ex) {
+    		log.error("Problema para establecer la hora inicio y fin del periodo...", ex);
+    	}
     }
 
     public void exportarPDF() {
@@ -248,50 +258,57 @@ public class RepAsistenciabean implements Serializable {
     }
 
     public void editarRegistro(DetRegistro registro) {
-        this.registroSelected = new DetRegistro();
-        this.registroSelected = registro;
-
-        int anio = DateUtil.getAnio(registro.getFechaEntrada());
-        int mes = DateUtil.getMes(registro.getFechaEntrada());
-        int dia = DateUtil.getDia(registro.getFechaEntrada());
-
-        Date diaPermitido = DateUtil.getDateTime(anio, mes, dia, 0, 0, 0, 0);
-
-        this.diasDesabilitados = new ArrayList<Date>();
-
-        int maximoDia = 30;
-
-        if (mes == 1) {
-            maximoDia = 28;
-            if (DateUtil.esBisiesto(diaPermitido)) {
-                maximoDia = 29;
-            }
-        }
-
-        if (mes == 0 || mes == 2 || mes == 4 || mes == 6 || mes == 7 || mes == 9 || mes == 11) {
-            maximoDia = 31;
-        }
-
-        maximoDia++;
-
-        for (int i = 1; i < maximoDia; i++) {
-            Date diaNoPermitido = DateUtil.getDateTime(anio, mes, i, 0, 0, 0, 0);
-            if (diaNoPermitido.compareTo(diaPermitido) != 0) {
-                this.diasDesabilitados.add(diaNoPermitido);
-            }
-        }
-
-        if (registro.getIdEstatus().getDescripcion().equals("Falta")) {
-            int horaSalida = DateUtil.getHora(registro.getIdEmpleado().getDatoEmpresa().getHorasalida());
-            Date diaSalida = DateUtil.getDateTime(anio, mes, dia, horaSalida, 0, 0, 0);
-            registro.setFechaSalida(diaSalida);
-        }
+    	try {
+    		this.registroSelected = registro;
+    		
+    		int anio = DateUtil.getAnio(registro.getFechaEntrada());
+    		int mes = DateUtil.getMes(registro.getFechaEntrada());
+    		int dia = DateUtil.getDia(registro.getFechaEntrada());
+    		
+    		Date diaPermitido = DateUtil.getDateTime(anio, mes, dia, 0, 0, 0, 0);
+    		
+    		this.diasDesabilitados = new ArrayList<Date>();
+    		
+    		int maximoDia = 30;
+    		
+    		if (mes == 1) {
+    			maximoDia = 28;
+    			if (DateUtil.esBisiesto(diaPermitido)) {
+    				maximoDia = 29;
+    			}
+    		}
+    		
+    		if (mes == 0 || mes == 2 || mes == 4 || mes == 6 || mes == 7 || mes == 9 || mes == 11) {
+    			maximoDia = 31;
+    		}
+    		
+    		maximoDia++;
+    		
+    		for (int i = 1; i < maximoDia; i++) {
+    			Date diaNoPermitido = DateUtil.getDateTime(anio, mes, i, 0, 0, 0, 0);
+    			if (diaNoPermitido.compareTo(diaPermitido) != 0) {
+    				this.diasDesabilitados.add(diaNoPermitido);
+    			}
+    		}
+    		
+    		if (registro.getIdEstatus().getDescripcion().equals("Falta")) {
+    			int horaSalida = DateUtil.getHora(registro.getIdEmpleado().getDatoEmpresa().getHorasalida());
+    			Date diaSalida = DateUtil.getDateTime(anio, mes, dia, horaSalida, 0, 0, 0);
+    			registro.setFechaSalida(diaSalida);
+    		}
+    	} catch(Exception ex) {
+    		log.error("Problema para editar el registro de asistencia...", ex);
+    	}
     }
 
     public void restablecerValores() {
-        this.registroSelected = null;
-        Integer idPlanta = this.planta == null ? null : this.planta.getIdPlanta();
-        registros = registroDAO.buscarPorPlantaPeriodo(idPlanta, this.fechaInicio, this.fechaFin);
+    	try {
+    		this.registroSelected = null;
+    		Integer idPlanta = this.planta == null ? null : this.planta.getIdPlanta();
+    		registros = registroDAO.buscarPorPlantaPeriodo(idPlanta, this.fechaInicio, this.fechaFin);
+    	} catch(Exception ex) {
+    		log.error("Problema para reestablecer los valores...", ex);
+    	}
     }
 
     public void actualizarRegistro() {
@@ -332,28 +349,32 @@ public class RepAsistenciabean implements Serializable {
     }
 
     public String obtenerEstatusAsistencia(DetRegistro registro) {
-
-        switch (registro.getIdEstatus().getCodigo()) {
-            case "T":
-            case "J":
-            case "V":
-            case "P":
-            case "X":
-            case "I":
-            case "D":
-                this.badgeColor = new String();
-                this.badgeColor = "success";
-                break;
-
-            case "R":
-                this.badgeColor = new String();
-                this.badgeColor = "warning";
-                break;
-
-            case "F":
-                this.badgeColor = new String();
-                this.badgeColor = "danger";
-                break;
+    	try {
+    		switch (registro.getIdEstatus().getCodigo()) {
+    		
+    		case "T":
+    		case "J":
+    		case "V":
+    		case "P":
+    		case "X":
+    		case "I":
+    		case "D":
+    			this.badgeColor = new String();
+    			this.badgeColor = "success";
+    			break;
+    			
+    		case "R":
+    			this.badgeColor = new String();
+    			this.badgeColor = "warning";
+    			break;
+    			
+    		case "F":
+    			this.badgeColor = new String();
+    			this.badgeColor = "danger";
+    			break;
+    		}
+    	} catch(Exception ex) {
+    		log.error("Problema para determinar el status del registro de asistencia...", ex);
         }
 
         return registro.getIdEstatus().getDescripcion();
