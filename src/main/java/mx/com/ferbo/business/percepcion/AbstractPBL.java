@@ -58,6 +58,7 @@ public abstract class AbstractPBL {
 	public static final String CVE_AGUINALDO                   = "024";
 	public static final String CVE_VACACIONES_EN_TIEMPO        = "029";
 	public static final String CVE_VALES_DESPENSA              = "032";
+	public static final String CVE_PTU                         = "100";
 	
 	public AbstractPBL(ParametrosNomina parametros, DetNomina nomina) {
 		this.parametros = parametros;

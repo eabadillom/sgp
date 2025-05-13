@@ -156,35 +156,38 @@ public class RegistroEmpleadosBean implements Serializable {
     private String texto;
 
     public RegistroEmpleadosBean() {
-    	
     	this.context = FacesContext.getCurrentInstance();
     	this.request = (HttpServletRequest) context.getExternalContext().getRequest();
     	this.session = request.getSession(false);
     	
-        empleadoFotoDAO = new EmpleadoFotoDAO(DetEmpleadoFoto.class);
-        empresaDAO = new EmpresaDAO(CatEmpresa.class);
-        perfilDAO = new PerfilDAO(CatPerfil.class);
-        plantaDAO = new PlantaDAO(CatPlanta.class);
-        puestoDAO = new PuestoDAO(CatPuesto.class);
-        biometricoDAO = new BiometricoDAO(DetBiometrico.class);
-        areaDAO = new AreaDAO(CatArea.class);
-        empleadoDAO = new EmpleadoDAO(DetEmpleado.class);
-        tipoContratoDAO = new TipoContratoDAO(CatTipoContrato.class);
-        tipoJornadaDAO = new TipoJornadaDAO(CatTipoJornada.class);
-        tipoRegimenDAO = new TipoRegimenDAO(CatTipoRegimen.class);
-        parametroDAO = new ParametroDAO(CatParametro.class);
-        entidadDAO = new EntidadFederativaDAO(CatEntidadFederativa.class);
-        riesgoDAO = new RiesgoPuestoDAO(CatRiesgoPuesto.class);
-        periodicidadDAO = new PeriodicidadPagoDAO(CatPeriodicidadPago.class);
-        tipoPercepcionDAO = new TipoPercepcionDAO();
-        tipoPrestamoDAO = new TipoPrestamoDAO();
-        asentamientoDAO = new AsentamientoDAO();
-        tipoBajaEmpleadoDAO = new TipoBajaEmpleadoDAO();
-        bancoDAO = new BancoDAO();
-
-        empleado = new DetEmpleado();
-        lstEmpleados = new ArrayList<>();
-        lstEmpleadosSelected = new ArrayList<>();
+    	try {
+    		empleadoFotoDAO = new EmpleadoFotoDAO(DetEmpleadoFoto.class);
+    		empresaDAO = new EmpresaDAO(CatEmpresa.class);
+    		perfilDAO = new PerfilDAO(CatPerfil.class);
+    		plantaDAO = new PlantaDAO(CatPlanta.class);
+    		puestoDAO = new PuestoDAO(CatPuesto.class);
+    		biometricoDAO = new BiometricoDAO(DetBiometrico.class);
+    		areaDAO = new AreaDAO(CatArea.class);
+    		empleadoDAO = new EmpleadoDAO(DetEmpleado.class);
+    		tipoContratoDAO = new TipoContratoDAO(CatTipoContrato.class);
+    		tipoJornadaDAO = new TipoJornadaDAO(CatTipoJornada.class);
+    		tipoRegimenDAO = new TipoRegimenDAO(CatTipoRegimen.class);
+    		parametroDAO = new ParametroDAO(CatParametro.class);
+    		entidadDAO = new EntidadFederativaDAO(CatEntidadFederativa.class);
+    		riesgoDAO = new RiesgoPuestoDAO(CatRiesgoPuesto.class);
+    		periodicidadDAO = new PeriodicidadPagoDAO(CatPeriodicidadPago.class);
+    		tipoPercepcionDAO = new TipoPercepcionDAO();
+    		tipoPrestamoDAO = new TipoPrestamoDAO();
+    		asentamientoDAO = new AsentamientoDAO();
+    		tipoBajaEmpleadoDAO = new TipoBajaEmpleadoDAO();
+    		bancoDAO = new BancoDAO();
+    		
+    		empleado = new DetEmpleado();
+    		lstEmpleados = new ArrayList<>();
+    		lstEmpleadosSelected = new ArrayList<>();
+    	} catch(Exception ex) {
+    		log.error("Problema para inicializar el registro de empleados...", ex);
+		}
     }
 
     @PostConstruct
@@ -215,8 +218,7 @@ public class RegistroEmpleadosBean implements Serializable {
             prestamo = new DetPrestamo();
             
         } catch (Exception ex) {
-        	ex.printStackTrace();
-            log.warn("EX-0008: " + ex.getMessage() + ". Error al cargar init()");
+            log.error("Problema para cargar el registro de empleados...", ex);
         }
     }
     

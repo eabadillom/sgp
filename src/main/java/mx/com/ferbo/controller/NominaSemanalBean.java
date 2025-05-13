@@ -146,12 +146,7 @@ public class NominaSemanalBean implements Serializable {
     		this.nominaPeriodo = NominaPeriodoBL.get(this.empresaSelected, NominaBL.TP_NOMINA_ORDINARIA, this.periodicidad, this.anio, this.semana);
     		this.periodoInicio = DateUtil.toDate(this.nominaPeriodo.getPeriodoInicio());
     		this.periodoFin = DateUtil.toDate(this.nominaPeriodo.getPeriodoFin());
-//    		this.calculaFechasPeriodo();
-//    		this.nominaPeriodo.setPeriodoInicio(DateUtil.toLocalDate(this.periodoInicio));
-//    		this.nominaPeriodo.setPeriodoFin(DateUtil.toLocalDate(this.periodoFin));
-//    		this.nominaPeriodo.setFechaPago(DateUtil.toLocalDate(this.fecha));
     		
-    			
     	} catch(SGPException ex) {
     		log.error("Problema para generar el periodo...", ex);
     	}
