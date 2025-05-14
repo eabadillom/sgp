@@ -25,8 +25,7 @@ import javax.validation.constraints.Size;
 @NamedQueries({
     @NamedQuery(name = "CatTipoSolicitud.findAll", query = "SELECT c FROM CatTipoSolicitud c"),
     @NamedQuery(name = "CatTipoSolicitud.findByActive", query = "SELECT c FROM CatTipoSolicitud c WHERE c.activo = 1"),
-    @NamedQuery(name = "CatTipoSolicitud.findByPermisoYVacaciones", query = "SELECT c FROM CatTipoSolicitud c WHERE (c.clave = :clavePermiso OR c.clave = :claveVacaciones) AND c.activo = 1"),
-    @NamedQuery(name = "CatTipoSolicitud.findByIncapacidades", query = "SELECT c FROM CatTipoSolicitud c WHERE (c.clave = :claveIncCorta OR c.clave = :claveIncLarga) AND c.activo = 1")    
+    @NamedQuery(name = "CatTipoSolicitud.findByPermisoYVacaciones", query = "SELECT c FROM CatTipoSolicitud c WHERE (c.clave = :clavePermiso OR c.clave = :claveVacaciones) AND c.activo = 1")
 })
 public class CatTipoSolicitud implements Serializable {
 
