@@ -90,27 +90,4 @@ public class TipoSolicitudDAO extends BaseDAO<CatTipoSolicitud, Integer>
         return modelList;
     }
     
-    public List<CatTipoSolicitud> buscarIncapacidades(String incapacidadCorta, String incapacidadLarga)
-    {
-        List<CatTipoSolicitud> modelList = null;
-        EntityManager em = null;
-        
-        try
-        {
-            em = getEntityManager();
-            modelList = em.createNamedQuery("CatTipoSolicitud.findByIncapacidades", CatTipoSolicitud.class)
-                .setParameter("claveIncCorta", incapacidadCorta)
-                .setParameter("claveIncLarga", incapacidadLarga)
-                .getResultList();
-        }catch(Exception ex) 
-        {
-            log.error("Problema para obtener el listado de tipos de solicitud...", ex);
-        }finally 
-        {
-           close(em);
-        }
-        
-        return modelList;
-    }
-    
 }
