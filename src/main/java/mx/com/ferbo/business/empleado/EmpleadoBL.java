@@ -140,6 +140,13 @@ public class EmpleadoBL {
     		log.info("El empleado no tiene configuración establecida, se creará un nuevo objeto de configuración.");
     		empleado.setEmpleadoConfiguracion(new DetEmpleadoConfiguracion());
     	}
+    	
+    	try {
+    		log.info("Id domicilio empleado: {}", empleado.getDomicilio().getId());
+    	} catch(Exception ex) {
+    		empleado.setDomicilio(new DetDomicilioEmpleado());
+			empleado.getDomicilio().setEmpleado(empleado);
+    	}
     }
 
     public static void validarDatosEmpleado(DetEmpleado empleadoporvalidar) {

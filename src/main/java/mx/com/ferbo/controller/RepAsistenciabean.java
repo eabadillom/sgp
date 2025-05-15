@@ -76,6 +76,7 @@ public class RepAsistenciabean implements Serializable {
     @PostConstruct
     public void init() {
     	try {
+    		log.info("Ejecutando proceso init...");
     		plantas = plantaDAO.buscarTodos();
     		lstEstatus = estatusRegistroDAO.buscarTodos();
     		this.fechaInicio = new Date();
@@ -89,6 +90,7 @@ public class RepAsistenciabean implements Serializable {
     		
     		xlsFile = DefaultStreamedContent.builder().contentType("application/vnd.ms-excel").contentLength(bytes.length)
     				.name("ReporteAsistencia.xlsx").stream(() -> new ByteArrayInputStream(bytes)).build();
+    		log.info("Proceso init terminado.");
     	} catch(Exception ex) {
     		log.error("Problema para entrar al reporte de inventario...", ex);
     	}
