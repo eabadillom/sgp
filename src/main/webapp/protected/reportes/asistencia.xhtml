@@ -67,21 +67,26 @@
                     <p:column headerText="Empleado" sortBy="#{registro.idEmpleado.nombre}">
                         <p:outputLabel value="#{registro.idEmpleado.nombre} #{registro.idEmpleado.primerAp} #{registro.idEmpleado.segundoAp}"/>
                     </p:column>
-                    <p:column headerText="Estatus asistencia" >
-                        <p:badge value="#{repAsistenciaBean.obtenerEstatusAsistencia(registro)}" size="large" severity="#{repAsistenciaBean.badgeColor}"></p:badge>
-                    </p:column>
-                    <p:column headerText="Entrada" style="width: 10rem; text-align: center;" sortBy="#{registro.fechaEntrada}">
+                    <p:column headerText="Fecha" style="width: 6rem; text-align: center;" sortBy="#{registro.fechaEntrada}">
                         <p:outputLabel value="#{registro.fechaEntrada}">
-                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" timeZone="GMT-6" locale="es_MX"/>
+                            <f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX"/>
                         </p:outputLabel>
                     </p:column>
-                    <p:column headerText="Salida" style="width: 10rem; text-align: center;" sortBy="#{registro.fechaSalida}">
+                    <p:column headerText="Entrada" style="width: 6rem; text-align: center;" sortBy="#{registro.fechaEntrada}">
+                        <p:outputLabel value="#{registro.fechaEntrada}">
+                            <f:convertDateTime pattern="HH:mm:ss" timeZone="GMT-6" locale="es_MX"/>
+                        </p:outputLabel>
+                    </p:column>
+                    <p:column headerText="Salida" style="width: 6rem; text-align: center;" sortBy="#{registro.fechaSalida}">
                         <p:outputLabel value="#{registro.fechaSalida}">
-                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" timeZone="GMT-6" locale="es_MX"/>
+                            <f:convertDateTime pattern="HH:mm:ss" timeZone="GMT-6" locale="es_MX"/>
                         </p:outputLabel>
                     </p:column>
-                    <p:column style="width: 10rem; text-align: right;">
-                        <p:commandButton icon="pi pi-bars" actionListener="#{repAsistenciaBean.editarRegistro(registro)}" oncomplete="PF('dgEditarRegistro').show()" update="form:dgEditarRegistro form:EstatusRegistro" process="@this"/>
+                    <p:column headerText="Status" style="width: 6rem;">
+                        <p:badge value="#{repAsistenciaBean.obtenerEstatusAsistencia(registro)}" severity="#{repAsistenciaBean.badgeColor}"></p:badge>
+                    </p:column>
+                    <p:column style="width: 2rem;">
+                        <p:commandButton icon="pi pi-bars" actionListener="#{repAsistenciaBean.editarRegistro(registro)}" oncomplete="PF('dgEditarRegistro').show();" update="form:pnl-registro" process="@this"/>
                     </p:column>
                 </p:dataTable>
             </div>
@@ -99,18 +104,32 @@
                     </div>
                 </p:panel>
             </div>
-            <p:dialog header="Editar asistencia" id="dgEditarRegistro" widgetVar="dgEditarRegistro" showEffect="fade" modal="true" responsive="true" draggable="true" resizable="false" dynamic="true">
-                <p:outputPanel class="ui-fluid" rendered="#{repAsistenciaBean.registroSelected ne null}">
+            <p:dialog header="Registro de asistencia" widgetVar="dgEditarRegistro" showEffect="fade" modal="true" responsive="true" draggable="true" resizable="false" dynamic="true">
+                <p:outputPanel id="pnl-registro" class="ui-fluid" rendered="#{repAsistenciaBean.registroSelected ne null}">
+               		<div class="p-field">
+               			<p:outputLabel value="Fecha" />
+               			<p:inputText value="#{repAsistenciaBean.registroSelected.fechaEntrada}" readonly="true">
+               				<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX" />
+               			</p:inputText>
+               		</div>
                     <div class="p-field">
-                        <p:outputLabel for="@next" value="Fecha de ingreso"/>
-                        <p:datePicker id="fechaEntrada" value="#{repAsistenciaBean.registroSelected.fechaEntrada}" 
-                                      pattern="dd-MM-yyyy" readonlyInput="false" timeZone="GMT-6" styleClass="ferbo-datePicker" 
-                                      panelStyleClass="ferbo-datePicker-panel" disabled="false" inline="true" showTime="true" timeInput="true" disabledDates="#{repAsistenciaBean.diasDesabilitados}" />
+                        <p:outputLabel for="@next" value="Entrada"/>
+                        <p:datePicker id="fechaEntrada" value="#{repAsistenciaBean.registroSelected.fechaEntrada}"
+                        				timeOnly="true"
+										pattern="dd-MM-yyyy" readonlyInput="false" timeZone="GMT-6" styleClass="ferbo-datePicker" 
+										panelStyleClass="ferbo-datePicker-panel" disabled="false" inline="true" showTime="true" timeInput="true" disabledDates="#{repAsistenciaBean.diasDesabilitados}" />
+                    </div>
+                    <div class="p-field">
+                        <p:outputLabel for="@next" value="Salida"/>
+                        <p:datePicker id="fechaSalida" value="#{repAsistenciaBean.registroSelected.fechaSalida}"
+										timeOnly="true"
+										pattern="dd-MM-yyyy" readonlyInput="false" timeZone="GMT-6" styleClass="ferbo-datePicker" 
+										panelStyleClass="ferbo-datePicker-panel" disabled="false" inline="true" showTime="true" timeInput="true" disabledDates="#{repAsistenciaBean.diasDesabilitados}" />
                     </div>
                     <div class="p-field">
                         <p:outputLabel for="@next" value="Estatus del registro"/>
                         <p:selectOneMenu id="EstatusRegistro" value="#{repAsistenciaBean.registroSelected.idEstatus}" converter="entityConverter">
-                            <f:selectItems value="#	{repAsistenciaBean.lstEstatus}" var="estatusregistro" itemLabel="#{estatusregistro.descripcion}" itemValue="#{estatusregistro}"/>
+                            <f:selectItems value="#{repAsistenciaBean.lstEstatus}" var="estatusregistro" itemLabel="#{estatusregistro.descripcion}" itemValue="#{estatusregistro}"/>
                             <p:ajax process="@this"/>
                         </p:selectOneMenu>
                     </div>

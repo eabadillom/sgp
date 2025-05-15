@@ -55,9 +55,6 @@ public class PtuPBL extends AbstractPBL {
 			percepcion = build(nomina, CVE_PTU, cantidad, importeExento, importeGravado);
 		}
 		
-		
-		
-		
 		return percepcion;
 	}
 
