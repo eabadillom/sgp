@@ -185,20 +185,13 @@ public class RegistroEmpleadosBean implements Serializable {
     		empleado = new DetEmpleado();
     		lstEmpleados = new ArrayList<>();
     		lstEmpleadosSelected = new ArrayList<>();
-    	} catch(Exception ex) {
-    		log.error("Problema para inicializar el registro de empleados...", ex);
-		}
-    }
-
-    @PostConstruct
-    public void init() {
-        this.activo = false;
-        this.inactivo = false;
-        
-        try {
-        	this.redirigir();
-        	
-            lstCatEmpresa = empresaDAO.buscarActivo();
+    		
+    		
+    		
+    		
+    		
+    		
+    		lstCatEmpresa = empresaDAO.buscarActivo();
             lstCatPerfil = perfilDAO.buscarActivo();
             lstCatPlanta = plantaDAO.buscarActivo();
             lstCatPuesto = puestoDAO.buscarActivo();
@@ -213,8 +206,20 @@ public class RegistroEmpleadosBean implements Serializable {
             tiposPrestamo = tipoPrestamoDAO.buscarTodos();
             tiposdebaja = tipoBajaEmpleadoDAO.obtenerTodos();
             lstBancos = bancoDAO.buscarTodos();
-
+            
             consultaEmpleados();
+    	} catch(Exception ex) {
+    		log.error("Problema para inicializar el registro de empleados...", ex);
+		}
+    }
+
+    @PostConstruct
+    public void init() {
+        this.activo = false;
+        this.inactivo = false;
+        
+        try {
+        	this.redirigir();
             prestamo = new DetPrestamo();
             
         } catch (Exception ex) {
@@ -247,7 +252,9 @@ public class RegistroEmpleadosBean implements Serializable {
      * Método para consultar a los empleados
      */
     private void consultaEmpleados() {
+    	log.info("Cargando lista de empleados...");
         this.lstEmpleados = empleadoDAO.buscarTodos(false);
+        log.info("Lista de empleados completa.");
     }
 
     /*
