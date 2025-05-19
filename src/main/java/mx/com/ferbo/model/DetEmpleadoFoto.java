@@ -30,28 +30,12 @@ public class DetEmpleadoFoto implements Serializable {
 	private Integer id;
 	
 	@Column(name = "nb_fotografia")
-	@Basic(optional = false)
+	@Basic(optional = true)
 	private String fotografia;
 	
 	@OneToOne(mappedBy = "empleadoFoto")
 	private DetEmpleado empleado;
-
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	public String getFotografia() {
-		return fotografia;
-	}
-
-	public void setFotografia(String fotografia) {
-		this.fotografia = fotografia;
-	}
-
+	
 	@Override
 	public String toString() {
 		return "{\"id\":\"" + id + "\", \"fotografia\":\"" + fotografia + "\"}";
@@ -72,5 +56,29 @@ public class DetEmpleadoFoto implements Serializable {
 			return false;
 		DetEmpleadoFoto other = (DetEmpleadoFoto) obj;
 		return Objects.equals(id, other.id);
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getFotografia() {
+		return fotografia;
+	}
+
+	public void setFotografia(String fotografia) {
+		this.fotografia = fotografia;
+	}
+	
+	public DetEmpleado getEmpleado() {
+		return empleado;
+	}
+
+	public void setEmpleado(DetEmpleado empleado) {
+		this.empleado = empleado;
 	}
 }

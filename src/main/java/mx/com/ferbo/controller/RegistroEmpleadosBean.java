@@ -282,6 +282,7 @@ public class RegistroEmpleadosBean implements Serializable {
     	this.empleado = EmpleadoBL.build();
     	this.datoEmpresa = this.empleado.getDatoEmpresa();
         this.empleadoFoto = new DetEmpleadoFoto();
+        this.empleadoFoto.setEmpleado(empleado);
         this.empleado.setEmpleadoFoto(this.empleadoFoto);
         this.detBiometrico = new DetBiometrico();
         this.detBiometrico.setEmpleado(this.empleado);
