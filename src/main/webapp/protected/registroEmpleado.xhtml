@@ -66,8 +66,7 @@
                             <f:facet name="header">
                                 <div class="flex justify-content-start">
                                     <p:inputText id="filtarNombre" value="#{registroEmpleadosBean.texto}" onkeyup="PF('dtEmpleados').filter();" style="width:300px"
-                                                 placeholder="Buscar empleado por nombre o apellidos" onchange="PF('statusInfoDialog').show();">
-                                        <p:ajax update="dtEmpleados" process="@this" oncomplete="PF('statusInfoDialog').hide()"/>
+                                                 placeholder="Buscar empleado por nombre o apellidos" >
                                     </p:inputText>
                                 </div>
                             </f:facet>
