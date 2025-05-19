@@ -139,7 +139,7 @@ public class DetEmpleado implements Serializable {
     @JoinColumn(name = "id_empleado_empresa")
     private InfDatoEmpresa datoEmpresa;
 
-    @OneToOne(cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinColumn(name = "id_empleado_foto")
     private DetEmpleadoFoto empleadoFoto;
     
