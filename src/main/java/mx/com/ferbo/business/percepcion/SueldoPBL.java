@@ -55,7 +55,7 @@ public class SueldoPBL extends AbstractPBL {
 				throw new SGPException("No se indicó el valor (cantidad).");
 			
 			this.cantidad = cantidad;
-			this.importe = this.calcularImporte(cantidad, baseCalculo);
+			this.importe = this.calcularImporte(this.cantidad, baseCalculo);
 			this.calcularExentoGravado();
 		} catch(SGPException ex) {
 			log.warn("[UI] {}", ex.getMessage());
