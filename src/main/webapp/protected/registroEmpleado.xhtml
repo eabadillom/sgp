@@ -107,19 +107,19 @@
                                     <div class="formgrid grid">
                                         <div class="field col">
                                             <p:outputLabel for="@next" value="Nombre"/>
-                                            <p:inputText id="nombreEmp" value="#{registroEmpleadosBean.empleado.nombre}" style="text-transform: uppercase">
+                                            <p:inputText id="nombreEmp" value="#{registroEmpleadosBean.empleado.nombre}" style="text-transform: uppercase" oninput="this.value = this.value.toUpperCase()">
                                                 <p:ajax process="@this" />
                                             </p:inputText>
                                         </div>
                                         <div class="field col">
                                             <p:outputLabel for="@next" value="Primer Apellido"/>
-                                            <p:inputText id="primerAp" value="#{registroEmpleadosBean.empleado.primerAp}" style="text-transform: uppercase">
+                                            <p:inputText id="primerAp" value="#{registroEmpleadosBean.empleado.primerAp}" style="text-transform: uppercase" oninput="this.value = this.value.toUpperCase()">
                                                 <p:ajax process="@this" />
                                             </p:inputText>
                                         </div>
                                         <div class="field col">
                                             <p:outputLabel for="@next" value="Segundo Apellido"/>
-                                            <p:inputText id="segundoAp" value="#{registroEmpleadosBean.empleado.segundoAp}" style="text-transform: uppercase">
+                                            <p:inputText id="segundoAp" value="#{registroEmpleadosBean.empleado.segundoAp}" style="text-transform: uppercase" oninput="this.value = this.value.toUpperCase()">
                                                 <p:ajax process="@this" />
                                             </p:inputText>
                                         </div>
@@ -127,7 +127,7 @@
                                     <div class="formgrid grid">
                                         <div class="field col">
                                             <p:outputLabel for="@next" value="CURP"/>
-                                            <p:inputText id="curp" value="#{registroEmpleadosBean.empleado.curp}" maxlength="18" style="text-transform: uppercase">
+                                            <p:inputText id="curp" value="#{registroEmpleadosBean.empleado.curp}" maxlength="18" style="text-transform: uppercase" oninput="this.value = this.value.toUpperCase()">
                                                 <p:ajax process="@this" />
                                             </p:inputText>  
                                         </div>
@@ -227,7 +227,7 @@
                                         <div class="ui-fluid formgrid grid align-items-left">
                                         	<div class="field col-12 md:col-3">
                                                 <p:outputLabel for="@next" value="RFC" />
-                                                <p:inputText id="rfc" value="#{registroEmpleadosBean.datoEmpresa.rfc}" maxlength="18" style="text-transform: uppercase">
+                                                <p:inputText id="rfc" value="#{registroEmpleadosBean.datoEmpresa.rfc}" maxlength="18" style="text-transform: uppercase" oninput="this.value = this.value.toUpperCase()">
                                                     <p:ajax process="@this"/>
                                                 </p:inputText>
                                             </div>
