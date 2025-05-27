@@ -41,15 +41,15 @@
                                 </p:selectOneMenu>
                             </p:toolbarGroup>
                             <p:toolbarGroup>
-                                <p:outputLabel id="toggleactivo" value="Activo "/>
+                                <p:outputLabel id="toggleactivo" value="Activo"/>
                                 <p:toggleSwitch value="#{registroEmpleadosBean.activo}">
-                                    <p:ajax  update="dtEmpleados" process="@this"/>
+                                    <p:ajax event="change" update="dtEmpleados" process="@this"/>
                                 </p:toggleSwitch>
                             </p:toolbarGroup>
                             <p:toolbarGroup>
-                                <p:outputLabel value="Inactivo "/>
+                                <p:outputLabel value="Inactivo"/>
                                 <p:toggleSwitch id="toggleinactivo" value="#{registroEmpleadosBean.inactivo}">
-                                    <p:ajax  update="dtEmpleados" process="@this"/>
+                                    <p:ajax event="change" update="dtEmpleados" process="@this"/>
                                 </p:toggleSwitch>
                             </p:toolbarGroup>
                             <p:toolbarGroup align="right">
