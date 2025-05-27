@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -208,6 +208,9 @@ public class NominaSemanalBL extends NominaBL {
 				percepcionBO = new SueldoPBL(parametros, nomina);
 				break;
 				
+			case AbstractPBL.CVE_SEPTIMO_DIA:
+				percepcionBO = new SeptimoDiaPBL(parametros, nomina);
+				
 			default:
 				log.info("[UI] La percepción solicitada no está considerada para la nómina extraordinaria o no está implementada.");
 				throw new UnsupportedOperationException("La percepción no está implementada.");
@@ -304,6 +307,7 @@ public class NominaSemanalBL extends NominaBL {
 	throws SGPException {
 		DetNominaPercepcion  sueldo       = null;
 		DetNominaPercepcion  vacaciones   = null;
+		DetNominaPercepcion  septimoDia   = null;
 		AbstractPBL          sueldoBO     = null;
 		AbstractPBL          vacacionesBO = null;
 		AbstractPBL          septimoDiaBO = null;
@@ -333,8 +337,14 @@ public class NominaSemanalBL extends NominaBL {
 		
 		//Para el séptimo día, se considera el salario diario (sin SDI), dividiendolo entre los días de la semana que se deben laborar,
 		//multiplicado por los días que si laboró el trabajador (parte proporcional de los días trabajados).
-		septimoDiaBO = new SeptimoDiaPBL(parametros, nomina, diasLaborales, diasNoLaborales, diasTrabajados, diasVacaciones);
-		septimoDiaBO.procesar(nomina);
+		removedPercepciones = nomina.getPercepciones().removeIf(d -> AbstractPBL.CVE_SEPTIMO_DIA.equalsIgnoreCase(d.getClave()));
+		if(removedPercepciones)
+			log.info("Se encontraron conceptos {}, los cuales fueron eliminados para el reproceso de SEPTIMO DIA.", AbstractPBL.CVE_SEPTIMO_DIA);
+		septimoDiaBO = new SeptimoDiaPBL(parametros, nomina);
+		septimoDia = septimoDiaBO.procesar(nomina);
+		
+		if(septimoDia.getImporteExento().add(septimoDia.getImporteGravado()).compareTo(ValoresBD._CERO.get()) > 0)
+			nomina.getPercepciones().add(septimoDia);
 	}
 	
 	private static void calcularBonoPuntualidad(DetNomina nomina, ParametrosNomina parametros, List<DetPercepcionEmpleado> percepcionesEmpleado, Map<String, DetRegistro> mapAsistencias, Boolean procesarRetardos, BigDecimal diasLaborales, BigDecimal diasNoLaborales, BigDecimal diasTrabajados) {
@@ -558,7 +568,7 @@ public class NominaSemanalBL extends NominaBL {
 				.findFirst()
 				.get();
 		
-		mapAsistencias = new LinkedHashMap<String, DetRegistro>();
+		mapAsistencias = new HashMap<String, DetRegistro>();
 		registroDAO = new RegistroDAO();
 		listaAsistencias = registroDAO.buscar(empleado.getIdEmpleado(), parametros.getPeriodoInicio(), parametros.getPeriodoFin());
 		for(DetRegistro registro : listaAsistencias) {

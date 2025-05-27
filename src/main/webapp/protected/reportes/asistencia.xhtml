@@ -63,7 +63,7 @@
                 </p:panelGrid>
             </div>
             <div style="padding-top: 1rem;">
-                <p:dataTable id="dt-registros" value="#{repAsistenciaBean.registros}" var="registro" lazy="true" rows="10" paginator="true">
+                <p:dataTable id="dt-registros" widgetVar="dtRegistros" value="#{repAsistenciaBean.registros}" var="registro" lazy="true" rows="10" paginator="true">
                     <p:column headerText="Empleado" sortBy="#{registro.idEmpleado.nombre}">
                         <p:outputLabel value="#{registro.idEmpleado.nombre} #{registro.idEmpleado.primerAp} #{registro.idEmpleado.segundoAp}"/>
                     </p:column>
@@ -115,16 +115,19 @@
                     <div class="p-field">
                         <p:outputLabel for="@next" value="Entrada"/>
                         <p:datePicker id="fechaEntrada" value="#{repAsistenciaBean.registroSelected.fechaEntrada}"
-                        				timeOnly="true"
-										pattern="dd-MM-yyyy" readonlyInput="false" timeZone="GMT-6" styleClass="ferbo-datePicker" 
-										panelStyleClass="ferbo-datePicker-panel" disabled="false" inline="true" showTime="true" timeInput="true" disabledDates="#{repAsistenciaBean.diasDesabilitados}" />
+                        				timeOnly="false" mindate="#{repAsistenciaBean.registroSelected.fechaEntrada}"
+                        				maxdate="#{repAsistenciaBean.registroSelected.fechaEntrada}"
+										pattern="dd/MM/yyyy HH:mm:ss" readonlyInput="false" timeZone="GMT-6" styleClass="ferbo-datePicker" 
+										panelStyleClass="ferbo-datePicker-panel" disabled="false" inline="true" showTime="true" timeInput="true" disabledDates="#{repAsistenciaBean.diasDesabilitados}">
+						</p:datePicker>
                     </div>
                     <div class="p-field">
                         <p:outputLabel for="@next" value="Salida"/>
                         <p:datePicker id="fechaSalida" value="#{repAsistenciaBean.registroSelected.fechaSalida}"
-										timeOnly="true"
-										pattern="dd-MM-yyyy" readonlyInput="false" timeZone="GMT-6" styleClass="ferbo-datePicker" 
-										panelStyleClass="ferbo-datePicker-panel" disabled="false" inline="true" showTime="true" timeInput="true" disabledDates="#{repAsistenciaBean.diasDesabilitados}" />
+                        				pattern="dd/MM/yyyy HH:mm:ss" timeOnly="false"
+										readonlyInput="false" timeZone="GMT-6" 
+										panelStyleClass="ferbo-datePicker-panel" disabled="false" inline="true" showTime="true" timeInput="true" disabledDates="#{repAsistenciaBean.diasDesabilitados}">
+						</p:datePicker>
                     </div>
                     <div class="p-field">
                         <p:outputLabel for="@next" value="Estatus del registro"/>

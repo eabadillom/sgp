@@ -1226,6 +1226,9 @@ public class RegistroEmpleadosBean implements Serializable {
 
     public void validarEmpleado(DetEmpleado empleado) {
         EmpleadoBL.validarDatosEmpleado(empleado);
+        this.tipofinrelacion = null;
+        this.motivofinrelaicion = null;
+        this.fechafinrelacion = null;
     }
 
     public void recalcularVacaciones() {
