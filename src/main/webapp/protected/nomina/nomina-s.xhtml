@@ -76,15 +76,17 @@
 				</div>
 				<div class="field col-12 md:col-2">
 					<p:outputLabel value="Del" />
-					<p:datePicker id="dp-periodo-inicio" value="#{nominaS.periodoInicio}" placeholder="Periodo Inicio" showIcon="false" pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6" readonly="true">
-						<p:ajax process="@this" listener="#{nominaS.calculaFechaFin}" update="dp-periodo-fin anio semana" />
-					</p:datePicker>
+					<p:inputText id="dp-periodo-inicio" value="#{nominaS.periodoInicio}" readonly="true">
+						<f:convertDateTime pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6" />
+					</p:inputText>
+					
 				</div>
 				<div class="field col-12 md:col-2">
 					<p:outputLabel value="al" />
-					<p:datePicker id="dp-periodo-fin" value="#{nominaS.periodoFin}" placeholder="Periodo Fin" showIcon="false" pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6" readonly="true">
-						<p:ajax process="@this" listener="#{nominaS.calculaFechaInicio}" update="dp-periodo-inicio anio semana" />
-					</p:datePicker>
+					<p:inputText id="dp-periodo-fin" value="#{nominaS.periodoFin}" readonly="true">
+						<f:convertDateTime pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6" />
+					</p:inputText>
+					
 				</div>
 				<div class="field col-12 md:col-2">
 					<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
@@ -283,7 +285,7 @@
 							</div>
 						</p:outputPanel>
 					</p:tab>
-					<p:tab title="Asistencia">
+					<p:tab title="Incidencias">
 						<p:dataTable value="#{nominaS.asistencias}" var="asistencia">
 							<p:column headerText="Dia">
 								<p:outputLabel value="#{asistencia.diaSemana}" />

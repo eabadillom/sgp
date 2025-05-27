@@ -1,6 +1,7 @@
 package mx.com.ferbo.business.nomina;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -13,10 +14,7 @@ public class AsistenciaBL {
 	
 	public static List<Asistencia> getAsistenciaSemanal(Map<String, DetRegistro> mapAsistencias) {
 		List<Asistencia> asistenciaList = new ArrayList<Asistencia>();
-		
 		Asistencia asistencia = null;
-		
-		
 		
 		for(Map.Entry<String, DetRegistro> entry : mapAsistencias.entrySet()) {
 			DetRegistro registro = entry.getValue();
@@ -33,6 +31,7 @@ public class AsistenciaBL {
 			asistenciaList.add(asistencia);
 		}
 		
+		asistenciaList.sort(Comparator.comparing(Asistencia :: getEntrada));
 		
 		return asistenciaList;
 	}

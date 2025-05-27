@@ -105,8 +105,7 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
                     .setParameter("fechaFin", fechaFin)
                     .getResultList();
             for (DetRegistro model : modelList) {
-                log.trace("IdEmpleado: {}", model.getIdEmpleado().getIdEmpleado());
-                log.trace("Id Planta: {}", model.getIdEmpleado().getDatoEmpresa().getPlanta().getIdPlanta());
+                cargaInfo(model);
             }
         } catch (Exception ex) {
             log.error("Problema para obtener el listado de registros...", ex);
@@ -116,6 +115,16 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
         }
         return modelList;
     }
+    
+    private void cargaInfo(DetRegistro model) {
+    	try {
+    		log.trace("IdEmpleado: {}", model.getIdEmpleado().getIdEmpleado());
+    		log.trace("Id Planta: {}", model.getIdEmpleado().getDatoEmpresa().getPlanta().getIdPlanta());
+    	} catch(Exception ex) {
+    		log.warn("Problema para cargar el detalle del empleado...", ex);
+    	}
+    }
+    
     public List<DetRegistro> consultaRegistrosPorIdEmp(Integer idEmp)
     {
         List<DetRegistro> modelList = null;
