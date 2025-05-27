@@ -46,7 +46,7 @@ public class RepAsistenciabean implements Serializable {
 
     private PlantaDAO plantaDAO;
     private RegistroDAO registroDAO;
-    private EstatusRegistroDAO estatusRegistroDAO;
+    private EstatusRegistroDAO statusRegistroDAO;
 
     private List<CatPlanta> plantas;
     private List<DetRegistro> registros;
@@ -67,7 +67,7 @@ public class RepAsistenciabean implements Serializable {
     	try {
     		plantaDAO = new PlantaDAO(CatPlanta.class);
     		registroDAO = new RegistroDAO(DetRegistro.class);
-    		estatusRegistroDAO = new EstatusRegistroDAO(CatEstatusRegistro.class);
+    		statusRegistroDAO = new EstatusRegistroDAO(CatEstatusRegistro.class);
     	} catch(Exception ex) {
     		log.error("Problema para inicializar el reporte de asistencia...", ex);
     	}
@@ -75,10 +75,22 @@ public class RepAsistenciabean implements Serializable {
 
     @PostConstruct
     public void init() {
+    	CatEstatusRegistro status = null;
+    	
     	try {
     		log.info("Ejecutando proceso init...");
     		plantas = plantaDAO.buscarTodos();
-    		lstEstatus = estatusRegistroDAO.buscarTodos();
+    		lstEstatus = new ArrayList<CatEstatusRegistro>();
+    		status = statusRegistroDAO.buscarPorCodigo("T");
+    		lstEstatus.add(status);
+    		status = statusRegistroDAO.buscarPorCodigo("R");
+    		lstEstatus.add(status);
+    		status = statusRegistroDAO.buscarPorCodigo("F");
+    		statusRegistroDAO.buscarPorCodigo("J");
+    		lstEstatus.add(status);
+    		status = statusRegistroDAO.buscarPorCodigo("X");
+    		lstEstatus.add(status);
+    		
     		this.fechaInicio = new Date();
     		this.fechaFin = new Date();
     		this.badgeColor = "";
@@ -320,7 +332,7 @@ public class RepAsistenciabean implements Serializable {
         String titulo = "Actualizar asistencia";
         try {
 
-            if (this.registroSelected.getIdEstatus().getDescripcion().equals("Falta")) {
+            if ("F".equalsIgnoreCase(this.registroSelected.getIdEstatus().getCodigo())) {
                 int anio = DateUtil.getAnio(this.registroSelected.getFechaEntrada());
                 int mes = DateUtil.getMes(this.registroSelected.getFechaEntrada());
                 int dia = DateUtil.getDia(this.registroSelected.getFechaEntrada());
@@ -455,11 +467,11 @@ public class RepAsistenciabean implements Serializable {
     }
 
     public EstatusRegistroDAO getEstatusRegistroDAO() {
-        return estatusRegistroDAO;
+        return statusRegistroDAO;
     }
 
     public void setEstatusRegistroDAO(EstatusRegistroDAO estatusRegistroDAO) {
-        this.estatusRegistroDAO = estatusRegistroDAO;
+        this.statusRegistroDAO = estatusRegistroDAO;
     }
 
     public List<CatEstatusRegistro> getLstEstatus() {

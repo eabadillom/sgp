@@ -105,37 +105,52 @@
                 </p:panel>
             </div>
             <p:dialog header="Registro de asistencia" widgetVar="dgEditarRegistro" showEffect="fade" modal="true" responsive="true" draggable="true" resizable="false" dynamic="true">
-                <p:outputPanel id="pnl-registro" class="ui-fluid" rendered="#{repAsistenciaBean.registroSelected ne null}">
-               		<div class="p-field">
-               			<p:outputLabel value="Fecha" />
-               			<p:inputText value="#{repAsistenciaBean.registroSelected.fechaEntrada}" readonly="true">
-               				<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX" />
-               			</p:inputText>
-               		</div>
-                    <div class="p-field">
-                        <p:outputLabel for="@next" value="Entrada"/>
-                        <p:datePicker id="fechaEntrada" value="#{repAsistenciaBean.registroSelected.fechaEntrada}"
-                        				timeOnly="false" mindate="#{repAsistenciaBean.registroSelected.fechaEntrada}"
-                        				maxdate="#{repAsistenciaBean.registroSelected.fechaEntrada}"
-										pattern="dd/MM/yyyy HH:mm:ss" readonlyInput="false" timeZone="GMT-6" styleClass="ferbo-datePicker" 
-										panelStyleClass="ferbo-datePicker-panel" disabled="false" inline="true" showTime="true" timeInput="true" disabledDates="#{repAsistenciaBean.diasDesabilitados}">
-						</p:datePicker>
-                    </div>
-                    <div class="p-field">
-                        <p:outputLabel for="@next" value="Salida"/>
-                        <p:datePicker id="fechaSalida" value="#{repAsistenciaBean.registroSelected.fechaSalida}"
-                        				pattern="dd/MM/yyyy HH:mm:ss" timeOnly="false"
+                <p:outputPanel id="pnl-registro" rendered="#{repAsistenciaBean.registroSelected ne null}">
+                	<div class="ui-g">
+                		<div class="ui-g-2">
+	                		<p:outputLabel value="Fecha" />
+                		</div>
+                		<div class="ui-g-10">
+	               			<p:inputText value="#{repAsistenciaBean.registroSelected.fechaEntrada}" readonly="true">
+	               				<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX" />
+	               			</p:inputText>
+                		</div>
+                	</div>
+                	<div class="ui-g">
+                		<div class="ui-g-6">
+	                		<p:outputLabel for="@next" value="Entrada"/>
+                		</div>
+                		<div class="ui-g-6">
+                			<p:outputLabel for="@next" value="Salida"/>
+                		</div>
+                	</div>
+                	<div class="ui-g">
+                		<div class="ui-g-6">
+	                        <p:datePicker id="fechaEntrada" value="#{repAsistenciaBean.registroSelected.fechaEntrada}"
+	                        			pattern="dd/MM/yyyy HH:mm:ss" timeOnly="false"
+										readonlyInput="false" timeZone="GMT-6" 
+										disabled="false" inline="true" showTime="true" timeInput="true" disabledDates="#{repAsistenciaBean.diasDesabilitados}">
+							</p:datePicker>
+	                    </div>
+	                    <div class="ui-g-6">
+	                        <p:datePicker id="fechaSalida" value="#{repAsistenciaBean.registroSelected.fechaSalida}"
+	                        			pattern="dd/MM/yyyy HH:mm:ss" timeOnly="false"
 										readonlyInput="false" timeZone="GMT-6" 
 										panelStyleClass="ferbo-datePicker-panel" disabled="false" inline="true" showTime="true" timeInput="true" disabledDates="#{repAsistenciaBean.diasDesabilitados}">
-						</p:datePicker>
-                    </div>
-                    <div class="p-field">
-                        <p:outputLabel for="@next" value="Estatus del registro"/>
-                        <p:selectOneMenu id="EstatusRegistro" value="#{repAsistenciaBean.registroSelected.idEstatus}" converter="entityConverter">
-                            <f:selectItems value="#{repAsistenciaBean.lstEstatus}" var="estatusregistro" itemLabel="#{estatusregistro.descripcion}" itemValue="#{estatusregistro}"/>
-                            <p:ajax process="@this"/>
-                        </p:selectOneMenu>
-                    </div>
+							</p:datePicker>
+	                    </div>
+                	</div>
+                	<div class="ui-g">
+                		<div class="ui-g-3">
+	                        <p:outputLabel for="@next" value="Estatus del registro"/>
+	                    </div>
+	                    <div class="ui-g-3">
+	                    	<p:selectOneMenu id="EstatusRegistro" value="#{repAsistenciaBean.registroSelected.idEstatus}" converter="entityConverter">
+	                            <f:selectItems value="#{repAsistenciaBean.lstEstatus}" var="estatusregistro" itemLabel="#{estatusregistro.descripcion}" itemValue="#{estatusregistro}"/>
+	                            <p:ajax process="@this"/>
+	                        </p:selectOneMenu>
+	                    </div>
+                	</div>
                 </p:outputPanel>
                 <f:facet name="footer">
                     <p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{repAsistenciaBean.actualizarRegistro()}" update="form" oncomplete="PF('dgEditarRegistro').hide()"/>
