@@ -134,7 +134,7 @@ public class DetBiometrico implements Serializable {
 	@Override
 	public String toString() {
 		return "DetBiometrico [idBiometrico=" + idBiometrico + ", fechaCaptura=" + fechaCaptura + ", activo=" + activo
-				+ ", huella=" + huella + ", huella2=" + huella2 + "]";
+				+ ", huella=" + huella == null ? null : huella.length() + ", huella2=" + huella2 == null ? null : huella2.length() + "]";
 	}
     
 }
