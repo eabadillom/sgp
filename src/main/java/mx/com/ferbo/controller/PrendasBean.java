@@ -1,34 +1,30 @@
 package mx.com.ferbo.controller;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.primefaces.PrimeFaces;
+import org.primefaces.model.file.UploadedFile;
+
 import mx.com.ferbo.dao.n.PrendaDAO;
 import mx.com.ferbo.model.CatPrenda;
-import mx.com.ferbo.util.SGPException;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-import org.primefaces.PrimeFaces;
-import org.primefaces.event.FileUploadEvent;
-import org.primefaces.model.file.UploadedFile;
-import java.io.InputStream;
-import javax.servlet.ServletContext;
-import mx.com.ferbo.util.IOUtil;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.logging.Level;
 import mx.com.ferbo.util.DataSourceManager;
-import static org.omnifaces.util.Faces.getServletContext;
+import mx.com.ferbo.util.IOUtil;
+import mx.com.ferbo.util.SGPException;
 
 @Named(value = "prendasBean")
 @ViewScoped
@@ -43,7 +39,6 @@ public class PrendasBean implements Serializable {
 
     private FacesContext fc;
     private PrimeFaces pf;
-    private ServletContext sc;
 
     private UploadedFile imagen;
     private String direccion;
@@ -60,43 +55,7 @@ public class PrendasBean implements Serializable {
         pf = PrimeFaces.current();
         this.setDireccion(DataSourceManager.getJndiParameter("sgp/imagenes"));
     }
-
-    public CatPrenda getPrenda() {
-        return prenda;
-    }
-
-    public void setPrenda(CatPrenda prenda) {
-        this.prenda = prenda;
-    }
-
-    public List<CatPrenda> getPrendas() {
-        return prendas;
-    }
-
-    public String getAccion() {
-        return accion;
-    }
-
-    private void setAccion(String accion) {
-        this.accion = accion;
-    }
-
-    private String getDireccion() {
-        return direccion;
-    }
-
-    private void setDireccion(String direccion) {
-        this.direccion = direccion;
-    }
-
-    public UploadedFile getImagen() {
-        return imagen;
-    }
-
-    public void setImagen(UploadedFile imagen) {
-        this.imagen = imagen;
-    }
-
+    
     public void nuevaPrenda() {
         this.prenda = new CatPrenda();
         this.setAccion("Registrar");
@@ -224,7 +183,7 @@ public class PrendasBean implements Serializable {
         byte[] contenidoimagen = null;
         String nombreimagen = this.prenda.getDescripcion();
 
-        String ruta = this.getDireccion() + "prendas/";
+        String ruta = this.getDireccion() + File.separator + "uniformes";
         File directorio = new File(ruta);
         File buscado = this.buscaImagen(directorio, nombreimagen);
 
@@ -251,7 +210,7 @@ public class PrendasBean implements Serializable {
                 pf.ajax().update("frm:message");
             }
 
-            ruta = this.getDireccion() + "prendas/" + nombreimagen + ".jpg";
+            ruta = this.getDireccion() + File.separator + "uniformes" + File.separator + nombreimagen + ".jpg";
 
             try (FileOutputStream fos = new FileOutputStream(ruta)) {
                 fos.write(contenidoimagen);
@@ -306,6 +265,42 @@ public class PrendasBean implements Serializable {
         } catch (Exception ex) {
             throw new IOException("Problema al borrar la imagen del articulo.");
         }
+    }
+    
+    public CatPrenda getPrenda() {
+        return prenda;
+    }
+
+    public void setPrenda(CatPrenda prenda) {
+        this.prenda = prenda;
+    }
+
+    public List<CatPrenda> getPrendas() {
+        return prendas;
+    }
+
+    public String getAccion() {
+        return accion;
+    }
+
+    private void setAccion(String accion) {
+        this.accion = accion;
+    }
+
+    private String getDireccion() {
+        return direccion;
+    }
+
+    private void setDireccion(String direccion) {
+        this.direccion = direccion;
+    }
+
+    public UploadedFile getImagen() {
+        return imagen;
+    }
+
+    public void setImagen(UploadedFile imagen) {
+        this.imagen = imagen;
     }
 
 }

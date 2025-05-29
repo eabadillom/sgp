@@ -241,7 +241,7 @@ public class ArticulosBean implements Serializable {
                 PrimeFaces.current().ajax().update("frm:message");
             }
 
-            ruta = this.getDireccion() + File.separator + "articulos/" + nombreimagen + ".jpg";
+            ruta = this.getDireccion() + File.separator + "articulos" + File.separator + nombreimagen + ".jpg";
 
             try (FileOutputStream fos = new FileOutputStream(ruta)) {
                 fos.write(contenidoimagen);

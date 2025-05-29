@@ -27,7 +27,7 @@ public class ImageTool {
 		private final Integer width;
 		private final BigDecimal aspectRatio;
 		
-		public ImageSize(Integer height, Integer width) {
+		public ImageSize(Integer width, Integer height) {
 			this.height = height;
 			this.width = width;
 			
@@ -104,7 +104,7 @@ public class ImageTool {
 				.intValue()
 				;
 		
-		newImageSize = new ImageSize(newHeight, newWidth);
+		newImageSize = new ImageSize(newWidth, newHeight);
 		
 		return newImageSize;
 	}
@@ -126,6 +126,12 @@ public class ImageTool {
 				.divide(new BigDecimal(size.getHeight()), RoundingMode.HALF_UP)
 				.setScale(3, RoundingMode.HALF_UP);
 		
+		log.info("Original size: {}", size);
+		
+		log.info("New height: {}", maxHeight);
+		
+		log.info("Scale factor: {}", scaleFactor);
+		
 		newHeight = new BigDecimal(size.getHeight())
 				.multiply(scaleFactor)
 				.setScale(0, RoundingMode.HALF_UP)
@@ -136,7 +142,7 @@ public class ImageTool {
 				.setScale(0, RoundingMode.HALF_UP)
 				.intValue();
 		
-		newImageSize = new ImageSize(newHeight, newWidth);
+		newImageSize = new ImageSize(newWidth, newHeight);
 		
 		return newImageSize;
 	}
@@ -180,8 +186,6 @@ public class ImageTool {
 	
 	public static void resize(InputStream imagenEntrada, OutputStream imagenSalida, ImageSize size, String formatoSalida)
 	throws IOException {
-//		OutputStream imagenSalida = null;
-		
         BufferedImage imagenOriginal = ImageIO.read(imagenEntrada);
         Iterator<ImageReader> readers = ImageIO.getImageReaders(imagenEntrada);
         if (readers.hasNext()) {
@@ -234,7 +238,6 @@ public class ImageTool {
         g2dFinal.drawImage(imagenEscalada, 0, 0, size.getWidth(), size.getHeight(), null);
         g2dFinal.dispose();
         
-//        imagenSalida = new ByteArrayOutputStream();
         ImageIO.write(imagenFinal, formatoSalida, imagenSalida);
     }
 }
