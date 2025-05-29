@@ -27,6 +27,9 @@ public class DataSourceManager {
             
         } catch (NamingException ex) {
             try {
+            	if(initContext == null)
+            		initContext = new InitialContext();
+            	
                 Context envContext = (Context) initContext.lookup("java:/comp/env");
                 parameter = (String) envContext.lookup(name);
             } catch(NamingException inEx) {
