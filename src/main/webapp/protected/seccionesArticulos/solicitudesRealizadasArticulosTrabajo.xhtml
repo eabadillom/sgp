@@ -14,7 +14,8 @@
             <h:outputText value="#{articuloOficina.articulo.descripcion}" />
         </p:column>
         <p:column headerText="Imagen" width="100px">
-            <h:graphicImage name="images/articulos/#{articuloOficina.articulo.descripcion}.jpg" library="recursos" width="57" />
+            <!-- <h:graphicImage name="images/articulos/#{articuloOficina.articulo.descripcion}.jpg" library="recursos" width="57" /> -->
+            <h:graphicImage url="/imagen/articulo?name=#{articuloOficina.articulo.descripcion}.jpg" width="57" />
         </p:column>
         <p:column headerText="Cantidad" sortBy="#{articuloOficina.cantidad}"
                   width="100px">
@@ -44,7 +45,7 @@
     <p:dialog header="Detalle Estatus" id="dialogCambiarEstatus" showEffect="fade" modal="true" draggable="false" resizable="false"
         widgetVar="dialogCambiarEstatus" responsive="true" dynamic="true" cache="false" closable="false" 
         closeOnEscape="false" styleClass="ferbo-dialog-complemento-articulo">
-        <p:outputPanel id="pnlCancelar" rendered="#{not empty articuloOficinasBean.solicitud}">
+        <p:outputPanel id="pnlCancelar" rendered="#{articuloOficinasBean.solicitud ne null}">
             <div class="formgrid grid">
                 <div class="field col">
                     <p:outputLabel id="soArticulo" value="#{articuloOficinasBean.solicitud.articulo.descripcion}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
@@ -52,7 +53,8 @@
             </div>
             <div class="formgrid grid">
                 <div class="field col">
-                    <h:graphicImage id="imgArticulo" name="images/articulos/#{articuloOficinasBean.solicitud.articulo.descripcion}.jpg" library="recursos" width="113" rendered="#{articuloOficinasBean.solicitud.articulo.descripcion ne null}" styleClass="product-image"/>
+                    <!-- <h:graphicImage id="imgArticulo" name="images/articulos/#{articuloOficinasBean.solicitud.articulo.descripcion}.jpg" library="recursos" width="113" rendered="#{articuloOficinasBean.solicitud.articulo.descripcion ne null}" styleClass="product-image"/> -->
+                    <h:graphicImage id="imgArticulo" url="/imagen/articulo?name=#{articuloOficinasBean.solicitud.articulo.descripcion}.jpg" width="113" rendered="#{articuloOficinasBean.solicitud.articulo.descripcion ne null}" styleClass="product-image"/>
                 </div>
             </div>
             <h:panelGroup id="grupoRechazo" rendered="#{articuloOficinasBean.solicitud.descripcionRechazo ne null}" style="display:block ;font-size: 3rem;font-weight: 700;">

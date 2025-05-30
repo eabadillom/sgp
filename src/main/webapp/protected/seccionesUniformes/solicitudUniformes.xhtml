@@ -21,7 +21,6 @@
         </p:column>
         <p:column headerText="Imagen" width="18%">
         	<h:graphicImage url="/imagen/uniforme?name=#{prenda.descripcion}.jpg" height="60" />
-            <!-- <p:graphicImage name="images/prendas/#{uniforme.prenda.descripcion}.jpg" library="recursos" width="57" /> -->
         </p:column>
         <p:column headerText="Precio" sortBy="#{uniforme.cantidad}" width="18%">
             <h:outputText value="$#{uniforme.prenda.precio * uniforme.cantidad}" />
