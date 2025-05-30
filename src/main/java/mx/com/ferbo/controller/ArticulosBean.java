@@ -1,34 +1,30 @@
 package mx.com.ferbo.controller;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.primefaces.PrimeFaces;
+import org.primefaces.model.file.UploadedFile;
+
 import mx.com.ferbo.dao.n.ArticuloDAO;
 import mx.com.ferbo.model.CatArticulo;
-import mx.com.ferbo.util.SGPException;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-import org.primefaces.PrimeFaces;
-import org.primefaces.event.FileUploadEvent;
-import org.primefaces.model.file.UploadedFile;
-import java.io.InputStream;
-import javax.servlet.ServletContext;
-import mx.com.ferbo.util.IOUtil;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.logging.Level;
 import mx.com.ferbo.util.DataSourceManager;
-import static org.omnifaces.util.Faces.getServletContext;
+import mx.com.ferbo.util.IOUtil;
+import mx.com.ferbo.util.SGPException;
 
 @Named(value = "articulosBean")
 @ViewScoped
@@ -40,8 +36,6 @@ public class ArticulosBean implements Serializable {
     private List<CatArticulo> articulos;
     private CatArticulo articulo;
     private ArticuloDAO articulodao;
-
-    private ServletContext sc;
 
     private UploadedFile imagen;
     private String direccion;
@@ -220,7 +214,7 @@ public class ArticulosBean implements Serializable {
         byte[] contenidoimagen = null;
         String nombreimagen = this.articulo.getDescripcion();
 
-        String ruta = this.getDireccion() + "articulos/";
+        String ruta = this.getDireccion() + File.separator + "articulos";
         File directorio = new File(ruta);
         File buscado = this.buscaImagen(directorio, nombreimagen);
 
@@ -247,7 +241,7 @@ public class ArticulosBean implements Serializable {
                 PrimeFaces.current().ajax().update("frm:message");
             }
 
-            ruta = this.getDireccion() + "articulos/" + nombreimagen + ".jpg";
+            ruta = this.getDireccion() + File.separator + "articulos" + File.separator + nombreimagen + ".jpg";
 
             try (FileOutputStream fos = new FileOutputStream(ruta)) {
                 fos.write(contenidoimagen);

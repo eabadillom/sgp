@@ -22,7 +22,7 @@
             <p:outputLabel value="#{(prendas.tipoIncidencia.clave.matches('PR')) ? prendas.solPrenda.prenda.descripcion :''}"/>
         </p:column>
         <p:column headerText="Imagen" width="5rem">
-            <h:graphicImage name="images/prendas/#{prendas.solPrenda.prenda.descripcion}.jpg" library="recursos" width="57" />
+            <h:graphicImage url="/imagen/uniforme?name=#{prendas.solPrenda.prenda.descripcion}.jpg" width="57" />
         </p:column>
         <p:column headerText="Cantidad" width="5rem">
             <p:outputLabel value="#{(prendas.tipoIncidencia.clave.matches('PR')) ? prendas.solPrenda.cantidad : ''}"/>
@@ -49,7 +49,7 @@
 
     <p:dialog id="dialogPrendas" widgetVar="dialogPrendas" header="Detalle solicitud uniforme" showEffect="fade" responsive="true" modal="true" 
               styleClass="ferbo-dialog-complemento-articulo" dynamic="true" cache="false" >
-        <p:outputPanel id="pnlPrendas" rendered="#{not empty incidenciaBean.incidenciaSelected}">
+        <p:outputPanel id="pnlPrendas" rendered="#{incidenciaBean.incidenciaSelected ne null}">
             <div class="formgrid grid">
                 <div class="field col">
                     <p:outputLabel id="soPrenda" value="#{incidenciaBean.incidenciaSelected.solPrenda.prenda.descripcion}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
@@ -57,7 +57,7 @@
             </div>
             <div class="formgrid grid">
                 <div class="field col">
-                    <h:graphicImage id="imgPrenda" name="images/prendas/#{incidenciaBean.incidenciaSelected.solPrenda.prenda.descripcion}.jpg" library="recursos" width="113" rendered="#{incidenciaBean.incidenciaSelected.solPrenda.prenda.descripcion ne null}" styleClass="product-image"/>
+                    <h:graphicImage id="imgPrenda" url="/imagen/uniforme?name=#{incidenciaBean.incidenciaSelected.solPrenda.prenda.descripcion}.jpg" width="113" rendered="#{incidenciaBean.incidenciaSelected.solPrenda.prenda.descripcion ne null}" styleClass="product-image"/>
                 </div>
             </div>
             <div class="formgrid grid">
