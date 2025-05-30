@@ -78,8 +78,11 @@ public class ImagenUniformeServlet extends HttpServlet {
 		ImageSize newSize = null;
 		FileInputStream input = null;
 		
+		log.info("Imagen: {}", imagePath);
 		size = ImageTool.getSize(imagePath);
+		log.info("Tamaño: {}", size);
 		newSize = ImageTool.resizeToMaxHeight(size, 200);
+		log.info("Nuevo tamaño: {}", newSize);
 		input = new FileInputStream(imagePath);
 		response.setContentType("image/jpeg");
 		ImageTool.resize(input, response.getOutputStream(), newSize, "JPEG");

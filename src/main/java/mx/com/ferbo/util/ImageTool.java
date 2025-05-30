@@ -27,12 +27,21 @@ public class ImageTool {
 		private final Integer width;
 		private final BigDecimal aspectRatio;
 		
-		public ImageSize(Integer height, Integer width) {
+		public ImageSize(Integer width, Integer height) {
 			this.height = height;
 			this.width = width;
 			
+			if(height == null)
+				throw new IllegalArgumentException("Debe indicar el alto.");
+			
 			if(height == 0)
 				throw new IllegalArgumentException("El alto no puede ser cero para calcular la relación de aspecto.");
+			
+			if(width == null)
+				throw new IllegalArgumentException("Debe indicar el ancho.");
+			
+			if(width == 0)
+				throw new IllegalArgumentException("El ancho no puede ser cero.");
 			
 			this.aspectRatio = new BigDecimal(width).setScale(0, RoundingMode.HALF_UP)
 					.divide(new BigDecimal(this.height).setScale(0, RoundingMode.HALF_UP), RoundingMode.HALF_UP)
@@ -54,7 +63,7 @@ public class ImageTool {
 
 		@Override
 		public String toString() {
-			return "{\"height\":\"" + height + "\",  width\":\"" + width + "\",  aspectRatio\":\"" + aspectRatio + "}";
+			return "{\"width\":\"" + width + "\", \"height\":\"" + height + "\",  aspectRatio\":\"" + aspectRatio + "}";
 		}
 		
 		
@@ -104,7 +113,7 @@ public class ImageTool {
 				.intValue()
 				;
 		
-		newImageSize = new ImageSize(newHeight, newWidth);
+		newImageSize = new ImageSize(newWidth, newHeight);
 		
 		return newImageSize;
 	}
@@ -115,6 +124,8 @@ public class ImageTool {
 		Integer newWidth = null;
 		
 		BigDecimal scaleFactor = null;
+		
+		log.info("Original size: {}", size);
 		
 		if(maxHeight == null)
 			throw new IllegalArgumentException("La altura máxima no debe ser null");
@@ -136,7 +147,7 @@ public class ImageTool {
 				.setScale(0, RoundingMode.HALF_UP)
 				.intValue();
 		
-		newImageSize = new ImageSize(newHeight, newWidth);
+		newImageSize = new ImageSize(newWidth, newHeight);
 		
 		return newImageSize;
 	}
@@ -176,12 +187,9 @@ public class ImageTool {
 		return contenido;
 	}
 	
-	
-	
 	public static void resize(InputStream imagenEntrada, OutputStream imagenSalida, ImageSize size, String formatoSalida)
 	throws IOException {
-//		OutputStream imagenSalida = null;
-		
+		log.debug("Redimensionando imagen: ancho = {}, alto: {}", size.getWidth(), size.getHeight());
         BufferedImage imagenOriginal = ImageIO.read(imagenEntrada);
         Iterator<ImageReader> readers = ImageIO.getImageReaders(imagenEntrada);
         if (readers.hasNext()) {
@@ -234,7 +242,6 @@ public class ImageTool {
         g2dFinal.drawImage(imagenEscalada, 0, 0, size.getWidth(), size.getHeight(), null);
         g2dFinal.dispose();
         
-//        imagenSalida = new ByteArrayOutputStream();
         ImageIO.write(imagenFinal, formatoSalida, imagenSalida);
     }
 }

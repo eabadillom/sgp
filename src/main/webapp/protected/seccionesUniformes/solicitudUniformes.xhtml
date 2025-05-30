@@ -20,7 +20,7 @@
             <h:outputText value="#{uniforme.prenda.descripcion}" />
         </p:column>
         <p:column headerText="Imagen" width="18%">
-            <p:graphicImage name="images/prendas/#{uniforme.prenda.descripcion}.jpg" library="recursos" width="57" />
+        	<h:graphicImage url="/imagen/uniforme?name=#{prenda.descripcion}.jpg" height="60" />
         </p:column>
         <p:column headerText="Precio" sortBy="#{uniforme.cantidad}" width="18%">
             <h:outputText value="$#{uniforme.prenda.precio * uniforme.cantidad}" />
@@ -84,7 +84,9 @@
             <div style="height: 300px">
                 <div class="ferbo-list-item-prenda pl-5 pr-5 pt-0 pb-0">
                     <p:outputLabel value="#{prenda.descripcion}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
-                    <h:graphicImage name="images/prendas/#{prenda.descripcion}.jpg" library="recursos" styleClass="ferbo-prenda-imagen" alt="Sin imágen" />                    
+                    <!-- <h:graphicImage url="/imagen/uniforme?name=#{prenda.descripcion}.jpg" alt="Sin imágen" width="57" styleClass="ferbo-prenda-imagen"/> -->
+                    <!-- <h:graphicImage name="images/prendas/#{prenda.descripcion}.jpg" library="recursos"  alt="Sin imágen" width="57" /> -->         
+                    <h:graphicImage url="/imagen/uniforme?name=#{prenda.descripcion}.jpg" alt="Sin imagen" styleClass="ferbo-prenda-imagen" />           
                 </div>
                 <div class="ferbo-list-item-descripcion p-0">
                     <div class="product-list-action">
@@ -108,12 +110,13 @@
     <p:dialog id="dialogComplementoPrenda" showEffect="fade" modal="true" draggable="false" resizable="false"
               widgetVar="dialogComplementoPrenda" responsive="true" dynamic="true" cache="false" closable="false" closeOnEscape="false" styleClass="ferbo-dialog-complemento-prenda">
         <p:outputPanel id="manage-prendas-content" class="ui-fluid">
-            <p:outputPanel id="pnlPrendas" rendered="#{not empty uniformesBean.prendaSelected}">
+            <p:outputPanel id="pnlPrendas" rendered="#{uniformesBean.prendaSelected ne null}">
                 <div class="field" style="text-align: center">
                     <p:outputLabel value="#{uniformesBean.prendaSelected.descripcion}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
                 </div>
                 <div class="product-item-content" style="text-align: center">
-                    <h:graphicImage id="precioPrenda2" name="images/prendas/#{uniformesBean.prendaSelected.descripcion}.jpg" library="recursos" width="113" rendered="#{uniformesBean.prendaSelected.descripcion ne null}" styleClass="product-image"/>
+                    <!-- <h:graphicImage id="precioPrenda2" name="images/prendas/#{uniformesBean.prendaSelected.descripcion}.jpg" library="recursos" rendered="#{uniformesBean.prendaSelected.descripcion ne null}" styleClass="product-image"/> -->
+                    <h:graphicImage id="precioPrenda2" url="/imagen/uniforme?name=#{uniformesBean.prendaSelected.descripcion}.jpg" rendered="#{uniformesBean.prendaSelected.descripcion ne null}" styleClass="product-image"/>
                 </div>
                 <div class="field">
                     <p:outputLabel for="@next" value="Cantidad" />
@@ -189,6 +192,7 @@
         }
         .ferbo-prenda-imagen{
             height: 160px !important;
+            width: auto;
             margin: auto;
         }
         .ferbo-dialog-complemento-prenda{
