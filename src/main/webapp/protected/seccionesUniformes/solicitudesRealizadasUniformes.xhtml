@@ -12,7 +12,7 @@
             <h:outputText value="#{uniforme.prenda.descripcion}" />
         </p:column>
         <p:column headerText="Imagen" width="100px">
-            <h:graphicImage name="images/prendas/#{uniforme.prenda.descripcion}.jpg" library="recursos" width="57" />
+            <h:graphicImage url="/imagen/uniforme?name=#{uniforme.prenda.descripcion}.jpg" width="57" />
         </p:column>
         <p:column headerText="Precio" sortBy="#{uniforme.cantidad}" width="100px">
             <h:outputText value="Precio Individual: $#{uniforme.prenda.precio} / Precio Total: $#{uniforme.prenda.precio * uniforme.cantidad}" />
@@ -44,7 +44,7 @@
     <p:dialog header="Detalle Estatus" id="dialogCambiarEstatus" showEffect="fade" modal="true" draggable="false" resizable="false"
         widgetVar="dialogCambiarEstatus" responsive="true" dynamic="true" cache="false" closable="false" 
         closeOnEscape="false" styleClass="ferbo-dialog-complemento-prenda">
-        <p:outputPanel id="pnlCancelar" rendered="#{not empty uniformesBean.solicitud}">
+        <p:outputPanel id="pnlCancelar" rendered="#{uniformesBean.solicitud ne null}">
             <div class="formgrid grid">
                 <div class="field col">
                     <p:outputLabel id="soPrenda" value="#{uniformesBean.solicitud.prenda.descripcion}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>

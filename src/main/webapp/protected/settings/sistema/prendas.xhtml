@@ -33,8 +33,8 @@
                         <p:outputLabel value="#{prenda.descripcion}" />
                     </p:column>
 
-                    <p:column headerText="" width="18%" style="text-align: center;" >
-                        <h:graphicImage name="images/prendas/#{prenda.descripcion}.jpg" library="recursos" width="57" />
+                    <p:column headerText="" width="auto" style="text-align: center;" >
+                        <h:graphicImage url="/imagen/uniforme?name=#{prenda.descripcion}.jpg" height="60" />
                     </p:column>
 
                     <p:column headerText="Cantidad Maxima por pedido" sortBy="#{prenda.cantidadMax}" style="text-align: center;">

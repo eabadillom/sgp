@@ -34,7 +34,7 @@
                     </p:column>
 
                     <p:column headerText="" width="18%" style="text-align: center;" >
-                        <h:graphicImage name="images/articulos/#{articulo.descripcion}.jpg" library="recursos" width="57" />
+                        <h:graphicImage url="/imagen/articulo?name=#{articulo.descripcion}.jpg" width="57" />
                     </p:column>
 
                     <p:column headerText="Cantidad Maxima por pedido" sortBy="#{articulo.cantidadMax}" style="text-align: center;">

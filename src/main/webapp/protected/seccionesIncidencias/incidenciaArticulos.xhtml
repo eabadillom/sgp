@@ -22,7 +22,7 @@
             <p:outputLabel value="#{articulos.tipoIncidencia.idTipo eq 4 ? articulos.solArticulo.articulo.descripcion :''}"/>
         </p:column>
         <p:column headerText="Imagen" width="5rem">
-            <h:graphicImage name="images/articulos/#{articulos.solArticulo.articulo.descripcion}.jpg" library="recursos" width="57" />
+            <h:graphicImage url="/imagen/articulo?name=#{articulos.solArticulo.articulo.descripcion}.jpg" width="57" />
         </p:column>
         <p:column headerText="Cantidad / Unidad" width="5rem">
             <p:outputLabel value="#{articulos.tipoIncidencia.idTipo eq 4 ? articulos.solArticulo.cantidad :''} #{articulos.tipoIncidencia.idTipo eq 4 ? articulos.solArticulo.articulo.unidad :''}"/>
@@ -46,7 +46,7 @@
 
     <p:dialog id="dialogArticulos" showEffect="fade" modal="true" 
               widgetVar="dialogArticulos" responsive="true" dynamic="true" cache="false" styleClass="ferbo-dialog-complemento-articulo">
-        <p:outputPanel id="pnlArticulos" rendered="#{not empty incidenciaBean.incidenciaSelected}">
+        <p:outputPanel id="pnlArticulos" rendered="#{incidenciaBean.incidenciaSelected ne null}">
             <div class="formgrid grid">
                 <div class="field col">
                     <p:outputLabel value="#{incidenciaBean.incidenciaSelected.solArticulo.articulo.descripcion}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
@@ -54,7 +54,7 @@
             </div>
             <div class="formgrid grid">
                 <div class="field col">
-                    <h:graphicImage id="imgArticulo" name="images/articulos/#{incidenciaBean.incidenciaSelected.solArticulo.articulo.descripcion}.jpg" library="recursos" width="113" rendered="#{incidenciaBean.incidenciaSelected.solArticulo.articulo.descripcion ne null}" styleClass="product-image"/>
+                    <h:graphicImage id="imgArticulo" url="/imagen/articulo?name=#{incidenciaBean.incidenciaSelected.solArticulo.articulo.descripcion}.jpg" width="113" rendered="#{incidenciaBean.incidenciaSelected.solArticulo.articulo.descripcion ne null}" styleClass="product-image"/>
                 </div>
             </div>
             <div class="formgrid grid">
