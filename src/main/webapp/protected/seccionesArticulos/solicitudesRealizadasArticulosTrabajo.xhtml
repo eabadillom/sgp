@@ -14,7 +14,6 @@
             <h:outputText value="#{articuloOficina.articulo.descripcion}" />
         </p:column>
         <p:column headerText="Imagen" width="100px">
-            <!-- <h:graphicImage name="images/articulos/#{articuloOficina.articulo.descripcion}.jpg" library="recursos" width="57" /> -->
             <h:graphicImage url="/imagen/articulo?name=#{articuloOficina.articulo.descripcion}.jpg" width="57" />
         </p:column>
         <p:column headerText="Cantidad" sortBy="#{articuloOficina.cantidad}"
@@ -53,7 +52,6 @@
             </div>
             <div class="formgrid grid">
                 <div class="field col">
-                    <!-- <h:graphicImage id="imgArticulo" name="images/articulos/#{articuloOficinasBean.solicitud.articulo.descripcion}.jpg" library="recursos" width="113" rendered="#{articuloOficinasBean.solicitud.articulo.descripcion ne null}" styleClass="product-image"/> -->
                     <h:graphicImage id="imgArticulo" url="/imagen/articulo?name=#{articuloOficinasBean.solicitud.articulo.descripcion}.jpg" width="113" rendered="#{articuloOficinasBean.solicitud.articulo.descripcion ne null}" styleClass="product-image"/>
                 </div>
             </div>
