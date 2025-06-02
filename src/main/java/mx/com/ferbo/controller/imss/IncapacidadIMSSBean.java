@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -14,12 +13,14 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
-import mx.com.ferbo.business.dianolaboral.DiasDeDescansoObligatorioBL;
-import mx.com.ferbo.business.registro.RegistroBL;
-import mx.com.ferbo.business.incidencia.SolicitudPermisoBL;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.primefaces.PrimeFaces;
 
+import mx.com.ferbo.business.dianolaboral.DiasDeDescansoObligatorioBL;
+import mx.com.ferbo.business.incidencia.SolicitudPermisoBL;
+import mx.com.ferbo.business.registro.RegistroBL;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
-import mx.com.ferbo.dao.n.EmpresaDAO;
 import mx.com.ferbo.dao.n.EstatusIncapacidadDAO;
 import mx.com.ferbo.dao.n.imss.ControlIncapacidadIMSSDAO;
 import mx.com.ferbo.dao.n.imss.IncapacidadIMSSDAO;
@@ -27,7 +28,6 @@ import mx.com.ferbo.dao.n.imss.RiesgoTrabajoIMSSDAO;
 import mx.com.ferbo.dao.n.imss.TipoIncapacidadIMSSDAO;
 import mx.com.ferbo.dao.n.imss.TipoRiesgoIMSSDAO;
 import mx.com.ferbo.dao.n.sat.TipoIncapacidadSATDAO;
-
 import mx.com.ferbo.model.CatEstatusIncapacidad;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetRegistro;
@@ -38,14 +38,9 @@ import mx.com.ferbo.model.imss.CatTipoIncapacidadIMSS;
 import mx.com.ferbo.model.imss.CatTipoRiesgoIMSS;
 import mx.com.ferbo.model.imss.DetIncapacidad;
 import mx.com.ferbo.model.sat.CatTipoIncapacidadSAT;
-
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.ManageStatus;
 import mx.com.ferbo.util.SGPException;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.primefaces.PrimeFaces;
 
 /**
  *
@@ -67,7 +62,6 @@ public class IncapacidadIMSSBean implements Serializable
     private RiesgoTrabajoIMSSDAO riesgoTrabajoIMSSDAO;
     private TipoRiesgoIMSSDAO tipoRiesgoIMSSDAO;
     private EstatusIncapacidadDAO estatusSolicitudDAO;
-    private EmpresaDAO infDatoEmpresaDAO;
     private TipoIncapacidadSATDAO incapacidadSATDAO;
     
     private List<DetIncapacidad> listaRegistroIncapacidad;
@@ -87,11 +81,8 @@ public class IncapacidadIMSSBean implements Serializable
     private DetEmpleado empleadoRev;
     private CatTipoRiesgoIMSS tipoRiesgo;
     private CatEstatusIncapacidad estatusSolicitud;
-    private Date auxIncapacidadFechaInicial;
     private Date auxIncapacidadFechaFin;
     private int diasIncapacidad;
-    
-    private List<DetRegistro> lstAuxRegistros;
     
     private final String riesgoTrabajoSAT = "01";
     private final String accidenteTrabajo = "ATRB";
@@ -129,90 +120,76 @@ public class IncapacidadIMSSBean implements Serializable
         
         this.httpServletRequest = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         this.empleadoRev = (DetEmpleado) httpServletRequest.getSession(true).getAttribute("empleado");
+        
+		this.periodoFin = new Date();
+		this.periodoInicio = DateUtil.getFirstDayOfyear(this.periodoFin);
+		DateUtil.setTime(this.periodoInicio, 0, 0, 0);
+		this.validarFechaInicioFin();
+		
+		this.actualizarListaRegistroIncapacidades();
+		
+		
+		
+		this.listaIncapacidadesIMSS = this.tipoIncapacidadIMSSDAO.buscarTodos();
+		this.listaControlIncapacidadIMSS = this.controIncapacidadIMSSDAO.buscarTodos();
+		this.listaRiesgoTrabajo = this.riesgoTrabajoIMSSDAO.buscarTodos();
+		this.listaEmpleados = this.empleadoDAO.buscarTodosActivos((short) 1);
+		this.listaTipoRiesgoIMSS = this.tipoRiesgoIMSSDAO.buscarTodos();
+
+		this.status = new ManageStatus();
+
+		
+		this.estatusAprobado = false;
+		this.estatusCancelado = false;
+		this.estatusSolicitudAprobada = this.estatusSolicitudDAO.buscarPorClave(this.estatusIncidenciaAprobada);
+		this.estatusSolicitudCancelada = this.estatusSolicitudDAO.buscarPorClave(this.estatusIncidenciaCancelada);
+		this.riesgoIncapacidadDefuncion = this.riesgoTrabajoIMSSDAO.buscarPorClave(this.accidenteTrabajoDefuncion);
+		this.tipoIncapacidadSAT = this.incapacidadSATDAO.buscarPorId(this.riesgoTrabajoSAT);
+		this.tipoIncapacidadIMSS = this.tipoIncapacidadIMSSDAO.buscarPorClave(this.accidenteTrabajo);        
+        
+        
+        
     }
     
     @PostConstruct
-    public void init() 
-    {
-        this.actualizarListaRegistroIncapacidades();
-        this.listaIncapacidadesIMSS = this.tipoIncapacidadIMSSDAO.buscarTodos();
-        this.listaControlIncapacidadIMSS = this.controIncapacidadIMSSDAO.buscarTodos();
-        this.listaRiesgoTrabajo = this.riesgoTrabajoIMSSDAO.buscarTodos();
-        this.listaEmpleados = this.empleadoDAO.buscarTodosActivos((short)1);
-        this.listaTipoRiesgoIMSS = this.tipoRiesgoIMSSDAO.buscarTodos();
-        
-        this.status = new ManageStatus();
-        
-        this.periodoFin = new Date();
-        this.periodoInicio = DateUtil.inicializaFechaInicioAnioCurso(DateUtil.getAnio(periodoFin));
-        this.validarFechaInicioFin();
-        this.estatusAprobado = false;
-        this.estatusCancelado = false;
-        this.estatusSolicitudAprobada = this.estatusSolicitudDAO.buscarPorClave(this.estatusIncidenciaAprobada);
-        this.estatusSolicitudCancelada = this.estatusSolicitudDAO.buscarPorClave(this.estatusIncidenciaCancelada);
-        this.riesgoIncapacidadDefuncion = this.riesgoTrabajoIMSSDAO.buscarPorClave(this.accidenteTrabajoDefuncion);
-        this.tipoIncapacidadSAT = this.incapacidadSATDAO.buscarPorId(this.riesgoTrabajoSAT);
-        this.tipoIncapacidadIMSS = this.tipoIncapacidadIMSSDAO.buscarPorClave(this.accidenteTrabajo);
-    }
+	public void init() {
+
+	}
     
-    public void actualizarListaRegistroIncapacidades()
-    {
-        this.listaRegistroIncapacidad = registroIncapacidadDAO.buscarTodos();
-    }
+	public void actualizarListaRegistroIncapacidades() {
+		this.listaRegistroIncapacidad = registroIncapacidadDAO.buscarPorPeriodo(this.periodoInicio, this.periodoFin);
+	}
     
-    public void validarFechaInicioFin()
-    {
-        if(this.periodoFin.equals(this.periodoInicio))
-        {
-            this.periodoInicio = DateUtil.inicializaFechaInicioAnioCurso(DateUtil.getAnio(periodoFin) - 1);
-        }
-    }
+	public void validarFechaInicioFin() {
+		if (this.periodoFin.equals(this.periodoInicio)) {
+			this.periodoInicio = DateUtil.addYear(this.periodoFin, -1);
+		}
+	}
     
-    public List<DetIncapacidad> consultarIncapacidades()
-    {
-        List<DetIncapacidad> listaPeriodo = new ArrayList();
-        
-        if(this.periodoInicio != null && this.periodoFin != null)
-        {
-            List<DetIncapacidad> listAux = listaRegistroIncapacidad.stream()
-                .filter(objeto -> (objeto.getFechaInicio().compareTo(this.periodoInicio) == 0 || objeto.getFechaInicio().compareTo(this.periodoInicio) > 0))
-                .filter(objeto -> (objeto.getFechaFin().compareTo(this.periodoFin) == 0 || objeto.getFechaFin().compareTo(this.periodoFin) < 0))
-                .collect(Collectors.toList());
-            
-            listaPeriodo = Stream.concat(listaPeriodo.stream(), listAux.stream()).collect(Collectors.toList());
-        }
-        
-        List<DetIncapacidad> listaTipoEstatus = new ArrayList<>();
-        
-        if(!this.estatusAprobado && !this.estatusCancelado)
-        {
-            List<DetIncapacidad> listAux = listaPeriodo.stream()
-                .filter(objeto -> objeto.getEstatusSolicitud().getClave() == null)
-                .collect(Collectors.toList());
-            
-            listaTipoEstatus = Stream.concat(listaTipoEstatus.stream(), listAux.stream()).collect(Collectors.toList());
-        }
-        
-        if(this.estatusAprobado)
-        {
-            List<DetIncapacidad> listAux = listaPeriodo.stream()
-                .filter(objeto -> objeto.getEstatusSolicitud().equals(this.estatusSolicitudAprobada))
-                .collect(Collectors.toList());
-            
-            listaTipoEstatus = Stream.concat(listaTipoEstatus.stream(), listAux.stream()).collect(Collectors.toList());
-        }
-        
-        if(this.estatusCancelado)
-        {
-            List<DetIncapacidad> listAux = listaPeriodo.stream()
-                .filter(objeto -> objeto.getEstatusSolicitud().equals(this.estatusSolicitudCancelada))
-                .collect(Collectors.toList());
-            
-            listaTipoEstatus = Stream.concat(listaTipoEstatus.stream(), listAux.stream()).collect(Collectors.toList());
-        }
-        
-        return listaTipoEstatus;
-    }
+	public List<DetIncapacidad> consultarIncapacidades() {
+		List<DetIncapacidad> listaPeriodo = new ArrayList<DetIncapacidad>();
+		List<DetIncapacidad> listAprobado = null;
+		List<DetIncapacidad> listCancelado = null;
+		
+		if(this.estatusAprobado) {
+			listAprobado = this.listaRegistroIncapacidad.stream()
+					.filter(i -> i.getEstatusSolicitud().getClave().equalsIgnoreCase("A"))
+					.collect(Collectors.toList())
+					;
+			
+			listaPeriodo.addAll(listAprobado);
+		}
+		
+		if(this.estatusCancelado) {
+			listCancelado = this.listaRegistroIncapacidad.stream()
+					.filter(i -> i.getEstatusSolicitud().getClave().equalsIgnoreCase("C"))
+					.collect(Collectors.toList())
+					;
+			listaPeriodo.addAll(listCancelado);
+		}
+
+		return listaPeriodo;
+	}
     
     public void inicializaIncapacidad()
     {
@@ -255,7 +232,7 @@ public class IncapacidadIMSSBean implements Serializable
         }
         
         this.empleadoInc = aux.getIdEmpleadoInc();
-        this.auxIncapacidadFechaInicial = aux.getFechaInicio();
+//        this.auxIncapacidadFechaInicial = aux.getFechaInicio();
         this.auxIncapacidadFechaFin = aux.getFechaFin();
         this.diasIncapacidad = aux.getDiasAutorizados();
         this.accionBoton = "Actualizar";

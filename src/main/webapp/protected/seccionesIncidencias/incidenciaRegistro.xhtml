@@ -17,7 +17,7 @@
                         </p:datePicker>
                     </div>
                     <div class="field col-12 md:col-3">
-                        <p:outputLabel for="@next" value="Periodo Inicio" />
+                        <p:outputLabel for="@next" value="Periodo Fin" />
                         <p:datePicker  value="#{incidenciaBean.fin}" showIcon="true" locale="es" timeZone="GMT-6" pattern="dd/MM/yyyy">
                             <p:ajax update="dtRegistro" process="@this" />
                         </p:datePicker>
@@ -36,19 +36,19 @@
                 </p:inputText>
             </div>
         </f:facet>
-        <p:column headerText="Nombre" width="8rem">
+        <p:column headerText="Nombre">
             <p:outputLabel value="#{registro.idEmpleado.nombre} #{registro.idEmpleado.primerAp} #{registro.idEmpleado.segundoAp}"/>
         </p:column>
-        <p:column headerText="Fecha" width="5rem">
+        <p:column headerText="Fecha" width="10rem" style="text-align: center;">
             <p:outputLabel value="#{registro.fechaEntrada}">
-                <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+                <f:convertDateTime type="date" pattern="dd/MM/yyyy HH:mm:ss" />
             </p:outputLabel>
         </p:column>
-        <p:column headerText="Estatus" width="5rem">
+        <p:column headerText="Estatus" width="6rem" style="text-align: center;">
             <p:outputLabel class="customer-badge status-#{incidenciaBean.status.getEstatusRegistro(registro.idEstatus.codigo)}"
                            value="#{registro.idEstatus.descripcion}" style="display: block; width: 7rem"/>
         </p:column>
-        <p:column exportable="false" style="text-align: center" width="20px">
+        <p:column width="2rem" style="text-align: center;">
             <p:commandButton icon="pi pi-bars" class="ui-button-success rounded-button m-1" styleClass="edit-button" process="@this"
                              action="#{incidenciaBean.editarRegistro(registro)}" update="formIncidencias:tabViewI:pnlRegisto"
                              oncomplete="PF('dialogRegistro').show();">
