@@ -5,78 +5,76 @@
     xmlns:ui="http://java.sun.com/jsf/facelets"
     xmlns:p="http://primefaces.org/ui"
     template="/WEB-INF/plantillas/template.xhtml">
-    <ui:define name="title">Registro de Incapacidades</ui:define>
+    <ui:define name="title">Incapacidades</ui:define>
     <ui:define name="content">
         <h:form id="form">
             <p:growl id="messages" showDetail="true" />
-            <p:toolbarGroup>
-                <p:commandButton value="Registrar" icon="pi pi-plus" oncomplete="PF('dialogoRegistoIncapacidad').show();" update="pnlRegistoIncapacidad" 
-                                 actionListener="#{registroIncBean.incializarSolicitud()}" process="@this" style="margin-right: .5rem" >
-                    <p:resetInput target="form:pnlRegistoIncapacidad" />
-                </p:commandButton>
-                <div class="ui-fluid" >
-                    <div class="formgrid grid">
-                        <div class="field col-12 md:col-3">
-                            <p:outputLabel for="@next" value="Periodo Inicio" />
-                            <p:datePicker value="#{registroIncBean.periodoInicio}" showIcon="true" locale="es" timeZone="GMT-6" pattern="dd/MM/yyyy"
-                                          styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel">
-                                <p:ajax update="dtRegistroIncapacidad" process="@this" />
-                            </p:datePicker>
-                        </div>
-                        <div class="field col-12 md:col-3">
-                            <p:outputLabel for="@next" value="Periodo Fin" />
-                            <p:datePicker value="#{registroIncBean.periodoFin}" showIcon="true" locale="es" timeZone="GMT-6" pattern="dd/MM/yyyy"
-                                          styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel">
-                                <p:ajax update="dtRegistroIncapacidad" process="@this" />
-                            </p:datePicker>
-                        </div>
-                    </div>
-                    <div class="formgrid grid">
-                        <div class="field col-12 md:col-3">
-                            <p:selectBooleanButton id="idEstatusAprovado" value="#{registroIncBean.estatusAprobado}" onIcon="pi pi-check" offIcon="pi pi-times" style="width:2rem" >
-                                <p:ajax event="change" update="dtRegistroIncapacidad" process="@this"/>
-                            </p:selectBooleanButton>
-                            <p:outputLabel value="Aceptado" />
-                        </div>
-                        <div class="field col-12 md:col-3">
-                            <p:selectBooleanButton id="idEstatusCancelado" value="#{registroIncBean.estatusCancelado}" onIcon="pi pi-check" offIcon="pi pi-times" style="width:2rem" >
-                                <p:ajax event="change" update="dtRegistroIncapacidad" process="@this"/>
-                            </p:selectBooleanButton>
-                            <p:outputLabel value="Cancelado" />
-                        </div>
-                    </div>
-                </div>
-            </p:toolbarGroup>
+            
+            <div class="ui-fluid formgrid grid align-items-left">
+            	<div class="field col-12 md:col-2">
+            		<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+					<p:commandButton value="Registrar" icon="pi pi-plus" oncomplete="PF('dialogoRegistoIncapacidad').show();" update="pnlRegistoIncapacidad" 
+						actionListener="#{registroIncBean.incializarSolicitud()}" process="@this" style="margin-right: .5rem" >
+						<p:resetInput target="form:pnlRegistoIncapacidad" />
+					</p:commandButton>
+            	</div>
+            	<div class="field col-12 md:col-2">
+            		<p:outputLabel for="@next" value="Periodo Inicio" />
+					<p:datePicker value="#{registroIncBean.periodoInicio}" showIcon="true" locale="es" timeZone="GMT-6" pattern="dd/MM/yyyy"
+							styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel">
+						<p:ajax listener="#{registroIncBean.actualizarListaRegistroIncapacidades()}" update="dtRegistroIncapacidad" process="@this" />
+					</p:datePicker>
+            	</div>
+            	<div class="field col-12 md:col-2">
+					<p:outputLabel for="@next" value="Periodo Fin" />
+					<p:datePicker value="#{registroIncBean.periodoFin}" showIcon="true" locale="es" timeZone="GMT-6" pattern="dd/MM/yyyy"
+							styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel">
+						<p:ajax listener="#{registroIncBean.actualizarListaRegistroIncapacidades()}" update="form:dtRegistroIncapacidad" process="@this" />
+					</p:datePicker>
+            	</div>
+            	<div class="field col-12 md:col-2">
+            		<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+					<p:selectBooleanButton id="idEstatusAprobado" value="#{registroIncBean.estatusAprobado}" onIcon="pi pi-check" onLabel="Aceptada" offIcon="pi pi-times" offLabel="Aceptada" style="width: 100%;">
+						<p:ajax event="change" update="form:dtRegistroIncapacidad" process="@this"/>
+					</p:selectBooleanButton>
+            	</div>
+            	<div class="field col-12 md:col-2">
+            		<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+					<p:selectBooleanButton id="idEstatusCancelado" value="#{registroIncBean.estatusCancelado}" onIcon="pi pi-check" onLabel="Cancelada" offIcon="pi pi-times" offLabel="Cancelada" style="width: 100;">
+					    <p:ajax event="change" update="dtRegistroIncapacidad" process="@this"/>
+					</p:selectBooleanButton>
+            	</div>
+            </div>
+            
             <p:dataTable id="dtRegistroIncapacidad" widgetVar="dtRegistroIncapacidad" var="incapacidad" reflow="true"
                          value="#{registroIncBean.consultarIncapacidades()}" selection="#{registroIncBean.listaRegistroFiltrada}" 
                          paginator="true" rows="10" paginatorPosition="bottom" >
-                <p:column headerText="Empleado" style="text-align: center;" width="12rem">
+                <p:column headerText="Empleado">
                     <h:outputText value="#{incapacidad.idEmpleadoInc.nombre} #{incapacidad.idEmpleadoInc.primerAp} #{incapacidad.idEmpleadoInc.segundoAp}" />
                 </p:column>
-                <p:column headerText="Incapacidad" style="text-align: center;" width="5rem">
+                <p:column headerText="Incapacidad" style="text-align: center;" width="15rem">
                     <h:outputText value="#{incapacidad.tipoIncapacidad.descripcion}" />
                 </p:column>
-                <p:column headerText="Periodo" style="text-align: center;" width="5rem" >
+                <p:column headerText="Periodo" style="text-align: center;" width="8rem" >
                     <h:outputText value="#{incapacidad.fechaInicio}" >
-                        <f:convertDateTime type="date" pattern="dd/MM/yyyy" timeZone="GMT-6" />
+                        <f:convertDateTime type="date" pattern="dd MMM yyyy" timeZone="GMT-6" locale="es_MX"/>
                     </h:outputText>
-                    <p:outputLabel value=" - " />
+                    <p:outputLabel value=" al " />
                     <h:outputText value="#{incapacidad.fechaFin}" >
-                        <f:convertDateTime type="date" pattern="dd/MM/yyyy" timeZone="GMT-6"/>
+                        <f:convertDateTime type="date" pattern="dd MMM yyyy" timeZone="GMT-6" locale="es_MX"/>
                     </h:outputText>
                 </p:column>
-                <p:column headerText="Estatus" style="text-align: center;" width="3rem">
+                <p:column headerText="Estatus" style="text-align: center;" width="7rem">
                     <p:outputLabel class="customer-badge status-#{registroIncBean.status.getEstatusIncapacidad(incapacidad.estatusSolicitud.clave)}"
                         value="#{incapacidad.estatusSolicitud.descripcion}" style="width: 12rem"/>
                 </p:column>
-                <p:column exportable="false" ariaHeaderText="Actions" width="4rem">
-                    <p:commandButton class="ui-button-success rounded-button m-1" icon="pi pi-bars" update="form:pnlRegistoIncapacidad" 
-                        oncomplete="PF('dialogoRegistoIncapacidad').show()" styleClass="edit-button" process="@this"
-                        actionListener="#{registroIncBean.editarSolicitud(incapacidad)}" >
+                <p:column width="2rem" style="text-align: center;">
+                    <p:commandButton icon="pi pi-bars" update="form:pnlRegistoIncapacidad"  oncomplete="PF('dialogoRegistoIncapacidad').show()" process="@this" actionListener="#{registroIncBean.editarSolicitud(incapacidad)}" >
                         <f:setPropertyActionListener value="#{incapacidad}" target="#{registroIncBean.registroIncapacidad}" />
                     </p:commandButton>
-                    <p:commandButton class="ui-button-danger m-1" icon="pi pi-times" update="form:pnlRegistoIncapacidad" 
-                        oncomplete="PF('dialogoRegistoIncapacidad').show()" process="@this"
+                </p:column>
+                <p:column width="2rem" style="text-align: center;">
+                    <p:commandButton icon="pi pi-times" update="form:pnlRegistoIncapacidad" oncomplete="PF('dialogoRegistoIncapacidad').show()" styleClass="ui-button-danger" process="@this"
                         actionListener="#{registroIncBean.cancelarSolicitud(incapacidad)}" >
                         <f:setPropertyActionListener value="#{incapacidad}" target="#{registroIncBean.registroIncapacidad}" />
                     </p:commandButton>

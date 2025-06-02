@@ -16,20 +16,19 @@
         <h:form id="formIncidencias">
             <p:growl id="messages" showDetail="true" life="2500"/>
             <p:tabView id="tabViewI" cache="false" widgetVar="tvIncidencias" dynamic="true">
-                <p:tab title="Incidencias">
-                    <ui:include src="/protected/seccionesIncidencias/incidencia.xhtml" />
-                </p:tab>
-                <p:tab title="Uniformes">
-                    <ui:include src="/protected/seccionesIncidencias/incidenciaPrendas.xhtml" />
-                </p:tab>
-                <p:tab title="Articulos de Oficina">
-                    <ui:include src="/protected/seccionesIncidencias/incidenciaArticulos.xhtml" />
-                </p:tab>
                 <p:tab title="Retardos">
                     <ui:include src="/protected/seccionesIncidencias/incidenciaRegistro.xhtml" />
                 </p:tab>
-            </p:tabView>     
+                <p:tab title="Vacaciones / permisos">
+                    <ui:include src="/protected/seccionesIncidencias/incidencia.xhtml" />
+                </p:tab>
+                <p:tab title="Solicitudes de uniformes">
+                    <ui:include src="/protected/seccionesIncidencias/incidenciaPrendas.xhtml" />
+                </p:tab>
+                <p:tab title="Solicitudes de articulos">
+                    <ui:include src="/protected/seccionesIncidencias/incidenciaArticulos.xhtml" />
+                </p:tab>
+            </p:tabView>
         </h:form>
     </ui:define>
-
 </ui:composition>
