@@ -78,11 +78,11 @@
                 <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
             </p:outputLabel>
         </p:column>
-        <p:column headerText="Captura" width="5rem">
+        <!-- <p:column headerText="Captura" width="5rem">
             <p:outputLabel value="#{(incidencia.tipoIncidencia.idTipo eq 1 || incidencia.tipoIncidencia.idTipo eq 2) ? incidencia.fechaCap :''}">
                 <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
             </p:outputLabel>
-        </p:column>
+        </p:column> -->
         <p:column headerText="Estatus" width="5rem">
             <p:outputLabel class="customer-badge status-#{incidenciaBean.status.getStatusClass(incidencia.estatusIncidencia.clave)}"
                            value="#{incidencia.estatusIncidencia.descripcion}" style="display: block; width: 7rem"/>
