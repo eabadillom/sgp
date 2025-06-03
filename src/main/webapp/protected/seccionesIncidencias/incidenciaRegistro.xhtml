@@ -5,7 +5,40 @@
                 xmlns:jsf="http://xmlns.jcp.org/jsf"
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
-    
+	<script>
+	    PrimeFaces.locales['es'] = 
+	    {
+	        monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+	        monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+	        dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+	        dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
+	        dayNamesMin: ['D', 'L', 'M', 'X', 'J', 'V', 'S'],
+	        weekHeader: 'Semana',
+	        firstDay: 0,
+	        isRTL: false,
+	        showMonthAfterYear: false,
+	        yearSuffix: '',
+	        timeOnlyTitle: 'Sólo hora',
+	        timeText: 'Tiempo',
+	        hourText: 'Hora',
+	        minuteText: 'Minuto',
+	        secondText: 'Segundo',
+	        millisecondText: 'Milisegundo',
+	        ampm: false,
+	        month: 'Mes',
+	        week: 'Semana',
+	        day: 'Día',
+	        allDayText: 'Todo el día',
+	        today: 'Hoy',
+	        now: 'Ahora',
+	        clear: 'Limpiar',
+	        aria: {
+	           close: 'Cerrar',
+	           previous: 'Anterior',
+	           next: 'Siguiente'
+	       }
+	    };
+	</script>    
     <p:toolbar styleClass="mb-4">
         <p:toolbarGroup id="grupoBotonesRegistro" align="center">
             <div class="ui-fluid" >
@@ -91,10 +124,10 @@
             </p:commandButton>
         </f:facet>
     </p:dialog>
-    <p:confirmDialog widgetVar="dialogoJustificar" showEffect="fade" width="300"
+    <p:confirmDialog id="dlg-justificar" widgetVar="dialogoJustificar" showEffect="fade" width="300"
         message="Justificar Asistencia Empleado?" header="Confirmar" severity="warn">
         <p:commandButton value="Si" icon="pi pi-check" actionListener="#{incidenciaBean.actualizarRegistro()}"
-            process="@this" oncomplete="PF('dialogRegistro').hide()" >
+            process="@this" oncomplete="PF('dialogRegistro').hide()" update="formIncidencias:tabViewI:dtRegistro">
             <p:resetInput target="formIncidencias:tabViewI:pnlRegisto" />
         </p:commandButton>
         <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
@@ -102,38 +135,4 @@
             <p:resetInput target="formIncidencias:tabViewI:pnlRegisto" />
         </p:commandButton>
     </p:confirmDialog>
-    <script>
-        PrimeFaces.locales['es'] = 
-        {
-            monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-            monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-            dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
-            dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
-            dayNamesMin: ['D', 'L', 'M', 'X', 'J', 'V', 'S'],
-            weekHeader: 'Semana',
-            firstDay: 0,
-            isRTL: false,
-            showMonthAfterYear: false,
-            yearSuffix: '',
-            timeOnlyTitle: 'Sólo hora',
-            timeText: 'Tiempo',
-            hourText: 'Hora',
-            minuteText: 'Minuto',
-            secondText: 'Segundo',
-            millisecondText: 'Milisegundo',
-            ampm: false,
-            month: 'Mes',
-            week: 'Semana',
-            day: 'Día',
-            allDayText: 'Todo el día',
-            today: 'Hoy',
-            now: 'Ahora',
-            clear: 'Limpiar',
-            aria: {
-               close: 'Cerrar',
-               previous: 'Anterior',
-               next: 'Siguiente'
-           }
-        };
-    </script>
 </ui:composition>
