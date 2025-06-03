@@ -116,7 +116,6 @@ public class IncidenciaBean implements Serializable {
     private String sGoceSueldo;
     private String descripcionRechazo;
 
-    @SuppressWarnings("OverridableMethodCallInConstructor")
     public IncidenciaBean() {
         incidenciaDAO = new IncidenciaDAO();
         tipoSolicitudDAO = new TipoSolicitudDAO();
@@ -575,22 +574,20 @@ public class IncidenciaBean implements Serializable {
             RegistroBL.actualizarRegistroAsistencia(this.registro);
             mensaje = "Se actualizo el registro de asistencia";
             severity = FacesMessage.SEVERITY_INFO;
-        }
-        catch (SGPException ex) {
+            PrimeFaces.current().executeScript("PF('dialogoJustificar').hide()");
+        } catch (SGPException ex) {
             log.warn("Error al guardar el registro de asistencia del empleado: {}", empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
             log.warn("EX-0030: ", ex);
             mensaje = "Error al actualizar el registro, contacte al administrador de sistemas";
             severity = FacesMessage.SEVERITY_ERROR;
-        } finally{
+        } finally {
             consultarRegistrosAsistencia();
             message = new FacesMessage(severity, titulo, mensaje);
             FacesContext.getCurrentInstance().addMessage(null, message);
             PrimeFaces.current().ajax().update("formIncidencias:messages", "formIncidencias:tabViewI:dtRegistro");
-            PrimeFaces.current().executeScript("PF('dialogRechazar').hide()");
         }
     }
     
-    //<editor-fold defaultstate="collapsed" desc="Getters&Setters">
     public DetIncidencia getIncidenciaSelected() {
         return incidenciaSelected;
     }
