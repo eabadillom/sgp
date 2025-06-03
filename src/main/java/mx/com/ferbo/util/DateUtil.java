@@ -843,6 +843,7 @@ public class DateUtil {
         *@param anioEnCurso es el atributo del que se fijara la fecha inicial del año
         *return fecha, regresa la fecha de inicio del dia 1 de enero del año en curso
      */
+    @Deprecated
     public static Date inicializaFechaInicioAnioCurso(Integer anioEnCurso) 
     {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT-06:00"), Locale.getDefault());

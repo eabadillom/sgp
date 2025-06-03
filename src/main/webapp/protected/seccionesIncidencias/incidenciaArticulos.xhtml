@@ -5,38 +5,30 @@
                 xmlns:jsf="http://xmlns.jcp.org/jsf"
                 xmlns:h="http://xmlns.jcp.org/jsf/html">
 
-    <p:toolbar styleClass="mb-4">
-        <p:toolbarGroup align="right">
-            <p:commandButton value="Descargar" icon="pi pi-download" styleClass="ui-button-secondary" ajax="false">
-                <p:dataExporter type="pdf" target="dtArticulosSolicitados" fileName="articulos"/>
-            </p:commandButton>
-        </p:toolbarGroup>
-    </p:toolbar>
-
     <p:dataTable id="dtArticulosSolicitados" widgetVar="dtArticulosSolicitados" lazy="false" value="#{incidenciaBean.listaArticulos}" 
                  var="articulos" rowKey="#{articulos.idIncidencia}" paginator="true" rows="5" paginatorPosition="bottom">
-        <p:column headerText="Nombre" width="8rem">
+        <p:column headerText="Nombre">
             <p:outputLabel value="#{articulos.empleado.nombre} #{articulos.empleado.primerAp} #{articulos.empleado.segundoAp}"/>
         </p:column>
-        <p:column headerText="Articulos" width="5rem">
+        <p:column headerText="Articulos" width="10rem" style="text-align: center;">
             <p:outputLabel value="#{articulos.tipoIncidencia.idTipo eq 4 ? articulos.solArticulo.articulo.descripcion :''}"/>
         </p:column>
         <p:column headerText="Imagen" width="5rem">
             <h:graphicImage url="/imagen/articulo?name=#{articulos.solArticulo.articulo.descripcion}.jpg" width="57" />
         </p:column>
-        <p:column headerText="Cantidad / Unidad" width="5rem">
+        <p:column headerText="Cantidad / Unidad" width="5rem" style="text-align: center;">
             <p:outputLabel value="#{articulos.tipoIncidencia.idTipo eq 4 ? articulos.solArticulo.cantidad :''} #{articulos.tipoIncidencia.idTipo eq 4 ? articulos.solArticulo.articulo.unidad :''}"/>
         </p:column>
-        <p:column headerText="Captura" width="5rem">
+        <p:column headerText="Fecha solicitud" width="5rem" style="text-align: center;">
             <p:outputLabel value="#{articulos.tipoIncidencia.idTipo eq 4 ? articulos.fechaCap :''}">
                 <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
             </p:outputLabel>
         </p:column>
-        <p:column headerText="Estatus" width="5rem">
+        <p:column headerText="Estatus" width="6rem" style="text-align: center;">
             <p:outputLabel class="customer-badge status-#{incidenciaBean.status.getStatusClass(articulos.estatusIncidencia.clave)}"
                            value="#{articulos.estatusIncidencia.descripcion}" style="display: block; width: 7rem"/>
         </p:column>
-        <p:column exportable="false" style="text-align: center" width="5rem">
+        <p:column exportable="false" style="text-align: center" width="2rem">
             <p:commandButton icon="pi pi-bars" class="ui-button-success rounded-button m-1" styleClass="edit-button" process="@this"
                              action="#{incidenciaBean.visualizaDialog(articulos)}" update="formIncidencias:tabViewI:dialogArticulos">
                 <f:setPropertyActionListener value="#{articulos}" target="#{incidenciaBean.incidenciaSelected}" for="@previous"/>

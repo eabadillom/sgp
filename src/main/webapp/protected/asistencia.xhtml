@@ -5,7 +5,7 @@
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/plantillas/template.xhtml">
 
-    <ui:define name="title">Asistencia</ui:define>
+    <ui:define name="title">Mi asistencia</ui:define>
 
     <ui:define name="head">
         <h:outputScript library="recursos" name="js/primefaces_locale.js" />
@@ -19,10 +19,10 @@
                     <div class="card p-4">
                         <p:growl id="messages" showDetail="true" life="2500"/>
                         <p:tabView id="tabView" cache="false" widgetVar="tvAsistencia" dynamic="true">
-                            <p:tab title="Asistencia">
+                            <p:tab title="Registro de asistencia">
                                 <ui:include src="/protected/seccionesAsistencia/calendario.xhtml" />
                             </p:tab>
-                            <p:tab title="Vacaciones/Permisos">
+                            <p:tab title="Vacaciones / Permisos">
                                 <ui:include src="/protected/seccionesAsistencia/vacaciones.xhtml" />
                             </p:tab>
                         </p:tabView>                        
