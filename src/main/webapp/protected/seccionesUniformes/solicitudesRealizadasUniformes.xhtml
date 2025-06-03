@@ -52,7 +52,8 @@
             </div>
             <div class="formgrid grid">
                 <div class="field col">
-                    <h:graphicImage id="imgPrenda" name="images/prendas/#{uniformesBean.solicitud.prenda.descripcion}.jpg" library="recursos" width="113" rendered="#{uniformesBean.solicitud.prenda.descripcion ne null}" styleClass="product-image"/>
+                    <!-- <h:graphicImage id="imgPrenda" name="images/prendas/#{uniformesBean.solicitud.prenda.descripcion}.jpg" library="recursos" width="113" rendered="#{uniformesBean.solicitud.prenda.descripcion ne null}" styleClass="product-image"/> -->
+                    <h:graphicImage id="imgPrenda" url="/imagen/uniforme?name=#{uniformesBean.solicitud.prenda.descripcion}.jpg" width="113" rendered="#{uniformesBean.solicitud.prenda.descripcion ne null}" styleClass="product-image" />
                 </div>
             </div>
             <h:panelGroup id="fechaFinPanel" rendered="#{uniformesBean.solicitud.descripcionRechazo ne null}" style="display:block ;font-size: 3rem;font-weight: 700;">

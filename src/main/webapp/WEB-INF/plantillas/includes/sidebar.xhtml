@@ -6,6 +6,8 @@
     xmlns:p="http://primefaces.org/ui"
     xmlns:po="http://primefaces.org/omega">
     <h:form id="menuform">
+    	<h:outputStylesheet library="webjars" name="font-awesome/5.12.0/css/all.min-jsf.css" />
+		<h:outputStylesheet library="webjars" name="font-awesome/5.12.0/css/v4-shims.min-jsf.css" />
         <div class="sidebar">
 	        <div class="sidebar-scroll-content">
 	            <div class="profile">
@@ -13,20 +15,20 @@
 	            </div>
 	            <div class="menu">
 	                <po:menu widgetVar="OmegaMenuWidget">
-	                    <p:menuitem id="registroEmp" value="Registro de Empleados" icon="pi pi-fw pi-list" outcome="/protected/registroEmpleado" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1 or SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 2}"/>
-	                    <p:menuitem id="asistencia" value="Asistencia" icon="pi pi-fw pi-calendar" outcome="/protected/asistencia"/>
-	                    <p:menuitem id="incapacidad" value="Incapacidad" icon="pi pi-fw pi-calendar" outcome="/protected/settings/imss/registroIncapacidadIMSS" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1}"/>
-                            <p:menuitem id="incidencia" value="Incidencias" icon="pi pi-fw pi-check-circle" outcome="/protected/incidencias" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1 or SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 2 or SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 3}"/>
-	                    <p:menuitem id="uniformes" value="Uniforme" icon="pi pi-fw pi-compass" outcome="/protected/uniformes" rendered="#{SideBarBean.showUniformes}"/>
-	                    <p:menuitem id="articulos" value="Articulos" icon="pi pi-pencil" outcome="/protected/articulosTrabajo" rendered="#{SideBarBean.showUniformes}"/>
-	                    <p:menuitem id="cuotasImss" value="Cuotas del IMSS" icon="pi pi-book" outcome="/protected/cuotasImss" rendered="#{sideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1}"/>
-	                    <p:submenu id="nomina" label="Nomina" icon="pi pi-fw pi-money-bill" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1 }">
-		                    <p:menuitem id="nomina-semanal" value="Semanal" outcome="/protected/nomina/nomina-s" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1 }"/>
-		                    <p:menuitem id="nomina-extraordinaria" value="Extraordinaria" outcome="/protected/nomina/nomina-e" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1 }"/>
-	                    </p:submenu>
-	                    <p:menuitem id="reportes" value="Reportes" icon="pi pi-chart-bar" outcome="/protected/reportes" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1 }"/>
-	                    <p:menuitem id="ajustes" value="Ajustes" icon="pi pi-cog" outcome="/protected/settings/ajustes" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1}"></p:menuitem> 
-	                    <p:menuitem value="Salir" icon="pi pi-fw pi-sign-out" action="#{SideBarBean.killSesion()}"  process="@this" url="/sgp/login.jsp"/>
+						<p:menuitem id="registroEmp" value="Registro de Empleados" icon="fas fa-solid fa-user-plus" outcome="/protected/registroEmpleado" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1 or SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 2}"/>
+						<p:menuitem id="asistencia" value="Mi asistencia" icon="fas fa-solid fa-calendar-check" outcome="/protected/asistencia"/>
+						<p:menuitem id="uniformes" value="Solicitar uniforme" icon="fas fa-solid fa-tshirt" outcome="/protected/uniformes" rendered="#{SideBarBean.showUniformes}"/>
+						<p:menuitem id="articulos" value="Solicitar articulos" icon="fas fa-solid fa-clipboard-list" outcome="/protected/articulosTrabajo" rendered="#{SideBarBean.showUniformes}"/>
+						<p:menuitem id="incapacidad" value="Incapacidades" icon="fas fa-solid fa-stethoscope" outcome="/protected/settings/imss/registroIncapacidadIMSS" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1}"/>
+						<p:menuitem id="incidencia" value="Incidencias" icon="pi pi-fw pi-exclamation-circle" outcome="/protected/incidencias" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1 or SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 2 or SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 3}"/>
+						<p:menuitem id="cuotasImss" value="Cuotas del IMSS" icon="pi pi-book" outcome="/protected/cuotasImss" rendered="#{sideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1}"/>
+						<p:submenu id="nomina" label="Nomina" icon="fas fa-solid fa-file-invoice-dollar" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1 }">
+							<p:menuitem id="nomina-semanal" value="Semanal" outcome="/protected/nomina/nomina-s" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1 }"/>
+							<p:menuitem id="nomina-extraordinaria" value="Extraordinaria" outcome="/protected/nomina/nomina-e" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1 }"/>
+						</p:submenu>
+						<p:menuitem id="reportes" value="Reportes" icon="pi pi-chart-bar" outcome="/protected/reportes" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1 }"/>
+						<p:menuitem id="ajustes" value="Ajustes" icon="pi pi-cog" outcome="/protected/settings/ajustes" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1}"></p:menuitem> 
+						<p:menuitem value="Salir" icon="pi pi-fw pi-sign-out" action="#{SideBarBean.killSesion()}"  process="@this" url="/sgp/login.jsp"/>
 	                </po:menu>
 	            </div>
 	        </div>

@@ -5,41 +5,33 @@
                 xmlns:jsf="http://xmlns.jcp.org/jsf"
                 xmlns:h="http://xmlns.jcp.org/jsf/html">
 
-    <p:toolbar styleClass="mb-4">
-        <p:toolbarGroup align="right">
-            <p:commandButton value="Descargar" icon="pi pi-download" styleClass="ui-button-secondary" ajax="false">
-                <p:dataExporter type="pdf" target="dtPrendasSolicitados" fileName="prendas"/>
-            </p:commandButton>
-        </p:toolbarGroup>
-    </p:toolbar>
-
-    <p:dataTable id="dtPrendasSolicitados" widgetVar="dtPrendasSolicitados" lazy="false" value="#{incidenciaBean.listaPrendas}" 
+    <p:dataTable id="dtPrendasSolicitados" widgetVar="dtPrendasSolicitados" lazy="false" value="#{incidenciaBean.listaPrendas}"
                  var="prendas" rowKey="#{prendas.idIncidencia}" paginator="true" rows="5" paginatorPosition="bottom" >
-        <p:column headerText="Nombre" width="8rem">
+        <p:column headerText="Nombre">
             <p:outputLabel value="#{prendas.empleado.nombre} #{prendas.empleado.primerAp} #{prendas.empleado.segundoAp}"/>
         </p:column>
-        <p:column headerText="Prendas" width="5rem">
+        <p:column headerText="Descripción" width="10rem" style="text-align: center;">
             <p:outputLabel value="#{(prendas.tipoIncidencia.clave.matches('PR')) ? prendas.solPrenda.prenda.descripcion :''}"/>
         </p:column>
         <p:column headerText="Imagen" width="5rem">
-            <h:graphicImage url="/imagen/uniforme?name=#{prendas.solPrenda.prenda.descripcion}.jpg" width="57" />
+            <h:graphicImage url="/imagen/uniforme?name=#{prendas.solPrenda.prenda.descripcion}.jpg" width="60" />
         </p:column>
-        <p:column headerText="Cantidad" width="5rem">
+        <p:column headerText="Cantidad" width="5rem" style="text-align: center;">
             <p:outputLabel value="#{(prendas.tipoIncidencia.clave.matches('PR')) ? prendas.solPrenda.cantidad : ''}"/>
         </p:column>
-        <p:column headerText="Talla" width="5rem">
+        <p:column headerText="Talla" width="3rem" style="text-align: center;">
             <p:outputLabel value="#{(prendas.tipoIncidencia.clave.matches('PR')) ? prendas.solPrenda.talla.descripcion : ''}"/>
         </p:column>
-        <p:column headerText="Captura" width="5rem">
+        <p:column headerText="Fecha solicitud" width="5rem" style="text-align: center;">
             <p:outputLabel value="#{(prendas.tipoIncidencia.clave.matches('PR')) ? prendas.fechaCap : ''}">
                 <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
             </p:outputLabel>
         </p:column>
-        <p:column headerText="Estatus" width="5rem">
+        <p:column headerText="Estatus" width="6rem" style="text-align: center;">
             <p:outputLabel class="customer-badge status-#{incidenciaBean.status.getStatusClass(prendas.estatusIncidencia.clave)}"
                            value="#{prendas.estatusIncidencia.descripcion}" style="display: block; width: 7rem"/>
         </p:column>
-        <p:column exportable="false" style="text-align: center" width="5rem">
+        <p:column exportable="false" style="text-align: center" width="2rem">
             <p:commandButton icon="pi pi-bars" class="ui-button-success rounded-button m-1" styleClass="edit-button" process="@this" 
                              action="#{incidenciaBean.visualizaDialog(prendas)}" update="formIncidencias:tabViewI:dialogPrendas">
                 <f:setPropertyActionListener value="#{prendas}" target="#{incidenciaBean.incidenciaSelected}" for="@previous"/>
