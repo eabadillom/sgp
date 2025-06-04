@@ -112,7 +112,7 @@ public class ValesDespensaPBL extends AbstractPBL {
 			this.importeExento  = ValoresBD._CERO.get();
 			this.importeGravado = ValoresBD._CERO.get();
 		} finally {
-    		percepcion = this.build(nomina, CVE_VALES_DESPENSA, _CERO.get(), importeExento, importeGravado);
+    		percepcion = this.build(nomina, CVE_VALES_DESPENSA, this.cantidad, this.importeExento, this.importeGravado);
     	}
 		
 		return percepcion;

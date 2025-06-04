@@ -36,7 +36,7 @@ public class SeptimoDiaPBL extends AbstractPBL {
 		this.baseCalculo = this.nomina.getReceptor().getSalarioDiario();
 		this.diasTrabajados = nomina.getDiasLaborados();
 		this.diasVacaciones = nomina.getDiasVacaciones();
-		this.diasNoLaborales = nomina.getDiasNoLaborados();
+		this.diasNoLaborales = nomina.getDiasNoLaborales();
 	}
 
 	@Override
