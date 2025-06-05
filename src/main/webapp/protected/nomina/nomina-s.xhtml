@@ -325,8 +325,8 @@
 								<p:outputLabel value="#{percepcion.nombre}" />
 							</p:column>
 							<p:column headerText="Valor" width="5rem">
-								<p:inputNumber value="#{percepcion.cantidad}" decimalPlaces="2" decimalSeparator="." thousandSeparator="," inputStyle="text-align: right" readonly="#{nominaS.nomina.id ne null}">
-									<p:ajax process="@this" update="formNomina:tv-nomina" event="change" listener="#{nominaS.actualizarPercepcion(percepcion)}"/>
+								<p:inputNumber value="#{percepcion.cantidad}" decimalPlaces="3" decimalSeparator="." thousandSeparator="," inputStyle="text-align: right" readonly="#{nominaS.nomina.id ne null}">
+									<p:ajax process="@this" update="formNomina:tv-nomina" event="change" listener="#{nominaS.actualizarPorCantidad(percepcion)}"/>
 								</p:inputNumber>
 							</p:column>
 							<p:column headerText="Importe excento" width="8rem">
