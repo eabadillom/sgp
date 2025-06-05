@@ -214,6 +214,10 @@ public class NominaSemanalBL extends NominaBL {
 			case AbstractPBL.CVE_SEPTIMO_DIA:
 				percepcionBO = new SeptimoDiaPBL(parametros, nomina);
 				
+			case AbstractPBL.CVE_VALES_DESPENSA:
+				percepcionBO = new ValesDespensaPBL(parametros, nomina);
+				break;
+				
 			default:
 				log.info("[UI] La percepción solicitada no está considerada para la nómina extraordinaria o no está implementada.");
 				throw new UnsupportedOperationException("La percepción no está implementada.");
@@ -435,7 +439,7 @@ public class NominaSemanalBL extends NominaBL {
 			nomina.getPercepciones().add(percepcion);
 	}
 	
-	public void calcular(DetNomina nomina, String clavePercepcion, BigDecimal cantidad)
+	public static void calcular(DetNomina nomina, ParametrosNomina parametros, String clavePercepcion, BigDecimal cantidad)
 	throws SGPException {
 		AbstractPBL percepcionBO = null;
 		DetNominaPercepcion nuevaPercepcion = null;

@@ -1,18 +1,18 @@
 package mx.com.ferbo.business.percepcion;
 
+import static mx.com.ferbo.enums.ValoresBD._7;
+import static mx.com.ferbo.enums.ValoresBD._CERO;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import static mx.com.ferbo.enums.ValoresBD.*;
-
 import mx.com.ferbo.business.nomina.ParametrosNomina;
 import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
-import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.util.SGPException;
 
 /** Esta implementación del cálculo de vales de despensa tiene como base la UMA, para determinar de manera
@@ -25,18 +25,27 @@ public class ValesDespensaPBL extends AbstractPBL {
 	private static Logger log = LogManager.getLogger(ValesDespensaPBL.class);
 	
 	private BigDecimal diasTrabajados = null;
-	private BigDecimal uma = null;
 	private BigDecimal tasaVales = null;
 	private BigDecimal diasPeriodo = null;
 	
+	@Deprecated
 	public ValesDespensaPBL(ParametrosNomina parametros, DetNomina nomina, BigDecimal diasTrabajados, BigDecimal uma, BigDecimal tasaVales, BigDecimal diasPeriodo) {
 		super(parametros, nomina);
 		this.baseCalculo = uma;
 		
 		this.diasTrabajados = diasTrabajados;
-		this.uma = uma;
 		this.tasaVales = tasaVales;
 		this.diasPeriodo = diasPeriodo;
+	}
+	
+	public ValesDespensaPBL(ParametrosNomina parametros, DetNomina nomina) {
+		super(parametros, nomina);
+		this.baseCalculo = parametros.getUma().getImporteDiario();
+		this.diasTrabajados = nomina.getDiasLaborados();
+		this.diasPeriodo = new BigDecimal(parametros.getDiasPeriodo()).setScale(2, RoundingMode.HALF_UP);
+		//TODO La tasa de vales de despensa debe ser una propiedad que está configurada para el empleado,
+		//no en los parametros de la nómina.
+		this.tasaVales = parametros.getValeDespensa();
 	}
 	
 	@Override
@@ -57,7 +66,7 @@ public class ValesDespensaPBL extends AbstractPBL {
 		
 		//Cálculo de importes exento y gravado (para LISR, Art. 93, parrafo penultimo).
 		if(this.diasTrabajados.compareTo(_CERO.get()) == 0)
-			throw new SGPException("No es posible asignar vales de despensa.");
+			throw new SGPException("No es posible asignar vales de despensa porque el empleado no tiene asistencia en el periodo.");
 		
 		this.cantidad = this.calcularCantidad(nomina);
 		percepcion = this.procesar(nomina, this.cantidad);
@@ -68,7 +77,6 @@ public class ValesDespensaPBL extends AbstractPBL {
 	@Override
 	public DetNominaPercepcion procesar(DetNomina nomina, BigDecimal cantidad) throws SGPException {
 		DetNominaPercepcion percepcion = null;
-		DetPercepcionEmpleado percepcionEmpleado = null;
 		
 		try {
 			
@@ -82,19 +90,15 @@ public class ValesDespensaPBL extends AbstractPBL {
 			 * se calculará de manera diaria y se sumará al SBC.
 			 * */
 			//TODO Pendiente aplicar criterio de exención para SBC.
+			if(cantidad == null)
+				throw new SGPException("Debe indicar una cantidad.");
 			
-    		this.cantidad = this.calcularCantidad(nomina);
+			this.cantidad = cantidad;
+			
+			if(this.cantidad.compareTo(ValoresBD._CERO.get()) < 0)
+				throw new SGPException("La cantidad indicada es incorrecta");
+			
     		this.importe = this.calcularImporte(this.cantidad, this.baseCalculo);
-    		
-			percepcionEmpleado = this.buscaPercepcionEmpleado(P_VALES_DESPENSA);
-    		
-    		if(    (percepcionEmpleado != null) 
-    			&& (percepcionEmpleado.getActivo())
-				&& (percepcionEmpleado.getImporteMaximo() != null)
-				&& (importe.compareTo(percepcionEmpleado.getImporteMaximo()) > 0) ) {
-    			
-    			importe = percepcionEmpleado.getImporteMaximo();
-    		}
     		
     		this.calcularExentoGravado();
     		
@@ -128,7 +132,7 @@ public class ValesDespensaPBL extends AbstractPBL {
 	public BigDecimal calcularLimiteExento() {
 		/* Los vales de despensa están exentos de ISR hasta por 7 veces la UMA diaria.
 		 */
-		return this.uma
+		return this.baseCalculo
 				.multiply(_7.get())
 				.setScale(2, RoundingMode.HALF_UP);
 	}
