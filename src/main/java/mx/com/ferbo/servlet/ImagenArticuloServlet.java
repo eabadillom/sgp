@@ -36,7 +36,7 @@ public class ImagenArticuloServlet extends HttpServlet {
 		String jndiName = null;
 		
 		try {
-			imageName = request.getParameter("name");
+			imageName = request.getParameter("name");	
 			if(imageName == null)
 				throw new SGPException("No se proporcionó el nombre de la imgen.");
 			
