@@ -31,6 +31,7 @@ import mx.com.ferbo.dao.n.NominaDAO;
 import mx.com.ferbo.dao.n.PercepcionDAO;
 import mx.com.ferbo.dao.n.PeriodicidadPagoDAO;
 import mx.com.ferbo.dto.ui.Asistencia;
+import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.CatEmpresa;
 import mx.com.ferbo.model.CatPercepcion;
 import mx.com.ferbo.model.CatPeriodicidadPago;
@@ -361,6 +362,41 @@ public class NominaSemanalBean implements Serializable {
     	} finally {
     		PrimeFaces.current().ajax().update("formNomina:messages", "formNomina:tv-nomina");
     	}
+    }
+    
+    public void actualizarPorCantidad(DetNominaPercepcion percepcion) {
+    	FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Percepción";
+		
+		try {
+			if(percepcion == null)
+				throw new SGPException("No se ha definido una percepcion.");
+			
+			if(percepcion.getCantidad() == null)
+				throw new SGPException("No se ha definido una cantidad");
+			
+			if(percepcion.getCantidad().compareTo(ValoresBD._CERO.get()) <= 0)
+				throw new SGPException("La cantidad es incorrecta");
+			
+			NominaSemanalBL.calcular(nomina, parametros, percepcion.getClave(), percepcion.getCantidad());
+			
+			NominaSemanalBL.procesarISR(parametros, nomina);
+			
+			this.actualizar();
+		} catch(Exception ex) {
+			log.error("Problema para agregar la percepcion...", ex);
+    		mensaje = "Hay un problema para agregar la percepción.";
+			severity = FacesMessage.SEVERITY_ERROR;
+			
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+		} finally {
+			
+			PrimeFaces.current().ajax().update("formNomina:messages", "formNomina:tv-nomina");
+		}
+    	
     }
     
     public void actualizarPercepcion(DetNominaPercepcion percepcion) {

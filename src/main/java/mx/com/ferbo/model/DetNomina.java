@@ -131,6 +131,12 @@ public class DetNomina implements Serializable {
     @Basic(optional = true)
   	private Integer periodo;
     
+    @Transient
+    private BigDecimal diasLaborales;
+    
+    @Transient
+    private BigDecimal diasNoLaborales;
+    
     @Column(name = "nu_dias_laborados", precision = 6, scale = 2)
     @Basic(optional = true)
   	private BigDecimal diasLaborados;
@@ -469,5 +475,21 @@ public class DetNomina implements Serializable {
 
 	public void setDiasVacaciones(BigDecimal diasVacaciones) {
 		this.diasVacaciones = diasVacaciones;
+	}
+
+	public BigDecimal getDiasLaborales() {
+		return diasLaborales;
+	}
+
+	public void setDiasLaborales(BigDecimal diasLaborales) {
+		this.diasLaborales = diasLaborales;
+	}
+
+	public BigDecimal getDiasNoLaborales() {
+		return diasNoLaborales;
+	}
+
+	public void setDiasNoLaborales(BigDecimal diasNoLaborales) {
+		this.diasNoLaborales = diasNoLaborales;
 	}
 }
