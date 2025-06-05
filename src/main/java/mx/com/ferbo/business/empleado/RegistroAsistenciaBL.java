@@ -141,7 +141,7 @@ public class RegistroAsistenciaBL {
             registro = RegistroBL.validarConfiguracion(empleado, horaLimiteEntrada, fechaActual);
             if (empleado.getEmpleadoConfiguracion().getAsistenciaDiaNoLaboral() != null && empleado.getEmpleadoConfiguracion().getAsistenciaDiaNoLaboral()) {
                 if (EmpleadoBL.empleadoAsisteEnDiaDescanso(empleado)) {
-                    registro.setIdEstatus(estatusDAO.buscarPorCodigo("X"));
+                    registro.setStatus(estatusDAO.buscarPorCodigo("X"));
                 }
             }
             this.registroDAO.guardar(registro);

@@ -31,8 +31,8 @@ public class BonoPuntualidadPBL extends AbstractPBL {
 	private BigDecimal diasNoLaborales        = null;
 	private BigDecimal diasTrabajados         = null;
 	
-	private Boolean    procesaRetardos        = null;
 	
+	@Deprecated
 	public BonoPuntualidadPBL(
 			ParametrosNomina parametros, DetNomina nomina, BigDecimal tasaBono, 
 			Map<String, DetRegistro> mapAsistencias, BigDecimal diasLaborales, BigDecimal diasNoLaborales, BigDecimal diasTrabajados,
@@ -48,6 +48,20 @@ public class BonoPuntualidadPBL extends AbstractPBL {
 		
 	}
 	
+	public BonoPuntualidadPBL(ParametrosNomina parametros, DetNomina nomina) {
+		super(parametros, nomina);
+		this.baseCalculo     = this.nomina.getReceptor().getSalarioDiarioIntegrado();
+		this.diasTrabajados = nomina.getDiasLaborados();
+		this.diasLaborales  = nomina.getDiasLaborales();
+		this.diasNoLaborales = nomina.getDiasNoLaborales();
+		
+		//TODO Reemplazar posteriormente la tasa de bono de puntualidad por algún parametro proveniente
+		//de la configuración del empleado.
+		this.tasaBono        = this.parametros.getBonoPuntualidad();
+		
+	}
+	
+	
 	@Override
 	public DetNominaPercepcion procesar(DetNomina nomina) throws SGPException {
 		this.cantidad = this.calcularCantidad(nomina);
@@ -57,21 +71,10 @@ public class BonoPuntualidadPBL extends AbstractPBL {
 	@Override
 	public DetNominaPercepcion procesar(DetNomina nomina, BigDecimal cantidad) {
 		DetNominaPercepcion percepcion = null;
-		DetPercepcionEmpleado percepcionEmpleado = null;
 		
 		try {
 			this.cantidad = cantidad;
 			this.importe = this.calcularImporte(this.cantidad, this.baseCalculo);
-			
-			percepcionEmpleado = this.buscaPercepcionEmpleado(P_BONO_PUNTUALIDAD);
-			
-			if(    (percepcionEmpleado != null)
-					&& (percepcionEmpleado.getActivo())
-					&& (percepcionEmpleado.getImporteMaximo() != null)
-					&& (importe.compareTo(percepcionEmpleado.getImporteMaximo()) > 0) ) {
-				
-				importe = percepcionEmpleado.getImporteMaximo();
-			}
 			
 			this.calcularExentoGravado();
 			
@@ -88,32 +91,15 @@ public class BonoPuntualidadPBL extends AbstractPBL {
 		return percepcion;
 	}
 
-	public void setProcesaRetardos(Boolean procesaRetardos) {
-		this.procesaRetardos = procesaRetardos;
-	}
-	
 	@Override
 	protected BigDecimal calcularCantidad(DetNomina nomina)
 	throws SGPException {
 		BigDecimal diasPeriodo = null;
 		BigDecimal cantidad = null;
 		
-		//TODO VALIDAR PRIMERO SI NO HAY RETARDOS.
-		//En caso de existir retardos en el periodo de calculo, el bono de puntualidad es CERO.
-		if(this.diasTrabajados.compareTo(this.diasLaborales) < 0)
-			throw new SGPException("El empleado tiene ausencias, por lo que no se otorgará el bono de puntualidad.");
-		
-		if(this.procesaRetardos == null)
-			this.procesaRetardos = Boolean.FALSE;
-		
-		for(Map.Entry<String, DetRegistro> entry : this.mapAsistencias.entrySet()) {
-			log.info("Entry: {}", entry);
-			String claveStatusRegistro = entry.getValue().getIdEstatus().getCodigo();
-			if(procesaRetardos.booleanValue() && ("R".equalsIgnoreCase(claveStatusRegistro) || "F".equalsIgnoreCase(claveStatusRegistro)) )
-				throw new SGPException("Existen dias con retardo no justificados o faltas para el empleado.");
-		}
-		
 		diasPeriodo = this.diasTrabajados.add(this.diasNoLaborales).setScale(2, RoundingMode.HALF_UP);
+		
+		
 		
 		cantidad = this.tasaBono.multiply(diasPeriodo).setScale(5, RoundingMode.HALF_UP);
 		

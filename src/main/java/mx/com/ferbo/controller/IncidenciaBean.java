@@ -570,7 +570,7 @@ public class IncidenciaBean implements Serializable {
         String titulo = "Registro";
         try 
         {
-            this.registro.setIdEstatus(estatusRegJustificado);
+            this.registro.setStatus(estatusRegJustificado);
             RegistroBL.actualizarRegistroAsistencia(this.registro);
             mensaje = "Se actualizo el registro de asistencia";
             severity = FacesMessage.SEVERITY_INFO;

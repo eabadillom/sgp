@@ -59,7 +59,7 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
                     .setParameter("fechaEntradaFin", fechaEntradaFin)
                     .getSingleResult();
             log.debug("IdEmpleado: {}", model.getIdEmpleado().getIdEmpleado());
-            log.debug("Estatus: {}", model.getIdEstatus().getIdEstatus());
+            log.debug("Estatus: {}", model.getStatus().getIdEstatus());
         } catch (Exception ex) {
             model = null;
         } finally {
@@ -82,7 +82,7 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
 
             for (DetRegistro r : modelList) {
                 log.trace("Registro - idEmpleado: {}", r.getIdEmpleado().getIdEmpleado());
-                log.trace("Status registro: {}", r.getIdEstatus().getIdEstatus());
+                log.trace("Status registro: {}", r.getStatus().getIdEstatus());
             }
 
         } catch (Exception ex) {
@@ -260,7 +260,7 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
             
             for (DetRegistro r : modelList) {
                 log.debug("Registro - idEmpleado: {}", r.getIdEmpleado().getIdEmpleado());
-                log.debug("Status registro: {}", r.getIdEstatus().getIdEstatus());
+                log.debug("Status registro: {}", r.getStatus().getIdEstatus());
             }
         }catch (Exception ex) 
         {
