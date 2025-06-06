@@ -152,13 +152,13 @@ public class RegistroBL implements Serializable
         log.info("Hora actual del sistema: {}", horaSistema);
         if (empleadoConf == null || empleadoConf.getRetardo() == null) {
             log.info("Registro sin la configuracion de retardo");
-            registro.setIdEstatus((horaSistema.after(horaLimiteEntrada)) ? statusRetardo : statusEnTiempo);
+            registro.setStatus((horaSistema.after(horaLimiteEntrada)) ? statusRetardo : statusEnTiempo);
         } else {
             log.info("Registro con la configuracion de retardo: {}", empleadoConf.toString());
             if (empleadoConf.getRetardo() == true) {
-                registro.setIdEstatus((horaSistema.after(horaLimiteEntrada)) ? statusRetardo : statusEnTiempo);
+                registro.setStatus((horaSistema.after(horaLimiteEntrada)) ? statusRetardo : statusEnTiempo);
             } else {
-                registro.setIdEstatus(statusEnTiempo);
+                registro.setStatus(statusEnTiempo);
             }
         }
         return registro;
@@ -196,7 +196,7 @@ public class RegistroBL implements Serializable
         {
             DetRegistro registro = new DetRegistro();
             registro.setIdEmpleado(empleado);
-            registro.setIdEstatus(statusVacaciones);
+            registro.setStatus(statusVacaciones);
 
             Date registroEntrada = DateUtil.getDateTime(DateUtil.getAnio(dia), DateUtil.getMes(dia), DateUtil.getDia(dia), horaEntrada, 0, 0, 0);
             log.trace("Dia hora entrada: {}", registroEntrada);
@@ -234,7 +234,7 @@ public class RegistroBL implements Serializable
             {
                 DetRegistro registro = new DetRegistro();
                 registro.setIdEmpleado(empleadoInc);
-                registro.setIdEstatus(EstatusRegistroBL.estatusIncapacidad());
+                registro.setStatus(EstatusRegistroBL.estatusIncapacidad());
 
                 Date registroEntrada = DateUtil.getDateTime(DateUtil.getAnio(dia), DateUtil.getMes(dia), DateUtil.getDia(dia), horaEntrada, 0, 0, 0);
                 registro.setFechaEntrada(registroEntrada);
@@ -275,7 +275,7 @@ public class RegistroBL implements Serializable
             {
                 DetRegistro registro = new DetRegistro();
                 registro.setIdEmpleado(empleadoInc);
-                registro.setIdEstatus(EstatusRegistroBL.estatusIncapacidad());
+                registro.setStatus(EstatusRegistroBL.estatusIncapacidad());
 
                 Date registroEntrada = DateUtil.getDateTime(DateUtil.getAnio(dia), DateUtil.getMes(dia), DateUtil.getDia(dia), horaEntrada, 0, 0, 0);
                 registro.setFechaEntrada(registroEntrada);

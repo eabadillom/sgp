@@ -41,16 +41,9 @@
                                 </p:selectOneMenu>
                             </p:toolbarGroup>
                             <p:toolbarGroup>
-                                <p:outputLabel id="toggleactivo" value="Activo"/>
-                                <p:toggleSwitch value="#{registroEmpleadosBean.activo}">
-                                    <p:ajax event="change" update="dtEmpleados" process="@this"/>
-                                </p:toggleSwitch>
-                            </p:toolbarGroup>
-                            <p:toolbarGroup>
-                                <p:outputLabel value="Inactivo"/>
-                                <p:toggleSwitch id="toggleinactivo" value="#{registroEmpleadosBean.inactivo}">
-                                    <p:ajax event="change" update="dtEmpleados" process="@this"/>
-                                </p:toggleSwitch>
+                                <p:selectBooleanButton value="#{registroEmpleadosBean.activo}" onLabel="Activo" offLabel="Activo" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem">
+                                	<p:ajax event="change" update="dtEmpleados" process="@this"/>
+                                </p:selectBooleanButton>
                             </p:toolbarGroup>
                             <p:toolbarGroup align="right">
                                 <p:commandButton value="Descargar" icon="pi pi-download" styleClass="ui-button-secondary" ajax="false">

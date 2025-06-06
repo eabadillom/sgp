@@ -305,7 +305,7 @@ public class RepAsistenciabean implements Serializable {
     			}
     		}
     		
-    		if (registro.getIdEstatus().getDescripcion().equals("Falta")) {
+    		if (registro.getStatus().getDescripcion().equals("Falta")) {
     			int horaSalida = DateUtil.getHora(registro.getIdEmpleado().getDatoEmpresa().getHorasalida());
     			Date diaSalida = DateUtil.getDateTime(anio, mes, dia, horaSalida, 0, 0, 0);
     			registro.setFechaSalida(diaSalida);
@@ -332,7 +332,7 @@ public class RepAsistenciabean implements Serializable {
         String titulo = "Actualizar asistencia";
         try {
 
-            if ("F".equalsIgnoreCase(this.registroSelected.getIdEstatus().getCodigo())) {
+            if ("F".equalsIgnoreCase(this.registroSelected.getStatus().getCodigo())) {
                 int anio = DateUtil.getAnio(this.registroSelected.getFechaEntrada());
                 int mes = DateUtil.getMes(this.registroSelected.getFechaEntrada());
                 int dia = DateUtil.getDia(this.registroSelected.getFechaEntrada());
@@ -364,7 +364,7 @@ public class RepAsistenciabean implements Serializable {
 
     public String obtenerEstatusAsistencia(DetRegistro registro) {
     	try {
-    		switch (registro.getIdEstatus().getCodigo()) {
+    		switch (registro.getStatus().getCodigo()) {
     		
     		case "T":
     		case "J":
@@ -391,7 +391,7 @@ public class RepAsistenciabean implements Serializable {
     		log.error("Problema para determinar el status del registro de asistencia...", ex);
         }
 
-        return registro.getIdEstatus().getDescripcion();
+        return registro.getStatus().getDescripcion();
     }
 
     public List<CatPlanta> getPlantas() {

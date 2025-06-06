@@ -150,7 +150,7 @@ public class LoginBean implements Serializable {
                         } else {
                             catEstatusRegistro.setIdEstatus(1);
                         }
-                        registroEmpleado.setIdEstatus(catEstatusRegistro);
+                        registroEmpleado.setStatus(catEstatusRegistro);
                         try {
                             registroDAO.guardar(registroEmpleado);
 
