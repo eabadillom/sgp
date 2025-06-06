@@ -69,7 +69,6 @@ import mx.com.ferbo.model.sat.CatTipoContrato;
 import mx.com.ferbo.model.sat.CatTipoJornada;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.model.sat.CatTipoRegimen;
-import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.ManageStatus;
 import mx.com.ferbo.util.SGPException;
 
@@ -129,7 +128,6 @@ public class RegistroEmpleadosBean implements Serializable {
     private CatPlanta planta;
     private CatEmpresa empresa;
     private boolean activo;
-    private boolean inactivo;
 
     private CatTipoBajaEmpleado tipodebaja;
     private TipoBajaEmpleadoDAO tipoBajaEmpleadoDAO;
@@ -186,11 +184,6 @@ public class RegistroEmpleadosBean implements Serializable {
     		lstEmpleados = new ArrayList<>();
     		lstEmpleadosSelected = new ArrayList<>();
     		
-    		
-    		
-    		
-    		
-    		
     		lstCatEmpresa = empresaDAO.buscarActivo();
             lstCatPerfil = perfilDAO.buscarActivo();
             lstCatPlanta = plantaDAO.buscarActivo();
@@ -207,6 +200,8 @@ public class RegistroEmpleadosBean implements Serializable {
             tiposdebaja = tipoBajaEmpleadoDAO.obtenerTodos();
             lstBancos = bancoDAO.buscarTodos();
             
+            this.activo = Boolean.TRUE;
+            
             consultaEmpleados();
     	} catch(Exception ex) {
     		log.error("Problema para inicializar el registro de empleados...", ex);
@@ -215,9 +210,6 @@ public class RegistroEmpleadosBean implements Serializable {
 
     @PostConstruct
     public void init() {
-        this.activo = false;
-        this.inactivo = false;
-        
         try {
         	this.redirigir();
             prestamo = new DetPrestamo();
@@ -724,6 +716,124 @@ public class RegistroEmpleadosBean implements Serializable {
         this.empleado.setSegundoAp(apellidoMa);
         this.empleado.setCurp(curp);
     }
+    
+    public List<DetEmpleado> filtrarEmpleados() {
+    	
+    	//Sin filtro de empresa y planta. Activos seleccionados.
+    	//Devuelve todos los empleados.
+        if (this.empresa == null && this.planta == null && this.activo == true) {
+            return this.lstEmpleados.stream()
+            		.filter( e -> e.getActivo() == 1)
+            		.collect(Collectors.toList());
+        }
+        
+        //Sin filtro de empresa y planta. Sólo inactivos seleccionados.
+        //Devuelve los empleados inactivos.
+        if(this.empresa == null && this.planta == null && this.activo == false) {
+        	return this.lstEmpleados.stream()
+        			.filter( e -> e.getActivo() == 0)
+        			.collect(Collectors.toList());
+        }
+        
+        //Con filtro de empresa, sin filtro de planta. Activos e Inactivos seleccionados.
+        //Devuelve los empleados relacionados a una empresa, cualquier planta, activos e inactivos.
+        if(this.empresa != null && this.planta == null && this.activo == true) {
+        	
+        	return this.lstEmpleados.stream()
+        			.filter( e -> e.getDatoEmpresa() != null)
+        			.filter( e -> e.getDatoEmpresa().getEmpresa() != null)
+        			.filter( e -> e.getDatoEmpresa().getEmpresa().getIdEmpresa() == this.empresa.getIdEmpresa() )
+        			.filter( e -> e.getActivo() == 1 )
+        			.collect(Collectors.toList());
+        }
+        
+        if(this.empresa != null && this.planta == null && this.activo == false) {
+        	
+        	return this.lstEmpleados.stream()
+        			.filter( e -> e.getDatoEmpresa() != null )
+        			.filter( e -> e.getDatoEmpresa().getEmpresa() != null )
+        			.filter( e -> e.getDatoEmpresa().getEmpresa().getIdEmpresa() == this.empresa.getIdEmpresa() )
+        			.filter( e -> e.getActivo() == 0 )
+        			.collect(Collectors.toList());
+        }
+        
+        //Con filtro de planta, sin filtro de empresa. Activos seleccionados.
+        //Devuelve los empleados relacionados a una planta, cualquier empresa, activos.
+        if(this.empresa == null && this.planta != null && this.activo == true) {
+        	
+        	return this.lstEmpleados.stream()
+        			.filter( e -> e.getDatoEmpresa() != null )
+        			.filter( e -> e.getDatoEmpresa().getPlanta() != null )
+        			.filter( e -> e.getDatoEmpresa().getPlanta().getIdPlanta() == this.planta.getIdPlanta())
+        			.filter( e -> e.getActivo() == 1 )
+        			.collect(Collectors.toList());
+        }
+        
+        //Con filtro de planta, sin filtro de empresa. Inactivos seleccionados.
+        //Devuelve los empleados relacionados a una planta, cualquier empresa, inactivos.
+        if(this.empresa == null && this.planta != null && this.activo == false) {
+        	
+        	return this.lstEmpleados.stream()
+        			.filter( e -> e.getDatoEmpresa() != null )
+        			.filter( e -> e.getDatoEmpresa().getPlanta() != null )
+        			.filter( e -> e.getDatoEmpresa().getPlanta().getIdPlanta() == this.planta.getIdPlanta() )
+        			.filter( e -> e.getActivo() == 0)
+        			.collect(Collectors.toList());
+        }
+        
+        if(this.empresa != null && this.planta != null && this.activo == true) {
+        	return this.lstEmpleados.stream()
+        			.filter( e -> e.getDatoEmpresa() != null )
+        			.filter( e -> e.getDatoEmpresa().getEmpresa() != null)
+        			.filter( e -> e.getDatoEmpresa().getPlanta() != null )
+        			.filter( e -> e.getDatoEmpresa().getEmpresa().getIdEmpresa() == this.empresa.getIdEmpresa() )
+        			.filter( e -> e.getDatoEmpresa().getPlanta().getIdPlanta() == this.planta.getIdPlanta() )
+        			.filter( e -> e.getActivo() == 1 )
+        			.collect(Collectors.toList());
+        }
+        
+        if(this.empresa != null && this.planta != null && this.activo == false) {
+        	return this.lstEmpleados.stream()
+        			.filter( e -> e.getDatoEmpresa() != null )
+        			.filter( e -> e.getDatoEmpresa().getEmpresa() != null)
+        			.filter( e -> e.getDatoEmpresa().getPlanta() != null )
+        			.filter( e -> e.getDatoEmpresa().getEmpresa().getIdEmpresa() == this.empresa.getIdEmpresa() )
+        			.filter( e -> e.getDatoEmpresa().getPlanta().getIdPlanta() == this.planta.getIdPlanta() )
+        			.filter( e -> e.getActivo() == 0 )
+        			.collect(Collectors.toList());
+        }
+        
+        return null;
+    }
+
+    public void manipularStatusFechaBaja() {
+        if (this.tipofinrelacion == null) {
+            this.statusfechabaja = false;
+            return;
+        }
+
+        this.statusfechabaja = this.tipofinrelacion.getTipodebaja().startsWith("T");
+    }
+
+    public String obtenerStatusEmpleadoEmpresa(DetEmpleado empleado) {
+        return ManageStatus.getEstadoEmpleadoEmpresa(empleado.getActivo());
+    }
+
+    public void validarEmpleado(DetEmpleado empleado) {
+        EmpleadoBL.validarDatosEmpleado(empleado);
+        this.tipofinrelacion = null;
+        this.motivofinrelaicion = null;
+        this.fechafinrelacion = null;
+    }
+
+    public void recalcularVacaciones() {
+        try {
+            EmpleadoBL.recalcularVacaciones(this.empleado);
+        } catch (SGPException sgpEx) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", sgpEx.getMessage()));
+            PrimeFaces.current().ajax().update("form:messages");
+        }
+    }
 
     public List<CatEmpresa> getLstCatEmpresa() {
         return lstCatEmpresa;
@@ -1004,15 +1114,7 @@ public class RegistroEmpleadosBean implements Serializable {
     public void setActivo(boolean activo) {
         this.activo = activo;
     }
-
-    public boolean isInactivo() {
-        return inactivo;
-    }
-
-    public void setInactivo(boolean inactivo) {
-        this.inactivo = inactivo;
-    }
-
+    
     public String getTexto() {
         return texto;
     }
@@ -1075,168 +1177,5 @@ public class RegistroEmpleadosBean implements Serializable {
 
     public void setLstBancos(List<CatBanco> lstBancos) {
         this.lstBancos = lstBancos;
-    }
-
-    public List<DetEmpleado> filtrarEmpleados() {
-
-        if (this.activo && this.inactivo && this.empresa == null && this.planta == null) {
-            return this.lstEmpleados;
-        }
-
-        if (this.activo && this.inactivo && this.empresa != null && this.planta == null) {
-            return this.lstEmpleados.stream().
-                    filter(empleado -> empleado.getDatoEmpresa() != null).
-                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa() != null).
-                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa().getIdEmpresa().equals(this.empresa.getIdEmpresa())).
-                    collect(Collectors.toList());
-        }
-
-        if (this.activo && this.inactivo && this.planta != null && this.empresa == null) {
-            return this.lstEmpleados.stream().
-                    filter(empleado -> empleado.getDatoEmpresa() != null).
-                    filter(empleado -> empleado.getDatoEmpresa().getPlanta() != null).
-                    filter(empleado -> empleado.getDatoEmpresa().getPlanta().getIdPlanta().equals(this.planta.getIdPlanta())).
-                    collect(Collectors.toList());
-        }
-
-        if (this.activo && this.inactivo && this.empresa != null && this.planta != null) {
-            return this.lstEmpleados.stream().
-                    filter(empleado -> empleado.getDatoEmpresa() != null).
-                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa() != null && empleado.getDatoEmpresa().getPlanta() != null).
-                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa().getIdEmpresa().equals(this.empresa.getIdEmpresa()) && empleado.getDatoEmpresa().getPlanta().getIdPlanta().equals(this.planta.getIdPlanta())).
-                    collect(Collectors.toList());
-        }
-
-        if (this.activo && this.empresa == null && this.planta == null) {
-            return this.lstEmpleados.stream().
-                    filter(empleado -> empleado.getDatoEmpresa() != null).
-                    filter(empleado -> (empleado.getDatoEmpresa().getFechaBaja() == null || empleado.getDatoEmpresa().getFechaBaja().after(DateUtil.now()))).
-                    collect(Collectors.toList());
-        }
-
-        if (this.inactivo && this.empresa == null && this.planta == null) {
-            return this.lstEmpleados.stream().
-                    filter(empleado -> empleado.getDatoEmpresa() != null).
-                    filter(empleado -> (empleado.getDatoEmpresa().getFechaBaja() != null && empleado.getDatoEmpresa().getFechaBaja().before(DateUtil.now()))).
-                    collect(Collectors.toList());
-
-        }
-
-        if (this.activo && this.empresa != null && this.planta == null) {
-            return this.lstEmpleados.stream().
-                    filter(empleado -> empleado.getDatoEmpresa() != null).
-                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa() != null).
-                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa().getIdEmpresa().equals(this.empresa.getIdEmpresa())).
-                    filter(empleado -> (empleado.getDatoEmpresa().getFechaBaja() == null || empleado.getDatoEmpresa().getFechaBaja().after(DateUtil.now()))).
-                    collect(Collectors.toList());
-
-        }
-
-        if (this.inactivo && this.empresa != null && this.planta == null) {
-            return this.lstEmpleados.stream().
-                    filter(empleado -> empleado.getDatoEmpresa() != null).
-                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa() != null).
-                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa().getIdEmpresa().equals(this.empresa.getIdEmpresa())).
-                    filter(empleado -> (empleado.getDatoEmpresa().getFechaBaja() != null && empleado.getDatoEmpresa().getFechaBaja().before(DateUtil.now()))).
-                    collect(Collectors.toList());
-        }
-
-        if (this.activo && this.planta != null && this.empresa == null) {
-            return this.lstEmpleados.stream().
-                    filter(empleado -> empleado.getDatoEmpresa() != null).
-                    filter(empleado -> empleado.getDatoEmpresa().getPlanta() != null).
-                    filter(empleado -> empleado.getDatoEmpresa().getPlanta().getIdPlanta().equals(this.planta.getIdPlanta())).
-                    filter(empleado -> (empleado.getDatoEmpresa().getFechaBaja() == null || empleado.getDatoEmpresa().getFechaBaja().after(DateUtil.now()))).
-                    collect(Collectors.toList());
-        }
-
-        if (this.inactivo && this.planta != null && this.empresa == null) {
-            return this.lstEmpleados.stream().
-                    filter(empleado -> empleado.getDatoEmpresa() != null).
-                    filter(empleado -> empleado.getDatoEmpresa().getPlanta() != null).
-                    filter(empleado -> empleado.getDatoEmpresa().getPlanta().getIdPlanta().equals(this.planta.getIdPlanta())).
-                    filter(empleado -> (empleado.getDatoEmpresa().getFechaBaja() != null && empleado.getDatoEmpresa().getFechaBaja().before(DateUtil.now()))).
-                    collect(Collectors.toList());
-        }
-
-        if (this.activo && this.empresa != null && this.planta != null) {
-            return this.lstEmpleados.stream().
-                    filter(empleado -> empleado.getDatoEmpresa() != null).
-                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa() != null && empleado.getDatoEmpresa().getPlanta() != null).
-                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa().getIdEmpresa().equals(this.empresa.getIdEmpresa()) && empleado.getDatoEmpresa().getPlanta().getIdPlanta().equals(this.planta.getIdPlanta())).
-                    filter(empleado -> (empleado.getDatoEmpresa().getFechaBaja() == null || empleado.getDatoEmpresa().getFechaBaja().after(DateUtil.now()))).
-                    collect(Collectors.toList());
-        }
-
-        if (this.inactivo && this.empresa != null && this.planta != null) {
-            return this.lstEmpleados.stream().
-                    filter(empleado -> empleado.getDatoEmpresa() != null).
-                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa() != null && empleado.getDatoEmpresa().getPlanta() != null).
-                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa().getIdEmpresa().equals(this.empresa.getIdEmpresa()) && empleado.getDatoEmpresa().getPlanta().getIdPlanta().equals(this.planta.getIdPlanta())).
-                    filter(empleado -> (empleado.getDatoEmpresa().getFechaBaja() != null && empleado.getDatoEmpresa().getFechaBaja().before(DateUtil.now()))).
-                    collect(Collectors.toList());
-        }
-
-        if (this.empresa != null && this.planta == null) {
-            return this.lstEmpleados.stream().
-                    filter(empleado -> empleado.getDatoEmpresa() != null).
-                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa() != null).
-                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa().getIdEmpresa().equals(this.empresa.getIdEmpresa())).
-                    collect(Collectors.toList());
-        }
-
-        if (this.planta != null && this.empresa == null) {
-            return this.lstEmpleados.stream().
-                    filter(empleado -> empleado.getDatoEmpresa() != null).
-                    filter(empleado -> empleado.getDatoEmpresa().getPlanta() != null).
-                    filter(empleado -> empleado.getDatoEmpresa().getPlanta().getIdPlanta().equals(this.planta.getIdPlanta())).
-                    collect(Collectors.toList());
-        }
-
-        if (this.empresa != null && this.planta != null) {
-            return this.lstEmpleados.stream().
-                    filter(empleado -> empleado.getDatoEmpresa() != null).
-                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa() != null && empleado.getDatoEmpresa().getPlanta() != null).
-                    filter(empleado -> empleado.getDatoEmpresa().getEmpresa().getIdEmpresa().equals(this.empresa.getIdEmpresa()) && empleado.getDatoEmpresa().getPlanta().getIdPlanta().equals(this.planta.getIdPlanta())).
-                    collect(Collectors.toList());
-        }
-
-        if (this.texto != null && !this.texto.equals("")) {
-
-            return this.lstEmpleados.stream().
-                    filter(empleado -> empleado.getNombre().contains(this.texto.trim().toUpperCase()) || empleado.getPrimerAp().contains(this.texto.trim().toUpperCase()) || empleado.getSegundoAp().contains(this.texto.trim().toUpperCase())).
-                    collect(Collectors.toList());
-        }
-
-        return null;
-    }
-
-    public void manipularStatusFechaBaja() {
-        if (this.tipofinrelacion == null) {
-            this.statusfechabaja = false;
-            return;
-        }
-
-        this.statusfechabaja = this.tipofinrelacion.getTipodebaja().startsWith("T");
-    }
-
-    public String obtenerStatusEmpleadoEmpresa(DetEmpleado empleado) {
-        return ManageStatus.getEstadoEmpleadoEmpresa(empleado.getActivo());
-    }
-
-    public void validarEmpleado(DetEmpleado empleado) {
-        EmpleadoBL.validarDatosEmpleado(empleado);
-        this.tipofinrelacion = null;
-        this.motivofinrelaicion = null;
-        this.fechafinrelacion = null;
-    }
-
-    public void recalcularVacaciones() {
-        try {
-            EmpleadoBL.recalcularVacaciones(this.empleado);
-        } catch (SGPException sgpEx) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", sgpEx.getMessage()));
-            PrimeFaces.current().ajax().update("form:messages");
-        }
     }
 }

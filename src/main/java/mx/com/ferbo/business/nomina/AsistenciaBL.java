@@ -24,8 +24,8 @@ public class AsistenciaBL {
 			asistencia.setSalida(registro.getFechaSalida());
 			
 			asistencia.setStatus(new AsistenciaStatus());
-			asistencia.getStatus().setClave(registro.getIdEstatus().getCodigo());
-			asistencia.getStatus().setNombre(registro.getIdEstatus().getDescripcion());
+			asistencia.getStatus().setClave(registro.getStatus().getCodigo());
+			asistencia.getStatus().setNombre(registro.getStatus().getDescripcion());
 			asistencia.setDiaSemana(DateUtil.getDiaSemana(registro.getFechaEntrada()));
 			
 			asistenciaList.add(asistencia);

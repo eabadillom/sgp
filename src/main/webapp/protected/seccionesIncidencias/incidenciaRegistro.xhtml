@@ -78,8 +78,8 @@
             </p:outputLabel>
         </p:column>
         <p:column headerText="Estatus" width="6rem" style="text-align: center;">
-            <p:outputLabel class="customer-badge status-#{incidenciaBean.status.getEstatusRegistro(registro.idEstatus.codigo)}"
-                           value="#{registro.idEstatus.descripcion}" style="display: block; width: 7rem"/>
+            <p:outputLabel class="customer-badge status-#{incidenciaBean.status.getEstatusRegistro(registro.status.codigo)}"
+                           value="#{registro.status.descripcion}" style="display: block; width: 7rem"/>
         </p:column>
         <p:column width="2rem" style="text-align: center;">
             <p:commandButton icon="pi pi-bars" class="ui-button-success rounded-button m-1" styleClass="edit-button" process="@this"
@@ -109,8 +109,8 @@
             <div class="formgrid grid" >
                 <div class="field col" >
                     <p:outputLabel for="@next" value="Estatus: " style="width: 4rem" />
-                    <p:inputText class="customer-badge status-#{incidenciaBean.status.getEstatusRegistro(incidenciaBean.registro.idEstatus.codigo)}" 
-                                   value="#{incidenciaBean.registro.idEstatus.descripcion}" disabled="true" />
+                    <p:inputText class="customer-badge status-#{incidenciaBean.status.getEstatusRegistro(incidenciaBean.registro.status.codigo)}" 
+                                   value="#{incidenciaBean.registro.status.descripcion}" disabled="true" />
                 </div>
             </div>
         </p:outputPanel>
