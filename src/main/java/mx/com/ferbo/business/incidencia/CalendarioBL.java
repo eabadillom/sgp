@@ -110,7 +110,7 @@ public class CalendarioBL implements Serializable
                 diaInicioRegistros = cal.get(Calendar.DAY_OF_WEEK);
             }
             
-            estatusReg = obtenerRegistroPorEstatus(registro.getIdEstatus());
+            estatusReg = obtenerRegistroPorEstatus(registro.getStatus());
             
             if(estatusReg != null)
             {
@@ -127,7 +127,7 @@ public class CalendarioBL implements Serializable
                 eventoDia.add(eventoEstatus);
             }
             
-            if(registro.getIdEstatus().getIdEstatus() == 2) 
+            if(registro.getStatus().getIdEstatus() == 2) 
             {
                 retardosSemana += 1;
             }
@@ -138,7 +138,7 @@ public class CalendarioBL implements Serializable
                     .startDate(DateUtil.toLocalDateTime(registro.getFechaEntrada()))
                     .endDate(DateUtil.toLocalDateTime(registro.getFechaEntrada()))
                     .description(null)
-                    .dynamicProperty("estatus", registro.getIdEstatus().getDescripcion())
+                    .dynamicProperty("estatus", registro.getStatus().getDescripcion())
                     .build();
             eventoDia.add(eventoEntrada);
 
@@ -162,7 +162,7 @@ public class CalendarioBL implements Serializable
                         .startDate(DateUtil.toLocalDateTime(registro.getFechaSalida()))
                         .endDate(DateUtil.toLocalDateTime(registro.getFechaSalida()))
                         .description(sdf.format(registro.getFechaSalida()))
-                        .dynamicProperty("estatus", registro.getIdEstatus().getDescripcion())
+                        .dynamicProperty("estatus", registro.getStatus().getDescripcion())
                         .build();
                 eventoDia.add(eventoSalida);
             }

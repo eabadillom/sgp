@@ -125,7 +125,7 @@ public class BienvenidaBean implements Serializable {
     {
         String mensajeRetardo = null;
         mensajeRegistro = "<span style='font-size:3rem; font-weight: bold;'>REGISTRO CORRECTO</span>";
-        switch(registro.getIdEstatus().getIdEstatus())
+        switch(registro.getStatus().getIdEstatus())
         {
             case 1:
                 mensajeRegistro += "";

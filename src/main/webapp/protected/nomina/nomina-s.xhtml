@@ -326,7 +326,7 @@
 							</p:column>
 							<p:column headerText="Valor" width="5rem">
 								<p:inputNumber value="#{percepcion.cantidad}" decimalPlaces="3" decimalSeparator="." thousandSeparator="," inputStyle="text-align: right" readonly="#{nominaS.nomina.id ne null}">
-									<p:ajax process="@this" update="formNomina:tv-nomina" event="change" listener="#{nominaS.actualizarPorCantidad(percepcion)}"/>
+									<p:ajax process="@this" update="formNomina:tv-nomina" event="change" listener="#{nominaS.actualizarPorCantidad(percepcion)}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
 								</p:inputNumber>
 							</p:column>
 							<p:column headerText="Importe excento" width="8rem">
