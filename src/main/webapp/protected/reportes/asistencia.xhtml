@@ -145,7 +145,7 @@
 	                        <p:outputLabel for="@next" value="Estatus del registro"/>
 	                    </div>
 	                    <div class="ui-g-3">
-	                    	<p:selectOneMenu id="EstatusRegistro" value="#{repAsistenciaBean.registroSelected.idEstatus}" converter="entityConverter">
+	                    	<p:selectOneMenu id="EstatusRegistro" value="#{repAsistenciaBean.registroSelected.status}" converter="entityConverter">
 	                            <f:selectItems value="#{repAsistenciaBean.lstEstatus}" var="estatusregistro" itemLabel="#{estatusregistro.descripcion}" itemValue="#{estatusregistro}"/>
 	                            <p:ajax process="@this"/>
 	                        </p:selectOneMenu>

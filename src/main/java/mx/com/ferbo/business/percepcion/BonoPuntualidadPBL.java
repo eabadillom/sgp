@@ -2,7 +2,6 @@ package mx.com.ferbo.business.percepcion;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,8 +10,6 @@ import mx.com.ferbo.business.nomina.ParametrosNomina;
 import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
-import mx.com.ferbo.model.DetPercepcionEmpleado;
-import mx.com.ferbo.model.DetRegistro;
 import mx.com.ferbo.util.SGPException;
 
 /**Clase para el cálculo del Bono de puntualidad.<br>
@@ -24,29 +21,11 @@ public class BonoPuntualidadPBL extends AbstractPBL {
 	
 	private static Logger log = LogManager.getLogger(BonoPuntualidadPBL.class);
 	
-	private Map<String, DetRegistro> mapAsistencias = null;
 	
 	private BigDecimal tasaBono               = null;
 	private BigDecimal diasLaborales          = null;
 	private BigDecimal diasNoLaborales        = null;
 	private BigDecimal diasTrabajados         = null;
-	
-	
-	@Deprecated
-	public BonoPuntualidadPBL(
-			ParametrosNomina parametros, DetNomina nomina, BigDecimal tasaBono, 
-			Map<String, DetRegistro> mapAsistencias, BigDecimal diasLaborales, BigDecimal diasNoLaborales, BigDecimal diasTrabajados,
-			BigDecimal salarioDiarioIntegrado, BigDecimal proporcionalSeptimoDia
-	) {
-		super(parametros, nomina);
-		this.baseCalculo     = this.nomina.getReceptor().getSalarioDiarioIntegrado();
-		this.mapAsistencias  = mapAsistencias;
-		this.tasaBono        = tasaBono;
-		this.diasLaborales   = diasLaborales;
-		this.diasNoLaborales = diasNoLaborales;
-		this.diasTrabajados  = diasTrabajados;
-		
-	}
 	
 	public BonoPuntualidadPBL(ParametrosNomina parametros, DetNomina nomina) {
 		super(parametros, nomina);
