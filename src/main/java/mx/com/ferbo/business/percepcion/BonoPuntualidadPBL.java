@@ -77,9 +77,6 @@ public class BonoPuntualidadPBL extends AbstractPBL {
 		BigDecimal cantidad = null;
 		
 		diasPeriodo = this.diasTrabajados.add(this.diasNoLaborales).setScale(2, RoundingMode.HALF_UP);
-		
-		
-		
 		cantidad = this.tasaBono.multiply(diasPeriodo).setScale(5, RoundingMode.HALF_UP);
 		
 		return cantidad ;

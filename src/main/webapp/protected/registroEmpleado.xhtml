@@ -7,6 +7,8 @@
     <ui:define name="title">Registro de empleados</ui:define>
     <ui:define name="head">
         <h:outputScript library="recursos" name="js/primefaces_locale.js" />
+        <h:outputStylesheet library="webjars" name="font-awesome/5.12.0/css/all.min-jsf.css" />
+		<h:outputStylesheet library="webjars" name="font-awesome/5.12.0/css/v4-shims.min-jsf.css" />
     </ui:define>
     <ui:define name="content">
     	<f:event type="preRenderView" listener="#{registroEmpleadosBean.init()}" />
@@ -77,7 +79,7 @@
                                 <h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{empleado.nombre}" />
                             </p:column>
                             <p:column width="6rem">
-                                <p:commandButton styleClass="edit-button m-1" action="#{registroEmpleadosBean.editar}" process="@this" update="form:panelDialogEmpleado form:panelDialogEmpleado:previewFingerprint1" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dialogEmpleado').show();" icon="pi pi-pencil">
+                                <p:commandButton styleClass="edit-button m-1" action="#{registroEmpleadosBean.editar()}" process="@this" update="form:dlg-empleado form:panelDialogEmpleado form:panelDialogEmpleado:previewFingerprint1" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dialogEmpleado').show();" icon="pi pi-pencil">
                                     <f:setPropertyActionListener value="#{empleado}" target="#{registroEmpleadosBean.empleado}" />
                                 </p:commandButton>
                                 <p:commandButton class="ui-button-danger m-1" icon="pi pi-times" process="@this" actionListener="#{registroEmpleadosBean.validarEmpleado(empleado)}" oncomplete="PF('dg-eliminarEmpleado').show()" update=":form:dg-eliminarEmpleado" >
@@ -86,7 +88,7 @@
                             </p:column>
                         </p:dataTable>
 
-                        <p:dialog header="Información..." showEffect="fade" modal="true" widgetVar="dialogEmpleado" responsive="true" resizable="false" width="100%" height="100%" position="center top" cache="false">
+                        <p:dialog id="dlg-empleado" widgetVar="dialogEmpleado" header="Información #{registroEmpleadosBean.getDialogTitle()}" showEffect="fade" modal="true" responsive="true" resizable="false" width="100%" height="100%" position="center top">
                             <p:tabView id="panelDialogEmpleado" class="ui-fluid" dynamic="true" effect="drop">
                                 <p:ajax event="tabChange" update="form:panelDialogEmpleado form:panelDialogEmpleado:previewFotografia" oncomplete="PF('dialogEmpleado').initPosition();"/>
                                 <p:tab title="Personal">
@@ -486,14 +488,28 @@
                                     </div>
                                 </p:tab>
                                 <p:tab title="Percepciones">
-                                    <div class="ui-fluid formgrid grid">
-                                        <div class="field col-12 md:col-3">
-                                            <p:selectOneMenu id="selTipoPercepcion" value="#{registroEmpleadosBean.percepcionEmpleado.tipoPercepcion}" autoWidth="false" converter="entityConverter" filter="true" filterMatchMode="contains">
+                                	<div class="ui-fluid formgrid grid">
+                                    	<div class="field col-12 md:col-6">
+                                    		<p:selectOneMenu id="selPercepcion" value="#{registroEmpleadosBean.percepcion}" autoWidth="false" converter="entityConverter" filter="true" filterMatchMode="contains">
                                                 <f:selectItem itemLabel="---SELECCIONE UNA PERCEPCION---"/>
+                                                <f:selectItems value="#{registroEmpleadosBean.percepciones}" var="percepcion" itemLabel="#{percepcion.clave} - #{percepcion.nombre}" itemValue="#{percepcion}"/>
+                                                <p:ajax event="change" process="@this" listener="#{registroEmpleadosBean.configuraPercepcion()}" update="form:panelDialogEmpleado:selTipoPercepcion form:panelDialogEmpleado:txtValor"/>
+                                            </p:selectOneMenu>
+                                        </div>
+                                        <div class="field col-12 md:col-6">
+                                            <p:selectOneMenu id="selTipoPercepcion" value="#{registroEmpleadosBean.percepcionEmpleado.percepcion.tipoPercepcion}" autoWidth="false" converter="entityConverter" filter="true" filterMatchMode="contains">
+                                                <f:selectItem itemLabel="---TIPO DE PERCEPCION (SAT)---"/>
                                                 <f:selectItems value="#{registroEmpleadosBean.tiposPercepcion}" var="tipoPercepcion" itemLabel="#{tipoPercepcion.clave} - #{tipoPercepcion.descripcion}" itemValue="#{tipoPercepcion}"/>
                                             </p:selectOneMenu>
                                         </div>
-                                        <div class="field col-12 md:col-3">
+                                	</div>
+                                    <div class="ui-fluid formgrid grid">
+                                        <div class="field col-12 md:col-4">
+                                        	<p:inputNumber id="txtValor" value="#{registroEmpleadosBean.percepcionEmpleado.valor}" decimalPlaces="2" decimalSeparator="." thousandSeparator="," placeholder="#{registroEmpleadosBean.percepcion.descripcionValor}" title="#{registroEmpleadosBean.percepcion.descripcionValor}">
+                                        		<p:ajax process="@this" />
+                                        	</p:inputNumber>
+                                        </div>
+                                        <div class="field col-12 md:col-2">
                                             <p:inputNumber id="txtImportePercepcion" value="#{registroEmpleadosBean.percepcionEmpleado.importeMaximo}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," placeholder="Importe máximo">
                                                 <p:ajax process="@this" />
                                             </p:inputNumber>
@@ -501,24 +517,36 @@
                                         <div class="field col-12 md:col-3">
                                             <p:selectBooleanButton id="selPercepcionActivo" value="#{registroEmpleadosBean.percepcionEmpleado.activo}" onLabel="Activo" offLabel="Inactivo" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem" disabled="false" />
                                         </div>
-                                        <div class="field col-12 md:col-3">
-                                            <p:commandButton value="Agregar" actionListener="#{registroEmpleadosBean.agregarPercepcionEmpleado}" icon="pi pi-plus" update="dt-percepcion-empleado selTipoPercepcion txtImportePercepcion selPercepcionActivo"></p:commandButton>
+                                        <div class="field col-12 md:col-2">
+                                            <p:commandButton value="Agregar" actionListener="#{registroEmpleadosBean.agregarPercepcionEmpleado}" icon="pi pi-plus" update="form:panelDialogEmpleado:selPercepcion form:panelDialogEmpleado:selTipoPercepcion form:panelDialogEmpleado:txtValor form:panelDialogEmpleado:txtImportePercepcion form:panelDialogEmpleado:selPercepcionActivo form:panelDialogEmpleado:dt-percepcion-empleado">
+                                            </p:commandButton>
                                         </div>
                                     </div>
                                     <p:dataTable id="dt-percepcion-empleado" value="#{registroEmpleadosBean.empleado.percepcionesEmpleado}" var="percepcion" paginator="true" rows="5" paginatorPosition="bottom">
-                                        <p:column headerText="Percepcion">
-                                            <p:outputLabel value="#{percepcion.tipoPercepcion.clave} - #{percepcion.tipoPercepcion.descripcion}" />
+                                        <p:column headerText="SAT" width="2rem" style="text-align: center;">
+                                            <p:outputLabel value="#{percepcion.percepcion.tipoPercepcion.clave}" title="#{percepcion.percepcion.tipoPercepcion.descripcion}" />
                                         </p:column>
-                                        <p:column headerText="Importe máximo" width="6rem">
-                                            <p:inputNumber value="#{percepcion.importeMaximo}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator=",">
+                                    	<p:column headerText="Nombre">
+                                    		<p:outputLabel value="#{percepcion.percepcion.nombre}" />
+                                    	</p:column>
+                                        <p:column headerText="Valor" width="6rem" style="text-align: center;">
+                                        	<p:inputNumber value="#{percepcion.valor}" title="#{percepcion.percepcion.descripcionValor}" inputStyle="text-align: right">
+                                        	</p:inputNumber>
+                                        </p:column>
+                                        <p:column headerText="Importe máximo" width="6rem" style="text-align: center;">
+                                            <p:inputNumber value="#{percepcion.importeMaximo}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," inputStyle="text-align: right">
                                                 <p:ajax process="@this" />
                                             </p:inputNumber>
                                         </p:column>
-                                        <p:column headerText="Activo" width="4rem">
+                                        <p:column headerText="Activo" width="5rem" style="text-align: center;">
                                             <p:selectBooleanButton value="#{percepcion.activo}" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem"/>
                                         </p:column>
-                                        <p:column width="2rem">
-                                            <p:commandButton icon="pi pi-trash" onclick="PF('dlgEliminarPercepcionEmpleado').show();" styleClass="ui-button-danger">
+                                        <p:column width="2rem" style="text-align: center;">
+                                        	<p:commandButton id="cmd-precalculo" icon="fas fa-light fa-calculator" actionListener="#{registroEmpleadosBean.precalculoPercepcion(percepcion)}" oncomplete="PF('dlgPreCalculo').show();" update="form:dlg-precalculo form:panelDialogEmpleado:selTipoPercepcion"/>
+                                        	<p:tooltip for="cmd-precalculo" value="Revisar precálculo" position="right" />
+                                        </p:column>
+                                        <p:column width="2rem" style="text-align: center;">
+                                            <p:commandButton icon="pi pi-trash" oncomplete="PF('dlgEliminarPercepcionEmpleado').show();" styleClass="ui-button-danger">
                                                 <f:setPropertyActionListener value="#{percepcion}" target="#{registroEmpleadosBean.percepcionEmpleado}"></f:setPropertyActionListener>
                                             </p:commandButton>
                                         </p:column>
@@ -617,7 +645,26 @@
                                 <p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dialogEmpleado').hide()" class="ui-button-secondary" resetValues="true"/>
                             </f:facet>
                         </p:dialog> 
-
+						<p:dialog id="dlg-precalculo" widgetVar="dlgPreCalculo" header="Precálculo percepción" modal="true" draggable="false" cache="false" dynamic="true">
+							<div class="m-0">
+								<p:outputLabel value="Importe exento calculado:" />
+							</div>
+							<div class="m-0">
+								<p:inputNumber value="#{registroEmpleadosBean.percepcionEmpleado.importeExento}" symbol="$ " symbolPosition="p" inputStyle="text-align: right"/>
+							</div>
+							<div class="m-0">
+								<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+							</div>
+							<div class="m-0">
+								<p:outputLabel value="Importe gravado calculado:"/>
+							</div>
+							<div class="m-0">
+								<p:inputNumber value="#{registroEmpleadosBean.percepcionEmpleado.importeGravado}" symbol="$ " symbolPosition="p" inputStyle="text-align: right"/>
+							</div>
+							<f:facet name="footer">
+								<p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dlgPreCalculo').hide();" class="ui-button-secondary" resetValues="true"/>
+							</f:facet>
+						</p:dialog>
                         <p:dialog header="Captura de fotografía" widgetVar="dialogFotografia" modal="true" draggable="false" cache="false" dynamic="true" closable="false">
                             <p:outputPanel id="panelDialogFoto" class="ui-fluid">
                                 <h:panelGrid columns="3" cellpadding="5">
@@ -762,7 +809,7 @@
                         </p:confirmDialog>
 
                         <p:confirmDialog widgetVar="dlgEliminarPercepcionEmpleado" showEffect="fade" width="30rem" message="¿Está seguro que desea eliminar la percepción seleccionada?" header="Confirmar" severity="warn">
-                            <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{registroEmpleadosBean.eliminarPercepcionEmpleado}" process="@this" oncomplete="PF('dlgEliminarPercepcionEmpleado').hide();"/>
+                            <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{registroEmpleadosBean.eliminarPercepcionEmpleado()}" process="@this" oncomplete="PF('dlgEliminarPercepcionEmpleado').hide();"/>
                             <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('dlgEliminarPercepcionEmpleado').hide()" />
                         </p:confirmDialog>
 
