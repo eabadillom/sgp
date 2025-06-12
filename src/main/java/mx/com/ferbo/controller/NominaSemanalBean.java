@@ -162,34 +162,6 @@ public class NominaSemanalBean implements Serializable {
     	log.info("Fecha Fin: {}", this.periodoFin);
     }
 
-	@Deprecated
-    public void calculaFechaFin() {
-    	log.debug("Fecha Inicio: {}", this.periodoInicio);
-    	log.debug("Fecha Fin: {}", this.periodoFin);
-    	this.periodoFin = new Date(this.periodoInicio.getTime());
-    	this.periodoFin = DateUtil.addDay(this.periodoFin, 6);
-    	DateUtil.setTime(this.periodoFin, 23, 59, 59, 999);
-    	
-    	this.semana = DateUtil.getSemanaAnio(this.periodoInicio);
-    	
-    	log.info("Fecha Inicio: {}", this.periodoInicio);
-    	log.info("Fecha Fin: {}", this.periodoFin);
-    }
-    
-    @Deprecated
-	public void calculaFechaInicio() {
-    	log.debug("Fecha Inicio: {}", this.periodoInicio);
-    	log.debug("Fecha Fin: {}", this.periodoFin);
-    	this.periodoInicio = new Date(this.periodoFin.getTime());
-    	this.periodoInicio = DateUtil.addDay(this.periodoInicio, -6);
-    	DateUtil.setTime(this.periodoInicio, 0, 0, 0, 0);
-    	
-    	this.semana = DateUtil.getSemanaAnio(this.periodoInicio);
-    	
-    	log.info("Fecha Inicio: {}", this.periodoInicio);
-    	log.info("Fecha Fin: {}", this.periodoFin);
-    }
-
     public void calculandoNomina() {
     	FacesMessage message = null;
 		Severity severity = null;
