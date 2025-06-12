@@ -28,16 +28,6 @@ public class ValesDespensaPBL extends AbstractPBL {
 	private BigDecimal tasaVales = null;
 	private BigDecimal diasPeriodo = null;
 	
-	@Deprecated
-	public ValesDespensaPBL(ParametrosNomina parametros, DetNomina nomina, BigDecimal diasTrabajados, BigDecimal uma, BigDecimal tasaVales, BigDecimal diasPeriodo) {
-		super(parametros, nomina);
-		this.baseCalculo = uma;
-		
-		this.diasTrabajados = diasTrabajados;
-		this.tasaVales = tasaVales;
-		this.diasPeriodo = diasPeriodo;
-	}
-	
 	public ValesDespensaPBL(ParametrosNomina parametros, DetNomina nomina) {
 		super(parametros, nomina);
 		this.baseCalculo = parametros.getUma().getImporteDiario();

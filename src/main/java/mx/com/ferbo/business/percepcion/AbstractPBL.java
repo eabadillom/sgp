@@ -226,7 +226,7 @@ public abstract class AbstractPBL {
 		
 		try {
 			collect = this.percepcionesEmpleado.stream()
-					.filter(p -> clave.equals(p.getTipoPercepcion().getClave()))
+					.filter(p -> clave.equals(p.getPercepcion().getTipoPercepcion().getClave()))
 					.collect(Collectors.toList())
 					;
 			

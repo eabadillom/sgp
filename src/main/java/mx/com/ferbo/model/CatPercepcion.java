@@ -39,6 +39,16 @@ public class CatPercepcion implements Serializable{
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "cd_tipo_percepcion")
 	private CatTipoPercepcion tipoPercepcion;
+	
+	@Column(name = "nb_ds_valor")
+	@Size(min = 1, max = 150)
+	@Basic(optional = true)
+	private String descripcionValor;
+	
+	@Column(name = "nb_base_calculo")
+	@Size(min = 1, max = 10)
+	@Basic(optional = true)
+	private String baseCalculo;
 
 	@Override
 	public int hashCode() {
@@ -59,7 +69,8 @@ public class CatPercepcion implements Serializable{
 
 	@Override
 	public String toString() {
-		return "CatPercepcion [clave=" + clave + ", nombre=" + nombre + ", tipoPercepcion=" + tipoPercepcion + "]";
+		return "{\"clave\":\"" + clave + "\",  nombre\":\"" + nombre + "\",  descripcionValor\":\"" + descripcionValor
+				+ "}";
 	}
 
 	public String getClave() {
@@ -84,5 +95,21 @@ public class CatPercepcion implements Serializable{
 
 	public void setTipoPercepcion(CatTipoPercepcion tipoPercepcion) {
 		this.tipoPercepcion = tipoPercepcion;
+	}
+
+	public String getDescripcionValor() {
+		return descripcionValor;
+	}
+
+	public void setDescripcionValor(String descripcionValor) {
+		this.descripcionValor = descripcionValor;
+	}
+
+	public String getBaseCalculo() {
+		return baseCalculo;
+	}
+
+	public void setBaseCalculo(String baseCalculo) {
+		this.baseCalculo = baseCalculo;
 	}
 }
