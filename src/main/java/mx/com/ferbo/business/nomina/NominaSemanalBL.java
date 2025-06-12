@@ -413,7 +413,7 @@ public class NominaSemanalBL extends NominaBL {
 		AbstractPBL               valesDespensaBO = null;
 		
 		Optional<DetPercepcionEmpleado> optPercepcion029 = percepcionesEmpleado.stream
-				().filter(p -> p.getTipoPercepcion().getClave().equalsIgnoreCase("029"))
+				().filter(p -> p.getPercepcion().getTipoPercepcion().getClave().equalsIgnoreCase("029"))
 				.findFirst()
 				;
 		
@@ -429,7 +429,7 @@ public class NominaSemanalBL extends NominaBL {
 			nomina.getPercepciones().add(percepcion);
 	}
 	
-	public static void calcular(DetNomina nomina, ParametrosNomina parametros, String clavePercepcion, BigDecimal cantidad)
+	public static DetNominaPercepcion calcular(DetNomina nomina, ParametrosNomina parametros, String clavePercepcion, BigDecimal cantidad)
 	throws SGPException {
 		AbstractPBL percepcionBO = null;
 		DetNominaPercepcion nuevaPercepcion = null;
@@ -447,6 +447,8 @@ public class NominaSemanalBL extends NominaBL {
 			procesarISR(parametros, nomina);
 			calcularTotales(nomina, parametros);
 		}
+		
+		return nuevaPercepcion;
 	}
 	
 	public static synchronized Boolean esUltimaSemanaMes(Date periodoInicio, Date periodoFin) {
