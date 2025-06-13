@@ -14,7 +14,7 @@ import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.util.SGPException;
 
-public class SeptimoDiaPBL extends AbstractPBL {
+public class SeptimoDiaPBL extends PercepcionBL {
 	
 	private static Logger log = LogManager.getLogger(SeptimoDiaPBL.class);
 	
@@ -74,7 +74,7 @@ public class SeptimoDiaPBL extends AbstractPBL {
 			this.importeExento  = ValoresBD._CERO.get();
 			this.importeGravado = ValoresBD._CERO.get();
 		} finally {
-			percepcion = this.build(nomina, CVE_SEPTIMO_DIA, cantidad, importeExento, importeGravado);
+			percepcion = this.build(nomina, CVE_SEPTIMO_DIA, cantidad, this.importe, this.importeExento, this.importeGravado);
 		}
 		
 		return percepcion;

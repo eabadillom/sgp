@@ -22,23 +22,30 @@ import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.util.SGPException;
 
-/**
- * 
+/**Todos los objetos que implementan la logica de negocio sólamente para el cálculo del importe
+ * de las percepciones, deben heredar de PercepcionBL, siguiendo el siguiente patrón:<br>
+ * 1. En el constructor, se deben establecer parametros iniciales, como la base de cálculo.<br>
+ * 2. Implementar el método calcularLimiteExento, para determinar hasta que monto se obtendrá el importe exento o gravado de ISR.
+ * 3. En el método calcularCantidad, se debe implementar los cálculos para el valor que, multiplicado por la base de cálculo, proporcine el importe.
+ * 4. Ejecutar el método calcularExentoGravado, para dividir los importes exentos y gravados del importe obtenido.
+ * 5. Devolver un objeto DetNominaPercepcion por defecto con importes en cero, en caso de falla, o con los importes calculados. 
  */
-public abstract class AbstractPBL {
-	private static Logger log = LogManager.getLogger(AbstractPBL.class);
+public abstract class PercepcionBL {
+	private static Logger log = LogManager.getLogger(PercepcionBL.class);
 	
 	protected ParametrosNomina parametros = null;
 	protected DetNomina nomina = null;
 	protected List<CatTipoPercepcion> tiposPercepcion = null;
 	protected List<DetPercepcionEmpleado> percepcionesEmpleado = null;
 	
-	protected BigDecimal cantidad = null;
-	protected BigDecimal baseCalculo = null;
-	protected BigDecimal limiteExento = null;
-	protected BigDecimal importe = null;
-	protected BigDecimal importeExento = null;
+	protected BigDecimal valor          = null;
+	protected BigDecimal cantidad       = null;
+	protected BigDecimal baseCalculo    = null;
+	protected BigDecimal limiteExento   = null;
+	protected BigDecimal importe        = null;
+	protected BigDecimal importeExento  = null;
 	protected BigDecimal importeGravado = null;
+	protected BigDecimal importeMaximo  = null;
 	
 	
 	public static final String P_SUELDO           = "001";
@@ -60,7 +67,7 @@ public abstract class AbstractPBL {
 	public static final String CVE_VALES_DESPENSA              = "032";
 	public static final String CVE_PTU                         = "100";
 	
-	public AbstractPBL(ParametrosNomina parametros, DetNomina nomina) {
+	public PercepcionBL(ParametrosNomina parametros, DetNomina nomina) {
 		this.parametros = parametros;
 		log.info("Parametros nomina: {}", parametros);
 		this.nomina = nomina;
@@ -110,7 +117,18 @@ public abstract class AbstractPBL {
 		BigDecimal importe = null;
 		importe = cantidad.multiply(baseCalculo).setScale(2, RoundingMode.HALF_UP);
 		log.info("[UI] Importe = ({} * {})", cantidad, baseCalculo);
-		return importe;
+		
+		if(this.importeMaximo == null) {
+			return importe;
+		}
+		
+		if(this.importeMaximo.compareTo(importe) > 0 ) {
+			log.info("Importe Maximo: {}, Importe: {}, Devolviendo importe: {}", this.importeMaximo, this.importe, this.importe);
+			return this.importe;
+		}
+		
+		log.info("[UI] Aplicando importe maximo a los vales de despensa: {}", this.importeMaximo);
+		return this.importeMaximo;
 	}
 	
 	/**Todas las percepciones deben tener un límite de importe exento y gravado.
@@ -189,11 +207,12 @@ public abstract class AbstractPBL {
 		return percepcion;
 	}
 	
-	public DetNominaPercepcion build(DetNomina nomina, String clave, BigDecimal cantidad, BigDecimal importeExento, BigDecimal importeGravado) {
+	public DetNominaPercepcion build(DetNomina nomina, String clave, BigDecimal cantidad, BigDecimal importe, BigDecimal importeExento, BigDecimal importeGravado) {
 		DetNominaPercepcion percepcion = null;
 		
 		percepcion = this.build(nomina, clave);
 		percepcion.setCantidad(cantidad);
+		percepcion.setImporte(importe);
 		percepcion.setImporteExento(importeExento);
 		percepcion.setImporteGravado(importeGravado);
 		
@@ -261,8 +280,7 @@ public abstract class AbstractPBL {
 	public void setTiposPercepcion(List<CatTipoPercepcion> tiposPercepcion) {
 		this.tiposPercepcion = tiposPercepcion;
 	}
-
-
+	
 	public void setPercepcionesEmpleado(List<DetPercepcionEmpleado> percepcionesEmpleado) {
 		this.percepcionesEmpleado = percepcionesEmpleado;
 	}
@@ -313,5 +331,21 @@ public abstract class AbstractPBL {
 
 	public void setBaseCalculo(BigDecimal baseCalculo) {
 		this.baseCalculo = baseCalculo;
+	}
+
+	public BigDecimal getValor() {
+		return valor;
+	}
+
+	public void setValor(BigDecimal valor) {
+		this.valor = valor;
+	}
+
+	public BigDecimal getImporteMaximo() {
+		return importeMaximo;
+	}
+
+	public void setImporteMaximo(BigDecimal importeMaximo) {
+		this.importeMaximo = importeMaximo;
 	}
 }

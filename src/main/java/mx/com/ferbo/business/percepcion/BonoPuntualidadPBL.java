@@ -17,29 +17,35 @@ import mx.com.ferbo.util.SGPException;
  * En caso de exceder el 10%, se considerará como parte del SBC.
  * 
  */
-public class BonoPuntualidadPBL extends AbstractPBL {
+public class BonoPuntualidadPBL extends PercepcionBL {
 	
 	private static Logger log = LogManager.getLogger(BonoPuntualidadPBL.class);
 	
-	
-	private BigDecimal tasaBono               = null;
-	private BigDecimal diasLaborales          = null;
-	private BigDecimal diasNoLaborales        = null;
-	private BigDecimal diasTrabajados         = null;
+	private BigDecimal diasPeriodo     = null;
 	
 	public BonoPuntualidadPBL(ParametrosNomina parametros, DetNomina nomina) {
 		super(parametros, nomina);
 		this.baseCalculo     = this.nomina.getReceptor().getSalarioDiarioIntegrado();
-		this.diasTrabajados = nomina.getDiasLaborados();
-		this.diasLaborales  = nomina.getDiasLaborales();
-		this.diasNoLaborales = nomina.getDiasNoLaborales();
-		
-		//TODO Reemplazar posteriormente la tasa de bono de puntualidad por algún parametro proveniente
-		//de la configuración del empleado.
-		this.tasaBono        = this.parametros.getBonoPuntualidad();
-		
+		this.valor        = ValoresBD._1.get();
+		this.diasPeriodo = new BigDecimal(this.parametros.getDiasPeriodo()).setScale(2, RoundingMode.HALF_UP);
 	}
 	
+	@Override
+	public BigDecimal calcularLimiteExento() {
+		return ValoresBD._CERO.get();
+	}
+	
+	@Override
+	protected BigDecimal calcularCantidad(DetNomina nomina)
+	throws SGPException {
+		BigDecimal cantidad = null;
+		log.info("[UI] Cantidad = Tasa Bono puntualidad x Dias Periodo = {} x {}", this.valor, this.diasPeriodo);
+		cantidad = this.valor
+				.multiply(diasPeriodo)
+				.setScale(5, RoundingMode.HALF_UP);
+		
+		return cantidad ;
+	}
 	
 	@Override
 	public DetNominaPercepcion procesar(DetNomina nomina) throws SGPException {
@@ -64,26 +70,9 @@ public class BonoPuntualidadPBL extends AbstractPBL {
     		this.importeExento  = ValoresBD._CERO.get();
     		this.importeGravado = ValoresBD._CERO.get();
     	} finally {
-    		percepcion = this.build(nomina, CVE_BONO_PUNTUALIDAD, this.cantidad, this.importeExento, this.importeGravado);
+    		percepcion = this.build(nomina, CVE_BONO_PUNTUALIDAD, this.cantidad, this.importe, this.importeExento, this.importeGravado);
     	}
 		
 		return percepcion;
-	}
-
-	@Override
-	protected BigDecimal calcularCantidad(DetNomina nomina)
-	throws SGPException {
-		BigDecimal diasPeriodo = null;
-		BigDecimal cantidad = null;
-		
-		diasPeriodo = this.diasTrabajados.add(this.diasNoLaborales).setScale(2, RoundingMode.HALF_UP);
-		cantidad = this.tasaBono.multiply(diasPeriodo).setScale(5, RoundingMode.HALF_UP);
-		
-		return cantidad ;
-	}
-
-	@Override
-	public BigDecimal calcularLimiteExento() {
-		return ValoresBD._CERO.get();
 	}
 }
