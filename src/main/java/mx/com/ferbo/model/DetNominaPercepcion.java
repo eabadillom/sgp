@@ -11,6 +11,7 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
@@ -64,6 +65,9 @@ public class DetNominaPercepcion implements Serializable {
 	@Column(name = "nu_cantidad", precision = 6, scale = 3)
 	@Basic(optional = true)
 	private BigDecimal cantidad = null;
+	
+	@Transient
+	private BigDecimal importe;
 	
 	@Column(name = "nu_imp_gravado", precision = 12, scale = 2)
 	@Basic(optional = false)
@@ -163,5 +167,13 @@ public class DetNominaPercepcion implements Serializable {
 
 	public void setCantidad(BigDecimal cantidad) {
 		this.cantidad = cantidad;
+	}
+
+	public BigDecimal getImporte() {
+		return importe;
+	}
+
+	public void setImporte(BigDecimal importe) {
+		this.importe = importe;
 	}
 }

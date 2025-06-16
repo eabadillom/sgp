@@ -68,6 +68,6 @@ public class NominaPercepcion {
 	@Override
 	public String toString() {
 		return "NominaPercepcionDTO [key=" + key + ", clave=" + clave + ", nombre=" + nombre + ", importeGravado="
-				+ importeGravado + ", importeExcento=" + importeExento + "]";
+				+ importeGravado + ", importeExento=" + importeExento + "]";
 	}
 }

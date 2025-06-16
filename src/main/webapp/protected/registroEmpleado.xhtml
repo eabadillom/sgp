@@ -25,43 +25,43 @@
                         <p:blockUI block="form:dialogBiometrico" widgetVar="bui"/>
                         <p:remoteCommand name="verificaEstado" onstart="PF('bui').hide();" actionListener="#{registroEmpleadosBean.validaHuella()}"/>
                         <p:toolbar styleClass="mb-4">
-                            <p:toolbarGroup>
-                                <p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{registroEmpleadosBean.agregarEmpleado()}" update="form:panelDialogEmpleado" oncomplete="PF('dialogEmpleado').show()" style="margin-right: .5rem" process="@this"/>
-                            </p:toolbarGroup>
-                            <p:toolbarGroup>
-                                <p:selectOneMenu id="onemenuplanta" value="#{registroEmpleadosBean.planta}" converter="entityConverter">
-                                    <f:selectItem itemLabel="Todas las plantas" itemValue="#{null}"/>
-                                    <f:selectItems value="#{registroEmpleadosBean.lstCatPlanta}" var="planta" itemLabel="#{planta.descripcion}" itemValue="#{planta}"/>
-                                    <p:ajax event="change"  update="dtEmpleados" process="@this" />
-                                </p:selectOneMenu>
-                            </p:toolbarGroup>
-                            <p:toolbarGroup>
-                                <p:selectOneMenu id="onemenuempresa" value="#{registroEmpleadosBean.empresa}" converter="entityConverter">
-                                    <f:selectItem itemLabel="Todas las empresas" itemValue="#{null}"/>
-                                    <f:selectItems value="#{registroEmpleadosBean.lstCatEmpresa}" var="empresa" itemLabel="#{empresa.descripcion}" itemValue="#{empresa}"/>
-                                    <p:ajax event="change" update="dtEmpleados" process="@this" />
-                                </p:selectOneMenu>
-                            </p:toolbarGroup>
-                            <p:toolbarGroup>
-                                <p:selectBooleanButton value="#{registroEmpleadosBean.activo}" onLabel="Activo" offLabel="Activo" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem">
-                                	<p:ajax event="change" update="dtEmpleados" process="@this"/>
-                                </p:selectBooleanButton>
+                            <p:toolbarGroup align="left">
+                                <p:commandButton value="Agregar" icon="pi pi-plus" actionListener="#{registroEmpleadosBean.agregarEmpleado()}" update="form:dlg-empleado form:panelDialogEmpleado" oncomplete="PF('dialogEmpleado').show()" style="margin-right: .5rem" process="@this"/>
                             </p:toolbarGroup>
                             <p:toolbarGroup align="right">
-                                <p:commandButton value="Descargar" icon="pi pi-download" styleClass="ui-button-secondary" ajax="false">
-                                    <p:dataExporter type="pdf" target="dtEmpleados" fileName="empleados"/>
-                                </p:commandButton>
+                            	<div style="padding-left: 0.5rem; padding-right: 0.5rem;">
+	                                <p:selectOneMenu id="onemenuplanta" value="#{registroEmpleadosBean.planta}" converter="entityConverter" autoWidth="false">
+	                                    <f:selectItem itemLabel="Todas las plantas" itemValue="#{null}"/>
+	                                    <f:selectItems value="#{registroEmpleadosBean.lstCatPlanta}" var="planta" itemLabel="#{planta.descripcion}" itemValue="#{planta}"/>
+	                                    <p:ajax process="@this" event="change" listener="#{registroEmpleadosBean.filtrarEmpleados()}" update="dtEmpleados"/>
+	                                </p:selectOneMenu>
+                            	</div>
+                            	<div style="padding-left: 0.5rem; padding-right: 0.5rem;">
+	                                <p:selectOneMenu id="onemenuempresa" value="#{registroEmpleadosBean.empresa}" converter="entityConverter" autoWidth="false">
+	                                    <f:selectItem itemLabel="Todas las empresas" itemValue="#{null}"/>
+	                                    <f:selectItems value="#{registroEmpleadosBean.lstCatEmpresa}" var="empresa" itemLabel="#{empresa.descripcion}" itemValue="#{empresa}"/>
+	                                    <p:ajax process="@this" event="change" listener="#{registroEmpleadosBean.filtrarEmpleados()}" update="dtEmpleados"/>
+	                                </p:selectOneMenu>
+                            	</div>
+                            	<div style="padding-left: 0.5rem; padding-right: 0.5rem;">
+	                                <p:selectBooleanButton value="#{registroEmpleadosBean.activo}" onLabel="Activo" offLabel="Activo" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem">
+	                                	<p:ajax process="@this" event="change" listener="#{registroEmpleadosBean.filtrarEmpleados()}" update="dtEmpleados"/>
+	                                </p:selectBooleanButton>
+                            	</div>
                             </p:toolbarGroup>
                         </p:toolbar>
 
-                        <p:dataTable id="dtEmpleados" widgetVar="dtEmpleados" var="empleado" value="#{registroEmpleadosBean.filtrarEmpleados()}" reflow="true" styleClass="products-table"
-                                     selection="#{registroEmpleadosBean.lstEmpleadosSelected}" rowKey="#{empleado.idEmpleado}" paginator="true" rows="10" rowSelectMode="add" 
-                                     paginatorPosition="bottom" lazy="true">
+                        <p:dataTable id="dtEmpleados" widgetVar="dtEmpleados" var="empleado"
+                        			reflow="true" styleClass="products-table"
+                        			value="#{registroEmpleadosBean.empleados}"
+                        			paginator="true" rows="10"
+                        			emptyMessage="No hay empleados con los criterios de búsqueda" 
+                        			paginatorPosition="bottom" >
 
                             <f:facet name="header">
                                 <div class="flex justify-content-start">
-                                    <p:inputText id="filtarNombre" value="#{registroEmpleadosBean.texto}" onkeyup="PF('dtEmpleados').filter();" style="width:300px"
-                                                 placeholder="Buscar empleado por nombre o apellidos" >
+                                    <p:inputText id="filtarNombre" value="#{registroEmpleadosBean.texto}" onchange="PF('dtEmpleados').filter();" style="width:300px" placeholder="Buscar empleado por nombre o apellidos">
+                                    	<p:ajax process="@this" update="dtEmpleados" />
                                     </p:inputText>
                                 </div>
                             </f:facet>
@@ -79,18 +79,17 @@
                                 <h:outputText style="vertical-align: middle; margin-left: .5rem" value="#{empleado.nombre}" />
                             </p:column>
                             <p:column width="6rem">
-                                <p:commandButton styleClass="edit-button m-1" action="#{registroEmpleadosBean.editar()}" process="@this" update="form:dlg-empleado form:panelDialogEmpleado form:panelDialogEmpleado:previewFingerprint1" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dialogEmpleado').show();" icon="pi pi-pencil">
-                                    <f:setPropertyActionListener value="#{empleado}" target="#{registroEmpleadosBean.empleado}" />
+                                <p:commandButton styleClass="edit-button m-1" action="#{registroEmpleadosBean.editar(empleado)}" process="@this" update="form:dlg-empleado form:panelDialogEmpleado form:panelDialogEmpleado:previewFingerprint1" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dialogEmpleado').show();" icon="pi pi-pencil">
                                 </p:commandButton>
                                 <p:commandButton class="ui-button-danger m-1" icon="pi pi-times" process="@this" actionListener="#{registroEmpleadosBean.validarEmpleado(empleado)}" oncomplete="PF('dg-eliminarEmpleado').show()" update=":form:dg-eliminarEmpleado" >
                                     <f:setPropertyActionListener value="#{empleado}" target="#{registroEmpleadosBean.empleado}" />
                                 </p:commandButton>
                             </p:column>
                         </p:dataTable>
-
+                        
                         <p:dialog id="dlg-empleado" widgetVar="dialogEmpleado" header="Información #{registroEmpleadosBean.getDialogTitle()}" showEffect="fade" modal="true" responsive="true" resizable="false" width="100%" height="100%" position="center top">
                             <p:tabView id="panelDialogEmpleado" class="ui-fluid" dynamic="true" effect="drop">
-                                <p:ajax event="tabChange" update="form:panelDialogEmpleado form:panelDialogEmpleado:previewFotografia" oncomplete="PF('dialogEmpleado').initPosition();"/>
+                                <p:ajax event="tabChange" update="form:panelDialogEmpleado form:panelDialogEmpleado:previewFotografia" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dialogEmpleado').initPosition();"/>
                                 <p:tab title="Personal">
                                     <h4>Información del empleado</h4>
                                     <div class="formgrid grid">
@@ -609,7 +608,7 @@
                                        			</div>
                                         	</div>
                                             <div class="field col-12 md:col-3">
-                                            	<div><p:outputLabel for="@next" value="Retardo"/></div>
+                                            	<div><p:outputLabel for="@next" value="Registrar retardos"/></div>
                                                 <div>
                                                 	<p:selectBooleanButton value="#{registroEmpleadosBean.empleado.empleadoConfiguracion.retardo}" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem">
                                                 		<p:ajax process="@this" />
@@ -625,13 +624,13 @@
                                                	</div>
                                             </div>
                                             <div class="field col-12 md:col-3">
-                                                <p:outputLabel for="@next" value="Goce de sueldo"/><br/>
+                                                <p:outputLabel for="@next" value="Permisos con goce de sueldo"/><br/>
                                                 <p:selectBooleanButton value="#{registroEmpleadosBean.empleado.empleadoConfiguracion.goceSueldo}" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem">
                                                 	<p:ajax process="@this" />
                                                 </p:selectBooleanButton>
                                             </div>
                                             <div class="field col-12 md:col-3">
-                                                <p:outputLabel for="@next" value="Asistencia en dias no laborables"/><br/>
+                                                <p:outputLabel for="@next" value="Registrar asistencia en dias no laborables"/><br/>
                                                 <p:selectBooleanButton value="#{registroEmpleadosBean.empleado.empleadoConfiguracion.asistenciaDiaNoLaboral}" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem">
                                                 	<p:ajax process="@this" />
                                                 </p:selectBooleanButton>

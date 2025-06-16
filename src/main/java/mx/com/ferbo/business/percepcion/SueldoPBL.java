@@ -13,7 +13,7 @@ import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.util.SGPException;
 
-public class SueldoPBL extends AbstractPBL {
+public class SueldoPBL extends PercepcionBL {
 	
 	private static Logger log = LogManager.getLogger(SueldoPBL.class);
 	
@@ -71,7 +71,7 @@ public class SueldoPBL extends AbstractPBL {
 			this.importeExento  = ValoresBD._CERO.get();
 			this.importeGravado = ValoresBD._CERO.get();
 		} finally {
-			percepcion = this.build(nomina, CVE_SUELDO, cantidad, importeExento, importeGravado);
+			percepcion = this.build(nomina, CVE_SUELDO, cantidad, this.importe, importeExento, importeGravado);
 		}
 		
 		return percepcion;

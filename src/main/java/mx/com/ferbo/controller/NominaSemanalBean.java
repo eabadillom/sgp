@@ -24,7 +24,7 @@ import mx.com.ferbo.business.nomina.NominaBL;
 import mx.com.ferbo.business.nomina.NominaPeriodoBL;
 import mx.com.ferbo.business.nomina.NominaSemanalBL;
 import mx.com.ferbo.business.nomina.ParametrosNomina;
-import mx.com.ferbo.business.percepcion.AbstractPBL;
+import mx.com.ferbo.business.percepcion.PercepcionBL;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.EmpresaDAO;
 import mx.com.ferbo.dao.n.NominaDAO;
@@ -93,6 +93,7 @@ public class NominaSemanalBean implements Serializable {
     private List<Asistencia> asistencias;
     
     private Boolean detalle = true;
+    private String bitacora = null;
 
 	public NominaSemanalBean() {
 		listaNomina     = new ArrayList<>();
@@ -187,7 +188,7 @@ public class NominaSemanalBean implements Serializable {
     			listaEmpleados.clear();
     		message = new FacesMessage(severity, titulo, mensaje);
     		FacesContext.getCurrentInstance().addMessage(null, message);
-    		PrimeFaces.current().ajax().update(":formNomina:messages", "formNomina:dtNomina");
+    		PrimeFaces.current().ajax().update("form:messages", "form:dtNomina");
     		PrimeFaces.current().executeScript("PF('empresaDialog').hide()");
     	}
     }
@@ -281,13 +282,13 @@ public class NominaSemanalBean implements Serializable {
 			severity = FacesMessage.SEVERITY_WARN;
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update("formNomina:messages");
+			PrimeFaces.current().ajax().update("form:messages");
 		} catch(Exception ex) {
 			mensaje = "Hay un problema para crear la percepcion.";
 			severity = FacesMessage.SEVERITY_ERROR;
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update("formNomina:messages");
+			PrimeFaces.current().ajax().update("form:messages");
 		}
     }
     
@@ -332,7 +333,7 @@ public class NominaSemanalBean implements Serializable {
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
     	} finally {
-    		PrimeFaces.current().ajax().update("formNomina:messages", "formNomina:tv-nomina");
+    		PrimeFaces.current().ajax().update("form:messages", "form:tv-nomina");
     	}
     }
     
@@ -366,7 +367,7 @@ public class NominaSemanalBean implements Serializable {
 			FacesContext.getCurrentInstance().addMessage(null, message);
 		} finally {
 			
-			PrimeFaces.current().ajax().update("formNomina:messages", "formNomina:tv-nomina");
+			PrimeFaces.current().ajax().update("form:messages", "form:tv-nomina");
 		}
     	
     }
@@ -392,7 +393,7 @@ public class NominaSemanalBean implements Serializable {
 			diasNoLaboralesEmpleado = new BigDecimal(listaDiasNoLaboralesEmpleado.size()).setScale(2, BigDecimal.ROUND_HALF_UP);
 			diasTrabajados = percepcion.getCantidad();
 			
-			if(percepcion.getCantidad() != null && AbstractPBL.CVE_SUELDO.equalsIgnoreCase(percepcion.getClave())) {
+			if(percepcion.getCantidad() != null && PercepcionBL.CVE_SUELDO.equalsIgnoreCase(percepcion.getClave())) {
 				NominaSemanalBL.calcularSueldo(nomina, parametros,  diasLaboralesEmpleado, diasNoLaboralesEmpleado, diasTrabajados, null);
 			}
 			NominaSemanalBL.procesarISR(parametros, nomina);
@@ -407,7 +408,7 @@ public class NominaSemanalBean implements Serializable {
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
 		} finally {
-			PrimeFaces.current().ajax().update("formNomina:messages", "formNomina:tv-nomina");
+			PrimeFaces.current().ajax().update("form:messages", "form:tv-nomina");
 		}
     }
     
@@ -436,7 +437,7 @@ public class NominaSemanalBean implements Serializable {
 		} finally {
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update("formNomina:messages", "formNomina:tv-nomina");
+			PrimeFaces.current().ajax().update("form:messages", "form:tv-nomina");
 		}
     }
     
@@ -454,14 +455,14 @@ public class NominaSemanalBean implements Serializable {
 			
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update("formNomina:messages");
+			PrimeFaces.current().ajax().update("form:messages");
 		} catch(Exception ex) {
 			mensaje = "Hay un problema para crear el pago.";
 			severity = FacesMessage.SEVERITY_ERROR;
 			
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update("formNomina:messages");
+			PrimeFaces.current().ajax().update("form:messages");
 		}
     }
     
@@ -506,7 +507,7 @@ public class NominaSemanalBean implements Serializable {
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
     	} finally {
-    		PrimeFaces.current().ajax().update("formNomina:messages", "formNomina:tv-nomina");
+    		PrimeFaces.current().ajax().update("form:messages", "form:tv-nomina");
     	}
     }
     
@@ -534,7 +535,7 @@ public class NominaSemanalBean implements Serializable {
 		} finally {
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update("formNomina:messages", "formNomina:tv-nomina");
+			PrimeFaces.current().ajax().update("form:messages", "form:tv-nomina");
 		}
     }
     
@@ -552,14 +553,14 @@ public class NominaSemanalBean implements Serializable {
 			
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update("formNomina:messages");
+			PrimeFaces.current().ajax().update("form:messages");
 		} catch(Exception ex) {
 			mensaje = "Hay un problema para crear la deducción.";
 			severity = FacesMessage.SEVERITY_ERROR;
 			
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update("formNomina:messages");
+			PrimeFaces.current().ajax().update("form:messages");
 		}
     }
     
@@ -603,7 +604,7 @@ public class NominaSemanalBean implements Serializable {
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
     	} finally {
-    		PrimeFaces.current().ajax().update("formNomina:messages", "formNomina:tv-nomina");
+    		PrimeFaces.current().ajax().update("form:messages", "form:tv-nomina");
     	}
     }
     
@@ -630,7 +631,7 @@ public class NominaSemanalBean implements Serializable {
 		} finally {
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update("formNomina:messages", "formNomina:tv-nomina");
+			PrimeFaces.current().ajax().update("form:messages", "form:tv-nomina");
 		}
     }
     
@@ -650,8 +651,21 @@ public class NominaSemanalBean implements Serializable {
 			message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
     	} finally {
-    		PrimeFaces.current().ajax().update(":formNomina:messages", ":formNomina:dtNomina");
+    		PrimeFaces.current().ajax().update("form:messages", "form:dtNomina");
     	}
+    }
+    
+    public void actualizarImporte(DetNominaPercepcion percepcion) {
+    	PercepcionBL percepcionBO = null;
+    	
+    	percepcionBO = NominaSemanalBL.getPercepcionBusinessLogic(parametros, nomina, percepcion.getClave());
+    	percepcionBO.setImporte(percepcion.getImporte());
+    	percepcionBO.calcularExentoGravado();
+    	
+    	percepcion.setImporteExento(percepcionBO.getImporteExento());
+    	percepcion.setImporteGravado(percepcionBO.getImporteGravado());
+    	
+    	this.actualizar();
     }
 
     public void guardarNominaEmpleado() {
@@ -693,7 +707,7 @@ public class NominaSemanalBean implements Serializable {
     	} finally {
     		message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update(":formNomina:messages");
+			PrimeFaces.current().ajax().update("form:messages");
     	}
     }
     
@@ -727,8 +741,12 @@ public class NominaSemanalBean implements Serializable {
     	} finally {
     		message = new FacesMessage(severity, titulo, mensaje);
 			FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update(":formNomina:messages");
+			PrimeFaces.current().ajax().update("form:messages");
     	}
+    	
+    }
+    
+    public void cargarBitacora() {
     	
     }
     
@@ -886,5 +904,13 @@ public class NominaSemanalBean implements Serializable {
 
 	public void setTiposPercepcion(List<CatTipoPercepcion> tiposPercepcion) {
 		this.tiposPercepcion = tiposPercepcion;
+	}
+
+	public String getBitacora() {
+		return bitacora;
+	}
+
+	public void setBitacora(String bitacora) {
+		this.bitacora = bitacora;
 	}
 }
