@@ -19,7 +19,7 @@ import mx.com.ferbo.model.DetVacaciones;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.SGPException;
 
-public class PrimaVacacionalEnTiempoPBL extends AbstractPBL {
+public class PrimaVacacionalEnTiempoPBL extends PercepcionBL {
 	
 	private static Logger log = LogManager.getLogger(PrimaVacacionalEnTiempoPBL.class);
 	
@@ -62,7 +62,7 @@ public class PrimaVacacionalEnTiempoPBL extends AbstractPBL {
 			importeExento  = _CERO.get();
 			importeGravado = _CERO.get();
 		} finally {
-			percepcion = this.build(nomina, CVE_PRIMA_VACACIONES_EN_TIEMPO, cantidad, importeExento, importeGravado);
+			percepcion = this.build(nomina, CVE_PRIMA_VACACIONES_EN_TIEMPO, cantidad, this.importe, this.importeExento, this.importeGravado);
 			log.info("Percepcion agregada: {}", percepcion);
 		}
 		

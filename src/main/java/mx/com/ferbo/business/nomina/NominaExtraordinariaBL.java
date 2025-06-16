@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.deduccion.AbstractDBL;
 import mx.com.ferbo.business.deduccion.isr.ISRL174DBL;
-import mx.com.ferbo.business.percepcion.AbstractPBL;
+import mx.com.ferbo.business.percepcion.PercepcionBL;
 import mx.com.ferbo.business.percepcion.AguinaldoPBL;
 import mx.com.ferbo.business.percepcion.PrimaVacacionalEnTiempoPBL;
 import mx.com.ferbo.business.percepcion.PrimaVacacionalReportadasPBL;
@@ -37,7 +37,7 @@ public class NominaExtraordinariaBL extends NominaBL {
 	
 	public DetNomina calcular(DetNomina nomina, String clavePercepcion)
 	throws SGPException {
-		AbstractPBL percepcionBO = null;
+		PercepcionBL percepcionBO = null;
 		DetNominaPercepcion percepcion = null;
 		
 		try {
@@ -59,7 +59,7 @@ public class NominaExtraordinariaBL extends NominaBL {
 	
 	public void calcular(DetNomina nomina, String clavePercepcion, BigDecimal cantidad)
 	throws SGPException {
-		AbstractPBL percepcionBO = null;
+		PercepcionBL percepcionBO = null;
 		DetNominaPercepcion nuevaPercepcion = null;
 		
 		try {
@@ -78,27 +78,27 @@ public class NominaExtraordinariaBL extends NominaBL {
 	}
 	
 	/*--------------------------PERCEPCIONES----------------------------------------------------*/
-	public static AbstractPBL getPercepcionBusinessLogic(ParametrosNomina parametros, DetNomina nomina, String clavePercepcion) {
-		AbstractPBL percepcionBO = null;
+	public static PercepcionBL getPercepcionBusinessLogic(ParametrosNomina parametros, DetNomina nomina, String clavePercepcion) {
+		PercepcionBL percepcionBO = null;
 		
 		switch (clavePercepcion) {
-		case AbstractPBL.CVE_PRIMA_VACACIONES_EN_TIEMPO:
+		case PercepcionBL.CVE_PRIMA_VACACIONES_EN_TIEMPO:
 				percepcionBO = new PrimaVacacionalEnTiempoPBL(parametros, nomina);
 				break;
 				
-			case AbstractPBL.CVE_VACACIONES_REPORTADAS:
+			case PercepcionBL.CVE_VACACIONES_REPORTADAS:
 				percepcionBO = new VacacionesReportadasPBL(parametros, nomina);
 				break;
 				
-			case AbstractPBL.CVE_PRIMA_VACACIONES_REPORTADAS:
+			case PercepcionBL.CVE_PRIMA_VACACIONES_REPORTADAS:
 				percepcionBO = new PrimaVacacionalReportadasPBL(parametros, nomina);
 				break;
 			
-			case AbstractPBL.CVE_AGUINALDO:
+			case PercepcionBL.CVE_AGUINALDO:
 				percepcionBO = new AguinaldoPBL(parametros, nomina);
 				break;
 				
-			case AbstractPBL.CVE_PTU:
+			case PercepcionBL.CVE_PTU:
 			default:
 				log.info("[UI] La percepción solicitada no está considerada para la nómina extraordinaria o no está implementada.");
 				throw new UnsupportedOperationException("La percepción no está implementada.");

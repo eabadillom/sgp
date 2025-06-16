@@ -1,7 +1,6 @@
 package mx.com.ferbo.business.nomina;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Date;
 import java.util.List;
 
@@ -13,7 +12,6 @@ import mx.com.ferbo.dao.n.CuotaIMSSDAO;
 import mx.com.ferbo.dao.n.DiaNoLaboralDAO;
 import mx.com.ferbo.dao.n.EstatusRegistroDAO;
 import mx.com.ferbo.dao.n.MetodoPagoDAO;
-import mx.com.ferbo.dao.n.PeriodicidadPagoDAO;
 import mx.com.ferbo.dao.n.RegimenFiscalDAO;
 import mx.com.ferbo.dao.n.TarifaISRDAO;
 import mx.com.ferbo.dao.n.TipoDeduccionDAO;
@@ -76,7 +74,6 @@ public class ParametrosNomina {
 	private MetodoPagoDAO       metodoPagoDAO      = null;
 	private ConceptoDAO         conceptoDAO        = null;
 	private UnidadSATDAO        unidadSATDAO       = null;
-	private PeriodicidadPagoDAO periodicidadDAO    = null;
 	private RegimenFiscalDAO    regimenFiscalDAO   = null;
 	private UsoCFDIDAO          usoCfdiDAO         = null;
 	private TipoPercepcionDAO   tipoPercepcionDAO  = null;
@@ -99,7 +96,6 @@ public class ParametrosNomina {
 		this.metodoPagoDAO      = new MetodoPagoDAO();
 		this.conceptoDAO        = new ConceptoDAO();
 		this.unidadSATDAO       = new UnidadSATDAO();
-		this.periodicidadDAO    = new PeriodicidadPagoDAO();
 		this.regimenFiscalDAO   = new RegimenFiscalDAO();
 		this.usoCfdiDAO         = new UsoCFDIDAO();
 		this.tipoPercepcionDAO  = new TipoPercepcionDAO();
@@ -140,9 +136,6 @@ public class ParametrosNomina {
 		//Status de registro de asistencia
 		this.statusRegistros        = this.statusRegistroDAO.buscarTodos();
 		
-		//TODO Temporalmente se movieron las tasas de bono de puntualidad y vales de despensa a esta clase, sin embargo, deben parametrizarse en otro lugar.
-		this.bonoPuntualidad        = new BigDecimal("0.1").setScale(2, RoundingMode.HALF_UP);
-		this.valeDespensa           = new BigDecimal("0.4").setScale(2, RoundingMode.HALF_UP);
 		this.fechaEmision           = new Date();
 		
 		try {

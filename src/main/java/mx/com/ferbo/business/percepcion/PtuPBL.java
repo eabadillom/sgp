@@ -9,7 +9,7 @@ import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.util.SGPException;
 
-public class PtuPBL extends AbstractPBL {
+public class PtuPBL extends PercepcionBL {
 
 	public PtuPBL(ParametrosNomina parametros, DetNomina nomina) {
 		super(parametros, nomina);
@@ -52,7 +52,7 @@ public class PtuPBL extends AbstractPBL {
 			this.importeExento = ValoresBD._CERO.get();
 			this.importeGravado = ValoresBD._CERO.get();
 		} finally {
-			percepcion = build(nomina, CVE_PTU, cantidad, importeExento, importeGravado);
+			percepcion = build(nomina, CVE_PTU, cantidad, this.importe, importeExento, importeGravado);
 		}
 		
 		return percepcion;

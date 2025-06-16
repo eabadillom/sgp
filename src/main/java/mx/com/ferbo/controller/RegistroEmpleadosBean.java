@@ -94,38 +94,38 @@ public class RegistroEmpleadosBean implements Serializable {
     private String contextPath = null;
     private HttpSession session = null;
 
-    private EmpresaDAO empresaDAO;
-    private EmpleadoFotoDAO empleadoFotoDAO;
-    private TipoPrestamoDAO tipoPrestamoDAO;
-    private PerfilDAO perfilDAO;
-    private PlantaDAO plantaDAO;
-    private PuestoDAO puestoDAO;
-    private AreaDAO areaDAO;
-    private EmpleadoDAO empleadoDAO;
-    private BiometricoDAO biometricoDAO;
+    private EmpresaDAO            empresaDAO;
+    private EmpleadoFotoDAO       empleadoFotoDAO;
+    private TipoPrestamoDAO       tipoPrestamoDAO;
+    private PerfilDAO             perfilDAO;
+    private PlantaDAO             plantaDAO;
+    private PuestoDAO             puestoDAO;
+    private AreaDAO               areaDAO;
+    private EmpleadoDAO           empleadoDAO;
+    private BiometricoDAO         biometricoDAO;
     private List<CatTipoContrato> tiposContrato;
-    private TipoContratoDAO tipoContratoDAO;
-    private List<CatTipoJornada> tiposJornada;
-    private TipoJornadaDAO tipoJornadaDAO;
-    private List<CatTipoRegimen> tiposRegimen;
-    private TipoRegimenDAO tipoRegimenDAO;
-    private ParametroDAO parametroDAO;
-    private EntidadFederativaDAO entidadDAO;
-    private RiesgoPuestoDAO riesgoDAO;
-    private PeriodicidadPagoDAO periodicidadDAO;
-    private TipoPercepcionDAO tipoPercepcionDAO;
-    private AsentamientoDAO asentamientoDAO;
-    private BancoDAO bancoDAO;
-    private PercepcionDAO percepcionDAO;
-    private TipoBajaEmpleadoDAO tipoBajaEmpleadoDAO;
+    private TipoContratoDAO       tipoContratoDAO;
+    private List<CatTipoJornada>  tiposJornada;
+    private TipoJornadaDAO        tipoJornadaDAO;
+    private List<CatTipoRegimen>  tiposRegimen;
+    private TipoRegimenDAO        tipoRegimenDAO;
+    private ParametroDAO          parametroDAO;
+    private EntidadFederativaDAO  entidadDAO;
+    private RiesgoPuestoDAO       riesgoDAO;
+    private PeriodicidadPagoDAO   periodicidadDAO;
+    private TipoPercepcionDAO     tipoPercepcionDAO;
+    private AsentamientoDAO       asentamientoDAO;
+    private BancoDAO              bancoDAO;
+    private PercepcionDAO         percepcionDAO;
+    private TipoBajaEmpleadoDAO   tipoBajaEmpleadoDAO;
+    private InfDatoEmpresa        datoEmpresa;
     
-    private List<CatPercepcion> percepciones;
+    private List<CatPercepcion>   percepciones;
     private List<DetPercepcionEmpleado> percepcionesEmpleado;
-    private InfDatoEmpresa datoEmpresa;
     
 
     private List<DetEmpleado> lstEmpleados;
-    private List<DetEmpleado> lstEmpleadosSelected;
+    private List<DetEmpleado> empleados;
     private List<CatEmpresa> lstCatEmpresa;
     private List<CatPerfil> lstCatPerfil;
     private List<CatPlanta> lstCatPlanta;
@@ -161,10 +161,6 @@ public class RegistroEmpleadosBean implements Serializable {
     private DetDomicilioEmpleado  domicilioEmpleadoSelected;
     private CatPercepcion         percepcion;
 
-//    private String curp;
-//    private String rfc;
-//    private String nss;
-//    private String codigoPostal;
     private Integer activeTabIndex = 0;
     private String texto;
 
@@ -198,7 +194,6 @@ public class RegistroEmpleadosBean implements Serializable {
     		
     		empleado = new DetEmpleado();
     		lstEmpleados = new ArrayList<>();
-    		lstEmpleadosSelected = new ArrayList<>();
     		
     		lstCatEmpresa = empresaDAO.buscarActivo();
             lstCatPerfil = perfilDAO.buscarActivo();
@@ -216,7 +211,7 @@ public class RegistroEmpleadosBean implements Serializable {
             tiposdebaja = tipoBajaEmpleadoDAO.obtenerTodos();
             lstBancos = bancoDAO.buscarTodos();
             percepciones = percepcionDAO.buscarTodos();
-            
+            prestamo = new DetPrestamo();
             this.activo = Boolean.TRUE;
             
             consultaEmpleados();
@@ -229,7 +224,6 @@ public class RegistroEmpleadosBean implements Serializable {
     public void init() {
         try {
         	this.redirigir();
-            prestamo = new DetPrestamo();
             
         } catch (Exception ex) {
             log.error("Problema para cargar el registro de empleados...", ex);
@@ -267,24 +261,6 @@ public class RegistroEmpleadosBean implements Serializable {
     }
 
     /*
-     * Método para obtener el mensaje a mostrar en el botón eliminar
-     */
-    public String getMensajeBotonEliminar() {
-        if (isEmpleadoSeleccionado()) {
-            int size = this.lstEmpleadosSelected.size();
-            return size > 1 ? size + " empleados seleccionados" : "1 empleado seleccionado";
-        }
-        return "Eliminar";
-    }
-
-    /*
-     * Método para eliminar verificar la seleccioón de n empleados
-     */
-    public boolean isEmpleadoSeleccionado() {
-        return this.lstEmpleadosSelected != null && !this.lstEmpleadosSelected.isEmpty();
-    }
-
-    /*
      * Método para inicializar objeto empleado
      */
     public void agregarEmpleado() {
@@ -299,10 +275,10 @@ public class RegistroEmpleadosBean implements Serializable {
         this.activeTabIndex = 0;
     }
     
-    public void editar() {
+    public void editar(DetEmpleado empleado) {
     	try {
-    		log.info("Cargando información del empleado: {}", this.empleado);
-			this.empleado = EmpleadoBL.load(this.empleado.getIdEmpleado());
+    		log.info("Cargando información del empleado: {}", empleado);
+			this.empleado = EmpleadoBL.load(empleado.getIdEmpleado());
 			this.datoEmpresa = this.empleado.getDatoEmpresa();
 			this.percepcionesEmpleado = this.empleado.getPercepcionesEmpleado();
 			this.empleadoFoto = empleadoFotoDAO.buscar(this.empleado.getNumEmpleado());
@@ -321,18 +297,18 @@ public class RegistroEmpleadosBean implements Serializable {
 		} catch (SGPException ex) {
 			log.error("Problema para cargar el detalle del empleado...", ex);
 		} finally {
-			PrimeFaces.current().ajax().update("form:messages", "form:panelDialogFoto", ":form:panelDialogEmpleado");
+			PrimeFaces.current().ajax().update("form:messages", "form:dlg-empleado", "form:panelDialogFoto", ":form:panelDialogEmpleado");
 		}
     }
     
     public String getDialogTitle() {
     	
     	if(this.empleado == null) {
-    		return "...";
+    		return "de empleado nuevo";
     	}
     	
     	if(this.empleado.getIdEmpleado() == null) {
-    		return "...";
+    		return "de empleado nuevo";
     	}
     	
     	return String.format(" de %s %s %s",
@@ -845,72 +821,78 @@ public class RegistroEmpleadosBean implements Serializable {
         this.empleado.setCurp(curp);
     }
     
-    public List<DetEmpleado> filtrarEmpleados() {
+    public void filtrarEmpleados() {
     	
     	//Sin filtro de empresa y planta. Activos seleccionados.
     	//Devuelve todos los empleados.
         if (this.empresa == null && this.planta == null && this.activo == true) {
-            return this.lstEmpleados.stream()
+            this.empleados = this.lstEmpleados.stream()
             		.filter( e -> e.getActivo() == 1)
             		.collect(Collectors.toList());
+            return;
         }
         
         //Sin filtro de empresa y planta. Sólo inactivos seleccionados.
         //Devuelve los empleados inactivos.
         if(this.empresa == null && this.planta == null && this.activo == false) {
-        	return this.lstEmpleados.stream()
+        	this.empleados = this.lstEmpleados.stream()
         			.filter( e -> e.getActivo() == 0)
         			.collect(Collectors.toList());
+        	return;
         }
         
         //Con filtro de empresa, sin filtro de planta. Activos e Inactivos seleccionados.
         //Devuelve los empleados relacionados a una empresa, cualquier planta, activos e inactivos.
         if(this.empresa != null && this.planta == null && this.activo == true) {
         	
-        	return this.lstEmpleados.stream()
+        	this.empleados = this.lstEmpleados.stream()
         			.filter( e -> e.getDatoEmpresa() != null)
         			.filter( e -> e.getDatoEmpresa().getEmpresa() != null)
         			.filter( e -> e.getDatoEmpresa().getEmpresa().getIdEmpresa() == this.empresa.getIdEmpresa() )
         			.filter( e -> e.getActivo() == 1 )
         			.collect(Collectors.toList());
+        	return;
         }
         
         if(this.empresa != null && this.planta == null && this.activo == false) {
         	
-        	return this.lstEmpleados.stream()
+        	this.empleados = this.lstEmpleados.stream()
         			.filter( e -> e.getDatoEmpresa() != null )
         			.filter( e -> e.getDatoEmpresa().getEmpresa() != null )
         			.filter( e -> e.getDatoEmpresa().getEmpresa().getIdEmpresa() == this.empresa.getIdEmpresa() )
         			.filter( e -> e.getActivo() == 0 )
         			.collect(Collectors.toList());
+        	return;
         }
         
         //Con filtro de planta, sin filtro de empresa. Activos seleccionados.
         //Devuelve los empleados relacionados a una planta, cualquier empresa, activos.
         if(this.empresa == null && this.planta != null && this.activo == true) {
         	
-        	return this.lstEmpleados.stream()
+        	this.empleados = this.lstEmpleados.stream()
         			.filter( e -> e.getDatoEmpresa() != null )
         			.filter( e -> e.getDatoEmpresa().getPlanta() != null )
         			.filter( e -> e.getDatoEmpresa().getPlanta().getIdPlanta() == this.planta.getIdPlanta())
         			.filter( e -> e.getActivo() == 1 )
         			.collect(Collectors.toList());
+        	return;
         }
         
         //Con filtro de planta, sin filtro de empresa. Inactivos seleccionados.
         //Devuelve los empleados relacionados a una planta, cualquier empresa, inactivos.
         if(this.empresa == null && this.planta != null && this.activo == false) {
         	
-        	return this.lstEmpleados.stream()
+        	this.empleados = this.lstEmpleados.stream()
         			.filter( e -> e.getDatoEmpresa() != null )
         			.filter( e -> e.getDatoEmpresa().getPlanta() != null )
         			.filter( e -> e.getDatoEmpresa().getPlanta().getIdPlanta() == this.planta.getIdPlanta() )
         			.filter( e -> e.getActivo() == 0)
         			.collect(Collectors.toList());
+        	return;
         }
         
         if(this.empresa != null && this.planta != null && this.activo == true) {
-        	return this.lstEmpleados.stream()
+        	this.empleados = this.lstEmpleados.stream()
         			.filter( e -> e.getDatoEmpresa() != null )
         			.filter( e -> e.getDatoEmpresa().getEmpresa() != null)
         			.filter( e -> e.getDatoEmpresa().getPlanta() != null )
@@ -918,10 +900,11 @@ public class RegistroEmpleadosBean implements Serializable {
         			.filter( e -> e.getDatoEmpresa().getPlanta().getIdPlanta() == this.planta.getIdPlanta() )
         			.filter( e -> e.getActivo() == 1 )
         			.collect(Collectors.toList());
+        	return;
         }
         
         if(this.empresa != null && this.planta != null && this.activo == false) {
-        	return this.lstEmpleados.stream()
+        	this.empleados = this.lstEmpleados.stream()
         			.filter( e -> e.getDatoEmpresa() != null )
         			.filter( e -> e.getDatoEmpresa().getEmpresa() != null)
         			.filter( e -> e.getDatoEmpresa().getPlanta() != null )
@@ -929,9 +912,8 @@ public class RegistroEmpleadosBean implements Serializable {
         			.filter( e -> e.getDatoEmpresa().getPlanta().getIdPlanta() == this.planta.getIdPlanta() )
         			.filter( e -> e.getActivo() == 0 )
         			.collect(Collectors.toList());
+        	return;
         }
-        
-        return null;
     }
 
     public void manipularStatusFechaBaja() {
@@ -1017,14 +999,6 @@ public class RegistroEmpleadosBean implements Serializable {
 
     public void setLstEmpleados(List<DetEmpleado> lstEmpleados) {
         this.lstEmpleados = lstEmpleados;
-    }
-
-    public List<DetEmpleado> getLstEmpleadosSelected() {
-        return lstEmpleadosSelected;
-    }
-
-    public void setLstEmpleadosSelected(List<DetEmpleado> lstEmpleadosSelected) {
-        this.lstEmpleadosSelected = lstEmpleadosSelected;
     }
 
     public String getBiometrico() {
@@ -1321,5 +1295,13 @@ public class RegistroEmpleadosBean implements Serializable {
 
 	public void setPercepcion(CatPercepcion percepcion) {
 		this.percepcion = percepcion;
+	}
+
+	public List<DetEmpleado> getEmpleados() {
+		return empleados;
+	}
+
+	public void setEmpleados(List<DetEmpleado> empleados) {
+		this.empleados = empleados;
 	}
 }

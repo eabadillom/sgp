@@ -16,7 +16,7 @@ import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.util.DateUtil;
 
-public class AguinaldoPBL extends AbstractPBL {
+public class AguinaldoPBL extends PercepcionBL {
 	
 	private static Logger log = LogManager.getLogger(AguinaldoPBL.class);
 	
@@ -63,7 +63,7 @@ public class AguinaldoPBL extends AbstractPBL {
 			this.importeExento = _CERO.get();
 			this.importeGravado = _CERO.get();
 		} finally {
-			percepcion = build(nomina, CVE_AGUINALDO, cantidad, importeExento, importeGravado);
+			percepcion = build(nomina, CVE_AGUINALDO, cantidad, this.importe, importeExento, importeGravado);
 			log.info("Percepcion generada: {}", percepcion);
 		}
 		
