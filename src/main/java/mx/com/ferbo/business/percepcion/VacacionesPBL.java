@@ -14,7 +14,7 @@ import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.util.SGPException;
 
-public class VacacionesPBL extends AbstractPBL {
+public class VacacionesPBL extends PercepcionBL {
 	
 	private static Logger log = LogManager.getLogger(VacacionesPBL.class);
 	
@@ -24,6 +24,11 @@ public class VacacionesPBL extends AbstractPBL {
 		super(parametros, nomina);
 		this.baseCalculo    = nomina.getReceptor().getSalarioDiario();
 		this.diasVacaciones = diasVacaciones;
+	}
+	
+	public VacacionesPBL(ParametrosNomina parametros, DetNomina nomina) {
+		super(parametros, nomina);
+		this.baseCalculo = nomina.getReceptor().getSalarioDiario();
 	}
 
 	@Override
@@ -63,7 +68,7 @@ public class VacacionesPBL extends AbstractPBL {
 			this.importeExento  = ValoresBD._CERO.get();
 			this.importeGravado = ValoresBD._CERO.get();
 		} finally {
-			percepcion = this.build(nomina, CVE_VACACIONES_EN_TIEMPO, cantidad, ValoresBD._CERO.get(), importe);
+			percepcion = this.build(nomina, CVE_VACACIONES_EN_TIEMPO, cantidad, this.importe, ValoresBD._CERO.get(), importe);
 		}
 		
 		return percepcion;

@@ -28,7 +28,7 @@ import mx.com.ferbo.util.SGPException;
  * tiene derecho a disfrutar de sus días de vacaciones y al vencimiento de 6 meses posteriores<br>
  * al finalizar dicho periodo, tiene derecho a exigir el pago de las vacaciones no disfrutadas.
  * */
-public class VacacionesReportadasPBL extends AbstractPBL {
+public class VacacionesReportadasPBL extends PercepcionBL {
 	
 	private static Logger log = LogManager.getLogger(VacacionesReportadasPBL.class);
 	
@@ -74,7 +74,7 @@ public class VacacionesReportadasPBL extends AbstractPBL {
 			this.importeExento  = ValoresBD._CERO.get();
 			this.importeGravado = ValoresBD._CERO.get();
 		} finally {
-			percepcion = this.build(nomina, CVE_VACACIONES_REPORTADAS, cantidad, importeExento, importeGravado);
+			percepcion = this.build(nomina, CVE_VACACIONES_REPORTADAS, cantidad, this.importe, this.importeExento, this.importeGravado);
 		}
 		
 		return percepcion;

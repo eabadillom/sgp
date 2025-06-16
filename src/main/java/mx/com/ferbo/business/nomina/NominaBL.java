@@ -439,7 +439,7 @@ public abstract class NominaBL {
 			throw new SGPException("La lista de percepciones no está definida.");
 		
 		if(percepcion.getImporteExento() == null && percepcion.getImporteGravado() == null)
-			throw new SGPException("Debe indicar un importe (excento o gravado).");
+			throw new SGPException("Debe indicar un importe (exento o gravado).");
 		
 		if(percepcion.getImporteExento() == null)
 			percepcion.setImporteExento(ValoresBD._CERO.get());
@@ -450,7 +450,7 @@ public abstract class NominaBL {
 		if(percepcion.getImporteExento().compareTo(ValoresBD._CERO.get()) < 0
 				&& percepcion.getImporteGravado().compareTo(ValoresBD._CERO.get()) < 0
 				)
-			throw new SGPException("Debe indicar un importe (excento o gravado).");
+			throw new SGPException("Debe indicar un importe (exento o gravado).");
 		
 		if(percepcion.getNombre() == null)
 			throw new SGPException("Debe indicar una descripción para la percepción.");
@@ -620,8 +620,6 @@ public abstract class NominaBL {
     		log.info("Ajuste al neto como Otro pago: {}", opOpt.isPresent() ? opOpt.get() : null);
     		nomina.getOtrosPagos().remove(opOpt.get());
     	}
-    	
-    	
     	
     	totalPercepciones = nomina.getPercepciones().stream()
 				.map(item -> item.getImporteExento().add(item.getImporteGravado()))

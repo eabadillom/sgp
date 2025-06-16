@@ -20,22 +20,22 @@ import mx.com.ferbo.util.SGPException;
  * Se otorga el 40% de la UMA diaria, por cada día trabajado de la semana + el proporcional del septimo día.
 *
 */
-public class ValesDespensaPBL extends AbstractPBL {
+public class ValesDespensaPBL extends PercepcionBL {
 	
 	private static Logger log = LogManager.getLogger(ValesDespensaPBL.class);
 	
 	private BigDecimal diasTrabajados = null;
-	private BigDecimal tasaVales = null;
-	private BigDecimal diasPeriodo = null;
+	private BigDecimal diasPeriodo    = null;
+	private BigDecimal uma            = null;
 	
 	public ValesDespensaPBL(ParametrosNomina parametros, DetNomina nomina) {
 		super(parametros, nomina);
-		this.baseCalculo = parametros.getUma().getImporteDiario();
+		
+		this.baseCalculo    = parametros.getUma().getImporteDiario();
+		this.uma            = parametros.getUma().getImporteDiario();
 		this.diasTrabajados = nomina.getDiasLaborados();
-		this.diasPeriodo = new BigDecimal(parametros.getDiasPeriodo()).setScale(2, RoundingMode.HALF_UP);
-		//TODO La tasa de vales de despensa debe ser una propiedad que está configurada para el empleado,
-		//no en los parametros de la nómina.
-		this.tasaVales = parametros.getValeDespensa();
+		this.diasPeriodo    = new BigDecimal(parametros.getDiasPeriodo()).setScale(2, RoundingMode.HALF_UP);
+		this.valor          = ValoresBD._1.get();
 	}
 	
 	@Override
@@ -51,8 +51,8 @@ public class ValesDespensaPBL extends AbstractPBL {
 		 * En caso de exceder el valor deL 40% de la UMA, la diferencia
 		 * se calculará de manera diaria y se sumará al SBC.
 		 * */
-		//TODO Pendiente aplicar criterio de exención para SBC.
 		
+		//TODO Pendiente aplicar criterio de exención para SBC.
 		
 		//Cálculo de importes exento y gravado (para LISR, Art. 93, parrafo penultimo).
 		if(this.diasTrabajados.compareTo(_CERO.get()) == 0)
@@ -88,6 +88,7 @@ public class ValesDespensaPBL extends AbstractPBL {
 			if(this.cantidad.compareTo(ValoresBD._CERO.get()) < 0)
 				throw new SGPException("La cantidad indicada es incorrecta");
 			
+			log.info("Importe = cantidad x baseCalculo = {} x {}", this.cantidad, this.baseCalculo);
     		this.importe = this.calcularImporte(this.cantidad, this.baseCalculo);
     		
     		this.calcularExentoGravado();
@@ -106,7 +107,7 @@ public class ValesDespensaPBL extends AbstractPBL {
 			this.importeExento  = ValoresBD._CERO.get();
 			this.importeGravado = ValoresBD._CERO.get();
 		} finally {
-    		percepcion = this.build(nomina, CVE_VALES_DESPENSA, this.cantidad, this.importeExento, this.importeGravado);
+    		percepcion = this.build(nomina, CVE_VALES_DESPENSA, this.cantidad, this.importe, this.importeExento, this.importeGravado);
     	}
 		
 		return percepcion;
@@ -114,15 +115,17 @@ public class ValesDespensaPBL extends AbstractPBL {
 	
 	@Override
 	protected BigDecimal calcularCantidad(DetNomina nomina) throws SGPException {
-		return this.tasaVales.setScale(4, RoundingMode.HALF_UP)
+		BigDecimal cantidad = this.valor.setScale(4, RoundingMode.HALF_UP)
 				.multiply(this.diasPeriodo);
+		log.info("[UI] Cantidad = Tasa vales x Dias del periodo = {} x {} = {}", this.valor, this.diasPeriodo, cantidad);
+		return cantidad;
 	}
 
 	@Override
 	public BigDecimal calcularLimiteExento() {
 		/* Los vales de despensa están exentos de ISR hasta por 7 veces la UMA diaria.
 		 */
-		return this.baseCalculo
+		return this.uma
 				.multiply(_7.get())
 				.setScale(2, RoundingMode.HALF_UP);
 	}
