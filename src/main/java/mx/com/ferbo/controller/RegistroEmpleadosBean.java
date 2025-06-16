@@ -379,9 +379,9 @@ public class RegistroEmpleadosBean implements Serializable {
     		parametros = new ParametrosNomina();
     		parametros.cargar(nominaPeriodo);
     		
-    		nomina = NominaBL.build(NominaBL.TP_NOMINA_ORDINARIA, parametros, this.empleado);
+    		nomina = NominaBL.build(NominaBL.TP_NOMINA_TEST, parametros, this.empleado);
     		
-    		nominaPercepcion = NominaSemanalBL.calcular(nomina, parametros, this.percepcionEmpleado.getPercepcion().getClave(), this.percepcionEmpleado.getValor());
+    		nominaPercepcion = NominaSemanalBL.calcular(nomina, parametros, this.percepcionEmpleado.getPercepcion().getClave(), empleado.getPercepcionesEmpleado(), this.percepcionEmpleado);
     		
     		this.percepcionEmpleado.setImporteExento(nominaPercepcion.getImporteExento());
     		this.percepcionEmpleado.setImporteGravado(nominaPercepcion.getImporteGravado());
