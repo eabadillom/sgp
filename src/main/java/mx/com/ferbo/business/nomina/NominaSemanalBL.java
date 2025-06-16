@@ -443,6 +443,27 @@ public class NominaSemanalBL extends NominaBL {
 		return nuevaPercepcion;
 	}
 	
+	public static DetNominaPercepcion calcular(DetNomina nomina, ParametrosNomina parametros, String clavePercepcion, List<DetPercepcionEmpleado> percepcionesEmpleado, DetPercepcionEmpleado percepcionEmpleado)
+	throws SGPException {
+		PercepcionBL percepcionBO = null;
+		DetNominaPercepcion nuevaPercepcion = null;
+		
+		try {
+			log.info("[UI] Recalculando para el empleado {}", nomina.getReceptor().getNombre());
+			percepcionBO = NominaSemanalBL.getPercepcionBusinessLogic(parametros, nomina, clavePercepcion);
+			percepcionBO.setPercepcionesEmpleado(percepcionesEmpleado);
+			percepcionBO.setValor(percepcionEmpleado.getValor());
+			percepcionBO.setImporteMaximo(percepcionEmpleado.getImporteMaximo());
+			nuevaPercepcion = percepcionBO.procesar(nomina);
+		} catch(UnsupportedOperationException ex) {
+			throw new SGPException("El cálculo de la percepción no está implementado para la nómina semanal");
+		} catch(Exception ex) {
+			log.error("Problema para calcular la percepcion: {}", clavePercepcion);
+		}
+		
+		return nuevaPercepcion;
+	}
+	
 	public static synchronized Boolean esUltimaSemanaMes(Date periodoInicio, Date periodoFin) {
 		Boolean ultimaSemanaMes = null;
 		Integer mesActualInicio = null;
