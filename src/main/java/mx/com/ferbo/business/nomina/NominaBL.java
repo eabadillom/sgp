@@ -48,6 +48,10 @@ public abstract class NominaBL {
 	public static final String TP_NOMINA_ORDINARIA      = "O";
 	public static final String TP_NOMINA_EXTRAORDINARIA = "E";
 	public static final String TP_COMPROBANTE_CFDI      = "N";
+	//El tipo de nómina TEST no existe en el catálogo del SAT, sin embargo,
+	//se implementa para poder ejecutar precálculos de ciertas percepciones.
+	//El precálculo está disponible en el registro de empleados.
+	public static final String TP_NOMINA_TEST           = "T";
 	
 	public static final int DIAS_ANIO = 365;
 	public static final BigDecimal cien = new BigDecimal(100).setScale(2, RoundingMode.HALF_UP);
@@ -116,6 +120,8 @@ public abstract class NominaBL {
 				nomina.setTipoNomina(TP_NOMINA_ORDINARIA);
 			} else if(TP_NOMINA_EXTRAORDINARIA.equalsIgnoreCase(tipoNomina)) {
 				nomina.setTipoNomina(TP_NOMINA_EXTRAORDINARIA);
+			} else if(TP_NOMINA_TEST.equalsIgnoreCase(tipoNomina)) {
+				nomina.setTipoNomina(tipoNomina);
 			} else
 				throw new SGPException("El tipo de nómina no es válido: " + tipoNomina);
 			
@@ -138,7 +144,10 @@ public abstract class NominaBL {
 			nomina.setPeriodo(parametros.getPeriodo());
 			nomina.setPeriodoInicio(parametros.getPeriodoInicio().toInstant().atZone(ZoneId.of("GMT-6")).toLocalDate());
 			nomina.setPeriodoFin(parametros.getPeriodoFin().toInstant().atZone(ZoneId.of("GMT-6")).toLocalDate());
-			nomina.setDiasLaborados(ValoresBD._CERO.get());
+			if(TP_NOMINA_TEST.equalsIgnoreCase(tipoNomina))
+				nomina.setDiasLaborados(new BigDecimal(parametros.getDiasPeriodo()).setScale(2, RoundingMode.HALF_UP));
+			else
+				nomina.setDiasLaborados(ValoresBD._CERO.get());
 			nomina.setDiasNoLaborados(ValoresBD._CERO.get());
 			nomina.setDiasAsueto(ValoresBD._CERO.get());
 			nomina.setDiasPagados(ValoresBD._CERO.get());
