@@ -9,7 +9,6 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
-import mx.com.ferbo.model.DetNominaDeduccionPK;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 
 public class AjusteAlNetoDBL extends AbstractDBL implements IDeduccion {
@@ -26,7 +25,6 @@ public class AjusteAlNetoDBL extends AbstractDBL implements IDeduccion {
 	public DetNominaDeduccion calcular(DetNomina nomina) {
 		DetNominaDeduccion deduccion = null;
 		CatTipoDeduccion   tdAjusteAlNeto = null;
-		Integer            index = null;
 		
 		try {
 			tdAjusteAlNeto = this.getTipoDeduccion(TD_AJUSTE_AL_NETO);
@@ -34,10 +32,9 @@ public class AjusteAlNetoDBL extends AbstractDBL implements IDeduccion {
 			log.error("Problema para generar el ajuste al neto...", ex);
 			this.ajusteAlNeto = _CERO.get();
 		} finally {
-			index = this.nuevoIndiceDe(nomina.getDeducciones());
 			
 			deduccion = new DetNominaDeduccion.Builder()
-					.key(new DetNominaDeduccionPK(nomina, index))
+					.nomina(nomina)
 					.tipoDeduccion(tdAjusteAlNeto)
 					.clave(CVE_AJUSTE_AL_NETO)
 					.nombre("Ajuste al neto")

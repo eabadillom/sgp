@@ -177,8 +177,10 @@ public class NominaSemanalBL extends NominaBL {
 			
 			log.info("Emisor: {}", nomina.getEmisor().getNombre());
 			
+		} catch(SGPException ex) {
+			log.error("Problema para obtener el cálculo de la nómina del empleado {} {} {}... {}", empleado.getNombre(), empleado.getPrimerAp(), empleado.getSegundoAp(), ex.getMessage());
 		} catch(Exception ex) {
-			log.error("Problema para obtener el cálculo de la nómina del empleado {} {} {}... {}", empleado.getNombre(), empleado.getPrimerAp(), empleado.getSegundoAp(), ex);
+			log.error("Problema para obtener el cálculo de la nómina del empleado...", ex);
 			log.error("", ex);
 		} finally {
 			log.info("-----------------------------------------------------------------------------");

@@ -5,8 +5,11 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Objects;
 
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
@@ -29,6 +32,11 @@ public class DetNominaReceptor implements Serializable {
 	private static final long serialVersionUID = -8691279351662644877L;
 	
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id_receptor")
+	private Integer id;
+	
 	@OneToOne
 	@JoinColumn(name = "id_nomina")
 	private DetNomina nomina = null;
@@ -121,6 +129,41 @@ public class DetNominaReceptor implements Serializable {
 	@OneToOne
 	@JoinColumn(name = "cd_ent_fed")
 	private CatEntidadFederativa entidadFederativa;
+	
+	@Override
+	public int hashCode() {
+		if (this.id == null) {
+    		return System.identityHashCode(this);
+        }
+        return Objects.hash(id);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		System.out.println("Equals receptor...");
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DetNominaReceptor other = (DetNominaReceptor) obj;
+		return Objects.equals(id, other.id);
+	}
+	
+	@Override
+	public String toString() {
+		return "{\"id\":\"" + id + "\",  nombre\":\"" + nombre + "\",  rfc\":\"" + rfc + "\",  codigoPostal\":\""
+				+ codigoPostal + "}";
+	}
+	
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
 	public DetNomina getNomina() {
 		return nomina;
@@ -296,32 +339,6 @@ public class DetNominaReceptor implements Serializable {
 
 	public void setEntidadFederativa(CatEntidadFederativa entidadFederativa) {
 		this.entidadFederativa = entidadFederativa;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(nomina);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		DetNominaReceptor other = (DetNominaReceptor) obj;
-		return Objects.equals(nomina, other.nomina);
-	}
-
-	@Override
-	public String toString() {
-		return "DetNominaReceptor [nombre=" + nombre + ", rfc=" + rfc + ", codigoPostal=" + codigoPostal + ", curp="
-				+ curp + ", nss=" + nss + ", inicioRelacionLaboral=" + inicioRelacionLaboral + ", antiguedad="
-				+ antiguedad + ", sindicalizado=" + sindicalizado + ", numeroEmpleado=" + numeroEmpleado
-				+ ", departamento=" + departamento + ", puesto=" + puesto + ", salarioDiario=" + salarioDiario
-				+ ", salarioDiarioIntegrado=" + salarioDiarioIntegrado + "]";
 	}
 
 	public BigDecimal getDiasVacaciones() {

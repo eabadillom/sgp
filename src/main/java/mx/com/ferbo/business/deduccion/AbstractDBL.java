@@ -1,8 +1,6 @@
 package mx.com.ferbo.business.deduccion;
 
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,9 +9,7 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
-import mx.com.ferbo.model.DetNominaDeduccionPK;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
-import mx.com.ferbo.util.SGPException;
 
 /**Abstract Deduccion Business Logic
  * 
@@ -32,7 +28,7 @@ public abstract class AbstractDBL {
 	
 	public static final String CVE_ISR                   = "045";
 	public static final String CVE_ISR_LEY_174           = "043";
-	public static final String CVE_ISR_ANTES_DE_SUBSIDIO = "002A";
+	public static final String CVE_ISR_ANTES_DE_SUBSIDIO = "041";
 	public static final String CVE_AJUSTE_ISR_MENSUAL    = "104";
 	public static final String CVE_AJUSTE_AL_SUBSIDIO    = "107";
 	public static final String CVE_IMSS                  = "052";
@@ -41,12 +37,9 @@ public abstract class AbstractDBL {
 	
 	public DetNominaDeduccion build(DetNomina nomina, String clave, String nombre, BigDecimal importe, CatTipoDeduccion tipoDeduccion, Boolean informar, Boolean procesar) {
 		DetNominaDeduccion deduccion = null;
-		Integer index = null;
-		
-		index = this.nuevoIndiceDe(nomina.getDeducciones());
 		
 		deduccion = new DetNominaDeduccion();
-		deduccion.setKey(new DetNominaDeduccionPK(nomina, index));
+		deduccion.setNomina(nomina);
 		deduccion.setClave(clave);
 		deduccion.setNombre(nombre);
 		deduccion.setImporte(importe);
@@ -83,22 +76,23 @@ public abstract class AbstractDBL {
 	}
 	
 	public Integer nuevoIndiceDe(List<DetNominaDeduccion> deducciones) {
-		Integer maxIndex = null;
-		DetNominaDeduccion maxD = null;
-		
-		try {
-			maxD = Collections.max(deducciones, Comparator.comparing(d -> d.getKey().getId()));
-			
-			if(maxD.getKey().getId() == null)
-				throw new SGPException("Existen elementos de \"Deducciones\" que no tienen asignado un consecutivo");
-			
-			maxIndex = maxD.getKey().getId() + 1;
-			
-		} catch(Exception ex) {
-			maxIndex = 0;
-		}
-		
-		return maxIndex;
+//		Integer maxIndex = null;
+//		DetNominaDeduccion maxD = null;
+//		
+//		try {
+//			maxD = Collections.max(deducciones, Comparator.comparing(d -> d.getKey().getId()));
+//			
+//			if(maxD.getKey().getId() == null)
+//				throw new SGPException("Existen elementos de \"Deducciones\" que no tienen asignado un consecutivo");
+//			
+//			maxIndex = maxD.getKey().getId() + 1;
+//			
+//		} catch(Exception ex) {
+//			maxIndex = 0;
+//		}
+//		
+//		return maxIndex;
+		return 0;
 	}
 	
 	public DetNominaDeduccion getDeduccion(DetNomina nomina, int idx, String tipoDeduccion, String clave, String nombre, Boolean informar, Boolean procesar, BigDecimal importe ) {
@@ -107,7 +101,7 @@ public abstract class AbstractDBL {
 		
 		tipo = this.getTipoDeduccion(tipoDeduccion);
 		deduccion = new DetNominaDeduccion();
-		deduccion.setKey(new DetNominaDeduccionPK(nomina, idx));
+		deduccion.setNomina(nomina);
 		deduccion.setTipoDeduccion(tipo);
 		deduccion.setClave(clave);
 		deduccion.setNombre(nombre);

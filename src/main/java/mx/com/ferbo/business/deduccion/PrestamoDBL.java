@@ -13,7 +13,6 @@ import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
-import mx.com.ferbo.model.DetNominaDeduccionPK;
 import mx.com.ferbo.model.DetPrestamo;
 import mx.com.ferbo.util.SGPException;
 
@@ -37,10 +36,7 @@ public class PrestamoDBL extends AbstractDBL implements IDeducciones {
 		DetNominaDeduccion deduccion = null;
 		List<DetNominaDeduccion> prestamosDeduccion = null;
 		
-		Integer idx = null;
-		
 		try {
-			idx = this.nuevoIndiceDe(nomina.getDeducciones());
 			
 			prestamosDeduccion = new ArrayList<DetNominaDeduccion>();
 			prestamos = prestamoDAO.buscarPorEmpleadoVigente(empleado.getIdEmpleado(), fecha);
@@ -52,7 +48,7 @@ public class PrestamoDBL extends AbstractDBL implements IDeducciones {
 			
 			for(DetPrestamo prestamo : prestamos) {
 				deduccion = new DetNominaDeduccion();
-				deduccion.setKey(new DetNominaDeduccionPK(nomina, idx++));
+				deduccion.setNomina(nomina);
 				deduccion.setTipoDeduccion(prestamo.getTipoPrestamo().getTipoDeduccion());
 				deduccion.setNombre(prestamo.getTipoPrestamo().getDescripcion());
 				deduccion.setClave(prestamo.getTipoPrestamo().getTipoPrestamo());

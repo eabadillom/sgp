@@ -14,15 +14,14 @@ import mx.com.ferbo.business.deduccion.AbstractDBL;
 import mx.com.ferbo.business.deduccion.IDeducciones;
 import mx.com.ferbo.business.deduccion.subsidio.ISubsidioEmpleo;
 import mx.com.ferbo.business.deduccion.subsidio.SubsidioEmpleoExecutor;
+import mx.com.ferbo.business.nomina.NominaBL;
 import mx.com.ferbo.business.nomina.ParametrosNomina;
 import mx.com.ferbo.business.otropago.AbstractOtroPago;
 import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.CatTarifaISR;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
-import mx.com.ferbo.model.DetNominaDeduccionPK;
 import mx.com.ferbo.model.DetNominaOtroPago;
-import mx.com.ferbo.model.DetNominaOtroPagoPK;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.model.sat.CatTipoOtroPago;
@@ -145,10 +144,10 @@ public class ISRSemanalDBL2 extends AbstractDBL implements IDeducciones {
 		DetNominaDeduccion        dAjusteAlSubsidioCausado  = null;
 		BigDecimal                isrAjustadoPorSubsidio    = null;
 		
-		Integer idx = null;
+//		Integer idx = null;
 		
 		try {
-			idx = this.nuevoIndiceDe(nomina.getDeducciones());
+//			idx = this.nuevoIndiceDe(nomina.getDeducciones());
 			percepcionesSemanales = nomina.getPercepciones();
 			
 			deduccionesISR = new ArrayList<>();
@@ -233,10 +232,10 @@ public class ISRSemanalDBL2 extends AbstractDBL implements IDeducciones {
 					.compareTo(ValoresBD._CERO.get()) < 0) {
 					
 					ajusteISRMensual = importeSubsidioAcumulado.setScale(2, RoundingMode.HALF_UP);
-					dAjusteISRMensual = this.getDeduccion(nomina, idx++, TD_AJUSTE_ISR_MENSUAL, CVE_AJUSTE_ISR_MENSUAL, "ISR de ajuste mensual", true, true, ajusteISRMensual);
+					dAjusteISRMensual = this.getDeduccion(nomina, 0, TD_AJUSTE_ISR_MENSUAL, CVE_AJUSTE_ISR_MENSUAL, "ISR de ajuste mensual", true, true, ajusteISRMensual);
 					
 					ajusteAlSubsidioCausado = importeSubsidioAcumulado.setScale(2, RoundingMode.HALF_UP);
-					dAjusteAlSubsidioCausado = this.getDeduccion(nomina, idx++, TD_AJUSTE_AL_SUBSIDIO, CVE_AJUSTE_AL_SUBSIDIO, "Ajuste al subsidio causado", true, false, ajusteAlSubsidioCausado);
+					dAjusteAlSubsidioCausado = this.getDeduccion(nomina, 0, TD_AJUSTE_AL_SUBSIDIO, CVE_AJUSTE_AL_SUBSIDIO, "Ajuste al subsidio causado", true, false, ajusteAlSubsidioCausado);
 					
 					isrAjustadoPorSubsidio = importeSubsidioAcumulado.setScale(2, RoundingMode.HALF_UP);
 					this.procesaISRAjustadoPorSubsidio(nomina, isrAjustadoPorSubsidio);
@@ -253,7 +252,7 @@ public class ISRSemanalDBL2 extends AbstractDBL implements IDeducciones {
 			}
 			
 			dISR = new DetNominaDeduccion.Builder()
-					.key(new DetNominaDeduccionPK(nomina, idx++))
+					.nomina(nomina)
 					.tipoDeduccion(tdISR)
 					.clave(CVE_ISR)
 					.nombre("I.S.R.")
@@ -262,18 +261,18 @@ public class ISRSemanalDBL2 extends AbstractDBL implements IDeducciones {
 					.procesar(true)
 					.build();
 			
-			deduccionesISR.add(dISRAntesSubsidio);
-			deduccionesISR.add(dISR);
+			NominaBL.agregarDeduccion(nomina, dISRAntesSubsidio);
+			NominaBL.agregarDeduccion(nomina, dISR);
 			
 			if(dAjusteISRMensual != null)
-				deduccionesISR.add(dAjusteISRMensual);
+				NominaBL.agregarDeduccion(nomina, dAjusteISRMensual);
 			
 			if(dAjusteAlSubsidioCausado != null)
-				deduccionesISR.add(dAjusteAlSubsidioCausado);
+				NominaBL.agregarDeduccion(nomina, dAjusteAlSubsidioCausado);
 			
 			this.procesaSubsidioAlEmpleo(nomina, importeSubsidio);
 			
-			nomina.getDeducciones().addAll(deduccionesISR);
+//			nomina.getDeducciones().addAll(deduccionesISR);
 		} catch(Exception ex) {
 			log.error("Problema para calcular el ISR...", ex);
 		} finally {
@@ -345,9 +344,8 @@ public class ISRSemanalDBL2 extends AbstractDBL implements IDeducciones {
 		return subsidioSemanasAnteriores;
 	}
 
-	public void procesaSubsidioAlEmpleo(DetNomina nomina, BigDecimal importeSubsidio) {
+	public void procesaSubsidioAlEmpleo(DetNomina nomina, BigDecimal importeSubsidio) throws SGPException {
 		CatTipoOtroPago topSubsidioEmpleo = null;
-		int indexOP = -1;
 		
 		if(importeSubsidio.compareTo(ValoresBD._CERO.get()) <= 0)
 			return;
@@ -355,44 +353,26 @@ public class ISRSemanalDBL2 extends AbstractDBL implements IDeducciones {
 		if(nomina.getOtrosPagos() == null)
 			nomina.setOtrosPagos(new ArrayList<>());
 		
-		for(DetNominaOtroPago o : nomina.getOtrosPagos()) {
-			if(indexOP >= o.getKey().getId())
-				continue;
-			indexOP = o.getKey().getId();
-		}
-		indexOP++;
-		
 		topSubsidioEmpleo = this.getTipoOtroPago(AbstractOtroPago.OP_SUBSIDIO_AL_SALARIO);
 		
 		opSubsidioEmpleo = new DetNominaOtroPago();
-		opSubsidioEmpleo.setKey(new DetNominaOtroPagoPK(nomina, indexOP));
+		opSubsidioEmpleo.setNomina(nomina);
 		opSubsidioEmpleo.setTipoOtroPago(topSubsidioEmpleo);
 		opSubsidioEmpleo.setClave(AbstractOtroPago.CVE_SUBSIDIO_AL_SALARIO);
 		opSubsidioEmpleo.setNombre("Subs al empleo acreditado");
 		opSubsidioEmpleo.setImporte(importeSubsidio);
 		opSubsidioEmpleo.setInformar(true);
 		opSubsidioEmpleo.setProcesar(false);
-		nomina.getOtrosPagos().add(opSubsidioEmpleo);
+		NominaBL.agregarOtroPago(nomina, opSubsidioEmpleo);
 	}
 	
 	public void procesaISRAjustadoPorSubsidio(DetNomina nomina, BigDecimal importeSubsidio) {
 		CatTipoOtroPago topSubsidioEmpleo = null;
-		int indexOP = -1;
-		
-		if(nomina.getOtrosPagos() == null)
-			nomina.setOtrosPagos(new ArrayList<>());
-		
-		for(DetNominaOtroPago o : nomina.getOtrosPagos()) {
-			if(indexOP >= o.getKey().getId())
-				continue;
-			indexOP = o.getKey().getId();
-		}
-		indexOP++;
 		
 		topSubsidioEmpleo = this.getTipoOtroPago(AbstractOtroPago.OP_ISR_AJUSTADO_POR_SUBSIDIO);
 		
 		opSubsidioEmpleo = new DetNominaOtroPago();
-		opSubsidioEmpleo.setKey(new DetNominaOtroPagoPK(nomina, indexOP));
+		opSubsidioEmpleo.setNomina(nomina);
 		opSubsidioEmpleo.setTipoOtroPago(topSubsidioEmpleo);
 		opSubsidioEmpleo.setClave(AbstractOtroPago.CVE_ISR_AJUSTADO_POR_SUBSIDIO);
 		opSubsidioEmpleo.setNombre("ISR ajustado por subsidio");

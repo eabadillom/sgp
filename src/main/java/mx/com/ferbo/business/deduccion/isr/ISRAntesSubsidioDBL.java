@@ -13,7 +13,6 @@ import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.CatTarifaISR;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
-import mx.com.ferbo.model.DetNominaDeduccionPK;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.util.SGPException;
 
@@ -37,7 +36,6 @@ public class ISRAntesSubsidioDBL extends AbstractDBL implements IDeduccion {
 		DetNominaDeduccion deduccion      = null;
 		CatTipoDeduccion   tdISR          = null;
 		BigDecimal         isrPreSubsidio = null;
-		Integer            index          = null;
 		
 		try {
 			if(baseISR == null)
@@ -60,9 +58,8 @@ public class ISRAntesSubsidioDBL extends AbstractDBL implements IDeduccion {
 			log.error("Problema para obtener el ISR antes del subsidio al empleo...", ex);
 			isrPreSubsidio = BigDecimal.ZERO.setScale(2,  RoundingMode.HALF_UP);
 		} finally {
-			index = this.nuevoIndiceDe(nomina.getDeducciones());
 			deduccion = new DetNominaDeduccion.Builder()
-					.key(new DetNominaDeduccionPK(nomina, index))
+					.nomina(nomina)
 					.tipoDeduccion(tdISR)
 					.clave(CVE_ISR_ANTES_DE_SUBSIDIO)
 					.nombre("I.S.R. antes de Subs al empleo")
@@ -100,7 +97,7 @@ public class ISRAntesSubsidioDBL extends AbstractDBL implements IDeduccion {
 	public BigDecimal getExcedente() {
 		return excedente;
 	}
-
+	
 	public BigDecimal getIsrPrevio() {
 		return isrPrevio;
 	} 
