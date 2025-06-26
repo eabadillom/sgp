@@ -15,6 +15,7 @@ import mx.com.ferbo.model.DetNominaConcepto;
 import mx.com.ferbo.model.DetNominaDeduccion;
 import mx.com.ferbo.model.DetNominaOtroPago;
 import mx.com.ferbo.model.DetNominaPercepcion;
+import mx.com.ferbo.util.SGPException;
 
 public class NominaDAO extends BaseDAO<DetNomina, Integer> {
 	
@@ -27,7 +28,7 @@ public class NominaDAO extends BaseDAO<DetNomina, Integer> {
 	public NominaDAO() {
 		super(DetNomina.class);
 	}
-
+	
 	public List<DetNomina> buscarPorPeriodo(LocalDate periodoInicio, LocalDate periodoFin) {
 		List<DetNomina> modelList = null;
 		EntityManager em = null;
@@ -62,6 +63,14 @@ public class NominaDAO extends BaseDAO<DetNomina, Integer> {
 					.getSingleResult()
 					;
 			log.debug("periodo inicio {}, periodo fin {}, rfc {}");
+			
+			model.getConceptos().stream().forEach(item -> log.debug("Concepto: {}", item.getId()));
+			
+			model.getPercepciones().stream().forEach(item -> log.debug("Percepcion: {}", item.getId()));
+			
+			model.getDeducciones().stream().forEach(item -> log.debug("Deduccion: {}", item.getId()));
+			
+			model.getOtrosPagos().stream().forEach(item -> log.debug("Otro pago: {}", item.getId()));
 			
 		} catch(NoResultException ex) {
 			log.warn("Problema para obtener la lista de nomina del periodo solicitado...", ex.getMessage());
@@ -163,19 +172,19 @@ public class NominaDAO extends BaseDAO<DetNomina, Integer> {
 			model = em.find(modelClass, id);
 			
 			for(DetNominaConcepto concepto : model.getConceptos()) {
-				log.info("Concepto: {}", concepto.getKey().getId());
+				log.info("Concepto: {}", concepto.getId());
 			}
 			
 			for(DetNominaPercepcion percepcion : model.getPercepciones()) {
-				log.info("Percepcion: {} - {}", percepcion.getKey().getId(), percepcion.getClave());
+				log.info("Percepcion: {} - {}", percepcion.getId(), percepcion.getClave());
 			}
 			
 			for(DetNominaOtroPago otroPago: model.getOtrosPagos()) {
-				log.info("Otro pago: {} - {}", otroPago.getKey().getId(), otroPago.getClave());
+				log.info("Otro pago: {} - {}", otroPago.getId(), otroPago.getClave());
 			}
 			
 			for(DetNominaDeduccion deduccion : model.getDeducciones()) {
-				log.info("Deduccion: {} - ", deduccion.getKey().getId(), deduccion.getClave());
+				log.info("Deduccion: {} - ", deduccion.getId(), deduccion.getClave());
 			}
 			
 		} catch(Exception ex) {
@@ -185,5 +194,34 @@ public class NominaDAO extends BaseDAO<DetNomina, Integer> {
 		}
 		
 		return model;
+	}
+	
+	@Override
+	public synchronized void eliminar(DetNomina model) throws SGPException {
+		EntityManager em = null;
+		try {
+			log.info("Eliminando objeto: {} ........", model);
+			em = getEntityManager();
+			em.getTransaction().begin();
+			
+			model = em.contains(model) ? model : em.merge(model);
+			
+			model.getEmisor().setNomina(null);
+			model.getReceptor().setNomina(null);
+//			model.getConceptos().forEach(item -> item.setNomina(null));
+//			model.getPercepciones().forEach(item -> item.getKey().setNomina(null));
+//			model.getOtrosPagos().forEach(item -> item.getKey().setNomina(null));
+//			model.getDeducciones().forEach(item -> item.getKey().setNomina(null));
+			
+			em.remove(model);
+			em.getTransaction().commit();
+			log.info("Objeto eliminado correctamente: {}", model);
+		} catch(Exception ex) {
+			this.rollback(em);
+			log.error("Probleam para eliminar el objeto: " + model, ex);
+                        throw new SGPException("Error al eliminar en la base de datos.");
+		} finally {
+			this.close(em);
+		}
 	}
 }

@@ -6,8 +6,10 @@ import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -17,12 +19,19 @@ import mx.com.ferbo.model.sat.CatTipoOtroPago;
 
 @Entity
 @Table(name = "det_nom_otro_pago")
-public class DetNominaOtroPago implements Serializable, Identificable<DetNominaOtroPagoPK> {
+public class DetNominaOtroPago implements Serializable {
 
 	private static final long serialVersionUID = -3073795346585740482L;
 	
-	@EmbeddedId
-	private DetNominaOtroPagoPK key;
+	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+	@Column(name = "id_otro_pago")
+	private Integer id;
+	
+	@ManyToOne
+	@JoinColumn(name = "id_nomina")
+	private DetNomina nomina;
 	
 	@ManyToOne
 	@JoinColumn(name = "tp_otro_pago", referencedColumnName = "cd_tipo_otro_pago")
@@ -53,7 +62,9 @@ public class DetNominaOtroPago implements Serializable, Identificable<DetNominaO
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(key);
+		if(this.id == null)
+			System.identityHashCode(this);
+		return Objects.hash(this.id);
 	}
 	
 	@Override
@@ -65,23 +76,30 @@ public class DetNominaOtroPago implements Serializable, Identificable<DetNominaO
 		if (getClass() != obj.getClass())
 			return false;
 		DetNominaOtroPago other = (DetNominaOtroPago) obj;
-		return Objects.equals(key, other.key);
+		return Objects.equals(this.id, other.id);
 	}
 	
 	@Override
 	public String toString() {
-		return "DetNominaOtroPago [key=" + key + ", clave=" + clave + ", nombre=" + nombre + ", importe=" + importe
-				+ "]";
+		return "DetNominaOtroPago [clave=" + clave + ", nombre=" + nombre + ", importe=" + importe + "]";
 	}
 	
-	public DetNominaOtroPagoPK getKey() {
-		return key;
+	public Integer getId() {
+		return id;
 	}
 
-	public void setKey(DetNominaOtroPagoPK key) {
-		this.key = key;
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
+	public DetNomina getNomina() {
+		return nomina;
+	}
+
+	public void setNomina(DetNomina nomina) {
+		this.nomina = nomina;
+	}
+	
 	public CatTipoOtroPago getTipoOtroPago() {
 		return tipoOtroPago;
 	}

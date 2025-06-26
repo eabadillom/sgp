@@ -19,9 +19,7 @@ import mx.com.ferbo.business.otropago.ReintegroISROtroPago;
 import mx.com.ferbo.model.CatTarifaISR;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
-import mx.com.ferbo.model.DetNominaDeduccionPK;
 import mx.com.ferbo.model.DetNominaOtroPago;
-import mx.com.ferbo.model.DetNominaOtroPagoPK;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.model.sat.CatTipoOtroPago;
@@ -145,10 +143,10 @@ public class ISRSemanalDBL1 extends AbstractDBL implements IDeducciones {
 		BigDecimal isrMensualDespuesDeSubsidio = null;
 		DetNominaDeduccion dISRAntesSubsidioMensual = null;
 		
-		Integer idxDeduccion = null;
+//		Integer idxDeduccion = null;
 		
 		try {
-			idxDeduccion = this.nuevoIndiceDe(nomina.getDeducciones());
+//			idxDeduccion = this.nuevoIndiceDe(nomina.getDeducciones());
 			percepciones = nomina.getPercepciones();
 			
 			deduccionesISR = new ArrayList<>();
@@ -210,7 +208,7 @@ public class ISRSemanalDBL1 extends AbstractDBL implements IDeducciones {
 			if(isrDespuesDeSubsidio.compareTo(BigDecimal.ZERO) > 0) {
 				log.info("Agregando ISR como Deduccion...");
 				dISR = new DetNominaDeduccion();
-				dISR.setKey(new DetNominaDeduccionPK(nomina, idxDeduccion++));
+				dISR.setNomina(nomina);
 				tdISR = this.getTipoDeduccion(TD_ISR);
 				dISR.setTipoDeduccion(tdISR);
 				dISR.setClave(CVE_ISR);
@@ -263,22 +261,14 @@ public class ISRSemanalDBL1 extends AbstractDBL implements IDeducciones {
 
 	public void procesaSubsidioAlEmpleo(DetNomina nomina, BigDecimal importeSubsidio) {
 		CatTipoOtroPago topSubsidioEmpleo = null;
-		int indexOP = -1;
 		
 		if(nomina.getOtrosPagos() == null)
 			nomina.setOtrosPagos(new ArrayList<>());
 		
-		for(DetNominaOtroPago o : nomina.getOtrosPagos()) {
-			if(indexOP >= o.getKey().getId())
-				continue;
-			indexOP = o.getKey().getId();
-		}
-		indexOP++;
-		
 		topSubsidioEmpleo = this.getTipoOtroPago(AbstractOtroPago.OP_SUBSIDIO_AL_SALARIO);
 		
 		opSubsidioEmpleo = new DetNominaOtroPago();
-		opSubsidioEmpleo.setKey(new DetNominaOtroPagoPK(nomina, indexOP));
+		opSubsidioEmpleo.setNomina(nomina);
 		opSubsidioEmpleo.setTipoOtroPago(topSubsidioEmpleo);
 		opSubsidioEmpleo.setClave(AbstractOtroPago.CVE_SUBSIDIO_AL_SALARIO);
 		opSubsidioEmpleo.setNombre("Subs. al empleo mes");

@@ -71,17 +71,23 @@
                             <p:inputText value="#{empresasBean.empresa.descripcion}"/>
                         </div>
                     </div>
-                    <div class="field col-12 md:col-6">
+                    <div class="field col-12 md:col-4">
                         <p:outputLabel value="RFC"/>
                         <div style="display: flex; align-items: center; gap: 5px;">
                             <p:inputText id="RFC" value="#{empresasBean.empresa.rfc}"/>
                         </div>
                     </div>
-                    <div class="field col-12 md:col-6">
+                    <div class="field col-12 md:col-4">
                         <p:outputLabel value="Regimen Capital"/>
                         <div style="display: flex; align-items: center; gap: 5px;">
                             <p:inputText id="txtRegimenCapital" value="#{empresasBean.empresa.regimenCapital}" placeholder="p. e. SOCIEDAD ANONIMA DE CAPITAL VARIABLE" disabled="#{emisoresCFDISBean.estado}"/>
                         </div>
+                    </div>
+                    <div class="field col-12 md:col-4">
+                    	<p:outputLabel value="Código postal" />
+                    	<div style="display: flex; align-items: center; gap: 5px;">
+                    		<p:inputText id="txtCodigoPostal" />
+                    	</div>
                     </div>
                     <div class="field col-12 md:col-6">
                         <p:outputLabel value="Régimen Fiscal"/>

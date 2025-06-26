@@ -57,13 +57,13 @@
 					<p:selectOneMenu id="soEmpresa" value="#{nominaS.empresaSelected}" autoWidth="false" converter="entityConverter">
 						<f:selectItem itemLabel="--Seleccione--"/>
 						<f:selectItems value="#{nominaS.lstEmpresas}" var="empresa" itemValue="#{empresa}" itemLabel="#{empresa.descripcion}"/>
-						<p:ajax event="change" process="@this" listener="#{nominaS.calculaPeriodo()}" update="anio semana dp-periodo-inicio dp-periodo-fin"/>
+						<p:ajax event="change" process="@this" listener="#{nominaS.calculaPeriodo()}" update="anio semana dp-periodo-inicio dp-periodo-fin" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
 					</p:selectOneMenu>
 				</div>
 				<div class="field col-12 md:col-2">
 					<p:outputLabel value="Año" />
 					<p:spinner id="anio" value="#{nominaS.anio}" buttons="horizontal">
-						<p:ajax event="change" process="@this" update="semana dp-periodo-inicio dp-periodo-fin" listener="#{nominaS.calculaSemanas()}"></p:ajax>
+						<p:ajax event="change" process="@this" update="semana dp-periodo-inicio dp-periodo-fin" listener="#{nominaS.calculaSemanas()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"></p:ajax>
 					</p:spinner>
 				</div>
 				<div class="field col-12 md:col-2">
@@ -71,7 +71,7 @@
 					<p:selectOneMenu id="semana" value="#{nominaS.semana}" filter="true" filterMatchMode="contains" filterPlaceholder="Número de semana">
 						<f:selectItem itemLabel="--Seleccione--" noSelectionOption="true"/>
 						<f:selectItems  value="#{nominaS.semanasDelAnio}" var="periodo" itemLabel="Semana #{periodo}" itemValue="#{periodo}" />
-						<p:ajax event="change"  update="anio semana dp-periodo-inicio dp-periodo-fin" process="@this" listener="#{nominaS.calculaPeriodo()}"/>
+						<p:ajax event="change"  update="anio semana dp-periodo-inicio dp-periodo-fin" process="@this" listener="#{nominaS.calculaPeriodo()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
 					</p:selectOneMenu>
 				</div>
 				<div class="field col-12 md:col-2">
@@ -487,7 +487,14 @@
 				</p:tabView>
 				<f:facet name="footer">
 					<span style="padding-left: 0.5rem; padding-right: 0.5rem;">
-						<p:commandButton value="Guardar" icon="pi pi-save" actionListener="#{nominaS.actualizarNomina}" process="@this" disabled="#{nominaS.nomina.id ne null}" update="form:dtNomina" />
+						<p:commandButton value="Eliminar" icon="pi pi-trash" actionListener="#{nominaS.eliminarNomina()}" rendered="#{nominaS.nomina.id ne null}" disabled="#{nominaS.nomina.uuid ne null}" styleClass="ui-button-outlined ui-button-danger" update="form:dtNomina">
+							<p:confirm header="Eliminar nómina" message="¿Está seguro que eliminar la nómina del empleado?" icon="pi pi-exclamation-triangle" />
+						</p:commandButton>
+					</span>
+					<span style="padding-left: 0.5rem; padding-right: 0.5rem;">
+						<p:commandButton value="Guardar" icon="pi pi-save" actionListener="#{nominaS.actualizarNomina}" process="@this" disabled="#{nominaS.nomina.id ne null}" update="form:dtNomina">
+							<p:confirm header="Guardar nómina" message="¿Está seguro que guardar la nómina del empleado?" icon="pi pi-exclamation-triangle" />
+						</p:commandButton>
 					</span>
 					<span style="padding-left: 0.5rem; padding-right: 0.5rem;">
 						<p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dgEmpleado').hide();" styleClass="ui-button-outlined ui-button-secondary" />
