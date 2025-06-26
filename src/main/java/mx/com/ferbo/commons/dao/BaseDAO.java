@@ -84,6 +84,7 @@ public abstract class BaseDAO<MODEL, PK> {
 			close(em);
 		}
 	}
+	
 	public synchronized void eliminar(MODEL model) throws SGPException {
 		EntityManager em = null;
 		try {

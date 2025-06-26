@@ -6,8 +6,6 @@ import java.time.Period;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -26,14 +24,10 @@ import mx.com.ferbo.model.CatEmpresa;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaConcepto;
-import mx.com.ferbo.model.DetNominaConceptoPK;
 import mx.com.ferbo.model.DetNominaDeduccion;
-import mx.com.ferbo.model.DetNominaDeduccionPK;
 import mx.com.ferbo.model.DetNominaEmisor;
 import mx.com.ferbo.model.DetNominaOtroPago;
-import mx.com.ferbo.model.DetNominaOtroPagoPK;
 import mx.com.ferbo.model.DetNominaPercepcion;
-import mx.com.ferbo.model.DetNominaPercepcionPK;
 import mx.com.ferbo.model.DetNominaReceptor;
 import mx.com.ferbo.model.DetRegistro;
 import mx.com.ferbo.model.DetVacaciones;
@@ -108,7 +102,7 @@ public abstract class NominaBL {
 			unidadSAT = parametros.getUnidadSAT();
 			
 			concepto = new DetNominaConcepto();
-			concepto.setKey(new DetNominaConceptoPK(nomina, 0));
+			concepto.setNomina(nomina);
 			concepto.setConcepto(conceptoSAT);
 			concepto.setCantidad(ValoresBD._1.get());
 			concepto.setUnidad(unidadSAT);
@@ -403,8 +397,7 @@ public abstract class NominaBL {
 			throw new SGPException("El objeto nómina no está definido");
 		
 		percepcion = new DetNominaPercepcion();
-    	percepcion.setKey(new DetNominaPercepcionPK());
-    	percepcion.getKey().setNomina(nomina);
+		percepcion.setNomina(nomina);
     	
     	return percepcion;
 	}
@@ -417,8 +410,7 @@ public abstract class NominaBL {
 			throw new SGPException("El objeto nómina no está definido.");
 		
 		otroPago = new DetNominaOtroPago();
-    	otroPago.setKey(new DetNominaOtroPagoPK());
-    	otroPago.getKey().setNomina(nomina);
+		otroPago.setNomina(nomina);
     	
 		return otroPago;
 	}
@@ -431,8 +423,7 @@ public abstract class NominaBL {
 			throw new SGPException("El objeto nómina no está definido.");
 		
 		deduccion = new DetNominaDeduccion();
-    	deduccion.setKey(new DetNominaDeduccionPK());
-    	deduccion.getKey().setNomina(nomina);
+		deduccion.setNomina(nomina);
     	
     	return deduccion;
 	}
@@ -485,8 +476,6 @@ public abstract class NominaBL {
 	
 	public static synchronized void agregarOtroPago(DetNomina nomina, DetNominaOtroPago otroPago)
 	throws SGPException {
-		Integer maxIndex = null;
-    	DetNominaOtroPago maxO = null;
     	
     	if(nomina == null)
 			throw new SGPException("El objeto nómina no está definido.");
@@ -506,23 +495,14 @@ public abstract class NominaBL {
 		if(otroPago.getNombre().trim().equalsIgnoreCase(""))
 			throw new SGPException("Debe indicar una descripción para el pago.");
 		
-		otroPago.setClave("FRB-" + otroPago.getTipoOtroPago().getClave());
-		otroPago.setInformar(true);
-		otroPago.setProcesar(true);
-		maxO = Collections.max(nomina.getOtrosPagos(), Comparator.comparing(o -> o.getKey().getId()));
+		if(nomina.getOtrosPagos() == null)
+			nomina.setOtrosPagos(new ArrayList<DetNominaOtroPago>());
 		
-		if(maxO.getKey().getId() == null)
-			throw new SGPException("Existen elementos de \"Otros pagos\" que no tienen asignado un consecutivo");
-		
-		maxIndex = maxO.getKey().getId() + 1;
-		otroPago.getKey().setId(maxIndex);
 		nomina.getOtrosPagos().add(otroPago);
 	}
 	
 	public static synchronized void agregarDeduccion(DetNomina nomina, DetNominaDeduccion deduccion)
 	throws SGPException {
-		Integer maxIndex = null;
-		DetNominaDeduccion maxD = null;
 		
 		if(nomina == null)
 			throw new SGPException("El objeto nómina no está definido.");
@@ -542,17 +522,9 @@ public abstract class NominaBL {
 		if(deduccion.getNombre().trim().equalsIgnoreCase(""))
 			throw new SGPException("Debe indicar una descripción para la deducción.");
 		
-		deduccion.setClave("FRB-" + deduccion.getTipoDeduccion().getClave());
-		deduccion.setInformar(true);
-		deduccion.setProcesar(true);
+		if(nomina.getDeducciones() == null)
+			nomina.setDeducciones(new ArrayList<DetNominaDeduccion>());
 		
-		maxD = Collections.max(nomina.getDeducciones(), Comparator.comparing(d -> d.getKey().getId()));
-		
-		if(maxD.getKey().getId() == null)
-			throw new SGPException("Existen elementos de \"Deducciones\" que no tienen asignado un consecutivo");
-		
-		maxIndex = maxD.getKey().getId() + 1;
-		deduccion.getKey().setId(maxIndex);
 		nomina.getDeducciones().add(deduccion);
 	}
 	
@@ -672,11 +644,9 @@ public abstract class NominaBL {
 			
 		} else if(ajusteAlNeto.compareTo(ValoresBD._CERO.get()) > 0) {
 			
-			Integer index = null;
 			opAjusteNetoBO = new AjusteAlNetoOtroPago(ajusteAlNeto);
 			opAjusteNetoBO.setTiposOtroPago(parametros.getTiposOtroPago());
-			index = opAjusteNetoBO.nuevoIndiceDe(nomina.getOtrosPagos());
-			opAjusteAlNeto = opAjusteNetoBO.calcular(nomina, index);
+			opAjusteAlNeto = opAjusteNetoBO.calcular(nomina);
 			nomina.getOtrosPagos().add(opAjusteAlNeto);
 			log.info("Aplicando ajuste al neto como otro pago: {}", opAjusteAlNeto);
 			

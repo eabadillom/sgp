@@ -24,9 +24,6 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
-
 import mx.com.ferbo.model.sat.CatMetodoPago;
 
 @Entity
@@ -157,26 +154,22 @@ public class DetNomina implements Serializable {
     @Basic(optional = true)
     private BigDecimal diasAsueto;
     
-    @OneToOne(mappedBy = "nomina", cascade = CascadeType.PERSIST)
+    @OneToOne(mappedBy = "nomina", cascade = CascadeType.ALL, orphanRemoval = true)
     private DetNominaEmisor emisor;
     
-    @OneToOne(mappedBy = "nomina", cascade = CascadeType.PERSIST)
+    @OneToOne(mappedBy = "nomina", cascade = CascadeType.ALL, orphanRemoval = true)
     private DetNominaReceptor receptor;
     
-    @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany(mappedBy = "key.nomina", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "nomina", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetNominaConcepto> conceptos;
     
-    @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany(mappedBy = "key.nomina", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "nomina", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetNominaPercepcion> percepciones;
     
-    @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany(mappedBy = "key.nomina", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "nomina", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetNominaOtroPago> otrosPagos;
     
-    @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany(mappedBy = "key.nomina", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "nomina", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetNominaDeduccion> deducciones;
     
     @Transient
@@ -184,9 +177,11 @@ public class DetNomina implements Serializable {
     
     @Override
 	public int hashCode() {
-    	if(this.id == null)
-    		return Objects.hash(this);
-		return Objects.hash(id);
+    	System.out.println("DetNomina hashCode...");
+    	if (this.id == null) {
+    		return System.identityHashCode(this);
+        }
+        return Objects.hash(id);
 	}
     
 	@Override

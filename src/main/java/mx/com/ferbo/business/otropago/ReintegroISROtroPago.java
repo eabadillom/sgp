@@ -7,7 +7,6 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaOtroPago;
-import mx.com.ferbo.model.DetNominaOtroPagoPK;
 import mx.com.ferbo.model.sat.CatTipoOtroPago;
 
 public class ReintegroISROtroPago extends AbstractOtroPago implements IOtroPago {
@@ -27,13 +26,12 @@ public class ReintegroISROtroPago extends AbstractOtroPago implements IOtroPago 
 		
 		try {
 			tpReintegroISR = this.getTipoOtroPago("001");
-			index = this.nuevoIndiceDe(nomina.getOtrosPagos());
 		} catch(Exception ex) {
 			log.error("Problema para generar el reintegro de ISR...", ex);
 			this.importeISR = BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP);
 		} finally {
 			opReintegroISR = new DetNominaOtroPago();
-			opReintegroISR.setKey(new DetNominaOtroPagoPK(nomina, index));
+			opReintegroISR.setNomina(nomina);
 			opReintegroISR.setTipoOtroPago(tpReintegroISR);
 			opReintegroISR.setClave("FRB-001");
 			opReintegroISR.setNombre("Reintegro de ISR pagado en exceso");

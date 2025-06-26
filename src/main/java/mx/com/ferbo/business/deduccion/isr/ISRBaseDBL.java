@@ -12,7 +12,6 @@ import mx.com.ferbo.dao.n.TipoDeduccionDAO;
 import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
-import mx.com.ferbo.model.DetNominaDeduccionPK;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.util.SGPException;
@@ -57,7 +56,7 @@ public class ISRBaseDBL extends AbstractDBL implements IDeduccion {
 		} finally {
 			log.info("Percepciones gravadas: {}", baseISR);
 			deduccion = new DetNominaDeduccion.Builder()
-					.key(new DetNominaDeduccionPK(nomina, index))
+					.nomina(nomina)
 					.tipoDeduccion(tdISR)
 					.clave(CVE_IMSS)
 					.nombre("Base I.S.R.")

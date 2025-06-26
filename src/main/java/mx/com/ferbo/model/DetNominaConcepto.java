@@ -6,8 +6,10 @@ import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -22,8 +24,15 @@ public class DetNominaConcepto implements Serializable {
 
 	private static final long serialVersionUID = -7162671144734951082L;
 	
-	@EmbeddedId
-	private DetNominaConceptoPK key;
+	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+	@Column(name = "id_concepto")
+	private Integer id;
+	
+	@ManyToOne
+	@JoinColumn(name = "id_nomina")
+	private DetNomina nomina;
 	
 	@ManyToOne
 	@JoinColumn(name = "cd_concepto", referencedColumnName = "cd_concepto")
@@ -57,13 +66,47 @@ public class DetNominaConcepto implements Serializable {
 	@Column(name = "nu_descuento", scale = 12, precision = 2)
 	@Basic(optional = false)
 	private BigDecimal descuento;
-
-	public DetNominaConceptoPK getKey() {
-		return key;
+	
+	@Override
+	public int hashCode() {
+		if(this.id == null)
+			System.identityHashCode(this);
+		return Objects.hash(this.id);
 	}
 
-	public void setKey(DetNominaConceptoPK key) {
-		this.key = key;
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DetNominaConcepto other = (DetNominaConcepto) obj;
+		return Objects.equals(this.id, other.id);
+	}
+
+	@Override
+	public String toString() {
+		return "DetNominaConcepto [cantidad=" + cantidad + ", nombreConcepto=" + nombreConcepto
+				+ ", objetoImpuesto=" + objetoImpuesto + ", valorUnitario=" + valorUnitario + ", importe=" + importe
+				+ ", descuento=" + descuento + "]";
+	}
+	
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public DetNomina getNomina() {
+		return nomina;
+	}
+
+	public void setNomina(DetNomina nomina) {
+		this.nomina = nomina;
 	}
 
 	public CatConcepto getConcepto() {
@@ -128,29 +171,5 @@ public class DetNominaConcepto implements Serializable {
 
 	public void setDescuento(BigDecimal descuento) {
 		this.descuento = descuento;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(key);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		DetNominaConcepto other = (DetNominaConcepto) obj;
-		return Objects.equals(key, other.key);
-	}
-
-	@Override
-	public String toString() {
-		return "DetNominaConcepto [key=" + key + ", cantidad=" + cantidad + ", nombreConcepto=" + nombreConcepto
-				+ ", objetoImpuesto=" + objetoImpuesto + ", valorUnitario=" + valorUnitario + ", importe=" + importe
-				+ ", descuento=" + descuento + "]";
 	}
 }

@@ -6,6 +6,8 @@ import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -27,8 +29,13 @@ public class DetNominaEmisor implements Serializable {
 	private static final long serialVersionUID = 8524892581709741382L;
 	
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id_emisor")
+	private Integer id;
+	
 	@OneToOne
-	@JoinColumn(name = "id_nomina", referencedColumnName = "id_nomina")
+	@JoinColumn(name = "id_nomina")
 	private DetNomina nomina;
 	
 	@Basic(optional = false)
@@ -54,6 +61,40 @@ public class DetNominaEmisor implements Serializable {
 	@Column(name = "nu_reg_pat")
 	@Size(max = 20)
 	private String registroPatronal;
+	
+	@Override
+	public int hashCode() {
+		if(this.id == null)
+			System.identityHashCode(this);
+		return Objects.hash(id);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		System.out.println("Equals emisor...");
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DetNominaEmisor other = (DetNominaEmisor) obj;
+		return Objects.equals(id, other.id);
+	}
+	
+	@Override
+	public String toString() {
+		return "{\"id\":\"" + id + "\",  nombre\":\"" + nombre + "\",  rfc\":\"" + rfc + "\",  codigoPostal\":\""
+				+ codigoPostal + "\",  registroPatronal\":\"" + registroPatronal + "}";
+	}
+	
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
 	public DetNomina getNomina() {
 		return nomina;
@@ -101,22 +142,5 @@ public class DetNominaEmisor implements Serializable {
 
 	public void setRegistroPatronal(String registroPatronal) {
 		this.registroPatronal = registroPatronal;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(nomina);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		DetNominaEmisor other = (DetNominaEmisor) obj;
-		return Objects.equals(nomina, other.nomina);
 	}
 }

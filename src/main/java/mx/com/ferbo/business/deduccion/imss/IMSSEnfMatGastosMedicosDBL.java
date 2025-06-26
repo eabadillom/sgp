@@ -11,7 +11,6 @@ import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.CatCuotaIMSS;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
-import mx.com.ferbo.model.DetNominaDeduccionPK;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.util.SGPException;
 
@@ -42,7 +41,6 @@ public class IMSSEnfMatGastosMedicosDBL extends AbstractIMSSDBL implements IDedu
 		BigDecimal         cuota      = null;
 		CatCuotaIMSS       tarifaIMSS = null;
 		CatTipoDeduccion   tdIMSS     = null;
-		Integer            index      = null;
 		
 		try {
 			if(this.cuotasIMSS == null)
@@ -73,10 +71,8 @@ public class IMSSEnfMatGastosMedicosDBL extends AbstractIMSSDBL implements IDedu
 			log.error("No es posible calcular el excedente por Gastos Médicos para pensionados y beneficiarios...", ex);
 			cuota = ValoresBD._CERO.get();
 		} finally {
-			index = this.nuevoIndiceDe(nomina.getDeducciones());
-			
 			deduccion = new DetNominaDeduccion.Builder()
-					.key(new DetNominaDeduccionPK(nomina, index))
+					.nomina(nomina)
 					.tipoDeduccion(tdIMSS)
 					.clave(CVE_IMSS)
 					.nombre("I.M.S.S. (Gastos médicos pensionados y beneficiarios)")

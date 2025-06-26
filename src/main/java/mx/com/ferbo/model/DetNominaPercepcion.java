@@ -6,8 +6,10 @@ import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -22,9 +24,15 @@ public class DetNominaPercepcion implements Serializable {
 
 	private static final long serialVersionUID = -3328622010561838312L;
 	
-	@EmbeddedId
-	private DetNominaPercepcionPK key;
+	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+	@Column(name = "id_percepcion")
+	private Integer id;
 	
+	@ManyToOne
+	@JoinColumn(name = "id_nomina")
+	private DetNomina nomina;
 	
 	@ManyToOne
 	@JoinColumn(name = "tp_percepcion", referencedColumnName = "cd_tipo_percepcion")
@@ -77,22 +85,11 @@ public class DetNominaPercepcion implements Serializable {
 	@Basic(optional = false)
 	private BigDecimal importeExento;
 	
-	public DetNominaPercepcion() {
-	}
-	
-	public DetNominaPercepcion(DetNominaPercepcion percepcion) {
-		this.key = new DetNominaPercepcionPK(percepcion.getKey().getNomina(), percepcion.getKey().getId());
-		this.tipoPercepcion = percepcion.getTipoPercepcion();
-		this.clave = percepcion.getClave();
-		this.nombre = percepcion.getNombre();
-		this.cantidad = percepcion.getCantidad();
-		this.importeGravado = percepcion.getImporteGravado();
-		this.importeExento = percepcion.getImporteExento();
-	}
-	
 	@Override
 	public int hashCode() {
-		return Objects.hash(key);
+		if(this.id == null)
+			System.identityHashCode(this);
+		return Objects.hash(this.id);
 	}
 
 	@Override
@@ -104,23 +101,48 @@ public class DetNominaPercepcion implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		DetNominaPercepcion other = (DetNominaPercepcion) obj;
-		return Objects.equals(key, other.key);
+		return Objects.equals(this.id, other.id);
 	}
 
 	@Override
 	public String toString() {
-		return "DetNominaPercepcion [key=" + key + ", clavePercepcion=" + clave + ", nombrePercepcion="
+		return "DetNominaPercepcion [clavePercepcion=" + clave + ", nombrePercepcion="
 				+ nombre + ", importeGravado=" + importeGravado + ", importeExento=" + importeExento + "]";
 	}
-
-	public DetNominaPercepcionPK getKey() {
-		return key;
+	
+	public DetNominaPercepcion() {
+		
+	}
+	
+	public DetNominaPercepcion(DetNominaPercepcion percepcion) {
+		this.id             = percepcion.getId();
+		this.nomina         = percepcion.getNomina();
+		this.tipoPercepcion = percepcion.getTipoPercepcion();
+		this.clave          = percepcion.getClave();
+		this.nombre         = percepcion.getNombre();
+		this.cantidad       = percepcion.getCantidad();
+		this.importe        = percepcion.getImporteExento()
+				.add(percepcion.getImporteGravado());
+		this.importeGravado = percepcion.getImporteGravado();
+		this.importeExento  = percepcion.getImporteExento();
+	}
+	
+	public Integer getId() {
+		return id;
 	}
 
-	public void setKey(DetNominaPercepcionPK key) {
-		this.key = key;
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
+	public DetNomina getNomina() {
+		return nomina;
+	}
+
+	public void setNomina(DetNomina nomina) {
+		this.nomina = nomina;
+	}
+	
 	public CatTipoPercepcion getTipoPercepcion() {
 		return tipoPercepcion;
 	}

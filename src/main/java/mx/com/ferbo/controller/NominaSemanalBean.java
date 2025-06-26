@@ -746,6 +746,48 @@ public class NominaSemanalBean implements Serializable {
     	
     }
     
+    public void eliminarNomina() {
+    	FacesMessage message = null;
+    	Severity severity = null;
+		String mensaje = null;
+		String titulo = "Nómina";
+		
+		try {
+			log.info("Eliminando información de la nomina...");
+			
+			if(this.nomina.getUuid() != null && this.nomina.getUuid().trim().length() > 0) {
+				throw new SGPException("La nomina del empleado ya se encuentra timbrada. No es posible eliminar la información.");
+			}
+			
+			if(nomina.getId() == null)
+				throw new SGPException("La nómina del empleado no está guardada");
+			
+			if(nomina.getUuid() != null)
+				throw new SGPException("La nómina del empleado ya se encuentra timbrada. No es posible eliminarla.");
+			
+			this.nominaDAO.eliminar(nomina);
+			this.listaNomina.remove(nomina);
+			
+			log.info("Nomina actualizada correctamente.");
+			
+			mensaje = "La información se actualizó correctamente.";
+    		severity = FacesMessage.SEVERITY_INFO;
+			PrimeFaces.current().executeScript("PF('dgEmpleado').hide()");
+		} catch(SGPException ex) {
+    		mensaje = ex.getMessage();
+			severity = FacesMessage.SEVERITY_WARN;
+    	} catch(Exception ex) {
+    		log.error("Problema para guardar la nómina...", ex);
+			mensaje = "Hay un problema para guardar nómina.";
+			severity = FacesMessage.SEVERITY_ERROR;
+    	} finally {
+    		message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+			PrimeFaces.current().ajax().update("form:messages", "form:dtNomina");
+    	}
+    	
+    }
+    
     public void cargarBitacora() {
     	
     }

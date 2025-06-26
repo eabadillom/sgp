@@ -18,7 +18,6 @@ import mx.com.ferbo.business.nomina.ParametrosNomina;
 import mx.com.ferbo.model.CatTarifaISR;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
-import mx.com.ferbo.model.DetNominaDeduccionPK;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.util.SGPException;
 
@@ -44,7 +43,6 @@ public class ISRL174DBL extends AbstractDBL implements IDeduccion {
 		DetNominaDeduccion deduccion     = null;
 		CatTipoDeduccion   tipoDeduccion = null;
 		BigDecimal         salarioDiario = null;
-		Integer            index         = null;
 		
 		//Art. 174 F. I
 		BigDecimal remuneracionMensual = null;
@@ -179,10 +177,8 @@ public class ISRL174DBL extends AbstractDBL implements IDeduccion {
 			log.error("Problema para generar el cálculo de ISR R. Art. 174...", ex);
 			isrCausadoFraccion4 = _CERO.get();
 		} finally {
-			index = this.nuevoIndiceDe(nomina.getDeducciones());
-			
 			deduccion = new DetNominaDeduccion.Builder()
-					.key(new DetNominaDeduccionPK(nomina, index))
+					.nomina(nomina)
 					.clave(CVE_ISR_LEY_174)
 					.nombre("I.S.R. Art. 174")
 					.importe(isrCausadoFraccion4)

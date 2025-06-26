@@ -496,7 +496,6 @@
                             </webResources>
                             <warSourceDirectory>src/main/webapp</warSourceDirectory>
                             <webXml>${project.build.directory}/web.xml</webXml>
-                            <warName>${project.artifactId}</warName>
                         </configuration>
                     </plugin>
                 </plugins>
