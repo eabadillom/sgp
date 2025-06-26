@@ -1,7 +1,5 @@
 package mx.com.ferbo.business.otropago;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,7 +8,6 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.model.DetNominaOtroPago;
 import mx.com.ferbo.model.sat.CatTipoOtroPago;
-import mx.com.ferbo.util.SGPException;
 
 public class AbstractOtroPago {
 	private static Logger log = LogManager.getLogger(AbstractOtroPago.class);
@@ -47,19 +44,8 @@ public class AbstractOtroPago {
 	}
 	
 	public Integer nuevoIndiceDe(List<DetNominaOtroPago> otrosPagos) {
-		Integer maxIndex = null;
-		DetNominaOtroPago maxOP = null;
 		
-		try {
-			maxOP = Collections.max(otrosPagos, Comparator.comparing(o -> o.getKey().getId()));
-			if(maxOP.getKey().getId() == null)
-				throw new SGPException("Existen elementos de \"Otros pagos\" que no tienen asignado un consecutivo.");
-			
-			maxIndex = maxOP.getKey().getId() + 1;
-		} catch(Exception ex) {
-			maxIndex = 0;
-		}
 		
-		return maxIndex;
+		return 0;
 	}
 }

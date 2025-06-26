@@ -11,7 +11,6 @@ import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.CatCuotaIMSS;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
-import mx.com.ferbo.model.DetNominaDeduccionPK;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.util.SGPException;
 
@@ -50,8 +49,6 @@ public class IMSSEnfMatEnDineroDBL extends AbstractIMSSDBL implements IDeduccion
 		CatCuotaIMSS tarifaIMSS = null;
 		CatTipoDeduccion tdIMSS = null;
 		
-		Integer index = null;
-		
 		try {
 			if(this.cuotasIMSS == null)
 				throw new SGPException("No se establecio la lista de cuotas del IMSS.");
@@ -80,10 +77,8 @@ public class IMSSEnfMatEnDineroDBL extends AbstractIMSSDBL implements IDeduccion
 			log.error("No es posible calcular el excedente En Dinero...", ex);
 			cuota = ValoresBD._CERO.get();
 		} finally {
-			index = this.nuevoIndiceDe(nomina.getDeducciones());
-			
 			deduccion = new DetNominaDeduccion.Builder()
-					.key(new DetNominaDeduccionPK(nomina, index))
+					.nomina(nomina)
 					.clave(CVE_IMSS)
 					.nombre("I.M.S.S. (En dinero)")
 					.tipoDeduccion(tdIMSS)

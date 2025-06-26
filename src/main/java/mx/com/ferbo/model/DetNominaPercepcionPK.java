@@ -15,12 +15,40 @@ public class DetNominaPercepcionPK implements Serializable {
 	private static final long serialVersionUID = -3667496136505583150L;
 	
 	@ManyToOne
-	@JoinColumn(name = "id_nomina", referencedColumnName = "id_nomina")
+	@JoinColumn(name = "id_nomina")
 	private DetNomina nomina;
 	
 	@Basic(optional = false)
 	@Column(name = "id_percepcion")
 	private Integer id;
+	
+	@Override
+	public int hashCode() {
+		System.out.println("Hashcode percepcion...");
+		
+		if (this.nomina != null && this.nomina.getId() != null && this.id != null) {
+            return Objects.hash(this.nomina.getId(), this.id);
+        }
+        return System.identityHashCode(this);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		System.out.println("Equals percepcion...");
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DetNominaPercepcionPK other = (DetNominaPercepcionPK) obj;
+		return Objects.equals(id, other.id);
+	}
+
+	@Override
+	public String toString() {
+		return "DetNominaPercepcionPK [id=" + id + "]";
+	}
 	
 	public DetNominaPercepcionPK() {
 	}
@@ -45,27 +73,5 @@ public class DetNominaPercepcionPK implements Serializable {
 
 	public void setId(Integer id) {
 		this.id = id;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(id, nomina);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		DetNominaPercepcionPK other = (DetNominaPercepcionPK) obj;
-		return Objects.equals(id, other.id) && Objects.equals(nomina, other.nomina);
-	}
-
-	@Override
-	public String toString() {
-		return "DetNominaPercepcionPK [nomina=" + nomina + ", id=" + id + "]";
 	}
 }

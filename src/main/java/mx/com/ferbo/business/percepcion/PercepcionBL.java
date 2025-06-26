@@ -4,8 +4,6 @@ import static mx.com.ferbo.enums.ValoresBD._CERO;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,7 +15,6 @@ import mx.com.ferbo.dao.n.PercepcionDAO;
 import mx.com.ferbo.model.CatPercepcion;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
-import mx.com.ferbo.model.DetNominaPercepcionPK;
 import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
 import mx.com.ferbo.util.SGPException;
@@ -191,15 +188,12 @@ public abstract class PercepcionBL {
 		DetNominaPercepcion percepcion = null;
 		PercepcionDAO percepcionDAO = null;
 		CatPercepcion catPercepcion = null;
-		Integer index = null;
 		
 		percepcionDAO = new PercepcionDAO();
 		catPercepcion = percepcionDAO.buscarPorId(clave);
 		
-		index = this.nuevoIndiceDe(nomina.getPercepciones());
-		
 		percepcion = new DetNominaPercepcion();
-		percepcion.setKey(new DetNominaPercepcionPK(nomina, index));
+		percepcion.setNomina(nomina);
 		percepcion.setClave(clave);
 		percepcion.setNombre(catPercepcion.getNombre());
 		percepcion.setTipoPercepcion(catPercepcion.getTipoPercepcion());
@@ -256,25 +250,6 @@ public abstract class PercepcionBL {
 		}
 		
 		return percepcionEmpleado;
-	}
-	
-	public Integer nuevoIndiceDe(List<DetNominaPercepcion> percepciones) {
-		Integer maxIndex = null;
-		DetNominaPercepcion maxP = null;
-		
-		try {
-			maxP = Collections.max(percepciones, Comparator.comparing(p -> p.getKey().getId()));
-			
-			if(maxP.getKey().getId() == null)
-				throw new SGPException("Existen elementos de \"Percepciones\" que no tienen asignado un consecutivo");
-			
-			maxIndex = maxP.getKey().getId() + 1;
-			
-		} catch(Exception ex) {
-			maxIndex = 0;
-		}
-		
-		return maxIndex;
 	}
 	
 	public void setTiposPercepcion(List<CatTipoPercepcion> tiposPercepcion) {

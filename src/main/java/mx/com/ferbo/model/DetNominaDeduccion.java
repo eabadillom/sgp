@@ -6,8 +6,10 @@ import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -21,8 +23,15 @@ public class DetNominaDeduccion implements Serializable {
 
 	private static final long serialVersionUID = 4306393726440622025L;
 	
-	@EmbeddedId
-	private DetNominaDeduccionPK key;
+	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+	@Column(name = "id_deduccion")
+	private Integer id;
+	
+	@ManyToOne
+	@JoinColumn(name = "id_nomina")
+	private DetNomina nomina;
 	
 	@ManyToOne
 	@JoinColumn(name = "tp_deduccion", referencedColumnName = "cd_tipo_deduccion")
@@ -53,7 +62,9 @@ public class DetNominaDeduccion implements Serializable {
 	
 	@Override
 	public int hashCode() {
-		return Objects.hash(key);
+		if(this.id == null)
+			System.identityHashCode(this);
+		return Objects.hash(this.id);
 	}
 
 	@Override
@@ -65,12 +76,12 @@ public class DetNominaDeduccion implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		DetNominaDeduccion other = (DetNominaDeduccion) obj;
-		return this.key.equals(other.key);
+		return this.id.equals(other.id);
 	}
 
 	@Override
 	public String toString() {
-		return "DetNominaDeduccion [key=" + key + ", claveDeduccion=" + clave + ", nombreDeduccion="
+		return "DetNominaDeduccion [claveDeduccion=" + clave + ", nombreDeduccion="
 				+ nombre + ", importe=" + importe + "]";
 	}
 	
@@ -79,7 +90,8 @@ public class DetNominaDeduccion implements Serializable {
 	}
 	
 	public DetNominaDeduccion(Builder builder) {
-		this.key = builder.key;
+		this.id = builder.id;
+		this.nomina = builder.nomina;
 		this.tipoDeduccion = builder.tipoDeduccion;
 		this.clave = builder.clave;
 		this.nombre = builder.nombre;
@@ -88,10 +100,11 @@ public class DetNominaDeduccion implements Serializable {
 		this.procesar = builder.procesar;
 	}
 
-	public DetNominaDeduccion(DetNominaDeduccionPK key, CatTipoDeduccion tipoDeduccion, @Size(max = 5) String clave,
-			@Size(max = 150) String nombre, BigDecimal importe, Boolean informar, Boolean procesar) {
+	public DetNominaDeduccion(Integer id, DetNomina nomina, CatTipoDeduccion tipoDeduccion,
+			@Size(max = 5) String clave, @Size(max = 150) String nombre, BigDecimal importe, Boolean informar, Boolean procesar) {
 		super();
-		this.key = key;
+		this.id = id;
+		this.nomina = nomina;
 		this.tipoDeduccion = tipoDeduccion;
 		this.clave = clave;
 		this.nombre = nombre;
@@ -99,13 +112,21 @@ public class DetNominaDeduccion implements Serializable {
 		this.informar = informar;
 		this.procesar = procesar;
 	}
-
-	public DetNominaDeduccionPK getKey() {
-		return key;
+	
+	public Integer getId() {
+		return id;
 	}
 
-	public void setKey(DetNominaDeduccionPK key) {
-		this.key = key;
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public DetNomina getNomina() {
+		return nomina;
+	}
+
+	public void setNomina(DetNomina nomina) {
+		this.nomina = nomina;
 	}
 
 	public CatTipoDeduccion getTipoDeduccion() {
@@ -157,7 +178,8 @@ public class DetNominaDeduccion implements Serializable {
 	}
 	
 	public static class Builder {
-		private DetNominaDeduccionPK key;
+		private Integer id;
+		private DetNomina nomina;
 		private CatTipoDeduccion tipoDeduccion;
 		private String clave;
 		private String nombre;
@@ -165,8 +187,13 @@ public class DetNominaDeduccion implements Serializable {
 		private Boolean informar;
 		private Boolean procesar;
 		
-		public DetNominaDeduccion.Builder key(DetNominaDeduccionPK key) {
-			this.key = key;
+		public DetNominaDeduccion.Builder id(Integer id) {
+			this.id = id;
+			return this;
+		}
+		
+		public DetNominaDeduccion.Builder nomina(DetNomina nomina) {
+			this.nomina = nomina;
 			return this;
 		}
 		

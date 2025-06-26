@@ -8,10 +8,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.deduccion.IDeducciones;
+import mx.com.ferbo.business.nomina.NominaBL;
 import mx.com.ferbo.business.nomina.ParametrosNomina;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
-import mx.com.ferbo.model.DetNominaDeduccionPK;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.util.SGPException;
 
@@ -54,7 +54,7 @@ public class IMSSDeduccionesBL extends AbstractIMSSDBL implements IDeducciones {
 		DetNominaDeduccion       dIMSS                 = null;
 		CatTipoDeduccion         tdIMSS                = null;
 		BigDecimal               imss                  = null;
-		Integer                  index                 = null;
+//		Integer                  index                 = null;
 		
 		try {
 			if(nomina.getReceptor() == null || nomina.getReceptor().getSalarioDiarioIntegrado() == null)
@@ -72,34 +72,34 @@ public class IMSSDeduccionesBL extends AbstractIMSSDBL implements IDeducciones {
 			
 			//RIESGOS DE TRABAJO
 			imssRiesgoTrabajoBO = new IMSSRiesgoTrabajoDBL(this.parametros, this.diasPeriodo, this.ausencias, this.incapacidades, this.sdi);
-			index = imssRiesgoTrabajoBO.nuevoIndiceDe(nomina.getDeducciones());
+//			index = imssRiesgoTrabajoBO.nuevoIndiceDe(nomina.getDeducciones());
 			//TODO Falta integrar la cuota de riesgo de la empresa.
 			dRiesgoTrabajo = imssRiesgoTrabajoBO.calcular(nomina);
-			nomina.getDeducciones().add(dRiesgoTrabajo);
+			NominaBL.agregarDeduccion(nomina, dRiesgoTrabajo);
 			aportacionesIMSS.add(dRiesgoTrabajo);
 			
 			//ENFERMEDADES Y MATERNIDAD (EN ESPECIE)
 			imssEnfMatBO = new IMSSEnfMatEnEspecieDBL(this.parametros, this.diasPeriodo, this.ausencias, this.incapacidades, this.sdi);
 			dEnfermedadMaternidad = imssEnfMatBO.calcular(nomina);
-			nomina.getDeducciones().add(dEnfermedadMaternidad);
+			NominaBL.agregarDeduccion(nomina, dEnfermedadMaternidad);
 			aportacionesIMSS.add(dEnfermedadMaternidad);
 			
 			//ENFERMEDADES Y MATERNIDAD (GASTOS MEDICOS PARA PENSIONADOS Y BENEFICIARIOS)
 			imssEnfMatGastosMedBO = new IMSSEnfMatGastosMedicosDBL(this.parametros, this.diasPeriodo, this.ausencias, this.incapacidades, this.sdi);
 			dGastosMedicos = imssEnfMatGastosMedBO.calcular(nomina);
-			nomina.getDeducciones().add(dGastosMedicos);
+			NominaBL.agregarDeduccion(nomina, dGastosMedicos);
 			aportacionesIMSS.add(dGastosMedicos);
 			
 			//ENFERMEDADES Y MATERNIDAD (EN DINERO)
 			imssEnfMatEnDineroBO = new IMSSEnfMatEnDineroDBL(this.parametros, this.diasPeriodo, this.ausencias, this.incapacidades, this.sdi);
 			dEnDinero = imssEnfMatEnDineroBO.calcular(nomina);
-			nomina.getDeducciones().add(dEnDinero);
+			NominaBL.agregarDeduccion(nomina, dEnDinero);
 			aportacionesIMSS.add(dEnDinero);
 			
 			//INVALIDEZ Y VIDA (EN ESPECIE Y EN DINERO)
 			imssInvalidezVidaBO = new IMSSInvalidezVidaDBL(this.parametros, this.diasPeriodo, this.ausencias, this.incapacidades, this.sdi);
 			dInvalidezVida = imssInvalidezVidaBO.calcular(nomina);
-			nomina.getDeducciones().add(dInvalidezVida);
+			NominaBL.agregarDeduccion(nomina, dInvalidezVida);
 			aportacionesIMSS.add(dInvalidezVida);
 			
 			//GUARDERIAS Y PRESTACIONES SOCIALES (EN ESPECIE) Fund. Art. 211 LSS
@@ -115,7 +115,7 @@ public class IMSSDeduccionesBL extends AbstractIMSSDBL implements IDeducciones {
 			//CESANTIA EN EDAD AVANZADA Y VEJEZ (RETIRO)
 			imssCesantiaVejezBO = new IMSSCesantiaEdadAvanzadaVejezDBL(this.parametros, this.diasPeriodo, this.ausencias, this.incapacidades, this.sdi);
 			dCesantiaVejez = imssCesantiaVejezBO.calcular(nomina);
-			nomina.getDeducciones().add(dCesantiaVejez);
+			NominaBL.agregarDeduccion(nomina, dCesantiaVejez);
 			aportacionesIMSS.add(dCesantiaVejez);
 			
 			//INFONAVIT Fund. Art. 29 Fracción II LEY DEL INSTITUTO DEL FONDO NACIONAL DE LA VIVIENDA PARA LOS TRABAJADORES.
@@ -128,13 +128,6 @@ public class IMSSDeduccionesBL extends AbstractIMSSDBL implements IDeducciones {
 			
 			
 			/**************SUMA DE APORTACIONES IMSS*********************/
-			imss = dEnfermedadMaternidad.getImporte()
-					.add(dGastosMedicos.getImporte())
-					.add(dEnDinero.getImporte())
-					.add(dInvalidezVida.getImporte())
-					.add(dCesantiaVejez.getImporte())
-					;
-			
 			imss = aportacionesIMSS.stream()
 					.map(c -> c.getImporte())
 					.reduce(BigDecimal.ZERO.setScale(2, BigDecimal.ROUND_HALF_UP), BigDecimal :: add)
@@ -142,7 +135,7 @@ public class IMSSDeduccionesBL extends AbstractIMSSDBL implements IDeducciones {
 			
 			tdIMSS = this.getTipoDeduccion(TD_IMSS);
 			dIMSS = new DetNominaDeduccion.Builder()
-					.key(new DetNominaDeduccionPK(nomina, index++))
+					.nomina(nomina)
 					.tipoDeduccion(tdIMSS)
 					.clave(CVE_IMSS)
 					.nombre("I.M.S.S.")
@@ -151,7 +144,7 @@ public class IMSSDeduccionesBL extends AbstractIMSSDBL implements IDeducciones {
 					.procesar(true)
 					.build();
 			
-			nomina.getDeducciones().add(dIMSS);
+			NominaBL.agregarDeduccion(nomina, dIMSS);
 			
 		} catch(Exception ex) {
 			log.error("Problema para obtener las aportaciones del IMSS...", ex);
