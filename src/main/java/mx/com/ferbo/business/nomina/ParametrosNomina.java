@@ -12,6 +12,7 @@ import mx.com.ferbo.dao.n.CuotaIMSSDAO;
 import mx.com.ferbo.dao.n.DiaNoLaboralDAO;
 import mx.com.ferbo.dao.n.EstatusRegistroDAO;
 import mx.com.ferbo.dao.n.MetodoPagoDAO;
+import mx.com.ferbo.dao.n.ParametroDAO;
 import mx.com.ferbo.dao.n.RegimenFiscalDAO;
 import mx.com.ferbo.dao.n.TarifaISRDAO;
 import mx.com.ferbo.dao.n.TipoDeduccionDAO;
@@ -24,6 +25,7 @@ import mx.com.ferbo.model.CatCuotaIMSS;
 import mx.com.ferbo.model.CatDiaNoLaboral;
 import mx.com.ferbo.model.CatEmpresa;
 import mx.com.ferbo.model.CatEstatusRegistro;
+import mx.com.ferbo.model.CatParametro;
 import mx.com.ferbo.model.CatPeriodicidadPago;
 import mx.com.ferbo.model.CatTarifaISR;
 import mx.com.ferbo.model.CatUMA;
@@ -43,15 +45,18 @@ public class ParametrosNomina {
 	
 	private static Logger log = LogManager.getLogger(ParametrosNomina.class);
 	
-	private Integer anio         = null;
-	private Integer periodo      = null;
-	private Integer diasPeriodo  = null;
+	private Integer anio               = null;
+	private Integer periodo            = null;
+	private Integer diasPeriodo        = null;
 	
-	private Date periodoInicio   = null;
-	private Date periodoFin      = null;
-	private Date fechaInicioAnio = null;
-	private Date fechaFinAnio    = null;
-	private Date fechaEmision    = null;
+	private Date    periodoInicio      = null;
+	private Date    periodoFin         = null;
+	private Integer desfaseIncidencias = null;
+	private Date    incidenciaInicio   = null;
+	private Date    incidenciaFin      = null;
+	private Date    fechaInicioAnio    = null;
+	private Date    fechaFinAnio       = null;
+	private Date    fechaEmision       = null;
 	
 	private CatEmpresa               empresa                = null;
 	private CatUMA                   uma                    = null;
@@ -82,6 +87,7 @@ public class ParametrosNomina {
 	private TipoOtroPagoDAO     tipoOtroPagoDAO    = null;
 	private UMADAO              umaDAO             = null;
 	private EstatusRegistroDAO  statusRegistroDAO  = null;
+	private ParametroDAO        parametroDAO       = null;
 	
 	private BigDecimal          bonoPuntualidad    = null;
 	private BigDecimal          valeDespensa       = null;
@@ -104,6 +110,7 @@ public class ParametrosNomina {
 		this.cuotasIMSSDAO      = new CuotaIMSSDAO();
 		this.umaDAO             = new UMADAO();
 		this.statusRegistroDAO  = new EstatusRegistroDAO();
+		this.parametroDAO       = new ParametroDAO();
 		this.fechaEmision       = new Date();
 	}
 	
@@ -147,7 +154,26 @@ public class ParametrosNomina {
 			log.error("Problema para generar el objeto de parámetros para nómina...", e);
 		}
 		
+		try {
+			if("02".equalsIgnoreCase(this.periodicidad.getPeriodicidad())) {
+				CatParametro p = parametroDAO.buscarPorClave("DINCS");
+				this.desfaseIncidencias = Integer.parseInt(p.getValor());
+			} else
+				this.desfaseIncidencias = 0;
+		} catch(NumberFormatException ex) {
+			this.desfaseIncidencias = 0;
+		}
 		
+		this.incidenciaInicio = DateUtil.addDay(this.periodoInicio, this.desfaseIncidencias);
+		this.incidenciaFin    = DateUtil.addDay(this.periodoFin, this.desfaseIncidencias);
+		
+		DateUtil.setTime(this.incidenciaFin, 23, 59, 59);
+		
+		try {
+			log.info("[UI] Periodo de incidencias: {} al {}", DateUtil.getString(this.incidenciaInicio, DateUtil.FORMATO_E_DD_MM_YYYY), DateUtil.getString(this.incidenciaFin, DateUtil.FORMATO_E_DD_MM_YYYY));
+		} catch (SGPException ex) {
+			log.error("Problema para obtener el periodo de incidencias...", ex);
+		}
 	}
 	
 	public CatMetodoPago getMetodoPago() {
@@ -244,6 +270,18 @@ public class ParametrosNomina {
 
 	public Date getFechaEmision() {
 		return fechaEmision;
+	}
+
+	public Integer getDesfaseIncidencias() {
+		return desfaseIncidencias;
+	}
+
+	public Date getIncidenciaInicio() {
+		return incidenciaInicio;
+	}
+
+	public Date getIncidenciaFin() {
+		return incidenciaFin;
 	}
 	
 }

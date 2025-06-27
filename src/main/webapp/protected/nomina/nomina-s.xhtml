@@ -303,27 +303,40 @@
 						</p:outputPanel>
 					</p:tab>
 					<p:tab title="Incidencias">
-						<p:dataTable value="#{nominaS.asistencias}" var="asistencia">
+						<div class="ui-fluid formgrid grid">
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Incidencias"/>
+							</div>
+							<div class="field col-12 md:col-3">
+								
+							</div>
+							<div class="field col-12 md:col-3">
+								
+							</div>
+						</div>
+						<p:dataTable value="#{nominaS.nomina.incidencias}" var="incidencia">
 							<p:column headerText="Dia">
-								<p:outputLabel value="#{asistencia.diaSemana}" />
+								<p:outputLabel value="#{incidencia.fechaHoraEntrada}">
+									<f:convertDateTime pattern="EEEE" timeZone="GMT-6" locale="es_MX"/>
+								</p:outputLabel>
 							</p:column>
 							<p:column headerText="Fecha">
-								<p:outputLabel value="#{asistencia.entrada}">
-									<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT-6"/>
+								<p:outputLabel value="#{incidencia.fechaHoraEntrada}">
+									<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX"/>
 								</p:outputLabel>
 							</p:column>
 							<p:column headerText="Hora Entrada">
-								<p:outputLabel value="#{asistencia.entrada}">
-									<f:convertDateTime pattern="HH:mm:ss" timeZone="GMT-6"/>
+								<p:outputLabel value="#{incidencia.fechaHoraEntrada}">
+									<f:convertDateTime pattern="HH:mm:ss" timeZone="GMT-6" locale="es_MX"/>
 								</p:outputLabel>
 							</p:column>
 							<p:column headerText="Salida">
-								<p:outputLabel value="#{asistencia.salida}">
-									<f:convertDateTime pattern="HH:mm:ss" timeZone="GMT-6" />
+								<p:outputLabel value="#{incidencia.fechaHoraSalida}">
+									<f:convertDateTime pattern="HH:mm:ss" timeZone="GMT-6" locale="es_MX"/>
 								</p:outputLabel>
 							</p:column>
 							<p:column headerText="Status">
-								<p:outputLabel value="#{asistencia.status.nombre}" />
+								<p:outputLabel value="#{incidencia.descripcion}" />
 							</p:column>
 						</p:dataTable>
 					</p:tab>
@@ -537,13 +550,13 @@
 						</div>
 						<div class="field col-12 md:col-3">
 							<p:outputLabel value="Importe exento"/>
-							<p:inputNumber id="importeExento" value="#{nominaS.percepcion.importeExento}" decimalPlaces="2" decimalSeparator="." symbol="$ " symbolPosition="p" placeholder="importe exento" emptyValue="null" minValue="0.00" rendered="#{nominaE.calculoAutomatico eq false}">
+							<p:inputNumber id="importeExento" value="#{nominaS.percepcion.importeExento}" decimalPlaces="2" decimalSeparator="." symbol="$ " symbolPosition="p" placeholder="importe exento" emptyValue="null" minValue="0.00" >
 								<p:ajax process="@this" />
 							</p:inputNumber>
 						</div>
 						<div class="field col-12 md:col-3">
 							<p:outputLabel value="Importe gravado"/>
-							<p:inputNumber id="importeGravado" value="#{nominaS.percepcion.importeGravado}" decimalPlaces="2" decimalSeparator="." symbol="$ " symbolPosition="p" placeholder="importe gravado" emptyValue="null" minValue="0.00" rendered="#{nominaE.calculoAutomatico eq false}">
+							<p:inputNumber id="importeGravado" value="#{nominaS.percepcion.importeGravado}" decimalPlaces="2" decimalSeparator="." symbol="$ " symbolPosition="p" placeholder="importe gravado" emptyValue="null" minValue="0.00" >
 								<p:ajax process="@this" />
 							</p:inputNumber>
 						</div>
@@ -616,7 +629,7 @@
 				<f:facet name="footer">
 					<span style="padding-left: 0.5rem; padding-right: 0.5rem;">
 					</span>
-					<p:commandButton id="descargarBitacora" value="Descargar" actionListener="#{nominaE.descargarBitacora()}" icon="pi pi-download" styleClass="edit-button" ajax="false">
+					<p:commandButton id="descargarBitacora" value="Descargar" actionListener="#{nominaS.descargarBitacora()}" icon="pi pi-download" styleClass="edit-button" ajax="false">
 						<p:fileDownload value="#{nominaE.file}" />
 					</p:commandButton>
 					<p:commandButton icon="pi pi-copy" value="Copiar Bitácora" type="button" onclick="copiarBitacora();" />

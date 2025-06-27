@@ -1,5 +1,7 @@
 package mx.com.ferbo.controller;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -18,6 +20,8 @@ import javax.inject.Named;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 
 import mx.com.ferbo.business.nomina.AsistenciaBL;
 import mx.com.ferbo.business.nomina.NominaBL;
@@ -94,6 +98,7 @@ public class NominaSemanalBean implements Serializable {
     
     private Boolean detalle = true;
     private String bitacora = null;
+    private StreamedContent file = null;
 
 	public NominaSemanalBean() {
 		listaNomina     = new ArrayList<>();
@@ -123,6 +128,13 @@ public class NominaSemanalBean implements Serializable {
         this.anio = DateUtil.getAnio(fecha);
         this.semanasDelAnio = DateUtil.semanasDelAnio(this.anio);
         this.semana = DateUtil.getSemanaAnio(this.fecha);
+        
+        byte bytes[] = {};
+        this.file = DefaultStreamedContent.builder()
+				.contentType("text/plain")
+				.contentLength(bytes.length)
+				.name("bitacora.txt").stream(() -> new ByteArrayInputStream(bytes))
+				.build();
     }
     
     public void calculaSemanas() {
@@ -788,6 +800,19 @@ public class NominaSemanalBean implements Serializable {
     	
     }
     
+    public void descargarBitacora() {
+    	this.bitacora = BitacoraUIAppender.getMensajes().stream()
+    			.collect(Collectors.joining());
+    	
+    	byte bytes[] = this.bitacora.getBytes();
+    	InputStream input = new ByteArrayInputStream(bytes);
+    	this.file = DefaultStreamedContent.builder()
+    			.contentType("text/plain")
+    			.name("Bitacora.txt")
+				.stream(() -> input)
+				.build();
+    }
+    
     public void cargarBitacora() {
     	
     }
@@ -954,5 +979,13 @@ public class NominaSemanalBean implements Serializable {
 
 	public void setBitacora(String bitacora) {
 		this.bitacora = bitacora;
+	}
+
+	public StreamedContent getFile() {
+		return file;
+	}
+
+	public void setFile(StreamedContent file) {
+		this.file = file;
 	}
 }
