@@ -88,7 +88,7 @@ public class DetNominaPercepcion implements Serializable {
 	@Override
 	public int hashCode() {
 		if(this.id == null)
-			System.identityHashCode(this);
+			return System.identityHashCode(this);
 		return Objects.hash(this.id);
 	}
 
@@ -100,7 +100,12 @@ public class DetNominaPercepcion implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
+		
 		DetNominaPercepcion other = (DetNominaPercepcion) obj;
+		
+		if(this.id == null || other.id == null)
+			return Objects.equals(System.identityHashCode(this), System.identityHashCode(other));
+		
 		return Objects.equals(this.id, other.id);
 	}
 

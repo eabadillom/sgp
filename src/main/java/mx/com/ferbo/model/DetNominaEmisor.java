@@ -65,7 +65,7 @@ public class DetNominaEmisor implements Serializable {
 	@Override
 	public int hashCode() {
 		if(this.id == null)
-			System.identityHashCode(this);
+			return System.identityHashCode(this);
 		return Objects.hash(id);
 	}
 

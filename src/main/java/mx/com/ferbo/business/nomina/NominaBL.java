@@ -26,6 +26,7 @@ import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaConcepto;
 import mx.com.ferbo.model.DetNominaDeduccion;
 import mx.com.ferbo.model.DetNominaEmisor;
+import mx.com.ferbo.model.DetNominaIncidencia;
 import mx.com.ferbo.model.DetNominaOtroPago;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.DetNominaReceptor;
@@ -77,6 +78,7 @@ public abstract class NominaBL {
 		List<DetNominaOtroPago>   otrosPagos   = null;
 		List<DetNominaDeduccion>  deducciones  = null;
 		List<DetVacaciones>       vacaciones   = null;
+		List<DetNominaIncidencia> incidencias  = null;
 		
 		if(parametros == null)
 			throw new SGPException("Los parámetros de nómina no están definidos.");
@@ -97,6 +99,7 @@ public abstract class NominaBL {
 			otrosPagos = new ArrayList<DetNominaOtroPago>();
 			deducciones = new ArrayList<DetNominaDeduccion>();
 			vacaciones = new ArrayList<DetVacaciones>();
+			incidencias = new ArrayList<DetNominaIncidencia>();
 			
 			conceptoSAT = parametros.getConcepto();
 			unidadSAT = parametros.getUnidadSAT();
@@ -110,14 +113,15 @@ public abstract class NominaBL {
 			concepto.setObjetoImpuesto("01");
 			conceptos.add(concepto);
 			
-			if(TP_NOMINA_ORDINARIA.equalsIgnoreCase(tipoNomina)) {
-				nomina.setTipoNomina(TP_NOMINA_ORDINARIA);
-			} else if(TP_NOMINA_EXTRAORDINARIA.equalsIgnoreCase(tipoNomina)) {
-				nomina.setTipoNomina(TP_NOMINA_EXTRAORDINARIA);
-			} else if(TP_NOMINA_TEST.equalsIgnoreCase(tipoNomina)) {
+			switch(tipoNomina) {
+			case TP_NOMINA_ORDINARIA:
+			case TP_NOMINA_EXTRAORDINARIA:
+			case TP_NOMINA_TEST:
 				nomina.setTipoNomina(tipoNomina);
-			} else
+				break;
+			default:
 				throw new SGPException("El tipo de nómina no es válido: " + tipoNomina);
+			}
 			
 			nomina.setEmisor(emisor);
 			nomina.setReceptor(receptor);
@@ -126,6 +130,7 @@ public abstract class NominaBL {
 			nomina.setOtrosPagos(otrosPagos);
 			nomina.setDeducciones(deducciones);
 			nomina.setVacaciones(vacaciones);
+			nomina.setIncidencias(incidencias);
 			nomina.setTipoComprobante(TP_COMPROBANTE_CFDI);
 			nomina.setClaveExportacion("01");
 			nomina.setMoneda("MXN");
@@ -593,8 +598,9 @@ public abstract class NominaBL {
     			;
     	
     	if(dOpt.isPresent()) {
+    		int index = nomina.getDeducciones().indexOf(dOpt.get());
     		log.info("Ajuste al neto como deduccion encontrado: {}", dOpt.isPresent() ? dOpt.get() : null);
-    		nomina.getDeducciones().remove(dOpt.get());
+    		nomina.getDeducciones().remove(index);
     	}
     	
     	if(opOpt.isPresent()) {
