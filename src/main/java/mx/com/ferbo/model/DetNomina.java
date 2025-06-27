@@ -172,6 +172,9 @@ public class DetNomina implements Serializable {
     @OneToMany(mappedBy = "nomina", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetNominaDeduccion> deducciones;
     
+    @OneToMany(mappedBy = "nomina", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DetNominaIncidencia> incidencias;
+    
     @Transient
     private List<DetVacaciones> vacaciones;
     
@@ -486,5 +489,16 @@ public class DetNomina implements Serializable {
 
 	public void setDiasNoLaborales(BigDecimal diasNoLaborales) {
 		this.diasNoLaborales = diasNoLaborales;
+	}
+
+	public List<DetNominaIncidencia> getIncidencias() {
+		return incidencias;
+	}
+
+	public void setIncidencias(List<DetNominaIncidencia> incidencias) {
+		if(this.incidencias == null)
+			this.incidencias = incidencias;
+		else
+			this.incidencias.addAll(incidencias);
 	}
 }
