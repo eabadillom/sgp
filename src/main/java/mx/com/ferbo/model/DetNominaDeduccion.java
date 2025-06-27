@@ -63,7 +63,7 @@ public class DetNominaDeduccion implements Serializable {
 	@Override
 	public int hashCode() {
 		if(this.id == null)
-			System.identityHashCode(this);
+			return System.identityHashCode(this);
 		return Objects.hash(this.id);
 	}
 
@@ -76,6 +76,10 @@ public class DetNominaDeduccion implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		DetNominaDeduccion other = (DetNominaDeduccion) obj;
+		
+		if(this.id == null || other.id == null)
+			return Objects.equals(System.identityHashCode(this), System.identityHashCode(other));
+		
 		return this.id.equals(other.id);
 	}
 

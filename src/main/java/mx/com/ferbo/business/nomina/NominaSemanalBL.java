@@ -3,6 +3,7 @@ package mx.com.ferbo.business.nomina;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +38,7 @@ import mx.com.ferbo.model.CatEstatusRegistro;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaDeduccion;
+import mx.com.ferbo.model.DetNominaIncidencia;
 import mx.com.ferbo.model.DetNominaOtroPago;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.DetPercepcionEmpleado;
@@ -61,8 +63,6 @@ public class NominaSemanalBL extends NominaBL {
 	private List<String> listaDiasLaboralesEmpleado = null;
 	private List<String> listaDiasNoLaboralesEmpleado = null;
 	
-	public static final int DIAS_PERIODO = 7;
-	
 	public NominaSemanalBL(DetEmpleado empleado, ParametrosNomina parametros, Map<String, DetRegistro> mapAsistencias) {
 		super(empleado, parametros, mapAsistencias);
 		this.percepcionEmpleadoDAO = new PercepcionEmpleadoDAO();
@@ -77,7 +77,6 @@ public class NominaSemanalBL extends NominaBL {
 		
 		DateUtil.setTime(this.fechaInicioAnio, 0, 0, 0, 0);
 		DateUtil.setTime(this.fechafinAnio, 23, 59, 59, 000);
-		
 	}
 	
 	public DetNomina calcular() {
@@ -95,6 +94,7 @@ public class NominaSemanalBL extends NominaBL {
 		List<DetNominaPercepcion>   percepciones         = null;
 		List<DetNominaOtroPago>     otrosPagos           = null;
 		List<DetNominaDeduccion>    deducciones          = null;
+		List<DetNominaIncidencia>  incidencias          = null;
 		
 		try {
 			//DIAS TOTALES DEL PERIODO = 7
@@ -122,14 +122,17 @@ public class NominaSemanalBL extends NominaBL {
 			
 			//Para los días trabajados, se debe considerar el periodo inicio y fin de cálculo de la nómina y validar si de los 6 días que
 			//al trabajador le corresponde laborar, tuvo alguna falta.
+			incidencias    = this.getIncidencias(nomina, mapAsistencias);
 			diasTrabajados = this.getDiasTrabajados(listaDiasLaboralesEmpleado, mapAsistencias, this.parametros);
 			diasVacaciones = this.getDiasVacaciones(listaDiasLaboralesEmpleado, mapAsistencias, this.parametros);
 			ausencias      = this.getAusencias(listaDiasLaboralesEmpleado, mapAsistencias, this.parametros);
 			incapacidades = this.getIncapacidades(mapAsistencias, diasLaboralesEmpleado);
 			
+			
 			nomina.setDiasLaborados(diasTrabajados);
 			nomina.setDiasVacaciones(diasVacaciones);
 			nomina.setDiasNoLaborados(ausencias);
+			nomina.setIncidencias(incidencias);
 			
     		/*---------------------------PERCEPCIONES------------------------------*/
     		NominaSemanalBL.calcularSueldo(nomina, this.parametros, diasLaboralesEmpleado, diasNolaboralesEmpleado, diasTrabajados, diasVacaciones);
@@ -312,6 +315,24 @@ public class NominaSemanalBL extends NominaBL {
 			throw new SGPException("No hay días de descanso asignados para el empleado.");
 		
 		return listaDiasNoLaborales;
+	}
+	
+	public List<DetNominaIncidencia> getIncidencias(DetNomina nomina, Map<String, DetRegistro> mapAsistencias) {
+		List<DetNominaIncidencia> incidencias = new ArrayList<DetNominaIncidencia>();
+		
+		mapAsistencias.forEach((key, registro) -> {
+			DetNominaIncidencia incidencia = new DetNominaIncidencia();
+			incidencia.setNomina(nomina);
+			incidencia.setFechaHoraEntrada(registro.getFechaEntrada());
+			incidencia.setFechaHoraSalida(registro.getFechaSalida());
+			incidencia.setClave(registro.getStatus().getCodigo());
+			incidencia.setDescripcion(registro.getStatus().getDescripcion());
+			incidencias.add(incidencia);
+		});
+		
+		incidencias.sort( (i1, i2) -> i1.getFechaHoraEntrada().compareTo(i2.getFechaHoraEntrada()));
+		
+		return incidencias;
 	}
 
 	/**Cálculo de sueldo semanal (6 días de trabajo + Septimo día)
@@ -586,7 +607,7 @@ public class NominaSemanalBL extends NominaBL {
 		
 		mapAsistencias = new HashMap<String, DetRegistro>();
 		registroDAO = new RegistroDAO();
-		listaAsistencias = registroDAO.buscar(empleado.getIdEmpleado(), parametros.getPeriodoInicio(), parametros.getPeriodoFin());
+		listaAsistencias = registroDAO.buscar(empleado.getIdEmpleado(), parametros.getIncidenciaInicio(), parametros.getIncidenciaFin());
 		for(DetRegistro registro : listaAsistencias) {
 			diaSemana = DateUtil.getDiaSemana(registro.getFechaEntrada());
 			if(mapAsistencias.containsKey(diaSemana))

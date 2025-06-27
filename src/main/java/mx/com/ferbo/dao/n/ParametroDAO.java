@@ -16,6 +16,10 @@ public class ParametroDAO extends BaseDAO<CatParametro, Integer> {
 		super(modelClass);
 	}
 	
+	public ParametroDAO() {
+		super(CatParametro.class);
+	}
+	
 	public CatParametro buscarPorClave(String clave) {
 		CatParametro model = null;
 		EntityManager em = null;

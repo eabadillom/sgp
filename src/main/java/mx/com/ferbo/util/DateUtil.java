@@ -34,6 +34,7 @@ public class DateUtil {
     public static String PREF_DIA_ESPECIAL = "especial"; //Para lectura del .properties
 
     public static final String FORMATO_DD_MM_YYYY = "dd/MM/yyyy";
+    public static final String FORMATO_E_DD_MM_YYYY = "E dd/MM/yyyy";
     public static final String FORMATO_YYYY_MM_DD = "yyyy-MM-dd";
     public static final String FORMATO_YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd hh:mm:ss.SSS";
     public static final String FORMATO_ISO_Z = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
@@ -620,7 +621,7 @@ public class DateUtil {
         String           strFecha = null;
         SimpleDateFormat dateFormat = null;
 
-        dateFormat = new SimpleDateFormat(formato);
+        dateFormat = new SimpleDateFormat(formato, new Locale("es", "MX"));
         if(fecha == null) {
             throw new SGPException("El parámetro fecha no debe ser nulo");
         }

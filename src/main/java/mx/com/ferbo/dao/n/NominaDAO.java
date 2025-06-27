@@ -11,10 +11,6 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.model.DetNomina;
-import mx.com.ferbo.model.DetNominaConcepto;
-import mx.com.ferbo.model.DetNominaDeduccion;
-import mx.com.ferbo.model.DetNominaOtroPago;
-import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.util.SGPException;
 
 public class NominaDAO extends BaseDAO<DetNomina, Integer> {
@@ -65,12 +61,10 @@ public class NominaDAO extends BaseDAO<DetNomina, Integer> {
 			log.debug("periodo inicio {}, periodo fin {}, rfc {}");
 			
 			model.getConceptos().stream().forEach(item -> log.debug("Concepto: {}", item.getId()));
-			
 			model.getPercepciones().stream().forEach(item -> log.debug("Percepcion: {}", item.getId()));
-			
 			model.getDeducciones().stream().forEach(item -> log.debug("Deduccion: {}", item.getId()));
-			
 			model.getOtrosPagos().stream().forEach(item -> log.debug("Otro pago: {}", item.getId()));
+			model.getIncidencias().stream().forEach(item -> log.debug("Incidencia: {}", item.getId()));
 			
 		} catch(NoResultException ex) {
 			log.warn("Problema para obtener la lista de nomina del periodo solicitado...", ex.getMessage());
@@ -171,21 +165,11 @@ public class NominaDAO extends BaseDAO<DetNomina, Integer> {
 			em = this.getEntityManager();
 			model = em.find(modelClass, id);
 			
-			for(DetNominaConcepto concepto : model.getConceptos()) {
-				log.info("Concepto: {}", concepto.getId());
-			}
-			
-			for(DetNominaPercepcion percepcion : model.getPercepciones()) {
-				log.info("Percepcion: {} - {}", percepcion.getId(), percepcion.getClave());
-			}
-			
-			for(DetNominaOtroPago otroPago: model.getOtrosPagos()) {
-				log.info("Otro pago: {} - {}", otroPago.getId(), otroPago.getClave());
-			}
-			
-			for(DetNominaDeduccion deduccion : model.getDeducciones()) {
-				log.info("Deduccion: {} - ", deduccion.getId(), deduccion.getClave());
-			}
+			model.getConceptos().stream().forEach(item -> log.info("Concepto: {}", item.getId()));
+			model.getPercepciones().stream().forEach(item -> log.info("Percepcion: {}", item.getId()));
+			model.getOtrosPagos().stream().forEach(item -> log.info("Otro pago: {}", item.getId()));
+			model.getDeducciones().stream().forEach(item -> log.info("Deduccion: {}", item.getId()));
+			model.getIncidencias().stream().forEach(item -> log.info("Incidencia: {}", item.getId()));
 			
 		} catch(Exception ex) {
 			log.error("Problema para obtener la información de nomina...", ex);
@@ -205,13 +189,6 @@ public class NominaDAO extends BaseDAO<DetNomina, Integer> {
 			em.getTransaction().begin();
 			
 			model = em.contains(model) ? model : em.merge(model);
-			
-			model.getEmisor().setNomina(null);
-			model.getReceptor().setNomina(null);
-//			model.getConceptos().forEach(item -> item.setNomina(null));
-//			model.getPercepciones().forEach(item -> item.getKey().setNomina(null));
-//			model.getOtrosPagos().forEach(item -> item.getKey().setNomina(null));
-//			model.getDeducciones().forEach(item -> item.getKey().setNomina(null));
 			
 			em.remove(model);
 			em.getTransaction().commit();
