@@ -33,7 +33,8 @@ public class ValesDespensaPBL extends PercepcionBL {
 		
 		this.baseCalculo    = parametros.getUma().getImporteDiario();
 		this.uma            = parametros.getUma().getImporteDiario();
-		this.diasTrabajados = nomina.getDiasLaborados();
+		this.diasTrabajados = nomina.getDiasLaborados()
+				.add(nomina.getDiasVacaciones());
 		this.diasPeriodo    = new BigDecimal(parametros.getDiasPeriodo()).setScale(2, RoundingMode.HALF_UP);
 		this.valor          = ValoresBD._1.get();
 	}
