@@ -56,7 +56,7 @@ public class ValesDespensaPBL extends PercepcionBL {
 		//TODO Pendiente aplicar criterio de exención para SBC.
 		
 		//Cálculo de importes exento y gravado (para LISR, Art. 93, parrafo penultimo).
-		if(this.diasTrabajados.compareTo(_CERO.get()) == 0)
+		if(this.diasTrabajados.compareTo(_CERO.get()) <= 0)
 			throw new SGPException("No es posible asignar vales de despensa porque el empleado no tiene asistencia en el periodo.");
 		
 		this.cantidad = this.calcularCantidad(nomina);
