@@ -3,7 +3,6 @@ package mx.com.ferbo.business.nomina;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -142,10 +141,16 @@ public class NominaSemanalBL extends NominaBL {
     		
     		
     		/*-------------------------DEDUCCIONES-----------------------*/
-    		Optional<DetNominaPercepcion> optSueldo = nomina.getPercepciones().stream().filter(p -> PercepcionBL.CVE_SUELDO.equalsIgnoreCase(p.getClave())).findFirst();
-    		salarioSemanal = optSueldo.isPresent() ? optSueldo.get().getImporteExento().add(optSueldo.get().getImporteGravado()) : ValoresBD._CERO.get();
+    		BigDecimal ingresosGravados = nomina.getPercepciones().stream()
+    			.map(item -> item.getImporteGravado())
+    			.reduce(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP), BigDecimal::add)
+    			;
     		
-			if(salarioSemanal.compareTo(ValoresBD._CERO.get()) > 0) {
+//    		Optional<DetNominaPercepcion> optSueldo = nomina.getPercepciones().stream()
+//    				.filter(p -> PercepcionBL.CVE_SUELDO.equalsIgnoreCase(p.getClave())).findFirst();
+//    		salarioSemanal = optSueldo.isPresent() ? optSueldo.get().getImporteExento().add(optSueldo.get().getImporteGravado()) : ValoresBD._CERO.get();
+    		
+			if(ingresosGravados.compareTo(ValoresBD._CERO.get()) > 0) {
 				NominaSemanalBL.procesarISR(this.parametros, nomina);
 				NominaSemanalBL.procesarIMSS(nomina, this.parametros, diasPeriodo, ausencias, incapacidades);
 				NominaSemanalBL.procesarPrestamos(nomina, this.parametros, this.empleado);
@@ -752,6 +757,9 @@ public class NominaSemanalBL extends NominaBL {
 		removedOtrosPagos = otrosPagos.removeIf(o -> AbstractOtroPago.OP_ISR_AJUSTADO_POR_SUBSIDIO.equalsIgnoreCase(o.getTipoOtroPago().getClave()));
 		if(removedOtrosPagos)
 			log.info("Se encontraron conceptos {}, los cuales fueron eliminados para el reproceso de Subsidio al empleo.", AbstractOtroPago.OP_ISR_AJUSTADO_POR_SUBSIDIO);
+		
+		
+		
 		
 		ISRExecutor isrExecutor = new ISRExecutor(parametros, nominaMensual);
 		IDeducciones isrBO = isrExecutor.loadClass("ISRS", DateUtil.toLocalDate(parametros.getPeriodoFin()));

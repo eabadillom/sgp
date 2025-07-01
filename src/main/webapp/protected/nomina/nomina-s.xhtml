@@ -134,7 +134,7 @@
 						</p:outputLabel>
 					</p:column>
 					<p:column width="3rem" style="text-align: right;">
-						<p:commandButton icon="pi pi-bars" oncomplete="PF('dgEmpleado').show();" actionListener="#{nominaS.cargaEmpleadoNomina(nomina)}" process="@this" update="form:dg-empleado" />
+						<p:commandButton icon="pi pi-bars" actionListener="#{nominaS.cargaEmpleadoNomina(nomina)}" process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dgEmpleado').show();" update="form:dg-empleado" />
 					</p:column>
 					
 					<p:columnGroup type="footer">
@@ -177,7 +177,7 @@
 		
 			<p:dialog id="dg-empleado" widgetVar="dgEmpleado" header="#{nominaS.nomina.receptor.nombre}" modal="true" responsive="true" position="center top" height="100%" resizable="false" showEffect="fade" hideEffect="fade">
 				<p:tabView id="tv-nomina" class="ui-fluid" dynamic="true" cache="true" effect="drop">
-					<p:ajax event="tabChange" oncomplete="PF('dgEmpleado').initPosition();"/>
+					<p:ajax event="tabChange" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dgEmpleado').initPosition();"/>
 					<p:tab title="General">
 						<div class="ui-fluid formgrid grid">
 							<div class="field col-12 md:col-3">
