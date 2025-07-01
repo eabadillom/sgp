@@ -137,7 +137,7 @@ public class NominaSemanalBL extends NominaBL {
     		NominaSemanalBL.calcularSueldo(nomina, this.parametros, diasLaboralesEmpleado, diasNolaboralesEmpleado, diasTrabajados, diasVacaciones);
     		NominaSemanalBL.calcularBonoPuntualidad(nomina, this.parametros, this.percepcionesEmpleado, this.mapAsistencias, this.empleado.getEmpleadoConfiguracion().getRetardo(), diasLaboralesEmpleado, diasNolaboralesEmpleado, diasTrabajados);
     		NominaSemanalBL.calcularValesDespensa(nomina, this.parametros, percepcionesEmpleado);
-			
+			NominaSemanalBL.calcularPrimaVacacionalEnTiempo(nomina, this.parametros);
     		
     		
     		/*-------------------------DEDUCCIONES-----------------------*/
@@ -145,10 +145,6 @@ public class NominaSemanalBL extends NominaBL {
     			.map(item -> item.getImporteGravado())
     			.reduce(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP), BigDecimal::add)
     			;
-    		
-//    		Optional<DetNominaPercepcion> optSueldo = nomina.getPercepciones().stream()
-//    				.filter(p -> PercepcionBL.CVE_SUELDO.equalsIgnoreCase(p.getClave())).findFirst();
-//    		salarioSemanal = optSueldo.isPresent() ? optSueldo.get().getImporteExento().add(optSueldo.get().getImporteGravado()) : ValoresBD._CERO.get();
     		
 			if(ingresosGravados.compareTo(ValoresBD._CERO.get()) > 0) {
 				NominaSemanalBL.procesarISR(this.parametros, nomina);
@@ -447,6 +443,34 @@ public class NominaSemanalBL extends NominaBL {
 		percepcion = valesDespensaBO.procesar(nomina);
 		
 		agregarPercepcion(nomina, percepcion);
+	}
+	
+	public static void calcularPrimaVacacionalEnTiempo(DetNomina nomina, ParametrosNomina parametros) {
+		DetNominaPercepcion percepcion = null;
+		PercepcionBL primaEnTiempoBO = null;
+		
+		primaEnTiempoBO = NominaSemanalBL.getPercepcionBusinessLogic(parametros, nomina, PercepcionBL.CVE_PRIMA_VACACIONES_EN_TIEMPO);
+		try {
+			percepcion = primaEnTiempoBO.procesar(nomina);
+			
+			Optional<DetNominaPercepcion> optPercepcion = nomina.getPercepciones().stream()
+					.filter(item -> item.getClave().equalsIgnoreCase(PercepcionBL.CVE_PRIMA_VACACIONES_EN_TIEMPO))
+					.findFirst()
+					;
+			
+			if(optPercepcion.isPresent() == false) {
+				agregarPercepcion(nomina, percepcion);
+				return;
+			}
+			
+			optPercepcion.get().setCantidad(percepcion.getCantidad());
+			optPercepcion.get().setImporte(percepcion.getImporte());
+			optPercepcion.get().setImporteExento(percepcion.getImporteExento());
+			optPercepcion.get().setImporteGravado(percepcion.getImporteGravado());
+			
+		} catch (SGPException ex) {
+			log.error("[UI] Problema para obtener el cálculo de la prima vacacional en tiempo: {}", ex.getMessage());
+		}
 	}
 	
 	public static DetNominaPercepcion calcular(DetNomina nomina, ParametrosNomina parametros, String clavePercepcion, BigDecimal cantidad)
