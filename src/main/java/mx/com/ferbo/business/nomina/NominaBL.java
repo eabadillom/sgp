@@ -18,6 +18,7 @@ import mx.com.ferbo.business.deduccion.AbstractDBL;
 import mx.com.ferbo.business.deduccion.AjusteAlNetoDBL;
 import mx.com.ferbo.business.otropago.AbstractOtroPago;
 import mx.com.ferbo.business.otropago.AjusteAlNetoOtroPago;
+import mx.com.ferbo.business.percepcion.PercepcionBL;
 import mx.com.ferbo.dao.n.VacacionesDAO;
 import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.CatEmpresa;
@@ -540,6 +541,10 @@ public abstract class NominaBL {
 			throw new SGPException("Debe seleccionar una percepción.");
 		
 		boolean respuesta = nomina.getPercepciones().remove(percepcion);
+		
+		if(PercepcionBL.CVE_PRIMA_VACACIONES_EN_TIEMPO.equalsIgnoreCase(percepcion.getClave())) {
+			nomina.getVacaciones().clear();
+		}
 		
 		if(respuesta == false)
 			throw new SGPException("Ocurrió un problema para eliminar la percepción.");
