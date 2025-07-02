@@ -34,6 +34,7 @@ import mx.com.ferbo.dao.n.EmpresaDAO;
 import mx.com.ferbo.dao.n.NominaDAO;
 import mx.com.ferbo.dao.n.PercepcionDAO;
 import mx.com.ferbo.dao.n.PeriodicidadPagoDAO;
+import mx.com.ferbo.dao.n.VacacionesDAO;
 import mx.com.ferbo.dto.ui.Asistencia;
 import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.CatEmpresa;
@@ -68,6 +69,7 @@ public class NominaSemanalBean implements Serializable {
     private EmpresaDAO empresaDAO;
     private NominaDAO nominaDAO;
     private PercepcionDAO percepcionDAO = null;
+    private VacacionesDAO vacacionesDAO = null;
     
     private List<CatEmpresa>        lstEmpresas;
     private List<CatPercepcion>     catalogoPercepciones = null;
@@ -107,6 +109,7 @@ public class NominaSemanalBean implements Serializable {
 		nominaDAO       = new NominaDAO();
 		periodicidadDAO = new PeriodicidadPagoDAO();
 		percepcionDAO   = new PercepcionDAO();
+		vacacionesDAO   = new VacacionesDAO();
 	}
     
     @PostConstruct
@@ -705,6 +708,16 @@ public class NominaSemanalBean implements Serializable {
     			log.info("Nomina: {}", nomina);
     		}
     		
+    		if(nomina.getVacaciones() != null) {
+    			nomina.getVacaciones().stream()
+    			.forEach(v -> {
+    				try {
+    					vacacionesDAO.actualizar(v);
+    				} catch(Exception ex) {
+    					log.error("Problema para actualizar el periodo vacacional...", ex);
+    				}
+    			});
+    		}    		
     		log.info("Nomina guardada correctamente.");
     		
     		mensaje = "La información se guardó correctamente.";

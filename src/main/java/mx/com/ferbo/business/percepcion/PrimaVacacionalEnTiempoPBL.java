@@ -76,7 +76,7 @@ public class PrimaVacacionalEnTiempoPBL extends PercepcionBL {
 		Integer diferenciaEnDias  = null;
 		
 		vacacionesDAO = new VacacionesDAO();
-		periodo = vacacionesDAO.obtenerPorRfcFecha(nomina.getReceptor().getRfc(), this.parametros.getPeriodoFin());
+		periodo = vacacionesDAO.buscarEnTiempoPorRfcFecha(nomina.getReceptor().getRfc(), this.parametros.getPeriodoFin());
 		
 		if(periodo == null) {
 			log.info("[UI] No se encontraron periodos vacacionales para el empleado.");
