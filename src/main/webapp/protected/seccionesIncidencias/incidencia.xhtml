@@ -179,13 +179,14 @@
                              oncomplete="PF('dialogPermisos').hide(); PF('dialogoCancelar').show()"/> 
         </f:facet>
     </p:dialog>
-    <p:dialog widgetVar="dialogRechazar" header="Detalle rechazo" showEffect="fade" responsive="true" modal="true" 
+    <p:dialog widgetVar="dialogRechazar" header="Detalle rechazo" showEffect="fade" responsive="true" modal="true" width="100%" height="100%" position="center top"
               styleClass="ferbo-dialog" dynamic="true" cache="false" >
         <p:outputPanel id="pnlDetalleRechazo" styleClass="ui-fluid pb-3">
             <div class="formgrid grid">
                 <div class="field col">
-                    <p:outputLabel for="txtRechazo" value="Descripción de rechazo"/>
-                    <p:inputTextarea id="txtRechazo" value="#{incidenciaBean.descripcionRechazo}"/>
+                    <p:outputLabel for="txtRechazo" value="Descripción:"/>
+                    <p:keyboard id="txtRechazo" value="#{incidenciaBean.descripcionRechazo}" layout="custom"
+                        layoutTemplate="1234567890,qwertyuiop,asdfghjkl,zxcvbnm,shift-back-spacebar-clear-close" style="height: 8rem" styleClass="aqua" />
                 </div>
             </div>
         </p:outputPanel>
@@ -208,6 +209,29 @@
     <style>
         .ferbo-datePicker .ui-datepicker-calendar td a.ui-state-active{
             background: #77ff00 !important;
+        }
+        #keypad-div.aqua {
+            background: #6699CC;
+            border: 1px solid #CCCCFF;
+            -moz-border-radius: 20px;
+            -webkit-border-radius: 20px;
+        }
+        .aqua .keypad-key {
+            width: 40px;
+            border: 1px solid #CCCCFF;
+            -moz-border-radius: 20px;
+            -webkit-border-radius: 20px;
+            color: #FFFFFF;
+            background: #99CCFF;
+        }
+        .aqua .keypad-key-down {
+            background: #8c8;
+        }
+        .aqua .keypad-clear {
+            letter-spacing: -1px;
+        }
+        .aqua .keypad-space {
+            width: 40px;
         }
     </style>
 </ui:composition>
