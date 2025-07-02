@@ -153,7 +153,7 @@
                                                             minQueryLength="5"
                                                             maxlength="5"
                                                             converter="entityConverter">
-                                                <p:ajax process="@this" event="itemSelect" listener="#{registroEmpleadosBean.asignarDomicilio()}" update=":form:panelDialogEmpleado"/>
+                                                <p:ajax process="@this" event="itemSelect" listener="#{registroEmpleadosBean.asignarDomicilio()}" update=":form:panelDialogEmpleado" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
                                                 <p:column>
                                                     <p:outputLabel value="#{sugerencia.cp}"/>
                                                 </p:column>
