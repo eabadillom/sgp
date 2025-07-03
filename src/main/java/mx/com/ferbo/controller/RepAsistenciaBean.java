@@ -39,10 +39,10 @@ import mx.com.ferbo.util.SGPException;
 
 @Named(value = "repAsistenciaBean")
 @ViewScoped
-public class RepAsistenciabean implements Serializable {
+public class RepAsistenciaBean implements Serializable {
 
     private static final long serialVersionUID = -1127550691400298355L;
-    private static Logger log = LogManager.getLogger(RepAsistenciabean.class);
+    private static Logger log = LogManager.getLogger(RepAsistenciaBean.class);
 
     private PlantaDAO plantaDAO;
     private RegistroDAO registroDAO;
@@ -63,7 +63,7 @@ public class RepAsistenciabean implements Serializable {
     private List<CatEstatusRegistro> lstEstatus;
     private List<Date> diasDesabilitados;
 
-    public RepAsistenciabean() {
+    public RepAsistenciaBean() {
     	try {
     		plantaDAO = new PlantaDAO(CatPlanta.class);
     		registroDAO = new RegistroDAO(DetRegistro.class);
@@ -89,6 +89,8 @@ public class RepAsistenciabean implements Serializable {
     		statusRegistroDAO.buscarPorCodigo("J");
     		lstEstatus.add(status);
     		status = statusRegistroDAO.buscarPorCodigo("X");
+    		lstEstatus.add(status);
+    		status = statusRegistroDAO.buscarPorCodigo("J");
     		lstEstatus.add(status);
     		
     		this.fechaInicio = new Date();
