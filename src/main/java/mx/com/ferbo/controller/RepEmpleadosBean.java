@@ -94,8 +94,8 @@ public class RepEmpleadosBean implements Serializable {
         Connection conn = null;
 
         try {
-            jasperPath = "/jasper/ReporteAsistencia.jrxml";
-            filename = String.format("ReporteEmpresa_%s.pdf", DateUtil.getString(new Date(), DateUtil.FORMATO_YYYY_MM_DD));
+            jasperPath = "/jasper/ReporteEmpleados.jrxml";
+            filename = String.format("ReporteEmpleados_%s.pdf", DateUtil.getString(new Date(), DateUtil.FORMATO_YYYY_MM_DD));
             images = "/images/logo.png";
             reportFile = new File(jasperPath);
             jasperReportUtil = new JasperReportUtil();
