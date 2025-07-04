@@ -149,6 +149,10 @@
         <exception-type>javax.faces.application.ViewExpiredException</exception-type>
         <location>/login.jsp?faces-redirect=true</location>
     </error-page>
+    <error-page>
+    	<exception-type>mx.com.ferbo.util.SGPSecurityException</exception-type>
+    	<location>/unauthorized.xhtmlfaces-redirect=true</location>
+    </error-page>
     <context-param>
         <param-name>com.sun.faces.enableRestoreView11Compatibility</param-name>
         <param-value>true</param-value>
