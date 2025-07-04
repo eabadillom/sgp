@@ -399,6 +399,28 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
         
         return modelList;
     }
+    
+    public List<DetEmpleado> buscarActivos(Integer idEmpresa, Integer idPlanta, Date fecha) {
+    	List<DetEmpleado> modelList = null;
+    	EntityManager em = null;
+    	
+    	try {
+    		em = this.getEntityManager();
+    		modelList = em.createNamedQuery("DetEmpleado.findByActiveEmpresaPlanta", this.modelClass)
+    				.setParameter("idEmpresa", idEmpresa)
+    				.setParameter("idPlanta", idPlanta)
+    				.setParameter("fecha", fecha)
+    				.getResultList()
+    				;
+    		
+    	} catch(Exception ex) {
+    		log.error("Problema para obtener la lista de empleados...", ex);
+    	} finally {
+    		this.close(em);
+    	}
+    	
+    	return modelList;
+    }
 
     public DetEmpleadoFoto buscarFoto(String numeroEmpleado) {
         DetEmpleadoFoto foto = null;

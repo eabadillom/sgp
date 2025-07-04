@@ -18,6 +18,10 @@ public class PlantaDAO extends BaseDAO<CatPlanta, Integer> {
 		super(modelClass);
 	}
 	
+	public PlantaDAO() {
+		super(CatPlanta.class);
+	}
+	
 	public List<CatPlanta> buscarActivo() {
 		List<CatPlanta> modelList = null;
 		EntityManager em = null;
