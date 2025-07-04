@@ -2,8 +2,11 @@ package mx.com.ferbo.filter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.servlet.Filter;
@@ -35,6 +38,21 @@ public class SessionFilter implements Filter {
     private static final String INIT_PARAM_ENABLED = "enabled";
     private static final String DEFAULT_LOGIN_PAGE = "/login.jsp";
     private static final String NO_SESSION_PAGE = "/login.jsp";
+    private static final String UNAUTHORIZED = "/unauthorized.xhtml";
+    
+    private static final Map<String, List<Integer>> permisos = new HashMap<String, List<Integer>>();
+    
+    static {
+        permisos.put("/protected/uniformes.xhtml", Arrays.asList(1,4));    // solo admins
+        permisos.put("/protected/articulosTrabajo.xhtml", Arrays.asList(1, 4));
+        permisos.put("/protected/settings/imss/registroIncapacidadIMSS.xhtml", Arrays.asList(1));
+        permisos.put("/protected/incidencias.xhtml", Arrays.asList(1));
+        permisos.put("/protected/nomina/nomina-s.xhtml", Arrays.asList(1));
+        permisos.put("/protected/nomina/nomina-e.xhtml", Arrays.asList(1));
+    	permisos.put("/protected/reportes.xhtml", Arrays.asList(1));
+    	permisos.put("/protected/settings/ajustes.xhtml", Arrays.asList(1));
+    	permisos.put("/protected/reportes/asistencia.xhtml", Arrays.asList(1));
+    }
 
     /**
      * Default constructor.
@@ -110,6 +128,12 @@ public class SessionFilter implements Filter {
         }
 
         log.debug("El usuario esta correctamente autenticado.");
+        
+        if(tienePermiso(usuario, context + pagina) == false) {
+        	response.sendRedirect(context + UNAUTHORIZED);
+        	return;
+        }
+        
         chain.doFilter(request, response);
 
     }
@@ -168,6 +192,17 @@ public class SessionFilter implements Filter {
         }
 
         return false;
+    }
+    
+    private boolean tienePermiso(DetEmpleado empleado, String path) {
+    	Integer idPerfil = empleado.getDatoEmpresa().getPerfil().getIdPerfil();
+    	for (Map.Entry<String, List<Integer>> entry : permisos.entrySet()) {
+            if (path.endsWith(entry.getKey())) {
+                return entry.getValue().contains(idPerfil);
+            }
+        }
+    	
+    	return true;
     }
 
     /**

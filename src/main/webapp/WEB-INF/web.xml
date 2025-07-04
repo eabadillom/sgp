@@ -151,7 +151,7 @@
     </error-page>
     <error-page>
     	<exception-type>mx.com.ferbo.util.SGPSecurityException</exception-type>
-    	<location>/unauthorized.xhtmlfaces-redirect=true</location>
+    	<location>/unauthorized.xhtml?faces-redirect=true</location>
     </error-page>
     <context-param>
         <param-name>com.sun.faces.enableRestoreView11Compatibility</param-name>

@@ -2,7 +2,6 @@ package mx.com.ferbo.controller;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
 import java.sql.Connection;
@@ -17,7 +16,6 @@ import java.util.TimeZone;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.FacesMessage.Severity;
-import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
@@ -74,7 +72,7 @@ public class RepAsistenciaBean implements Serializable {
     private List<CatEstatusRegistro> lstEstatus;
     private List<Date> diasDesabilitados;
 
-    public RepAsistenciaBean() {
+    public RepAsistenciaBean() throws SGPSecurityException {
     	DetEmpleado empleadoSesion = null;
     	
     	this.context = FacesContext.getCurrentInstance();
@@ -122,6 +120,8 @@ public class RepAsistenciaBean implements Serializable {
     				.name("ReporteAsistencia.xlsx").stream(() -> new ByteArrayInputStream(bytes)).build();
     		
     		log.info("Termina constructor.");
+    	} catch(SGPSecurityException ex) {
+    		throw ex;
     	} catch(Exception ex) {
     		log.error("Problema para inicializar el reporte de asistencia...", ex);
     	}
