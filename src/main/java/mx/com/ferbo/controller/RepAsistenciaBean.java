@@ -19,6 +19,8 @@ import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,11 +33,13 @@ import mx.com.ferbo.dao.n.PlantaDAO;
 import mx.com.ferbo.dao.n.RegistroDAO;
 import mx.com.ferbo.model.CatEstatusRegistro;
 import mx.com.ferbo.model.CatPlanta;
+import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetRegistro;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.EntityManagerUtil;
 import mx.com.ferbo.util.JasperReportUtil;
 import mx.com.ferbo.util.SGPException;
+import mx.com.ferbo.util.SGPSecurityException;
 
 @Named(value = "repAsistenciaBean")
 @ViewScoped
@@ -43,6 +47,11 @@ public class RepAsistenciaBean implements Serializable {
 
     private static final long serialVersionUID = -1127550691400298355L;
     private static Logger log = LogManager.getLogger(RepAsistenciaBean.class);
+    
+    private HttpServletRequest request = null;
+    private FacesContext context = null;
+    private String contextPath = null;
+    private HttpSession session = null;
 
     private PlantaDAO plantaDAO;
     private RegistroDAO registroDAO;
@@ -63,22 +72,27 @@ public class RepAsistenciaBean implements Serializable {
     private List<CatEstatusRegistro> lstEstatus;
     private List<Date> diasDesabilitados;
 
-    public RepAsistenciaBean() {
-    	try {
-    		plantaDAO = new PlantaDAO(CatPlanta.class);
-    		registroDAO = new RegistroDAO(DetRegistro.class);
-    		statusRegistroDAO = new EstatusRegistroDAO(CatEstatusRegistro.class);
-    	} catch(Exception ex) {
-    		log.error("Problema para inicializar el reporte de asistencia...", ex);
-    	}
-    }
-
-    @PostConstruct
-    public void init() {
+    public RepAsistenciaBean() throws SGPSecurityException {
+    	DetEmpleado empleadoSesion = null;
+    	
+    	this.context = FacesContext.getCurrentInstance();
+    	this.request = (HttpServletRequest) context.getExternalContext().getRequest();
+    	this.session = request.getSession(false);
+    	
     	CatEstatusRegistro status = null;
     	
     	try {
-    		log.info("Ejecutando proceso init...");
+    		log.info("Ejecutando constructor...");
+    		empleadoSesion = (DetEmpleado) session.getAttribute("empleado");
+    		
+    		if(empleadoSesion.getDatoEmpresa().getPerfil().getIdPerfil() != 1)
+    			throw new SGPSecurityException("No tiene acceso a este recurso.");
+    		
+    		
+    		plantaDAO = new PlantaDAO(CatPlanta.class);
+    		registroDAO = new RegistroDAO(DetRegistro.class);
+    		statusRegistroDAO = new EstatusRegistroDAO(CatEstatusRegistro.class);
+    		
     		plantas = plantaDAO.buscarTodos();
     		lstEstatus = new ArrayList<CatEstatusRegistro>();
     		status = statusRegistroDAO.buscarPorCodigo("T");
@@ -104,12 +118,46 @@ public class RepAsistenciaBean implements Serializable {
     		
     		xlsFile = DefaultStreamedContent.builder().contentType("application/vnd.ms-excel").contentLength(bytes.length)
     				.name("ReporteAsistencia.xlsx").stream(() -> new ByteArrayInputStream(bytes)).build();
-    		log.info("Proceso init terminado.");
+    		
+    		log.info("Termina constructor.");
+    	} catch(SGPSecurityException ex) {
+    		throw ex;
+    	} catch(Exception ex) {
+    		log.error("Problema para inicializar el reporte de asistencia...", ex);
+    	}
+    }
+
+    @PostConstruct
+    public void init() {
+    	DetEmpleado empleadoSesion = null;
+    	String path = null;
+    	empleadoSesion = (DetEmpleado) session.getAttribute("empleado");
+    	contextPath = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
+    	FacesContext context = null;
+    	
+    	try {
+    		log.info("Ejecutando proceso init...");
+    		
+    		
+    		if(empleadoSesion.getDatoEmpresa().getPerfil().getIdPerfil() == 1) {
+    			return;
+    		}
+    		
+//	    	path = this.contextPath + "/unauthorized.xhtml?faces-redirect=true";
+//	    	log.info("Redirigiendo a {}", path);
+//	    	context = FacesContext.getCurrentInstance();
+//	    	FacesContext.getCurrentInstance()
+//	    		.getApplication()
+//	    		.getNavigationHandler()
+//	    		.handleNavigation(context, null, path);
+//    		
+//    		
+//    		log.info("Proceso init terminado.");
     	} catch(Exception ex) {
     		log.error("Problema para entrar al reporte de inventario...", ex);
     	}
     }
-
+    
     public void cargaInfo() {
         FacesMessage message = null;
         Severity severity = null;
