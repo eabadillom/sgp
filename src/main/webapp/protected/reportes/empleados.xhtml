@@ -1,0 +1,101 @@
+<ui:composition
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/plantillas/template.xhtml">
+	<ui:define name="title">Empleados activos</ui:define>
+	<ui:define name="content">
+		<script>
+            PrimeFaces.locales['es'] = {
+                monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+                monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+                dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
+                dayNamesMin: ['D', 'L', 'M', 'X', 'J', 'V', 'S'],
+                weekHeader: 'Semana',
+                firstDay: 1,
+                isRTL: false,
+                showMonthAfterYear: false,
+                yearSuffix: '',
+                timeOnlyTitle: 'Sólo hora',
+                timeText: 'Tiempo',
+                hourText: 'Hora',
+                minuteText: 'Minuto',
+                secondText: 'Segundo',
+                millisecondText: 'Milisegundo',
+                ampm: false,
+                month: 'Mes',
+                week: 'Semana',
+                day: 'Día',
+                allDayText: 'Todo el día',
+                today: 'Hoy',
+                now: 'Ahora',
+                clear: 'Limpiar',
+                aria: {
+                    close: 'Cerrar',
+                    previous: 'Anterior',
+                    next: 'Siguiente',
+                }
+            };
+        </script>
+        <h:form id="form" enctype="multipart/form-data">
+        	<p:growl id="messages" showDetail="true" life="2000"/>
+        	<p:dialog modal="true" widgetVar="statusInfoDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
+                <div align="center">
+                    <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+                </div>
+            </p:dialog>
+            <div class="ui-fluid formgrid grid">
+            	<div class="field col-12 md:col-3">
+            		<p:selectOneMenu value="#{repEmpleados.empresa}" converter="entityConverter" autoWidth="false">
+            			<f:selectItem itemLabel="--Todas las empresas--"/>
+            			<f:selectItems value="#{repEmpleados.empresas}" var="empresa" itemLabel="#{empresa.razonSocial}" itemValue="#{empresa}" />
+            			<p:ajax process="@this" />
+            		</p:selectOneMenu>
+            	</div>
+            	<div class="field col-12 md:col-3">
+            		<p:selectOneMenu value="#{repEmpleados.planta}" converter="entityConverter" autoWidth="false">
+            			<f:selectItem itemLabel="--Todas las plantas--"/>
+            			<f:selectItems value="#{repEmpleados.plantas}" var="planta" itemLabel="#{planta.descripcion}" itemValue="#{planta}" />
+            			<p:ajax process="@this" />
+            		</p:selectOneMenu>
+            	</div>
+            	<div class="field col-12 md:col-2">
+            		<p:commandButton value="Buscar" icon="pi pi-search" process="@this" actionListener="#{repEmpleados.buscarEmpleados}" update="form:dt-empleados" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();">
+            		</p:commandButton>
+            	</div>
+            	<div class="field col-12 md:col-2">
+            		<p:commandButton value="PDF" icon="pi pi-file-pdf" ajax="false" process="@this" actionListener="#{repEmpleados.exportarPDF()}">
+            			<p:fileDownload value="#{repEmpleados.pdfFile}"/>
+            		</p:commandButton>
+            	</div>
+            	<div class="field col-12 md:col-2">
+            		<p:commandButton value="Excel" icon="pi pi-file-excel" ajax="false" process="@this" actionListener="#{repEmpleados.exportarXLS()}">
+            			<p:fileDownload value="#{repEmpleados.xlsFile}"/>
+            		</p:commandButton>
+            	</div>
+            </div>
+            <p:dataTable id="dt-empleados" widgetVar="dtEmpleados" value="#{repEmpleados.empleados}" var="empleado" emptyMessage="No hay información para mostrar">
+            	<p:column headerText="Número" sortBy="#{empleado.numEmpleado}" width="6rem">
+            		<p:outputLabel value="#{empleado.numEmpleado}" />
+            	</p:column>
+            	<p:column headerText="Nombre" sortBy="#{empleado.nombre}">
+            		<p:outputLabel value="#{empleado.nombre}" />
+            	</p:column>
+            	<p:column headerText="Primer apellido" sortBy="#{empleado.primerAp}">
+            		<p:outputLabel value="#{empleado.primerAp}"/>
+            	</p:column>
+            	<p:column headerText="Segundo apellido" sortBy="#{empleado.segundoAp}">
+            		<p:outputLabel value="#{empleado.segundoAp}" />
+            	</p:column>
+            	<p:column headerText="Ingreso" sortBy="#{empleado.datoEmpresa.fechaIngreso}">
+            		<p:outputLabel value="#{empleado.datoEmpresa.fechaIngreso}">
+            			<f:convertDateTime pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6" />
+            		</p:outputLabel>
+            	</p:column>
+            </p:dataTable>
+        </h:form>
+	</ui:define>
+</ui:composition>
