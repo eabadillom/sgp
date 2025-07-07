@@ -44,7 +44,6 @@ public class RepEmpleadosBean implements Serializable {
 	
 	private CatEmpresa empresa = null;
 	private CatPlanta planta = null;
-	private Boolean activo = null;
 	private List<DetEmpleado> empleados = null;
 	private List<CatEmpresa> empresas = null;
 	private List<CatPlanta> plantas = null;
@@ -190,12 +189,6 @@ public class RepEmpleadosBean implements Serializable {
 	}
 	public void setPlanta(CatPlanta planta) {
 		this.planta = planta;
-	}
-	public Boolean getActivo() {
-		return activo;
-	}
-	public void setActivo(Boolean activo) {
-		this.activo = activo;
 	}
 	public List<DetEmpleado> getEmpleados() {
 		return empleados;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteAsistencia" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="b2dbfb33-a851-457d-b39e-16777d1ed655">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteAsistencia" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="b2dbfb33-a851-457d-b39e-16777d1ed655">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="361"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="626"/>
@@ -188,6 +188,7 @@ order by ce.nb_razon_social, cp.descripcion, de.nombre, de.primer_ap, de.segundo
 	</background>
 	<title>
 		<band height="43" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<image>
 				<reportElement x="0" y="0" width="118" height="43" uuid="953bca87-1328-455b-9584-46f1a5aee502">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -206,21 +207,20 @@ order by ce.nb_razon_social, cp.descripcion, de.nombre, de.primer_ap, de.segundo
 				</textElement>
 				<text><![CDATA[REPORTE DE EMPLEADOS]]></text>
 			</staticText>
-			<staticText>
-				<reportElement x="118" y="21" width="132" height="12" uuid="d277a52c-9d83-4dd8-997d-437daf116394">
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<textElement textAlignment="Right"/>
-				<text><![CDATA[al ]]></text>
-			</staticText>
-			<textField pattern="dd/MMM/yyyy HH:mm">
-				<reportElement x="250" y="21" width="322" height="12" uuid="0f962cc0-abb1-4d3b-945e-f096b0083b0f"/>
+			<textField pattern="dd / MMM / yyyy">
+				<reportElement x="242" y="21" width="125" height="12" uuid="0f962cc0-abb1-4d3b-945e-f096b0083b0f"/>
+				<textElement textAlignment="Center"/>
 				<textFieldExpression><![CDATA[$P{fecha}]]></textFieldExpression>
 			</textField>
+			<staticText>
+				<reportElement x="118" y="21" width="124" height="12" uuid="121b72f9-d78c-4249-b43d-aa243d8b8eee"/>
+				<textElement textAlignment="Right"/>
+				<text><![CDATA[Al ]]></text>
+			</staticText>
 		</band>
 	</title>
 	<pageHeader>
-		<band height="18" splitType="Stretch">
+		<band splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 		</band>
 	</pageHeader>
@@ -323,14 +323,14 @@ order by ce.nb_razon_social, cp.descripcion, de.nombre, de.primer_ap, de.segundo
 				<text><![CDATA[REPORTE DE EMPLEADOS]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="291" y="21" width="12" height="12" uuid="eaa8201a-f03b-4f7e-8c27-e574496f1ba5">
+				<reportElement x="118" y="21" width="124" height="12" uuid="eaa8201a-f03b-4f7e-8c27-e574496f1ba5">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center"/>
 				<text><![CDATA[al]]></text>
 			</staticText>
-			<textField pattern="dd/MMM/yyyy HH:mm">
-				<reportElement x="303" y="21" width="100" height="12" uuid="2b0bb9c3-8923-4e52-8104-f326a084775a"/>
+			<textField pattern="dd / MMM / yyyy">
+				<reportElement x="242" y="21" width="125" height="12" uuid="2b0bb9c3-8923-4e52-8104-f326a084775a"/>
 				<textFieldExpression><![CDATA[$P{fecha}]]></textFieldExpression>
 			</textField>
 			<textField>

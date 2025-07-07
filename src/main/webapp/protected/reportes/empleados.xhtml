@@ -48,35 +48,31 @@
                 </div>
             </p:dialog>
             <div class="ui-fluid formgrid grid">
-            	<div class="field col-12 md:col-4">
+            	<div class="field col-12 md:col-3">
             		<p:selectOneMenu value="#{repEmpleados.empresa}" converter="entityConverter" autoWidth="false">
             			<f:selectItem itemLabel="--Todas las empresas--"/>
             			<f:selectItems value="#{repEmpleados.empresas}" var="empresa" itemLabel="#{empresa.razonSocial}" itemValue="#{empresa}" />
             			<p:ajax process="@this" />
             		</p:selectOneMenu>
             	</div>
-            	<div class="field col-12 md:col-4">
+            	<div class="field col-12 md:col-3">
             		<p:selectOneMenu value="#{repEmpleados.planta}" converter="entityConverter" autoWidth="false">
             			<f:selectItem itemLabel="--Todas las plantas--"/>
             			<f:selectItems value="#{repEmpleados.plantas}" var="planta" itemLabel="#{planta.descripcion}" itemValue="#{planta}" />
             			<p:ajax process="@this" />
             		</p:selectOneMenu>
             	</div>
-            	<!-- <div class="field col-12 md:col-2">
-            		<p:selectBooleanButton value="#{repEmpleados.activo}" onLabel="Activos" onIcon="pi pi-check" offLabel="Inactivos" offIcon="pi pi-times">
-            		</p:selectBooleanButton>
-            	</div> -->
             	<div class="field col-12 md:col-2">
-            		<p:commandButton value="Buscar" icon="pi pi-search" process="@this" actionListener="#{repEmpleados.buscarEmpleados}" update="form:dt-empleados">
+            		<p:commandButton value="Buscar" icon="pi pi-search" process="@this" actionListener="#{repEmpleados.buscarEmpleados}" update="form:dt-empleados" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();">
             		</p:commandButton>
             	</div>
-            	<div class="field col-12 md:col-1">
-            		<p:commandButton icon="pi pi-file-pdf" ajax="false" process="@this" actionListener="#{repEmpleados.exportarPDF()}">
+            	<div class="field col-12 md:col-2">
+            		<p:commandButton value="PDF" icon="pi pi-file-pdf" ajax="false" process="@this" actionListener="#{repEmpleados.exportarPDF()}">
             			<p:fileDownload value="#{repEmpleados.pdfFile}"/>
             		</p:commandButton>
             	</div>
-            	<div class="field col-12 md:col-1">
-            		<p:commandButton icon="pi pi-file-excel" ajax="false" process="@this" actionListener="#{repEmpleados.exportarXLS()}">
+            	<div class="field col-12 md:col-2">
+            		<p:commandButton value="Excel" icon="pi pi-file-excel" ajax="false" process="@this" actionListener="#{repEmpleados.exportarXLS()}">
             			<p:fileDownload value="#{repEmpleados.xlsFile}"/>
             		</p:commandButton>
             	</div>
