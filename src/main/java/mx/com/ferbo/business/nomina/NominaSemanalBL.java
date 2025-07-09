@@ -86,7 +86,7 @@ public class NominaSemanalBL extends NominaBL {
 		BigDecimal diasVacaciones          = null;
 		BigDecimal ausencias               = null;
 		BigDecimal incapacidades           = null;
-		BigDecimal salarioSemanal          = null;
+//		BigDecimal salarioSemanal          = null;
 		BigDecimal diasPagados             = null;
 		DetNomina  nomina                  = null;
 		

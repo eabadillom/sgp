@@ -73,6 +73,8 @@ public class IMSSEnfMatEnDineroDBL extends AbstractIMSSDBL implements IDeduccion
 					.setScale(2, BigDecimal.ROUND_HALF_UP)
 					;
 			
+			log.info("[UI] Cuota Enf. y Mat. (En dinero): {} = SDI x (Dias trabajados - incapacidades) = {} x ({} - {})", this.sdi, this.diasTrabajados, this.incapacidades);
+			
 		} catch(Exception ex) {
 			log.error("No es posible calcular el excedente En Dinero...", ex);
 			cuota = ValoresBD._CERO.get();
