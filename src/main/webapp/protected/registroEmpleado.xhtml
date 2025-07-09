@@ -449,10 +449,14 @@
                                             <h:outputText value="#{(vacacion.diasTotales - vacacion.diasTomados - vacacion.diasPagados)}"/>
                                         </p:column>
                                         <p:column headerText="Prima vacional Pagada" style="text-align: center;">
-                                            <p:commandButton disabled="true" styleClass="#{vacacion.primaPagada ? 'ui-button-success' : 'ui-button-danger m-1'}" icon="#{vacacion.primaPagada ? 'pi pi-check' : 'pi pi-times'}"/>
+                                        	<p:selectBooleanButton value="#{vacacion.primaPagada}" onIcon="pi pi-check" offIcon="pi pi-times">
+                                        		<p:ajax process="@this" />
+                                        	</p:selectBooleanButton>
                                         </p:column>
                                         <p:column headerText="Dias pendientes pagados" style="text-align: center;">
-                                            <p:commandButton disabled="true" styleClass="#{vacacion.diasPendientesPagados ? 'ui-button-success' : 'ui-button-danger m-1'}" icon="#{vacacion.diasPendientesPagados ? 'pi pi-check' : 'pi pi-times'}"/>
+                                        	<p:selectBooleanButton value="#{vacacion.diasPendientesPagados}" onIcon="pi pi-check" offIcon="pi pi-times">
+                                        		<p:ajax process="@this" />
+                                        	</p:selectBooleanButton>
                                         </p:column>
                                     </p:dataTable>
                                 </p:tab>
