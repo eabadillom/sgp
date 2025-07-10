@@ -88,12 +88,6 @@ public class DetEmpleado implements Serializable {
     @Column(name = "curp")
     private String curp;
 
-    @Basic(optional = true)
-    @NotNull
-    @Size(min = 1, max = 45)
-    @Column(name = "rfc")
-    private String rfc;
-
     @Size(max = 45)
     @Column(name = "correo")
     private String correo;
@@ -172,7 +166,7 @@ public class DetEmpleado implements Serializable {
         this.idEmpleado = idEmpleado;
     }
     
-    public DetEmpleado(Integer idEmpleado, String numEmpleado, String nombre, String primerAp, Date fechaNacimiento, Date fechaRegistro, String rfc,
+    public DetEmpleado(Integer idEmpleado, String numEmpleado, String nombre, String primerAp, Date fechaNacimiento, Date fechaRegistro,
             Date fechaIngreso, short activo, BigDecimal sueldoDiario) {
         this.idEmpleado = idEmpleado;
         this.numEmpleado = numEmpleado;
@@ -180,13 +174,12 @@ public class DetEmpleado implements Serializable {
         this.primerAp = primerAp;
         this.fechaNacimiento = fechaNacimiento;
         this.fechaRegistro = fechaRegistro;
-        this.rfc = rfc;
         this.fechaIngreso = fechaIngreso;
         this.activo = activo;
         this.sueldoDiario = sueldoDiario;
     }
 
-    public DetEmpleado(Integer idEmpleado, String numEmpleado, String nombre, String primerAp, Date fechaNacimiento, Date fechaRegistro, String rfc,
+    public DetEmpleado(Integer idEmpleado, String numEmpleado, String nombre, String primerAp, Date fechaNacimiento, Date fechaRegistro,
             Date fechaIngreso, short activo) {
         this.idEmpleado = idEmpleado;
         this.numEmpleado = numEmpleado;
@@ -194,7 +187,6 @@ public class DetEmpleado implements Serializable {
         this.primerAp = primerAp;
         this.fechaNacimiento = fechaNacimiento;
         this.fechaRegistro = fechaRegistro;
-        this.rfc = rfc;
         this.fechaIngreso = fechaIngreso;
         this.activo = activo;
 
@@ -270,14 +262,6 @@ public class DetEmpleado implements Serializable {
 
     public void setCurp(String curp) {
         this.curp = curp;
-    }
-
-    public String getRfc() {
-        return rfc;
-    }
-
-    public void setRfc(String rfc) {
-        this.rfc = rfc;
     }
 
     public String getCorreo() {

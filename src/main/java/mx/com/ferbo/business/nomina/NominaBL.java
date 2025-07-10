@@ -19,6 +19,7 @@ import mx.com.ferbo.business.deduccion.AjusteAlNetoDBL;
 import mx.com.ferbo.business.otropago.AbstractOtroPago;
 import mx.com.ferbo.business.otropago.AjusteAlNetoOtroPago;
 import mx.com.ferbo.business.percepcion.PercepcionBL;
+import mx.com.ferbo.dao.n.NominaDAO;
 import mx.com.ferbo.dao.n.VacacionesDAO;
 import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.CatEmpresa;
@@ -31,6 +32,7 @@ import mx.com.ferbo.model.DetNominaIncidencia;
 import mx.com.ferbo.model.DetNominaOtroPago;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.DetNominaReceptor;
+import mx.com.ferbo.model.DetNominaVacaciones;
 import mx.com.ferbo.model.DetRegistro;
 import mx.com.ferbo.model.DetVacaciones;
 import mx.com.ferbo.model.sat.CatConcepto;
@@ -67,19 +69,20 @@ public abstract class NominaBL {
 	
 	public static synchronized DetNomina build(String tipoNomina, ParametrosNomina parametros, DetEmpleado empleado)
 	throws SGPException {
-		DetNomina                 nomina       = null;
-		DetNominaEmisor           emisor       = null;
-		DetNominaReceptor         receptor     = null;
-		DetNominaConcepto         concepto     = null;
-		CatConcepto               conceptoSAT  = null;
-		CatUnidadSAT              unidadSAT    = null;
+		DetNomina                 nomina           = null;
+		DetNominaEmisor           emisor           = null;
+		DetNominaReceptor         receptor         = null;
+		DetNominaConcepto         concepto         = null;
+		CatConcepto               conceptoSAT      = null;
+		CatUnidadSAT              unidadSAT        = null;
 		
-		List<DetNominaConcepto>   conceptos    = null;
-		List<DetNominaPercepcion> percepciones = null;
-		List<DetNominaOtroPago>   otrosPagos   = null;
-		List<DetNominaDeduccion>  deducciones  = null;
-		List<DetVacaciones>       vacaciones   = null;
-		List<DetNominaIncidencia> incidencias  = null;
+		List<DetNominaConcepto>   conceptos        = null;
+		List<DetNominaPercepcion> percepciones     = null;
+		List<DetNominaOtroPago>   otrosPagos       = null;
+		List<DetNominaDeduccion>  deducciones      = null;
+		List<DetVacaciones>       vacaciones       = null;
+		List<DetNominaIncidencia> incidencias      = null;
+		List<DetNominaVacaciones> nominaVacaciones = null;
 		
 		if(parametros == null)
 			throw new SGPException("Los parámetros de nómina no están definidos.");
@@ -95,12 +98,13 @@ public abstract class NominaBL {
 				emisor   = getEmisor(nomina, empleado.getDatoEmpresa().getEmpresa());
 			}
 			
-			conceptos = new ArrayList<DetNominaConcepto>();
-			percepciones = new ArrayList<DetNominaPercepcion>();
-			otrosPagos = new ArrayList<DetNominaOtroPago>();
-			deducciones = new ArrayList<DetNominaDeduccion>();
-			vacaciones = new ArrayList<DetVacaciones>();
-			incidencias = new ArrayList<DetNominaIncidencia>();
+			conceptos        = new ArrayList<DetNominaConcepto>();
+			percepciones     = new ArrayList<DetNominaPercepcion>();
+			otrosPagos       = new ArrayList<DetNominaOtroPago>();
+			deducciones      = new ArrayList<DetNominaDeduccion>();
+			vacaciones       = new ArrayList<DetVacaciones>();
+			incidencias      = new ArrayList<DetNominaIncidencia>();
+			nominaVacaciones = new ArrayList<DetNominaVacaciones>();
 			
 			conceptoSAT = parametros.getConcepto();
 			unidadSAT = parametros.getUnidadSAT();
@@ -132,6 +136,8 @@ public abstract class NominaBL {
 			nomina.setDeducciones(deducciones);
 			nomina.setVacaciones(vacaciones);
 			nomina.setIncidencias(incidencias);
+			nomina.setNominaVacaciones(nominaVacaciones);
+			
 			nomina.setTipoComprobante(TP_COMPROBANTE_CFDI);
 			nomina.setClaveExportacion("01");
 			nomina.setMoneda("MXN");
@@ -144,6 +150,7 @@ public abstract class NominaBL {
 			nomina.setPeriodo(parametros.getPeriodo());
 			nomina.setPeriodoInicio(parametros.getPeriodoInicio().toInstant().atZone(ZoneId.of("GMT-6")).toLocalDate());
 			nomina.setPeriodoFin(parametros.getPeriodoFin().toInstant().atZone(ZoneId.of("GMT-6")).toLocalDate());
+			
 			if(TP_NOMINA_TEST.equalsIgnoreCase(tipoNomina))
 				nomina.setDiasLaborados(new BigDecimal(parametros.getDiasPeriodo()).setScale(2, RoundingMode.HALF_UP));
 			else
@@ -161,6 +168,16 @@ public abstract class NominaBL {
 		} catch(Exception ex) {
 			log.error("Problema para generar la estructura básica de la nómina del empleado.");
 		}
+		
+		return nomina;
+	}
+	
+	public static synchronized DetNomina load(ParametrosNomina parametros, String rfc) {
+		DetNomina nomina = null;
+		NominaDAO nominaDAO = null;
+		
+		nominaDAO = new NominaDAO();
+		nomina = nominaDAO.buscarPorPeriodoEmpleado(DateUtil.toLocalDate(parametros.getPeriodoInicio()), DateUtil.toLocalDate(parametros.getPeriodoFin()), rfc);
 		
 		return nomina;
 	}
@@ -472,9 +489,19 @@ public abstract class NominaBL {
 		
 		final String clave = percepcion.getClave();
 		
-		boolean removedPercepciones = nomina.getPercepciones().removeIf(p -> p.getClave().equalsIgnoreCase(clave));
-		if(removedPercepciones)
-			log.info("Se encontraron conceptos {}, los cuales fueron eliminados de la lista de percepciones.", clave);
+		Optional<DetNominaPercepcion> optPercepcion = nomina.getPercepciones().stream()
+				.filter(item -> item.getClave().equalsIgnoreCase(clave))
+				.findFirst()
+				;
+		
+		if(optPercepcion.isPresent()) {
+			optPercepcion.get().setCantidad(percepcion.getCantidad());
+			optPercepcion.get().setImporte(percepcion.getImporte());
+			optPercepcion.get().setImporteExento(percepcion.getImporteExento());
+			optPercepcion.get().setImporteGravado(percepcion.getImporteGravado());
+			
+			return;
+		}
 		
 		if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(ValoresBD._CERO.get()) > 0)
 			nomina.getPercepciones().add(percepcion);
