@@ -6,7 +6,6 @@ import static mx.com.ferbo.enums.ValoresBD._CERO;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,6 +14,7 @@ import mx.com.ferbo.business.nomina.ParametrosNomina;
 import mx.com.ferbo.dao.n.VacacionesDAO;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
+import mx.com.ferbo.model.DetNominaVacaciones;
 import mx.com.ferbo.model.DetVacaciones;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.SGPException;
@@ -22,6 +22,8 @@ import mx.com.ferbo.util.SGPException;
 public class PrimaVacacionalEnTiempoPBL extends PercepcionBL {
 	
 	private static Logger log = LogManager.getLogger(PrimaVacacionalEnTiempoPBL.class);
+	
+	private DetVacaciones periodo = null;
 	
 	public PrimaVacacionalEnTiempoPBL(ParametrosNomina parametros, DetNomina nomina) {
 		super(parametros, nomina);
@@ -32,10 +34,52 @@ public class PrimaVacacionalEnTiempoPBL extends PercepcionBL {
 	public DetNominaPercepcion procesar(DetNomina nomina) throws SGPException {
 		DetNominaPercepcion       percepcion    = null;
 		
+		//Generar automáticamente el "periodo" vacacional en tiempo
+		this.periodo = this.buscarPeriodoEnTiempo();
+		
+		//Calcular el concepto "Cantidad" con base en el periodo vacacional establecido.
 		this.cantidad = this.calcularCantidad(nomina);
 		percepcion = this.procesar(nomina, this.cantidad);
 		
 		return percepcion;
+	}
+	
+	protected DetVacaciones buscarPeriodoEnTiempo()
+	throws SGPException {
+		DetVacaciones             periodo          = null;
+		VacacionesDAO             vacacionesDAO    = null;
+		Integer                   diferenciaEnDias = null;
+		DetNominaVacaciones       nominaVacaciones = null;
+		
+		log.info("[UI] El ultimo periodo de vacaciones registrado es: {}", periodo);
+		vacacionesDAO = new VacacionesDAO();
+		periodo = vacacionesDAO.buscarEnTiempoPorRfcFecha(nomina.getReceptor().getRfc(), this.parametros.getPeriodoFin());
+		
+		if(periodo == null) {
+			log.info("[UI] No se encontraron periodos vacacionales para el empleado.");
+			throw new SGPException("El empleado no ha cumplido su aniversario laboral.");
+		}
+		
+		diferenciaEnDias = DateUtil.daysDiff(periodo.getFechaFin(), this.parametros.getPeriodoFin());
+		
+		if(diferenciaEnDias > 365)
+			throw new SGPException("El periodo encontrado tiene más de un año respecto al fin del periodo de cálculo. "
+					+ "Se recomienda revisar los periodos vacacionales del empleado.");
+		
+		periodo.setPrimaPagada(true);
+		nomina.getVacaciones().add(periodo);
+		
+		nominaVacaciones = new DetNominaVacaciones();
+		nominaVacaciones.setNomina(nomina);
+		nominaVacaciones.setVacaciones(periodo);
+		nomina.getNominaVacaciones().add(nominaVacaciones);
+		
+		return periodo;
+	}
+	
+	@Override
+	public BigDecimal calcularCantidad(DetNomina nomina) throws SGPException {
+		return this.calcularTasa(periodo, this.baseCalculo);
 	}
 	
 	@Override
@@ -69,33 +113,7 @@ public class PrimaVacacionalEnTiempoPBL extends PercepcionBL {
 		return percepcion;
 	}
 	
-	@Override
-	protected BigDecimal calcularCantidad(DetNomina nomina) throws SGPException {
-		VacacionesDAO             vacacionesDAO = null;
-		DetVacaciones             periodo       = null;
-		Integer diferenciaEnDias  = null;
-		
-		vacacionesDAO = new VacacionesDAO();
-		periodo = vacacionesDAO.buscarEnTiempoPorRfcFecha(nomina.getReceptor().getRfc(), this.parametros.getPeriodoFin());
-		
-		if(periodo == null) {
-			log.info("[UI] No se encontraron periodos vacacionales para el empleado.");
-			throw new SGPException("El empleado no ha cumplido su aniversario laboral.");
-		}
-		log.info("[UI] El ultimo periodo de vacaciones registrado es: {}", periodo);
-		
-		diferenciaEnDias = DateUtil.daysDiff(periodo.getFechaFin(), this.parametros.getPeriodoFin());
-		
-		if(diferenciaEnDias > 365)
-			throw new SGPException("El periodo encontrado tiene más de un año respecto al fin del periodo de cálculo. "
-					+ "Se recomienda revisar los periodos vacacionales del empleado.");
-		
-		periodo.setPrimaPagada(true);
-		nomina.setVacaciones(new ArrayList<DetVacaciones>());
-		nomina.getVacaciones().add(periodo);
-		
-		return this.calcularTasa(periodo, this.baseCalculo);
-	}
+	
 	
 	private BigDecimal calcularTasa(DetVacaciones periodo, BigDecimal salarioDiario) {
 		BigDecimal tasa            = null;
@@ -118,5 +136,18 @@ public class PrimaVacacionalEnTiempoPBL extends PercepcionBL {
 		return _15.get()
 				.multiply(this.parametros.getUma().getImporteDiario())
 				.setScale(2, RoundingMode.HALF_UP);
+	}
+	
+	public void setPeriodo(DetVacaciones periodo) {
+		DetNominaVacaciones nominaVacaciones = null;
+		
+		this.periodo = periodo;
+		
+		nomina.getVacaciones().add(this.periodo);
+		nominaVacaciones = new DetNominaVacaciones();
+		nominaVacaciones.setNomina(nomina);
+		nominaVacaciones.setVacaciones(this.periodo);
+		nominaVacaciones.setTipoPrima("T");
+		nomina.getNominaVacaciones().add(nominaVacaciones);
 	}
 }

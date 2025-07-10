@@ -23,12 +23,12 @@ import org.primefaces.PrimeFaces;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 
-import mx.com.ferbo.business.nomina.AsistenciaBL;
 import mx.com.ferbo.business.nomina.NominaBL;
 import mx.com.ferbo.business.nomina.NominaPeriodoBL;
 import mx.com.ferbo.business.nomina.NominaSemanalBL;
 import mx.com.ferbo.business.nomina.ParametrosNomina;
 import mx.com.ferbo.business.percepcion.PercepcionBL;
+import mx.com.ferbo.business.percepcion.PrimaVacacionalEnTiempoPBL;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.EmpresaDAO;
 import mx.com.ferbo.dao.n.NominaDAO;
@@ -48,6 +48,7 @@ import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.DetNominaPeriodo;
 import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.DetRegistro;
+import mx.com.ferbo.model.DetVacaciones;
 import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.model.sat.CatTipoOtroPago;
 import mx.com.ferbo.model.sat.CatTipoPercepcion;
@@ -94,9 +95,11 @@ public class NominaSemanalBean implements Serializable {
     private Date    periodoFin;
     private Integer semana;
     
-    private List<DetNomina>  listaNomina;
-    private List<Integer>    semanasDelAnio;
-    private List<Asistencia> asistencias;
+    private List<DetNomina>     listaNomina;
+    private List<Integer>       semanasDelAnio;
+    private List<Asistencia>    asistencias;
+    private List<DetVacaciones> periodosVacacionales;
+    private DetVacaciones       periodoVacacional;
     
     private Boolean detalle = true;
     private String bitacora = null;
@@ -110,6 +113,7 @@ public class NominaSemanalBean implements Serializable {
 		periodicidadDAO = new PeriodicidadPagoDAO();
 		percepcionDAO   = new PercepcionDAO();
 		vacacionesDAO   = new VacacionesDAO();
+		periodosVacacionales = new ArrayList<DetVacaciones>();
 	}
     
     @PostConstruct
@@ -123,14 +127,16 @@ public class NominaSemanalBean implements Serializable {
         log.info("Fin del periodo: {}", periodoInicio);
         
         this.periodicidad = periodicidadDAO.buscarPorId(CatPeriodicidadPago.P_SEMANAL);
-        this.percepcion = new DetNominaPercepcion();
-        this.otroPago = new DetNominaOtroPago();
-        this.deduccion = new DetNominaDeduccion();
+        this.percepcion   = new DetNominaPercepcion();
+        this.otroPago     = new DetNominaOtroPago();
+        this.deduccion    = new DetNominaDeduccion();
         
-        this.fecha = DateUtil.now();
-        this.anio = DateUtil.getAnio(fecha);
+        this.fecha          = DateUtil.now();
+        this.anio           = DateUtil.getAnio(fecha);
         this.semanasDelAnio = DateUtil.semanasDelAnio(this.anio);
-        this.semana = DateUtil.getSemanaAnio(this.fecha);
+        this.semana         = DateUtil.getSemanaAnio(this.fecha);
+        
+        this.periodoVacacional = new DetVacaciones();
         
         byte bytes[] = {};
         this.file = DefaultStreamedContent.builder()
@@ -220,10 +226,16 @@ public class NominaSemanalBean implements Serializable {
     		
     		for (DetEmpleado empleado : listaEmpleados) {
     			
-    			nomina = nominaDAO.buscarPorPeriodoEmpleado(DateUtil.toLocalDate(this.parametros.getPeriodoInicio()), DateUtil.toLocalDate(this.parametros.getPeriodoFin()), empleado.getDatoEmpresa().getRfc());
+    			nomina = NominaBL.load(parametros, empleado.getDatoEmpresa().getRfc());
     			
-    			if(nomina == null)
+    			if(nomina == null) {
     				nomina = this.procesaEmpleado(empleado);
+    			} else {
+    				nomina.getPercepciones().stream()
+    					.forEach(item -> item.setImporte(item.getImporteExento().add(item.getImporteGravado())));
+    				nomina.getNominaVacaciones().stream()
+    					.forEach(item -> item.getNomina().getVacaciones().add(item.getVacaciones()));
+    			}
     			
     			listaNomina.add(nomina);
     		}
@@ -251,23 +263,7 @@ public class NominaSemanalBean implements Serializable {
     
     public void cargaEmpleadoNomina(DetNomina nomina) {
     	log.info("Cargando información de nómina: {}", nomina);
-    	DetEmpleado empleado = empleadoDAO.buscarPorRFC(nomina.getReceptor().getRfc());
-    	
-    	Map<String, DetRegistro> mapAsistencias = NominaSemanalBL.getAsistencias(empleado, this.parametros);
-    	List<Asistencia> asistencias = AsistenciaBL.getAsistenciaSemanal(mapAsistencias);
-    	
-    	this.asistencias = asistencias;
-    	
-    	//Si el ID de Nómina es NULL, entonces el objeto de nómina fue generado por el proceso de cálculo y
-    	//la información debería estar completamente cargada en memoria.
-    	if(nomina.getId() == null) {
-    		this.nomina = nomina;
-    		return;
-    	}
-    	
-    	//En el caso del ID de Nómina diferente de NULL, el objeto de nómina fue extraido por consulta a la
-    	//base de datos sin el detalle completo, por lo que debe extraerse a través del DAO.
-    	this.nomina = nominaDAO.buscarPorId(nomina.getId());
+    	this.nomina = nomina;
     }
 
     public String statusNomina(DetNomina nomina) {
@@ -350,6 +346,65 @@ public class NominaSemanalBean implements Serializable {
     	} finally {
     		PrimeFaces.current().ajax().update("form:messages", "form:tv-nomina");
     	}
+    }
+    
+    public void agregaPeriodoVacacional() {
+    	FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Periodo vacacional";
+		
+		try {
+			this.periodosVacacionales = vacacionesDAO.buscarPeriodosNoPagados(this.nomina.getReceptor().getRfc());
+			
+			PrimeFaces.current().executeScript("PF('dlgAddPeriodoVacacional').show();");
+			
+		} catch(Exception ex) {
+			log.error("Problema para cargar los periodos vacacionales...", ex);
+    		mensaje = "Hay un problema para cargar los periodos vacacionales.";
+			severity = FacesMessage.SEVERITY_ERROR;
+			
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+    	} finally {
+    		PrimeFaces.current().ajax().update("form:messages", "form:dlg-add-periodo-vacacional");
+    	}
+    }
+    
+    public void procesaPeriodoVacacional(DetVacaciones periodoVacacional, String tipoPrima) {
+    	FacesMessage message = null;
+		Severity severity = null;
+		String mensaje = null;
+		String titulo = "Periodo vacacional";
+		
+		DetNominaPercepcion primaVacacional = null;
+		PrimaVacacionalEnTiempoPBL primaEnTiempoBO = null;
+		
+		try {
+			
+			if("T".equalsIgnoreCase(tipoPrima)) {
+				primaEnTiempoBO = (PrimaVacacionalEnTiempoPBL) NominaSemanalBL.getPercepcionBusinessLogic(parametros, nomina, PercepcionBL.CVE_PRIMA_VACACIONES_EN_TIEMPO);
+				primaEnTiempoBO.setPeriodo(periodoVacacional);
+				primaVacacional = primaEnTiempoBO.procesar(nomina, primaEnTiempoBO.calcularCantidad(nomina));
+			} else if ("R".equalsIgnoreCase(tipoPrima)) {
+				log.info("Nada que realizar por el momento...");
+			} else {
+				throw new SGPException("El tipo de prima vacacional es incorrecto.");
+			}
+			
+			NominaBL.agregarPercepcion(nomina, primaVacacional);
+			
+			PrimeFaces.current().executeScript("PF('dlgAddPeriodoVacacional').hide();");
+		} catch(Exception ex) {
+			log.error("Problema para agregar el periodo vacacional", ex);
+    		mensaje = "Hay un problema para agregar los periodos vacacionales.";
+			severity = FacesMessage.SEVERITY_ERROR;
+			
+			message = new FacesMessage(severity, titulo, mensaje);
+			FacesContext.getCurrentInstance().addMessage(null, message);
+		} finally {
+			PrimeFaces.current().ajax().update("form:messages", "form:tv-nomina", "form:dtNomina");
+		}
     }
     
     public void actualizarPorCantidad(DetNominaPercepcion percepcion) {
@@ -1000,5 +1055,21 @@ public class NominaSemanalBean implements Serializable {
 
 	public void setFile(StreamedContent file) {
 		this.file = file;
+	}
+
+	public List<DetVacaciones> getPeriodosVacacionales() {
+		return periodosVacacionales;
+	}
+
+	public void setPeriodosVacacionales(List<DetVacaciones> periodosVacacionales) {
+		this.periodosVacacionales = periodosVacacionales;
+	}
+
+	public DetVacaciones getPeriodoVacacional() {
+		return periodoVacacional;
+	}
+
+	public void setPeriodoVacacional(DetVacaciones periodoVacacional) {
+		this.periodoVacacional = periodoVacacional;
 	}
 }

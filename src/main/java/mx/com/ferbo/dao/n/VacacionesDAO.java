@@ -210,4 +210,23 @@ public class VacacionesDAO extends BaseDAO<DetVacaciones, Integer> {
     	
     	return modelList;
     }
+    
+    public List<DetVacaciones> buscarPeriodosNoPagados(String rfc) {
+    	List<DetVacaciones> modelList = null;
+    	EntityManager em = null;
+    	
+    	try {
+    		em = this.getEntityManager();
+    		modelList = em.createNamedQuery("DetVacaciones.buscarPeriodosNoPagados", this.modelClass)
+    				.setParameter("rfc", rfc)
+    				.getResultList();
+    		
+    	} catch(Exception ex) {
+    		log.error("Problema para obtener la lista de periodos vacacionales...", ex);
+    	} finally {
+    		this.close(em);
+    	}
+    	
+    	return modelList;
+    }
 }

@@ -86,7 +86,6 @@ public class NominaSemanalBL extends NominaBL {
 		BigDecimal diasVacaciones          = null;
 		BigDecimal ausencias               = null;
 		BigDecimal incapacidades           = null;
-//		BigDecimal salarioSemanal          = null;
 		BigDecimal diasPagados             = null;
 		DetNomina  nomina                  = null;
 		
@@ -136,7 +135,7 @@ public class NominaSemanalBL extends NominaBL {
     		/*---------------------------PERCEPCIONES------------------------------*/
     		NominaSemanalBL.calcularSueldo(nomina, this.parametros, diasLaboralesEmpleado, diasNolaboralesEmpleado, diasTrabajados, diasVacaciones);
     		NominaSemanalBL.calcularBonoPuntualidad(nomina, this.parametros, this.percepcionesEmpleado, this.mapAsistencias, this.empleado.getEmpleadoConfiguracion().getRetardo(), diasLaboralesEmpleado, diasNolaboralesEmpleado, diasTrabajados);
-    		NominaSemanalBL.calcularValesDespensa(nomina, this.parametros, percepcionesEmpleado);
+    		NominaSemanalBL.calcularValesDespensa(nomina, this.parametros, this.percepcionesEmpleado);
 			NominaSemanalBL.calcularPrimaVacacionalEnTiempo(nomina, this.parametros);
     		
     		
@@ -340,7 +339,7 @@ public class NominaSemanalBL extends NominaBL {
 	 * @param nomina
 	 * @param parametros
 	 * @param diasTrabajados
-	 * @param diasVacaciones TODO
+	 * @param diasVacaciones
 	 */
 	public static synchronized void calcularSueldo(DetNomina nomina, ParametrosNomina parametros, BigDecimal diasLaborales, BigDecimal diasNoLaborales, BigDecimal diasTrabajados, BigDecimal diasVacaciones)
 	throws SGPException {
@@ -449,24 +448,12 @@ public class NominaSemanalBL extends NominaBL {
 		DetNominaPercepcion percepcion = null;
 		PercepcionBL primaEnTiempoBO = null;
 		
-		primaEnTiempoBO = NominaSemanalBL.getPercepcionBusinessLogic(parametros, nomina, PercepcionBL.CVE_PRIMA_VACACIONES_EN_TIEMPO);
 		try {
+			primaEnTiempoBO = NominaSemanalBL.getPercepcionBusinessLogic(parametros, nomina, PercepcionBL.CVE_PRIMA_VACACIONES_EN_TIEMPO);
+			
 			percepcion = primaEnTiempoBO.procesar(nomina);
 			
-			Optional<DetNominaPercepcion> optPercepcion = nomina.getPercepciones().stream()
-					.filter(item -> item.getClave().equalsIgnoreCase(PercepcionBL.CVE_PRIMA_VACACIONES_EN_TIEMPO))
-					.findFirst()
-					;
-			
-			if(optPercepcion.isPresent() == false) {
-				agregarPercepcion(nomina, percepcion);
-				return;
-			}
-			
-			optPercepcion.get().setCantidad(percepcion.getCantidad());
-			optPercepcion.get().setImporte(percepcion.getImporte());
-			optPercepcion.get().setImporteExento(percepcion.getImporteExento());
-			optPercepcion.get().setImporteGravado(percepcion.getImporteGravado());
+			agregarPercepcion(nomina, percepcion);
 			
 		} catch (SGPException ex) {
 			log.error("[UI] Problema para obtener el cálculo de la prima vacacional en tiempo: {}", ex.getMessage());
