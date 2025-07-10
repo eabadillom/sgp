@@ -1,6 +1,7 @@
 package mx.com.ferbo.dao.n;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -11,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.model.DetNomina;
+import mx.com.ferbo.model.DetVacaciones;
 import mx.com.ferbo.util.SGPException;
 
 public class NominaDAO extends BaseDAO<DetNomina, Integer> {
@@ -62,9 +64,11 @@ public class NominaDAO extends BaseDAO<DetNomina, Integer> {
 			
 			model.getConceptos().stream().forEach(item -> log.debug("Concepto: {}", item.getId()));
 			model.getPercepciones().stream().forEach(item -> log.debug("Percepcion: {}", item.getId()));
+			model.setVacaciones(new ArrayList<DetVacaciones>());
 			model.getDeducciones().stream().forEach(item -> log.debug("Deduccion: {}", item.getId()));
 			model.getOtrosPagos().stream().forEach(item -> log.debug("Otro pago: {}", item.getId()));
 			model.getIncidencias().stream().forEach(item -> log.debug("Incidencia: {}", item.getId()));
+			model.getNominaVacaciones().stream().forEach(item -> log.debug("Nomina vacaciones: {}", item.getId()));
 			
 		} catch(NoResultException ex) {
 			log.warn("Problema para obtener la lista de nomina del periodo solicitado...", ex.getMessage());

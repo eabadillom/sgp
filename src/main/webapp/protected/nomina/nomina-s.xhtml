@@ -341,6 +341,12 @@
 						</p:dataTable>
 					</p:tab>
 					<p:tab title="Vacaciones">
+						<p:toolbar>
+							<p:toolbarGroup>
+								<p:commandButton value="Agregar" icon="pi pi-plus" process="@this" actionListener="#{nominaS.agregaPeriodoVacacional()}">
+								</p:commandButton>
+							</p:toolbarGroup>
+						</p:toolbar>
 						<p:dataTable value="#{nominaS.nomina.vacaciones}" var="periodo">
 							<p:column headerText="Inicio periodo">
 								<p:outputLabel value="#{periodo.fechaInicio}">
@@ -531,7 +537,30 @@
 					</span>
 				</f:facet>
 			</p:dialog>
-			
+			<p:dialog widgetVar="dlgAddPeriodoVacacional" header="Periodo vacacional" modal="true">
+				<p:outputLabel id="dlg-add-periodo-vacacional">
+					<p:dataTable value="#{nominaS.periodosVacacionales}" var="periodo">
+						<p:column headerText="Inicio">
+							<p:outputLabel value="#{periodo.fechaInicio}">
+								<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX"/>
+							</p:outputLabel>
+						</p:column>
+						<p:column headerText="Fin">
+							<p:outputLabel value="#{periodo.fechaFin}">
+								<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX"/>
+							</p:outputLabel>
+						</p:column>
+						<p:column headerText="Dias">
+							<p:outputLabel value="#{periodo.diasTotales}">
+							</p:outputLabel>
+						</p:column>
+						<p:column>
+							<p:commandButton icon="pi pi-plus" process="@this" actionListener="#{nominaS.procesaPeriodoVacacional(periodo, 'T')}">
+							</p:commandButton>
+						</p:column>
+					</p:dataTable>
+				</p:outputLabel>
+			</p:dialog>
 			<p:dialog widgetVar="dlgAddPercepcion" header="Percepcion" modal="true">
 				<p:outputPanel id="dlg-add-percepcion" styleClass="ui-fluid">
 					<div class="ui-fluid formgrid grid">
