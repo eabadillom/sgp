@@ -175,12 +175,14 @@ public class DetNomina implements Serializable {
     @OneToMany(mappedBy = "nomina", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetNominaIncidencia> incidencias;
     
+    @OneToMany(mappedBy = "nomina", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DetNominaVacaciones> nominaVacaciones;
+    
     @Transient
     private List<DetVacaciones> vacaciones;
     
     @Override
 	public int hashCode() {
-    	System.out.println("DetNomina hashCode...");
     	if (this.id == null) {
     		return System.identityHashCode(this);
         }
@@ -500,5 +502,13 @@ public class DetNomina implements Serializable {
 			this.incidencias = incidencias;
 		else
 			this.incidencias.addAll(incidencias);
+	}
+
+	public List<DetNominaVacaciones> getNominaVacaciones() {
+		return nominaVacaciones;
+	}
+
+	public void setNominaVacaciones(List<DetNominaVacaciones> nominaVacaciones) {
+		this.nominaVacaciones = nominaVacaciones;
 	}
 }
