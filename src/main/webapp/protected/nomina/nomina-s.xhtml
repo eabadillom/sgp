@@ -404,7 +404,8 @@
 							</p:column>
 							<p:columnGroup type="footer">
 								<p:row>
-									<p:column colspan="2" style="text-align:right;" footerText="Total:"/>
+									<p:column colspan="1" style="text-align:left;" footerText="Total:"/>
+									<p:column colspan="1" style="text-align:left;" footerText="#{nominaS.nomina.percepciones.size()} concepto(s)"/>
 									<p:column colspan="1" style="text-align:right;" footerText=""/>
 									<p:column style="text-align:right;">
 										<f:facet name="footer">
@@ -459,7 +460,8 @@
 							</p:column>
 							<p:columnGroup type="footer">
 								<p:row>
-									<p:column colspan="2" style="text-align:right;" footerText="Total:"/>
+									<p:column colspan="1" style="text-align:left;" footerText="Total:"/>
+									<p:column colspan="1" style="text-align:left;" footerText="#{nominaS.nomina.otrosPagos.size()} concepto(s)"/>
 									<p:column style="text-align:right;">
 										<f:facet name="footer">
 											<p:outputLabel value="#{nominaS.nomina.otrosPagos.stream().map(item->item.importe).sum()}">
@@ -506,7 +508,8 @@
 							</p:column>
 							<p:columnGroup type="footer">
 								<p:row>
-									<p:column colspan="2" style="text-align:right;" footerText="Total:"/>
+									<p:column colspan="1" style="text-align:left;" footerText="Total:"/>
+									<p:column colspan="1" style="text-align:left;" footerText="#{nominaS.nomina.deducciones.size()} concepto(s)"/>
 									<p:column style="text-align:right;">
 										<f:facet name="footer">
 											<p:outputLabel value="#{nominaS.nomina.deducciones.stream().filter(d -> d.procesar).map(item->item.importe).sum()}">
