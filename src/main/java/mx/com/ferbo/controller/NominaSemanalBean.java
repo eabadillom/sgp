@@ -355,7 +355,7 @@ public class NominaSemanalBean implements Serializable {
 		String titulo = "Periodo vacacional";
 		
 		try {
-			this.periodosVacacionales = vacacionesDAO.buscarPeriodosNoPagados(this.nomina.getReceptor().getRfc());
+			this.periodosVacacionales = vacacionesDAO.buscarPeriodosEnTiempoNoPagados(this.nomina.getReceptor().getRfc());
 			
 			PrimeFaces.current().executeScript("PF('dlgAddPeriodoVacacional').show();");
 			

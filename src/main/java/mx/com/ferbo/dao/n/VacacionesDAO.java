@@ -143,7 +143,10 @@ public class VacacionesDAO extends BaseDAO<DetVacaciones, Integer> {
     	String sql = null;
     	
     	try {
-    		sql = "select * from det_vacaciones dv\n"
+    		sql = "select\n"
+    				+ "	nv.id_nom_vacaciones,\n"
+    				+ "	dv.*\n"
+    				+ "from det_vacaciones dv\n"
     				+ "inner join\n"
     				+ "(\n"
     				+ "	select\n"
@@ -158,7 +161,10 @@ public class VacacionesDAO extends BaseDAO<DetVacaciones, Integer> {
     				+ "		and ee.nb_rfc = :rfc\n"
     				+ "		and v.fh_fin < :fecha\n"
     				+ "	group by id_empleado\n"
-    				+ ") t on dv.id_empleado = t.id_empleado and dv.fh_fin = t.fh_fin"
+    				+ ") t on dv.id_empleado = t.id_empleado and dv.fh_fin = t.fh_fin\n"
+    				+ "left outer join det_nom_vacaciones nv\n"
+    				+ "on dv.id_vacaciones = nv.id_vacaciones\n"
+    				+ "where (nv.id_nom_vacaciones is null)"
     				;
     		em = this.getEntityManager();
     		model = (DetVacaciones) em.createNativeQuery(sql, modelClass)
@@ -211,7 +217,7 @@ public class VacacionesDAO extends BaseDAO<DetVacaciones, Integer> {
     	return modelList;
     }
     
-    public List<DetVacaciones> buscarPeriodosNoPagados(String rfc) {
+    public List<DetVacaciones> buscarPeriodosEnTiempoNoPagados(String rfc) {
     	List<DetVacaciones> modelList = null;
     	EntityManager em = null;
     	
