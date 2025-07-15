@@ -3,6 +3,7 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.Column;
@@ -14,13 +15,14 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "det_vacaciones")
 @NamedQueries({
 	@NamedQuery(name = "DetVacaciones.buscarPeriodoPorEmpleadoFecha", query = "SELECT v FROM DetVacaciones v WHERE v.empleado.idEmpleado = :idEmpleado AND :fecha BETWEEN v.fechaInicio AND v.fechaFin"),
-	@NamedQuery(name = "DetVacaciones.buscarPeriodosNoPagados", query = "SELECT v FROM DetVacaciones v WHERE v.empleado.datoEmpresa.rfc = :rfc AND v.primaPagada = false")
+	@NamedQuery(name = "DetVacaciones.buscarPeriodosNoPagados", query = "SELECT v FROM DetVacaciones v LEFT JOIN v.nominaVacaciones nv WHERE v.empleado.datoEmpresa.rfc = :rfc AND ( v.primaPagada = false or v.primaPagada IS NULL ) AND (nv IS NULL)")
 })
 public class DetVacaciones implements Serializable{
 
@@ -55,6 +57,37 @@ public class DetVacaciones implements Serializable{
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_empleado", referencedColumnName = "id_empleado")
     private DetEmpleado empleado;
+    
+    @OneToMany(mappedBy = "vacaciones" )
+    private List<DetNominaVacaciones> nominaVacaciones;
+    
+    @Override
+    public int hashCode() {
+    	if (this.idVacaciones == null) {
+    		return System.identityHashCode(this);
+        }
+        return Objects.hash(this.idVacaciones);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final DetVacaciones other = (DetVacaciones) obj;
+        return Objects.equals(this.idVacaciones, other.idVacaciones);
+    }
+
+    @Override
+    public String toString() {
+        return "DetVacaciones{" + "idVacaciones=" + idVacaciones + ", fechainicio=" + fechaInicio + ", fechafin=" + fechaFin + ", diastotales=" + diasTotales + ", diastomados=" + diasTomados + ", primapagada=" + primaPagada + ", diaspendientespagados=" + diasPendientesPagados + '}';
+    }
 
     public DetVacaciones() {
     }
@@ -147,31 +180,14 @@ public class DetVacaciones implements Serializable{
         this.empleado = empleado;
     }
     
-    @Override
-    public int hashCode() {
-        int hash = 3;
-        hash = 73 * hash + Objects.hashCode(this.idVacaciones);
-        return hash;
-    }
+    
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final DetVacaciones other = (DetVacaciones) obj;
-        return Objects.equals(this.idVacaciones, other.idVacaciones);
-    }
+	public List<DetNominaVacaciones> getNominaVacaciones() {
+		return nominaVacaciones;
+	}
 
-    @Override
-    public String toString() {
-        return "DetVacaciones{" + "idVacaciones=" + idVacaciones + ", fechainicio=" + fechaInicio + ", fechafin=" + fechaFin + ", diastotales=" + diasTotales + ", diastomados=" + diasTomados + ", primapagada=" + primaPagada + ", diaspendientespagados=" + diasPendientesPagados + '}';
-    }
+	public void setNominaVacaciones(List<DetNominaVacaciones> nominaVacaciones) {
+		this.nominaVacaciones = nominaVacaciones;
+	}
    
 }
