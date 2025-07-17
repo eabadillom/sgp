@@ -171,10 +171,6 @@ public class IncidenciaBean implements Serializable {
     private void consultaIncidencias() {
         lstIncidencias = incidenciaDAO.buscarTodos();
 
-        listaPermisos = lstIncidencias.stream()
-                .filter(objeto -> objeto.getTipoIncidencia().getClave().trim().matches("V") || objeto.getTipoIncidencia().getClave().trim().matches("PE"))
-                .collect(Collectors.toList());
-
         listaPrendas = lstIncidencias.stream()
                 .filter(objeto -> objeto.getTipoIncidencia().getClave().trim().matches("PR"))
                 .collect(Collectors.toList());
@@ -184,16 +180,16 @@ public class IncidenciaBean implements Serializable {
                 .collect(Collectors.toList());
     }
 
-    public List<DetIncidencia> consultarTipoPermisos() {
-        List<DetIncidencia> listaPeriodo = new ArrayList();
-
-        if (this.periodoInicio != null && this.periodoFin != null) {
-            listaPeriodo = listaPermisos.stream()
-                    .filter(objeto -> objeto.getSolPermiso().getFechaInicio().compareTo(this.periodoInicio) == 0 || objeto.getSolPermiso().getFechaInicio().compareTo(this.periodoInicio) > 0)
-                    .filter(objeto -> objeto.getSolPermiso().getFechaFin().compareTo(this.periodoFin) == 0 || objeto.getSolPermiso().getFechaFin().compareTo(this.periodoFin) < 0)
-                    .collect(Collectors.toList());
-        }
-
+    public List<DetIncidencia> consultarTipoPermisos()
+    throws SGPException {
+        List<DetIncidencia> listaPeriodo = new ArrayList<DetIncidencia>();
+        
+        if(this.periodoInicio == null || this.periodoFin == null)
+        	throw new SGPException("El periodo de consulta de permisos / vacaciones es incorrecto.");
+        
+        listaPeriodo = incidenciaDAO.buscarPermisos(periodoInicio, periodoFin);
+        
+        
         List<DetIncidencia> listaTipoPermiso = new ArrayList<>();
 
         if (this.incidenciaPermiso) {
@@ -344,8 +340,7 @@ public class IncidenciaBean implements Serializable {
             incidenciaSelected.getSolPermiso().setFechaMod(new Date());
             incidenciaSelected.getSolPermiso().setEmpleadoRev(empleadoSelected);
             
-            if(incidenciaSelected.getEstatusIncidencia().getClave().trim().matches("A")) 
-            {
+            if(incidenciaSelected.getEstatusIncidencia().getClave().trim().matches("A")) {
                 RegistroBL.guardarRegistroVacaciones(empleadoSelected, incidenciaSelected, DiasDeDescansoObligatorioBL.diasDeAsueto());
             }
             

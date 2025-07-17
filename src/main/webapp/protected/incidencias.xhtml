@@ -15,6 +15,11 @@
     <ui:define name="content">
         <h:form id="formIncidencias">
             <p:growl id="messages" showDetail="true" life="2500"/>
+            <p:dialog modal="true" widgetVar="statusInfoDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+					<i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
+			</p:dialog>
             <p:tabView id="tabViewI" cache="false" widgetVar="tvIncidencias" dynamic="true">
                 <p:tab title="Retardos">
                     <ui:include src="/protected/seccionesIncidencias/incidenciaRegistro.xhtml" />
