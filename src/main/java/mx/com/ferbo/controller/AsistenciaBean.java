@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultScheduleEvent;
@@ -28,15 +27,14 @@ import org.primefaces.model.ScheduleModel;
 import mx.com.ferbo.business.dianolaboral.DiasDeDescansoObligatorioBL;
 import mx.com.ferbo.business.empleado.EmpleadoBL;
 import mx.com.ferbo.business.empleado.RegistroAsistenciaBL;
-import mx.com.ferbo.business.incidencia.SolicitudPermisoBL;
-import mx.com.ferbo.business.incidencia.CalendarioBL;
 import mx.com.ferbo.business.incapacidad.IncapacidadBL;
+import mx.com.ferbo.business.incidencia.CalendarioBL;
 import mx.com.ferbo.business.incidencia.EstatusIncidenciaBL;
 import mx.com.ferbo.business.incidencia.EstatusSolicitudBL;
-
+import mx.com.ferbo.business.incidencia.SolicitudPermisoBL;
 import mx.com.ferbo.dao.n.IncidenciaDAO;
-import mx.com.ferbo.dao.n.TipoSolicitudDAO;
 import mx.com.ferbo.dao.n.SolicitudPermisoDAO;
+import mx.com.ferbo.dao.n.TipoSolicitudDAO;
 import mx.com.ferbo.dao.n.VacacionesDAO;
 import mx.com.ferbo.model.CatTipoIncidencia;
 import mx.com.ferbo.model.CatTipoSolicitud;
@@ -44,10 +42,11 @@ import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetIncidencia;
 import mx.com.ferbo.model.DetSolicitudPermiso;
 import mx.com.ferbo.model.DetVacaciones;
-
 import mx.com.ferbo.util.DateUtil;
-import mx.com.ferbo.util.SGPException;
 import mx.com.ferbo.util.ManageStatus;
+import mx.com.ferbo.util.SGPException;
+
+
 
 /**
  *
@@ -77,6 +76,8 @@ public class AsistenciaBean implements Serializable {
     private List<Integer> invalidDays;
     private List<Date> lstRangoRegistro;
     private List<SelectItem> lstTipoSolSelect;
+    private List<DetVacaciones> periodosVacacionales;
+    private DetVacaciones periodoVacacional;
     private Date fechaSeleccionada;
     private List<Date> fechaDatePickerView;
     private final List<Date> diasDeAsueto;
@@ -149,6 +150,19 @@ public class AsistenciaBean implements Serializable {
     public void diaSeleccionado(SelectEvent<LocalDateTime> selectEvent) {
         evento = DefaultScheduleEvent.builder().startDate(selectEvent.getObject()).endDate(selectEvent.getObject()).build();
     }
+    
+    public void onPeriodoSelect(SelectEvent<DetVacaciones> event) {
+    	log.debug("Seleccionando periodo vacacional: {}", event.getObject().getIdVacaciones());
+    	FacesMessage msg = new FacesMessage("PERIODO SELECCIONADO", String.valueOf(event.getObject().getIdVacaciones()));
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+        PrimeFaces.current().ajax().update("formActividades:tabView:pnlDetalleVacaciones");
+    }
+    
+    public void onPeriodoUnselect(SelectEvent<DetVacaciones> event) {
+    	log.debug("Seleccionando periodo vacacional: {}", event.getObject().getIdVacaciones());
+    	FacesMessage msg = new FacesMessage("Product Unselected", String.valueOf(event.getObject().getIdVacaciones()));
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+    }
 
     public void guardaSolicitud() {
         FacesMessage message = null;
@@ -191,16 +205,10 @@ public class AsistenciaBean implements Serializable {
             solicitudSelected.setEstatus(EstatusSolicitudBL.estatusEnviado());
             solicitudSelected.setFechaCap(new Date());
             solicitudSelected.setEmpleadoSol(empleadoSelected);
+            solicitudSelected.setVacaciones(periodoVacacional);
             
             SolicitudPermisoBL.validarSolicitudPermiso(solicitudSelected);
             IncapacidadBL.validarRegistrosIncapacidades(empleadoSelected, solicitudSelected.getFechaInicio(), solicitudSelected.getFechaFin());
-            /*
-            boolean existeRegistro = SolicitudPermisoBL.validarFechasVacaciones(empleadoSelected, solicitudSelected.getFechaInicio(), solicitudSelected.getFechaFin());
-            if(existeRegistro == true)
-            {
-                log.info("Existe por lo menos un registro de vacaciones del empleado {}", empleadoSelected.getNumEmpleado());
-                throw new SGPException("Error. El periodo que solicitaste ya se encuentra aceptado");
-            }*/
             
             catTipoIncidencia = new CatTipoIncidencia();
             switch (solicitudSelected.getTipoSolicitud().getClave()) {
@@ -224,7 +232,7 @@ public class AsistenciaBean implements Serializable {
             incidencia.setSolPermiso(solicitudSelected);
             incidencia.setFechaCap(new Date());
 
-            incidenciaDAO.guardar(incidencia);
+            incidenciaDAO.actualizar(incidencia);
             
             mensaje = "Se guardo correctamente";
             severity = FacesMessage.SEVERITY_INFO;
@@ -310,7 +318,10 @@ public class AsistenciaBean implements Serializable {
             DiasDeDescansoObligatorioBL.diasDescansoEstanActualizados();
             EmpleadoBL.empleadoTieneDiasLaborales(empleadoSelected);
             
-            inicializaSolicitud();
+            this.inicializaSolicitud();
+            
+            this.periodosVacacionales = this.periodosPorFechaActual();
+            
             PrimeFaces.current().executeScript("PF('dialogVacaciones').show()");
         } catch (SGPException sgpEx) {
             mensaje = sgpEx.getMessage();
@@ -357,6 +368,7 @@ public class AsistenciaBean implements Serializable {
         List<DetVacaciones> periodos = new ArrayList<DetVacaciones>();
         this.diasTotalesPermitidos = 0;
         try {
+        	log.info("Buscando periodos vacacionales del empleado...");
             List<DetVacaciones> periodosTmp = vacacionesDAO.obtenerPeriodosPorFecha(empleadoSelected.getIdEmpleado(), DateUtil.now());
 
             for (DetVacaciones periodo : periodosTmp) {
@@ -397,7 +409,6 @@ public class AsistenciaBean implements Serializable {
         return this.maxDate;
     }
     
-    //<editor-fold defaultstate="collapsed" desc="Getters&Setters">
     public ScheduleModel getCalendario() {
         return calendario;
     }
@@ -518,5 +529,19 @@ public class AsistenciaBean implements Serializable {
         this.maxDate = maxDate;
     }
 
-    //</editor-fold>
+	public List<DetVacaciones> getPeriodosVacacionales() {
+		return periodosVacacionales;
+	}
+
+	public void setPeriodosVacacionales(List<DetVacaciones> periodosVacacionales) {
+		this.periodosVacacionales = periodosVacacionales;
+	}
+
+	public DetVacaciones getPeriodoVacacional() {
+		return periodoVacacional;
+	}
+
+	public void setPeriodoVacacional(DetVacaciones periodoVacacional) {
+		this.periodoVacacional = periodoVacacional;
+	}
 }

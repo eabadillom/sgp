@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -92,6 +93,11 @@ public class DetSolicitudPermiso implements Serializable {
     @Basic(optional = true)
     @Column(name = "pc_goce_sueldo")
     private BigDecimal goceSueldo;
+    
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH})
+    @JoinColumn(name = "id_vacaciones")
+    @Basic(optional = true)
+    private DetVacaciones vacaciones;
 
     public DetSolicitudPermiso() {
     }
@@ -229,5 +235,13 @@ public class DetSolicitudPermiso implements Serializable {
     public String toString() {
         return "DetSolicitudPermiso[" + "idSolicitud=" + idSolicitud + ", fechaCap=" + fechaCap + ", fechaMod=" + fechaMod + ", fechaInicio=" + fechaInicio + ", fechaFin=" + fechaFin + ", aprobada=" + estatus.getClave() + ", descripcionRechazo=" + descripcionRechazo + ']';
     }
+
+	public DetVacaciones getVacaciones() {
+		return vacaciones;
+	}
+
+	public void setVacaciones(DetVacaciones vacaciones) {
+		this.vacaciones = vacaciones;
+	}
 
 }

@@ -1,13 +1,17 @@
 package mx.com.ferbo.dao.n;
 
+import java.util.Date;
 import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.model.DetIncidencia;
 import mx.com.ferbo.util.SGPException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -185,6 +189,29 @@ public class IncidenciaDAO extends BaseDAO<DetIncidencia, Integer> {
         }
 
         return modelList;
+    }
+    
+    public List<DetIncidencia> buscarPermisos(Date periodoInicio, Date periodoFin) {
+    	List<DetIncidencia> modelList = null;
+    	EntityManager em = null;
+    	
+    	try {
+    		em = this.getEntityManager();
+    		modelList = em.createNamedQuery("DetIncidencia.findPermisoByPeriodo", this.modelClass)
+    				.setParameter("periodoInicio", periodoInicio)
+    				.setParameter("periodoFin", periodoFin)
+    				.getResultList()
+    				;
+    		
+    		modelList.stream().forEach(item -> log.debug("Permiso: {}", item.getSolPermiso().getIdSolicitud()));
+    		
+    	} catch(Exception ex) {
+    		log.error("Problema para obtener los permisos de ausencia y/o permisos de vacaciones...", ex);
+    	} finally {
+    		this.close(em);
+    	}
+    	
+    	return modelList;
     }
 
     public synchronized void eliminaIncidenciaPorIdEmpleado(Integer idIncidencia, Integer idEmpleado, Integer idPermiso) throws SGPException {

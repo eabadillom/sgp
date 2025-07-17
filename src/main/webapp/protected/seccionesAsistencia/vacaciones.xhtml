@@ -39,7 +39,7 @@
     </p:dataTable>
 
     <p:dialog widgetVar="dialogVacaciones" header="Registrar solicitud" showEffect="fade" responsive="true" modal="true" styleClass="ferbo-dialog" 
-              dynamic="true" resizable="false" width="100%" height="100%" position="center top" cache="false" >
+              dynamic="true" resizable="false" height="100%" width="35rem" position="center top" cache="false" >
         <p:outputPanel id="pnlDetalleVacaciones" styleClass="ui-fluid">
 
             <div class="formgrid grid">
@@ -54,30 +54,42 @@
                     <p:message for="soTipoPermiso"/>
                 </div>
             </div>
-            <p:dataTable id="dtPeriodosVacaciones" widgetVar="dtPeriodosVacaciones" var="periodo" value="#{asistenciaBean.periodosPorFechaActual()}" reflow="true"
-                         rowKey="#{periodo.idVacaciones}" paginator="true" rows="4" paginatorPosition="bottom" rowSelectMode="add" lazy="true" rendered="#{asistenciaBean.solicitudSelected.tipoSolicitud.idTipoSolicitud ne null 
-                                   and asistenciaBean.solicitudSelected.tipoSolicitud.idTipoSolicitud eq 2}" >
-                <p:column headerText="Periodos disponibles" filterable="false" style="text-align: center; width: 100px;">
+            <p:dataTable id="dtPeriodosVacaciones" widgetVar="dtPeriodosVacaciones" var="periodo" value="#{asistenciaBean.periodosVacacionales}" reflow="true"
+                         rowKey="#{periodo.idVacaciones}" paginator="true" rows="4" paginatorPosition="bottom"
+                         rendered="#{asistenciaBean.solicitudSelected.tipoSolicitud.idTipoSolicitud ne null and asistenciaBean.solicitudSelected.tipoSolicitud.idTipoSolicitud eq 2}"
+                         selection="#{asistenciaBean.periodoVacacional}" >
+                <p:ajax event="rowSelectRadio" listener="#{asistenciaBean.onPeriodoSelect}"/>
+                <!-- <p:ajax event="rowUnselect" listener="#{asistenciaBean.onPeriodoUnselect}" update=":formActividades:messages"/> -->
+                
+                <p:column selectionMode="single"  width="2rem" style="text-align:center">
+                </p:column>
+                
+                
+                <p:column headerText="Periodo" width="15rem" style="text-align: center;">
                     <p:outputLabel value="#{asistenciaBean.formatoPeriodo(periodo)}" />
                 </p:column>
-                <p:column headerText="Dias permitidos" filterable="false" style="text-align: center; width: 100px;">
+                <p:column headerText="Dias disponibles" width="8rem" style="text-align: center;">
                     <p:outputLabel value="#{periodo.diasTotales - periodo.diasTomados - periodo.diasPagados}"/>
                 </p:column>    
             </p:dataTable>
             <p:outputLabel value="Total de dias disponibles: #{asistenciaBean.diasTotalesPermitidos}" style="text-align: right;" rendered="#{asistenciaBean.solicitudSelected.tipoSolicitud.idTipoSolicitud ne null 
                                                                and asistenciaBean.solicitudSelected.tipoSolicitud.idTipoSolicitud eq 2}"/>
-            <p:datePicker id="dpRango"  rendered="#{asistenciaBean.solicitudSelected.tipoSolicitud.idTipoSolicitud ne null 
-                                                    and asistenciaBean.solicitudSelected.tipoSolicitud.idTipoSolicitud eq 2}"
-                          styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" 
-                          pattern="dd-MM-yyyy" showIcon="true" readonlyInput="true" timeZone="GMT-6" value="#{asistenciaBean.lstRangoRegistro}"
-                          mindate="#{asistenciaBean.minDate}" inline="true" selectionMode="range" disabledDays="#{asistenciaBean.invalidDays}"
-                          disabledDates="#{asistenciaBean.diasDeAsueto}"/>
-            <p:datePicker id="dpSimple" rendered="#{asistenciaBean.solicitudSelected.tipoSolicitud.idTipoSolicitud ne null 
-                                                    and asistenciaBean.solicitudSelected.tipoSolicitud.idTipoSolicitud eq 1}" 
-                          styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" 
-                          pattern="dd-MM-yyyy" showIcon="true" readonlyInput="true" timeZone="GMT-6" value="#{asistenciaBean.fechaSeleccionada}"
-                          mindate="#{asistenciaBean.minDate}" inline="true" disabledDays="#{asistenciaBean.invalidDays}" 
-                          disabledDates="#{asistenciaBean.diasDeAsueto}"/>
+			<div align="center" style="width: 30rem">
+	            <p:datePicker id="dpRango"  rendered="#{asistenciaBean.periodoVacacional ne null 
+	                                                    and asistenciaBean.solicitudSelected.tipoSolicitud.idTipoSolicitud eq 2}"
+	                           
+	                          pattern="dd-MM-yyyy" showIcon="true" readonlyInput="true" timeZone="GMT-6" value="#{asistenciaBean.lstRangoRegistro}"
+	                          mindate="#{asistenciaBean.minDate}" inline="true" selectionMode="range" disabledDays="#{asistenciaBean.invalidDays}"
+	                          disabledDates="#{asistenciaBean.diasDeAsueto}"/>
+	                          
+	                          
+	            <p:datePicker id="dpSimple" rendered="#{asistenciaBean.solicitudSelected.tipoSolicitud.idTipoSolicitud ne null 
+	                                                    and asistenciaBean.solicitudSelected.tipoSolicitud.idTipoSolicitud eq 1}" 
+	                          styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" 
+	                          pattern="dd-MM-yyyy" showIcon="true" readonlyInput="true" timeZone="GMT-6" value="#{asistenciaBean.fechaSeleccionada}"
+	                          mindate="#{asistenciaBean.minDate}" inline="true" disabledDays="#{asistenciaBean.invalidDays}" 
+	                          disabledDates="#{asistenciaBean.diasDeAsueto}"/>
+			</div>
         </p:outputPanel>
         <f:facet name="footer">
             <p:commandButton value="Guardar" icon="pi pi-save" actionListener="#{asistenciaBean.guardaSolicitud()}" 

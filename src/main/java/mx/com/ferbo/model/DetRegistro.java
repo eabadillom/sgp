@@ -64,70 +64,15 @@ public class DetRegistro implements Serializable {
     @JoinColumn(name = "id_empleado", referencedColumnName = "id_empleado")
     @ManyToOne(optional = false)
     private DetEmpleado idEmpleado;
-
-    public DetRegistro() {
-    }
-
-    public DetRegistro(Integer idRegistro) {
-        this.idRegistro = idRegistro;
-    }
-
-    public DetRegistro(Integer idRegistro, Date fechaEntrada, Date fechaSalida, Integer idEstatus, String descripcionEstatus) {
-        this.idRegistro = idRegistro;
-        this.fechaEntrada = fechaEntrada;
-        this.fechaSalida = fechaSalida;
-        this.status = new CatEstatusRegistro(idEstatus, descripcionEstatus, (short) 0);
-    }
     
-    public DetRegistro(Integer idRegistro, Date fechaEntrada, Date fechaSalida, CatEstatusRegistro status) {
-    	this.idRegistro = idRegistro;
-        this.fechaEntrada = fechaEntrada;
-        this.fechaSalida = fechaSalida;
-        this.status = status;
-    }
-
-    public Integer getIdRegistro() {
-        return idRegistro;
-    }
-
-    public void setIdRegistro(Integer idRegistro) {
-        this.idRegistro = idRegistro;
-    }
-
-    public Date getFechaEntrada() {
-        return fechaEntrada;
-    }
-
-    public void setFechaEntrada(Date fechaEntrada) {
-        this.fechaEntrada = fechaEntrada;
-    }
-
-    public Date getFechaSalida() {
-        return fechaSalida;
-    }
-
-    public void setFechaSalida(Date fechaSalida) {
-        this.fechaSalida = fechaSalida;
-    }
-
-    public CatEstatusRegistro getStatus() {
-        return status;
-    }
-
-    public void setStatus(CatEstatusRegistro estatus) {
-        this.status = estatus;
-    }
-
-    public DetEmpleado getIdEmpleado() {
-        return idEmpleado;
-    }
-
-    public void setIdEmpleado(DetEmpleado idEmpleado) {
-        this.idEmpleado = idEmpleado;
-    }
-
-	@Override
+//    @OneToOne(optional = true, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+//    private DetRegistroVacaciones registroVacaciones;
+    
+    @Override
 	public int hashCode() {
+    	if(this.idRegistro == null)
+    		return System.identityHashCode(this);
+    	
 		return Objects.hash(idRegistro);
 	}
 
@@ -148,4 +93,73 @@ public class DetRegistro implements Serializable {
 		return "DetRegistro [idRegistro=" + idRegistro + ", fechaEntrada=" + fechaEntrada + ", fechaSalida="
 				+ fechaSalida + "]";
 	}
+    
+    public DetRegistro() {
+    }
+    
+    public DetRegistro(Integer idRegistro) {
+        this.idRegistro = idRegistro;
+    }
+    
+    public DetRegistro(Integer idRegistro, Date fechaEntrada, Date fechaSalida, Integer idEstatus, String descripcionEstatus) {
+        this.idRegistro = idRegistro;
+        this.fechaEntrada = fechaEntrada;
+        this.fechaSalida = fechaSalida;
+        this.status = new CatEstatusRegistro(idEstatus, descripcionEstatus, (short) 0);
+    }
+    
+    public DetRegistro(Integer idRegistro, Date fechaEntrada, Date fechaSalida, CatEstatusRegistro status) {
+    	this.idRegistro = idRegistro;
+        this.fechaEntrada = fechaEntrada;
+        this.fechaSalida = fechaSalida;
+        this.status = status;
+    }
+    
+    public Integer getIdRegistro() {
+        return idRegistro;
+    }
+    
+    public void setIdRegistro(Integer idRegistro) {
+        this.idRegistro = idRegistro;
+    }
+    
+    public Date getFechaEntrada() {
+        return fechaEntrada;
+    }
+    
+    public void setFechaEntrada(Date fechaEntrada) {
+        this.fechaEntrada = fechaEntrada;
+    }
+    
+    public Date getFechaSalida() {
+        return fechaSalida;
+    }
+    
+    public void setFechaSalida(Date fechaSalida) {
+        this.fechaSalida = fechaSalida;
+    }
+    
+    public CatEstatusRegistro getStatus() {
+        return status;
+    }
+    
+    public void setStatus(CatEstatusRegistro estatus) {
+        this.status = estatus;
+    }
+    
+    public DetEmpleado getIdEmpleado() {
+        return idEmpleado;
+    }
+    
+    public void setIdEmpleado(DetEmpleado idEmpleado) {
+        this.idEmpleado = idEmpleado;
+    }
+
+//	public DetRegistroVacaciones getRegistroVacaciones() {
+//		return registroVacaciones;
+//	}
+//
+//	public void setRegistroVacaciones(DetRegistroVacaciones registroVacaciones) {
+//		this.registroVacaciones = registroVacaciones;
+//	}
 }
