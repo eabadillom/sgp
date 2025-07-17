@@ -22,7 +22,8 @@ import javax.persistence.Table;
 @Table(name = "det_vacaciones")
 @NamedQueries({
 	@NamedQuery(name = "DetVacaciones.buscarPeriodoPorEmpleadoFecha", query = "SELECT v FROM DetVacaciones v WHERE v.empleado.idEmpleado = :idEmpleado AND :fecha BETWEEN v.fechaInicio AND v.fechaFin"),
-	@NamedQuery(name = "DetVacaciones.buscarPeriodosNoPagados", query = "SELECT v FROM DetVacaciones v LEFT JOIN v.nominaVacaciones nv WHERE v.empleado.datoEmpresa.rfc = :rfc AND ( v.primaPagada = false or v.primaPagada IS NULL ) AND (nv IS NULL)")
+	@NamedQuery(name = "DetVacaciones.buscarPeriodosNoPagados", query = "SELECT v FROM DetVacaciones v LEFT JOIN v.nominaVacaciones nv WHERE v.empleado.datoEmpresa.rfc = :rfc AND ( v.primaPagada = false or v.primaPagada IS NULL ) AND (nv IS NULL)"),
+	@NamedQuery(name = "DetVacaciones.buscarPeriodosDisponibles", query = "select v from DetVacaciones v where v.empleado.idEmpleado = :idEmpleado and v.fechaFin < :fecha AND (v.primaPagada = FALSE OR v.primaPagada IS NULL)")
 })
 public class DetVacaciones implements Serializable{
 
@@ -60,6 +61,9 @@ public class DetVacaciones implements Serializable{
     
     @OneToMany(mappedBy = "vacaciones" )
     private List<DetNominaVacaciones> nominaVacaciones;
+    
+    @OneToMany(mappedBy = "vacaciones")
+    private List<DetRegistroVacaciones> registroVacaciones;
     
     @Override
     public int hashCode() {
@@ -170,24 +174,27 @@ public class DetVacaciones implements Serializable{
         this.diasPagados = diasPagados;
     }
     
-    
-
     public DetEmpleado getEmpleado() {
         return empleado;
     }
-
+    
     public void setEmpleado(DetEmpleado empleado) {
         this.empleado = empleado;
     }
     
-    
-
 	public List<DetNominaVacaciones> getNominaVacaciones() {
 		return nominaVacaciones;
 	}
-
+	
 	public void setNominaVacaciones(List<DetNominaVacaciones> nominaVacaciones) {
 		this.nominaVacaciones = nominaVacaciones;
 	}
-   
+	
+	public List<DetRegistroVacaciones> getRegistroVacaciones() {
+		return registroVacaciones;
+	}
+	
+	public void setRegistroVacaciones(List<DetRegistroVacaciones> registroVacaciones) {
+		this.registroVacaciones = registroVacaciones;
+	}
 }

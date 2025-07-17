@@ -72,28 +72,26 @@ public class VacacionesDAO extends BaseDAO<DetVacaciones, Integer> {
     }
     
     public synchronized List<DetVacaciones> obtenerPeriodosPorFecha(Integer idEmpleado, Date fechaSeleccionada) throws SGPException{
-        List<DetVacaciones> periodos = null;
+        List<DetVacaciones> modelList = null;
         EntityManager em = null;
         
         try{
             log.info("Inicia el proceso para obtener los periodos vacacionales en base a una fecha.");
             em = getEntityManager();
-            TypedQuery<DetVacaciones> query = em.createQuery("select v from DetVacaciones v where v.empleado.idEmpleado = :idEmpleado and v.fechaFin < :fechaSeleccionada", DetVacaciones.class);
-            query.setParameter("idEmpleado", idEmpleado);
-            query.setParameter("fechaSeleccionada", fechaSeleccionada);
-            periodos = query.getResultList();
+            modelList = em.createNamedQuery("DetVacaciones.buscarPeriodosDisponibles", DetVacaciones.class)
+            		.setParameter("idEmpleado", idEmpleado)
+            		.setParameter("fecha", fechaSeleccionada)
+            		.getResultList();
             log.info("Finaliza el proceso para obtener los periodos vacacionales en base a una fecha.");
-        }
-        catch(Exception ex){
+        } catch(Exception ex) {
             log.error("Error al obtener los periodos vacacionales en base a una fecha. " + ex.getMessage());
-            rollback(em);
+            this.rollback(em);
             throw new SGPException("Hubo algun problema al obtener los periodos vacacionales en base a una fecha");
-        }
-        finally{
-            close(em);
+        } finally {
+            this.close(em);
         }
         
-        return periodos;
+        return modelList;
     }
     
     public DetVacaciones obtenerPorRfcFecha(String rfc, Date fecha) {

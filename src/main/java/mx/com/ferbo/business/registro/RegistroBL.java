@@ -4,25 +4,22 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import mx.com.ferbo.business.dianolaboral.DiasDeDescansoObligatorioBL;
 import mx.com.ferbo.business.empleado.EmpleadoBL;
-import mx.com.ferbo.business.registro.EstatusRegistroBL;
-
-import mx.com.ferbo.dao.n.EstatusRegistroDAO;
 import mx.com.ferbo.dao.n.RegistroDAO;
-
+import mx.com.ferbo.dao.n.RegistroVacacionesDAO;
 import mx.com.ferbo.model.CatEstatusRegistro;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetEmpleadoConfiguracion;
 import mx.com.ferbo.model.DetIncidencia;
 import mx.com.ferbo.model.DetRegistro;
+import mx.com.ferbo.model.DetRegistroVacaciones;
 import mx.com.ferbo.model.InfDatoEmpresa;
-
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.SGPException;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -171,6 +168,7 @@ public class RegistroBL implements Serializable
         
         int cantidadRegistrosGuardados = 0;
         RegistroDAO registroDAO = new RegistroDAO();
+        RegistroVacacionesDAO registroVacacionesDAO = new RegistroVacacionesDAO();
         InfDatoEmpresa empleadoEmpresa = empleado.getDatoEmpresa();
         CatEstatusRegistro statusVacaciones = null;
         
@@ -192,11 +190,12 @@ public class RegistroBL implements Serializable
 
         listaFechas = DateUtil.diasVacacionesSolicitados(listaFechas, diasAsueto, empleado.getDatoEmpresa());
 
-        for(Date dia : listaFechas) 
-        {
+        for(Date dia : listaFechas) {
+        	
             DetRegistro registro = new DetRegistro();
             registro.setIdEmpleado(empleado);
             registro.setStatus(statusVacaciones);
+            
 
             Date registroEntrada = DateUtil.getDateTime(DateUtil.getAnio(dia), DateUtil.getMes(dia), DateUtil.getDia(dia), horaEntrada, 0, 0, 0);
             log.trace("Dia hora entrada: {}", registroEntrada);
@@ -206,7 +205,12 @@ public class RegistroBL implements Serializable
             log.trace("Dia hora salida: {}", registroSalida);
             registro.setFechaSalida(registroSalida);
 
-            registroDAO.guardar(registro);
+            DetRegistroVacaciones registroVacaciones = new DetRegistroVacaciones();
+            registroVacaciones.setRegistro(registro);
+            registroVacaciones.setVacaciones(incidencia.getSolPermiso().getVacaciones());
+            
+            registroVacacionesDAO.actualizar(registroVacaciones);
+//            registroDAO.guardar(registro);
             cantidadRegistrosGuardados += 1;
         }
         
