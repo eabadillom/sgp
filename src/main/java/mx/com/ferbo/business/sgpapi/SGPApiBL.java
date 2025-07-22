@@ -63,7 +63,7 @@ public abstract class SGPApiBL
             resultContent = EntityUtils.toString(entity);
             bodyResponse = new String(resultContent.getBytes(), "UTF-8");
         } catch (ParseException | IOException e) {
-            log.error("Problema para obtener la respueta de facturama...", e);
+            log.error("Problema para obtener la respueta de sgp-api...", e);
         }
         
         return bodyResponse;
