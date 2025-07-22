@@ -1,0 +1,75 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:ui="http://java.sun.com/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+	<div class="ui-fluid formgrid grid">
+		<div class="field col-12 md:col-2">
+			<p:datePicker value="#{permisosBean.periodoInicio}" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy" showIcon="true">
+				<p:ajax process="@this" event="change" listener="#{permisosBean.cargarPermisos()}" update="dt-permisos" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
+			</p:datePicker>
+		</div>
+		<div class="field col-12 md:col-2">
+			<p:datePicker value="#{permisosBean.periodoFin}" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy" showIcon="true">
+				<p:ajax process="@this" event="change" listener="#{permisosBean.cargarPermisos()}" update="dt-permisos"/>
+			</p:datePicker>
+		</div>
+		<div class="field col-12 md:col-6">
+    		<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+    	</div>
+    	<div class="field col-12 md:col-2">
+    		<p:commandButton value="Registrar" icon="pi pi-plus" class="ui-button-success m-1" styleClass="edit-button" style="margin-right: .5rem" process="@this" actionListener="#{permisosBean.nuevoPermiso()}" oncomplete="PF('dgPermiso').show();" update="formActividades:tabView:dg-permiso">
+            </p:commandButton>
+    	</div>
+	</div>
+	<div align="center">
+		<div style="width: 30rem;">
+			<p:dataTable id="dt-permisos" widgetVar="dtPermisos" var="permiso" value="#{permisosBean.permisos}">
+				<p:column headerText="Fecha" width="5rem">
+					<p:outputLabel value="#{permiso.solPermiso.fechaInicio}">
+						<f:convertDateTime pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6"/>
+					</p:outputLabel>
+				</p:column>
+				<p:column headerText="Status" style="text-align: center;">
+					<span class="customer-badge status-#{permisosBean.status.getStatusClass(permiso.solPermiso.estatus.clave)}">
+						#{permiso.solPermiso.estatus.descripcion}
+					</span>
+				</p:column>
+				<p:column width="2rem">
+					<p:commandButton icon="pi pi-bars" process="@this" actionListener="#{permisosBean.cargarPermiso(permiso)}" update="formActividades:tabView:dg-permiso" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dgPermiso').show();">
+					</p:commandButton>
+				</p:column>
+			</p:dataTable>
+			
+		</div>
+	</div>
+	<p:dialog id="dg-permiso" widgetVar="dgPermiso" header="Permiso de ausencia" showEffect="fade" responsive="true" modal="true" >
+		<div class="field" align="center">
+			<p:inputText id="txtFecha" value="#{permisosBean.permiso.solPermiso.fechaInicio}" readonly="true">
+				<f:convertDateTime locale="es_MX" timeZone="GMT-6" pattern="d 'de' MMMM 'de' yyyy" />
+			</p:inputText>
+		</div>
+		<div class="field">
+			<p:datePicker id="dp-fecha" pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX"
+					showIcon="true" readonlyInput="true" value="#{permisosBean.permiso.solPermiso.fechaInicio}"
+					mindate="#{permisosBean.minDate}" inline="true" disabledDays="#{asistenciaBean.invalidDays}" disabledDates="#{asistenciaBean.diasDeAsueto}">
+				<p:ajax event="dateSelect" listener="#{permisosBean.seleccionarFecha()}" update="txtFecha" />
+			</p:datePicker>
+		</div>
+		<div class="field" align="center">
+			<p:inputText id="txtStatus" value="#{permisosBean.permiso.solPermiso.estatus.descripcion}" rendered="#{permisosBean.permiso.idIncidencia ne null}"/>
+		</div>
+		<f:facet name="footer">
+			<p:commandButton value="Cancelar" icon="pi pi-times" actionListener="#{permisosBean.cancelar()}" rendered="#{permisosBean.permiteCancelar()}" styleClass="ui-button-danger">
+				<p:confirm header="Cancelar permiso" message="¿Está seguro que desea cancelar este permiso?" icon="pi pi-exclamation-triangle" />
+			</p:commandButton>
+			<p:commandButton value="Actualizar" icon="pi pi-check" process="@this" actionListener="#{permisosBean.actualizar()}" rendered="#{permisosBean.permiteActualizar()}">
+				<p:confirm header="Actualizar permiso" message="¿Está seguro que desea actualizar permiso para este día?" icon="pi pi-exclamation-triangle" />
+			</p:commandButton>
+			<p:commandButton value="Solicitar" icon="pi pi-check" process="@this" actionListener="#{permisosBean.guardar()}" rendered="#{permisosBean.permiso.idIncidencia eq null}">
+				<p:confirm header="Solicitar permiso" message="¿Está seguro que desea solicitar permiso para este día?" icon="pi pi-exclamation-triangle" />
+			</p:commandButton>
+			<p:commandButton value="Cerrar" icon="pi pi-times" styleClass="ui-button-secondary" onclick="PF('dgPermiso').hide();" />
+		</f:facet>
+	</p:dialog>
+</ui:composition>

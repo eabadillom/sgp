@@ -3,6 +3,7 @@ package mx.com.ferbo.model;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -12,8 +13,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -26,17 +27,15 @@ import javax.validation.constraints.Null;
  */
 @Entity
 @Table(name = "det_incidencia")
-@NamedQueries({
-    @NamedQuery(name = "DetIncidencia.findAll", query = "SELECT d FROM DetIncidencia d JOIN d.empleado e JOIN d.tipoIncidencia ct JOIN d.estatusIncidencia ce LEFT JOIN d.solPermiso sp LEFT JOIN d.solArticulo sa LEFT JOIN d.solPrenda spr LEFT JOIN sp.tipoSolicitud tp LEFT JOIN sa.articulo a LEFT JOIN spr.prenda p LEFT JOIN spr.talla t ORDER BY d.fechaCap"),
-    @NamedQuery(name = "DetIncidencia.findByIdEmpleado", query = "SELECT d FROM DetIncidencia d JOIN d.empleado e WHERE e.idEmpleado = :idEmpleado"),
-    @NamedQuery(name = "DetIncidencia.findByArticulo", query = "SELECT d FROM DetIncidencia d INNER JOIN d.empleado e INNER JOIN d.solArticulo sa WHERE e.idEmpleado = :idEmpleado AND sa.idSolicitud = :idSolicitud"),
-    @NamedQuery(name = "DetIncidencia.findByPermiso", query = "SELECT d FROM DetIncidencia d INNER JOIN d.empleado e INNER JOIN d.solPermiso sp WHERE e.idEmpleado = :idEmpleado AND sp.idSolicitud = :idSolicitud"),
-    @NamedQuery(name = "DetIncidencia.findByPrenda", query = "SELECT d FROM DetIncidencia d INNER JOIN d.empleado e INNER JOIN d.solPrenda sp WHERE e.idEmpleado = :idEmpleado AND sp.idSolicitud = :idSolicitud"),
-    @NamedQuery(name = "DetIncidencia.findByIdEmpleadoPrenda", query = "SELECT d FROM DetIncidencia d JOIN d.empleado e JOIN d.tipoIncidencia ct JOIN d.estatusIncidencia ce INNER JOIN d.solPrenda sp WHERE e.idEmpleado = :idEmpleado AND ct.clave = 'PR'"),
-    @NamedQuery(name = "DetIncidencia.findByIdEmpleadoArticulo", query = "SELECT d FROM DetIncidencia d JOIN d.empleado e JOIN d.tipoIncidencia ct JOIN d.estatusIncidencia ce INNER JOIN d.solArticulo sp WHERE e.idEmpleado = :idEmpleado AND ct.clave = 'A'"),
-    @NamedQuery(name = "DetIncidencia.findByIdEmpleadoPermiso", query = "SELECT d FROM DetIncidencia d JOIN d.empleado e JOIN d.tipoIncidencia ct JOIN d.estatusIncidencia ce INNER JOIN d.solPermiso sp WHERE e.idEmpleado = :idEmpleado AND (ct.clave = 'PE' OR ct.clave = 'V')"),
-    @NamedQuery(name = "DetIncidencia.findPermisoByPeriodo", query = "SELECT i FROM DetIncidencia i INNER JOIN i.solPermiso p WHERE i.tipoIncidencia.clave IN ('PE', 'V') AND p.fechaFin >= :periodoInicio AND p.fechaInicio <= :periodoFin ORDER BY p.fechaCap ")
-})
+@NamedQuery(name = "DetIncidencia.findAll", query = "SELECT d FROM DetIncidencia d JOIN d.empleado e JOIN d.tipoIncidencia ct JOIN d.estatusIncidencia ce LEFT JOIN d.solPermiso sp LEFT JOIN d.solArticulo sa LEFT JOIN d.solPrenda spr LEFT JOIN sp.tipoSolicitud tp LEFT JOIN sa.articulo a LEFT JOIN spr.prenda p LEFT JOIN spr.talla t ORDER BY d.fechaCap")
+@NamedQuery(name = "DetIncidencia.findByIdEmpleado", query = "SELECT d FROM DetIncidencia d JOIN d.empleado e WHERE e.idEmpleado = :idEmpleado")
+@NamedQuery(name = "DetIncidencia.findByArticulo", query = "SELECT d FROM DetIncidencia d INNER JOIN d.empleado e INNER JOIN d.solArticulo sa WHERE e.idEmpleado = :idEmpleado AND sa.idSolicitud = :idSolicitud")
+@NamedQuery(name = "DetIncidencia.findByPermiso", query = "SELECT d FROM DetIncidencia d INNER JOIN d.empleado e INNER JOIN d.solPermiso sp WHERE e.idEmpleado = :idEmpleado AND sp.idSolicitud = :idSolicitud")
+@NamedQuery(name = "DetIncidencia.findByPrenda", query = "SELECT d FROM DetIncidencia d INNER JOIN d.empleado e INNER JOIN d.solPrenda sp WHERE e.idEmpleado = :idEmpleado AND sp.idSolicitud = :idSolicitud")
+@NamedQuery(name = "DetIncidencia.findByIdEmpleadoPrenda", query = "SELECT d FROM DetIncidencia d JOIN d.empleado e JOIN d.tipoIncidencia ct JOIN d.estatusIncidencia ce INNER JOIN d.solPrenda sp WHERE e.idEmpleado = :idEmpleado AND ct.clave = 'PR'")
+@NamedQuery(name = "DetIncidencia.findByIdEmpleadoArticulo", query = "SELECT d FROM DetIncidencia d JOIN d.empleado e JOIN d.tipoIncidencia ct JOIN d.estatusIncidencia ce INNER JOIN d.solArticulo sp WHERE e.idEmpleado = :idEmpleado AND ct.clave = 'A'")
+@NamedQuery(name = "DetIncidencia.findByIdEmpleadoPermiso", query = "SELECT d FROM DetIncidencia d JOIN d.empleado e JOIN d.tipoIncidencia ct JOIN d.estatusIncidencia ce INNER JOIN d.solPermiso sp WHERE e.idEmpleado = :idEmpleado AND (ct.clave = 'PE' OR ct.clave = 'V')")
+@NamedQuery(name = "DetIncidencia.findPermisoByPeriodo", query = "SELECT i FROM DetIncidencia i INNER JOIN i.solPermiso p WHERE i.tipoIncidencia.clave IN ('PE', 'V') AND p.fechaFin >= :periodoInicio AND p.fechaInicio <= :periodoFin ORDER BY p.fechaCap ")
 public class DetIncidencia implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -67,16 +66,16 @@ public class DetIncidencia implements Serializable {
     @ManyToOne()
     private CatTipoIncidencia tipoIncidencia;
     
+    @OneToOne(optional = true, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "id_sol_articulo", referencedColumnName = "id_solicitud")
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private DetSolicitudArticulo solArticulo;
     
+    @OneToOne(optional = true, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "id_sol_permiso", referencedColumnName = "id_solicitud")
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private DetSolicitudPermiso solPermiso;
     
+    @OneToOne(optional = true, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "id_sol_prenda", referencedColumnName = "id_solicitud")
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private DetSolicitudPrenda solPrenda;
     
     @Basic(optional = false)

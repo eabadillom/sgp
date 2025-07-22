@@ -27,16 +27,15 @@ import org.primefaces.model.ScheduleModel;
 import mx.com.ferbo.business.dianolaboral.DiasDeDescansoObligatorioBL;
 import mx.com.ferbo.business.empleado.EmpleadoBL;
 import mx.com.ferbo.business.empleado.RegistroAsistenciaBL;
-import mx.com.ferbo.business.incapacidad.IncapacidadBL;
 import mx.com.ferbo.business.incidencia.CalendarioBL;
 import mx.com.ferbo.business.incidencia.EstatusIncidenciaBL;
 import mx.com.ferbo.business.incidencia.EstatusSolicitudBL;
+import mx.com.ferbo.business.incidencia.IncidenciaBL;
 import mx.com.ferbo.business.incidencia.SolicitudPermisoBL;
 import mx.com.ferbo.dao.n.IncidenciaDAO;
 import mx.com.ferbo.dao.n.SolicitudPermisoDAO;
 import mx.com.ferbo.dao.n.TipoSolicitudDAO;
 import mx.com.ferbo.dao.n.VacacionesDAO;
-import mx.com.ferbo.model.CatTipoIncidencia;
 import mx.com.ferbo.model.CatTipoSolicitud;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetIncidencia;
@@ -89,11 +88,13 @@ public class AsistenciaBean implements Serializable {
     // Obteniendo Empleado
     private DetEmpleado empleadoSelected;
     private DetIncidencia incidencia;
-    private CatTipoIncidencia catTipoIncidencia;
-    private final HttpServletRequest httpServletRequest;
+    private HttpServletRequest request;
     private ManageStatus status;
-    private final String permisos = "P";
-    private final String vacaciones = "V";
+    private static final String PERMISOS = "P";
+    private static final String VACACIONES = "V";
+    
+    private Date periodoSolicitudInicio;
+    private Date periodoSolicitudFin;
     
     public AsistenciaBean() {
         this.diasDeAsueto = DiasDeDescansoObligatorioBL.diasDeAsueto();
@@ -102,20 +103,24 @@ public class AsistenciaBean implements Serializable {
         tipoSolicitudDAO = new TipoSolicitudDAO();
         incidenciaDAO = new IncidenciaDAO();
         vacacionesDAO = new VacacionesDAO();
-        inicializaSolicitud();
+//        inicializaSolicitud();
         lstTipoSolSelect = new ArrayList<>();
         this.fechaDatePickerView = new ArrayList<>();
 
         empleadoSelected = new DetEmpleado();
-        httpServletRequest = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-        this.empleadoSelected = (DetEmpleado) httpServletRequest.getSession(true).getAttribute("empleado");
-        invalidDays = SolicitudPermisoBL.obtenerDiasSeleccionados(empleadoSelected.getDatoEmpresa());
+        request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+        this.empleadoSelected = (DetEmpleado) request.getSession(false).getAttribute("empleado");
+        this.invalidDays = SolicitudPermisoBL.obtenerDiasSeleccionados(empleadoSelected.getDatoEmpresa());
         this.empleadoAsistencia = new RegistroAsistenciaBL();
+        
+        this.periodoSolicitudFin = DateUtil.now();
+        this.periodoSolicitudInicio = DateUtil.addMonth(this.periodoSolicitudFin, -1);
+        evento = new DefaultScheduleEvent();
+        
     }
 
     @PostConstruct
     public void init() {
-        evento = new DefaultScheduleEvent();
         actualizarSolicitudPermiso();
         lstTipoSol.forEach((CatTipoSolicitud tipo) -> {
             lstTipoSolSelect.add(new SelectItem(tipo.getIdTipoSolicitud(),
@@ -131,8 +136,9 @@ public class AsistenciaBean implements Serializable {
     }
     
     public void actualizarSolicitudPermiso() {
-        lstSolicitudes = solicitudPermisoDAO.buscarPorIdEmpleado(empleadoSelected.getIdEmpleado());
-        lstTipoSol = tipoSolicitudDAO.buscarPermisosyVacaciones(permisos, vacaciones);
+    	log.info("Buscando solicitudes de permisos...");
+    	lstSolicitudes = solicitudPermisoDAO.buscarPorEmpleadoPeriodo(empleadoSelected.getIdEmpleado(), this.periodoSolicitudInicio, this.periodoSolicitudFin);
+        lstTipoSol = tipoSolicitudDAO.buscarPermisosyVacaciones(PERMISOS, VACACIONES);
     }
     
     public void actualizarListas() {
@@ -169,6 +175,7 @@ public class AsistenciaBean implements Serializable {
         FacesMessage.Severity severity = null;
         String mensaje = null;
         String titulo = "Solicitud";
+        
         try {
             if (solicitudSelected.getTipoSolicitud() == null) {
                 throw new SGPException("Error. Debes selecionar una solicitud");
@@ -197,42 +204,8 @@ public class AsistenciaBean implements Serializable {
                     throw new SGPException("El numero de dias seleccionados es mayor a los permitidos");
                 }
             }
-
-            if (solicitudSelected.getFechaInicio() == null || solicitudSelected.getFechaFin() == null) {
-                throw new SGPException("Error. Debes seleccionar una fecha");
-            }
             
-            solicitudSelected.setEstatus(EstatusSolicitudBL.estatusEnviado());
-            solicitudSelected.setFechaCap(new Date());
-            solicitudSelected.setEmpleadoSol(empleadoSelected);
-            solicitudSelected.setVacaciones(periodoVacacional);
-            
-            SolicitudPermisoBL.validarSolicitudPermiso(solicitudSelected);
-            IncapacidadBL.validarRegistrosIncapacidades(empleadoSelected, solicitudSelected.getFechaInicio(), solicitudSelected.getFechaFin());
-            
-            catTipoIncidencia = new CatTipoIncidencia();
-            switch (solicitudSelected.getTipoSolicitud().getClave()) {
-                // Tipo Permisos
-                case "P":
-                    catTipoIncidencia.setIdTipo(1);
-                    break;
-                // Tipo Vacaciones
-                case "V":
-                    catTipoIncidencia.setIdTipo(2);
-                    break;
-                default:
-                    log.warn("EX-0023: Error al seleccionar opción");
-            }
-            
-            incidencia = new DetIncidencia();
-            incidencia.setTipoIncidencia(catTipoIncidencia);
-            incidencia.setEmpleado(empleadoSelected);
-            incidencia.setEstatusIncidencia(EstatusIncidenciaBL.estatusEnviado());
-            incidencia.setVisible((short) 1);
-            incidencia.setSolPermiso(solicitudSelected);
-            incidencia.setFechaCap(new Date());
-
-            incidenciaDAO.actualizar(incidencia);
+            IncidenciaBL.guardar(incidencia, periodoVacacional);
             
             mensaje = "Se guardo correctamente";
             severity = FacesMessage.SEVERITY_INFO;
@@ -270,9 +243,7 @@ public class AsistenciaBean implements Serializable {
         try {
             switch (solicitudSelected.getEstatus().getClave()) {
                 case "A":
-                    throw new SGPException("No se puede modificar el permiso");
                 case "R":
-                    throw new SGPException("No se puede modificar el permiso");
                 case "C":
                     throw new SGPException("No se puede modificar el permiso");
             }
@@ -305,7 +276,7 @@ public class AsistenciaBean implements Serializable {
             PrimeFaces.current().executeScript("PF('dialogVacacionesView').hide()");
         }
     }
-
+    
     public void validarDiasEmpleado() {
         FacesMessage message = null;
         FacesMessage.Severity severity = null;
@@ -321,6 +292,7 @@ public class AsistenciaBean implements Serializable {
             this.inicializaSolicitud();
             
             this.periodosVacacionales = this.periodosPorFechaActual();
+            this.periodoVacacional = null;
             
             PrimeFaces.current().executeScript("PF('dialogVacaciones').show()");
         } catch (SGPException sgpEx) {
@@ -355,7 +327,7 @@ public class AsistenciaBean implements Serializable {
                 this.totalDiasTomados = DateUtil.diasVacacionesSolicitados(fechas, this.diasDeAsueto, this.empleadoSelected.getDatoEmpresa()).size();
                 this.fechaDatePickerView.addAll(fechas);
                 break;
-            case "V"://VACACIONES
+            case VACACIONES://VACACIONES
                 fechas = DateUtil.generarArreglosFechas(solicitudSelected.getFechaInicio(), solicitudSelected.getFechaFin());
                 this.totalDiasTomados = DateUtil.diasVacacionesSolicitados(fechas, this.diasDeAsueto, this.empleadoSelected.getDatoEmpresa()).size();
                 this.fechaDatePickerView = Arrays.asList(solicitudSelected.getFechaInicio(), solicitudSelected.getFechaFin());
@@ -543,5 +515,21 @@ public class AsistenciaBean implements Serializable {
 
 	public void setPeriodoVacacional(DetVacaciones periodoVacacional) {
 		this.periodoVacacional = periodoVacacional;
+	}
+
+	public Date getPeriodoSolicitudInicio() {
+		return periodoSolicitudInicio;
+	}
+
+	public void setPeriodoSolicitudInicio(Date periodoSolicitudInicio) {
+		this.periodoSolicitudInicio = periodoSolicitudInicio;
+	}
+
+	public Date getPeriodoSolicitudFin() {
+		return periodoSolicitudFin;
+	}
+
+	public void setPeriodoSolicitudFin(Date periodoSolicitudFin) {
+		this.periodoSolicitudFin = periodoSolicitudFin;
 	}
 }

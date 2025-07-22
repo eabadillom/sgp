@@ -3,30 +3,44 @@
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:jsf="http://xmlns.jcp.org/jsf">
-    <p:toolbar styleClass="mb-0 p-0" style="border: none">
-        <p:toolbarGroup align="left">
+    <div class="ui-fluid formgrid grid">
+    	<div class="field col-12 md:col-2">
+    		<p:datePicker value="#{asistenciaBean.periodoSolicitudInicio}" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy" showIcon="true">
+    			<p:ajax process="@this" event="change" listener="#{asistenciaBean.actualizarSolicitudPermiso}"  update="formActividades:tabView:dtSolicitudes"/>
+    		</p:datePicker>
+    	</div>
+    	<div class="field col-12 md:col-2">
+    		<p:datePicker value="#{asistenciaBean.periodoSolicitudFin}" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy" showIcon="true">
+    			<p:ajax process="@this" event="change" listener="#{asistenciaBean.actualizarSolicitudPermiso}" update="formActividades:tabView:dtSolicitudes"/>
+    		</p:datePicker>
+    	</div>
+    	<div class="field col-12 md:col-6">
+    		<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+    	</div>
+    	<div class="field col-12 md:col-2">
             <p:commandButton value="Registrar" icon="pi pi-plus" class="ui-button-success m-1" styleClass="edit-button" style="margin-right: .5rem" process="@this"
                              actionListener="#{asistenciaBean.validarDiasEmpleado()}" >
             </p:commandButton>
-        </p:toolbarGroup>
-    </p:toolbar>
+    	</div>
+    </div>
+    
     <p:dataTable id="dtSolicitudes" widgetVar="dtSolicitudes" var="solicitud" value="#{asistenciaBean.lstSolicitudes}" reflow="true"
                  selection="#{asistenciaBean.solicitudSelected}" rowKey="#{solicitud.idSolicitud}" 
                  paginator="true" rows="5" paginatorPosition="bottom" rowSelectMode="add" lazy="true" >
         <p:column headerText="Tipo de solicitud">
             <p:outputLabel value="#{solicitud.tipoSolicitud.descripcion}" />
         </p:column>
-        <p:column headerText="Inicio" sortBy="#{solicitud.fechaInicio}" filterBy="#{solicitud.fechaInicio}">
+        <p:column headerText="Inicio" sortBy="#{solicitud.fechaInicio}">
             <p:outputLabel value="#{solicitud.fechaInicio}">
                 <f:convertDateTime type="date" pattern="dd-MM-yyyy" timeZone="GMT-6"/>
             </p:outputLabel>
         </p:column>
-        <p:column headerText="Fin" sortBy="#{solicitud.fechaFin}" filterBy="#{solicitud.fechaFin}">
+        <p:column headerText="Fin" sortBy="#{solicitud.fechaFin}">
             <p:outputLabel value="#{solicitud.fechaFin}">
                 <f:convertDateTime type="date" pattern="dd-MM-yyyy" timeZone="GMT-6"/>
             </p:outputLabel>
         </p:column>
-        <p:column headerText="Estatus" sortBy="#{solicitud.estatus}" filterBy="#{solicitud.estatus}">
+        <p:column headerText="Estatus" sortBy="#{solicitud.estatus}">
             <span class="customer-badge status-#{asistenciaBean.status.getStatusClass(solicitud.estatus.clave)}" style="display: block; width: 7rem">
                 #{asistenciaBean.status.getStatusText(solicitud.estatus.clave)}</span>
         </p:column>
@@ -45,8 +59,7 @@
             <div class="formgrid grid">
                 <div class="field col">
                     <p:outputLabel for="soTipoPermiso" value="Tipo"/>
-                    <p:selectOneMenu id="soTipoPermiso" autoWidth="false" converter="entityConverter" 
-                                     value="#{asistenciaBean.solicitudSelected.tipoSolicitud}">
+                    <p:selectOneMenu id="soTipoPermiso" autoWidth="false" converter="entityConverter" value="#{asistenciaBean.solicitudSelected.tipoSolicitud}">
                         <f:selectItem itemLabel="--Seleccione--"/>
                         <f:selectItems value="#{asistenciaBean.lstTipoSol}" var="idTipoSolicitud" itemValue="#{idTipoSolicitud}" itemLabel="#{idTipoSolicitud.descripcion}"/>
                         <p:ajax event="change" update="formActividades:tabView:pnlDetalleVacaciones" process="@this" resetValues="true"/>
@@ -59,8 +72,6 @@
                          rendered="#{asistenciaBean.solicitudSelected.tipoSolicitud.idTipoSolicitud ne null and asistenciaBean.solicitudSelected.tipoSolicitud.idTipoSolicitud eq 2}"
                          selection="#{asistenciaBean.periodoVacacional}" >
                 <p:ajax event="rowSelectRadio" listener="#{asistenciaBean.onPeriodoSelect}"/>
-                <!-- <p:ajax event="rowUnselect" listener="#{asistenciaBean.onPeriodoUnselect}" update=":formActividades:messages"/> -->
-                
                 <p:column selectionMode="single"  width="2rem" style="text-align:center">
                 </p:column>
                 
@@ -75,6 +86,7 @@
             <p:outputLabel value="Total de dias disponibles: #{asistenciaBean.diasTotalesPermitidos}" style="text-align: right;" rendered="#{asistenciaBean.solicitudSelected.tipoSolicitud.idTipoSolicitud ne null 
                                                                and asistenciaBean.solicitudSelected.tipoSolicitud.idTipoSolicitud eq 2}"/>
 			<div align="center" style="width: 30rem">
+				
 	            <p:datePicker id="dpRango"  rendered="#{asistenciaBean.periodoVacacional ne null 
 	                                                    and asistenciaBean.solicitudSelected.tipoSolicitud.idTipoSolicitud eq 2}"
 	                           

@@ -322,6 +322,7 @@ public class IncidenciaBean implements Serializable {
         FacesMessage.Severity severity = null;
         String mensaje = null;
         String titulo = "Incidencia";
+        
         try {
             BigDecimal valor = null;
             if(incidenciaSelected.getEmpleado().getEmpleadoConfiguracion().getGoceSueldo() == false) {

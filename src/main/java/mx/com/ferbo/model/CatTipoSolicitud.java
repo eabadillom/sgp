@@ -2,6 +2,7 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.List;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -9,7 +10,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -22,11 +22,10 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @Table(name = "cat_tipo_solicitud")
-@NamedQueries({
-    @NamedQuery(name = "CatTipoSolicitud.findAll", query = "SELECT c FROM CatTipoSolicitud c"),
-    @NamedQuery(name = "CatTipoSolicitud.findByActive", query = "SELECT c FROM CatTipoSolicitud c WHERE c.activo = 1"),
-    @NamedQuery(name = "CatTipoSolicitud.findByPermisoYVacaciones", query = "SELECT c FROM CatTipoSolicitud c WHERE (c.clave = :clavePermiso OR c.clave = :claveVacaciones) AND c.activo = 1")
-})
+@NamedQuery(name = "CatTipoSolicitud.findAll", query = "SELECT c FROM CatTipoSolicitud c")
+@NamedQuery(name = "CatTipoSolicitud.findByActive", query = "SELECT c FROM CatTipoSolicitud c WHERE c.activo = 1")
+@NamedQuery(name = "CatTipoSolicitud.findByPermisoYVacaciones", query = "SELECT c FROM CatTipoSolicitud c WHERE (c.clave = :clavePermiso OR c.clave = :claveVacaciones) AND c.activo = 1")
+@NamedQuery(name = "CatTipoSolicitud.findByClave", query = "SELECT c FROM CatTipoSolicitud c WHERE c.clave = :clave")
 public class CatTipoSolicitud implements Serializable {
 
     private static final long serialVersionUID = 1L;

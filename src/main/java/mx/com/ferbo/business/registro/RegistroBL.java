@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.dianolaboral.DiasDeDescansoObligatorioBL;
 import mx.com.ferbo.business.empleado.EmpleadoBL;
+import mx.com.ferbo.business.incidencia.SolicitudPermisoBL;
 import mx.com.ferbo.dao.n.RegistroDAO;
 import mx.com.ferbo.dao.n.RegistroVacacionesDAO;
 import mx.com.ferbo.model.CatEstatusRegistro;
@@ -29,6 +30,9 @@ public class RegistroBL implements Serializable
 {
     private static final long serialVersionUID = 1L;
     private static final Logger log = LogManager.getLogger(RegistroBL.class);
+    
+    private static final String VACACIONES = "V";
+    private static final String PERMISO = "P";
     
     /*Valida las fechas de solicitud permiso en registro de asistencia de un empleado*/
     public boolean validarFechasVacaciones(DetEmpleado empleado, Date fechaInicial, Date fechaFinal) 
@@ -167,36 +171,36 @@ public class RegistroBL implements Serializable
         EmpleadoBL.empleadoTieneDiasLaborales(empleado);
         
         int cantidadRegistrosGuardados = 0;
-        RegistroDAO registroDAO = new RegistroDAO();
-        RegistroVacacionesDAO registroVacacionesDAO = new RegistroVacacionesDAO();
+        
         InfDatoEmpresa empleadoEmpresa = empleado.getDatoEmpresa();
         CatEstatusRegistro statusVacaciones = null;
         
         switch(incidencia.getSolPermiso().getTipoSolicitud().getClave())
         {
-            case "V":
+            case VACACIONES:
                 statusVacaciones = EstatusRegistroBL.estatusVacaciones();
                 break;
-            case "P":
+            case PERMISO:
                 statusVacaciones = EstatusRegistroBL.estatusPermiso();
                 break;
+            default:
+            	throw new SGPException(String.format("Status no permitido: %s", incidencia.getSolPermiso().getTipoSolicitud().getClave()));
         }
 
         Integer horaEntrada = DateUtil.getHora(empleadoEmpresa.getHoraEntrada());
         Integer horaSalida = DateUtil.getHora(empleadoEmpresa.getHorasalida());
-
+        
         List<Date> listaFechas = DateUtil.generarArreglosFechas(incidencia.getSolPermiso().getFechaInicio(), incidencia.getSolPermiso().getFechaFin());
         log.trace("Lista de Fechas: {}", listaFechas);
-
+        
         listaFechas = DateUtil.diasVacacionesSolicitados(listaFechas, diasAsueto, empleado.getDatoEmpresa());
-
+        
         for(Date dia : listaFechas) {
         	
             DetRegistro registro = new DetRegistro();
             registro.setIdEmpleado(empleado);
             registro.setStatus(statusVacaciones);
             
-
             Date registroEntrada = DateUtil.getDateTime(DateUtil.getAnio(dia), DateUtil.getMes(dia), DateUtil.getDia(dia), horaEntrada, 0, 0, 0);
             log.trace("Dia hora entrada: {}", registroEntrada);
             registro.setFechaEntrada(registroEntrada);
@@ -204,13 +208,18 @@ public class RegistroBL implements Serializable
             Date registroSalida = DateUtil.getDateTime(DateUtil.getAnio(dia), DateUtil.getMes(dia), DateUtil.getDia(dia), horaSalida, 0, 0, 0);
             log.trace("Dia hora salida: {}", registroSalida);
             registro.setFechaSalida(registroSalida);
-
-            DetRegistroVacaciones registroVacaciones = new DetRegistroVacaciones();
-            registroVacaciones.setRegistro(registro);
-            registroVacaciones.setVacaciones(incidencia.getSolPermiso().getVacaciones());
             
-            registroVacacionesDAO.actualizar(registroVacaciones);
-//            registroDAO.guardar(registro);
+            if(SolicitudPermisoBL.TP_VACACIONES.equalsIgnoreCase(incidencia.getSolPermiso().getTipoSolicitud().getClave())) {
+            	DetRegistroVacaciones registroVacaciones = new DetRegistroVacaciones();
+            	registroVacaciones.setRegistro(registro);
+            	registroVacaciones.setVacaciones(incidencia.getSolPermiso().getVacaciones());
+            	RegistroVacacionesDAO registroVacacionesDAO = new RegistroVacacionesDAO();
+            	registroVacacionesDAO.actualizar(registroVacaciones);
+            } else {
+            	RegistroDAO registroDAO = new RegistroDAO();
+            	registroDAO.guardar(registro);
+            }
+
             cantidadRegistrosGuardados += 1;
         }
         

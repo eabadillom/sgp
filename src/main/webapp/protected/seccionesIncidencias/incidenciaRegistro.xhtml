@@ -39,26 +39,20 @@
 	       }
 	    };
 	</script>    
-    <p:toolbar styleClass="mb-4">
-        <p:toolbarGroup id="grupoBotonesRegistro" align="center">
-            <div class="ui-fluid" >
-                <div class="formgrid grid">
-                    <div class="field col-12 md:col-3">
-                        <p:outputLabel for="@next" value="Periodo Inicio" />
-                        <p:datePicker value="#{incidenciaBean.inicio}" showIcon="true" locale="es" timeZone="GMT-6" pattern="dd/MM/yyyy">
-                            <p:ajax update="dtRegistro" process="@this" />
-                        </p:datePicker>
-                    </div>
-                    <div class="field col-12 md:col-3">
-                        <p:outputLabel for="@next" value="Periodo Fin" />
-                        <p:datePicker  value="#{incidenciaBean.fin}" showIcon="true" locale="es" timeZone="GMT-6" pattern="dd/MM/yyyy">
-                            <p:ajax update="dtRegistro" process="@this" />
-                        </p:datePicker>
-                    </div>
-                </div>
-            </div>
-        </p:toolbarGroup>
-    </p:toolbar>
+    <div class="ui-fluid formgrid grid">
+        <div class="field col-12 md:col-3">
+            <p:outputLabel for="@next" value="Periodo Inicio" />
+            <p:datePicker value="#{incidenciaBean.inicio}" showIcon="true" locale="es" timeZone="GMT-6" pattern="dd/MM/yyyy">
+                <p:ajax update="dtRegistro" process="@this" />
+            </p:datePicker>
+        </div>
+        <div class="field col-12 md:col-3">
+            <p:outputLabel for="@next" value="Periodo Fin" />
+            <p:datePicker  value="#{incidenciaBean.fin}" showIcon="true" locale="es" timeZone="GMT-6" pattern="dd/MM/yyyy">
+                <p:ajax update="dtRegistro" process="@this" />
+            </p:datePicker>
+        </div>
+    </div>
     <p:dataTable id="dtRegistro" widgetVar="dtRegistro" value="#{incidenciaBean.consultarRegistros()}" selection="#{incidenciaBean.listRegistroFiltrada}"
                  var="registro" rowKey="#{registro.idRegistro}" paginator="true" rows="10" paginatorPosition="bottom" reflow="true">
         <f:facet name="header">
