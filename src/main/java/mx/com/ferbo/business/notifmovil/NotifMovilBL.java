@@ -3,7 +3,7 @@ package mx.com.ferbo.business.notifmovil;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.dto.NotificacionMovilDTO;
 
-public interface BLNotifMovil {
+public interface NotifMovilBL {
 
     public static NotificacionMovilDTO obtenerMensaje(String operacion, DetEmpleado empleado) {
         String incidencia;

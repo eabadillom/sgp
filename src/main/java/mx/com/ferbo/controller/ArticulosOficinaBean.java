@@ -14,6 +14,7 @@ import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import mx.com.ferbo.business.incidencia.EstatusIncidenciaBL;
 import mx.com.ferbo.business.incidencia.EstatusSolicitudBL;
+import mx.com.ferbo.business.notifmovil.NotifMovilBL;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,11 +24,13 @@ import mx.com.ferbo.dao.n.ArticuloDAO;
 import mx.com.ferbo.dao.n.SolicitudArticuloDAO;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.IncidenciaDAO;
+import mx.com.ferbo.dto.NotificacionMovilDTO;
 import mx.com.ferbo.model.CatArticulo;
 import mx.com.ferbo.model.CatTipoIncidencia;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetIncidencia;
 import mx.com.ferbo.model.DetSolicitudArticulo;
+import mx.com.ferbo.servlet.NotificacionServlet;
 import mx.com.ferbo.util.SGPException;
 import mx.com.ferbo.util.ManageStatus;
 
@@ -143,6 +146,9 @@ public class ArticulosOficinaBean implements Serializable {
                 actualizarListas();
                 mensaje = "Solicitud Registrada";
                 severity = FacesMessage.SEVERITY_INFO;
+                NotificacionMovilDTO nmDTO = NotifMovilBL.obtenerMensaje("articulo", this.empleadoSelected);
+                NotificacionServlet notifServlet = new NotificacionServlet();
+                notifServlet.enviarNotificacion(nmDTO);
             } catch (SGPException e) 
             {
                 log.warn("Error al guardar el registro de articulos del empleado: {}", empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
