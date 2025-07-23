@@ -164,7 +164,7 @@ public class RegistroAsistenciaBL {
     
     public void enviarNotificacion(DetEmpleado empleado, Date horaLimiteEntrada)
     {
-        SGPApiClientBL notificacion = null;
+        SGPApiClientBL sgpApiClient = null;
         NotificacionMovilDTO msjNotificacion = null;
         DetEmpleadoConfiguracion empleadoConf = empleado.getEmpleadoConfiguracion();
         Date horaSistema = new Date();
@@ -176,8 +176,8 @@ public class RegistroAsistenciaBL {
         
         if(horaSistema.after(horaLimiteEntrada)){
             msjNotificacion = NotifMovilBL.obtenerMensaje("retardo", empleado);
-            notificacion = new SGPApiClientBL();
-            notificacion.enviarNotificacion(msjNotificacion);
+            sgpApiClient = new SGPApiClientBL();
+            sgpApiClient.enviarNotificacion(msjNotificacion);
             log.info("Notificacion enviada de retardo del empleado: {}", empleado.getIdEmpleado());
         }
     }
