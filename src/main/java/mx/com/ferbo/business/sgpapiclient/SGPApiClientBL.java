@@ -1,4 +1,4 @@
-package mx.com.ferbo.servlet;
+package mx.com.ferbo.business.sgpapiclient;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -9,7 +9,7 @@ import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import mx.com.ferbo.business.sgpapi.SGPApiBL;
+import mx.com.ferbo.client.SGPApiClient;
 import mx.com.ferbo.dto.NotificacionMovilDTO;
 import mx.com.ferbo.util.SGPException;
 
@@ -17,11 +17,11 @@ import mx.com.ferbo.util.SGPException;
  *
  * @author alberto
  */
-public class NotificacionServlet extends SGPApiBL
+public class SGPApiClientBL extends SGPApiClient
 {
-    private static Logger log = LogManager.getLogger(NotificacionServlet.class);
+    private static Logger log = LogManager.getLogger(SGPApiClient.class);
     
-    public NotificacionServlet()
+    public SGPApiClientBL()
     {
         super();
     }

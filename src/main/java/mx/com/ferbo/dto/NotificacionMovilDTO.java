@@ -3,23 +3,23 @@ package mx.com.ferbo.dto;
 
 public class NotificacionMovilDTO {
     
-    String titulo;
-    String contenido;
+    String title;
+    String body;
 
     public NotificacionMovilDTO() {
     }
 
     public NotificacionMovilDTO(String titulo, String contenido) {
-        this.titulo = titulo;
-        this.contenido = contenido;
+        this.title = titulo;
+        this.body = contenido;
     }
 
-    public String getTitulo() {
-        return titulo;
+    public String getTitle() {
+        return title;
     }
 
-    public String getContenido() {
-        return contenido;
+    public String getBody() {
+        return body;
     }
     
 }

@@ -1,4 +1,4 @@
-package mx.com.ferbo.business.sgpapi;
+package mx.com.ferbo.client;
 
 import com.google.gson.Gson;
 import java.io.IOException;
@@ -23,7 +23,7 @@ import org.apache.logging.log4j.Logger;
  *
  * @author alberto
  */
-public abstract class SGPApiBL 
+public abstract class SGPApiClient 
 {
     private static Logger log = LogManager.getLogger();
     
@@ -38,7 +38,7 @@ public abstract class SGPApiBL
     
     protected CloseableHttpClient httpClient = null;
 
-    public SGPApiBL() 
+    public SGPApiClient() 
     {
         basePath = DataSourceManager.getJndiParameter("sgpapi/api");
         user = DataSourceManager.getJndiParameter("sgpapi/user");

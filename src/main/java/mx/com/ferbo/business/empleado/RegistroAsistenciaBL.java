@@ -1,16 +1,18 @@
 package mx.com.ferbo.business.empleado;
 
 import java.util.Date;
-
 import mx.com.ferbo.business.registro.RegistroBL;
+import mx.com.ferbo.business.sgpapiclient.SGPApiClientBL;
 
 import mx.com.ferbo.dao.n.EmpleadoFotoDAO;
 import mx.com.ferbo.dao.n.EstatusRegistroDAO;
 import mx.com.ferbo.dao.n.RegistroDAO;
 import mx.com.ferbo.dao.n.TokenDAO;
+import mx.com.ferbo.dto.NotificacionMovilDTO;
 
 import mx.com.ferbo.model.CatEstatusRegistro;
 import mx.com.ferbo.model.DetEmpleado;
+import mx.com.ferbo.model.DetEmpleadoConfiguracion;
 import mx.com.ferbo.model.DetEmpleadoFoto;
 import mx.com.ferbo.model.DetRegistro;
 import mx.com.ferbo.model.DetToken;
@@ -21,6 +23,7 @@ import mx.com.ferbo.util.SGPException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import mx.com.ferbo.business.notifmovil.NotifMovilBL;
 
 /**
  *
@@ -146,6 +149,8 @@ public class RegistroAsistenciaBL {
             }
             this.registroDAO.guardar(registro);
             log.info("Entrada registrada correctamente");
+            
+            this.enviarNotificacion(empleado, horaLimiteEntrada);
         }
 
         if (tipoRegistro == false) {
@@ -155,6 +160,26 @@ public class RegistroAsistenciaBL {
             log.info("Salida registrada correctamente");
         }
 
+    }
+    
+    public void enviarNotificacion(DetEmpleado empleado, Date horaLimiteEntrada)
+    {
+        SGPApiClientBL notificacion = null;
+        NotificacionMovilDTO msjNotificacion = null;
+        DetEmpleadoConfiguracion empleadoConf = empleado.getEmpleadoConfiguracion();
+        Date horaSistema = new Date();
+        
+        if(empleadoConf == null || empleadoConf.getRetardo() == null){
+            log.info("No se envia notificacion de retardo del empleado: {}", empleado.getIdEmpleado());
+            return;
+        }
+        
+        if(horaSistema.after(horaLimiteEntrada)){
+            msjNotificacion = NotifMovilBL.obtenerMensaje("retardo", empleado);
+            notificacion = new SGPApiClientBL();
+            notificacion.enviarNotificacion(msjNotificacion);
+            log.info("Notificacion enviada de retardo del empleado: {}", empleado.getIdEmpleado());
+        }
     }
     
 }
