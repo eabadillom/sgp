@@ -93,8 +93,14 @@ public class IncidenciaBL implements Serializable
     	
     	switch(claveTipoIncidencia) {
     		case TP_PERMISO:
-    		case TP_VACACIONES:
     			incidencia.setSolPermiso(createSolicitudPermiso(empleado));
+    			tipoIncidencia = tipoIncidenciaDAO.buscarPorClave(TP_PERMISO).orElseThrow(() -> new SGPException("Tipo de incidencia no encontrado."));
+    			incidencia.setTipoIncidencia(tipoIncidencia);
+    			break;
+    		case TP_VACACIONES:
+    			incidencia.setSolPermiso(createSolicitudVacaciones(empleado));
+    			tipoIncidencia = tipoIncidenciaDAO.buscarPorClave(TP_VACACIONES).orElseThrow(() -> new SGPException("Tipo de incidencia no encontrado."));
+    			incidencia.setTipoIncidencia(tipoIncidencia);
     			break;
     		case TP_PRENDA:
     			incidencia.setSolPrenda(createSolicitudPrenda(empleado));
@@ -109,15 +115,14 @@ public class IncidenciaBL implements Serializable
     	return incidencia;
     }
     
-    private static DetSolicitudPermiso createSolicitudPermiso(DetEmpleado empleado) {
-    	DetSolicitudPermiso solicitud;
-    	
-    	solicitud = new DetSolicitudPermiso();
-    	solicitud.setEmpleadoSol(empleado);
-    	solicitud.setEstatus(EstatusSolicitudBL.estatusEnviado());
-    	solicitud.setFechaCap(new Date());
-    	
-    	return solicitud;
+    private static DetSolicitudPermiso createSolicitudPermiso(DetEmpleado empleado)
+    throws SGPException {
+    	return SolicitudPermisoBL.createSolicitudPermiso(empleado);
+    }
+    
+    private static DetSolicitudPermiso createSolicitudVacaciones(DetEmpleado empleado)
+    throws SGPException {
+    	return SolicitudPermisoBL.createSolicitudVacaciones(empleado);
     }
     
     public static DetSolicitudArticulo createSolicitudArticulo(DetEmpleado empleado) {
@@ -167,7 +172,7 @@ public class IncidenciaBL implements Serializable
     	if(incidencia.getIdIncidencia() == null)
     		incidenciaDAO.guardar(incidencia);
     	else
-    		incidenciaDAO.actualizar(incidencia);
+			incidenciaDAO.actualizar(incidencia);
     }
     
     public static void cancelar(DetIncidencia incidencia)

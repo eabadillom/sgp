@@ -16,38 +16,31 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
-import mx.com.ferbo.business.empleado.EmpleadoBL;
-import mx.com.ferbo.business.dianolaboral.DiasDeDescansoObligatorioBL;
-import mx.com.ferbo.business.incidencia.IncidenciaBL;
-import mx.com.ferbo.business.incidencia.EstatusIncidenciaBL;
-import mx.com.ferbo.business.incidencia.EstatusSolicitudBL;
-import mx.com.ferbo.business.registro.RegistroBL;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
+import mx.com.ferbo.business.dianolaboral.DiasDeDescansoObligatorioBL;
+import mx.com.ferbo.business.empleado.EmpleadoBL;
+import mx.com.ferbo.business.incidencia.EstatusIncidenciaBL;
+import mx.com.ferbo.business.incidencia.EstatusSolicitudBL;
+import mx.com.ferbo.business.incidencia.IncidenciaBL;
+import mx.com.ferbo.business.registro.RegistroBL;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
-import mx.com.ferbo.dao.n.IncidenciaDAO;
-import mx.com.ferbo.dao.n.SolicitudArticuloDAO;
-import mx.com.ferbo.dao.n.SolicitudPermisoDAO;
-import mx.com.ferbo.dao.n.SolicitudPrendaDAO;
-import mx.com.ferbo.dao.n.TipoSolicitudDAO;
 import mx.com.ferbo.dao.n.EstatusRegistroDAO;
+import mx.com.ferbo.dao.n.IncidenciaDAO;
 import mx.com.ferbo.dao.n.RegistroDAO;
-import mx.com.ferbo.dao.n.imss.IncapacidadIMSSDAO;
-
+import mx.com.ferbo.dao.n.TipoSolicitudDAO;
 import mx.com.ferbo.model.CatEstatusIncidencia;
+import mx.com.ferbo.model.CatEstatusRegistro;
 import mx.com.ferbo.model.CatTipoIncidencia;
 import mx.com.ferbo.model.CatTipoSolicitud;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetIncidencia;
+import mx.com.ferbo.model.DetRegistro;
 import mx.com.ferbo.model.DetSolicitudArticulo;
 import mx.com.ferbo.model.DetSolicitudPermiso;
 import mx.com.ferbo.model.DetSolicitudPrenda;
-import mx.com.ferbo.model.CatEstatusRegistro;
-import mx.com.ferbo.model.DetRegistro;
-
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.ManageStatus;
 import mx.com.ferbo.util.SGPException;
@@ -64,11 +57,7 @@ public class IncidenciaBean implements Serializable {
     private static Logger log = LogManager.getLogger(IncidenciaBean.class);
 
     private final IncidenciaDAO incidenciaDAO;
-    private final SolicitudPermisoDAO solicitudPermisoDAO;
     private final TipoSolicitudDAO tipoSolicitudDAO;
-    private final SolicitudPrendaDAO solicitudPrendaDAO;
-    private final SolicitudArticuloDAO solicitudArticulosDAO;
-    private final IncapacidadIMSSDAO incapacidadIMSSDAO;
     private DetIncidencia incidenciaSelected;
     private Date fechaSeleccionada;
     private List<DetIncidencia> lstIncidencias;
@@ -77,10 +66,7 @@ public class IncidenciaBean implements Serializable {
     private List<DetIncidencia> listaPrendas;
     private List<DetIncidencia> listaArticulos;
     private List<CatTipoSolicitud> lstTipoSol;
-    private List<DetSolicitudArticulo> listArticulos;
-    private List<DetSolicitudPermiso> listPermisos;
     private List<DetIncidencia> listAuxPermisos;
-    private List<DetSolicitudPrenda> listPrendas;
     private List<Date> lstRangoRegistro;
     private final List<Date> diasDeAsueto;
     private List<Integer> invalidDays;
@@ -125,13 +111,8 @@ public class IncidenciaBean implements Serializable {
         httpServletRequest = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         this.empleadoSelected = (DetEmpleado) httpServletRequest.getSession(true).getAttribute("empleado");
 
-        solicitudArticulosDAO = new SolicitudArticuloDAO();
-        solicitudPermisoDAO = new SolicitudPermisoDAO();
-        solicitudPrendaDAO = new SolicitudPrendaDAO();
-
         empleadoSelected = empleadoDAO.buscarPorId(empleadoSelected.getIdEmpleado());
         inicializarIncidencia();
-        this.incapacidadIMSSDAO = new IncapacidadIMSSDAO();
         this.diasDeAsueto = DiasDeDescansoObligatorioBL.diasDeAsueto();
         this.registroDAO = new RegistroDAO();
         this.estatusRegistroDAO = new EstatusRegistroDAO();
@@ -141,11 +122,8 @@ public class IncidenciaBean implements Serializable {
     public void init() {
         consultaIncidencias();
         consultarRegistrosAsistencia();
-        lstTipoSol = tipoSolicitudDAO.buscarActivos();
-        listArticulos = solicitudArticulosDAO.buscarPorIdEmpleado(empleadoSelected.getIdEmpleado());
-        listPermisos = solicitudPermisoDAO.buscarPorIdEmpleado(empleadoSelected.getIdEmpleado());
-        listPrendas = solicitudPrendaDAO.buscarPorIdEmpleado(empleadoSelected.getIdEmpleado());
-        listRegistro = registroDAO.buscarPorEmpleadoEstatus(retardo);
+        this.lstTipoSol = this.tipoSolicitudDAO.buscarActivos();
+        this.listRegistro = this.registroDAO.buscarPorEmpleadoEstatus(this.retardo);
         this.periodoFin = new Date();
         this.periodoInicio = DateUtil.inicializaFechaInicioAnioCurso(DateUtil.getAnio(periodoFin));
         this.validarFechaInicioFinIncidencia();
@@ -158,7 +136,7 @@ public class IncidenciaBean implements Serializable {
         this.estatusRechazado = false;
         this.estatusCancelado = false;
         this.estatusEnviado = false;
-        status = new ManageStatus();
+        this.status = new ManageStatus();
         this.sGoceSueldo = "100.0";
     }
     
@@ -169,13 +147,13 @@ public class IncidenciaBean implements Serializable {
     }
     
     private void consultaIncidencias() {
-        lstIncidencias = incidenciaDAO.buscarTodos();
+        this.lstIncidencias = incidenciaDAO.buscarTodos();
 
-        listaPrendas = lstIncidencias.stream()
+        this.listaPrendas = lstIncidencias.stream()
                 .filter(objeto -> objeto.getTipoIncidencia().getClave().trim().matches("PR"))
                 .collect(Collectors.toList());
 
-        listaArticulos = lstIncidencias.stream()
+        this.listaArticulos = lstIncidencias.stream()
                 .filter(objeto -> objeto.getTipoIncidencia().getClave().trim().matches("A"))
                 .collect(Collectors.toList());
     }
@@ -187,10 +165,10 @@ public class IncidenciaBean implements Serializable {
         if(this.periodoInicio == null || this.periodoFin == null)
         	throw new SGPException("El periodo de consulta de permisos / vacaciones es incorrecto.");
         
-        listaPeriodo = incidenciaDAO.buscarPermisos(periodoInicio, periodoFin);
+        listaPeriodo = this.incidenciaDAO.buscarPermisos(this.periodoInicio, this.periodoFin);
         
         
-        List<DetIncidencia> listaTipoPermiso = new ArrayList<>();
+        List<DetIncidencia> listaTipoPermiso = new ArrayList<DetIncidencia>();
 
         if (this.incidenciaPermiso) {
             List<DetIncidencia> listAux = listaPeriodo.stream()
@@ -368,15 +346,18 @@ public class IncidenciaBean implements Serializable {
         FacesMessage.Severity severity = null;
         String mensaje = null;
         String titulo = "Incidencia";
+        
         try {
-            DetSolicitudPermiso solicitudPermisoRechazada = incidenciaSelected.getSolPermiso();
-            incidenciaDAO.eliminaIncidenciaPorIdEmpleado(incidenciaSelected.getIdIncidencia(), incidenciaSelected.getEmpleado().getIdEmpleado(), solicitudPermisoRechazada.getIdSolicitud());
+            this.incidenciaSelected.setEstatusIncidencia(EstatusIncidenciaBL.estatusRechazado());
+            this.incidenciaSelected.setEmpleadoRev(empleadoSelected);
+            this.incidenciaSelected.setFechaMod(new Date());
             
-            solicitudPermisoRechazada.setFechaMod(new Date());
-            solicitudPermisoRechazada.setEstatus(EstatusSolicitudBL.estatusRechazado());
-            solicitudPermisoRechazada.setEmpleadoRev(this.empleadoSelected);
-            solicitudPermisoRechazada.setDescripcionRechazo(this.descripcionRechazo);
-            solicitudPermisoDAO.actualizar(solicitudPermisoRechazada);
+            this.incidenciaSelected.getSolPermiso().setFechaMod(new Date());
+            this.incidenciaSelected.getSolPermiso().setEstatus(EstatusSolicitudBL.estatusRechazado());
+            this.incidenciaSelected.getSolPermiso().setEmpleadoRev(this.empleadoSelected);
+            this.incidenciaSelected.getSolPermiso().setDescripcionRechazo(this.descripcionRechazo);
+            
+            incidenciaDAO.actualizar(incidenciaSelected);
             
             severity = FacesMessage.SEVERITY_INFO;
             mensaje = "Incidencia rechazada";
@@ -524,7 +505,7 @@ public class IncidenciaBean implements Serializable {
     
     public List<DetRegistro> consultarRegistros()
     {
-        List<DetRegistro> listaPeriodo = new ArrayList();
+        List<DetRegistro> listaPeriodo = new ArrayList<DetRegistro>();
         
         if (this.inicio != null && this.fin != null) {
             listaPeriodo = this.listRegistro.stream()
@@ -533,7 +514,7 @@ public class IncidenciaBean implements Serializable {
                     .collect(Collectors.toList());
         }
         
-        List<DetRegistro> listaEmpleado = new ArrayList();
+        List<DetRegistro> listaEmpleado = new ArrayList<DetRegistro>();
         
         if(this.empleadoAsistenciaTXT.equals(""))
         {

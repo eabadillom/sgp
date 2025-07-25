@@ -103,7 +103,7 @@ public class AsistenciaBean implements Serializable {
         tipoSolicitudDAO = new TipoSolicitudDAO();
         incidenciaDAO = new IncidenciaDAO();
         vacacionesDAO = new VacacionesDAO();
-//        inicializaSolicitud();
+        
         lstTipoSolSelect = new ArrayList<>();
         this.fechaDatePickerView = new ArrayList<>();
 

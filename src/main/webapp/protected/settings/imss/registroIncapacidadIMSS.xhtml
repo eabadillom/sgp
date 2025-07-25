@@ -12,13 +12,6 @@
             
             <div class="ui-fluid formgrid grid align-items-left">
             	<div class="field col-12 md:col-2">
-            		<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
-					<p:commandButton value="Registrar" icon="pi pi-plus" oncomplete="PF('dialogoRegistoIncapacidad').show();" update="pnlRegistoIncapacidad" 
-						actionListener="#{registroIncBean.incializarSolicitud()}" process="@this" style="margin-right: .5rem" >
-						<p:resetInput target="form:pnlRegistoIncapacidad" />
-					</p:commandButton>
-            	</div>
-            	<div class="field col-12 md:col-2">
             		<p:outputLabel for="@next" value="Periodo Inicio" />
 					<p:datePicker value="#{registroIncBean.periodoInicio}" showIcon="true" locale="es" timeZone="GMT-6" pattern="dd/MM/yyyy"
 							styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel">
@@ -43,6 +36,17 @@
 					<p:selectBooleanButton id="idEstatusCancelado" value="#{registroIncBean.estatusCancelado}" onIcon="pi pi-check" onLabel="Cancelada" offIcon="pi pi-times" offLabel="Cancelada" style="width: 100;">
 					    <p:ajax event="change" update="dtRegistroIncapacidad" process="@this"/>
 					</p:selectBooleanButton>
+            	</div>
+            	<div class="field col-12 md:col-2">
+            		<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+            		<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+            	</div>
+            	<div class="field col-12 md:col-2">
+            		<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+					<p:commandButton value="Registrar" icon="pi pi-plus" oncomplete="PF('dialogoRegistoIncapacidad').show();" update="pnlRegistoIncapacidad" 
+						actionListener="#{registroIncBean.incializarSolicitud()}" process="@this" style="margin-right: .5rem" >
+						<p:resetInput target="form:pnlRegistoIncapacidad" />
+					</p:commandButton>
             	</div>
             </div>
             

@@ -12,8 +12,11 @@ import mx.com.ferbo.dao.n.EstatusIncidenciaDAO;
 import mx.com.ferbo.dao.n.EstatusSolicitudDAO;
 import mx.com.ferbo.dao.n.IncidenciaDAO;
 import mx.com.ferbo.dao.n.SolicitudPermisoDAO;
+import mx.com.ferbo.dao.n.TipoSolicitudDAO;
 import mx.com.ferbo.model.CatEstatusIncidencia;
 import mx.com.ferbo.model.CatEstatusSolicitud;
+import mx.com.ferbo.model.CatTipoSolicitud;
+import mx.com.ferbo.model.DetDiaPermiso;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetIncidencia;
 import mx.com.ferbo.model.DetSolicitudPermiso;
@@ -69,6 +72,42 @@ public class SolicitudPermisoBL implements Serializable
         log.trace("Dias de bloqueo: {}", diasSeleccionados.toString());
         return diasSeleccionados;
     }
+    
+    private static DetSolicitudPermiso create(DetEmpleado empleado) {
+    	DetSolicitudPermiso solicitud = new DetSolicitudPermiso();
+    	solicitud.setEmpleadoSol(empleado);
+    	solicitud.setEstatus(EstatusSolicitudBL.estatusEnviado());
+    	solicitud.setFechaCap(new Date());
+    	return solicitud;
+    }
+    
+    public static DetSolicitudPermiso createSolicitudPermiso(DetEmpleado empleado)
+    throws SGPException {
+    	DetSolicitudPermiso solicitud = create(empleado);
+    	
+    	TipoSolicitudDAO tipoSolicitudDAO = new TipoSolicitudDAO();
+    	CatTipoSolicitud tipoPermiso;
+    	tipoPermiso = tipoSolicitudDAO.buscarPorClave(TP_PERMISO).orElseThrow(() -> new SGPException("Tipo de solicitud no soportada."));
+    	solicitud.setTipoSolicitud(tipoPermiso);
+    	
+    	return solicitud;
+    }
+    
+    public static DetSolicitudPermiso createSolicitudVacaciones(DetEmpleado empleado)
+    throws SGPException {
+    	DetSolicitudPermiso solicitud = create(empleado);
+    	
+    	TipoSolicitudDAO tipoSolicitudDAO = new TipoSolicitudDAO();
+    	CatTipoSolicitud tipoVacaciones;
+    	tipoVacaciones = tipoSolicitudDAO.buscarPorClave(TP_VACACIONES).orElseThrow(() -> new SGPException("Tipo de solicitud no soportada."));;
+    	
+    	solicitud.setTipoSolicitud(tipoVacaciones);
+    	solicitud.setDiasPermiso(new ArrayList<DetDiaPermiso>());
+    	
+    	return solicitud;
+    }
+    
+    
     
     //Valida que una solicitud de permiso que no se empalme con otro registro durante un periodo solicitado
     public static void validarSolicitudPermiso(DetSolicitudPermiso solicitudPermiso) throws SGPException {

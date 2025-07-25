@@ -3,6 +3,7 @@ package mx.com.ferbo.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.Basic;
@@ -16,6 +17,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -91,10 +93,13 @@ public class DetSolicitudPermiso implements Serializable {
     @Column(name = "pc_goce_sueldo")
     private BigDecimal goceSueldo;
     
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH})
+    @ManyToOne
     @JoinColumn(name = "id_vacaciones")
     @Basic(optional = true)
     private DetVacaciones vacaciones;
+    
+    @OneToMany(mappedBy = "solicitudPermiso", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DetDiaPermiso> diasPermiso;
 
     public DetSolicitudPermiso() {
     }
@@ -231,6 +236,14 @@ public class DetSolicitudPermiso implements Serializable {
 
 	public void setVacaciones(DetVacaciones vacaciones) {
 		this.vacaciones = vacaciones;
+	}
+
+	public List<DetDiaPermiso> getDiasPermiso() {
+		return diasPermiso;
+	}
+
+	public void setDiasPermiso(List<DetDiaPermiso> diasPermiso) {
+		this.diasPermiso = diasPermiso;
 	}
 
 }

@@ -14,11 +14,16 @@
 				<p:ajax process="@this" event="change" listener="#{permisosBean.cargarPermisos()}" update="dt-permisos"/>
 			</p:datePicker>
 		</div>
-		<div class="field col-12 md:col-6">
+		<div class="field col-12 md:col-4">
     		<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
     	</div>
     	<div class="field col-12 md:col-2">
-    		<p:commandButton value="Registrar" icon="pi pi-plus" class="ui-button-success m-1" styleClass="edit-button" style="margin-right: .5rem" process="@this" actionListener="#{permisosBean.nuevoPermiso()}" oncomplete="PF('dgPermiso').show();" update="formActividades:tabView:dg-permiso">
+    		<p:selectBooleanButton value="#{permisosBean.mostrarCanceladas}" onIcon="pi pi-eye" onLabel="Cancelados" offIcon="pi pi-eye-slash" offLabel="Cancelados">
+    			<p:ajax event="change" process="@this" update="formActividades:tabView:dt-permisos" listener="#{permisosBean.cargarPermisos()}"/>
+    		</p:selectBooleanButton>
+    	</div>
+    	<div class="field col-12 md:col-2">
+    		<p:commandButton value="Registrar" icon="pi pi-plus" process="@this" actionListener="#{permisosBean.nuevoPermiso()}" oncomplete="PF('dgPermiso').show();" update="formActividades:tabView:dg-permiso">
             </p:commandButton>
     	</div>
 	</div>
@@ -57,7 +62,8 @@
 			</p:datePicker>
 		</div>
 		<div class="field" align="center">
-			<p:inputText id="txtStatus" value="#{permisosBean.permiso.solPermiso.estatus.descripcion}" rendered="#{permisosBean.permiso.idIncidencia ne null}"/>
+			<p:outputLabel value="#{permisosBean.permiso.solPermiso.estatus.descripcion}" styleClass="customer-badge status-#{permisosBean.status.getStatusClass(permiso.solPermiso.estatus.clave)}">
+			</p:outputLabel>
 		</div>
 		<f:facet name="footer">
 			<p:commandButton value="Cancelar" icon="pi pi-times" actionListener="#{permisosBean.cancelar()}" rendered="#{permisosBean.permiteCancelar()}" styleClass="ui-button-danger">

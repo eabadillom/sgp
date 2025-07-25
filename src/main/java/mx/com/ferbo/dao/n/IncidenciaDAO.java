@@ -2,6 +2,7 @@ package mx.com.ferbo.dao.n;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -28,7 +29,7 @@ public class IncidenciaDAO extends BaseDAO<DetIncidencia, Integer> {
     public IncidenciaDAO() {
         super(DetIncidencia.class);
     }
-
+    
     public List<DetIncidencia> buscarTodos() {
         List<DetIncidencia> modelList = null;
         EntityManager emSGP = null;
@@ -57,6 +58,34 @@ public class IncidenciaDAO extends BaseDAO<DetIncidencia, Integer> {
         }
 
         return modelList;
+    }
+    
+    public Optional<DetIncidencia> cargar(Integer id)
+    throws SGPException {
+    	
+    	Optional<DetIncidencia> optional;
+    	DetIncidencia model = null;
+    	EntityManager em = null;
+    	
+    	try {
+    		em = this.getEntityManager();
+    		
+    		model = em.find(this.modelClass, id);
+    		
+    		model.getSolPermiso().getDiasPermiso().stream()
+    		.forEach(item -> log.info("dia solicitado: {}", item.getId()));
+    		
+    		log.info("Id vacaciones: {}", model.getSolPermiso().getVacaciones().getIdVacaciones());
+    		
+    		optional = Optional.of(model);
+    	} catch(Exception ex) {
+    		log.warn("Problema para obtener la incidencia {}... {}", id, ex.getMessage());
+    		optional = Optional.empty();
+    	} finally {
+    		this.close(em);
+    	}
+    	
+    	return optional;
     }
 
     public List<DetIncidencia> buscarPorIdEmpleado(Integer idEmpleado) {

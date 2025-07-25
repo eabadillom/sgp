@@ -40,19 +40,18 @@ public class PermisosBean implements Serializable {
 	private Date periodoInicio;
 	private Date periodoFin;
 	private Date minDate;
-	private Date fecha;
 	private List<DetIncidencia> permisos;
 	private DetIncidencia permiso;
 	private IncidenciaDAO incidenciaDAO;
 	private CatTipoSolicitud tipoSolicitud;
 	private TipoSolicitudDAO tipoSolicitudDAO;
+	private Boolean mostrarCanceladas;
 	
 	private ManageStatus status;
 	
 	public PermisosBean() throws SGPException {
-		request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-		this.empleado = (DetEmpleado) request.getSession(false).getAttribute("empleado");
-		
+		this.request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+		this.empleado = (DetEmpleado) this.request.getSession(false).getAttribute("empleado");
 		this.periodoInicio = DateUtil.addMonth(new Date(), -1);
 		this.periodoFin    = DateUtil.addMonth(new Date(),  1);
 		this.incidenciaDAO = new IncidenciaDAO();
@@ -61,6 +60,7 @@ public class PermisosBean implements Serializable {
 				.orElseThrow(() -> new SGPException("Tipo de solicitud no encontrada"));
 		this.minDate = DateUtil.addDay(DateUtil.now(), -7);
 		this.status = new ManageStatus();
+		this.mostrarCanceladas = Boolean.FALSE;
 	}
 	
 	@PostConstruct
@@ -72,9 +72,16 @@ public class PermisosBean implements Serializable {
 		log.info("Cargando lista de permisos del empleado...");
 		permisos = incidenciaDAO.buscarPermisos(periodoInicio, periodoFin)
 				.stream()
-				.filter(item -> "P".equalsIgnoreCase(item.getSolPermiso().getTipoSolicitud().getClave()))
+				.filter(item -> SolicitudPermisoBL.TP_PERMISO
+						.equalsIgnoreCase(item.getSolPermiso().getTipoSolicitud().getClave()))
 				.collect(Collectors.toList())
 				;
+		
+		if(this.mostrarCanceladas == false)
+			permisos = permisos.stream()
+			.filter(item -> !"C".equalsIgnoreCase(item.getSolPermiso().getEstatus().getClave()) )
+			.collect(Collectors.toList())
+			;
 	}
 	
 	public void nuevoPermiso() {
@@ -203,6 +210,7 @@ public class PermisosBean implements Serializable {
 			case SolicitudPermisoBL.STATUS_CANCELADA:
 			case SolicitudPermisoBL.STATUS_RECHAZADA:
 				respuesta = false;
+				break;
 		}
 		
 		return respuesta;
@@ -221,6 +229,7 @@ public class PermisosBean implements Serializable {
 			case SolicitudPermisoBL.STATUS_ENVIADA:
 			case SolicitudPermisoBL.STATUS_APROBADA:
 				respuesta = true;
+				break;
 			case SolicitudPermisoBL.STATUS_RECHAZADA:
 			case SolicitudPermisoBL.STATUS_CANCELADA:
 				respuesta = false;
@@ -270,20 +279,20 @@ public class PermisosBean implements Serializable {
 		this.minDate = minDate;
 	}
 
-	public Date getFecha() {
-		return fecha;
-	}
-
-	public void setFecha(Date fecha) {
-		this.fecha = fecha;
-	}
-
 	public ManageStatus getStatus() {
 		return status;
 	}
 
 	public void setStatus(ManageStatus status) {
 		this.status = status;
+	}
+
+	public Boolean getMostrarCanceladas() {
+		return mostrarCanceladas;
+	}
+
+	public void setMostrarCanceladas(Boolean mostrarCanceladas) {
+		this.mostrarCanceladas = mostrarCanceladas;
 	}
 	
 
