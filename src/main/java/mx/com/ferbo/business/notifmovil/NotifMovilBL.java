@@ -12,7 +12,6 @@ public interface NotifMovilBL {
         switch (operacion) {
 
             case "retardo":
-            case "ausencia":
                 incidencia = "Notificiacion";
                 descripcion = " tiene ";
                 break;
