@@ -2,12 +2,17 @@ package mx.com.ferbo.dao.n.imss;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+
 import javax.persistence.EntityManager;
 import javax.persistence.TemporalType;
-import mx.com.ferbo.commons.dao.BaseDAO;
-import mx.com.ferbo.model.imss.DetIncapacidad;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import mx.com.ferbo.commons.dao.BaseDAO;
+import mx.com.ferbo.model.DetRegistroIncapacidad;
+import mx.com.ferbo.model.imss.DetIncapacidad;
 
 /**
  *
@@ -170,6 +175,38 @@ public class IncapacidadIMSSDAO extends BaseDAO<DetIncapacidad, Integer>
 		}
 
 		return modelList;
+	}
+	
+	public Optional<DetIncapacidad> cargar(Integer id){
+		Optional<DetIncapacidad> optional;
+		DetIncapacidad model = null;
+		EntityManager em = null;
+		
+		try {
+			em = this.getEntityManager();
+			model = em.find(this.modelClass, id);
+			
+			for(DetRegistroIncapacidad item : model.getRegistrosIncapacidad()) {
+				log.debug("Id registro incapacidad: {}", item.getId());
+				log.debug("Id registro: {}",  item.getRegistro());
+			}
+//			if(model.getRegistrosIncapacidad() != null || model.getRegistrosIncapacidad().size() > 0) {
+//				model.getRegistrosIncapacidad()
+//				.forEach(item -> {
+//					
+//				});
+//			}
+			
+			optional = Optional.of(model);
+			
+		} catch(Exception ex) {
+			log.error("Problema para obtener la incapacidad con id: {}...\n{}", id, ex);
+			optional = Optional.empty();
+		} finally {
+			this.close(em);
+		}
+		
+		return optional;
 	}
     
 }

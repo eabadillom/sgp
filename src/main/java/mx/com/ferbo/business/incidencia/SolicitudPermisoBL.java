@@ -134,7 +134,7 @@ public class SolicitudPermisoBL implements Serializable
     //Valida si existe un periodo de una solicitud de permiso y/o vacaciones durante un periodo de una incapacidad
     public static void validarPeriodoSolicitudPermiso(DetIncapacidad incapacidad) throws SGPException {
         log.info("Entrando a validar vacaciones y/o permisos");
-        Integer idEmpleadoInc = incapacidad.getIdEmpleadoInc().getIdEmpleado();
+        Integer idEmpleadoInc = incapacidad.getEmpleado().getIdEmpleado();
         Date fechaInicio = incapacidad.getFechaInicio();
         Date fechaFin = incapacidad.getFechaFin();
         log.trace("Fecha Inicial: {} y Fecha Final: {} del Empleado: {}", fechaInicio, fechaFin, idEmpleadoInc);

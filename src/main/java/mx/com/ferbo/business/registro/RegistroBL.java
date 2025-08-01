@@ -1,6 +1,7 @@
 package mx.com.ferbo.business.registro;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -17,8 +18,10 @@ import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetEmpleadoConfiguracion;
 import mx.com.ferbo.model.DetIncidencia;
 import mx.com.ferbo.model.DetRegistro;
+import mx.com.ferbo.model.DetRegistroIncapacidad;
 import mx.com.ferbo.model.DetRegistroVacaciones;
 import mx.com.ferbo.model.InfDatoEmpresa;
+import mx.com.ferbo.model.imss.DetIncapacidad;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.SGPException;
 
@@ -226,51 +229,56 @@ public class RegistroBL implements Serializable
         log.info("Num. registros de incapacidad guardados del empleado {} en asistencia: {}", empleado.getIdEmpleado(), cantidadRegistrosGuardados);
     }
     
-    /*Guarda los registros de incapacidad en registro de asistencia*/
-    public static void guardarRegistroIncapacidad(DetEmpleado empleadoInc, Date fechaInicio, Date fechaFin, List<Date> diasAsueto) throws SGPException
-    {
-        EmpleadoBL.empleadoTieneDiasLaborales(empleadoInc);
-        
-        int cantidadRegistrosGuardados = 0;
-        RegistroDAO registroDAO = new RegistroDAO();
-        InfDatoEmpresa empleadoEmpresa = empleadoInc.getDatoEmpresa();
-        
-        Integer horaEntrada = DateUtil.getHora(empleadoEmpresa.getHoraEntrada());
-        Integer horaSalida = DateUtil.getHora(empleadoEmpresa.getHorasalida());
-        try
-        {
-            List<Date> listaFechas = DateUtil.generarArreglosFechas(fechaInicio, fechaFin);
-            log.trace("Lista de Fechas: {}", listaFechas);
-            listaFechas = DateUtil.diasVacacionesSolicitados(listaFechas, diasAsueto, empleadoInc.getDatoEmpresa());
+	/* Guarda los registros de incapacidad en registro de asistencia */
+	public static void guardarRegistroIncapacidad(DetIncapacidad incapacidad, Date fechaInicio, Date fechaFin,
+			List<Date> diasAsueto) throws SGPException {
+		List<DetRegistroIncapacidad> registrosIncapacidad = null;
+		DetRegistroIncapacidad registroIncapacidad = null;
 
-            for(Date dia : listaFechas)
-            {
-                DetRegistro registro = new DetRegistro();
-                registro.setIdEmpleado(empleadoInc);
-                registro.setStatus(EstatusRegistroBL.estatusIncapacidad());
+		DetEmpleado empleado = incapacidad.getEmpleado();
+		EmpleadoBL.empleadoTieneDiasLaborales(empleado);
 
-                Date registroEntrada = DateUtil.getDateTime(DateUtil.getAnio(dia), DateUtil.getMes(dia), DateUtil.getDia(dia), horaEntrada, 0, 0, 0);
-                registro.setFechaEntrada(registroEntrada);
-                log.trace("Hora entrada: {}", registroEntrada);
-                
-                Date registroSalida = DateUtil.getDateTime(DateUtil.getAnio(dia), DateUtil.getMes(dia), DateUtil.getDia(dia), horaSalida, 0, 0, 0);
-                registro.setFechaSalida(registroSalida);
-                log.trace("Hora salida: {}", registroSalida);
-                
-                registroDAO.guardar(registro);
-                cantidadRegistrosGuardados += 1;
-            }
-            
-            log.info("Num. registros de incapacidad guardados del empleado {} en asistencia: {}", empleadoInc.getIdEmpleado(), cantidadRegistrosGuardados);
-        }catch(SGPException ex)
-        {
-            log.info("Error al registrar la incapacidad: {}", ex);
-            throw new SGPException("Error al registrar la incapacidad");
-        }catch (Exception e) 
-        {
-            log.info("Error: ", e);
-        }
-    }
+		int cantidadRegistrosGuardados = 0;
+//		RegistroDAO registroDAO = new RegistroDAO();
+		InfDatoEmpresa empleadoEmpresa = empleado.getDatoEmpresa();
+
+		Integer horaEntrada = DateUtil.getHora(empleadoEmpresa.getHoraEntrada());
+		Integer horaSalida = DateUtil.getHora(empleadoEmpresa.getHorasalida());
+		
+		registrosIncapacidad = new ArrayList<DetRegistroIncapacidad>();
+		
+		List<Date> listaFechas = DateUtil.generarArreglosFechas(fechaInicio, fechaFin);
+		log.trace("Lista de Fechas: {}", listaFechas);
+		listaFechas = DateUtil.diasVacacionesSolicitados(listaFechas, diasAsueto, empleado.getDatoEmpresa());
+		
+		for (Date dia : listaFechas) {
+			DetRegistro registro = new DetRegistro();
+			registro.setIdEmpleado(empleado);
+			registro.setStatus(EstatusRegistroBL.estatusIncapacidad());
+			
+			Date registroEntrada = DateUtil.getDateTime(DateUtil.getAnio(dia), DateUtil.getMes(dia),
+					DateUtil.getDia(dia), horaEntrada, 0, 0, 0);
+			registro.setFechaEntrada(registroEntrada);
+			log.trace("Hora entrada: {}", registroEntrada);
+			
+			Date registroSalida = DateUtil.getDateTime(DateUtil.getAnio(dia), DateUtil.getMes(dia),
+					DateUtil.getDia(dia), horaSalida, 0, 0, 0);
+			registro.setFechaSalida(registroSalida);
+			log.trace("Hora salida: {}", registroSalida);
+			
+			registroIncapacidad = new DetRegistroIncapacidad();
+			registroIncapacidad.setIncapacidad(incapacidad);
+			registroIncapacidad.setRegistro(registro);
+			
+			registrosIncapacidad.add(registroIncapacidad);
+			incapacidad.setRegistrosIncapacidad(registrosIncapacidad);
+//				registroDAO.guardar(registro);
+			cantidadRegistrosGuardados += 1;
+		}
+		
+		log.info("Num. registros de incapacidad guardados del empleado {} en asistencia: {}",
+				empleado.getIdEmpleado(), cantidadRegistrosGuardados);
+	}
     
     public static void actualizarRegistroIncapacidad(DetEmpleado empleadoInc, List<Date> listaFechas, List<Date> diasAsueto) throws SGPException
     {
