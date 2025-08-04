@@ -121,16 +121,14 @@ public class CatEstatusSolicitud implements Serializable
     }
 
     @Override
-    public int hashCode() 
-    {
-        int hash = 7;
-        hash = 13 * hash + Objects.hashCode(this.id);
-        return hash;
+    public int hashCode() {
+    	if(this.id == null)
+    		return System.identityHashCode(this);
+        return Objects.hashCode(this.id);
     }
 
     @Override
-    public boolean equals(Object obj) 
-    {
+    public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }

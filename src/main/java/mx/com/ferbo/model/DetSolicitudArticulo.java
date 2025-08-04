@@ -2,8 +2,8 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,9 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -25,10 +23,8 @@ import javax.persistence.TemporalType;
  */
 @Entity
 @Table(name = "det_solicitud_articulo")
-@NamedQueries({
-    @NamedQuery(name = "DetSolicitudArticulo.findAll", query = "SELECT d FROM DetSolicitudArticulo d"),
-    @NamedQuery(name = "DetSolicitudArticulo.findArticulosIdEmpleado", query = "SELECT dsa FROM DetSolicitudArticulo dsa INNER JOIN dsa.empleadoSol e INNER JOIN dsa.articulo a WHERE e.idEmpleado = :numEmpl")
-})
+@NamedQuery(name = "DetSolicitudArticulo.findAll", query = "SELECT d FROM DetSolicitudArticulo d")
+@NamedQuery(name = "DetSolicitudArticulo.findArticulosIdEmpleado", query = "SELECT dsa FROM DetSolicitudArticulo dsa INNER JOIN dsa.empleadoSol e INNER JOIN dsa.articulo a WHERE e.idEmpleado = :numEmpl")
 public class DetSolicitudArticulo implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -55,9 +51,6 @@ public class DetSolicitudArticulo implements Serializable {
     @Column(name = "fecha_mod")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaMod;
-    
-    @OneToMany(mappedBy = "solArticulo")
-    private List<DetIncidencia> detIncidenciaList;
     
     @JoinColumn(name = "id_articulo", referencedColumnName = "id_articulo")
     @ManyToOne(optional = false)
@@ -124,14 +117,6 @@ public class DetSolicitudArticulo implements Serializable {
 
     public void setFechaMod(Date fechaMod) {
         this.fechaMod = fechaMod;
-    }
-
-    public List<DetIncidencia> getDetIncidenciaList() {
-        return detIncidenciaList;
-    }
-
-    public void setDetIncidenciaList(List<DetIncidencia> detIncidenciaList) {
-        this.detIncidenciaList = detIncidenciaList;
     }
 
     public CatArticulo getArticulo() {

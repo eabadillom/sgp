@@ -153,10 +153,10 @@ public class DetEmpleado implements Serializable {
     @OneToOne(mappedBy = "empleado", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private DetEmpleadoConfiguracion empleadoConfiguracion;
     
-    @OneToMany(mappedBy = "idEmpleadoInc")
+    @OneToMany(mappedBy = "empleado")
     private List<DetIncapacidad> registroIncapacidadInc;
     
-    @OneToMany(mappedBy = "idEmpleadoRev")
+    @OneToMany(mappedBy = "autorizador")
     private List<DetIncapacidad> registroIncapacidadRev;
     
     public DetEmpleado() {

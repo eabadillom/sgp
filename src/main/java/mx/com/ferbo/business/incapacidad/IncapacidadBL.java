@@ -1,19 +1,18 @@
 package mx.com.ferbo.business.incapacidad;
 
 import java.io.Serializable;
-
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import mx.com.ferbo.dao.n.imss.IncapacidadIMSSDAO;
-
-import mx.com.ferbo.model.DetEmpleado;
-import mx.com.ferbo.model.imss.DetIncapacidad;
-
-import mx.com.ferbo.util.SGPException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import mx.com.ferbo.dao.n.imss.IncapacidadIMSSDAO;
+import mx.com.ferbo.model.DetEmpleado;
+import mx.com.ferbo.model.DetRegistroIncapacidad;
+import mx.com.ferbo.model.imss.DetIncapacidad;
+import mx.com.ferbo.util.SGPException;
 
 /**
  *
@@ -34,6 +33,15 @@ public class IncapacidadBL implements Serializable
             log.warn("El empleado {} tiene las siguientes incapacidades: {}", empleado.getIdEmpleado(), listIncapacidades.toString());
             throw new SGPException("Ya existe un registro de incapacidad");
         }
+    }
+    
+    public static DetIncapacidad create() {
+    	DetIncapacidad incapacidad = null;
+    	
+    	incapacidad = new DetIncapacidad();
+    	incapacidad.setRegistrosIncapacidad(new ArrayList<DetRegistroIncapacidad>());
+    	
+    	return incapacidad;
     }
     
 }

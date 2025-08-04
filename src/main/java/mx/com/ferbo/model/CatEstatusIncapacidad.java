@@ -1,8 +1,8 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,9 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import mx.com.ferbo.model.imss.DetIncapacidad;
 
 /**
  *
@@ -22,113 +20,86 @@ import mx.com.ferbo.model.imss.DetIncapacidad;
 @Entity
 @Table(name = "cat_estatus_incapacidad")
 @NamedQueries({
-    @NamedQuery(name = "CatEstatusIncapacidad.findAll", query = "SELECT ces FROM CatEstatusIncapacidad ces"),
-    @NamedQuery(name = "CatEstatusIncapacidad.findByClave", query = "SELECT ces FROM CatEstatusIncapacidad ces WHERE ces.clave = :clave")
-})
-public class CatEstatusIncapacidad implements Serializable
-{
-    private static final long serialVersionUID = 1L;
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "cd_estatus_inc")
-    private Integer idEstatusSolicitud;
-    
-    @Basic(optional = false)
-    @Column(name = "nb_clave")
-    private String clave;
-    
-    @Basic(optional = false)
-    @Column(name = "nb_descripcion")
-    private String descripcion;
-    
-    @OneToMany(mappedBy = "estatusSolicitud")
-    private List<DetIncapacidad> registroEstatusSolicitudes;
+		@NamedQuery(name = "CatEstatusIncapacidad.findAll", query = "SELECT ces FROM CatEstatusIncapacidad ces"),
+		@NamedQuery(name = "CatEstatusIncapacidad.findByClave", query = "SELECT ces FROM CatEstatusIncapacidad ces WHERE ces.clave = :clave") })
+public class CatEstatusIncapacidad implements Serializable {
+	private static final long serialVersionUID = 1L;
 
-    public CatEstatusIncapacidad() 
-    {
-    }
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Basic(optional = false)
+	@Column(name = "cd_estatus_inc")
+	private Integer idEstatusSolicitud;
 
-    public CatEstatusIncapacidad(Integer idEstatusSolicitud) 
-    {
-        this.idEstatusSolicitud = idEstatusSolicitud;
-    }
+	@Basic(optional = false)
+	@Column(name = "nb_clave")
+	private String clave;
 
-    public CatEstatusIncapacidad(String clave) 
-    {
-        this.clave = clave;
-    }
+	@Basic(optional = false)
+	@Column(name = "nb_descripcion")
+	private String descripcion;
 
-    public Integer getIdEstatusSolicitud() 
-    {
-        return idEstatusSolicitud;
-    }
+	public CatEstatusIncapacidad() {
+	}
 
-    public void setIdEstatusSolicitud(Integer idEstatusSolicitud) 
-    {
-        this.idEstatusSolicitud = idEstatusSolicitud;
-    }
-    
-    public String getClave() 
-    {
-        return clave;
-    }
+	public CatEstatusIncapacidad(Integer idEstatusSolicitud) {
+		this.idEstatusSolicitud = idEstatusSolicitud;
+	}
 
-    public void setClave(String clave) 
-    {
-        this.clave = clave;
-    }
+	public CatEstatusIncapacidad(String clave) {
+		this.clave = clave;
+	}
 
-    public String getDescripcion() 
-    {
-        return descripcion;
-    }
+	public Integer getIdEstatusSolicitud() {
+		return idEstatusSolicitud;
+	}
 
-    public void setDescripcion(String descripcion) 
-    {
-        this.descripcion = descripcion;
-    }
-    
-    public List<DetIncapacidad> getRegistroEstatusSolicitudes() 
-    {
-        return registroEstatusSolicitudes;
-    }
+	public void setIdEstatusSolicitud(Integer idEstatusSolicitud) {
+		this.idEstatusSolicitud = idEstatusSolicitud;
+	}
 
-    public void setRegistroEstatusSolicitudes(List<DetIncapacidad> registroEstatusSolicitudes) 
-    {
-        this.registroEstatusSolicitudes = registroEstatusSolicitudes;
-    }
+	public String getClave() {
+		return clave;
+	}
 
-    @Override
-    public int hashCode() 
-    {
-        int hash = 7;
-        hash = 41 * hash + Objects.hashCode(this.idEstatusSolicitud);
-        return hash;
-    }
+	public void setClave(String clave) {
+		this.clave = clave;
+	}
 
-    @Override
-    public boolean equals(Object obj) 
-    {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) 
-        {
-            return false;
-        }
-        final CatEstatusIncapacidad other = (CatEstatusIncapacidad) obj;
-        return Objects.equals(this.idEstatusSolicitud, other.idEstatusSolicitud);
-    }
+	public String getDescripcion() {
+		return descripcion;
+	}
 
-    @Override
-    public String toString() 
-    {
-        return "CatEstatusIncapacidad[" + "IdEstatusSolicitud: " + idEstatusSolicitud + ", Clave: " + clave + ", Descripcion: " + descripcion + ']';
-    }
-    
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
+
+	@Override
+	public int hashCode() {
+		if(this.idEstatusSolicitud == null)
+			return System.identityHashCode(this);
+		return Objects.hashCode(this.idEstatusSolicitud);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final CatEstatusIncapacidad other = (CatEstatusIncapacidad) obj;
+		return Objects.equals(this.idEstatusSolicitud, other.idEstatusSolicitud);
+	}
+
+	@Override
+	public String toString() {
+		return "CatEstatusIncapacidad[" + "IdEstatusSolicitud: " + idEstatusSolicitud + ", Clave: " + clave
+				+ ", Descripcion: " + descripcion + ']';
+	}
+
 }
