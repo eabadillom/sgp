@@ -6,48 +6,44 @@
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
-    <p:toolbar>
-        <p:toolbarGroup id="grupoBotones" align="center">
-            <div class="ui-fluid formgrid grid" >
-                <div class="field col-12 md:col-2">
-                    <p:outputLabel for="@next" value="Periodo Inicio" />
-                    <p:datePicker value="#{incidenciaBean.periodoInicio}" showIcon="true" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy">
-                        <p:ajax update="dtIncidencias" process="@this" />
-                    </p:datePicker>
-                </div>
-                <div class="field col-12 md:col-2">
-                    <p:outputLabel for="@next" value="Periodo Fin" />
-                    <p:datePicker  value="#{incidenciaBean.periodoFin}" showIcon="true" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy">
-                        <p:ajax update="dtIncidencias" process="@this" />
-                    </p:datePicker>
-                </div>
-                <div class="field col-12 md:col-2">
-                	<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
-                    <p:selectBooleanButton id="idVacaciones" widgetVar="idVacaciones" value="#{incidenciaBean.incidenciaVacaciones}" onIcon="pi pi-check" onLabel="Vacaciones" offIcon="pi pi-times" offLabel="Vacaciones">
-                        <p:ajax event="change" update="dtIncidencias" process="@this" />
-                    </p:selectBooleanButton>
-                </div>
-                <div class="field col-12 md:col-2">
-                	<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
-                    <p:selectBooleanButton id="idPermiso" widgetVar="idPermiso" value="#{incidenciaBean.incidenciaPermiso}" onIcon="pi pi-check" onLabel="Permisos" offIcon="pi pi-times" offLabel="Permisos" >
-                        <p:ajax event="change" update="dtIncidencias" process="@this" />
-                    </p:selectBooleanButton>
-                </div>
-                <div class="field col-12 md:col-2">
-                	<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
-                    <p:selectBooleanButton id="idEstatusAceptado" value="#{incidenciaBean.estatusAceptado}" onIcon="pi pi-check" onLabel="Aprobadas" offIcon="pi pi-times" offLabel="Aprobadas" >
-                        <p:ajax event="change" update="dtIncidencias" process="@this"/>
-                    </p:selectBooleanButton>
-                </div>
-                <div class="field col-12 md:col-2" >
-                	<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
-                    <p:selectBooleanButton id="idEstatusEnviado" value="#{incidenciaBean.estatusEnviado}" onIcon="pi pi-check" onLabel="Pendientes" offIcon="pi pi-times" offLabel="Pendientes" >
-                        <p:ajax event="change" update="dtIncidencias" process="@this"/>
-                    </p:selectBooleanButton>
-                </div>
-            </div>
-        </p:toolbarGroup>
-    </p:toolbar>
+    <div class="ui-fluid formgrid grid" >
+        <div class="field col-12 md:col-2">
+            <p:outputLabel for="@next" value="Periodo Inicio" />
+            <p:datePicker value="#{incidenciaBean.periodoInicio}" showIcon="true" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy">
+                <p:ajax update="dtIncidencias" process="@this" />
+            </p:datePicker>
+        </div>
+        <div class="field col-12 md:col-2">
+            <p:outputLabel for="@next" value="Periodo Fin" />
+            <p:datePicker  value="#{incidenciaBean.periodoFin}" showIcon="true" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy">
+                <p:ajax update="dtIncidencias" process="@this" />
+            </p:datePicker>
+        </div>
+        <div class="field col-12 md:col-2">
+        	<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+            <p:selectBooleanButton id="idVacaciones" widgetVar="idVacaciones" value="#{incidenciaBean.incidenciaVacaciones}" onIcon="pi pi-check" onLabel="Vacaciones" offIcon="pi pi-times" offLabel="Vacaciones">
+                <p:ajax event="change" update="dtIncidencias" process="@this" />
+            </p:selectBooleanButton>
+        </div>
+        <div class="field col-12 md:col-2">
+        	<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+            <p:selectBooleanButton id="idPermiso" widgetVar="idPermiso" value="#{incidenciaBean.incidenciaPermiso}" onIcon="pi pi-check" onLabel="Permisos" offIcon="pi pi-times" offLabel="Permisos" >
+                <p:ajax event="change" update="dtIncidencias" process="@this" />
+            </p:selectBooleanButton>
+        </div>
+        <div class="field col-12 md:col-2">
+        	<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+            <p:selectBooleanButton id="idEstatusAceptado" value="#{incidenciaBean.estatusAceptado}" onIcon="pi pi-check" onLabel="Aprobadas" offIcon="pi pi-times" offLabel="Aprobadas" >
+                <p:ajax event="change" update="dtIncidencias" process="@this"/>
+            </p:selectBooleanButton>
+        </div>
+        <div class="field col-12 md:col-2" >
+        	<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+            <p:selectBooleanButton id="idEstatusEnviado" value="#{incidenciaBean.estatusEnviado}" onIcon="pi pi-check" onLabel="Pendientes" offIcon="pi pi-times" offLabel="Pendientes" >
+                <p:ajax event="change" update="dtIncidencias" process="@this"/>
+            </p:selectBooleanButton>
+        </div>
+    </div>
 
     <p:dataTable id="dtIncidencias" widgetVar="dtIncidencias" value="#{incidenciaBean.consultarTipoPermisos()}" selection="#{incidenciaBean.listaPermisosFiltrada}"
                  var="incidencia" rowKey="#{incidencia.idIncidencia}" paginator="true" rows="5" paginatorPosition="bottom" reflow="true">
@@ -180,7 +176,7 @@
         </f:facet>
     </p:dialog>
     <p:confirmDialog widgetVar="dialogoCancelar" showEffect="fade" width="300" 
-                     message="Cancelar Incapacidad?" header="Confirmar" severity="warn">
+                     message="¿Está seguro que desea cancelar el permiso?" header="Confirmar" severity="warn">
         <p:commandButton value="Si" icon="pi pi-check" actionListener="#{incidenciaBean.cancelarIncidencia()}"
             process="@this" oncomplete="PF('dialogPermisos').hide()" >
             <p:resetInput target="formIncidencias:tabViewI:pnlDetalleSolicitudPermiso" />

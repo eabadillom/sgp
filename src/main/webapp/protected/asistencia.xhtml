@@ -10,26 +10,67 @@
     <ui:define name="head">
         <h:outputScript library="recursos" name="js/primefaces_locale.js" />
         <h:outputStylesheet name="css/estilos.css" library="recursos"/>
+        <script>
+			PrimeFaces.locales['es'] = {
+				monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+				monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+				dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+				dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
+				dayNamesMin: ['D', 'L', 'M', 'X', 'J', 'V', 'S'],
+				weekHeader: 'Semana',
+				firstDay: 1,
+				isRTL: false,
+				showMonthAfterYear: false,
+				yearSuffix: '',
+				timeOnlyTitle: 'Sólo hora',
+				timeText: 'Tiempo',
+				hourText: 'Hora',
+				minuteText: 'Minuto',
+				secondText: 'Segundo',
+				millisecondText: 'Milisegundo',
+				ampm: false,
+				month: 'Mes',
+				week: 'Semana',
+				day: 'Día',
+				allDayText: 'Todo el día',
+				today: 'Hoy',
+				now: 'Ahora',
+				clear: 'Limpiar',
+				aria: {
+				   close: 'Cerrar',
+				   previous: 'Anterior',
+				   next: 'Siguiente',
+				}
+			};
+		</script>
     </ui:define>
 
     <ui:define name="content">
         <h:form id="formActividades">
-            <div class="grid table-demo">
-                <div class="col-12">
-                    <div class="card p-4">
-                        <p:growl id="messages" showDetail="true" life="2500"/>
-                        <p:tabView id="tabView" cache="false" widgetVar="tvAsistencia" dynamic="true">
-                            <p:tab title="Registro de asistencia">
-                                <ui:include src="/protected/seccionesAsistencia/calendario.xhtml" />
-                            </p:tab>
-                            <p:tab title="Vacaciones / Permisos">
-                                <ui:include src="/protected/seccionesAsistencia/vacaciones.xhtml" />
-                            </p:tab>
-                        </p:tabView>                        
-                    </div>
-                </div>
-            </div>
+            <p:growl id="messages" showDetail="true" life="2500"/>
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="30rem">
+				<p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes ui-button-primary" icon="pi pi-check"/>
+				<p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-outlined ui-button-secondary" icon="pi pi-times" />
+			</p:confirmDialog>
+        	<p:dialog modal="true" widgetVar="statusInfoDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
+				<div align="center">
+					<i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+				</div>
+			</p:dialog>
+            <p:tabView id="tabView" cache="false" widgetVar="tvAsistencia" dynamic="true">
+                <p:tab title="Asistencia">
+                    <ui:include src="/protected/seccionesAsistencia/calendario.xhtml" />
+                </p:tab>
+                <p:tab title="Permisos">
+                	<ui:include src="/protected/seccionesAsistencia/permisos.xhtml"></ui:include>
+                </p:tab>
+                <p:tab title="Vacaciones">
+                    <ui:include src="/protected/seccionesAsistencia/vacaciones.xhtml" />
+                </p:tab>
+                <p:tab title="Incapacidades">
+                	<ui:include src="/protected/seccionesAsistencia/incapacidades.xhtml" />
+                </p:tab>
+            </p:tabView>
         </h:form>
     </ui:define>
-
 </ui:composition>

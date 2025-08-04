@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,7 +13,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -25,10 +25,8 @@ import javax.persistence.TemporalType;
  */
 @Entity
 @Table(name = "det_solicitud_prenda")
-@NamedQueries({
-    @NamedQuery(name = "DetSolicitudPrenda.findAll", query = "SELECT d FROM DetSolicitudPrenda d"),
-    @NamedQuery(name = "DetSolicitudPrenda.findPrendasIdEmpleado", query = "SELECT dsp FROM DetSolicitudPrenda dsp INNER JOIN dsp.empleadoSol e INNER JOIN dsp.prenda p INNER JOIN dsp.talla t WHERE e.idEmpleado = :numEmpl")
-})
+@NamedQuery(name = "DetSolicitudPrenda.findAll", query = "SELECT d FROM DetSolicitudPrenda d")
+@NamedQuery(name = "DetSolicitudPrenda.findPrendasIdEmpleado", query = "SELECT dsp FROM DetSolicitudPrenda dsp INNER JOIN dsp.empleadoSol e INNER JOIN dsp.prenda p INNER JOIN dsp.talla t WHERE e.idEmpleado = :numEmpl")
 public class DetSolicitudPrenda implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -130,15 +128,7 @@ public class DetSolicitudPrenda implements Serializable {
     public void setFechaMod(Date fechaMod) {
         this.fechaMod = fechaMod;
     }
-
-    public List<DetIncidencia> getDetIncidenciaList() {
-        return detIncidenciaList;
-    }
-
-    public void setDetIncidenciaList(List<DetIncidencia> detIncidenciaList) {
-        this.detIncidenciaList = detIncidenciaList;
-    }
-
+    
     public CatPrenda getPrenda() {
         return prenda;
     }

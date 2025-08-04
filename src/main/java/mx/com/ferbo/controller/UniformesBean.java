@@ -13,6 +13,8 @@ import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import mx.com.ferbo.business.incidencia.EstatusIncidenciaBL;
 import mx.com.ferbo.business.incidencia.EstatusSolicitudBL;
+import mx.com.ferbo.business.notifmovil.NotifMovilBL;
+import mx.com.ferbo.business.sgpapiclient.SGPApiClientBL;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,6 +26,7 @@ import mx.com.ferbo.dao.n.TallaDAO;
 import mx.com.ferbo.dao.n.SolicitudPrendaDAO;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.IncidenciaDAO;
+import mx.com.ferbo.dto.NotificacionMovilDTO;
 import mx.com.ferbo.model.CatPrenda;
 import mx.com.ferbo.model.CatTalla;
 import mx.com.ferbo.model.CatTipoIncidencia;
@@ -185,6 +188,9 @@ public class UniformesBean implements Serializable {
                 actualizarListas();
                 mensaje = "Solicitud Registrada";
                 severity = FacesMessage.SEVERITY_INFO;
+                NotificacionMovilDTO nmDTO = NotifMovilBL.obtenerMensaje("uniforme", this.empleadoSelected);
+                SGPApiClientBL sgpApiClient = new SGPApiClientBL();
+                sgpApiClient.enviarNotificacion(nmDTO);
             } catch (SGPException e) 
             {
                 log.warn("Error al guardar el registro de la prenda del empleado: {}", empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
