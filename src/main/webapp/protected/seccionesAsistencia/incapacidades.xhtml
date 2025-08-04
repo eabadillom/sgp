@@ -1,0 +1,135 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:ui="http://java.sun.com/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+	<div class="ui-fluid formgrid grid">
+    	<div class="field col-12 md:col-2">
+    		<p:datePicker value="#{incapacidadBean.periodoInicio}" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy" showIcon="true">
+    			<p:ajax process="@this" event="change" listener="#{incapacidadBean.cargarIncapacidades()}"  update="formActividades:tabView:dtVacaciones"/>
+    		</p:datePicker>
+    	</div>
+    	<div class="field col-12 md:col-2">
+    		<p:datePicker value="#{incapacidadBean.periodoFin}" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy" showIcon="true">
+    			<p:ajax process="@this" event="change" listener="#{incapacidadBean.cargarIncapacidades()}" update="formActividades:tabView:dtVacaciones"/>
+    		</p:datePicker>
+    	</div>
+    	<div class="field col-12 md:col-6">
+    		<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+    	</div>
+    	<div class="field col-12 md:col-2">
+    		<p:selectBooleanButton value="#{incapacidadBean.mostrarCanceladas}" onIcon="pi pi-eye" onLabel="Canceladas" offIcon="pi pi-eye-slash" offLabel="Canceladas">
+    			<p:ajax event="change" process="@this" update="formActividades:tabView:dt-incapacidades" listener="#{incapacidadBean.cargarIncapacidades()}"/>
+    		</p:selectBooleanButton>
+    	</div>
+    </div>
+    
+    <p:dataTable id="dt-incapacidades" widgetVar="dtIncapacidades" var="incapacidad" value="#{incapacidadBean.incapacidades}" paginator="true" rows="5" paginatorPosition="bottom">
+    	<p:column headerText="Del" sortBy="#{incapacidad.fechaInicio}" width="5rem">
+    		<p:outputLabel value="#{incapacidad.fechaInicio}">
+    			<f:convertDateTime type="date" pattern="dd/MM/yyyy" timeZone="GMT-6"/>
+    		</p:outputLabel>
+    	</p:column>
+    	
+    	<p:column headerText="al" sortBy="#{incapacidad.fechaFin}" width="5rem">
+    		<p:outputLabel value="#{incapacidad.fechaFin}">
+    			<f:convertDateTime type="date" pattern="dd/MM/yyyy" timeZone="GMT-6"/>
+    		</p:outputLabel>
+    	</p:column>
+    	
+    	<p:column headerText="Tipo" sortBy="#{incapacidad.tipoIncapacidad.descripcion}">
+    		<p:outputLabel value="#{incapacidad.tipoIncapacidad.descripcion}"/>
+    	</p:column>
+    	
+    	<p:column headerText="Status" width="7rem" style="text-align: center;" sortBy="#{incapacidad.estatusSolicitud.descripcion}">
+    		<span class="customer-badge status-#{incapacidadBean.status.getEstatusIncapacidad(incapacidad.estatusSolicitud.clave)}" style="display: block;">
+    			#{incapacidad.estatusSolicitud.descripcion}
+    		</span>
+    	</p:column>
+    	
+    	<p:column width="2rem">
+    		<p:commandButton icon="pi pi-bars" process="@this" actionListener="#{incapacidadBean.cargar(incapacidad)}" update="formActividades:tabView:dg-incapacidad" onstart="PF('statusInfoDialog').show()" oncomplete="PF('statusInfoDialog').hide();PF('dgIncapacidad').show();">
+    		</p:commandButton>
+    	</p:column>
+    </p:dataTable>
+    
+    <p:dialog id="dg-incapacidad" widgetVar="dgIncapacidad" header="Incapacidad" showEffect="fade" responsive="true" modal="true">
+    	<p:panelGrid layout="tabular" columns="0" styleClass="ui-noborder" rendered="#{incapacidadBean.incapacidad ne null}"><!-- Sin bordes, agregar propiedad  styleClass="ui-noborder" -->
+    		<p:row>
+    			<p:column style="vertical-align: top;">
+    				<p:card class="ui-fluid">
+    					<div class="p-field">
+    						<div style="padding-bottom: 0.5rem;">
+    							<p:outputLabel value="Del" />
+   								<p:inputText value="#{incapacidadBean.incapacidad.fechaInicio}" readonly="true">
+   									<f:convertDateTime locale="es_MX" pattern="d 'de' MMMM 'de' yyyy"></f:convertDateTime>
+   								</p:inputText>
+    						</div>
+    					</div>
+    					<div class="p-field">
+    						<div style="padding-bottom: 0.5rem;">
+    							<p:outputLabel value="al" />
+   								<p:inputText value="#{incapacidadBean.incapacidad.fechaFin}" readonly="true">
+   									<f:convertDateTime locale="es_MX" pattern="d 'de' MMMM 'de' yyyy"></f:convertDateTime>
+   								</p:inputText>
+    						</div>
+    					</div>
+    					<div class="p-field">
+    						<div style="padding-bottom: 0.5rem;">
+    							<p:outputLabel value="Días autorizados" />
+   								<p:inputText value="#{incapacidadBean.incapacidad.diasAutorizados}" readonly="true">
+   								</p:inputText>
+    						</div>
+    					</div>
+    					<div class="p-field">
+    						<div style="padding-bottom: 0.5rem;">
+	    						<p:outputLabel value="Tipo de incapacidad" />
+		    					<p:inputText value="#{incapacidadBean.incapacidad.tipoIncapacidad.descripcion}" readonly="true">
+		    					</p:inputText>
+    						</div>
+    					</div>
+    					<div class="p-field">
+    						<div style="padding-bottom: 0.5rem;">
+	    						<p:outputLabel value="Tipo de riesgo" />
+		    					<p:inputText value="#{incapacidadBean.incapacidad.tipoRiesgo.descripcion}" readonly="true">
+		   						</p:inputText>
+    						</div>
+    					</div>
+   						<div class="p-field">
+   							<div style="padding-bottom: 0.5rem;">
+	   							<p:outputLabel value="Control de incapacidad" />
+		   						<p:inputText value="#{incapacidadBean.incapacidad.controlIncapacidad.descripcion}" readonly="true">
+		    					</p:inputText>
+   							</div>
+   						</div>
+   						<div class="p-field">
+   							<div style="padding-bottom: 0.5rem;">
+	   							<p:outputLabel value="Folio IMSS" />
+		   						<p:inputText value="#{incapacidadBean.incapacidad.folio}" readonly="true">
+		    					</p:inputText>
+   							</div>
+   						</div>
+   						<div class="p-field">
+   							<div style="padding-bottom: 0.5rem;">
+	   							<p:outputLabel value="Descripción" />
+		   						<p:inputText value="#{incapacidadBean.incapacidad.descripcion}" readonly="true">
+		    					</p:inputText>
+   							</div>
+   						</div>
+    				</p:card>
+    			</p:column>
+    			<p:column style="vertical-align: top;">
+    				<p:card>
+    					<p:datePicker value="#{incapacidadBean.diasIncapacidad}" readonly="true" readonlyInput="true" inline="true" selectionMode="range" pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX">
+    					</p:datePicker>
+    				</p:card>
+    			</p:column>
+    		</p:row>
+    	</p:panelGrid>
+   		<f:facet name="footer">
+   			<p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dgIncapacidad').hide();" styleClass="ui-button-secondary">
+   			</p:commandButton>
+   		</f:facet>
+    </p:dialog>
+    
+</ui:composition>

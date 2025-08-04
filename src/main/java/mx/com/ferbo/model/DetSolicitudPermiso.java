@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -34,7 +35,8 @@ import javax.validation.constraints.NotNull;
     @NamedQuery(name = "DetSolicitudPermiso.findByClave", query = "SELECT dsp FROM DetSolicitudPermiso dsp INNER JOIN dsp.empleadoSol de INNER JOIN dsp.tipoSolicitud cts WHERE de.idEmpleado = :idEmp AND cts.clave = :clave"),
     @NamedQuery(name = "DetSolicitudPermiso.findByTipoSolicitud", query = "SELECT dsp FROM DetSolicitudPermiso dsp INNER JOIN dsp.empleadoSol de INNER JOIN dsp.tipoSolicitud cts WHERE de.idEmpleado = :idEmp AND (cts.clave = :clavePermiso OR cts.clave = :claveVacaciones)"),
     @NamedQuery(name = "DetSolicitudPermiso.findByCriterios", query = "SELECT dsp FROM DetSolicitudPermiso dsp INNER JOIN dsp.empleadoSol de INNER JOIN dsp.tipoSolicitud ts INNER JOIN dsp.estatus es WHERE de.idEmpleado = :idEmp AND (:fechaInicio BETWEEN dsp.fechaInicio AND dsp.fechaFin OR :fechaFin BETWEEN dsp.fechaInicio AND dsp.fechaFin OR dsp.fechaInicio BETWEEN :fechaInicio AND :fechaFin OR dsp.fechaFin BETWEEN :fechaInicio AND :fechaFin) AND (ts.clave = :clave1 OR ts.clave = :clave2) AND (es.clave = :enviada OR es.clave = :aprobada)"),
-    @NamedQuery(name = "DetSolicitudPermiso.findByPeriodo", query = "SELECT dsp FROM DetSolicitudPermiso dsp INNER JOIN dsp.empleadoSol de INNER JOIN dsp.estatus es WHERE de.idEmpleado = :idEmp AND ((:fechaInicio = dsp.fechaInicio AND :fechaFin = dsp.fechaFin) OR ((:fechaInicio = dsp.fechaFin) OR (:fechaFin = dsp.fechaInicio)) OR ((:fechaInicio BETWEEN dsp.fechaInicio AND dsp.fechaFin) OR (:fechaFin BETWEEN dsp.fechaInicio AND dsp.fechaFin)) OR ((dsp.fechaInicio BETWEEN :fechaInicio AND :fechaFin) OR (dsp.fechaFin BETWEEN :fechaInicio AND :fechaFin))) AND (es.clave = :enviada OR es.clave = :aprobada)")
+    @NamedQuery(name = "DetSolicitudPermiso.findByPeriodo", query = "SELECT dsp FROM DetSolicitudPermiso dsp INNER JOIN dsp.empleadoSol de INNER JOIN dsp.estatus es WHERE de.idEmpleado = :idEmp AND ((:fechaInicio = dsp.fechaInicio AND :fechaFin = dsp.fechaFin) OR ((:fechaInicio = dsp.fechaFin) OR (:fechaFin = dsp.fechaInicio)) OR ((:fechaInicio BETWEEN dsp.fechaInicio AND dsp.fechaFin) OR (:fechaFin BETWEEN dsp.fechaInicio AND dsp.fechaFin)) OR ((dsp.fechaInicio BETWEEN :fechaInicio AND :fechaFin) OR (dsp.fechaFin BETWEEN :fechaInicio AND :fechaFin))) AND (es.clave = :enviada OR es.clave = :aprobada)"),
+    @NamedQuery(name = "DetSolicitudPermiso.findByEmpleadoPeriodo", query = "SELECT dsp FROM DetSolicitudPermiso dsp WHERE dsp.empleadoSol.idEmpleado = :idEmpleado AND ((:fechaInicio = dsp.fechaInicio AND :fechaFin = dsp.fechaFin) OR ((:fechaInicio = dsp.fechaFin) OR (:fechaFin = dsp.fechaInicio)) OR ((:fechaInicio BETWEEN dsp.fechaInicio AND dsp.fechaFin) OR (:fechaFin BETWEEN dsp.fechaInicio AND dsp.fechaFin)) OR ((dsp.fechaInicio BETWEEN :fechaInicio AND :fechaFin) OR (dsp.fechaFin BETWEEN :fechaInicio AND :fechaFin)))")
 })
 public class DetSolicitudPermiso implements Serializable {
 
@@ -75,9 +77,6 @@ public class DetSolicitudPermiso implements Serializable {
     @Column(name = "descripcion_rechazo")
     private String descripcionRechazo;
     
-    @OneToMany(mappedBy = "solPermiso")
-    private List<DetIncidencia> detIncidenciaList;
-    
     @JoinColumn(name = "id_tipo_solicitud", referencedColumnName = "id_tipo_solicitud")
     @ManyToOne(optional = false)
     private CatTipoSolicitud tipoSolicitud;
@@ -94,10 +93,13 @@ public class DetSolicitudPermiso implements Serializable {
     @Column(name = "pc_goce_sueldo")
     private BigDecimal goceSueldo;
     
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH})
+    @ManyToOne
     @JoinColumn(name = "id_vacaciones")
     @Basic(optional = true)
     private DetVacaciones vacaciones;
+    
+    @OneToMany(mappedBy = "solicitudPermiso", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DetDiaPermiso> diasPermiso;
 
     public DetSolicitudPermiso() {
     }
@@ -161,14 +163,6 @@ public class DetSolicitudPermiso implements Serializable {
         this.estatus = estatus;
     }
     
-    public List<DetIncidencia> getDetIncidenciaList() {
-        return detIncidenciaList;
-    }
-
-    public void setDetIncidenciaList(List<DetIncidencia> detIncidenciaList) {
-        this.detIncidenciaList = detIncidenciaList;
-    }
-
     public CatTipoSolicitud getTipoSolicitud() {
         return tipoSolicitud;
     }
@@ -242,6 +236,14 @@ public class DetSolicitudPermiso implements Serializable {
 
 	public void setVacaciones(DetVacaciones vacaciones) {
 		this.vacaciones = vacaciones;
+	}
+
+	public List<DetDiaPermiso> getDiasPermiso() {
+		return diasPermiso;
+	}
+
+	public void setDiasPermiso(List<DetDiaPermiso> diasPermiso) {
+		this.diasPermiso = diasPermiso;
 	}
 
 }
