@@ -60,37 +60,67 @@
     				<p:card class="ui-fluid">
     					<div class="p-field">
     						<div style="padding-bottom: 0.5rem;">
-	    						<p:outputLabel value="Tipo de incapacidad"></p:outputLabel>
+    							<p:outputLabel value="Del" />
+   								<p:inputText value="#{incapacidadBean.incapacidad.fechaInicio}" readonly="true">
+   									<f:convertDateTime locale="es_MX" pattern="d 'de' MMMM 'de' yyyy"></f:convertDateTime>
+   								</p:inputText>
+    						</div>
+    					</div>
+    					<div class="p-field">
+    						<div style="padding-bottom: 0.5rem;">
+    							<p:outputLabel value="al" />
+   								<p:inputText value="#{incapacidadBean.incapacidad.fechaFin}" readonly="true">
+   									<f:convertDateTime locale="es_MX" pattern="d 'de' MMMM 'de' yyyy"></f:convertDateTime>
+   								</p:inputText>
+    						</div>
+    					</div>
+    					<div class="p-field">
+    						<div style="padding-bottom: 0.5rem;">
+    							<p:outputLabel value="Días autorizados" />
+   								<p:inputText value="#{incapacidadBean.incapacidad.diasAutorizados}" readonly="true">
+   								</p:inputText>
+    						</div>
+    					</div>
+    					<div class="p-field">
+    						<div style="padding-bottom: 0.5rem;">
+	    						<p:outputLabel value="Tipo de incapacidad" />
 		    					<p:inputText value="#{incapacidadBean.incapacidad.tipoIncapacidad.descripcion}" readonly="true">
 		    					</p:inputText>
     						</div>
     					</div>
     					<div class="p-field">
     						<div style="padding-bottom: 0.5rem;">
-	    						<p:outputLabel value="Tipo de riesgo"></p:outputLabel>
+	    						<p:outputLabel value="Tipo de riesgo" />
 		    					<p:inputText value="#{incapacidadBean.incapacidad.tipoRiesgo.descripcion}" readonly="true">
 		   						</p:inputText>
     						</div>
     					</div>
    						<div class="p-field">
    							<div style="padding-bottom: 0.5rem;">
-	   							<p:outputLabel value="Control de incapacidad"></p:outputLabel>
+	   							<p:outputLabel value="Control de incapacidad" />
 		   						<p:inputText value="#{incapacidadBean.incapacidad.controlIncapacidad.descripcion}" readonly="true">
 		    					</p:inputText>
    							</div>
    						</div>
    						<div class="p-field">
    							<div style="padding-bottom: 0.5rem;">
-	   							<p:outputLabel value="Status"></p:outputLabel>
-		   						<p:inputText value="#{incapacidadBean.incapacidad.estatusSolicitud.descripcion}" readonly="true">
+	   							<p:outputLabel value="Folio IMSS" />
+		   						<p:inputText value="#{incapacidadBean.incapacidad.folio}" readonly="true">
+		    					</p:inputText>
+   							</div>
+   						</div>
+   						<div class="p-field">
+   							<div style="padding-bottom: 0.5rem;">
+	   							<p:outputLabel value="Descripción" />
+		   						<p:inputText value="#{incapacidadBean.incapacidad.descripcion}" readonly="true">
 		    					</p:inputText>
    							</div>
    						</div>
     				</p:card>
     			</p:column>
-    			<p:column>
+    			<p:column style="vertical-align: top;">
     				<p:card>
-    					<p:datePicker value="#{incapacidadBean.diasIncapacidad()}" readonlyInput="true" inline="true" selectionMode="range">
+    					<p:datePicker value="#{incapacidadBean.diasIncapacidad}" readonly="true" readonlyInput="true" inline="true" selectionMode="range" pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX">
     					</p:datePicker>
     				</p:card>
     			</p:column>

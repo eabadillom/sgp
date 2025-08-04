@@ -41,6 +41,7 @@ public class IncapacidadBean implements Serializable {
 	private Date periodoInicio;
 	private Date periodoFin;
 	private Boolean mostrarCanceladas;
+	private List<Date> diasIncapacidad;
 	
 	private ManageStatus status;
 	
@@ -91,6 +92,11 @@ public class IncapacidadBean implements Serializable {
 			this.incapacidad = incapacidadDAO.cargar(incapacidad.getIdIncapacidad())
 					.orElseThrow(() -> new SGPException("Incapacidad no encontrada."));
 			
+			this.diasIncapacidad = new ArrayList<Date>();
+			
+			diasIncapacidad.add(this.incapacidad.getFechaInicio());
+			diasIncapacidad.add(this.incapacidad.getFechaFin());
+			
 		} catch(SGPException ex) {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
@@ -106,17 +112,6 @@ public class IncapacidadBean implements Serializable {
 		}
 	}
 	
-	public List<Date> diasIncapacidad() {
-		List<Date> dias = null;
-		dias = new ArrayList<Date>();
-		if(this.incapacidad != null) {
-			dias.add(this.incapacidad.getFechaInicio());
-			dias.add(this.incapacidad.getFechaFin());
-		}
-		log.info("Dias de incapacidad: {}", dias);
-		return dias;
-	}
-
 	public DetIncapacidad getIncapacidad() {
 		return incapacidad;
 	}
@@ -164,9 +159,12 @@ public class IncapacidadBean implements Serializable {
 	public void setStatus(ManageStatus status) {
 		this.status = status;
 	}
-	
-	
-	
-	
 
+	public List<Date> getDiasIncapacidad() {
+		return diasIncapacidad;
+	}
+
+	public void setDiasIncapacidad(List<Date> diasIncapacidad) {
+		this.diasIncapacidad = diasIncapacidad;
+	}
 }
