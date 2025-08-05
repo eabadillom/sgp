@@ -93,7 +93,7 @@ public class VacacionesBean implements Serializable {
 	
 	public void cargarPermisos() {
 		log.info("Cargando lista de permisos del empleado...");
-		permisos = incidenciaDAO.buscarPermisos(periodoInicio, periodoFin)
+		this.permisos = this.incidenciaDAO.buscarPermisos(this.empleado.getIdEmpleado(), this.periodoInicio, this.periodoFin)
 				.stream()
 				.filter(item -> SolicitudPermisoBL.TP_VACACIONES
 						.equalsIgnoreCase(item.getSolPermiso().getTipoSolicitud().getClave()))

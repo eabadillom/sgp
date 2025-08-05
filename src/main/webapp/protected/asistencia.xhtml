@@ -11,7 +11,7 @@
         <h:outputScript library="recursos" name="js/primefaces_locale.js" />
         <h:outputStylesheet name="css/estilos.css" library="recursos"/>
         <script>
-			PrimeFaces.locales['es'] = {
+			PrimeFaces.locales['es_MX'] = {
 				monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
 				monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
 				dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
@@ -58,6 +58,7 @@
 				</div>
 			</p:dialog>
             <p:tabView id="tabView" cache="false" widgetVar="tvAsistencia" dynamic="true">
+            	<p:ajax event="tabChange" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
                 <p:tab title="Asistencia">
                     <ui:include src="/protected/seccionesAsistencia/calendario.xhtml" />
                 </p:tab>

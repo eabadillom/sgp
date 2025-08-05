@@ -6,12 +6,12 @@
 	<div class="ui-fluid formgrid grid">
     	<div class="field col-12 md:col-2">
     		<p:datePicker value="#{incapacidadBean.periodoInicio}" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy" showIcon="true">
-    			<p:ajax process="@this" event="change" listener="#{incapacidadBean.cargarIncapacidades()}"  update="formActividades:tabView:dtVacaciones"/>
+    			<p:ajax process="@this" event="change" listener="#{incapacidadBean.cargarIncapacidades()}"  update="formActividades:tabView:dtVacaciones" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
     		</p:datePicker>
     	</div>
     	<div class="field col-12 md:col-2">
     		<p:datePicker value="#{incapacidadBean.periodoFin}" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy" showIcon="true">
-    			<p:ajax process="@this" event="change" listener="#{incapacidadBean.cargarIncapacidades()}" update="formActividades:tabView:dtVacaciones"/>
+    			<p:ajax process="@this" event="change" listener="#{incapacidadBean.cargarIncapacidades()}" update="formActividades:tabView:dtVacaciones" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
     		</p:datePicker>
     	</div>
     	<div class="field col-12 md:col-6">
@@ -19,7 +19,7 @@
     	</div>
     	<div class="field col-12 md:col-2">
     		<p:selectBooleanButton value="#{incapacidadBean.mostrarCanceladas}" onIcon="pi pi-eye" onLabel="Canceladas" offIcon="pi pi-eye-slash" offLabel="Canceladas">
-    			<p:ajax event="change" process="@this" update="formActividades:tabView:dt-incapacidades" listener="#{incapacidadBean.cargarIncapacidades()}"/>
+    			<p:ajax event="change" process="@this" update="formActividades:tabView:dt-incapacidades" listener="#{incapacidadBean.cargarIncapacidades()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
     		</p:selectBooleanButton>
     	</div>
     </div>
