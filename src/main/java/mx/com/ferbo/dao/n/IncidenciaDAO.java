@@ -242,6 +242,30 @@ public class IncidenciaDAO extends BaseDAO<DetIncidencia, Integer> {
     	
     	return modelList;
     }
+    
+    public List<DetIncidencia> buscarPermisos(Integer idEmpleado, Date periodoInicio, Date periodoFin) {
+    	List<DetIncidencia> modelList = null;
+    	EntityManager em = null;
+    	
+    	try {
+    		em = this.getEntityManager();
+    		modelList = em.createNamedQuery("DetIncidencia.findPermisoByEmpleadoPeriodo", this.modelClass)
+    				.setParameter("idEmpleado", idEmpleado)
+    				.setParameter("periodoInicio", periodoInicio)
+    				.setParameter("periodoFin", periodoFin)
+    				.getResultList()
+    				;
+    		
+    		modelList.stream().forEach(item -> log.debug("Permiso: {}", item.getSolPermiso().getIdSolicitud()));
+    		
+    	} catch(Exception ex) {
+    		log.error("Problema para obtener los permisos de ausencia y/o permisos de vacaciones...", ex);
+    	} finally {
+    		this.close(em);
+    	}
+    	
+    	return modelList;
+    }
 
     public synchronized void eliminaIncidenciaPorIdEmpleado(Integer idIncidencia, Integer idEmpleado, Integer idPermiso) throws SGPException {
         EntityManager em = null;
