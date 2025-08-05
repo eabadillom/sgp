@@ -70,6 +70,8 @@ import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.DetNominaPeriodo;
 import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.DetPrestamo;
+import mx.com.ferbo.model.DetRegistroVacaciones;
+import mx.com.ferbo.model.DetVacaciones;
 import mx.com.ferbo.model.InfDatoEmpresa;
 import mx.com.ferbo.model.sat.CatBanco;
 import mx.com.ferbo.model.sat.CatEntidadFederativa;
@@ -943,6 +945,25 @@ public class RegistroEmpleadosBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", sgpEx.getMessage()));
             PrimeFaces.current().ajax().update("form:messages");
         }
+    }
+    
+    public Integer diasVacacionesTomados(DetVacaciones periodo) {
+    	Integer diasTomados = periodo.getDiasTomados();
+    	Integer diasRegistro = 0;
+    	
+    	for(DetRegistroVacaciones registroV : periodo.getRegistroVacaciones()) {
+    		
+    		if( registroV.getRegistro() == null )
+    			continue;
+    		
+    		if( ! "V".equalsIgnoreCase(registroV.getRegistro().getStatus().getCodigo()))
+    			continue;
+    		
+    		diasRegistro++;
+    	}
+    	
+    	return diasTomados + diasRegistro;
+    	
     }
 
     public List<CatEmpresa> getLstCatEmpresa() {

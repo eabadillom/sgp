@@ -31,6 +31,7 @@ import mx.com.ferbo.model.CatTipoSolicitud;
 import mx.com.ferbo.model.DetDiaPermiso;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetIncidencia;
+import mx.com.ferbo.model.DetRegistroVacaciones;
 import mx.com.ferbo.model.DetVacaciones;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.ManageStatus;
@@ -136,21 +137,39 @@ public class VacacionesBean implements Serializable {
         List<DetVacaciones> periodos = new ArrayList<DetVacaciones>();
         this.diasTotalesPermitidos = 0;
         
-        try {
-        	log.info("Buscando periodos vacacionales del empleado...");
-            List<DetVacaciones> periodosTmp = vacacionesDAO.obtenerPeriodosPorFecha(this.empleado.getIdEmpleado(), DateUtil.now());
-
-            for (DetVacaciones periodo : periodosTmp) {
-                if (periodo.getDiasTomados() < periodo.getDiasTotales() && (periodo.getDiasPagados() + periodo.getDiasTomados()) < periodo.getDiasTotales()) {
-                    periodos.add(periodo);
-                    this.diasTotalesPermitidos += (periodo.getDiasTotales() - periodo.getDiasPagados() - periodo.getDiasTomados());
-                }
-            }
-        } catch (SGPException sgpEx) {
-            log.info(sgpEx.getMessage());
+        log.info("Buscando periodos vacacionales del empleado...");
+        List<DetVacaciones> periodosTmp = vacacionesDAO.cargarPeriodos(this.empleado.getIdEmpleado(), DateUtil.now());
+        
+        for (DetVacaciones periodo : periodosTmp) {
+        	
+        	if (periodo.getDiasTomados() < periodo.getDiasTotales() && (periodo.getDiasPagados() + periodo.getDiasTomados()) < periodo.getDiasTotales()) {
+        		periodos.add(periodo);
+        		this.diasTotalesPermitidos += (periodo.getDiasTotales() - periodo.getDiasPagados() - periodo.getDiasTomados());
+        	}
         }
+        
         return periodos;
     }
+	
+	public Integer diasDisponibles(DetVacaciones periodo) {
+		Integer diasTomados = periodo.getDiasTomados();
+    	Integer diasRegistro = 0;
+    	
+    	for(DetRegistroVacaciones registroV : periodo.getRegistroVacaciones()) {
+    		
+    		if( registroV.getRegistro() == null )
+    			continue;
+    		
+    		if( ! "V".equalsIgnoreCase(registroV.getRegistro().getStatus().getCodigo()))
+    			continue;
+    		
+    		diasRegistro++;
+    	}
+    	
+    	Integer saldo = periodo.getDiasTotales() - diasTomados - diasRegistro;
+    	
+    	return saldo;
+	}
 	
 	public void onPeriodoSelect(SelectEvent<DetVacaciones> event) {
     	log.debug("Seleccionando periodo vacacional: {}", event.getObject().getIdVacaciones());
