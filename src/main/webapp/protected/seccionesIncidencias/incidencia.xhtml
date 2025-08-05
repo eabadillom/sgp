@@ -10,37 +10,37 @@
         <div class="field col-12 md:col-2">
             <p:outputLabel for="@next" value="Periodo Inicio" />
             <p:datePicker value="#{incidenciaBean.periodoInicio}" showIcon="true" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy">
-                <p:ajax update="dtIncidencias" process="@this" />
+                <p:ajax update="dtIncidencias" process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
             </p:datePicker>
         </div>
         <div class="field col-12 md:col-2">
             <p:outputLabel for="@next" value="Periodo Fin" />
             <p:datePicker  value="#{incidenciaBean.periodoFin}" showIcon="true" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy">
-                <p:ajax update="dtIncidencias" process="@this" />
+                <p:ajax update="dtIncidencias" process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
             </p:datePicker>
         </div>
         <div class="field col-12 md:col-2">
         	<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
             <p:selectBooleanButton id="idVacaciones" widgetVar="idVacaciones" value="#{incidenciaBean.incidenciaVacaciones}" onIcon="pi pi-check" onLabel="Vacaciones" offIcon="pi pi-times" offLabel="Vacaciones">
-                <p:ajax event="change" update="dtIncidencias" process="@this" />
+                <p:ajax event="change" update="dtIncidencias" process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
             </p:selectBooleanButton>
         </div>
         <div class="field col-12 md:col-2">
         	<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
             <p:selectBooleanButton id="idPermiso" widgetVar="idPermiso" value="#{incidenciaBean.incidenciaPermiso}" onIcon="pi pi-check" onLabel="Permisos" offIcon="pi pi-times" offLabel="Permisos" >
-                <p:ajax event="change" update="dtIncidencias" process="@this" />
+                <p:ajax event="change" update="dtIncidencias" process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
             </p:selectBooleanButton>
         </div>
         <div class="field col-12 md:col-2">
         	<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
             <p:selectBooleanButton id="idEstatusAceptado" value="#{incidenciaBean.estatusAceptado}" onIcon="pi pi-check" onLabel="Aprobadas" offIcon="pi pi-times" offLabel="Aprobadas" >
-                <p:ajax event="change" update="dtIncidencias" process="@this"/>
+                <p:ajax event="change" update="dtIncidencias" process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
             </p:selectBooleanButton>
         </div>
         <div class="field col-12 md:col-2" >
         	<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
             <p:selectBooleanButton id="idEstatusEnviado" value="#{incidenciaBean.estatusEnviado}" onIcon="pi pi-check" onLabel="Pendientes" offIcon="pi pi-times" offLabel="Pendientes" >
-                <p:ajax event="change" update="dtIncidencias" process="@this"/>
+                <p:ajax event="change" update="dtIncidencias" process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
             </p:selectBooleanButton>
         </div>
     </div>
@@ -69,8 +69,9 @@
         </p:column>
         <p:column style="text-align: center" width="2rem">
             <p:commandButton icon="pi pi-bars" class="ui-button-success rounded-button m-1"  process="@this" styleClass="edit-button"
-                             action="#{incidenciaBean.visualizaDialog(incidencia)}" update="formIncidencias:tabViewI:dialogPermisos">
-                <f:setPropertyActionListener value="#{incidencia}" target="#{incidenciaBean.incidenciaSelected}" for="@previous"/>
+                             action="#{incidenciaBean.visualizaDialog(incidencia)}" update="formIncidencias:tabViewI:dialogPermisos"
+                             onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();">
+                <f:setPropertyActionListener value="#{incidencia}" target="#{incidenciaBean.incidenciaSelected}" for="@previous" />
             </p:commandButton>
         </p:column>
 

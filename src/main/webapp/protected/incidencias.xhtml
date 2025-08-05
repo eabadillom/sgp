@@ -21,6 +21,7 @@
 				</div>
 			</p:dialog>
             <p:tabView id="tabViewI" cache="false" widgetVar="tvIncidencias" dynamic="true">
+            	<p:ajax event="tabChange" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
                 <p:tab title="Retardos">
                     <ui:include src="/protected/seccionesIncidencias/incidenciaRegistro.xhtml" />
                 </p:tab>

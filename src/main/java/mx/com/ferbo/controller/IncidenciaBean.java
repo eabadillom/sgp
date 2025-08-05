@@ -272,14 +272,18 @@ public class IncidenciaBean implements Serializable {
                 default:
                     log.warn("EX-0023: Error al seleccionar opción");
             }
-            mensaje = "Editando una solicitud";
-            severity = FacesMessage.SEVERITY_INFO;
         }catch (SGPException e) {
             log.warn("Error al abrir el registro de incidencia del empleado: {}", empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
             log.warn("EX-0032: {}, ", e.getMessage());
             mensaje = "Consulte al administrador de sistemas";
             severity = FacesMessage.SEVERITY_ERROR;
-        } finally {
+            message = new FacesMessage(severity, titulo, mensaje);
+            FacesContext.getCurrentInstance().addMessage(null, message);
+            PrimeFaces.current().ajax().update("formIncidencias:messages");
+        } catch(Exception ex) {
+        	log.warn("Error al abrir el registro de incidencia del empleado: {}", empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
+            mensaje = "Consulte al administrador de sistemas";
+            severity = FacesMessage.SEVERITY_ERROR;
             message = new FacesMessage(severity, titulo, mensaje);
             FacesContext.getCurrentInstance().addMessage(null, message);
             PrimeFaces.current().ajax().update("formIncidencias:messages");
