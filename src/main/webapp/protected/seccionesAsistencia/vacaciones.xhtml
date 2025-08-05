@@ -6,12 +6,12 @@
     <div class="ui-fluid formgrid grid">
     	<div class="field col-12 md:col-2">
     		<p:datePicker value="#{vacacionesBean.periodoInicio}" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy" showIcon="true">
-    			<p:ajax process="@this" event="change" listener="#{vacacionesBean.cargarPermisos()}"  update="formActividades:tabView:dtVacaciones"/>
+    			<p:ajax process="@this" event="change" listener="#{vacacionesBean.cargarPermisos()}"  update="formActividades:tabView:dtVacaciones" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
     		</p:datePicker>
     	</div>
     	<div class="field col-12 md:col-2">
     		<p:datePicker value="#{vacacionesBean.periodoFin}" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy" showIcon="true">
-    			<p:ajax process="@this" event="change" listener="#{vacacionesBean.cargarPermisos()}" update="formActividades:tabView:dtVacaciones"/>
+    			<p:ajax process="@this" event="change" listener="#{vacacionesBean.cargarPermisos()}" update="formActividades:tabView:dtVacaciones" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
     		</p:datePicker>
     	</div>
     	<div class="field col-12 md:col-4">
@@ -19,11 +19,11 @@
     	</div>
     	<div class="field col-12 md:col-2">
     		<p:selectBooleanButton value="#{vacacionesBean.mostrarCanceladas}" onIcon="pi pi-eye" onLabel="Canceladas" offIcon="pi pi-eye-slash" offLabel="Canceladas">
-    			<p:ajax event="change" process="@this" update="formActividades:tabView:dtVacaciones" listener="#{vacacionesBean.cargarPermisos()}"/>
+    			<p:ajax event="change" process="@this" update="formActividades:tabView:dtVacaciones" listener="#{vacacionesBean.cargarPermisos()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
     		</p:selectBooleanButton>
     	</div>
     	<div class="field col-12 md:col-2">
-            <p:commandButton value="Registrar" icon="pi pi-plus" process="@this" actionListener="#{vacacionesBean.nuevoPermiso()}" oncomplete="PF('dgVacaciones').show();" update="formActividades:tabView:dg-vacaciones">
+            <p:commandButton value="Registrar" icon="pi pi-plus" process="@this" actionListener="#{vacacionesBean.nuevoPermiso()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dgVacaciones').show();" update="formActividades:tabView:dg-vacaciones">
             </p:commandButton>
     	</div>
     </div>
@@ -85,7 +85,7 @@
 				<p:column rowspan="2">
 					<p:card>
 						<p:datePicker id="dpView" styleClass="ferbo-datePicker"  disabled="#{vacacionesBean.periodoVacacional eq null}" readonlyInput="true" 
-		                          timeZone="GMT-06" value="#{vacacionesBean.diasSolicitados}"
+		                          timeZone="GMT-6" locale="es_MX" value="#{vacacionesBean.diasSolicitados}"
 		                          mindate="#{vacacionesBean.permiso.solPermiso.fechaInicio}" maxdate="#{vacacionesBean.permiso.solPermiso.fechaFin}"
 		                          inline="true" selectionMode="multiple" disabledDays="#{vacacionesBean.invalidDays}" 
 		                          disabledDates="#{vacacionesBean.diasDeAsueto}">
