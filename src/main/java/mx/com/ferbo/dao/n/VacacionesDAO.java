@@ -94,6 +94,31 @@ public class VacacionesDAO extends BaseDAO<DetVacaciones, Integer> {
         return modelList;
     }
     
+    public synchronized List<DetVacaciones> cargarPeriodos(Integer idEmpleado, Date fecha) {
+    	List<DetVacaciones> modelList = null;
+    	EntityManager em = null;
+    	
+    	try {
+    		em = this.getEntityManager();
+    		modelList = em.createNamedQuery("DetVacaciones.buscarPeriodosDisponibles", DetVacaciones.class)
+            		.setParameter("idEmpleado", idEmpleado)
+            		.setParameter("fecha", fecha)
+            		.getResultList();
+    		
+    		for(DetVacaciones model : modelList) {
+    			model.getRegistroVacaciones().stream().forEach(item -> log.debug("id registro: {}", item.getRegistro().getStatus().getIdEstatus()));
+    		}
+    		
+            log.info("Finaliza el proceso para obtener los periodos vacacionales en base a una fecha.");
+    	} catch(Exception ex) {
+    		log.error("Problema para obtener los periodos vacacionales...", ex);
+    	} finally {
+    		this.close(em);
+    	}
+    	
+    	return modelList;
+    }
+    
     public DetVacaciones obtenerPorRfcFecha(String rfc, Date fecha) {
     	DetVacaciones model = null;
     	EntityManager em = null;

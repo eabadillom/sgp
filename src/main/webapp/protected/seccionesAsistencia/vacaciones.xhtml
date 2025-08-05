@@ -68,16 +68,19 @@
 			                </p:column>
 			                <p:column headerText="Periodo inicio" style="text-align: center;">
 			                    <p:outputLabel value="#{periodo.fechaInicio}">
-			                    	<f:convertDateTime pattern="dd 'de' MMMM 'de' yyyy" locale="es_MX" timeZone="GMT-6" />
+			                    	<f:convertDateTime pattern="dd 'de' MMM 'de' yyyy" locale="es_MX" timeZone="GMT-6" />
 			                    </p:outputLabel>
 			                </p:column>
 			                <p:column headerText="Periodo fin" style="text-align: center;">
 			                    <p:outputLabel value="#{periodo.fechaFin}">
-			                    	<f:convertDateTime pattern="dd 'de' MMMM 'de' yyyy" locale="es_MX" timeZone="GMT-6" />
+			                    	<f:convertDateTime pattern="dd 'de' MMM 'de' yyyy" locale="es_MX" timeZone="GMT-6" />
 			                    </p:outputLabel>
 			                </p:column>
-			                <p:column headerText="Dias disponibles" width="8rem" style="text-align: center;">
-			                    <p:outputLabel value="#{periodo.diasTotales - periodo.diasTomados - periodo.diasPagados}"/>
+			                <p:column headerText="Total" width="4rem" style="text-align: center;">
+			                    <p:outputLabel value="#{periodo.diasTotales} día(s)"/>
+			                </p:column>
+			                <p:column headerText="Disponibles" width="5rem" style="text-align: center;">
+			                    <p:outputLabel value="#{vacacionesBean.diasDisponibles(periodo)} día(s)"/>
 			                </p:column>
 			            </p:dataTable>
 					</p:card>
