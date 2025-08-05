@@ -123,6 +123,15 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
                 
                 for(DetVacaciones v : model.getVacaciones()) {
                 	log.debug("Periodo Vacacional: {}", v.getIdVacaciones());
+                	
+                	v.getRegistroVacaciones().stream().forEach(item -> {
+                		if(item.getRegistro() == null)
+                			return;
+                		if(!"V".equalsIgnoreCase(item.getRegistro().getStatus().getCodigo()))
+                			return;
+                		
+                		log.debug("Id registro vacaciones: {}", item.getRegistro().getIdRegistro());
+                	});
                 }
                 
                 for(DetPercepcionEmpleado p : model.getPercepcionesEmpleado()) {

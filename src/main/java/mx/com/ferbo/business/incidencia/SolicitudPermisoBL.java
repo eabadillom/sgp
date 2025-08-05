@@ -108,7 +108,6 @@ public class SolicitudPermisoBL implements Serializable
     }
     
     
-    
     //Valida que una solicitud de permiso que no se empalme con otro registro durante un periodo solicitado
     public static void validarSolicitudPermiso(DetSolicitudPermiso solicitudPermiso) throws SGPException {
         

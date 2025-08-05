@@ -266,7 +266,7 @@ public class IncidenciaDAO extends BaseDAO<DetIncidencia, Integer> {
     	
     	return modelList;
     }
-
+    
     public synchronized void eliminaIncidenciaPorIdEmpleado(Integer idIncidencia, Integer idEmpleado, Integer idPermiso) throws SGPException {
         EntityManager em = null;
 

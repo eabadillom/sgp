@@ -11,20 +11,20 @@
             <p:outputLabel value="#{prendas.empleado.nombre} #{prendas.empleado.primerAp} #{prendas.empleado.segundoAp}"/>
         </p:column>
         <p:column headerText="Descripción" width="10rem" style="text-align: center;">
-            <p:outputLabel value="#{(prendas.tipoIncidencia.clave.matches('PR')) ? prendas.solPrenda.prenda.descripcion :''}"/>
+            <p:outputLabel value="#{(prendas.tipoIncidencia.clave eq 'PR') ? prendas.solPrenda.prenda.descripcion :''}"/>
         </p:column>
         <p:column headerText="Imagen" width="5rem">
             <h:graphicImage url="/imagen/uniforme?name=#{prendas.solPrenda.prenda.descripcion}.jpg" width="60" />
         </p:column>
         <p:column headerText="Cantidad" width="5rem" style="text-align: center;">
-            <p:outputLabel value="#{(prendas.tipoIncidencia.clave.matches('PR')) ? prendas.solPrenda.cantidad : ''}"/>
+            <p:outputLabel value="#{(prendas.tipoIncidencia.clave eq 'PR') ? prendas.solPrenda.cantidad : ''}"/>
         </p:column>
         <p:column headerText="Talla" width="3rem" style="text-align: center;">
-            <p:outputLabel value="#{(prendas.tipoIncidencia.clave.matches('PR')) ? prendas.solPrenda.talla.descripcion : ''}"/>
+            <p:outputLabel value="#{(prendas.tipoIncidencia.clave eq 'PR') ? prendas.solPrenda.talla.descripcion : ''}"/>
         </p:column>
         <p:column headerText="Fecha solicitud" width="5rem" style="text-align: center;">
-            <p:outputLabel value="#{(prendas.tipoIncidencia.clave.matches('PR')) ? prendas.fechaCap : ''}">
-                <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+            <p:outputLabel value="#{(prendas.tipoIncidencia.clave eq 'PR') ? prendas.fechaCap : ''}">
+                <f:convertDateTime type="date" pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6"/>
             </p:outputLabel>
         </p:column>
         <p:column headerText="Estatus" width="6rem" style="text-align: center;">
@@ -33,7 +33,8 @@
         </p:column>
         <p:column exportable="false" style="text-align: center" width="2rem">
             <p:commandButton icon="pi pi-bars" class="ui-button-success rounded-button m-1" styleClass="edit-button" process="@this" 
-                             action="#{incidenciaBean.visualizaDialog(prendas)}" update="formIncidencias:tabViewI:dialogPrendas">
+                             action="#{incidenciaBean.visualizaDialog(prendas)}" update="formIncidencias:tabViewI:dialogPrendas"
+                             onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();">
                 <f:setPropertyActionListener value="#{prendas}" target="#{incidenciaBean.incidenciaSelected}" for="@previous"/>
             </p:commandButton>
         </p:column>
@@ -60,7 +61,7 @@
         </p:outputPanel>
         <f:facet name="footer">
             <p:commandButton value="Aprobar" icon="pi pi-check" class="ui-button-success" process="pnlPrendas @this"
-                             actionListener="#{incidenciaBean.guardarEstatusPrenda(true)}" 
+                             actionListener="#{incidenciaBean.guardarEstatusPrenda(true)}"
                              disabled="#{incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 2 or incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 3 or incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 4}"/>
             <p:commandButton value="Rechazar" icon="pi pi-times" class="ui-button-danger" process="pnlPrendas @this"
                              disabled="#{incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 2 or incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 3 or incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 4}"
