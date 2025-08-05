@@ -36,6 +36,7 @@ import javax.validation.constraints.Null;
 @NamedQuery(name = "DetIncidencia.findByIdEmpleadoArticulo", query = "SELECT d FROM DetIncidencia d JOIN d.empleado e JOIN d.tipoIncidencia ct JOIN d.estatusIncidencia ce INNER JOIN d.solArticulo sp WHERE e.idEmpleado = :idEmpleado AND ct.clave = 'A'")
 @NamedQuery(name = "DetIncidencia.findByIdEmpleadoPermiso", query = "SELECT d FROM DetIncidencia d JOIN d.empleado e JOIN d.tipoIncidencia ct JOIN d.estatusIncidencia ce INNER JOIN d.solPermiso sp WHERE e.idEmpleado = :idEmpleado AND (ct.clave = 'PE' OR ct.clave = 'V')")
 @NamedQuery(name = "DetIncidencia.findPermisoByPeriodo", query = "SELECT i FROM DetIncidencia i INNER JOIN i.solPermiso p WHERE i.tipoIncidencia.clave IN ('PE', 'V') AND p.fechaFin >= :periodoInicio AND p.fechaInicio <= :periodoFin ORDER BY p.fechaCap ")
+@NamedQuery(name = "DetIncidencia.findPermisoByEmpleadoPeriodo", query = "SELECT i FROM DetIncidencia i INNER JOIN i.solPermiso p WHERE i.empleado.idEmpleado = :idEmpleado AND i.tipoIncidencia.clave IN ('PE', 'V') AND p.fechaFin >= :periodoInicio AND p.fechaInicio <= :periodoFin ORDER BY p.fechaCap ")
 public class DetIncidencia implements Serializable {
 
     private static final long serialVersionUID = 1L;
