@@ -10,8 +10,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.incapacidad.IncapacidadBL;
+import mx.com.ferbo.business.notifmovil.NotifMovilBL;
+import mx.com.ferbo.business.sgpapiclient.SGPApiClientBL;
 import mx.com.ferbo.dao.n.IncidenciaDAO;
 import mx.com.ferbo.dao.n.TipoIncidenciaDAO;
+import mx.com.ferbo.dto.NotificacionMovilDTO;
 import mx.com.ferbo.model.CatTipoIncidencia;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetIncidencia;
@@ -171,7 +174,7 @@ public class IncidenciaBL implements Serializable
     	
     	if(incidencia.getIdIncidencia() == null)
     		incidenciaDAO.guardar(incidencia);
-    	else
+        else
 			incidenciaDAO.actualizar(incidencia);
     }
     
@@ -199,4 +202,26 @@ public class IncidenciaBL implements Serializable
     	}
     
     }
+    
+    public static void enviarNotificacion(DetIncidencia incidencia)
+    {
+        SGPApiClientBL sgpApiClient = new SGPApiClientBL();
+        
+        NotificacionMovilDTO msjNotificacion = null;
+        String mensaje = "";
+        switch(incidencia.getTipoIncidencia().getClave())
+        {
+            case TP_VACACIONES: 
+                mensaje = "vacaciones";
+                break;
+            case TP_PERMISO:
+                mensaje = "permiso";
+                break;
+        }
+        
+        msjNotificacion = NotifMovilBL.obtenerMensaje(mensaje, incidencia.getEmpleado());
+        
+        sgpApiClient.enviarNotificacion(msjNotificacion);
+    }
+    
 }

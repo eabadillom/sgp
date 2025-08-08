@@ -117,6 +117,7 @@ public class PermisosBean implements Serializable {
 			this.permiso.getSolPermiso().setTipoSolicitud(tipoSolicitud);
 			
 			IncidenciaBL.guardar(this.permiso);
+                        IncidenciaBL.enviarNotificacion(this.permiso);
 			this.cargarPermisos();
 			
 			PrimeFaces.current().executeScript("PF('dgPermiso').hide();");
