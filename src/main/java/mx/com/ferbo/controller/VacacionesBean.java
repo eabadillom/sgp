@@ -281,6 +281,7 @@ public class VacacionesBean implements Serializable {
 			
 			
 			IncidenciaBL.guardar(this.permiso);
+                        IncidenciaBL.enviarNotificacion(this.permiso);
 			this.cargarPermisos();
 			
 			PrimeFaces.current().executeScript("PF('dgVacaciones').hide();");

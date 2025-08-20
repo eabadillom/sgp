@@ -37,6 +37,9 @@ public class RegistroAsistenciaBL {
     private EstatusRegistroDAO estatusDAO = null;
     private TokenDAO detTokenDAO = null;
     private RegistroDAO registroDAO = null;
+    private static final String VACACIONES = "V";
+    private static final String ASISTENCIA_DIA_NO_LABORAL = "X";
+    private static final String A_TIEMPO = "T";
 
     public RegistroAsistenciaBL() {
         this.registroDAO = new RegistroDAO(DetRegistro.class);
@@ -128,38 +131,43 @@ public class RegistroAsistenciaBL {
                 DateUtil.getString(fechaEntradaInicio, DateUtil.FORMATO_YYYY_MM_DD_HH_MM_SS),
                 DateUtil.getString(fechaEntradaFin, DateUtil.FORMATO_YYYY_MM_DD_HH_MM_SS));
 
-        boolean tipoRegistro;
         DetRegistro registro = this.buscarPorEmpleadoFechaEntrada(empleado.getIdEmpleado(), fechaEntradaInicio, fechaEntradaFin);
-        if (registro == null || registro.getIdRegistro() == null) {
-            tipoRegistro = true;
-        } else {
-            tipoRegistro = false;
-        }
+        
+        boolean tipoRegistro = (registro == null || registro.getIdRegistro() == null);
 
         DateUtil.setTime(horaLimiteEntrada, horaEntrada, (minEntrada + minutosTolerancia), 0, 0);
         log.trace("Hora limite de entrada: {}", horaLimiteEntrada);
 
-        if (tipoRegistro == true) {
-            log.info("Registrando entrada...");
-            registro = RegistroBL.validarConfiguracion(empleado, horaLimiteEntrada, fechaActual);
-            if (empleado.getEmpleadoConfiguracion().getAsistenciaDiaNoLaboral() != null && empleado.getEmpleadoConfiguracion().getAsistenciaDiaNoLaboral()) {
-                if (EmpleadoBL.empleadoAsisteEnDiaDescanso(empleado)) {
-                    registro.setStatus(estatusDAO.buscarPorCodigo("X"));
-                }
-            }
-            this.registroDAO.guardar(registro);
-            log.info("Entrada registrada correctamente");
-            
-            this.enviarNotificacion(empleado, horaLimiteEntrada);
-        }
+        if (!tipoRegistro) {
+            log.info("Registrando de salida...");
 
-        if (tipoRegistro == false) {
-            log.info("Registrando salida...");
-            registro.setFechaSalida(fechaActual);
+            switch(registro.getStatus().getCodigo())
+            {
+                case VACACIONES:
+                    registro.setStatus(this.estatusDAO.buscarPorCodigo(A_TIEMPO));
+                    registro.setFechaEntrada(fechaActual);
+                    registro.setFechaSalida(null);
+                    break;
+                default:
+                    registro.setFechaSalida(fechaActual);   
+            }
+
             this.registroDAO.actualizar(registro);
             log.info("Salida registrada correctamente");
+            return;
         }
+        
+        log.info("Registrando de entrada...");
+        registro = RegistroBL.validarConfiguracion(empleado, horaLimiteEntrada, fechaActual);
+        if (empleado.getEmpleadoConfiguracion().getAsistenciaDiaNoLaboral() != null && 
+                empleado.getEmpleadoConfiguracion().getAsistenciaDiaNoLaboral() && 
+                EmpleadoBL.empleadoAsisteEnDiaDescanso(empleado)) {
+            registro.setStatus(this.estatusDAO.buscarPorCodigo(ASISTENCIA_DIA_NO_LABORAL));
+        }
+        this.registroDAO.guardar(registro);
+        log.info("Entrada registrada correctamente");
 
+        this.enviarNotificacion(empleado, horaLimiteEntrada);
     }
     
     public void enviarNotificacion(DetEmpleado empleado, Date horaLimiteEntrada)
