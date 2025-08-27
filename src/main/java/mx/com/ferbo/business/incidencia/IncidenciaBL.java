@@ -40,6 +40,11 @@ public class IncidenciaBL implements Serializable
     public static final String TP_PRENDA = "PR";
     public static final String TP_ARTICULO = "A";
     
+    public static final String ST_ENVIADA = "E";
+    public static final String ST_APROBADA = "A";
+    public static final String ST_RECHAZADA = "R";
+    public static final String ST_CANCELADA = "C";
+    
     public static List<Date> fechasSolicitudPermiso(DetSolicitudPermiso auxSolicitudPermiso)
     {
         Date fechaInicio = auxSolicitudPermiso.getFechaInicio();
