@@ -72,6 +72,7 @@ public class PrimaVacacionalEnTiempoPBL extends PercepcionBL {
 		nominaVacaciones = new DetNominaVacaciones();
 		nominaVacaciones.setNomina(nomina);
 		nominaVacaciones.setVacaciones(periodo);
+		nominaVacaciones.setTipoPrima("T");
 		nomina.getNominaVacaciones().add(nominaVacaciones);
 		
 		return periodo;

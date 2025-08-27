@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -35,6 +36,7 @@ import mx.com.ferbo.model.CatEstatusIncidencia;
 import mx.com.ferbo.model.CatEstatusRegistro;
 import mx.com.ferbo.model.CatTipoIncidencia;
 import mx.com.ferbo.model.CatTipoSolicitud;
+import mx.com.ferbo.model.DetDiaPermiso;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetIncidencia;
 import mx.com.ferbo.model.DetRegistro;
@@ -116,10 +118,11 @@ public class IncidenciaBean implements Serializable {
         this.diasDeAsueto = DiasDeDescansoObligatorioBL.diasDeAsueto();
         this.registroDAO = new RegistroDAO();
         this.estatusRegistroDAO = new EstatusRegistroDAO();
-    }
-
-    @PostConstruct
-    public void init() {
+        
+        
+        
+        /* * * * * estaba en el post-construct* * * * * * * */
+        
         consultaIncidencias();
         consultarRegistrosAsistencia();
         this.lstTipoSol = this.tipoSolicitudDAO.buscarActivos();
@@ -138,6 +141,11 @@ public class IncidenciaBean implements Serializable {
         this.estatusEnviado = false;
         this.status = new ManageStatus();
         this.sGoceSueldo = "100.0";
+    }
+
+    @PostConstruct
+    public void init() {
+        
     }
     
     public void validarFechaInicioFinIncidencia() {
@@ -233,8 +241,7 @@ public class IncidenciaBean implements Serializable {
             List<Date> fechas;
             this.descripcionRechazo = "";
             switch (incidenciaSelected.getTipoIncidencia().getClave()) {
-                // Tipo Permisos
-                case "PE":
+                case IncidenciaBL.TP_PERMISO: // Tipo Permisos
                     EmpleadoBL.empleadoTieneDiasLaborales(incidenciaSelected.getEmpleado());
                     switch (incidenciaSelected.getSolPermiso().getTipoSolicitud().getIdTipoSolicitud()) {
                         case 1://PERMISO
@@ -249,8 +256,11 @@ public class IncidenciaBean implements Serializable {
                     log.info("Total Dias de Vacaciones Solicitados: {}", this.diasVacacionesSolicitados);
                     PrimeFaces.current().executeScript("PF('dialogPermisos').show();");
                     break;
-                // Tipo Vacaciones
-                case "V":
+                
+                case IncidenciaBL.TP_VACACIONES: // Tipo Vacaciones
+                	this.incidenciaSelected = incidenciaDAO.cargar(solicitudIncidencia.getIdIncidencia())
+                		.orElseThrow(() -> new SGPException("No se encontró la incidencia solicitada."));
+                	
                     EmpleadoBL.empleadoTieneDiasLaborales(incidenciaSelected.getEmpleado());
                     this.invalidDays = IncidenciaBL.obtenerDiasSeleccionados(empleadoSelected.getDatoEmpresa());
                     fechas = IncidenciaBL.fechasSolicitudPermiso(incidenciaSelected.getSolPermiso());
@@ -261,12 +271,12 @@ public class IncidenciaBean implements Serializable {
                     log.info("Total Dias de Vacaciones Solicitados: {}", this.diasVacacionesSolicitados);
                     PrimeFaces.current().executeScript("PF('dialogPermisos').show();");
                     break;
-                // Tipo Prendas
-                case "PR":
+                
+                case IncidenciaBL.TP_PRENDA: // Tipo Prendas
                     PrimeFaces.current().executeScript("PF('dialogPrendas').show();");
                     break;
                 // Tipo Articulos
-                case "A":
+                case IncidenciaBL.TP_ARTICULO:
                     PrimeFaces.current().executeScript("PF('dialogArticulos').show();");
                     break;
                 default:
@@ -404,9 +414,30 @@ public class IncidenciaBean implements Serializable {
                     throw new SGPException("No hay solicitudes de vacaciones y/o permiso, contacte a su administrador de sistemas");
             }
             
-            List<DetRegistro> registroIncidencias = RegistroBL.obtenerRegistroAsistencia(empleadoSelected, incidenciaSelected.getSolPermiso().getFechaInicio(), incidenciaSelected.getSolPermiso().getFechaFin(), clave);
+//            List<DetRegistro> registroIncidencias = RegistroBL.obtenerRegistroAsistencia(empleadoSelected, incidenciaSelected.getSolPermiso().getFechaInicio(), incidenciaSelected.getSolPermiso().getFechaFin(), clave);
+            List<DetRegistro> registroIncidencias = RegistroBL.buscarRegistrosVacaciones(this.incidenciaSelected);
             int registrosEliminados = RegistroBL.cancelarRegistroAsistencia(registroIncidencias);
             log.info("Registros eliminados {} del empleado {}", registrosEliminados, empleadoSelected.getIdEmpleado());
+            
+            if(incidenciaSelected.getSolPermiso().getVacaciones() != null) {
+            	
+            	List<Date> diasPermiso = incidenciaSelected.getSolPermiso().getDiasPermiso().stream()
+            			.map(item -> item.getFecha())
+            			.collect(Collectors.toList());
+            	
+            	incidenciaSelected.getSolPermiso().getVacaciones().getRegistroVacaciones().stream()
+            	.forEach(item -> {
+            		if(item.getRegistro() == null)
+            			return;
+            		
+            		Date fecha = new Date(item.getRegistro().getFechaEntrada().getTime());
+            		DateUtil.resetTime(fecha);
+            		
+            		if( ! diasPermiso.contains(fecha) )
+            			return;
+            		item.setRegistro(null);
+            	});
+            }
             
             incidenciaDAO.actualizar(incidenciaSelected);
             
@@ -568,6 +599,97 @@ public class IncidenciaBean implements Serializable {
             PrimeFaces.current().ajax().update("formIncidencias:messages", "formIncidencias:tabViewI:dtRegistro");
         }
     }
+    
+    public boolean permiteAprobar() {
+    	boolean respuesta = false;
+    	if(this.incidenciaSelected == null)
+    		return false;
+    	
+    	if(this.incidenciaSelected.getSolPermiso() == null)
+    		return false;
+    	
+    	if(this.incidenciaSelected.getEstatusIncidencia() == null)
+    		return false;
+    	
+    	if(this.incidenciaSelected.getEstatusIncidencia().getClave() == null)
+    		return false;
+    	
+    	switch(this.incidenciaSelected.getEstatusIncidencia().getClave()) {
+    	case IncidenciaBL.ST_ENVIADA:
+    		respuesta = true;
+    		break;
+    	case IncidenciaBL.ST_APROBADA:
+    	case IncidenciaBL.ST_RECHAZADA:
+    	case IncidenciaBL.ST_CANCELADA:
+    		respuesta = false;
+    		break;
+		default:
+			respuesta = false;
+    	}
+    	
+    	return respuesta;
+    }
+    
+    public boolean permiteRechazar() {
+    	boolean respuesta = false;
+    	if(this.incidenciaSelected == null)
+    		return false;
+    	
+    	if(this.incidenciaSelected.getSolPermiso() == null)
+    		return false;
+    	
+    	if(this.incidenciaSelected.getEstatusIncidencia() == null)
+    		return false;
+    	
+    	if(this.incidenciaSelected.getEstatusIncidencia().getClave() == null)
+    		return false;
+    	
+    	switch(this.incidenciaSelected.getEstatusIncidencia().getClave()) {
+    	case IncidenciaBL.ST_ENVIADA:
+    		respuesta = true;
+    		break;
+    	case IncidenciaBL.ST_APROBADA:
+    	case IncidenciaBL.ST_RECHAZADA:
+    	case IncidenciaBL.ST_CANCELADA:
+    		respuesta = false;
+    		break;
+		default:
+			respuesta = false;
+    	}
+    	
+    	return respuesta;
+    }
+    
+    public boolean permiteCancelar() {
+    	boolean respuesta = false;
+    	if(this.incidenciaSelected == null)
+    		return false;
+    	
+    	if(this.incidenciaSelected.getSolPermiso() == null)
+    		return false;
+    	
+    	if(this.incidenciaSelected.getEstatusIncidencia() == null)
+    		return false;
+    	
+    	if(this.incidenciaSelected.getEstatusIncidencia().getClave() == null)
+    		return false;
+    	
+    	switch(this.incidenciaSelected.getEstatusIncidencia().getClave()) {
+    	case IncidenciaBL.ST_APROBADA:
+    		respuesta = true;
+    		break;
+    	case IncidenciaBL.ST_ENVIADA:
+    	case IncidenciaBL.ST_RECHAZADA:
+    	case IncidenciaBL.ST_CANCELADA:
+    		respuesta = false;
+    		break;
+		default:
+			respuesta = false;
+    	}
+    	
+    	return respuesta;
+    }
+    
     
     public DetIncidencia getIncidenciaSelected() {
         return incidenciaSelected;
