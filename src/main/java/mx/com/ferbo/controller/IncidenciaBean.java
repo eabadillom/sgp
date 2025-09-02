@@ -263,11 +263,15 @@ public class IncidenciaBean implements Serializable {
                 	
                     EmpleadoBL.empleadoTieneDiasLaborales(incidenciaSelected.getEmpleado());
                     this.invalidDays = IncidenciaBL.obtenerDiasSeleccionados(empleadoSelected.getDatoEmpresa());
-                    fechas = IncidenciaBL.fechasSolicitudPermiso(incidenciaSelected.getSolPermiso());
-                    this.diasDeVacaciones = DateUtil.diasVacacionesSolicitados(fechas, DiasDeDescansoObligatorioBL.diasDeAsueto(), empleadoSelected.getDatoEmpresa());
-                    log.info("Dias Solicitados: {}", this.diasDeVacaciones.toString());
-                    this.diasVacacionesSolicitados = this.diasDeVacaciones.size();
-                    lstRangoRegistro = Arrays.asList(diasDeVacaciones.get(0), diasDeVacaciones.get(this.diasVacacionesSolicitados - 1));
+                    
+                    fechas = this.incidenciaSelected.getSolPermiso().getDiasPermiso().stream()
+                        .map(DetDiaPermiso::getFecha)
+                        .collect(Collectors.toList());  
+                    
+                    log.info("Dias Solicitados: {}", fechas.toString());
+                    this.diasVacacionesSolicitados = fechas.size();
+                    lstRangoRegistro = fechas;
+                    
                     log.info("Total Dias de Vacaciones Solicitados: {}", this.diasVacacionesSolicitados);
                     PrimeFaces.current().executeScript("PF('dialogPermisos').show();");
                     break;
