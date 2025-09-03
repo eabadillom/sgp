@@ -445,13 +445,13 @@ public class IncidenciaBean implements Serializable {
                     empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
             log.warn("EX-0028: ", ex);
             mensaje = ex.getMessage();
-            severity = FacesMessage.SEVERITY_WARN;
+            severity = FacesMessage.SEVERITY_ERROR;
         } catch (Exception ex) {
             log.warn("Error al guardar el status del registro de la incidencia del empleado: {}",
                     empleadoSelected.getNumEmpleado() != null ? empleadoSelected.getNumEmpleado() : null);
             log.warn("EX-0028: ", ex);
             mensaje = "Error desconocido, contacte con el administrador se sistemas";
-            severity = FacesMessage.SEVERITY_WARN;
+            severity = FacesMessage.SEVERITY_ERROR;
         } finally {
             consultaIncidencias();
             message = new FacesMessage(severity, titulo, mensaje);
