@@ -130,11 +130,11 @@
                     </div>
                 </p:panel>
             </div>
-            <p:datePicker id="dpRangoView" rendered="#{incidenciaBean.incidenciaSelected.solPermiso.tipoSolicitud.idTipoSolicitud ne null 
+            <p:datePicker id="lazyEvent" rendered="#{incidenciaBean.incidenciaSelected.solPermiso.tipoSolicitud.idTipoSolicitud ne null 
                                                        and (incidenciaBean.incidenciaSelected.solPermiso.tipoSolicitud.idTipoSolicitud eq 2 
                                                        or incidenciaBean.incidenciaSelected.solPermiso.tipoSolicitud.idTipoSolicitud eq 4)}" 
                           styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" locale="es" disabled="false" 
-                          showIcon="true" readonlyInput="true" value="#{incidenciaBean.incidenciaSelected.solPermiso.diasPermiso}" showMinMaxRange="true" 
+                          showIcon="true" readonlyInput="true" value="#{incidenciaBean.lstRangoRegistro}" showMinMaxRange="true" 
                           mindate="#{incidenciaBean.incidenciaSelected.solPermiso.fechaInicio}" maxdate="#{incidenciaBean.incidenciaSelected.solPermiso.fechaFin}"
                           inline="true" selectionMode="multiple" disabledDays="#{incidenciaBean.invalidDays}"
                           disabledDates="#{incidenciaBean.diasDeAsueto}"/>
