@@ -55,7 +55,7 @@
 			</p:inputText>
 		</div>
 		<div class="field">
-			<p:datePicker id="dp-fecha" pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX"
+			<p:datePicker id="dp-fecha" pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX" styleClass="ferbo-datePicker"
 					showIcon="true" readonlyInput="true" value="#{permisosBean.permiso.solPermiso.fechaInicio}"
 					mindate="#{permisosBean.minDate}" inline="true" disabledDays="#{asistenciaBean.invalidDays}" disabledDates="#{asistenciaBean.diasDeAsueto}">
 				<p:ajax event="dateSelect" listener="#{permisosBean.seleccionarFecha()}" update="txtFecha" />
@@ -78,4 +78,9 @@
 			<p:commandButton value="Cerrar" icon="pi pi-times" styleClass="ui-button-secondary" onclick="PF('dgPermiso').hide();" />
 		</f:facet>
 	</p:dialog>
+        <style>
+            .ferbo-datePicker .ui-datepicker-calendar td a.ui-state-active{
+                background: #77ff00 !important;
+            }
+        </style>
 </ui:composition>

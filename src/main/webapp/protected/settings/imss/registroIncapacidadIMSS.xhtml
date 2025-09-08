@@ -62,6 +62,7 @@
 						<p:ajax listener="#{registroIncBean.actualizarListaRegistroIncapacidades()}" update="form:dtRegistroIncapacidad" process="@this" />
 					</p:datePicker>
             	</div>
+                <p:divider layout="vertical"></p:divider>
             	<div class="field col-12 md:col-2">
             		<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
 					<p:selectBooleanButton id="idEstatusAprobado" value="#{registroIncBean.estatusAprobado}" onIcon="pi pi-check" onLabel="Aceptada" offIcon="pi pi-times" offLabel="Aceptada" style="width: 100%;">
@@ -70,20 +71,21 @@
             	</div>
             	<div class="field col-12 md:col-2">
             		<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
-					<p:selectBooleanButton id="idEstatusCancelado" value="#{registroIncBean.estatusCancelado}" onIcon="pi pi-check" onLabel="Cancelada" offIcon="pi pi-times" offLabel="Cancelada" style="width: 100;">
+					<p:selectBooleanButton id="idEstatusCancelado" value="#{registroIncBean.estatusCancelado}" onIcon="pi pi-check" onLabel="Cancelada" offIcon="pi pi-times" offLabel="Cancelada" style="width: 100%;">
 					    <p:ajax event="change" update="dtRegistroIncapacidad" process="@this"/>
 					</p:selectBooleanButton>
             	</div>
-            	<div class="field col-12 md:col-2">
-            		<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
-            		<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
-            	</div>
+                <p:divider layout="vertical"></p:divider>
             	<div class="field col-12 md:col-2">
             		<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
 					<p:commandButton value="Registrar" icon="pi pi-plus" oncomplete="PF('dialogoRegistoIncapacidad').show();" update="pnlRegistoIncapacidad" 
 						actionListener="#{registroIncBean.incializarSolicitud()}" process="@this" style="margin-right: .5rem" >
 						<p:resetInput target="form:pnlRegistoIncapacidad" />
 					</p:commandButton>
+            	</div>
+                <div class="field col-12 md:col-2">
+            		<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+            		<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
             	</div>
             </div>
             
@@ -130,8 +132,8 @@
                             <p:selectOneMenu id="empleado" autoWidth="false" converter="entityConverter" value="#{registroIncBean.incapacidad.empleado}"
                                              disabled="#{registroIncBean.incapacidad.estatusSolicitud.clave.matches('C') eq true}" 
                                              filter="true" filterMatchMode="contains" styleClass="custom-style">
-                                <f:selectItem itemLabel="--Seleccione--"/>
-                                <f:selectItems value="#{registroIncBean.listaEmpleados}" var="tipoV" itemLabel="#{tipoV.nombre} #{tipoV.primerAp} #{tipoV.segundoAp}" itemValue="#{empleadoInc}"/>
+                                <f:selectItem itemLabel="--Seleccione--" itemValue="#{null}" />
+                                <f:selectItems value="#{registroIncBean.listaEmpleados}" var="tipoV" itemLabel="#{tipoV.nombre} #{tipoV.primerAp} #{tipoV.segundoAp}" itemValue="#{tipoV}"/>
                                 <p:ajax event="change" update="pnlRegistoIncapacidad" process="@this" resetValues="true"/>
                             </p:selectOneMenu>
                         </div>
@@ -139,8 +141,8 @@
                             <p:outputLabel for="@next" value="Tipo Incapacidad"/>
                             <p:selectOneMenu id="tipoIncapacidad" autoWidth="false" converter="entityConverter" value="#{registroIncBean.incapacidad.tipoIncapacidad}"
                                 disabled="#{registroIncBean.incapacidad.estatusSolicitud.clave eq 'C' or registroIncBean.incapacidad.controlIncapacidad.clave eq 'D'}" >
-                                <f:selectItem itemLabel="--Seleccione--" noSelectionOption="true"/>
-                                <f:selectItems value="#{registroIncBean.listaIncapacidadesIMSS}" var="tipoV" itemLabel="#{tipoV.descripcion}" itemValue="#{tipoIncapacidad}"/>
+                                <f:selectItem itemLabel="--Seleccione--" noSelectionOption="true" itemValue="#{null}" />
+                                <f:selectItems value="#{registroIncBean.listaIncapacidadesIMSS}" var="tipoV" itemLabel="#{tipoV.descripcion}" itemValue="#{tipoV}"/>
                                 <p:ajax event="change" update="pnlRegistoIncapacidad" process="@this" resetValues="true"/>
                             </p:selectOneMenu>
                         </div>
@@ -150,32 +152,30 @@
                             <p:outputLabel for="@next" value="Control Incapacidad"/>
                             <p:selectOneMenu id="controlIncapacidad" autoWidth="false" converter="entityConverter" value="#{registroIncBean.incapacidad.controlIncapacidad}"
                                 disabled="#{registroIncBean.incapacidad.estatusSolicitud.clave eq 'C' or registroIncBean.incapacidad.controlIncapacidad.clave eq 'D'}" >
-                                <f:selectItem itemLabel="--Seleccione--"/>
-                                <f:selectItems value="#{registroIncBean.listaControlIncapacidadIMSS}" var="tipoV" itemLabel="#{tipoV.descripcion}" itemValue="#{controlIncapacidad}"/>
+                                <f:selectItem itemLabel="--Seleccione--" itemValue="#{null}" />
+                                <f:selectItems value="#{registroIncBean.listaControlIncapacidadIMSS}" var="tipoV" itemLabel="#{tipoV.descripcion}" itemValue="#{tipoV}"/>
                                 <p:ajax event="change" update="pnlRegistoIncapacidad" process="@this" resetValues="true"/>
                             </p:selectOneMenu>
                         </div>
                         <div class="field col">
                             <p:outputLabel for="@next" value="Riesgo Trabajo"/>
                             <p:selectOneMenu id="riesgoTrabajo" autoWidth="false" converter="entityConverter" value="#{registroIncBean.riesgoTrabajo}" 
-                                             disabled="#{registroIncBean.tpIncapacidadSelecciondado eq true 
+                                             disabled="#{registroIncBean.incapacidad.tipoIncapacidad.incapacidadSAT.clave ne '01' 
                                             or registroIncBean.incapacidad.estatusSolicitud.clave eq 'C' 
-                                            or registroIncBean.tipoIncapacidad.incapacidadSAT.clave eq '01' 
-                                            eq false or registroIncBean.incapacidad.controlIncapacidad.clave eq 'D'}" >
-                                <f:selectItem itemLabel="--Seleccione--"/>
-                                <f:selectItems value="#{registroIncBean.listaRiesgoTrabajo}" var="tipoV" itemLabel="#{tipoV.descripcion}" itemValue="#{riesgoTrabajo}"/>
+                                            or registroIncBean.controlIncapacidad.clave eq 'D'}" >
+                                <f:selectItem itemLabel="--Seleccione--" itemValue="#{null}" />
+                                <f:selectItems value="#{registroIncBean.listaRiesgoTrabajo}" var="tipoV" itemLabel="#{tipoV.descripcion}" itemValue="#{tipoV}"/>
                                 <p:ajax event="change" update="pnlRegistoIncapacidad" process="@this" resetValues="true"/>
                             </p:selectOneMenu>
                         </div>
                         <div class="field col">
                             <p:outputLabel for="@next" value="Tipo de Riesgo de Trabajo"/>
-                            <p:selectOneMenu id="tipoRiesgoTrabajo" autoWidth="false" converter="entityConverter" value="#{registroIncBean.incapacidad.tipoRiesgo}" 
-                                disabled="#{registroIncBean.tpIncapacidadSelecciondado eq true 
+                            <p:selectOneMenu id="tipoRiesgoTrabajo" autoWidth="false" converter="entityConverter" value="#{registroIncBean.tipoRiesgo}" 
+                                             disabled="#{registroIncBean.incapacidad.tipoIncapacidad.incapacidadSAT.clave ne '01' 
                                             or registroIncBean.incapacidad.estatusSolicitud.clave eq 'C' 
-                                            or registroIncBean.tipoIncapacidad.incapacidadSAT.clave eq '01' eq false 
-                                            or registroIncBean.incapacidad.controlIncapacidad.clave eq 'D'}" >
-                                <f:selectItem itemLabel="--Seleccione--"/>
-                                <f:selectItems value="#{registroIncBean.listaTipoRiesgoIMSS}" var="tipoV" itemLabel="#{tipoV.descripcion}" itemValue="#{tipoRiesgo}"/>
+                                            or registroIncBean.controlIncapacidad.clave eq 'D'}" >
+                                <f:selectItem itemLabel="--Seleccione--" itemValue="#{null}" />
+                                <f:selectItems value="#{registroIncBean.listaTipoRiesgoIMSS}" var="tipoV" itemLabel="#{tipoV.descripcion}" itemValue="#{tipoV}"/>
                                 <p:ajax event="change" update="pnlRegistoIncapacidad" process="@this" resetValues="true"/>
                             </p:selectOneMenu>
                         </div>
@@ -235,7 +235,8 @@
 					                 actionListener="#{registroIncBean.cancelar()}"
 					                 process="pnlRegistoIncapacidad @this" update="pnlRegistoIncapacidad dtRegistroIncapacidad" 
 					                 rendered="#{registroIncBean.incapacidad.idIncapacidad ne null}"
-					                 disabled="#{registroIncBean.incapacidad.controlIncapacidad.clave eq 'D'}">
+					                 disabled="#{registroIncBean.incapacidad.controlIncapacidad.clave eq 'D'
+                                                            or registroIncBean.incapacidad.estatusSolicitud.clave eq 'C'}">
 						<p:confirm header="Cancelar incapacidad" message="¿Está seguro que quiere cancelar la incapacidad?" icon="pi pi-exclamation-triangle" />
 						<p:resetInput target="form:pnlRegistoIncapacidad" />
                     </p:commandButton>
