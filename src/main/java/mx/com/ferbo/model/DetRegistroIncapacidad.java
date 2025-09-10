@@ -27,8 +27,8 @@ public class DetRegistroIncapacidad implements Serializable {
 	@Column(name = "id_reg_incapacidad", nullable = false)
 	private Integer id;
 	
-	@OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
-	@JoinColumn(name = "id_registro", nullable = false)
+	@OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval=true)
+	@JoinColumn(name = "id_registro", nullable = true)
 	private DetRegistro registro;
 	
 	@ManyToOne
