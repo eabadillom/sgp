@@ -100,10 +100,12 @@ public class VacacionesDAO extends BaseDAO<DetVacaciones, Integer> {
     	
     	try {
     		em = this.getEntityManager();
-    		modelList = em.createNamedQuery("DetVacaciones.buscarPeriodosDisponibles", DetVacaciones.class)
-            		.setParameter("idEmpleado", idEmpleado)
-            		.setParameter("fecha", fecha)
-            		.getResultList();
+    		
+    		modelList = em.createNamedQuery("DetVacaciones.buscarPeriodosConSaldo", this.modelClass)
+    				.setParameter("idEmpleado", idEmpleado)
+    				.setParameter("fecha", fecha)
+    				.getResultList()
+    				;
     		
     		for(DetVacaciones model : modelList) {
     			model.getRegistroVacaciones().stream().forEach(item -> log.debug("id registro: {}", item.getRegistro().getStatus().getIdEstatus()));
