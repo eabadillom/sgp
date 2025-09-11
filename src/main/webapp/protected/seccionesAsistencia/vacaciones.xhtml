@@ -92,7 +92,7 @@
 		                          mindate="#{vacacionesBean.permiso.solPermiso.fechaInicio}" maxdate="#{vacacionesBean.permiso.solPermiso.fechaFin}"
 		                          inline="true" selectionMode="multiple" disabledDays="#{vacacionesBean.invalidDays}" 
 		                          disabledDates="#{vacacionesBean.diasDeAsueto}">
-							<p:ajax event="dateSelect" process="@this" listener="#{vacacionesBean.seleccionarFecha()}" update="txtFechaInicio txtFechaFin" />
+							<p:ajax event="dateSelect" process="@this" listener="#{vacacionesBean.seleccionarFecha()}" update="txtFechaInicio txtFechaFin dt-periodos-vacacionales" />
 			            </p:datePicker>
 					</p:card>
 				</p:column>
