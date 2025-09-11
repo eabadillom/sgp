@@ -110,6 +110,16 @@ public class IncapacidadIMSSDAO extends BaseDAO<DetIncapacidad, Integer>
     				.setParameter("fechaFin", fechaFin)
     				.getResultList()
     				;
+                
+                modelList.stream()
+                    .flatMap(incapacidad -> incapacidad.getRegistrosIncapacidad().stream())
+                    .forEach(registro -> {
+                        log.debug("Registro incapacidad: {}", (registro != null) ? registro.toString() : null);
+
+                        if (registro != null) {
+                            log.debug("Registro Asistencia: {}", (registro.getRegistro() != null) ? registro.getRegistro().toString() : null);
+                        }
+                    });
     	} catch(Exception ex) {
     		log.error("Problema para obtener la lista de incapacidades...", ex);
     	} finally {

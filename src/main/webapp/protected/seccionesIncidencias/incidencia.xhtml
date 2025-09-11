@@ -46,7 +46,7 @@
     </div>
 
     <p:dataTable id="dtIncidencias" widgetVar="dtIncidencias" value="#{incidenciaBean.consultarTipoPermisos()}" selection="#{incidenciaBean.listaPermisosFiltrada}"
-                 var="incidencia" rowKey="#{incidencia.idIncidencia}" paginator="true" rows="5" paginatorPosition="bottom" reflow="true">
+                 var="incidencia" rowKey="#{incidencia.idIncidencia}" paginator="true" rows="8" paginatorPosition="bottom" reflow="true">
         <p:column headerText="Nombre">
             <p:outputLabel value="#{incidencia.empleado.nombre} #{incidencia.empleado.primerAp} #{incidencia.empleado.segundoAp}"/>
         </p:column>
@@ -71,7 +71,7 @@
             <p:commandButton icon="pi pi-bars" class="ui-button-success rounded-button m-1"  process="@this" styleClass="edit-button"
                              action="#{incidenciaBean.visualizaDialog(incidencia)}" update="formIncidencias:tabViewI:dialogPermisos"
                              onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();">
-                <f:setPropertyActionListener value="#{incidencia}" target="#{incidenciaBean.incidenciaSelected}" for="@previous" />
+                <!-- <f:setPropertyActionListener value="#{incidencia}" target="#{incidenciaBean.incidenciaSelected}" for="@previous" /> -->
             </p:commandButton>
         </p:column>
 
@@ -79,7 +79,7 @@
 
     <p:dialog id="dialogPermisos" widgetVar="dialogPermisos" header="Información del permiso" showEffect="fade" responsive="true" modal="true" 
               styleClass="ferbo-dialog" dynamic="true" cache="false" >
-        <p:outputPanel id="pnlDetalleSolicitudPermiso" styleClass="ui-fluid pb-3">
+        <p:outputPanel id="pnlDetalleSolicitudPermiso" rendered="#{incidenciaBean.incidenciaSelected ne null}" styleClass="ui-fluid pb-3">
 
             <div class="formgrid grid">
                 <div class="field col">
@@ -130,13 +130,13 @@
                     </div>
                 </p:panel>
             </div>
-            <p:datePicker id="dpRangoView" rendered="#{incidenciaBean.incidenciaSelected.solPermiso.tipoSolicitud.idTipoSolicitud ne null 
+            <p:datePicker id="lazyEvent" rendered="#{incidenciaBean.incidenciaSelected.solPermiso.tipoSolicitud.idTipoSolicitud ne null 
                                                        and (incidenciaBean.incidenciaSelected.solPermiso.tipoSolicitud.idTipoSolicitud eq 2 
                                                        or incidenciaBean.incidenciaSelected.solPermiso.tipoSolicitud.idTipoSolicitud eq 4)}" 
                           styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" locale="es" disabled="false" 
                           showIcon="true" readonlyInput="true" value="#{incidenciaBean.lstRangoRegistro}" showMinMaxRange="true" 
                           mindate="#{incidenciaBean.incidenciaSelected.solPermiso.fechaInicio}" maxdate="#{incidenciaBean.incidenciaSelected.solPermiso.fechaFin}"
-                          inline="true" selectionMode="range" disabledDays="#{incidenciaBean.invalidDays}"
+                          inline="true" selectionMode="multiple" disabledDays="#{incidenciaBean.invalidDays}"
                           disabledDates="#{incidenciaBean.diasDeAsueto}"/>
             <p:datePicker id="dpSimpleView" rendered="#{incidenciaBean.incidenciaSelected.solPermiso.tipoSolicitud.idTipoSolicitud ne null 
                                                         and (incidenciaBean.incidenciaSelected.solPermiso.tipoSolicitud.idTipoSolicitud eq 1 
@@ -150,14 +150,17 @@
         </p:outputPanel>
         <f:facet name="footer">
             <p:commandButton value="Aprobar" icon="pi pi-check" class="ui-button-success" process="pnlDetalleSolicitudPermiso @this"
-                             actionListener="#{incidenciaBean.aprobarIncidencia()}" 
-                             disabled="#{incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 2 or incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 3 or incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 4}"/>
-            <p:commandButton value="Rechazar" icon="pi pi-times" class="ui-button-danger" process="pnlDetalleSolicitudPermiso @this" 
-                             disabled="#{incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 2 or incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 3 or incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 4}"
+                             actionListener="#{incidenciaBean.aprobarIncidencia()}"
+                             rendered="#{incidenciaBean.permiteAprobar()}"/>
+            <p:commandButton value="Rechazar" icon="pi pi-times" class="ui-button-warning" process="pnlDetalleSolicitudPermiso @this"
+                             rendered="#{incidenciaBean.permiteRechazar()}"
                              oncomplete="PF('dialogPermisos').hide(); PF('dialogRechazar').show()"/>
             <p:commandButton value="Cancelar" icon="pi pi-trash" class="ui-button-danger" process="pnlDetalleSolicitudPermiso @this" 
-                             rendered="#{incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 2}"
-                             oncomplete="PF('dialogPermisos').hide(); PF('dialogoCancelar').show()"/> 
+                             rendered="#{incidenciaBean.permiteCancelar()}"
+                             oncomplete="PF('dialogPermisos').hide(); PF('dialogoCancelar').show()"/>
+            <p:commandButton value="Cerrar" icon="pi pi-times" class="ui-button-secondary" onclick="PF('').hide();">
+            	<p:resetInput target="formIncidencias:tabViewI:pnlDetalleSolicitudPermiso" />
+            </p:commandButton> 
         </f:facet>
     </p:dialog>
     <p:dialog widgetVar="dialogRechazar" header="Detalle rechazo" showEffect="fade" responsive="true" modal="true" width="100%" height="100%" position="center top"

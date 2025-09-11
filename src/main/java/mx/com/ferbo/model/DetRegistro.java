@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Objects;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,6 +15,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -65,8 +67,8 @@ public class DetRegistro implements Serializable {
     @ManyToOne(optional = false)
     private DetEmpleado idEmpleado;
     
-//    @OneToOne(optional = true, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
-//    private DetRegistroVacaciones registroVacaciones;
+    @OneToOne(mappedBy = "registro", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private DetRegistroVacaciones registroVacaciones;
     
     @Override
 	public int hashCode() {
@@ -155,11 +157,11 @@ public class DetRegistro implements Serializable {
         this.idEmpleado = idEmpleado;
     }
 
-//	public DetRegistroVacaciones getRegistroVacaciones() {
-//		return registroVacaciones;
-//	}
-//
-//	public void setRegistroVacaciones(DetRegistroVacaciones registroVacaciones) {
-//		this.registroVacaciones = registroVacaciones;
-//	}
+    public DetRegistroVacaciones getRegistroVacaciones() {
+		return registroVacaciones;
+    }
+
+	public void setRegistroVacaciones(DetRegistroVacaciones registroVacaciones) {
+        this.registroVacaciones = registroVacaciones;
+    }
 }

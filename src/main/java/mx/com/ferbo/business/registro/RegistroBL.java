@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,6 +15,7 @@ import mx.com.ferbo.business.incidencia.SolicitudPermisoBL;
 import mx.com.ferbo.dao.n.RegistroDAO;
 import mx.com.ferbo.dao.n.RegistroVacacionesDAO;
 import mx.com.ferbo.model.CatEstatusRegistro;
+import mx.com.ferbo.model.DetDiaPermiso;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetEmpleadoConfiguracion;
 import mx.com.ferbo.model.DetIncidencia;
@@ -37,76 +39,98 @@ public class RegistroBL implements Serializable
     private static final String VACACIONES = "V";
     private static final String PERMISO = "P";
     
-    /*Valida las fechas de solicitud permiso en registro de asistencia de un empleado*/
-    public boolean validarFechasVacaciones(DetEmpleado empleado, Date fechaInicial, Date fechaFinal) 
-    {
-        boolean existenVacaciones = false;
-        InfDatoEmpresa empleadoEmpresa = empleado.getDatoEmpresa();
-        Integer horaEntrada = DateUtil.getHora(empleadoEmpresa.getHoraEntrada());
-        RegistroDAO registroDAO = new RegistroDAO();
-        List<DetRegistro> registro = null;
+	/**
+	 * Valida las fechas de solicitud permiso en registro de asistencia de un empleado
+	 */
+	public boolean validarFechasVacaciones(DetEmpleado empleado, Date fechaInicial, Date fechaFinal) {
+		boolean existenVacaciones = false;
+		InfDatoEmpresa empleadoEmpresa = empleado.getDatoEmpresa();
+		Integer horaEntrada = DateUtil.getHora(empleadoEmpresa.getHoraEntrada());
+		RegistroDAO registroDAO = new RegistroDAO();
+		List<DetRegistro> registro = null;
 
-        Date fechaInicialEntrada = DateUtil.getDate(DateUtil.getAnio(fechaInicial), DateUtil.getMes(fechaInicial), DateUtil.getDia(fechaInicial), horaEntrada, 0, 0);
-        Date fechaFinEntrada = DateUtil.getDate(DateUtil.getAnio(fechaFinal), DateUtil.getMes(fechaFinal), DateUtil.getDia(fechaFinal), horaEntrada, 0, 0);
-        registro = registroDAO.buscar(empleado.getIdEmpleado(), fechaInicialEntrada, fechaFinEntrada);
+		Date fechaInicialEntrada = DateUtil.getDate(DateUtil.getAnio(fechaInicial), DateUtil.getMes(fechaInicial),
+				DateUtil.getDia(fechaInicial), horaEntrada, 0, 0);
+		Date fechaFinEntrada = DateUtil.getDate(DateUtil.getAnio(fechaFinal), DateUtil.getMes(fechaFinal),
+				DateUtil.getDia(fechaFinal), horaEntrada, 0, 0);
+		registro = registroDAO.buscar(empleado.getIdEmpleado(), fechaInicialEntrada, fechaFinEntrada);
 
-        if(!registro.isEmpty()) 
-        {
-            existenVacaciones = true;
-        }
+		if (!registro.isEmpty()) {
+			existenVacaciones = true;
+		}
 
-        return existenVacaciones;
-    }
+		return existenVacaciones;
+	}
     
     //Busca los registro de incapacidades uno por uno en la seccion de registro asistencia
-    public static List<DetRegistro> obtenerRegistroAsistencia(DetEmpleado empleado, Date fechaInicio, Date fechaFin, String clave) throws SGPException
-    {
-        DetRegistro registro = null;
-        RegistroDAO registroDAO = new RegistroDAO();
-        InfDatoEmpresa empleadoEmpresa = empleado.getDatoEmpresa();
-        Integer horaEntrada = DateUtil.getHora(empleadoEmpresa.getHoraEntrada());
-        Integer horaSalida = DateUtil.getHora(empleadoEmpresa.getHorasalida());
-        log.info("Buscando registros del empleado {} en asistencia", empleado.getIdEmpleado());
-        
-        DateUtil.setTime(fechaInicio, horaEntrada, 0, 0, 0);
-        DateUtil.setTime(fechaFin, horaSalida, 0, 0, 0);
-        
-        List<Date> listaFechasAsistencia = DateUtil.generarArreglosFechas(fechaInicio, fechaFin);
-        listaFechasAsistencia = DateUtil.diasVacacionesSolicitados(listaFechasAsistencia, DiasDeDescansoObligatorioBL.diasDeAsueto(), empleado.getDatoEmpresa());
-        int totalFechasIncapacidades = listaFechasAsistencia.size();
-        
-        List<DetRegistro> listaRegistroAsistencia = registroDAO.buscarPorEmpPeriodoSolicitud(empleado.getIdEmpleado(), clave, fechaInicio, fechaFin);
-        int totalRegistros = listaRegistroAsistencia.size();
-        horaEntrada = 12;
-        
-        log.trace("Tamaño rango fechas {}, Tamaño rango registros {}", totalFechasIncapacidades, totalRegistros);
-        
-        if(totalRegistros > 0)
-        {
-            listaRegistroAsistencia.clear();
-            for(Date aux : listaFechasAsistencia)
-            {
-                Date auxFecha = DateUtil.getDate(DateUtil.getAnio(aux), DateUtil.getMes(aux), DateUtil.getDia(aux), horaEntrada, 0, 0);
-                registro = registroDAO.buscarPorEstatus(empleado.getIdEmpleado(), auxFecha, clave);
-                if(registro != null)
-                {
-                    listaRegistroAsistencia.add(registro);
-                }
-            }
-            
-            log.info("El empleado {} tiene {} registros en asistencia", empleado.getIdEmpleado(), totalRegistros);
-            
-            if(listaRegistroAsistencia.isEmpty())
-            {
-                throw new SGPException("No se encontraron registros en asistencia");
-            }
-        }else
-        {
-            log.info("El empleado {} tiene {} registros en asistencia", empleado.getIdEmpleado(), totalRegistros);
-        }
-        
-        return listaRegistroAsistencia;
-    }
+	public static List<DetRegistro> obtenerRegistroAsistencia(DetEmpleado empleado, Date fechaInicio, Date fechaFin, String clave) throws SGPException {
+		DetRegistro registro = null;
+		RegistroDAO registroDAO = new RegistroDAO();
+		InfDatoEmpresa empleadoEmpresa = empleado.getDatoEmpresa();
+		Integer horaEntrada = DateUtil.getHora(empleadoEmpresa.getHoraEntrada());
+		Integer horaSalida = DateUtil.getHora(empleadoEmpresa.getHorasalida());
+		log.info("Buscando registros del empleado {} en asistencia", empleado.getIdEmpleado());
+
+		DateUtil.setTime(fechaInicio, horaEntrada, 0, 0, 0);
+		DateUtil.setTime(fechaFin, horaSalida, 0, 0, 0);
+
+		List<Date> listaFechasAsistencia = DateUtil.generarArreglosFechas(fechaInicio, fechaFin);
+		listaFechasAsistencia = DateUtil.diasVacacionesSolicitados(listaFechasAsistencia, DiasDeDescansoObligatorioBL.diasDeAsueto(), empleado.getDatoEmpresa());
+		int totalFechasIncapacidades = listaFechasAsistencia.size();
+
+		List<DetRegistro> listaRegistroAsistencia = registroDAO.buscarPorEmpPeriodoSolicitud(empleado.getIdEmpleado(), clave, fechaInicio, fechaFin);
+		int totalRegistros = listaRegistroAsistencia.size();
+		horaEntrada = 12;
+
+		log.trace("Tamaño rango fechas {}, Tamaño rango registros {}", totalFechasIncapacidades, totalRegistros);
+
+		if (totalRegistros > 0) {
+			listaRegistroAsistencia.clear();
+			for (Date aux : listaFechasAsistencia) {
+				Date auxFecha = DateUtil.getDate(DateUtil.getAnio(aux), DateUtil.getMes(aux), DateUtil.getDia(aux),
+						horaEntrada, 0, 0);
+				registro = registroDAO.buscarPorEstatus(empleado.getIdEmpleado(), auxFecha, clave);
+				if (registro != null) {
+					listaRegistroAsistencia.add(registro);
+				}
+			}
+
+			log.info("El empleado {} tiene {} registros en asistencia", empleado.getIdEmpleado(), totalRegistros);
+
+			if (listaRegistroAsistencia.isEmpty())
+				throw new SGPException("No se encontraron registros en asistencia");
+			
+		} else {
+			log.info("El empleado {} tiene {} registros en asistencia", empleado.getIdEmpleado(), totalRegistros);
+		}
+
+		return listaRegistroAsistencia;
+	}
+	
+	public static List<DetRegistro> buscarRegistrosVacaciones(DetIncidencia incidencia) {
+		List<DetRegistro> registros = null;
+		DetEmpleado empleado = null;
+		RegistroDAO registroDAO = null;
+		
+		try {
+			registros = new ArrayList<DetRegistro>();
+			empleado = incidencia.getEmpleado();
+			registroDAO = new RegistroDAO();
+			
+			for(DetDiaPermiso item : incidencia.getSolPermiso().getDiasPermiso()) {
+				Optional<DetRegistro> registro = registroDAO.buscarPorEmpleadoFecha(empleado.getIdEmpleado(), RegistroBL.VACACIONES, item.getFecha());
+				
+				if(!registro.isPresent())
+					continue;
+				
+				registros.add(registro.get());
+			}
+		} catch(Exception ex) {
+			log.error("Problema para obtener los registros de vacaciones del empleado", ex);
+		}
+		
+		return registros;
+	}
     
     //Quita los registros en asistencia de unas vacaciones/permiso/incapacidad
     public static int cancelarRegistroAsistencia(List<DetRegistro> listaRegistros) throws SGPException

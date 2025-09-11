@@ -62,7 +62,7 @@ public class TipoDeduccionBean implements Serializable{
         FacesMessage message = null;
         Severity severity = null;
         String mensaje = null;
-        String titulo = "Registro Guardado";
+        String titulo = "Registro";
 
         try {
             if(guardar){
@@ -71,7 +71,6 @@ public class TipoDeduccionBean implements Serializable{
                 severity = FacesMessage.SEVERITY_INFO;
             }else{
                 catTipoDeduccionDAO.actualizar(tipoDeduccion);
-                titulo = "Registro Actualizar";
                 mensaje = "Se actualizo con éxito";
                 severity = FacesMessage.SEVERITY_INFO;   
             }
@@ -98,7 +97,7 @@ public class TipoDeduccionBean implements Serializable{
         return tipoDeduccion;
     }
 
-    public void setTipoDeduccionDTO(CatTipoDeduccion tipoDeduccion) {
+    public void setTipoDeduccion(CatTipoDeduccion tipoDeduccion) {
         this.tipoDeduccion = tipoDeduccion;
     }
 

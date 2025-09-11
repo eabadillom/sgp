@@ -674,18 +674,11 @@ public class IncapacidadIMSSBean implements Serializable
     
     public void validarFolioIMSS(DetIncapacidad registroIncapacidad) throws SGPException
     {
-        int contFolios = 0;
-        
-        for(DetIncapacidad auxRegIncapacidad : this.listaRegistroIncapacidad)
-        {
-            if(registroIncapacidad.getFolio().toUpperCase().matches(auxRegIncapacidad.getFolio().toUpperCase()))
-            {
-                contFolios += 1;
-            }
-        }
-        
-        if(contFolios > 0)
-        {
+        boolean existe = this.listaRegistroIncapacidad.stream()
+            .anyMatch(aux -> registroIncapacidad.getFolio()
+            .equalsIgnoreCase(aux.getFolio()));
+
+        if (existe){
             throw new SGPException("Ya se encuentra el folio registrado");
         }
         
@@ -693,118 +686,65 @@ public class IncapacidadIMSSBean implements Serializable
     
     public void validarMaxTiempoIncapacidad(DetIncapacidad auxRegistroIncapacidad) throws SGPException
     {
-        CatTipoIncapacidadIMSS auxTPIncapacidad = auxRegistroIncapacidad.getTipoIncapacidad();
-        CatControlIncapacidadIMSS auxControlIncapacidad = auxRegistroIncapacidad.getControlIncapacidad();
-        int diasDeIncapacidad = auxRegistroIncapacidad.getDiasAutorizados();
-        
-        switch(auxTPIncapacidad.getClave().trim().toUpperCase())
+        String tipoClave = incapacidad.getTipoIncapacidad().getClave().trim().toUpperCase();
+        String controlClave = incapacidad.getControlIncapacidad() != null
+                ? incapacidad.getControlIncapacidad().getClave().trim().toUpperCase() : "";
+        int dias = incapacidad.getDiasAutorizados();
+        int maxDias = incapacidad.getTipoIncapacidad().getMaxDias();
+
+        switch (tipoClave) 
         {
             case "ATRB":
-                //Valida el maximo de dias que se pueden registrar en un accidente de trabajo
-                if(diasDeIncapacidad > auxTPIncapacidad.getMaxDias())
-                {
-                    throw new SGPException("No puedes ingresar más de 364 dias de incapacidad");
-                }else
-                {
-                    break;
-                }
             case "ATRY":
-                //Valida el maximo de dias que se pueden registrar en un accidente de trayecto
-                if(diasDeIncapacidad > auxTPIncapacidad.getMaxDias())
-                {
-                    throw new SGPException("No puedes ingresar más de 364 dias de incapacidad");
-                }else
-                {
-                    break;
+                if (dias > maxDias) {
+                    throw new SGPException("No puedes ingresar más de 364 días de incapacidad");
                 }
+                break;
+
             case "ENFG":
-                //Valida el maximo de dias que se pueden registrar es una enfermedad general
-                if(diasDeIncapacidad > auxTPIncapacidad.getMaxDias())
-                {
-                    throw new SGPException("No puedes ingresar más de 361 dias de incapacidad");
-                }else
-                {
-                    break;
+                if (dias > maxDias) {
+                    throw new SGPException("No puedes ingresar más de 361 días de incapacidad");
                 }
+                break;
+
             case "MAT":
-                //Valida el maximo de dias que se pueden registrar en maternidad prenatal, postnatal o enlaces
-                switch(auxControlIncapacidad.getClave().trim().toUpperCase())
-                {
+                switch (controlClave) {
                     case "PR":
-                        if(auxRegistroIncapacidad.getDiasAutorizados() > auxTPIncapacidad.getMaxDias())
-                        {
-                            throw new SGPException("No puedes ingresar más de 84 dias de incapacidad");
-                        }else
-                        {
-                            break;
-                        }
                     case "PO":
-                        if(auxRegistroIncapacidad.getDiasAutorizados() > auxTPIncapacidad.getMaxDias())
-                        {
-                            throw new SGPException("No puedes ingresar más de 84 dias de incapacidad");
-                        }else
-                        {
-                            break;
+                        if (dias > maxDias) {
+                            throw new SGPException("No puedes ingresar más de 84 días de incapacidad");
                         }
+                        break;
                     case "E":
-                        if(auxRegistroIncapacidad.getDiasAutorizados() > 21)
-                        {
-                            throw new SGPException("No puedes ingresar más de 21 dias de incapacidad");
-                        }else
-                        {
-                            break;
+                        if (dias > 21) {
+                            throw new SGPException("No puedes ingresar más de 21 días de incapacidad");
                         }
+                        break;
                 }
+                break;
+
             case "L140":
-                //Valida el maximo de dias que se pueden registrar licencia 140 bis
-                if(diasDeIncapacidad > auxTPIncapacidad.getMaxDias())
-                {
-                    throw new SGPException("No puedes ingresar más de 28 dias de incapacidad");
-                }else
-                {
-                    break;
+                if (dias > maxDias) {
+                    throw new SGPException("No puedes ingresar más de 28 días de incapacidad");
                 }
+                break;
         }
     }
     
     public boolean deshabilitarTPIncapacidad(CatTipoIncapacidadIMSS tpIncapacidad)
     {
-        boolean auxTPIncapacidad = false;
+        if (tpIncapacidad == null || tpIncapacidad.getClave() == null) return false;
         
-        switch(tpIncapacidad.getClave().trim().toUpperCase())
-        {
-            case "ATRB":
-                auxTPIncapacidad =  true;
-                break;
-            case "ATRY":
-                auxTPIncapacidad =  true;
-                break;
-            case "ENFG":
-                auxTPIncapacidad =  false;
-                break;
-            case "MAT":
-                auxTPIncapacidad =  true;
-                break;
-            case "L140":
-                auxTPIncapacidad =  true;
-                break;
-        }
-        
-        return auxTPIncapacidad;
+        String clave = tpIncapacidad.getClave().trim().toUpperCase();
+        return clave.equals("ENFG");
     }
     
     public String deshabilitarCamposPorDefuncion(String descripcion)
     {
-        String palabra1 = "Defuncion";
-        String palabra2 = "Defunción";
+        if(descripcion == null) return "";
         
-        if(descripcion.toUpperCase().contains(palabra1.toUpperCase()) || descripcion.toUpperCase().contains(palabra2.toUpperCase()))
-        {
-            return "D";
-        }else
-        {
-            return "";
-        }
+        String desc = descripcion.toUpperCase();
+        return (desc.contains("DEFUNCION") || desc.contains("DEFUNCIÓN")) ? "D" : "";
     }
     
     public void metodoBoton()

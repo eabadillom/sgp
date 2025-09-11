@@ -208,7 +208,7 @@ public class DetIncidencia implements Serializable {
 
     @Override
     public String toString() {
-        return "DetIncidencia[" + "idIncidencia=" + idIncidencia + ", idEmpleado=" + empleado.getIdEmpleado() + 
+        return "DetIncidencia[" + "idIncidencia=" + idIncidencia + ", idEmpleado=" + ((empleado != null) ? empleado.getIdEmpleado() : "null")+ 
                 ", idEmpleadoRev=" + ((empleadoRev != null) ? empleadoRev.getIdEmpleado() : "null") + ", visible=" + visible + 
                 ", idEstatus=" + estatusIncidencia.getClave() + ", idTipo=" + tipoIncidencia.getClave() + 
                 ", idSolArticulo=" + ((solArticulo != null) ? solArticulo.getIdSolicitud() : "null") + 
