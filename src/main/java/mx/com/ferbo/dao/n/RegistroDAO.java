@@ -3,6 +3,7 @@ package mx.com.ferbo.dao.n;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TemporalType;
@@ -67,6 +68,37 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
         }
 
         return model;
+    }
+    
+    public Optional<DetRegistro> buscarPorEmpleadoFecha(Integer idEmpleado, String clave, Date fecha) {
+    	Optional<DetRegistro> optional;
+    	DetRegistro model = null;
+    	EntityManager em = null;
+    	String query = null;
+    	
+    	try {
+    		query = "SELECT dr.* FROM det_registro dr\n"
+    				+ "inner join cat_estatus_registro cer on dr.id_estatus = cer.id_estatus\n"
+    				+ "WHERE dr.id_empleado = :idEmpleado AND cer.codigo = :clave AND DATE(dr.fecha_entrada ) = :fecha";
+    		
+    		em = this.getEntityManager();
+    		
+    		model = (DetRegistro) em.createNativeQuery(query, modelClass)
+    				.setParameter("idEmpleado", idEmpleado)
+    				.setParameter("clave", clave)
+    				.setParameter("fecha", fecha)
+    				.getSingleResult()
+    				;
+    		
+    		optional = Optional.of(model);
+    	} catch(Exception ex) {
+    		log.error("No se encontro informacion para idEmpleado = {}, fecha = {}...\n{}", idEmpleado, fecha, ex);
+    		optional = Optional.empty();
+    	} finally {
+    		this.close(em);
+    	}
+    	
+    	return optional;
     }
 
     public List<DetRegistro> buscar(Integer idEmpleado, Date fechaEntrada, Date fechaSalida) {

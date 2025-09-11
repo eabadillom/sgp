@@ -531,7 +531,7 @@
 						</p:commandButton>
 					</span>
 					<span style="padding-left: 0.5rem; padding-right: 0.5rem;">
-						<p:commandButton value="Guardar" icon="pi pi-save" actionListener="#{nominaS.actualizarNomina}" process="@this" disabled="#{nominaS.nomina.id ne null}" update="form:dtNomina">
+						<p:commandButton value="Guardar" icon="pi pi-save" actionListener="#{nominaS.actualizarNomina}" process="@this" disabled="#{nominaS.nomina.id ne null}" update="form:dtNomina" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();">
 							<p:confirm header="Guardar nómina" message="¿Está seguro que guardar la nómina del empleado?" icon="pi pi-exclamation-triangle" />
 						</p:commandButton>
 					</span>
