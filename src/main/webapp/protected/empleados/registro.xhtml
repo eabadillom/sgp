@@ -1,0 +1,132 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/plantillas/template.xhtml">
+    <ui:define name="title">Registro de empleados</ui:define>
+    <ui:define name="head">
+        <h:outputScript library="recursos" name="js/primefaces_locale.js" />
+        <h:outputStylesheet library="webjars" name="font-awesome/5.12.0/css/all.min-jsf.css" />
+		<h:outputStylesheet library="webjars" name="font-awesome/5.12.0/css/v4-shims.min-jsf.css" />
+    </ui:define>
+    <ui:define name="content">
+    	<f:event type="preRenderView" listener="#{registroEmpleadosBean.init()}" />
+        <h:form id="form">
+            <ui:include src="/protected/common/status-info.xhtml" />
+            <ui:include src="/protected/common/confirm.xhtml" />
+            <div class="grid table-demo">
+                <div class="col-12">
+                    <div class="card p-4">
+                        <p:blockUI block="form:dialogBiometrico" widgetVar="bui"/>
+                        <p:remoteCommand name="verificaEstado" onstart="PF('bui').hide();" actionListener="#{registroEmpleadosBean.validaHuella()}"/>
+                        
+                        <ui:include src="/protected/empleados/registro-filtros-busqueda.xhtml" />
+
+                        <ui:include src="/protected/empleados/registro-lista-empleados.xhtml" />
+                        
+                        <ui:include src="/protected/empleados/registro-detalle-empleado.xhtml" />
+                        
+                        <ui:include src="/protected/empleados/registro-precalculo.xhtml" />
+						
+                        <ui:include src="/protected/empleados/registro-fotografia.xhtml" /> 
+
+                        <ui:include src="/protected/empleados/registro-biometrico.xhtml" />
+                        
+                        <ui:include src="/protected/empleados/registro-detalle-prestamo.xhtml" />
+
+                        <ui:include src="/protected/empleados/registro-baja.xhtml" />
+
+                        <p:confirmDialog widgetVar="dlgEliminarPrestamo" showEffect="fade" width="30rem" message="¿Está seguro que desea eliminar el préstamo seleccionado?" header="Confirmar" severity="warn">
+                            <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{registroEmpleadosBean.eliminarPrestamo(prestamo)}" process="@this" oncomplete="PF('dlgEliminarPrestamo').hide();"/>
+                            <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('dlgEliminarPrestamo').hide()" />
+                        </p:confirmDialog>
+
+                        <p:confirmDialog widgetVar="dlgEliminarPercepcionEmpleado" showEffect="fade" width="30rem" message="¿Está seguro que desea eliminar la percepción seleccionada?" header="Confirmar" severity="warn">
+                            <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{registroEmpleadosBean.eliminarPercepcionEmpleado()}" process="@this" oncomplete="PF('dlgEliminarPercepcionEmpleado').hide();"/>
+                            <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('dlgEliminarPercepcionEmpleado').hide()" />
+                        </p:confirmDialog>
+
+                        <p:confirmDialog widgetVar="dialogEliminarEmpleado" showEffect="fade" width="300" message="¿Está seguro que desea dar de baja al empleado?" header="Confirmar" severity="warn">
+                            <div>
+                                <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{registroEmpleadosBean.eliminaEmpleado()}" process="@this" oncomplete="PF('dialogEliminarEmpleado').hide()"/>
+                                <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" actionListener="#{registroEmpleadosBean.limpiarEliminar()}" onclick="PF('dialogEliminarEmpleado').hide()" />
+                            </div>
+                        </p:confirmDialog>
+
+                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="300">
+                            <p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                            <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary" icon="pi pi-times" />
+                        </p:confirmDialog>
+                    </div>
+                </div>
+            </div>
+            <script>
+                $('.respresultado').hide();
+                $(".clean").click(function () {
+                    $('.respresultado').hide();
+                });
+
+                function createCORSRequest(method, url) {
+                    var xhr = new XMLHttpRequest();
+                    if ("withCredentials" in xhr) {
+                        xhr.open(method, url, true);
+                    } else if (typeof XDomainRequest != "undefined") {
+                        xhr = new XDomainRequest();
+                        xhr.open(method, url, true);
+                    } else {
+                        xhr = null;
+                    }
+                    return xhr;
+                }
+
+                function InvokeFingerScan(TpAccion, payload, signature) {
+                    var url = "http://localhost:8090/finger";
+                    var request = createCORSRequest('POST', url);
+                    if (!request) {
+                        throw new Error('CORS not supported');
+                    }
+                    request.setRequestHeader("Content-Type", "application/json");
+
+                    request.onreadystatechange = function () {
+                        if (this.readyState == 4) {
+                            if (this.status == 200) {
+                                var dataValue = {"cipherText": request.responseText};
+                                var response = JSON.parse(request.responseText);
+                                console.log(response);
+                                if (response != null) {
+                                    //En la respuesta 
+                                    if (response.biometricData1 != null) {
+                                        document.getElementById('form:biometrico').value = response.biometricData1;
+                                        $(".successfull").show(300);
+                                        verificaEstado();
+                                    } else {
+                                        if (response.verifyBiometricData == true) {
+                                            $(".verifyfingerprintOk").html("!!! Fingerprint Match !!!");
+                                            $(".verifyfingerprintOk").show(300);
+                                        } else {
+                                            $(".badrequest").html("!!! Fingerprint Not Match !!!");
+                                            $(".badrequest").show(300);
+                                        }
+                                    }
+                                }
+                            } else {
+                            }
+                        }
+                    };
+                    request.onerror = function () {
+                        console.error('Ocurrió un error al hacer una solicitud de adquisición de datos.');
+                    };
+                    request.ontimeout = function () {
+                        console.error("La solicitud de adquisición de datos ha expirado.");
+                    };
+
+                    var obj = new Object();
+                    obj.tpAccion = TpAccion;
+                    var jsonString = JSON.stringify(obj);
+                    request.send(jsonString);
+                }
+            </script>      
+        </h:form>
+    </ui:define>
+</ui:composition>

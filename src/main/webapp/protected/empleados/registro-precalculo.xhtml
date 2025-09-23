@@ -1,0 +1,28 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+
+						<p:dialog id="dlg-precalculo" widgetVar="dlgPreCalculo" header="Precálculo percepción" modal="true" draggable="false" cache="false" dynamic="true">
+							<div class="m-0">
+								<p:outputLabel value="Importe exento calculado:" />
+							</div>
+							<div class="m-0">
+								<p:inputNumber value="#{registroEmpleadosBean.percepcionEmpleado.importeExento}" symbol="$ " symbolPosition="p" inputStyle="text-align: right"/>
+							</div>
+							<div class="m-0">
+								<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+							</div>
+							<div class="m-0">
+								<p:outputLabel value="Importe gravado calculado:"/>
+							</div>
+							<div class="m-0">
+								<p:inputNumber value="#{registroEmpleadosBean.percepcionEmpleado.importeGravado}" symbol="$ " symbolPosition="p" inputStyle="text-align: right"/>
+							</div>
+							<f:facet name="footer">
+								<p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dlgPreCalculo').hide();" class="ui-button-secondary" resetValues="true"/>
+							</f:facet>
+						</p:dialog>
+</ui:composition>

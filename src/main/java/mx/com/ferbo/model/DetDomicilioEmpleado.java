@@ -26,161 +26,149 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @Table(name = "det_domicilio_empleado")
-@NamedQueries({
-    @NamedQuery(name = "DetDomicilioEmpleado.findAll", query = "SELECT cde FROM DetDomicilioEmpleado cde"),
-    @NamedQuery(name = "DetDomicilioEmpleado.findIdEmpleado", query = "SELECT cde FROM DetDomicilioEmpleado cde INNER JOIN cde.empleado e WHERE e.idEmpleado = :idEmpleado"),
-    @NamedQuery(name = "DetDomicilioEmpleado.findParametros", query = "SELECT cde FROM DetDomicilioEmpleado cde INNER JOIN cde.empleado e INNER JOIN cde.asentamiento a WHERE e.idEmpleado = :idEmpleado and a.key.id = :idAsentamiento and a.key.localidad.key.id = :idLocalidad and a.key.localidad.key.municipio.key.id = :idMunicipio and a.key.localidad.key.municipio.key.estado.key.id = :idEstado and a.key.localidad.key.municipio.key.estado.key.pais.id = :idPais")
-})
-public class DetDomicilioEmpleado implements Serializable
-{
-    private static final long serialVersionUID = 1L;
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "cd_domicilioEmp")
-    private Integer id;
-    
-    @Basic
-    @Null
-    @Size(min = 1, max = 150)
-    @Column(name = "nb_calle")
-    private String calle;
-    
-    @Basic
-    @Null
-    @Size(min = 1, max = 150)
-    @Column(name = "nu_numExt")
-    private String numeroExterior;
-    
-    @Basic
-    @Null
-    @Size(min = 1, max = 150)
-    @Column(name = "nu_numInt")
-    private String numeroInterior;
-    
-    @OneToOne(optional = false)
-    @NotNull
-    @JoinColumn(name = "id_empleado")
-    private DetEmpleado empleado;
+@NamedQueries({ @NamedQuery(name = "DetDomicilioEmpleado.findAll", query = "SELECT cde FROM DetDomicilioEmpleado cde"),
+		@NamedQuery(name = "DetDomicilioEmpleado.findIdEmpleado", query = "SELECT cde FROM DetDomicilioEmpleado cde INNER JOIN cde.empleado e WHERE e.idEmpleado = :idEmpleado"),
+		@NamedQuery(name = "DetDomicilioEmpleado.findParametros", query = "SELECT cde FROM DetDomicilioEmpleado cde INNER JOIN cde.empleado e INNER JOIN cde.asentamiento a WHERE e.idEmpleado = :idEmpleado and a.key.id = :idAsentamiento and a.key.localidad.key.id = :idLocalidad and a.key.localidad.key.municipio.key.id = :idMunicipio and a.key.localidad.key.municipio.key.estado.key.id = :idEstado and a.key.localidad.key.municipio.key.estado.key.pais.id = :idPais") })
+public class DetDomicilioEmpleado implements Serializable, Cloneable {
+	private static final long serialVersionUID = 1L;
 
-    @OneToOne
-    @Null
-    @JoinColumns(value = {
-        @JoinColumn(name = "cd_asentamiento", referencedColumnName = "cd_asentamiento"),
-        @JoinColumn(name = "cd_localidad", referencedColumnName = "cd_localidad"),
-        @JoinColumn(name = "cd_municipio", referencedColumnName = "cd_municipio"),
-        @JoinColumn(name = "cd_estado", referencedColumnName = "cd_estado"),
-        @JoinColumn(name = "cd_pais", referencedColumnName = "cd_pais")
-    },
-        foreignKey = @ForeignKey(name="FK_Domicilio_Empleado_Asentamiento"))
-    private CatAsentamiento asentamiento;
-    
-    public DetDomicilioEmpleado() 
-    {
-    }
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Basic(optional = false)
+	@NotNull
+	@Column(name = "cd_domicilioEmp")
+	private Integer id;
 
-    public DetDomicilioEmpleado(Integer id) 
-    {
-        this.id = id;
-    }
+	@Basic
+	@Null
+	@Size(min = 1, max = 150)
+	@Column(name = "nb_calle")
+	private String calle;
 
-    public DetDomicilioEmpleado(Integer id, String calle, String numeroExterior, String numeroInterior) 
-    {
-        this.id = id;
-        this.calle = calle;
-        this.numeroExterior = numeroExterior;
-        this.numeroInterior = numeroInterior;
-    }
+	@Basic
+	@Null
+	@Size(min = 1, max = 150)
+	@Column(name = "nu_numExt")
+	private String numeroExterior;
 
-    public Integer getId() 
-    {
-        return id;
-    }
+	@Basic
+	@Null
+	@Size(min = 1, max = 150)
+	@Column(name = "nu_numInt")
+	private String numeroInterior;
 
-    public void setId(Integer id) 
-    {
-        this.id = id;
-    }
+	@OneToOne(optional = false)
+	@NotNull
+	@JoinColumn(name = "id_empleado")
+	private DetEmpleado empleado;
 
-    public String getCalle() 
-    {
-        return calle;
-    }
+	@OneToOne
+	@Null
+	@JoinColumns(value = { @JoinColumn(name = "cd_asentamiento", referencedColumnName = "cd_asentamiento"),
+			@JoinColumn(name = "cd_localidad", referencedColumnName = "cd_localidad"),
+			@JoinColumn(name = "cd_municipio", referencedColumnName = "cd_municipio"),
+			@JoinColumn(name = "cd_estado", referencedColumnName = "cd_estado"),
+			@JoinColumn(name = "cd_pais", referencedColumnName = "cd_pais") }, foreignKey = @ForeignKey(name = "FK_Domicilio_Empleado_Asentamiento"))
+	private CatAsentamiento asentamiento;
+	
+	public DetDomicilioEmpleado clone() throws CloneNotSupportedException {
+		DetDomicilioEmpleado clone = new DetDomicilioEmpleado();
+		
+		clone.setCalle(new String(this.calle));
+		clone.setNumeroExterior(new String(this.numeroExterior));
+		clone.setNumeroInterior(new String(this.numeroInterior));
+		clone.setAsentamiento(this.asentamiento);
+		
+		return clone;
+	}
 
-    public void setCalle(String calle) 
-    {
-        this.calle = calle;
-    }
+	@Override
+	public int hashCode() {
+		if(this.id == null)
+			return System.identityHashCode(this);
+		return Objects.hashCode(this.id);
+	}
 
-    public String getNumeroExterior() 
-    {
-        return numeroExterior;
-    }
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final DetDomicilioEmpleado other = (DetDomicilioEmpleado) obj;
+		return Objects.equals(this.id, other.id);
+	}
 
-    public void setNumeroExterior(String numeroExterior) 
-    {
-        this.numeroExterior = numeroExterior;
-    }
+	@Override
+	public String toString() {
+		return "DetDomicilioEmpleado[" + "id=" + id + ", calle=" + calle + ", numeroExterior=" + numeroExterior
+				+ ", numeroInterior=" + numeroInterior + ']';
+	}
 
-    public String getNumeroInterior() 
-    {
-        return numeroInterior;
-    }
+	public DetDomicilioEmpleado() {
+	}
 
-    public void setNumeroInterior(String numeroInterior) 
-    {
-        this.numeroInterior = numeroInterior;
-    }
+	public DetDomicilioEmpleado(Integer id) {
+		this.id = id;
+	}
 
-    public DetEmpleado getEmpleado() 
-    {
-        return empleado;
-    }
+	public DetDomicilioEmpleado(Integer id, String calle, String numeroExterior, String numeroInterior) {
+		this.id = id;
+		this.calle = calle;
+		this.numeroExterior = numeroExterior;
+		this.numeroInterior = numeroInterior;
+	}
 
-    public void setEmpleado(DetEmpleado empleado) 
-    {
-        this.empleado = empleado;
-    }
+	public Integer getId() {
+		return id;
+	}
 
-    public CatAsentamiento getAsentamiento() 
-    {
-        return asentamiento;
-    }
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
-    public void setAsentamiento(CatAsentamiento asentamiento) 
-    {
-        this.asentamiento = asentamiento;
-    }
-    
-    @Override
-    public int hashCode() 
-    {
-        int hash = 5;
-        hash = 67 * hash + Objects.hashCode(this.id);
-        return hash;
-    }
+	public String getCalle() {
+		return calle;
+	}
 
-    @Override
-    public boolean equals(Object obj) 
-    {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final DetDomicilioEmpleado other = (DetDomicilioEmpleado) obj;
-        return Objects.equals(this.id, other.id);
-    }
+	public void setCalle(String calle) {
+		this.calle = calle;
+	}
 
-    @Override
-    public String toString() {
-        return "DetDomicilioEmpleado[" + "id=" + id + ", calle=" + calle + ", numeroExterior=" + numeroExterior + ", numeroInterior=" + numeroInterior + ']';
-    }
-    
+	public String getNumeroExterior() {
+		return numeroExterior;
+	}
+
+	public void setNumeroExterior(String numeroExterior) {
+		this.numeroExterior = numeroExterior;
+	}
+
+	public String getNumeroInterior() {
+		return numeroInterior;
+	}
+
+	public void setNumeroInterior(String numeroInterior) {
+		this.numeroInterior = numeroInterior;
+	}
+
+	public DetEmpleado getEmpleado() {
+		return empleado;
+	}
+
+	public void setEmpleado(DetEmpleado empleado) {
+		this.empleado = empleado;
+	}
+
+	public CatAsentamiento getAsentamiento() {
+		return asentamiento;
+	}
+
+	public void setAsentamiento(CatAsentamiento asentamiento) {
+		this.asentamiento = asentamiento;
+	}
 }

@@ -1,0 +1,26 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+						<p:dialog header="Captura de fotografía" widgetVar="dialogFotografia" modal="true" draggable="false" cache="false" dynamic="true" closable="false">
+                            <p:outputPanel id="panelDialogFoto" class="ui-fluid">
+                                <h:panelGrid columns="3" cellpadding="5">
+                                    <p:photoCam id="foto" widgetVar="pc" listener="#{registroEmpleadosBean.oncapture}"/>
+                                    <p:outputPanel id="photo">
+                                        <p:graphicImage rendered="#{not empty registroEmpleadosBean.empleadoFoto.fotografia}" library="recursos" name="images/user-icon.png" style="max-width: 100px;"></p:graphicImage>
+                                        <img src="#{registroEmpleadosBean.empleadoFoto.fotografia}"/>
+                                    </p:outputPanel>
+                                </h:panelGrid>
+                            </p:outputPanel>
+                            <f:facet name="footer">
+                                <p:commandButton  value="Capture" icon="pi pi-camera" onclick="PF('pc').capture()" process="@this" 
+                                                  update="form:photo form:btnAceptarFoto"/>
+                                <p:commandButton id="btnAceptarFoto" value="Aceptar" disabled="#{registroEmpleadosBean.empleadoFoto.fotografia eq null}" update="form:panelDialogEmpleado"
+                                                 oncomplete="PF('pc').detach();" class="ui-button-success" icon="pi pi-check" onclick="PF('dialogFotografia').hide()" process="@this"/>
+                                <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogFotografia').hide(); PF('pc').detach();" class="ui-button-secondary" />
+                            </f:facet>
+                        </p:dialog>
+
+</ui:composition>
