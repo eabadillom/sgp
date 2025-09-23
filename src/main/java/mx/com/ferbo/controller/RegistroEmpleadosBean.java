@@ -978,6 +978,7 @@ public class RegistroEmpleadosBean implements Serializable {
     		this.empleado = reingreso;
 			this.empleadoDAO.guardar(reingreso);
 			this.empleados.add(reingreso);
+			this.lstEmpleados.add(reingreso);
 			PrimeFaces.current().executeScript("PF('dialogEmpleado').hide();");
 		} catch (SGPException e) {
 			log.error("Problema para guardar el nuevo registro de empleado.");
