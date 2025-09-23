@@ -17,6 +17,7 @@ public class EmpleadoFotoDAO extends BaseDAO<DetEmpleadoFoto, Integer> {
 		super(modelClass);
 	}
 	
+	@Deprecated
 	public DetEmpleadoFoto buscar(String numeroEmpleado) {
 		DetEmpleadoFoto model = null;
 		EntityManager em = null;
