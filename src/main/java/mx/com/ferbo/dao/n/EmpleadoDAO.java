@@ -26,10 +26,9 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
         super(modelClass);
     }
     
-    public EmpleadoDAO()
-    {
-        super(DetEmpleado.class);
-    }
+	public EmpleadoDAO() {
+		super(DetEmpleado.class);
+	}
 
     public DetEmpleado buscarPorId(Integer id, boolean isFullInfo) {
         DetEmpleado model = null;
@@ -502,5 +501,26 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
         }
 
         return model;
+    }
+    
+    public List<DetEmpleado> buscarPorCURP(String curp) {
+    	List<DetEmpleado> registrosEmpleado = null;
+    	EntityManager em = null;
+    	
+    	try {
+    		em = this.getEntityManager();
+    		
+    		registrosEmpleado = em.createNamedQuery("DetEmpleado.findByCURP", modelClass)
+    				.setParameter("curp", curp)
+    				.getResultList()
+    				;
+    		
+    	} catch(Exception ex) {
+    		log.error("Problema para obtener la lista de registros del empleado con curp {}...\n{}", curp, ex);
+    	} finally {
+    		this.close(em);
+    	}
+    	
+    	return registrosEmpleado;
     }
 }

@@ -1,0 +1,51 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+                                <p:tab title="Vacaciones">
+                                    <p:toolbar styleClass="mb-4">
+                                        <p:toolbarGroup>
+                                            <p:commandButton value="Recalcular vacaciones" icon="pi pi-reload" actionListener="#{registroEmpleadosBean.recalcularVacaciones()}" update="panelDialogEmpleado" oncomplete="PF('dialogEmpleado').hide(); PF('dialogEmpleado').show();" style="margin-right: .5rem" process="@this"/>
+                                        </p:toolbarGroup>
+                                    </p:toolbar>
+                                    <p:dataTable id="dtVacaciones" widgetVar="dtVacaciones" var="vacacion" value="#{registroEmpleadosBean.empleado.vacaciones}" reflow="true" styleClass="products-table"
+                                                 rowKey="#{vacacion.idVacaciones}" paginator="true" rows="6" rowSelectMode="add" 
+                                                 paginatorPosition="bottom" lazy="true">
+                                        <p:column headerText="Fecha de inicio" style="text-align: center;">
+                                            <p:outputLabel value="#{vacacion.fechaInicio}">
+                                                <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+                                            </p:outputLabel>
+                                        </p:column>
+                                        <p:column headerText="Fecha de termino" style="text-align: center;">
+                                            <p:outputLabel value="#{vacacion.fechaFin}">
+                                                <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+                                            </p:outputLabel>
+                                        </p:column>
+                                        <p:column headerText="Dias al final del periodo" style="text-align: center;">
+                                            <h:outputText value="#{vacacion.diasTotales}"/>
+                                        </p:column>
+                                        <p:column headerText="Dias tomados" style="text-align: center;">
+                                            <h:outputText value="#{registroEmpleadosBean.diasVacacionesTomados(vacacion)}"/>
+                                        </p:column>
+                                        <p:column headerText="Dias pagados" style="text-align: center;">
+                                            <h:outputText value="#{vacacion.diasPagados}"/>
+                                        </p:column>
+                                        <p:column headerText="Dias restantes" style="text-align: center;">
+                                            <h:outputText value="#{(vacacion.diasTotales - vacacion.diasTomados - vacacion.diasPagados)}"/>
+                                        </p:column>
+                                        <p:column headerText="Prima vacional Pagada" style="text-align: center;">
+                                        	<p:selectBooleanButton value="#{vacacion.primaPagada}" onIcon="pi pi-check" offIcon="pi pi-times">
+                                        		<p:ajax process="@this" />
+                                        	</p:selectBooleanButton>
+                                        </p:column>
+                                        <p:column headerText="Dias pendientes pagados" style="text-align: center;">
+                                        	<p:selectBooleanButton value="#{vacacion.diasPendientesPagados}" onIcon="pi pi-check" offIcon="pi pi-times">
+                                        		<p:ajax process="@this" />
+                                        	</p:selectBooleanButton>
+                                        </p:column>
+                                    </p:dataTable>
+                                </p:tab>
+
+</ui:composition>

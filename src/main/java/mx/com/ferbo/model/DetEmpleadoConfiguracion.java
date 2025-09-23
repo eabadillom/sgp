@@ -61,113 +61,163 @@ public class DetEmpleadoConfiguracion implements Serializable
     @Basic(optional = true)
     @Column(name = "st_asistencia_nl")
     private Boolean asistenciaDiaNoLaboral;
+
+	private DetEmpleadoConfiguracion(Builder builder) {
+		this.idEmpleadoConf = builder.idEmpleadoConf;
+		this.empleado = builder.empleado;
+		this.procesarNomina = builder.procesarNomina;
+		this.retardo = builder.retardo;
+		this.horasextra = builder.horasextra;
+		this.goceSueldo = builder.goceSueldo;
+		this.asistenciaDiaNoLaboral = builder.asistenciaDiaNoLaboral;
+	}
     
-    public DetEmpleadoConfiguracion() 
-    {
-    }
+	@Override
+	public int hashCode() {
+		if (this.idEmpleadoConf == null)
+			return System.identityHashCode(this);
+		return Objects.hashCode(this.idEmpleadoConf);
+	}
 
-    public DetEmpleadoConfiguracion(Integer idEmpleadoConf, Boolean retardo) 
-    {
-        this.idEmpleadoConf = idEmpleadoConf;
-        this.retardo = retardo;
-    }
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final DetEmpleadoConfiguracion other = (DetEmpleadoConfiguracion) obj;
+		return Objects.equals(this.idEmpleadoConf, other.idEmpleadoConf);
+	}
 
-    public DetEmpleadoConfiguracion(Integer idEmpleadoConf, DetEmpleado empleado, Boolean retardo) 
-    {
-        this.idEmpleadoConf = idEmpleadoConf;
-        this.empleado = empleado;
-        this.retardo = retardo;
+    @Override
+    public String toString() {
+        return "DetEmpleadoConfiguracion{" + "idEmpleadoConf=" + idEmpleadoConf + ", retardo=" + retardo + ", horasextra=" + horasextra + ", goceSueldo=" + goceSueldo + ", asistenciaDiaNoLaboral=" + asistenciaDiaNoLaboral + '}';
     }
     
-    public Integer getIdEmpleadoConf() 
-    {
-        return idEmpleadoConf;
-    }
+	public DetEmpleadoConfiguracion() {
+	}
 
-    public void setIdEmpleadoConf(Integer id_empleado_conf) 
-    {
-        this.idEmpleadoConf = id_empleado_conf;
-    }
+	public DetEmpleadoConfiguracion(Integer idEmpleadoConf, Boolean retardo) {
+		this.idEmpleadoConf = idEmpleadoConf;
+		this.retardo = retardo;
+	}
 
-    public DetEmpleado getEmpleado() 
-    {
-        return empleado;
-    }
+	public DetEmpleadoConfiguracion(Integer idEmpleadoConf, DetEmpleado empleado, Boolean retardo) {
+		this.idEmpleadoConf = idEmpleadoConf;
+		this.empleado = empleado;
+		this.retardo = retardo;
+	}
 
-    public void setEmpleado(DetEmpleado empleado) 
-    {
-        this.empleado = empleado;
-    }
+	public Integer getIdEmpleadoConf() {
+		return idEmpleadoConf;
+	}
 
-    public Boolean getRetardo() 
-    {
-        return retardo;
-    }
+	public void setIdEmpleadoConf(Integer id_empleado_conf) {
+		this.idEmpleadoConf = id_empleado_conf;
+	}
 
-    public void setRetardo(Boolean retardo) 
-    {
-        this.retardo = retardo;
-    }
+	public DetEmpleado getEmpleado() {
+		return empleado;
+	}
 
-    public Boolean getHorasextra() {
-        return horasextra;
-    }
+	public void setEmpleado(DetEmpleado empleado) {
+		this.empleado = empleado;
+	}
 
-    public void setHorasextra(Boolean horasextra) {
-        this.horasextra = horasextra;
-    }
+	public Boolean getRetardo() {
+		return retardo;
+	}
+
+	public void setRetardo(Boolean retardo) {
+		this.retardo = retardo;
+	}
+
+	public Boolean getHorasextra() {
+		return horasextra;
+	}
+
+	public void setHorasextra(Boolean horasextra) {
+		this.horasextra = horasextra;
+	}
 
 	public Boolean getProcesarNomina() {
 		return procesarNomina;
 	}
-  
-  public void setProcesarNomina(Boolean procesarNomina) {
+
+	public void setProcesarNomina(Boolean procesarNomina) {
 		this.procesarNomina = procesarNomina;
 	}
 
-    public Boolean getGoceSueldo() {
-        return goceSueldo;
-    }
+	public Boolean getGoceSueldo() {
+		return goceSueldo;
+	}
 
-    public void setGoceSueldo(Boolean goceSueldo) {
-        this.goceSueldo = goceSueldo;
-    }
+	public void setGoceSueldo(Boolean goceSueldo) {
+		this.goceSueldo = goceSueldo;
+	}
 
-    public Boolean getAsistenciaDiaNoLaboral() {
-        return asistenciaDiaNoLaboral;
-    }
+	public Boolean getAsistenciaDiaNoLaboral() {
+		return asistenciaDiaNoLaboral;
+	}
 
-    public void setAsistenciaDiaNoLaboral(Boolean asistenciaDiaNoLaboral) {
-        this.asistenciaDiaNoLaboral = asistenciaDiaNoLaboral;
-    }
+	public void setAsistenciaDiaNoLaboral(Boolean asistenciaDiaNoLaboral) {
+		this.asistenciaDiaNoLaboral = asistenciaDiaNoLaboral;
+	}
 
-    @Override
-    public int hashCode() 
-    {
-        int hash = 7;
-        hash = 79 * hash + Objects.hashCode(this.idEmpleadoConf);
-        return hash;
-    }
+	public static final class Builder {
+		private Integer idEmpleadoConf;
+		private DetEmpleado empleado;
+		private Boolean procesarNomina;
+		private Boolean retardo;
+		private Boolean horasextra;
+		private Boolean goceSueldo;
+		private Boolean asistenciaDiaNoLaboral;
 
-    @Override
-    public boolean equals(Object obj) 
-    {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final DetEmpleadoConfiguracion other = (DetEmpleadoConfiguracion) obj;
-        return Objects.equals(this.idEmpleadoConf, other.idEmpleadoConf);
-    }
+		public Builder() {
+		}
 
-    @Override
-    public String toString() {
-        return "DetEmpleadoConfiguracion{" + "idEmpleadoConf=" + idEmpleadoConf + ", empleado=" + empleado.getIdEmpleado() + ", retardo=" + retardo + ", horasextra=" + horasextra + ", goceSueldo=" + goceSueldo + ", asistenciaDiaNoLaboral=" + asistenciaDiaNoLaboral + '}';
-    }
-    
+		public Builder idEmpleadoConf(Integer idEmpleadoConf) {
+			this.idEmpleadoConf = idEmpleadoConf;
+			return this;
+		}
+
+		public Builder empleado(DetEmpleado empleado) {
+			this.empleado = empleado;
+			return this;
+		}
+
+		public Builder procesarNomina(Boolean procesarNomina) {
+			this.procesarNomina = procesarNomina;
+			return this;
+		}
+
+		public Builder retardo(Boolean retardo) {
+			this.retardo = retardo;
+			return this;
+		}
+
+		public Builder horasextra(Boolean horasextra) {
+			this.horasextra = horasextra;
+			return this;
+		}
+
+		public Builder goceSueldo(Boolean goceSueldo) {
+			this.goceSueldo = goceSueldo;
+			return this;
+		}
+
+		public Builder asistenciaDiaNoLaboral(Boolean asistenciaDiaNoLaboral) {
+			this.asistenciaDiaNoLaboral = asistenciaDiaNoLaboral;
+			return this;
+		}
+
+		public DetEmpleadoConfiguracion build() {
+			return new DetEmpleadoConfiguracion(this);
+		}
+	}
 }

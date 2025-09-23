@@ -1,7 +1,6 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -15,7 +14,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -24,20 +22,18 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import mx.com.ferbo.model.imss.DetIncapacidad;
 
 @Entity
 @Table(name = "det_empleado")
-@NamedQueries({
-    @NamedQuery(name = "DetEmpleado.findByNumero", query = "SELECT e FROM DetEmpleado e WHERE e.numEmpleado = :numero"),
-    @NamedQuery(name = "DetEmpleado.getNumEmpleado", query = "SELECT COALESCE(MAX(e.idEmpleado),0) FROM DetEmpleado e"),
-    @NamedQuery(name = "DetEmpleado.getAll", query = "SELECT e FROM DetEmpleado e"),
-    @NamedQuery(name = "DetEmpleado.getActive", query = "SELECT e FROM DetEmpleado e WHERE e.activo = :activo"),
-    @NamedQuery(name = "DetEmpleado.findByActiveEmpresaIngreso", query = "SELECT e FROM DetEmpleado e WHERE e.empleadoConfiguracion.procesarNomina = true AND e.datoEmpresa.empresa.idEmpresa = :idEmpresa AND ( (e.datoEmpresa.fechaIngreso <= :periodoPagoInicio AND e.datoEmpresa.fechaBaja IS NULL) OR (e.datoEmpresa.fechaIngreso <= :periodoPagoInicio AND e.datoEmpresa.fechaBaja >= :periodoPagoFin)) ORDER BY e.nombre, e.primerAp, e.segundoAp"),
-    @NamedQuery(name = "DetEmpleado.findByRFC", query = "SELECT e FROM DetEmpleado e WHERE e.datoEmpresa.rfc = :rfc"),
-    @NamedQuery(name = "DetEmpleado.findByActiveEmpresaPlanta", query = "SELECT e FROM DetEmpleado e WHERE (:idEmpresa is null or e.datoEmpresa.empresa.idEmpresa = :idEmpresa) AND (:idPlanta is null or e.datoEmpresa.planta.idPlanta = :idPlanta) and ( (e.datoEmpresa.fechaIngreso <= :fecha) and ( e.datoEmpresa.fechaBaja is null or :fecha <= e.datoEmpresa.fechaBaja ) ) ")
-})
-public class DetEmpleado implements Serializable {
+@NamedQuery(name = "DetEmpleado.findByNumero", query = "SELECT e FROM DetEmpleado e WHERE e.numEmpleado = :numero")
+@NamedQuery(name = "DetEmpleado.getNumEmpleado", query = "SELECT COALESCE(MAX(e.idEmpleado),0) FROM DetEmpleado e")
+@NamedQuery(name = "DetEmpleado.getAll", query = "SELECT e FROM DetEmpleado e ORDER BY e.numEmpleado asc")
+@NamedQuery(name = "DetEmpleado.getActive", query = "SELECT e FROM DetEmpleado e WHERE e.activo = :activo")
+@NamedQuery(name = "DetEmpleado.findByActiveEmpresaIngreso", query = "SELECT e FROM DetEmpleado e WHERE e.empleadoConfiguracion.procesarNomina = true AND e.datoEmpresa.empresa.idEmpresa = :idEmpresa AND ( (e.datoEmpresa.fechaIngreso <= :periodoPagoInicio AND e.datoEmpresa.fechaBaja IS NULL) OR (e.datoEmpresa.fechaIngreso <= :periodoPagoInicio AND e.datoEmpresa.fechaBaja >= :periodoPagoFin)) ORDER BY e.nombre, e.primerAp, e.segundoAp")
+@NamedQuery(name = "DetEmpleado.findByRFC", query = "SELECT e FROM DetEmpleado e WHERE e.datoEmpresa.rfc = :rfc")
+@NamedQuery(name = "DetEmpleado.findByCURP", query = "SELECT e FROM DetEmpleado e WHERE e.curp = :curp")
+@NamedQuery(name = "DetEmpleado.findByActiveEmpresaPlanta", query = "SELECT e FROM DetEmpleado e WHERE (:idEmpresa is null or e.datoEmpresa.empresa.idEmpresa = :idEmpresa) AND (:idPlanta is null or e.datoEmpresa.planta.idPlanta = :idPlanta) and ( (e.datoEmpresa.fechaIngreso <= :fecha) and ( e.datoEmpresa.fechaBaja is null or :fecha <= e.datoEmpresa.fechaBaja ) ) ")
+public class DetEmpleado implements Serializable, Cloneable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -92,43 +88,10 @@ public class DetEmpleado implements Serializable {
     @Column(name = "correo")
     private String correo;
 
-    @Basic(optional = true)
-    @Column(name = "fecha_ingreso")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date fechaIngreso;
-
-    @Size(max = 45)
-    @Column(name = "nss")
-    private String nss;
-
     @Basic(optional = false)
     @NotNull
     @Column(name = "activo")
     private short activo;
-
-    @Column(name = "sueldo_diario")
-    private BigDecimal sueldoDiario;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idEmpleado")
-    private List<BitacoraInventario> bitacoraInventarioList;
-
-    @OneToMany(mappedBy = "idEmpleado")
-    private List<BitacoraCatPerfil> bitacoraCatPerfilList;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "empleadoSol")
-    private List<DetSolicitudPermiso> detSolicitudPermisoList;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "empleado")
-    private List<DetBiometrico> detBiometricoList;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idEmpleado")
-    private List<DetRegistro> detRegistroList;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "empleadoSol")
-    private List<DetSolicitudArticulo> detSolicitudArticuloList;
-
-    @OneToMany(mappedBy = "empleadoRev")
-    private List<DetSolicitudPrenda> detSolicitudPrendaList;
 
     @OneToOne(cascade = {CascadeType.ALL})
     @JoinColumn(name = "id_empleado_empresa")
@@ -153,45 +116,186 @@ public class DetEmpleado implements Serializable {
     @OneToOne(mappedBy = "empleado", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private DetEmpleadoConfiguracion empleadoConfiguracion;
     
-    @OneToMany(mappedBy = "empleado")
-    private List<DetIncapacidad> registroIncapacidadInc;
+    @Override
+    public int hashCode() {
+    	if(this.idEmpleado == null)
+    		return System.identityHashCode(this);
+        return Objects.hashCode(this.idEmpleado);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final DetEmpleado other = (DetEmpleado) obj;
+        return Objects.equals(this.idEmpleado, other.idEmpleado);
+    }
     
-    @OneToMany(mappedBy = "autorizador")
-    private List<DetIncapacidad> registroIncapacidadRev;
+    @Override
+    public String toString() {
+        return "DetEmpleado[" + "idEmpleado=" + idEmpleado + ", nombre=" + nombre + " " + primerAp + " " + segundoAp + ']';
+    }
+    
+    public static class Builder {
+    	private Integer idEmpleado;
+    	private String numEmpleado;
+    	private String nombre;
+    	private String primerAp;
+    	private String segundoAp;
+    	private Date fechaNacimiento;
+    	private Date fechaRegistro;
+    	private Date fechaModificacion;
+    	private String curp;
+    	private String correo;
+    	private short activo;
+    	private InfDatoEmpresa datoEmpresa;
+    	private DetEmpleadoFoto empleadoFoto;
+    	private List<DetPercepcionEmpleado> percepcionesEmpleado;
+    	private List<DetPrestamo> prestamos;
+    	private List<DetVacaciones> vacaciones;
+    	private DetDomicilioEmpleado domicilio;
+    	private DetEmpleadoConfiguracion empleadoConfiguracion;
+    	
+    	public DetEmpleado.Builder id(Integer id) {
+    		this.idEmpleado = id;
+    		return this;
+    	}
+    	
+    	public DetEmpleado.Builder numEmpleado(String numEmpleado) {
+    		this.numEmpleado = numEmpleado;
+    		return this;
+    	}
+    	
+    	public DetEmpleado.Builder nombre(String nombre) {
+    		this.nombre = nombre;
+    		return this;
+    	}
+    	
+    	public DetEmpleado.Builder primerApellido(String primerApellido) {
+    		this.primerAp = primerApellido;
+    		return this;
+    	}
+    	
+    	public DetEmpleado.Builder segundoApellido(String segundoApellido) {
+    		this.segundoAp = segundoApellido;
+    		return this;
+    	}
+    	
+    	public DetEmpleado.Builder fechaNacimiento(Date fechaNacimiento) {
+    		this.fechaNacimiento = fechaNacimiento;
+    		return this;
+    	}
+    	
+    	public DetEmpleado.Builder fechaRegistro(Date fechaRegistro) {
+    		this.fechaRegistro = fechaRegistro;
+    		return this;
+    	}
+    	
+    	public DetEmpleado.Builder fechaModificacion(Date fechaModificacion) {
+    		this.fechaModificacion = fechaModificacion;
+    		return this;
+    	}
+    	
+    	public DetEmpleado.Builder curp(String curp) {
+    		this.curp = curp;
+    		return this;
+    	}
+    	
+    	public DetEmpleado.Builder correo(String correo) {
+    		this.correo = correo;
+    		return this;
+    	}
+    	
+    	public DetEmpleado.Builder activo(short activo) {
+    		this.activo = activo;
+    		return this;
+    	}
+    	
+    	public DetEmpleado.Builder datoEmpresa(InfDatoEmpresa datoEmpresa) {
+    		this.datoEmpresa = datoEmpresa;
+    		return this;
+    	}
+    	
+    	public DetEmpleado.Builder empleadoFoto(DetEmpleadoFoto empleadoFoto) {
+    		this.empleadoFoto = empleadoFoto;
+    		return this;
+    	}
+    	
+    	public DetEmpleado.Builder percepcionesEmpleado(List<DetPercepcionEmpleado> percepcionesEmpleado) {
+    		this.percepcionesEmpleado = percepcionesEmpleado;
+    		return this;
+    	}
+    	
+    	public DetEmpleado.Builder prestamos(List<DetPrestamo> prestamos) {
+    		this.prestamos = prestamos;
+    		return this;
+    	}
+    	
+    	public DetEmpleado.Builder vacaciones(List<DetVacaciones> vacaciones) {
+    		this.vacaciones = vacaciones;
+    		return this;
+    	}
+    	
+    	public DetEmpleado.Builder domicilio(DetDomicilioEmpleado domicilio) {
+    		this.domicilio = domicilio;
+    		return this;
+    	}
+    	
+    	public DetEmpleado.Builder empleadoConfiguracion(DetEmpleadoConfiguracion empleadoConfiguracion) {
+    		this.empleadoConfiguracion = empleadoConfiguracion;
+    		return this;
+    	}
+    	
+    	public DetEmpleado build() {
+    		return new DetEmpleado(this);
+    	}
+    }
     
     public DetEmpleado() {
+    }
+    
+    public DetEmpleado(Builder builder) {
+    	this.idEmpleado = builder.idEmpleado;
+    	this.numEmpleado = builder.numEmpleado;
+    	this.nombre = builder.nombre;
+    	this.primerAp = builder.primerAp;
+    	this.segundoAp = builder.segundoAp;
+    	this.fechaNacimiento = builder.fechaNacimiento;
+    	this.fechaRegistro = builder.fechaRegistro;
+    	this.fechaModificacion = builder.fechaModificacion;
+    	this.curp = builder.curp;
+    	this.correo = builder.correo;
+    	this.activo = builder.activo;
+    	this.datoEmpresa = builder.datoEmpresa;
+    	this.empleadoFoto = builder.empleadoFoto;
+    	this.percepcionesEmpleado = builder.percepcionesEmpleado;
+    	this.prestamos = builder.prestamos;
+    	this.vacaciones = builder.vacaciones;
+    	this.domicilio = builder.domicilio;
+    	this.empleadoConfiguracion = builder.empleadoConfiguracion;
     }
 
     public DetEmpleado(Integer idEmpleado) {
         this.idEmpleado = idEmpleado;
     }
     
-    public DetEmpleado(Integer idEmpleado, String numEmpleado, String nombre, String primerAp, Date fechaNacimiento, Date fechaRegistro,
-            Date fechaIngreso, short activo, BigDecimal sueldoDiario) {
+    public DetEmpleado(Integer idEmpleado, String numEmpleado, String nombre, String primerAp, Date fechaNacimiento, Date fechaRegistro, short activo) {
         this.idEmpleado = idEmpleado;
         this.numEmpleado = numEmpleado;
         this.nombre = nombre;
         this.primerAp = primerAp;
         this.fechaNacimiento = fechaNacimiento;
         this.fechaRegistro = fechaRegistro;
-        this.fechaIngreso = fechaIngreso;
         this.activo = activo;
-        this.sueldoDiario = sueldoDiario;
     }
-
-    public DetEmpleado(Integer idEmpleado, String numEmpleado, String nombre, String primerAp, Date fechaNacimiento, Date fechaRegistro,
-            Date fechaIngreso, short activo) {
-        this.idEmpleado = idEmpleado;
-        this.numEmpleado = numEmpleado;
-        this.nombre = nombre;
-        this.primerAp = primerAp;
-        this.fechaNacimiento = fechaNacimiento;
-        this.fechaRegistro = fechaRegistro;
-        this.fechaIngreso = fechaIngreso;
-        this.activo = activo;
-
-    }
-
+    
     public Integer getIdEmpleado() {
         return idEmpleado;
     }
@@ -271,93 +375,13 @@ public class DetEmpleado implements Serializable {
     public void setCorreo(String correo) {
         this.correo = correo;
     }
-
-    public Date getFechaIngreso() {
-        return fechaIngreso;
-    }
-
-    public void setFechaIngreso(Date fechaIngreso) {
-        this.fechaIngreso = fechaIngreso;
-    }
-
-    public String getNss() {
-        return nss;
-    }
-
-    public void setNss(String nss) {
-        this.nss = nss;
-    }
-
+    
     public short getActivo() {
         return activo;
     }
 
     public void setActivo(short activo) {
         this.activo = activo;
-    }
-
-    public List<BitacoraInventario> getBitacoraInventarioList() {
-        return bitacoraInventarioList;
-    }
-
-    public void setBitacoraInventarioList(List<BitacoraInventario> bitacoraInventarioList) {
-        this.bitacoraInventarioList = bitacoraInventarioList;
-    }
-
-    public List<BitacoraCatPerfil> getBitacoraCatPerfilList() {
-        return bitacoraCatPerfilList;
-    }
-
-    public void setBitacoraCatPerfilList(List<BitacoraCatPerfil> bitacoraCatPerfilList) {
-        this.bitacoraCatPerfilList = bitacoraCatPerfilList;
-    }
-
-    public List<DetSolicitudPermiso> getDetSolicitudPermisoList() {
-        return detSolicitudPermisoList;
-    }
-
-    public void setDetSolicitudPermisoList(List<DetSolicitudPermiso> detSolicitudPermisoList) {
-        this.detSolicitudPermisoList = detSolicitudPermisoList;
-    }
-
-    public List<DetBiometrico> getDetBiometricoList() {
-        return detBiometricoList;
-    }
-
-    public void setDetBiometricoList(List<DetBiometrico> detBiometricoList) {
-        this.detBiometricoList = detBiometricoList;
-    }
-
-    public List<DetRegistro> getDetRegistroList() {
-        return detRegistroList;
-    }
-
-    public void setDetRegistroList(List<DetRegistro> detRegistroList) {
-        this.detRegistroList = detRegistroList;
-    }
-
-    public List<DetSolicitudArticulo> getDetSolicitudArticuloList() {
-        return detSolicitudArticuloList;
-    }
-
-    public void setDetSolicitudArticuloList(List<DetSolicitudArticulo> detSolicitudArticuloList) {
-        this.detSolicitudArticuloList = detSolicitudArticuloList;
-    }
-
-    public List<DetSolicitudPrenda> getDetSolicitudPrendaList() {
-        return detSolicitudPrendaList;
-    }
-
-    public void setDetSolicitudPrendaList(List<DetSolicitudPrenda> detSolicitudPrendaList) {
-        this.detSolicitudPrendaList = detSolicitudPrendaList;
-    }
-
-    public BigDecimal getSueldoDiario() {
-        return sueldoDiario;
-    }
-
-    public void setSueldoDiario(BigDecimal sueldoDiario) {
-        this.sueldoDiario = sueldoDiario;
     }
 
     public InfDatoEmpresa getDatoEmpresa() {
@@ -415,48 +439,4 @@ public class DetEmpleado implements Serializable {
     public void setVacaciones(List<DetVacaciones> vacaciones) {
         this.vacaciones = vacaciones;
     }
-
-    public List<DetIncapacidad> getRegistroIncapacidadInc() {
-        return registroIncapacidadInc;
-    }
-
-    public void setRegistroIncapacidadInc(List<DetIncapacidad> registroIncapacidadInc) {
-        this.registroIncapacidadInc = registroIncapacidadInc;
-    }
-
-    public List<DetIncapacidad> getRegistroIncapacidadRev() {
-        return registroIncapacidadRev;
-    }
-
-    public void setRegistroIncapacidadRev(List<DetIncapacidad> registroIncapacidadRev) {
-        this.registroIncapacidadRev = registroIncapacidadRev;
-    }
-    
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 17 * hash + Objects.hashCode(this.idEmpleado);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final DetEmpleado other = (DetEmpleado) obj;
-        return Objects.equals(this.idEmpleado, other.idEmpleado);
-    }
-    
-    @Override
-    public String toString() {
-        return "DetEmpleado[" + "idEmpleado=" + idEmpleado + ", nombre=" + nombre + " " + primerAp + " " + segundoAp + ']';
-    }
-
 }
