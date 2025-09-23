@@ -9,18 +9,16 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "det_empleado_foto")
-@NamedQueries({
-	@NamedQuery(name = "DetEmpleadoFoto.findByNumeroEmpleado", query = "SELECT f FROM DetEmpleadoFoto f WHERE f.empleado.numEmpleado = :numeroEmpleado")
-})
+@NamedQuery(name = "DetEmpleadoFoto.findByNumeroEmpleado", query = "SELECT f FROM DetEmpleadoFoto f WHERE f.empleado.numEmpleado = :numeroEmpleado")
+@NamedQuery(name = "DetEmpleadoFoto.findByIdEmpleado", query = "SELECT f FROM DetEmpleadoFoto f WHERE f.empleado.idEmpleado = :idEmpleado")
 public class DetEmpleadoFoto implements Serializable {
-
+	
 	private static final long serialVersionUID = 8183960341006171158L;
 	
 	@Id
@@ -43,6 +41,8 @@ public class DetEmpleadoFoto implements Serializable {
 
 	@Override
 	public int hashCode() {
+		if(this.id == null)
+			return System.identityHashCode(this);
 		return Objects.hash(id);
 	}
 

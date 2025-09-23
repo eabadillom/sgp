@@ -38,5 +38,26 @@ public class EmpleadoFotoDAO extends BaseDAO<DetEmpleadoFoto, Integer> {
 		
 		return model;
 	}
+	
+	public DetEmpleadoFoto buscar(Integer idEmpleado) {
+		DetEmpleadoFoto model = null;
+		EntityManager em = null;
+		
+		try {
+			em = this.getEntityManager();
+			model = em.createNamedQuery("DetEmpleadoFoto.findByIdEmpleado", modelClass)
+					.setParameter("idEmpleado", idEmpleado)
+					.getSingleResult()
+					;
+		} catch(NoResultException ex) {
+			log.warn("Problema para obtener la fotografía del empleado con id {}", idEmpleado);
+		} catch(Exception ex) {
+			log.error("Problema para obtener la foto del empleado con id {}...\n{}", idEmpleado, ex);
+		} finally {
+			this.close(em);
+		}
+		
+		return model;
+	}
 
 }

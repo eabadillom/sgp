@@ -1,0 +1,44 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+						<p:dialog header="Estatus del empleado en la empresa" id="dg-eliminarEmpleado" widgetVar="dg-eliminarEmpleado" showEffect="fade" modal="true" responsive="true" 
+                                  draggable="true" resizable="false" dynamic="true"  width="500">
+                            <div class="p-field">
+                                <p:outputLabel value="¿Por que se dio de baja o suspendio el empleado?"/>
+                                <p:selectOneMenu value="#{registroEmpleadosBean.tipofinrelacion}" converter="entityConverter">
+                                    <f:selectItem itemLabel="-- Seleccione una suspension o una terminacion --" value="#{null}"/>
+                                    <f:selectItems value="#{registroEmpleadosBean.tiposdebaja}" var="tipobaja" itemLabel="#{tipobaja.descripcion}" itemValue="#{tipobaja}"/>
+                                    <p:ajax event="change" listener="#{registroEmpleadosBean.manipularStatusFechaBaja}" process="@this" oncomplete="PF('dg-eliminarEmpleado').show();" update='form:dg-eliminarEmpleado'/>
+                                </p:selectOneMenu>
+                            </div>
+                            <div class="p-field">
+                                <p:outputLabel value="Detalle el motivo de la baja del empleado"/>
+                                <p:inputTextarea value="#{registroEmpleadosBean.motivofinrelaicion}" rows="5" cols="40" placeholder="Describa el motivo aqui...">
+                                    <p:ajax process="@this"/>
+                                </p:inputTextarea>
+                            </div>
+
+                            <h:panelGroup rendered="#{registroEmpleadosBean.statusfechabaja}">
+                                <div class="p-field">
+                                    <p:outputLabel for="fechadebaja" value="Fecha de ultimo dia laboral"/><br/>
+                                    <p:datePicker id="fechadebaja" 
+                                                  value="#{registroEmpleadosBean.fechafinrelacion}" 
+                                                  showIcon="true" 
+                                                  yearNavigator="true" 
+                                                  monthNavigator="true" 
+                                                  weekCalculator="true" 
+                                                  pattern="dd/MM/yyyy" 
+                                                  timeZone="GMT-6" 
+                                                  locale="es_MX">
+                                        <p:ajax process="@this"/>
+                                    </p:datePicker>
+                                </div>
+                            </h:panelGroup>
+                            <p:commandButton value="Eliminar" icon="pi pi-check" style="margin: 0.3rem" styleClass="ui-button-danger" oncomplete="PF('dg-eliminarEmpleado').hide(); PF('dialogEliminarEmpleado').show();" />
+                            <p:commandButton value="Cancelar" icon="pi pi-times" style="margin: 0.3rem" actionListener="#{registroEmpleadosBean.limpiarEliminar()}" oncomplete="PF('dg-eliminarEmpleado').hide(), PF('dialogEliminarEmpleado').hide();" />
+                        </p:dialog>
+
+</ui:composition>

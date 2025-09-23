@@ -1,0 +1,37 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+						<p:dataTable id="dtEmpleados" widgetVar="dtEmpleados" var="empleado"
+                        			reflow="true" styleClass="products-table"
+                        			value="#{registroEmpleadosBean.empleados}"
+                        			paginator="true" rows="10"
+                        			emptyMessage="No hay empleados con los criterios de búsqueda" 
+                        			paginatorPosition="bottom" >
+
+                            <f:facet name="header">
+                                <p:inputText id="globalFilter" onkeyup="PF('dtEmpleados').filter();" style="width:300px" placeholder="Buscar empleado por nombre o apellidos">
+                                </p:inputText>
+                            </f:facet>
+
+                            <p:column headerText="Número" width="4rem">
+                                <h:outputText value="#{empleado.numEmpleado}" styleClass="customer-badge status-#{registroEmpleadosBean.obtenerStatusEmpleadoEmpresa(empleado)}"/>
+                            </p:column>
+                            <p:column field="primerAp" headerText="Primer Apellido" filterMatchMode="contains" >
+                            </p:column>
+                            <p:column field="segundoAp" headerText="Segundo Apellido" filterMatchMode="contains">
+                            </p:column>
+                            <p:column field="nombre" headerText="Nombre" filterMatchMode="contains">
+                            </p:column>
+                            <p:column width="6rem">
+                                <p:commandButton styleClass="edit-button m-1" actionListener="#{registroEmpleadosBean.editar(empleado)}" process="@this" update="form:dlg-empleado form:panelDialogEmpleado form:panelDialogEmpleado:previewFingerprint1" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dialogEmpleado').show();" icon="pi pi-pencil">
+                                </p:commandButton>
+                                <p:commandButton class="ui-button-danger m-1" icon="pi pi-times" process="@this" actionListener="#{registroEmpleadosBean.validarEmpleado(empleado)}" oncomplete="PF('dg-eliminarEmpleado').show()" update=":form:dg-eliminarEmpleado" >
+                                    <f:setPropertyActionListener value="#{empleado}" target="#{registroEmpleadosBean.empleado}" />
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+
+</ui:composition>

@@ -1,0 +1,53 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+                                <p:tab title="Préstamos">
+                                    <p:toolbar>
+                                        <p:toolbarGroup>
+                                            <p:commandButton value="Agregar" icon="pi pi-plus" oncomplete="PF('dgPrestamo').show();"></p:commandButton>
+                                        </p:toolbarGroup>
+                                    </p:toolbar>
+                                    <p:dataTable id="dt-prestamos" widgetVar="dtPrestamos" value="#{registroEmpleadosBean.empleado.prestamos}" var="prestamo" allowUnsorting="true" sortMode="single" reflow="true" lazy="true">
+                                        <p:column headerText="Fecha inicio" sortBy="#{prestamo.fechaInicio}">
+                                            <p:datePicker value="#{prestamo.fechaInicio}" monthNavigator="true" yearNavigator="true" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
+                                                <p:ajax process="@this"></p:ajax>
+                                            </p:datePicker>
+                                        </p:column>
+                                        <p:column headerText="Fecha fin" sortBy="#{prestamo.fechaFin}">
+                                            <p:datePicker value="#{prestamo.fechaFin}" monthNavigator="true" yearNavigator="true" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
+                                                <p:ajax process="@this"></p:ajax>
+                                            </p:datePicker>
+                                        </p:column>
+                                        <p:column headerText="Periodicidad de pago" width="auto">
+                                            <p:selectOneMenu value="#{prestamo.periodicidadPago}" converter="entityConverter" autoWidth="false">
+                                                <f:selectItem itemLabel="Seleccione la periodicidad de pago" noSelectionOption="true" />
+                                                <f:selectItems value="#{registroEmpleadosBean.periodicidadesPago}" var="periodicidad" itemLabel="#{periodicidad.descripcion}"></f:selectItems>
+                                            </p:selectOneMenu>
+                                        </p:column>
+                                        <p:column headerText="Tipo Préstamo">
+                                            <p:selectOneMenu value="#{prestamo.tipoPrestamo}" converter="entityConverter" autoWidth="false">
+                                                <f:selectItem itemLabel="Seleccione un tipo de préstamo" noSelectionOption="true" />
+                                                <f:selectItems value="#{registroEmpleadosBean.tiposPrestamo}" var="tipoPrestamo" itemLabel="#{tipoPrestamo.descripcion}" itemValue="#{tipoPrestamo}" />
+                                            </p:selectOneMenu>
+                                        </p:column>
+                                        <p:column headerText="Acumulado" width="5rem">
+                                            <p:inputNumber value="#{prestamo.acumulado}" decimalSeparator="2" symbol="$" symbolPosition="p" emptyValue="empty" />
+                                        </p:column>
+                                        <p:column headerText="Importe" width="5rem;">
+                                            <p:inputNumber value="#{prestamo.importe}" decimalSeparator="2" symbol="$" symbolPosition="p" emptyValue="empty" />
+                                        </p:column>
+                                        <p:column headerText="Total" width="5rem">
+                                            <p:inputNumber value="#{prestamo.total}" decimalSeparator="2" symbol="$" symbolPosition="p" emptyValue="empty" />
+                                        </p:column>
+                                        <p:column width="3rem;">
+                                            <p:commandButton icon="pi pi-trash" styleClass="ui-button-danger" oncomplete="PF('dlgEliminarPrestamo').show();">
+                                                <f:setPropertyActionListener value="#{prestamo}" target="#{registroEmpleadosBean.prestamo}"></f:setPropertyActionListener>
+                                            </p:commandButton>
+                                        </p:column>
+                                    </p:dataTable>
+                                </p:tab>
+
+</ui:composition>

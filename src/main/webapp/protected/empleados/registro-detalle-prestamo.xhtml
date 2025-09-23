@@ -1,0 +1,65 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+						<p:dialog id="dg-prestamo" widgetVar="dgPrestamo" header="Préstamo" showEffect="hide" modal="true" responsive="true">
+                            <div class="ui-fluid">
+                                <div class="p-field">
+                                    <p:outputLabel value="Tipo de préstamo"></p:outputLabel>
+                                    <p:selectOneMenu id="tipoPrestamo" value="#{registroEmpleadosBean.prestamo.tipoPrestamo}" converter="entityConverter">
+                                        <f:selectItem itemLabel="Seleccione un tipo de préstamo" noSelectionOption="true" />
+                                        <f:selectItems value="#{registroEmpleadosBean.tiposPrestamo}" var="tipoPrestamo" itemLabel="#{tipoPrestamo.descripcion}" itemValue="#{tipoPrestamo}">
+                                        </f:selectItems>
+                                        <p:ajax process="@this"></p:ajax>
+                                    </p:selectOneMenu>
+                                </div>
+                                <div class="p-field">
+                                    <p:outputLabel value="Fecha inicio"></p:outputLabel>
+                                    <p:datePicker value="#{registroEmpleadosBean.prestamo.fechaInicio}" showIcon="true" yearNavigator="true" monthNavigator="true" weekCalculator="true" pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX">
+                                        <p:ajax process="@this"></p:ajax>
+                                    </p:datePicker>
+                                </div>
+                                <div class="p-field">
+                                    <p:outputLabel value="Fecha Fin"></p:outputLabel>
+                                    <p:datePicker value="#{registroEmpleadosBean.prestamo.fechaFin}" showIcon="true" yearNavigator="true" monthNavigator="true" weekCalculator="true" pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX">
+                                        <p:ajax process="@this"></p:ajax>
+                                    </p:datePicker>
+                                </div>
+                                <div class="p-field">
+                                    <p:outputLabel value="Acumulado"></p:outputLabel>
+                                    <p:inputNumber value="#{registroEmpleadosBean.prestamo.acumulado}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," minValue="0.00" emptyValue="zero">
+                                        <p:ajax process="@this"></p:ajax>
+                                    </p:inputNumber>
+                                </div>
+                                <div class="p-field">
+                                    <p:outputLabel value="Importe"></p:outputLabel>
+                                    <p:inputNumber value="#{registroEmpleadosBean.prestamo.importe}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," minValue="0.00" emptyValue="zero">
+                                        <p:ajax process="@this"></p:ajax>
+                                    </p:inputNumber>
+                                </div>
+                                <div class="p-field">
+                                    <p:outputLabel value="Periodicidad de pago"></p:outputLabel>
+                                    <p:selectOneMenu value="#{registroEmpleadosBean.prestamo.periodicidadPago}" converter="entityConverter">
+                                        <f:selectItem itemLabel="Seleccione la periodicidad de pago" noSelectionOption="true" />
+                                        <f:selectItems value="#{registroEmpleadosBean.periodicidadesPago}" var="periodicidad" itemLabel="#{periodicidad.descripcion}">
+                                        </f:selectItems>
+                                        <p:ajax process="@this"></p:ajax>
+                                    </p:selectOneMenu>
+                                </div>
+                                <div class="p-field">
+                                    <p:outputLabel value="Total"></p:outputLabel>
+                                    <p:inputNumber value="#{registroEmpleadosBean.prestamo.total}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," minValue="0.00" emptyValue="zero">
+                                        <p:ajax process="@this"></p:ajax>
+                                    </p:inputNumber>
+                                </div>
+                            </div>
+                            <f:facet name="footer">
+                                <p:commandButton value="Agregar" process="@this" actionListener="#{registroEmpleadosBean.agregarPrestamo()}">
+                                    <p:confirm header="Confirmación" message="¿Está seguro que desea agregar el préstamo?" icon="pi pi-exclamation-triangle"/>
+                                </p:commandButton>
+                            </f:facet>
+                        </p:dialog>
+
+</ui:composition>
