@@ -63,21 +63,29 @@
                 </p:panelGrid>
             </div>
             <div style="padding-top: 1rem;">
-                <p:dataTable id="dt-registros" widgetVar="dtRegistros" value="#{repAsistenciaBean.registros}" var="registro" lazy="true" rows="10" paginator="true">
-                    <p:column headerText="Empleado" sortBy="#{registro.idEmpleado.nombre}">
-                        <p:outputLabel value="#{registro.idEmpleado.nombre} #{registro.idEmpleado.primerAp} #{registro.idEmpleado.segundoAp}"/>
+                <p:dataTable id="dt-registros" widgetVar="dtRegistros" value="#{repAsistenciaBean.registros}" var="registro" rows="10" paginator="true" paginatorPosition="bottom">
+                
+                	<f:facet name="header">
+                		<p:inputText id="globalFilter" onkeyup="PF('dtRegistros').filter();" style="width: 100%;" placeholder="Buscar por nombre o apellidos" />
+                	</f:facet>
+                	
+                    <p:column field="idEmpleado.nombre" headerText="Nombre">
                     </p:column>
-                    <p:column headerText="Fecha" style="width: 6rem; text-align: center;" sortBy="#{registro.fechaEntrada}">
+                    <p:column field="idEmpleado.primerAp" headerText="1er Apellido">
+                    </p:column>
+                    <p:column field="idEmpleado.segundoAp" headerText="2o Apellido">
+                    </p:column>
+                    <p:column headerText="Fecha" style="width: 6rem; text-align: center;">
                         <p:outputLabel value="#{registro.fechaEntrada}">
                             <f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX"/>
                         </p:outputLabel>
                     </p:column>
-                    <p:column headerText="Entrada" style="width: 6rem; text-align: center;" sortBy="#{registro.fechaEntrada}">
+                    <p:column headerText="Entrada" style="width: 6rem; text-align: center;" >
                         <p:outputLabel value="#{registro.fechaEntrada}">
                             <f:convertDateTime pattern="HH:mm:ss" timeZone="GMT-6" locale="es_MX"/>
                         </p:outputLabel>
                     </p:column>
-                    <p:column headerText="Salida" style="width: 6rem; text-align: center;" sortBy="#{registro.fechaSalida}">
+                    <p:column headerText="Salida" style="width: 6rem; text-align: center;" >
                         <p:outputLabel value="#{registro.fechaSalida}">
                             <f:convertDateTime pattern="HH:mm:ss" timeZone="GMT-6" locale="es_MX"/>
                         </p:outputLabel>
