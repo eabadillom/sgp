@@ -3,6 +3,7 @@ package mx.com.ferbo.business.empleado;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -357,5 +358,104 @@ public class EmpleadoBL {
         }
         
         return false;
+    }
+    
+    public static DetEmpleado reingreso(DetEmpleado e) {
+    	DetEmpleado nuevoEmpleado = null;
+    	InfDatoEmpresa datoEmpresa = null;
+    	DetEmpleadoConfiguracion configuracion = null;
+    	Date fechaIngreso = new Date();
+		DateUtil.setTime(fechaIngreso, 0, 0, 0);
+    	
+    	try {
+    		datoEmpresa = new InfDatoEmpresa.Builder()
+    				.fechaIngreso(fechaIngreso)
+    				.rfc(e.getDatoEmpresa().getRfc())
+    				.nss(e.getDatoEmpresa().getNss())
+    				.perfil(e.getDatoEmpresa().getPerfil())
+    				.empresa(e.getDatoEmpresa().getEmpresa())
+    				.puesto(e.getDatoEmpresa().getPuesto())
+    				.area(e.getDatoEmpresa().getArea())
+    				.planta(e.getDatoEmpresa().getPlanta())
+    				.tipoContrato(e.getDatoEmpresa().getTipoContrato())
+    				.tipoJornada(e.getDatoEmpresa().getTipoJornada())
+    				.tipoRegimen(e.getDatoEmpresa().getTipoRegimen())
+    				.horaEntrada(e.getDatoEmpresa().getHoraEntrada())
+    				.horasalida(e.getDatoEmpresa().getHorasalida())
+    				.minutosTolerancia(e.getDatoEmpresa().getMinutosTolerancia())
+    				.entidadFederativa(e.getDatoEmpresa().getEntidadFederativa())
+    				.riesgoPuesto(e.getDatoEmpresa().getRiesgoPuesto())
+    				.periodicidadPago(e.getDatoEmpresa().getPeriodicidadPago())
+    				.banco(e.getDatoEmpresa().getBanco())
+    				.diasAguinaldo(e.getDatoEmpresa().getDiasAguinaldo())
+    				.primaVacacional(e.getDatoEmpresa().getPrimaVacacional())
+    				.sindicalizado(e.getDatoEmpresa().getSindicalizado())
+    				.confianza(e.getDatoEmpresa().getConfianza())
+    				.diaLunes(e.getDatoEmpresa().getDiaLunes())
+    				.diaMartes(e.getDatoEmpresa().getDiaMartes())
+    				.diaMiercoles(e.getDatoEmpresa().getDiaMiercoles())
+    				.diaJueves(e.getDatoEmpresa().getDiaJueves())
+    				.diaViernes(e.getDatoEmpresa().getDiaViernes())
+    				.diaSabado(e.getDatoEmpresa().getDiaSabado())
+    				.diaDomingo(e.getDatoEmpresa().getDiaDomingo())
+    				.build();
+    		
+    		configuracion = new DetEmpleadoConfiguracion.Builder()
+    				.build();
+    		
+    		nuevoEmpleado = new DetEmpleado.Builder()
+    				.numEmpleado(e.getNumEmpleado())
+    				.nombre(e.getNombre())
+    				.primerApellido(e.getPrimerAp())
+    				.segundoApellido(e.getSegundoAp())
+    				.fechaNacimiento(e.getFechaNacimiento())
+    				.fechaRegistro(new Date())
+    				.fechaModificacion(new Date())
+    				.curp(e.getCurp())
+    				.correo(e.getCorreo())
+    				.activo((short)1)
+    				.datoEmpresa(datoEmpresa)
+    				.percepcionesEmpleado(new ArrayList<DetPercepcionEmpleado>())
+    				.prestamos(new ArrayList<DetPrestamo>())
+    				.vacaciones(new ArrayList<DetVacaciones>())
+    				.domicilio(e.getDomicilio().clone())
+    				.empleadoConfiguracion(new DetEmpleadoConfiguracion())
+    				.build();
+    		
+    		configuracion.setEmpleado(nuevoEmpleado);
+    		nuevoEmpleado.setEmpleadoConfiguracion(configuracion);
+    		
+			nuevoEmpleado.setDomicilio(e.getDomicilio().clone());
+		} catch (CloneNotSupportedException e1) {
+			nuevoEmpleado.setDomicilio(new DetDomicilioEmpleado());
+		} finally {
+			nuevoEmpleado.getDomicilio().setEmpleado(nuevoEmpleado);
+		}
+    	
+    	return nuevoEmpleado;
+    }
+    
+    public static Boolean tieneReingresos(String curp) {
+    	List<DetEmpleado> registrosEmpleado = null;
+    	EmpleadoDAO empleadoDAO = null;
+    	Boolean tieneBajas = null;
+    	Boolean tieneVigente = null;
+    	
+    	empleadoDAO = new EmpleadoDAO();
+    	
+    	registrosEmpleado = empleadoDAO.buscarPorCURP(curp);
+    	
+		tieneBajas = registrosEmpleado.stream()
+				.filter(empleado -> empleado.getDatoEmpresa().getFechaBaja() != null && empleado.getActivo() == 0)
+				.collect(Collectors.toList()).size() > 0;
+    	
+    	tieneVigente = registrosEmpleado.stream()
+    			.filter(empleado -> empleado.getDatoEmpresa().getFechaBaja() == null && empleado.getActivo() == 1)
+    			.collect(Collectors.toList()).size() > 0;
+		
+    	if(tieneVigente && tieneBajas)
+    		return true;
+    	
+    	return false;
     }
 }

@@ -1,0 +1,73 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+                                <p:tab title="Percepciones">
+                                	<div class="ui-fluid formgrid grid">
+                                    	<div class="field col-12 md:col-6">
+                                    		<p:selectOneMenu id="selPercepcion" value="#{registroEmpleadosBean.percepcion}" autoWidth="false" converter="entityConverter" filter="true" filterMatchMode="contains">
+                                                <f:selectItem itemLabel="---SELECCIONE UNA PERCEPCION---"/>
+                                                <f:selectItems value="#{registroEmpleadosBean.percepciones}" var="percepcion" itemLabel="#{percepcion.clave} - #{percepcion.nombre}" itemValue="#{percepcion}"/>
+                                                <p:ajax event="change" process="@this" listener="#{registroEmpleadosBean.configuraPercepcion()}" update="form:panelDialogEmpleado:selTipoPercepcion form:panelDialogEmpleado:txtValor"/>
+                                            </p:selectOneMenu>
+                                        </div>
+                                        <div class="field col-12 md:col-6">
+                                            <p:selectOneMenu id="selTipoPercepcion" value="#{registroEmpleadosBean.percepcionEmpleado.percepcion.tipoPercepcion}" autoWidth="false" converter="entityConverter" filter="true" filterMatchMode="contains">
+                                                <f:selectItem itemLabel="---TIPO DE PERCEPCION (SAT)---"/>
+                                                <f:selectItems value="#{registroEmpleadosBean.tiposPercepcion}" var="tipoPercepcion" itemLabel="#{tipoPercepcion.clave} - #{tipoPercepcion.descripcion}" itemValue="#{tipoPercepcion}"/>
+                                            </p:selectOneMenu>
+                                        </div>
+                                	</div>
+                                    <div class="ui-fluid formgrid grid">
+                                        <div class="field col-12 md:col-4">
+                                        	<p:inputNumber id="txtValor" value="#{registroEmpleadosBean.percepcionEmpleado.valor}" decimalPlaces="2" decimalSeparator="." thousandSeparator="," placeholder="#{registroEmpleadosBean.percepcion.descripcionValor}" title="#{registroEmpleadosBean.percepcion.descripcionValor}">
+                                        		<p:ajax process="@this" />
+                                        	</p:inputNumber>
+                                        </div>
+                                        <div class="field col-12 md:col-2">
+                                            <p:inputNumber id="txtImportePercepcion" value="#{registroEmpleadosBean.percepcionEmpleado.importeMaximo}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," placeholder="Importe máximo">
+                                                <p:ajax process="@this" />
+                                            </p:inputNumber>
+                                        </div>
+                                        <div class="field col-12 md:col-3">
+                                            <p:selectBooleanButton id="selPercepcionActivo" value="#{registroEmpleadosBean.percepcionEmpleado.activo}" onLabel="Activo" offLabel="Inactivo" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem" disabled="false" />
+                                        </div>
+                                        <div class="field col-12 md:col-2">
+                                            <p:commandButton value="Agregar" actionListener="#{registroEmpleadosBean.agregarPercepcionEmpleado}" icon="pi pi-plus" update="form:panelDialogEmpleado:selPercepcion form:panelDialogEmpleado:selTipoPercepcion form:panelDialogEmpleado:txtValor form:panelDialogEmpleado:txtImportePercepcion form:panelDialogEmpleado:selPercepcionActivo form:panelDialogEmpleado:dt-percepcion-empleado">
+                                            </p:commandButton>
+                                        </div>
+                                    </div>
+                                    <p:dataTable id="dt-percepcion-empleado" value="#{registroEmpleadosBean.empleado.percepcionesEmpleado}" var="percepcion" paginator="true" rows="5" paginatorPosition="bottom">
+                                        <p:column headerText="SAT" width="2rem" style="text-align: center;">
+                                            <p:outputLabel value="#{percepcion.percepcion.tipoPercepcion.clave}" title="#{percepcion.percepcion.tipoPercepcion.descripcion}" />
+                                        </p:column>
+                                    	<p:column headerText="Nombre">
+                                    		<p:outputLabel value="#{percepcion.percepcion.nombre}" />
+                                    	</p:column>
+                                        <p:column headerText="Valor" width="6rem" style="text-align: center;">
+                                        	<p:inputNumber value="#{percepcion.valor}" title="#{percepcion.percepcion.descripcionValor}" inputStyle="text-align: right">
+                                        	</p:inputNumber>
+                                        </p:column>
+                                        <p:column headerText="Importe máximo" width="6rem" style="text-align: center;">
+                                            <p:inputNumber value="#{percepcion.importeMaximo}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," inputStyle="text-align: right">
+                                                <p:ajax process="@this" />
+                                            </p:inputNumber>
+                                        </p:column>
+                                        <p:column headerText="Activo" width="5rem" style="text-align: center;">
+                                            <p:selectBooleanButton value="#{percepcion.activo}" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem"/>
+                                        </p:column>
+                                        <p:column width="2rem" style="text-align: center;">
+                                        	<p:commandButton id="cmd-precalculo" icon="fas fa-light fa-calculator" actionListener="#{registroEmpleadosBean.precalculoPercepcion(percepcion)}" oncomplete="PF('dlgPreCalculo').show();" update="form:dlg-precalculo form:panelDialogEmpleado:selTipoPercepcion"/>
+                                        	<p:tooltip for="cmd-precalculo" value="Revisar precálculo" position="right" />
+                                        </p:column>
+                                        <p:column width="2rem" style="text-align: center;">
+                                            <p:commandButton icon="pi pi-trash" oncomplete="PF('dlgEliminarPercepcionEmpleado').show();" styleClass="ui-button-danger">
+                                                <f:setPropertyActionListener value="#{percepcion}" target="#{registroEmpleadosBean.percepcionEmpleado}"></f:setPropertyActionListener>
+                                            </p:commandButton>
+                                        </p:column>
+                                    </p:dataTable>
+                                </p:tab>
+
+</ui:composition>

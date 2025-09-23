@@ -1,0 +1,32 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+						<p:dialog id="dialogBiometrico" header="Biométrico" widgetVar="dialogBiometrico" modal="true" draggable="false" cache="false" dynamic="true" closable="false">
+                            <p:outputPanel id="panelDialogBiometrico" class="ui-fluid">
+                                <h:panelGrid columns="2" cellpadding="5" columnClasses="ui-g-6, ui-g-6">
+                                    <p:commandLink oncomplete="InvokeFingerScan('Enrollment'); PF('bui').show()" actionListener="#{registroEmpleadosBean.setNumBiometrico(1)}">
+                                        <p:graphicImage rendered="#{registroEmpleadosBean.detBiometrico.huella eq null}" name="images/huella/finger_print_01.png" library="recursos" style="max-width: 100px;"/>
+                                        <p:graphicImage rendered="#{registroEmpleadosBean.detBiometrico.huella ne null}" name="images/huella/finger_print_02.png" library="recursos" style="max-width: 100px;"/>
+                                    </p:commandLink>
+                                    <p:commandLink oncomplete="InvokeFingerScan('Enrollment'); PF('bui').show()" actionListener="#{registroEmpleadosBean.setNumBiometrico(2)}">
+                                        <p:graphicImage rendered="#{registroEmpleadosBean.detBiometrico.huella2 eq null}" name="images/huella/finger_print_01.png" library="recursos" style="max-width: 100px;"/>
+                                        <p:graphicImage rendered="#{registroEmpleadosBean.detBiometrico.huella2 ne null}" name="images/huella/finger_print_02.png" library="recursos" style="max-width: 100px;"/>
+                                    </p:commandLink>
+                                </h:panelGrid>
+                                <p:inputText id="biometrico" style="display: none;" value="#{registroEmpleadosBean.biometrico}"/>
+
+                                <div class="alert alert-primary respresultado successfull text-break" role="alert"/>                        
+                                <div class="alert alert-success respresultado verifyfingerprintOk" role="alert"/>
+                                <div class="alert alert-danger respresultado badrequest" role="alert"/>
+
+                            </p:outputPanel>
+                            <f:facet name="footer">
+                                <p:commandButton value="Aceptar" class="ui-button-success" icon="pi pi-check" oncomplete="PF('dialogBiometrico').hide()" process="@this"/>
+                                <p:commandButton value="Cancelar" class="ui-button-secondary" icon="pi pi-times" oncomplete="PF('dialogBiometrico').hide();" process="@this"/>
+                            </f:facet>
+                        </p:dialog>
+
+</ui:composition>

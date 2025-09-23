@@ -67,8 +67,14 @@ public class RegistroAsistenciaBL {
         }
     }
 
+    @Deprecated
     public DetEmpleadoFoto buscarFotoEmpleado(String numeroEmpleado) {
         DetEmpleadoFoto fotoEmpleado = this.empleadoFotoDAO.buscar(numeroEmpleado);
+        return fotoEmpleado;
+    }
+    
+    public DetEmpleadoFoto buscarFotoEmpleado(Integer idEmpleado) {
+    	DetEmpleadoFoto fotoEmpleado = this.empleadoFotoDAO.buscar(idEmpleado);
         return fotoEmpleado;
     }
 

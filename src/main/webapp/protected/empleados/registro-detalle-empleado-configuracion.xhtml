@@ -1,0 +1,50 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+                                <p:tab title="Conf. Empleado">
+                                    <div class="card">
+                                        <div class="ui-fluid formgrid grid align-items-left">
+                                        	<div class="field col-12 md:col-3">
+                                        		<div><p:outputLabel for="@next" value="Procesar Nomina" /></div>
+                                        		<div>
+                                        			<p:selectBooleanButton value="#{registroEmpleadosBean.empleado.empleadoConfiguracion.procesarNomina}" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem">
+                                        				<p:ajax process="@this" />
+                                        			</p:selectBooleanButton>
+                                       			</div>
+                                        	</div>
+                                            <div class="field col-12 md:col-3">
+                                            	<div><p:outputLabel for="@next" value="Registrar retardos"/></div>
+                                                <div>
+                                                	<p:selectBooleanButton value="#{registroEmpleadosBean.empleado.empleadoConfiguracion.retardo}" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem">
+                                                		<p:ajax process="@this" />
+                                                	</p:selectBooleanButton>
+                                               	</div>
+                                            </div>
+                                            <div class="field col-12 md:col-3">
+                                            	<div><p:outputLabel for="@next" value="Horas extra"/></div>
+                                                <div>
+                                                	<p:selectBooleanButton value="#{registroEmpleadosBean.empleado.empleadoConfiguracion.horasextra}" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem" >
+                                                		<p:ajax process="@this" />
+                                                	</p:selectBooleanButton>
+                                               	</div>
+                                            </div>
+                                            <div class="field col-12 md:col-3">
+                                                <p:outputLabel for="@next" value="Permisos con goce de sueldo"/><br/>
+                                                <p:selectBooleanButton value="#{registroEmpleadosBean.empleado.empleadoConfiguracion.goceSueldo}" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem">
+                                                	<p:ajax process="@this" />
+                                                </p:selectBooleanButton>
+                                            </div>
+                                            <div class="field col-12 md:col-3">
+                                                <p:outputLabel for="@next" value="Registrar asistencia en dias no laborables"/><br/>
+                                                <p:selectBooleanButton value="#{registroEmpleadosBean.empleado.empleadoConfiguracion.asistenciaDiaNoLaboral}" onLabel="Si" offLabel="No" onIcon="pi pi-check" offIcon="pi pi-times" style="width:6rem">
+                                                	<p:ajax process="@this" />
+                                                </p:selectBooleanButton>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </p:tab>
+
+</ui:composition>

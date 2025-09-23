@@ -260,6 +260,9 @@ public class RegistroEmpleadosBean implements Serializable {
     	log.info("Cargando lista de empleados...");
         this.lstEmpleados = empleadoDAO.buscarTodos(false);
         log.info("Lista de empleados completa.");
+        if(this.lstEmpleados == null || this.lstEmpleados.size() == 0)
+        	return;
+        this.empleados = new ArrayList<DetEmpleado>(this.lstEmpleados);
     }
 
     /*
@@ -283,7 +286,7 @@ public class RegistroEmpleadosBean implements Serializable {
 			this.empleado = EmpleadoBL.load(empleado.getIdEmpleado());
 			this.datoEmpresa = this.empleado.getDatoEmpresa();
 			this.percepcionesEmpleado = this.empleado.getPercepcionesEmpleado();
-			this.empleadoFoto = empleadoFotoDAO.buscar(this.empleado.getNumEmpleado());
+			this.empleadoFoto = empleadoFotoDAO.buscar(this.empleado.getIdEmpleado());
 	        if (this.empleadoFoto != null) {
 	            log.debug("Foto: {}", this.empleadoFoto.getFotografia());
 	        }
@@ -963,6 +966,25 @@ public class RegistroEmpleadosBean implements Serializable {
     	}
     	
     	return diasTomados + diasRegistro;
+    	
+    }
+    
+    public void reingreso() {
+    	
+    	try {
+    		log.info("Reingreso...");
+    		DetEmpleado reingreso = EmpleadoBL.reingreso(this.empleado);
+    		log.info("Reingreso: {}", reingreso);
+    		this.empleado = reingreso;
+			this.empleadoDAO.guardar(reingreso);
+			this.empleados.add(reingreso);
+			this.lstEmpleados.add(reingreso);
+			PrimeFaces.current().executeScript("PF('dialogEmpleado').hide();");
+		} catch (SGPException e) {
+			log.error("Problema para guardar el nuevo registro de empleado.");
+		} finally {
+			PrimeFaces.current().ajax().update("form:panelDialogEmpleado");
+		}
     	
     }
 

@@ -28,7 +28,7 @@ public class InfDatoEmpresa implements Serializable {
 
     private static final long serialVersionUID = -7428030225407170556L;
 
-    @Id
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id_empleado_empresa")
@@ -165,6 +165,120 @@ public class InfDatoEmpresa implements Serializable {
     @Basic(optional = true)
     @Column(name = "nu_dias_aguinaldo" , precision = 4, scale = 2)
     private BigDecimal diasAguinaldo;
+
+	private InfDatoEmpresa(Builder builder) {
+		this.id = builder.id;
+		this.perfil = builder.perfil;
+		this.empresa = builder.empresa;
+		this.planta = builder.planta;
+		this.area = builder.area;
+		this.puesto = builder.puesto;
+		this.tipoContrato = builder.tipoContrato;
+		this.tipoJornada = builder.tipoJornada;
+		this.tipoRegimen = builder.tipoRegimen;
+		this.fechaIngreso = builder.fechaIngreso;
+		this.fechaBaja = builder.fechaBaja;
+		this.nss = builder.nss;
+		this.rfc = builder.rfc;
+		this.salarioDiario = builder.salarioDiario;
+		this.horaEntrada = builder.horaEntrada;
+		this.horasalida = builder.horasalida;
+		this.minutosTolerancia = builder.minutosTolerancia;
+		this.entidadFederativa = builder.entidadFederativa;
+		this.riesgoPuesto = builder.riesgoPuesto;
+		this.periodicidadPago = builder.periodicidadPago;
+		this.tipodebaja = builder.tipodebaja;
+		this.banco = builder.banco;
+		this.sindicalizado = builder.sindicalizado;
+		this.confianza = builder.confianza;
+		this.diaLunes = builder.diaLunes;
+		this.diaMartes = builder.diaMartes;
+		this.diaMiercoles = builder.diaMiercoles;
+		this.diaJueves = builder.diaJueves;
+		this.diaViernes = builder.diaViernes;
+		this.diaSabado = builder.diaSabado;
+		this.diaDomingo = builder.diaDomingo;
+		this.motivobaja = builder.motivobaja;
+		this.primaVacacional = builder.primaVacacional;
+		this.diasAguinaldo = builder.diasAguinaldo;
+	}
+
+    @Override
+    public int hashCode() {
+    	if(this.id == null)
+    		return System.identityHashCode(this);
+        return Objects.hash(id);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        InfDatoEmpresa other = (InfDatoEmpresa) obj;
+        return Objects.equals(id, other.id);
+    }
+
+    @Override
+    public String toString() {
+        return "{\"id\":\"" + id + "\", \"perfil\":\"" + perfil + "\", \"fechaIngreso\":\"" + fechaIngreso
+                + "\", \"nss\":\"" + nss + "\", \"rfc\":\"" + rfc + "\", \"salarioDiario\":\"" + salarioDiario
+                + "\", \"horaEntrada\":\"" + horaEntrada + "\", \"minutosTolerancia\":\"" + minutosTolerancia + "\"}";
+    }
+    
+    public InfDatoEmpresa() {
+    }
+    
+    public InfDatoEmpresa(Integer id, CatPerfil perfil, CatEmpresa empresa, CatPlanta planta, CatArea area,
+			CatPuesto puesto, CatTipoContrato tipoContrato, CatTipoJornada tipoJornada, CatTipoRegimen tipoRegimen,
+			Date fechaIngreso, Date fechaBaja, String nss, String rfc, BigDecimal salarioDiario, Date horaEntrada,
+			Date horasalida, Integer minutosTolerancia, CatEntidadFederativa entidadFederativa,
+			CatRiesgoPuesto riesgoPuesto, CatPeriodicidadPago periodicidadPago, CatTipoBajaEmpleado tipodebaja,
+			CatBanco banco, Boolean sindicalizado, Boolean confianza, Boolean diaLunes, Boolean diaMartes,
+			Boolean diaMiercoles, Boolean diaJueves, Boolean diaViernes, Boolean diaSabado, Boolean diaDomingo,
+			String motivobaja, BigDecimal primaVacacional, BigDecimal diasAguinaldo) {
+		super();
+		this.id = id;
+		this.perfil = perfil;
+		this.empresa = empresa;
+		this.planta = planta;
+		this.area = area;
+		this.puesto = puesto;
+		this.tipoContrato = tipoContrato;
+		this.tipoJornada = tipoJornada;
+		this.tipoRegimen = tipoRegimen;
+		this.fechaIngreso = fechaIngreso;
+		this.fechaBaja = fechaBaja;
+		this.nss = nss;
+		this.rfc = rfc;
+		this.salarioDiario = salarioDiario;
+		this.horaEntrada = horaEntrada;
+		this.horasalida = horasalida;
+		this.minutosTolerancia = minutosTolerancia;
+		this.entidadFederativa = entidadFederativa;
+		this.riesgoPuesto = riesgoPuesto;
+		this.periodicidadPago = periodicidadPago;
+		this.tipodebaja = tipodebaja;
+		this.banco = banco;
+		this.sindicalizado = sindicalizado;
+		this.confianza = confianza;
+		this.diaLunes = diaLunes;
+		this.diaMartes = diaMartes;
+		this.diaMiercoles = diaMiercoles;
+		this.diaJueves = diaJueves;
+		this.diaViernes = diaViernes;
+		this.diaSabado = diaSabado;
+		this.diaDomingo = diaDomingo;
+		this.motivobaja = motivobaja;
+		this.primaVacacional = primaVacacional;
+		this.diasAguinaldo = diasAguinaldo;
+	}
 
     public Integer getId() {
         return id;
@@ -358,33 +472,6 @@ public class InfDatoEmpresa implements Serializable {
         this.confianza = confianza;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        InfDatoEmpresa other = (InfDatoEmpresa) obj;
-        return Objects.equals(id, other.id);
-    }
-
-    @Override
-    public String toString() {
-        return "{\"id\":\"" + id + "\", \"perfil\":\"" + perfil + "\", \"fechaIngreso\":\"" + fechaIngreso
-                + "\", \"nss\":\"" + nss + "\", \"rfc\":\"" + rfc + "\", \"salarioDiario\":\"" + salarioDiario
-                + "\", \"horaEntrada\":\"" + horaEntrada + "\", \"minutosTolerancia\":\"" + minutosTolerancia + "\"}";
-    }
-
     public CatEntidadFederativa getEntidadFederativa() {
         return entidadFederativa;
     }
@@ -464,6 +551,218 @@ public class InfDatoEmpresa implements Serializable {
 	public void setDiasAguinaldo(BigDecimal diasAguinaldo) {
 		this.diasAguinaldo = diasAguinaldo;
 	}
-    
-    
+
+	public static final class Builder {
+		private Integer id;
+		private CatPerfil perfil;
+		private CatEmpresa empresa;
+		private CatPlanta planta;
+		private CatArea area;
+		private CatPuesto puesto;
+		private CatTipoContrato tipoContrato;
+		private CatTipoJornada tipoJornada;
+		private CatTipoRegimen tipoRegimen;
+		private Date fechaIngreso;
+		private Date fechaBaja;
+		private String nss;
+		private String rfc;
+		private BigDecimal salarioDiario;
+		private Date horaEntrada;
+		private Date horasalida;
+		private Integer minutosTolerancia;
+		private CatEntidadFederativa entidadFederativa;
+		private CatRiesgoPuesto riesgoPuesto;
+		private CatPeriodicidadPago periodicidadPago;
+		private CatTipoBajaEmpleado tipodebaja;
+		private CatBanco banco;
+		private Boolean sindicalizado;
+		private Boolean confianza;
+		private Boolean diaLunes;
+		private Boolean diaMartes;
+		private Boolean diaMiercoles;
+		private Boolean diaJueves;
+		private Boolean diaViernes;
+		private Boolean diaSabado;
+		private Boolean diaDomingo;
+		private String motivobaja;
+		private BigDecimal primaVacacional;
+		private BigDecimal diasAguinaldo;
+
+		public Builder() {
+		}
+
+		public Builder id(Integer id) {
+			this.id = id;
+			return this;
+		}
+
+		public Builder perfil(CatPerfil perfil) {
+			this.perfil = perfil;
+			return this;
+		}
+
+		public Builder empresa(CatEmpresa empresa) {
+			this.empresa = empresa;
+			return this;
+		}
+
+		public Builder planta(CatPlanta planta) {
+			this.planta = planta;
+			return this;
+		}
+
+		public Builder area(CatArea area) {
+			this.area = area;
+			return this;
+		}
+
+		public Builder puesto(CatPuesto puesto) {
+			this.puesto = puesto;
+			return this;
+		}
+
+		public Builder tipoContrato(CatTipoContrato tipoContrato) {
+			this.tipoContrato = tipoContrato;
+			return this;
+		}
+
+		public Builder tipoJornada(CatTipoJornada tipoJornada) {
+			this.tipoJornada = tipoJornada;
+			return this;
+		}
+
+		public Builder tipoRegimen(CatTipoRegimen tipoRegimen) {
+			this.tipoRegimen = tipoRegimen;
+			return this;
+		}
+
+		public Builder fechaIngreso(Date fechaIngreso) {
+			this.fechaIngreso = fechaIngreso;
+			return this;
+		}
+
+		public Builder fechaBaja(Date fechaBaja) {
+			this.fechaBaja = fechaBaja;
+			return this;
+		}
+
+		public Builder nss(String nss) {
+			this.nss = nss;
+			return this;
+		}
+
+		public Builder rfc(String rfc) {
+			this.rfc = rfc;
+			return this;
+		}
+
+		public Builder salarioDiario(BigDecimal salarioDiario) {
+			this.salarioDiario = salarioDiario;
+			return this;
+		}
+
+		public Builder horaEntrada(Date horaEntrada) {
+			this.horaEntrada = horaEntrada;
+			return this;
+		}
+
+		public Builder horasalida(Date horasalida) {
+			this.horasalida = horasalida;
+			return this;
+		}
+
+		public Builder minutosTolerancia(Integer minutosTolerancia) {
+			this.minutosTolerancia = minutosTolerancia;
+			return this;
+		}
+
+		public Builder entidadFederativa(CatEntidadFederativa entidadFederativa) {
+			this.entidadFederativa = entidadFederativa;
+			return this;
+		}
+
+		public Builder riesgoPuesto(CatRiesgoPuesto riesgoPuesto) {
+			this.riesgoPuesto = riesgoPuesto;
+			return this;
+		}
+
+		public Builder periodicidadPago(CatPeriodicidadPago periodicidadPago) {
+			this.periodicidadPago = periodicidadPago;
+			return this;
+		}
+
+		public Builder tipodebaja(CatTipoBajaEmpleado tipodebaja) {
+			this.tipodebaja = tipodebaja;
+			return this;
+		}
+
+		public Builder banco(CatBanco banco) {
+			this.banco = banco;
+			return this;
+		}
+
+		public Builder sindicalizado(Boolean sindicalizado) {
+			this.sindicalizado = sindicalizado;
+			return this;
+		}
+
+		public Builder confianza(Boolean confianza) {
+			this.confianza = confianza;
+			return this;
+		}
+
+		public Builder diaLunes(Boolean diaLunes) {
+			this.diaLunes = diaLunes;
+			return this;
+		}
+
+		public Builder diaMartes(Boolean diaMartes) {
+			this.diaMartes = diaMartes;
+			return this;
+		}
+
+		public Builder diaMiercoles(Boolean diaMiercoles) {
+			this.diaMiercoles = diaMiercoles;
+			return this;
+		}
+
+		public Builder diaJueves(Boolean diaJueves) {
+			this.diaJueves = diaJueves;
+			return this;
+		}
+
+		public Builder diaViernes(Boolean diaViernes) {
+			this.diaViernes = diaViernes;
+			return this;
+		}
+
+		public Builder diaSabado(Boolean diaSabado) {
+			this.diaSabado = diaSabado;
+			return this;
+		}
+
+		public Builder diaDomingo(Boolean diaDomingo) {
+			this.diaDomingo = diaDomingo;
+			return this;
+		}
+
+		public Builder motivobaja(String motivobaja) {
+			this.motivobaja = motivobaja;
+			return this;
+		}
+
+		public Builder primaVacacional(BigDecimal primaVacacional) {
+			this.primaVacacional = primaVacacional;
+			return this;
+		}
+
+		public Builder diasAguinaldo(BigDecimal diasAguinaldo) {
+			this.diasAguinaldo = diasAguinaldo;
+			return this;
+		}
+
+		public InfDatoEmpresa build() {
+			return new InfDatoEmpresa(this);
+		}
+	}
 }
