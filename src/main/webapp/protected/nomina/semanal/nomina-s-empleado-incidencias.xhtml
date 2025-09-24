@@ -1,0 +1,47 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+					<p:tab title="Incidencias">
+						<div class="ui-fluid formgrid grid">
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Incidencias"/>
+							</div>
+							<div class="field col-12 md:col-3">
+								
+							</div>
+							<div class="field col-12 md:col-3">
+								
+							</div>
+						</div>
+						<p:dataTable value="#{nominaS.nomina.incidencias}" var="incidencia">
+							<p:column headerText="Dia">
+								<p:outputLabel value="#{incidencia.fechaHoraEntrada}">
+									<f:convertDateTime pattern="EEEE" timeZone="GMT-6" locale="es_MX"/>
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Fecha">
+								<p:outputLabel value="#{incidencia.fechaHoraEntrada}">
+									<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX"/>
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Hora Entrada">
+								<p:outputLabel value="#{incidencia.fechaHoraEntrada}">
+									<f:convertDateTime pattern="HH:mm:ss" timeZone="GMT-6" locale="es_MX"/>
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Salida">
+								<p:outputLabel value="#{incidencia.fechaHoraSalida}">
+									<f:convertDateTime pattern="HH:mm:ss" timeZone="GMT-6" locale="es_MX"/>
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Status">
+								<p:outputLabel value="#{incidencia.descripcion}" />
+							</p:column>
+						</p:dataTable>
+					</p:tab>
+
+</ui:composition>

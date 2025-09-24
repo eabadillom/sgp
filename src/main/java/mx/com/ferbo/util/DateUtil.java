@@ -18,12 +18,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import mx.com.ferbo.model.InfDatoEmpresa;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import mx.com.ferbo.model.InfDatoEmpresa;
 
 public class DateUtil {
 
@@ -769,6 +771,33 @@ public class DateUtil {
 
         return days;
 
+    }
+    
+    public static int daysDiffNonInclusive(Date fechaInicio, Date fechaFin) {
+    	Date inicio = new Date(fechaInicio.getTime());
+    	Date fin = new Date(fechaFin.getTime());
+    	
+        resetTime(inicio);
+        long inicioMs = inicio.getTime();
+        
+        resetTime(fin);
+        long finMs = fin.getTime();
+
+        return (int) TimeUnit.DAYS.convert(finMs - inicioMs, TimeUnit.MILLISECONDS);
+    }
+    
+    public static int daysDiffInclusive(Date fechaInicio, Date fechaFin) {
+    	Date inicio = new Date(fechaInicio.getTime());
+    	Date fin = new Date(fechaFin.getTime());
+    	
+        resetTime(inicio);
+        long inicioMs = inicio.getTime();
+        
+        resetTime(fin);
+        long finMs = fin.getTime();
+
+        int diff = (int) TimeUnit.DAYS.convert(finMs - inicioMs, TimeUnit.MILLISECONDS);
+        return diff + 1;
     }
 
     public static long weeksDiff(LocalDate fechaIni, LocalDate fechaFin) {
