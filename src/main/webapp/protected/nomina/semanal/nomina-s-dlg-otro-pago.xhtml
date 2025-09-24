@@ -1,0 +1,35 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+			<p:dialog widgetVar="dlgAddOtroPago" header="Otro pago" modal="true">
+				<p:outputPanel id="dlg-add-otro-pago" styleClass="ui-fluid">
+					<p:outputLabel value="Otro pago (SAT)" />
+					<p:autoComplete var="otroPago" minQueryLength="3" value="#{nominaS.otroPago.tipoOtroPago}" completeMethod="#{nominaS.buscaTipoOtroPago}" itemLabel="#{otroPago.descripcion}" itemValue="#{otroPago}" converter="entityConverter" forceSelection="true" effect="fade" scrollHeight="250" placeholder="Escriba el código SAT o nombre del pago">
+						<p:ajax process="@this" />
+						<p:column width="3rem">
+							<p:outputLabel value="#{otroPago.clave}" />
+						</p:column>
+						<p:column width="auto">
+							<p:outputLabel value="#{otroPago.descripcion}" />
+						</p:column>
+					</p:autoComplete>
+					<p:outputLabel value="Descripción" />
+					<p:inputText value="#{nominaS.otroPago.nombre}">
+						<p:ajax process="@this" />
+					</p:inputText>
+					<p:outputLabel value="Importe exento" />
+					<p:inputNumber value="#{nominaS.otroPago.importe}" decimalPlaces="2" decimalSeparator="." symbol="$ " symbolPosition="p" placeholder="Importe" emptyValue="null" minValue="0.00">
+						<p:ajax process="@this" />
+					</p:inputNumber>
+				</p:outputPanel>
+				<f:facet name="footer">
+					<p:commandButton value="Aceptar" icon="pi pi-check" process="@this" actionListener="#{nominaS.agregarOtroPago()}" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
+					<p:commandButton value="Cancelar" icon="pi pi-times" styleClass="ui-button-outlined ui-button-secondary" oncomplete="PF('dlgAddOtroPago').hide();" />
+				</f:facet>
+			</p:dialog>
+
+</ui:composition>

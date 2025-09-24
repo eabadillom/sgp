@@ -28,6 +28,7 @@ import mx.com.ferbo.business.percepcion.SueldoPBL;
 import mx.com.ferbo.business.percepcion.VacacionesPBL;
 import mx.com.ferbo.business.percepcion.VacacionesReportadasPBL;
 import mx.com.ferbo.business.percepcion.ValesDespensaPBL;
+import mx.com.ferbo.business.registro.EstatusRegistroBL;
 import mx.com.ferbo.dao.n.NominaDAO;
 import mx.com.ferbo.dao.n.PercepcionEmpleadoDAO;
 import mx.com.ferbo.dao.n.RegistroDAO;
@@ -715,7 +716,8 @@ public class NominaSemanalBL extends NominaBL {
 		
 		//Empezamos indicando los días laborales que si debe presentarse a trabajar el empleado (Lunes a Viernes: 5 días, Luens a Sábado, 6 días).
 		//A partir de este conteo, se quitarán las asistencias y los días de descanso obligatorio, para determinar si efectivamente hubo ausencias.
-		iAusencias = listaDiasLaboralesEmpleado.size();
+//		iAusencias = listaDiasLaboralesEmpleado.size();
+		iAusencias = 0;
 		
 		for(String sDia : listaDiasLaboralesEmpleado) {
 			registro = mapAsistencias.get(sDia);
@@ -723,7 +725,10 @@ public class NominaSemanalBL extends NominaBL {
 			if(registro == null)
 				continue;
 			
-			iAusencias--;
+			if(!registro.getStatus().getCodigo().equalsIgnoreCase(EstatusRegistroBL.AUSENCIA))
+				continue;
+			
+			iAusencias++;
 		}
 		
 		ausencias = new BigDecimal(iAusencias).setScale(2, RoundingMode.HALF_UP);

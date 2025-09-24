@@ -1,0 +1,68 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+			<p:dataTable id="dtNomina" widgetVar="dt-Nomina" var="nomina" value="#{nominaS.listaNomina}" lazy="true" reflow="true" paginatorPosition="bottom">
+				<p:column headerText="Num" width="4rem">
+					<h:outputText value="#{nomina.receptor.numeroEmpleado}" styleClass="customer-badge status-#{nominaS.statusNomina(nomina)}" />
+				</p:column>
+				<p:column headerText="Empleado">
+					<h:outputText value="#{nomina.receptor.nombre}" />
+				</p:column>
+				<p:column headerText="Percepciones" width="7rem" style="text-align: right;">
+					<h:outputText value="#{nomina.subtotal}">
+						<f:convertNumber pattern="$ #,##0.00" />
+					</h:outputText>
+				</p:column>
+				<p:column headerText="Deducciones" width="7rem" style="text-align: right;">
+					<p:outputLabel value="#{nomina.descuento}">
+						<f:convertNumber pattern="$ #,##0.00" />
+					</p:outputLabel>
+				</p:column>
+				<p:column headerText="Neto" width="7rem" style="text-align: right;">
+					<p:outputLabel value="#{nomina.total}">
+						<f:convertNumber pattern="$ #,##0.00" />
+					</p:outputLabel>
+				</p:column>
+				<p:column width="3rem" style="text-align: right;">
+					<p:commandButton icon="pi pi-bars" actionListener="#{nominaS.cargaEmpleadoNomina(nomina)}" process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dgEmpleado').show();" update="form:dg-empleado" />
+				</p:column>
+				
+				<p:columnGroup type="footer">
+					<p:row>
+						<p:column footerText="." style="color: rgba(255, 255, 255, 0);" />
+						<p:column style="text-align:right;" footerText="Total:"/>
+						<p:column style="text-align:right;">
+							<f:facet name="footer">
+								<h:outputText value="#{nominaS.listaNomina.stream().map(item -> item.subtotal).sum()}">
+									<f:convertNumber pattern="$ #,##0.00" />
+								</h:outputText>
+							</f:facet>
+						</p:column>
+						<p:column style="text-align:right;">
+							<f:facet name="footer">
+								<h:outputText value="#{nominaS.listaNomina.stream().map(item -> item.descuento).sum()}">
+									<f:convertNumber pattern="$ #,##0.00" />
+								</h:outputText>
+							</f:facet>
+						</p:column>
+						<p:column style="text-align:right;">
+							<f:facet name="footer">
+								<p:outputLabel value="#{nominaS.listaNomina.stream().map(item -> item.total).sum()}">
+									<f:convertNumber pattern="$ #,##0.00" />
+								</p:outputLabel>
+							</f:facet>
+						</p:column>
+						<p:column width="3rem">
+							<f:facet name="footer">
+								<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+							</f:facet>
+						</p:column>
+					</p:row>
+				</p:columnGroup>
+			</p:dataTable>
+
+</ui:composition>

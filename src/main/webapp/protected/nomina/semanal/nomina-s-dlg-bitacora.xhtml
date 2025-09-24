@@ -1,0 +1,25 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+			<p:dialog widgetVar="dgBitacora" header="Bitácora de operaciones" modal="true" responsive="true" position="center top" height="100%" width="100%" resizable="false" showEffect="fade" hideEffect="fade">
+				<p:outputPanel id="pnl-bitacora"
+				               style="overflow:auto; height:30rem; width:100%; background-color:#f4f4f4; border:1px solid #ccc;">
+				    <pre id="bitacoraTexto" style="font-family: monospace;">#{nominaS.bitacora}</pre>
+				</p:outputPanel>
+				<f:facet name="footer">
+					<span style="padding-left: 0.5rem; padding-right: 0.5rem;">
+					</span>
+					<p:commandButton id="descargarBitacora" value="Descargar" actionListener="#{nominaS.descargarBitacora()}" icon="pi pi-download" styleClass="edit-button" ajax="false">
+						<p:fileDownload value="#{nominaE.file}" />
+					</p:commandButton>
+					<p:commandButton icon="pi pi-copy" value="Copiar Bitácora" type="button" onclick="copiarBitacora();" />
+					<p:commandButton icon="pi pi-times" value="Cerrar" type="button" onclick="PF('dgBitacora').hide();" styleClass="ui-button-outlined ui-button-secondary" />
+				</f:facet>
+			</p:dialog>
+
+
+</ui:composition>

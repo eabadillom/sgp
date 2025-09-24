@@ -1,0 +1,32 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+					<p:tab title="Vacaciones">
+						<p:toolbar>
+							<p:toolbarGroup>
+								<p:commandButton value="Agregar" icon="pi pi-plus" process="@this" actionListener="#{nominaS.agregaPeriodoVacacional()}">
+								</p:commandButton>
+							</p:toolbarGroup>
+						</p:toolbar>
+						<p:dataTable value="#{nominaS.nomina.vacaciones}" var="periodo">
+							<p:column headerText="Inicio periodo">
+								<p:outputLabel value="#{periodo.fechaInicio}">
+									<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX"/>
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Fin periodo">
+								<p:outputLabel value="#{periodo.fechaFin}">
+									<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX"/>
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Dias">
+								<p:outputLabel value="#{periodo.diasTotales}"/>
+							</p:column>
+						</p:dataTable>
+					</p:tab>
+
+</ui:composition>
