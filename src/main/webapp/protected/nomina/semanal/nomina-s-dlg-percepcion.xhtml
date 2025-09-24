@@ -1,0 +1,62 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+			<p:dialog widgetVar="dlgAddPercepcion" header="Percepcion" modal="true">
+				<p:outputPanel id="dlg-add-percepcion" styleClass="ui-fluid">
+					<div class="ui-fluid formgrid grid">
+						<div class="field col-12 md:col-6">
+							<p:outputLabel value="Catálogo de percepciones" />
+							<p:selectOneMenu id="percepcion" value="#{nominaS.percepcionCatalogo}" filter="true" filterMatchMode="contains" filterPlaceholder="Concepto" converter="entityConverter">
+								<f:selectItem itemLabel="--Seleccione--" noSelectionOption="true" />
+								<f:selectItems value="#{nominaS.catalogoPercepciones}" var="percepcion" itemLabel="#{percepcion.nombre}" itemValue="#{percepcion}" />
+								<p:ajax process="@this" event="change" update="nombrePercepcion tipoPercepcion cantidad importeExento importeGravado" listener="#{nominaS.setPercepcionCatalogo()}"/>
+							</p:selectOneMenu>
+						</div>
+					</div>
+					<p:separator />
+					<div class="ui-fluid formgrid grid">
+						<div class="field col-12 md:col-6">
+							<p:outputLabel value="Descripción" />
+							<p:inputText id="nombrePercepcion" value="#{nominaS.percepcion.nombre}">
+								<p:ajax process="@this" />
+							</p:inputText>
+						</div>
+						<div class="field col-12 md:col-6">
+							<p:outputLabel value="Tipo percepción (SAT)" />
+							<p:selectOneMenu id="tipoPercepcion" value="#{nominaS.percepcion.tipoPercepcion}" filter="true" filterMatchMode="contains" converter="entityConverter" autoWidth="false">
+								<f:selectItem itemLabel="--Seleccione--" noSelectionOption="true" />
+								<f:selectItems value="#{nominaS.tiposPercepcion}" var="tipoPercepcion" itemLabel="#{tipoPercepcion.clave} - #{tipoPercepcion.descripcion}" itemValue="#{percepcion}" />
+							</p:selectOneMenu>
+						</div>
+						<div class="field col-12 md:col-3">
+							<p:outputLabel value="Cantidad"/>
+							<p:inputNumber id="cantidad" value="#{nominaS.percepcion.cantidad}" decimalPlaces="4" decimalSeparator="." placeholder="cantidad" emptyValue="null" minValue="0.0000" >
+								<p:ajax process="@this" />
+							</p:inputNumber>
+						</div>
+						<div class="field col-12 md:col-3">
+							<p:outputLabel value="Importe exento"/>
+							<p:inputNumber id="importeExento" value="#{nominaS.percepcion.importeExento}" decimalPlaces="2" decimalSeparator="." symbol="$ " symbolPosition="p" placeholder="importe exento" emptyValue="null" minValue="0.00" >
+								<p:ajax process="@this" />
+							</p:inputNumber>
+						</div>
+						<div class="field col-12 md:col-3">
+							<p:outputLabel value="Importe gravado"/>
+							<p:inputNumber id="importeGravado" value="#{nominaS.percepcion.importeGravado}" decimalPlaces="2" decimalSeparator="." symbol="$ " symbolPosition="p" placeholder="importe gravado" emptyValue="null" minValue="0.00" >
+								<p:ajax process="@this" />
+							</p:inputNumber>
+						</div>
+					</div>
+				</p:outputPanel>
+				<f:facet name="footer">
+					<p:commandButton value="Aceptar" icon="pi pi-check" process="@this" actionListener="#{nominaS.agregarPercepcion()}" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
+					<p:commandButton value="Cancelar" icon="pi pi-times" styleClass="ui-button-outlined ui-button-secondary" oncomplete="PF('dlgAddPercepcion').hide();" />
+				</f:facet>
+			</p:dialog>
+
+
+</ui:composition>

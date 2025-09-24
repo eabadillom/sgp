@@ -1,0 +1,46 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+					<p:tab title="General">
+						<div class="ui-fluid formgrid grid">
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Ejercicio"/>
+								<p:inputText value="#{nominaS.nomina.ejercicio}" readonly="true" style="text-align: right;"/>
+							</div>
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Periodo"/>
+								<p:inputText value="Semana #{nominaS.nomina.periodo}" readonly="true" style="text-align: right;"/>
+							</div>
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Dias laborados"/>
+								<p:inputNumber value="#{nominaS.nomina.diasLaborados}" symbol=" días" symbolPosition="s" inputStyle="text-align: right"/>
+							</div>
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Faltas"/>
+								<p:inputNumber value="#{nominaS.nomina.diasNoLaborados}" symbol=" días" symbolPosition="s" inputStyle="text-align: right"/>
+							</div>
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Dias pagados"/>
+								<p:inputNumber value="#{nominaS.nomina.diasPagados}" symbol=" días" symbolPosition="s" inputStyle="text-align: right"/>
+							</div>
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Subtotal"/>
+								<p:inputNumber value="#{nominaS.nomina.subtotal}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," readonly="true" inputStyle="text-align: right"/>
+							</div>
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Descuentos" />
+								<p:inputNumber value="#{nominaS.nomina.descuento}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," readonly="true" inputStyle="text-align: right"/>
+							</div>
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Total" />
+								<p:inputNumber value="#{nominaS.nomina.total}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," readonly="true" inputStyle="text-align: right"/>
+							</div>
+						</div>
+					</p:tab>
+
+
+</ui:composition>

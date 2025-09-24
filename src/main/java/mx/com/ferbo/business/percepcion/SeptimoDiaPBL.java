@@ -4,6 +4,7 @@ import static mx.com.ferbo.enums.ValoresBD._CERO;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Date;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,6 +13,7 @@ import mx.com.ferbo.business.nomina.ParametrosNomina;
 import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
+import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.SGPException;
 
 public class SeptimoDiaPBL extends PercepcionBL {
@@ -21,15 +23,7 @@ public class SeptimoDiaPBL extends PercepcionBL {
 	private BigDecimal diasNoLaborales  = null;
 	private BigDecimal diasVacaciones   = null;
 	private BigDecimal diasTrabajados   = null;
-	
-	public SeptimoDiaPBL(ParametrosNomina parametros, DetNomina nomina, BigDecimal diasLaborales, BigDecimal diasNoLaborales, BigDecimal diasTrabajados, BigDecimal diasVacaciones) {
-		super(parametros, nomina);
-		this.baseCalculo = this.nomina.getReceptor().getSalarioDiario();
-		
-		this.diasNoLaborales = diasNoLaborales;
-		this.diasTrabajados = diasTrabajados;
-		this.diasVacaciones = diasVacaciones;
-	}
+	private Date       incidenciaInicio = null;
 	
 	public SeptimoDiaPBL(ParametrosNomina parametros, DetNomina nomina) {
 		super(parametros, nomina);
@@ -37,6 +31,7 @@ public class SeptimoDiaPBL extends PercepcionBL {
 		this.diasTrabajados = nomina.getDiasLaborados();
 		this.diasVacaciones = nomina.getDiasVacaciones();
 		this.diasNoLaborales = nomina.getDiasNoLaborales();
+		this.incidenciaInicio = parametros.getIncidenciaInicio();
 	}
 
 	@Override
@@ -85,6 +80,21 @@ public class SeptimoDiaPBL extends PercepcionBL {
 		BigDecimal cantidad = null;
 		BigDecimal t = null;
 		BigDecimal proporcionalSemanal = null;
+		Boolean inicioEntrePeriodo = null;
+		Integer iDiasSinRelacionLaboral = 0;
+		BigDecimal diasSinRelacionLaboral = null;
+		
+		inicioEntrePeriodo     = DateUtil.isDateBetween(nomina.getReceptor().getInicioRelacionLaboral(), DateUtil.toDate(nomina.getPeriodoInicio()), DateUtil.toDate(nomina.getPeriodoFin()));
+		log.info("Inicio periodo: {}, Inicio relación laboral: {}, Fin periodo: {}", nomina.getPeriodoInicio(), nomina.getReceptor().getInicioRelacionLaboral(), nomina.getPeriodoFin());
+		
+		if(inicioEntrePeriodo) {
+			iDiasSinRelacionLaboral = DateUtil.daysDiffNonInclusive(this.incidenciaInicio, nomina.getReceptor().getInicioRelacionLaboral());
+			iDiasSinRelacionLaboral = iDiasSinRelacionLaboral - this.diasNoLaborales.intValue();
+		}
+		
+		diasSinRelacionLaboral = new BigDecimal(iDiasSinRelacionLaboral).setScale(0, RoundingMode.HALF_UP);
+		
+		log.info("El empleado tiene inicio de relación laboral dentro del periodo de nómina: Fecha Inicio relación laboral: {}", nomina.getReceptor().getInicioRelacionLaboral());
 		
 		t = new BigDecimal(parametros.getDiasPeriodo())
 				.setScale(2, RoundingMode.HALF_UP)
@@ -92,6 +102,7 @@ public class SeptimoDiaPBL extends PercepcionBL {
 				.setScale(2, RoundingMode.HALF_UP);
 		
 		proporcionalSemanal = diasTrabajados
+				.add(diasSinRelacionLaboral)
 				.add(diasVacaciones)
 				.divide(t, 4, RoundingMode.HALF_UP)
 				;

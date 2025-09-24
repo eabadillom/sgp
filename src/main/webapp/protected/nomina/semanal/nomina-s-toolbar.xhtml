@@ -1,0 +1,23 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+			<p:toolbar>
+				<p:toolbarGroup align="right">
+					<div style="padding-left: 0.5rem; padding-right: 0.5rem;">
+						<p:commandButton icon="pi pi-book" title="Ver bitácora" onstart="PF('statusInfoDialog').show();" actionListener="#{nominaS.cargarBitacora()}" oncomplete="PF('statusInfoDialog').hide();PF('dgBitacora').show();" update="form:pnl-bitacora"/>
+					</div>
+					<div style="padding-left: 0.5rem; padding-right: 0.5rem;">
+						<p:commandButton icon="pi pi-save" title="Guardar" onstart="PF('statusInfoDialog').show();" actionListener="#{nominaS.guardarNominaEmpleado}" oncomplete="PF('statusInfoDialog').hide();">
+							<p:confirm header="Guardar nómina" message="¿Está seguro que guardar la nómina de los empleados seleccionados?" icon="pi pi-exclamation-triangle" />
+						</p:commandButton>
+					</div>
+					<div style="padding-left: 0.5rem; padding-right: 0.5rem;">
+						<p:commandButton icon="pi pi-qrcode" title="Timbrar"></p:commandButton>
+					</div>
+				</p:toolbarGroup>
+			</p:toolbar>
+
+</ui:composition>

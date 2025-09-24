@@ -1,0 +1,35 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+			<p:dialog widgetVar="dlgAddDeduccion" header="Deduccion" modal="true">
+				<p:outputPanel id="dlg-add-deduccion" styleClass="ui-fluid">
+					<p:outputLabel value="Deduccion (SAT)" />
+					<p:autoComplete var="deduccion" minQueryLength="3" value="#{nominaS.deduccion.tipoDeduccion}" completeMethod="#{nominaS.buscaTipoDeduccion}" itemLabel="#{deduccion.descripcion}" itemValue="#{deduccion}" converter="entityConverter" forceSelection="true" effect="fade" scrollHeight="250" placeholder="Escriba el código SAT o nombre de la deducción">
+						<p:ajax process="@this" />
+						<p:column width="3rem">
+							<p:outputLabel value="#{deduccion.clave}"/>
+						</p:column>
+						<p:column width="auto">
+							<p:outputLabel value="#{deduccion.descripcion}" />
+						</p:column>
+					</p:autoComplete>
+					<p:outputLabel value="Descripcion"/>
+					<p:inputText value="#{nominaS.deduccion.nombre}">
+						<p:ajax process="@this" />
+					</p:inputText>
+					<p:outputLabel value="Importe"/>
+					<p:inputNumber value="#{nominaS.deduccion.importe}" decimalPlaces="2" decimalSeparator="." symbol="$ " symbolPosition="p" placeholder="importe" emptyValue="null" minValue="0.00">
+						<p:ajax process="@this" />
+					</p:inputNumber>
+				</p:outputPanel>
+				<f:facet name="footer">
+					<p:commandButton value="Aceptar" icon="pi pi-check" process="@this" actionListener="#{nominaS.agregarDeduccion()}" update="tv-nomina" />
+					<p:commandButton value="Cancelar" icon="pi pi-times" styleClass="ui-button-outlined ui-button-secondary" oncomplete="PF('dlgAddDeduccion').hide();" />
+				</f:facet>
+			</p:dialog>
+
+</ui:composition>
