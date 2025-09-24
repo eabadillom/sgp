@@ -1,0 +1,39 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+			<p:dialog id="dg-empleado" widgetVar="dgEmpleado" header="#{nominaS.nomina.receptor.nombre}" modal="true" responsive="true" position="center top" height="100%" resizable="false" showEffect="fade" hideEffect="fade">
+				<p:tabView id="tv-nomina" class="ui-fluid" dynamic="true" cache="true" effect="drop">
+					<p:ajax event="tabChange" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dgEmpleado').initPosition();"/>
+					
+					<ui:include src="/protected/nomina/semanal/nomina-s-empleado-datos-generales.xhtml" />
+					<ui:include src="/protected/nomina/semanal/nomina-s-empleado-emisor.xhtml" />
+					<ui:include src="/protected/nomina/semanal/nomina-s-empleado-receptor.xhtml" />
+					<ui:include src="/protected/nomina/semanal/nomina-s-empleado-incidencias.xhtml" />
+					<ui:include src="/protected/nomina/semanal/nomina-s-empleado-vacaciones.xhtml" />
+					<ui:include src="/protected/nomina/semanal/nomina-s-empleado-percepciones.xhtml" />
+					<ui:include src="/protected/nomina/semanal/nomina-s-empleado-otros-pagos.xhtml" />
+					<ui:include src="/protected/nomina/semanal/nomina-s-empleado-deducciones.xhtml" />
+					
+				</p:tabView>
+				<f:facet name="footer">
+					<span style="padding-left: 0.5rem; padding-right: 0.5rem;">
+						<p:commandButton value="Eliminar" icon="pi pi-trash" actionListener="#{nominaS.eliminarNomina()}" rendered="#{nominaS.nomina.id ne null}" disabled="#{nominaS.nomina.uuid ne null}" styleClass="ui-button-outlined ui-button-danger" update="form:dtNomina">
+							<p:confirm header="Eliminar nómina" message="¿Está seguro que eliminar la nómina del empleado?" icon="pi pi-exclamation-triangle" />
+						</p:commandButton>
+					</span>
+					<span style="padding-left: 0.5rem; padding-right: 0.5rem;">
+						<p:commandButton value="Guardar" icon="pi pi-save" actionListener="#{nominaS.actualizarNomina}" process="@this" disabled="#{nominaS.nomina.id ne null}" update="form:dtNomina" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();">
+							<p:confirm header="Guardar nómina" message="¿Está seguro que guardar la nómina del empleado?" icon="pi pi-exclamation-triangle" />
+						</p:commandButton>
+					</span>
+					<span style="padding-left: 0.5rem; padding-right: 0.5rem;">
+						<p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dgEmpleado').hide();" styleClass="ui-button-outlined ui-button-secondary" />
+					</span>
+				</f:facet>
+			</p:dialog>
+
+</ui:composition>

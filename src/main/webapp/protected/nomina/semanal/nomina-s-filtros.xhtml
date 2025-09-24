@@ -1,0 +1,50 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:ui="http://java.sun.com/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+			<div class="ui-fluid formgrid grid align-items-left">
+				<div class="field col-12 md:col-2">
+					<p:outputLabel value="Emisor" />
+					<p:selectOneMenu id="soEmpresa" value="#{nominaS.empresaSelected}" autoWidth="false" converter="entityConverter">
+						<f:selectItem itemLabel="--Seleccione--"/>
+						<f:selectItems value="#{nominaS.lstEmpresas}" var="empresa" itemValue="#{empresa}" itemLabel="#{empresa.descripcion}"/>
+						<p:ajax event="change" process="@this" listener="#{nominaS.calculaPeriodo()}" update="anio semana dp-periodo-inicio dp-periodo-fin" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
+					</p:selectOneMenu>
+				</div>
+				<div class="field col-12 md:col-2">
+					<p:outputLabel value="Año" />
+					<p:spinner id="anio" value="#{nominaS.anio}" buttons="horizontal">
+						<p:ajax event="change" process="@this" update="semana dp-periodo-inicio dp-periodo-fin" listener="#{nominaS.calculaSemanas()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"></p:ajax>
+					</p:spinner>
+				</div>
+				<div class="field col-12 md:col-2">
+					<p:outputLabel value="Periodo" />
+					<p:selectOneMenu id="semana" value="#{nominaS.semana}" filter="true" filterMatchMode="contains" filterPlaceholder="Número de semana">
+						<f:selectItem itemLabel="--Seleccione--" noSelectionOption="true"/>
+						<f:selectItems  value="#{nominaS.semanasDelAnio}" var="periodo" itemLabel="Semana #{periodo}" itemValue="#{periodo}" />
+						<p:ajax event="change"  update="anio semana dp-periodo-inicio dp-periodo-fin" process="@this" listener="#{nominaS.calculaPeriodo()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
+					</p:selectOneMenu>
+				</div>
+				<div class="field col-12 md:col-2">
+					<p:outputLabel value="Del" />
+					<p:inputText id="dp-periodo-inicio" value="#{nominaS.periodoInicio}" readonly="true">
+						<f:convertDateTime pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6" />
+					</p:inputText>
+					
+				</div>
+				<div class="field col-12 md:col-2">
+					<p:outputLabel value="al" />
+					<p:inputText id="dp-periodo-fin" value="#{nominaS.periodoFin}" readonly="true">
+						<f:convertDateTime pattern="dd/MM/yyyy" locale="es_MX" timeZone="GMT-6" />
+					</p:inputText>
+					
+				</div>
+				<div class="field col-12 md:col-2">
+					<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+					<p:commandButton value="Calcular" process="@this" update="dtNomina" actionListener="#{nominaS.calculandoNomina()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
+				</div>
+			</div>
+
+</ui:composition>
