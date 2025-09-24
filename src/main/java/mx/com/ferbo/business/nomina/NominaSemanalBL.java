@@ -614,6 +614,8 @@ public class NominaSemanalBL extends NominaBL {
 		Date                     diaNLEntrada     = null;
 		Date                     diaNLSalida      = null;
 		CatEstatusRegistro       statusDescanso   = null;
+		Date                     incidenciaInicio = null;
+		Date                     incidenciaFin    = null;
 		
 		statusRegistros = parametros.getStatusRegistros();
 		
@@ -624,7 +626,15 @@ public class NominaSemanalBL extends NominaBL {
 		
 		mapAsistencias = new HashMap<String, DetRegistro>();
 		registroDAO = new RegistroDAO();
-		listaAsistencias = registroDAO.buscar(empleado.getIdEmpleado(), parametros.getIncidenciaInicio(), parametros.getIncidenciaFin());
+		
+		if(DateUtil.isDateBetween(empleado.getDatoEmpresa().getFechaIngreso(), parametros.getIncidenciaInicio(), parametros.getIncidenciaFin()))
+			incidenciaInicio = new Date(empleado.getDatoEmpresa().getFechaIngreso().getTime());
+		else
+			incidenciaInicio = new Date(parametros.getIncidenciaInicio().getTime());
+		
+		incidenciaFin = new Date(parametros.getIncidenciaFin().getTime());
+		
+		listaAsistencias = registroDAO.buscar(empleado.getIdEmpleado(), incidenciaInicio, incidenciaFin);
 		for(DetRegistro registro : listaAsistencias) {
 			diaSemana = DateUtil.getDiaSemana(registro.getFechaEntrada());
 			if(mapAsistencias.containsKey(diaSemana))
