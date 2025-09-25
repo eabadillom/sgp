@@ -393,7 +393,7 @@ public class NominaSemanalBean implements Serializable {
 			}
 			
 			NominaBL.agregarPercepcion(nomina, primaVacacional);
-			
+			NominaBL.calcularTotales(nomina, parametros);
 			PrimeFaces.current().executeScript("PF('dlgAddPeriodoVacacional').hide();");
 		} catch(Exception ex) {
 			log.error("Problema para agregar el periodo vacacional", ex);
