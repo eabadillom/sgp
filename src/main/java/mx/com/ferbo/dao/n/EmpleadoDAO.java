@@ -359,7 +359,7 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
 
         return modelList;
     }
-
+    
     public List<DetEmpleado> buscarTodos(boolean isFullInfo) {
         List<DetEmpleado> modelList = null;
         EntityManager emSGP = null;
