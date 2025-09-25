@@ -1,6 +1,7 @@
 package mx.com.ferbo.business.empleado;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -148,6 +149,22 @@ public class EmpleadoBL {
     		empleado.setDomicilio(new DetDomicilioEmpleado());
 			empleado.getDomicilio().setEmpleado(empleado);
     	}
+    }
+    
+    public static List<DetEmpleado> buscarActivosPorEmpresa(Integer idEmpresa, Date periodoPagoInicio, Date periodoPagoFin) {
+    	List<DetEmpleado> empleados = null;
+    	EmpleadoDAO empleadoDAO = new EmpleadoDAO();
+    	
+    	List<DetEmpleado> resultado= empleadoDAO.buscarActivoEmpresaIngreso(idEmpresa, periodoPagoInicio, periodoPagoFin);
+		empleados = resultado.stream()
+				.sorted(Comparator.comparing(EmpleadoBL::obtenerNombreArea).reversed())
+				.collect(Collectors.toList());
+    	
+    	return empleados;
+    }
+    
+    private static String obtenerNombreArea(DetEmpleado empleado) {
+    	return empleado.getDatoEmpresa().getArea().getDescripcion();
     }
 
     public static void validarDatosEmpleado(DetEmpleado empleadoporvalidar) {
