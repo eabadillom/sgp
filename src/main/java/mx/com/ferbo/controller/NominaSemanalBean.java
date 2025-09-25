@@ -23,6 +23,7 @@ import org.primefaces.PrimeFaces;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 
+import mx.com.ferbo.business.empleado.EmpleadoBL;
 import mx.com.ferbo.business.nomina.NominaBL;
 import mx.com.ferbo.business.nomina.NominaPeriodoBL;
 import mx.com.ferbo.business.nomina.NominaSemanalBL;
@@ -195,7 +196,7 @@ public class NominaSemanalBean implements Serializable {
     		log.info("Cargando nómina para el periodo {}", this.nominaPeriodo);
     		
     		this.listaNomina.clear();
-    		listaEmpleados = empleadoDAO.buscarActivoEmpresaIngreso(empresaSelected.getIdEmpresa(), this.periodoInicio, this.periodoFin);
+    		listaEmpleados = EmpleadoBL.buscarActivosPorEmpresa(empresaSelected.getIdEmpresa(), this.periodoInicio, this.periodoFin);
     		this.procesaListaEmpleados(listaEmpleados);
     		
     		mensaje = "Nomina cargada correctamente.";
