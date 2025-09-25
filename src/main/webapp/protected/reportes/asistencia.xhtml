@@ -53,10 +53,10 @@
                         <f:selectItem itemLabel="Todas las plantas"></f:selectItem>
                         <f:selectItems value="#{repAsistenciaBean.plantas}" var="planta" itemLabel="#{planta.descripcion}" itemValue="#{planta}"></f:selectItems>
                     </p:selectOneMenu>
-                    <p:datePicker showIcon="true" placeholder="Del: dd/mm/aaaa" value="#{repAsistenciaBean.fechaInicio}" locale="es" pattern="dd/MM/yyyy" timeZone="GMT-6" readonly="false">
+                    <p:datePicker showIcon="true" placeholder="Del: dd/mm/aaaa" value="#{repAsistenciaBean.fechaInicio}" locale="es_MX" pattern="dd/MM/yyyy" timeZone="GMT-6" readonly="false">
                         <p:ajax event="dateSelect" listener="#{repAsistenciaBean.ajustaHoras}" process="@this"></p:ajax>
                     </p:datePicker>
-                    <p:datePicker showIcon="true" placeholder="Del: dd/mm/aaaa" value="#{repAsistenciaBean.fechaFin}" locale="es" pattern="dd/MM/yyyy" timeZone="GMT-6" readonly="false">
+                    <p:datePicker showIcon="true" placeholder="Del: dd/mm/aaaa" value="#{repAsistenciaBean.fechaFin}" locale="es_MX" pattern="dd/MM/yyyy" timeZone="GMT-6" readonly="false">
                         <p:ajax event="dateSelect" listener="#{repAsistenciaBean.ajustaHoras}" process="@this"></p:ajax>
                     </p:datePicker>
                     <p:commandButton value="Buscar" icon="pi pi-search" process="pnl-buscar @this" update="dt-registros :form:cmd-exportar-pdf" actionListener="#{repAsistenciaBean.cargaInfo}" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
@@ -135,14 +135,14 @@
                 	<div class="ui-g">
                 		<div class="ui-g-6">
 	                        <p:datePicker id="fechaEntrada" value="#{repAsistenciaBean.registroSelected.fechaEntrada}"
-	                        			pattern="dd/MM/yyyy HH:mm:ss" timeOnly="false"
+	                        			pattern="dd/MM/yyyy HH:mm:ss" timeOnly="false" locale="es_MX"
 										readonlyInput="false" timeZone="GMT-6" 
 										disabled="false" inline="true" showTime="true" timeInput="true" disabledDates="#{repAsistenciaBean.diasDesabilitados}">
 							</p:datePicker>
 	                    </div>
 	                    <div class="ui-g-6">
 	                        <p:datePicker id="fechaSalida" value="#{repAsistenciaBean.registroSelected.fechaSalida}"
-	                        			pattern="dd/MM/yyyy HH:mm:ss" timeOnly="false"
+	                        			pattern="dd/MM/yyyy HH:mm:ss" timeOnly="false" locale="es_MX"
 										readonlyInput="false" timeZone="GMT-6" 
 										panelStyleClass="ferbo-datePicker-panel" disabled="false" inline="true" showTime="true" timeInput="true" disabledDates="#{repAsistenciaBean.diasDesabilitados}">
 							</p:datePicker>
