@@ -2,13 +2,17 @@ package mx.com.ferbo.business.percepcion;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.nomina.ParametrosNomina;
+import mx.com.ferbo.business.registro.EstatusRegistroBL;
 import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.DetNomina;
+import mx.com.ferbo.model.DetNominaIncidencia;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.util.SGPException;
 
@@ -56,8 +60,18 @@ public class BonoPuntualidadPBL extends PercepcionBL {
 	@Override
 	public DetNominaPercepcion procesar(DetNomina nomina, BigDecimal cantidad) {
 		DetNominaPercepcion percepcion = null;
-		
+		List<DetNominaIncidencia> ausencias = null;
+				
 		try {
+			ausencias = nomina.getIncidencias().stream()
+					.filter(item -> EstatusRegistroBL.AUSENCIA.equalsIgnoreCase(item.getClave()))
+					.collect(Collectors.toList())
+					;
+			log.info("[UI] Ausencias: {}", ausencias.size());
+			
+			if(ausencias.size() > 0)
+				throw new SGPException("[UI] El empleado tiene ausencias. No es posible asignar bono de puntualidad");
+			
 			this.cantidad = cantidad;
 			this.importe = this.calcularImporte(this.cantidad, this.baseCalculo);
 			
