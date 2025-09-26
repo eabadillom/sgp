@@ -125,6 +125,12 @@ public class NominaDAO extends BaseDAO<DetNomina, Integer> {
 					;
 			log.debug("periodo inicio {}, periodo fin {}, rfc {}");
 			
+			modelList.stream().forEach(item -> {
+				item.getPercepciones().forEach(p -> log.debug("Percepcion: {}", p.getId()));
+				item.getDeducciones().forEach(d -> log.debug("Deduccion: {}", d.getId()));
+				item.getOtrosPagos().forEach(o -> log.debug("Otro pago: {}", o.getId()));
+			});
+			
 		} catch(Exception ex) {
 			log.error("Problema para obtener la lista de nomina del periodo solicitado...", ex);
 		} finally {
