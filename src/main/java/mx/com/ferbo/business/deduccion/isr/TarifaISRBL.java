@@ -14,11 +14,11 @@ public class TarifaISRBL {
 	
 	private static Logger log = LogManager.getLogger(TarifaISRBL.class);
 	
-	private List<CatTarifaISR> tablaISRSemanal = null;
+	private List<CatTarifaISR> tablaISR = null;
 	private BigDecimal baseISR = null;
 	
-	public TarifaISRBL(List<CatTarifaISR> tablaISRSemanal, BigDecimal baseISR) {
-		this.tablaISRSemanal = tablaISRSemanal;
+	public TarifaISRBL(List<CatTarifaISR> tablaISR, BigDecimal baseISR) {
+		this.tablaISR = tablaISR;
 		this.baseISR = baseISR;
 	}
 
@@ -29,15 +29,15 @@ public class TarifaISRBL {
 		if(this.baseISR == null)
 			throw new SGPException("No se proporcionó la base para el ISR.");
 		
-		if(this.tablaISRSemanal == null)
+		if(this.tablaISR == null)
 			throw new SGPException("No se proporcionó la tabla de ISR.");
 		
-		if(this.tablaISRSemanal.size() <= 0)
+		if(this.tablaISR.size() <= 0)
 			throw new SGPException("No se proporcionó la tabla de ISR.");
 		
 		
 		try {
-			resultList = this.tablaISRSemanal.stream()
+			resultList = this.tablaISR.stream()
 					.filter(i -> i.getLimiteInferior().compareTo(baseISR) <= 0 
 					&& i.getLimiteSuperior().compareTo(baseISR) >= 0)
 					.collect(Collectors.toList());
