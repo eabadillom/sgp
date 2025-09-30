@@ -713,6 +713,7 @@ public class NominaSemanalBean implements Serializable {
 		String titulo = "Nómina";
 		
     	try {
+    		NominaSemanalBL.procesarISR(this.parametros, this.nomina);
     		NominaBL.calcularTotales(nomina, parametros);
     	} catch(Exception ex) {
     		log.error("Problema para recalcular la nómina...", ex);
