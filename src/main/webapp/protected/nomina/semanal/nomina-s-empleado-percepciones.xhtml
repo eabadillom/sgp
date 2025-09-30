@@ -26,17 +26,17 @@
 							</p:column>
 							<p:column headerText="Importe" width="6rem" style="text-align: right;">
 								<p:inputNumber value="#{percepcion.importe}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," inputStyle="text-align: right" readonly="#{nominaS.nomina.id ne null}">
-									<p:ajax process="@this" update="form:tv-nomina" event="change" listener="#{nominaS.actualizarImporte(percepcion)}"/>
+									<p:ajax process="@this" update="form:tv-nomina" event="change" listener="#{nominaS.actualizarImporte(percepcion)}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
 								</p:inputNumber>
 							</p:column>
 							<p:column headerText="Exento" width="6rem" style="text-align: right;">
 								<p:inputNumber value="#{percepcion.importeExento}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," inputStyle="text-align: right" readonly="true">
-									<p:ajax process="@this" update="form:tv-nomina" event="change" listener="#{nominaS.actualizar()}"/>
+									<p:ajax process="@this" update="form:tv-nomina" event="change" listener="#{nominaS.actualizar()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
 								</p:inputNumber>
 							</p:column>
 							<p:column headerText="Gravado" width="6rem" style="text-align: right;">
 								<p:inputNumber value="#{percepcion.importeGravado}" symbol="$ " decimalPlaces="2" decimalSeparator="." thousandSeparator="," inputStyle="text-align: right" readonly="true">
-									<p:ajax process="@this" update="form:tv-nomina" event="change" listener="#{nominaS.actualizarPercepcion(percepcion)}"/>
+									<p:ajax process="@this" update="form:tv-nomina" event="change" listener="#{nominaS.actualizarPercepcion(percepcion)}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
 								</p:inputNumber>
 							</p:column>
 							<p:column width="2rem">
