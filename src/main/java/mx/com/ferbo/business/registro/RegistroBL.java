@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -196,6 +197,7 @@ public class RegistroBL implements Serializable
     public static void guardarRegistroVacaciones(DetEmpleado empleado, DetIncidencia incidencia, List<Date> diasAsueto) throws SGPException 
     {
         EmpleadoBL.empleadoTieneDiasLaborales(empleado);
+        List<Date> listaFechas = null;
         
         int cantidadRegistrosGuardados = 0;
         
@@ -217,10 +219,12 @@ public class RegistroBL implements Serializable
         Integer horaEntrada = DateUtil.getHora(empleadoEmpresa.getHoraEntrada());
         Integer horaSalida = DateUtil.getHora(empleadoEmpresa.getHorasalida());
         
-        List<Date> listaFechas = DateUtil.generarArreglosFechas(incidencia.getSolPermiso().getFechaInicio(), incidencia.getSolPermiso().getFechaFin());
+        listaFechas = incidencia.getSolPermiso().getDiasPermiso()
+        		.stream()
+        		.map(item -> item.getFecha())
+        		.sorted()
+        		.collect(Collectors.toList());
         log.trace("Lista de Fechas: {}", listaFechas);
-        
-        listaFechas = DateUtil.diasVacacionesSolicitados(listaFechas, diasAsueto, empleado.getDatoEmpresa());
         
         for(Date dia : listaFechas) {
         	
