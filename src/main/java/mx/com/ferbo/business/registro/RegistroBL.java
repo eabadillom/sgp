@@ -196,21 +196,22 @@ public class RegistroBL implements Serializable
     /*Guarda los registros del tipo solicitud permiso en registro asistencia*/
     public static void guardarRegistroVacaciones(DetEmpleado empleado, DetIncidencia incidencia, List<Date> diasAsueto) throws SGPException 
     {
+    	RegistroDAO registroDAO = new RegistroDAO();
         EmpleadoBL.empleadoTieneDiasLaborales(empleado);
         List<Date> listaFechas = null;
         
         int cantidadRegistrosGuardados = 0;
         
         InfDatoEmpresa empleadoEmpresa = empleado.getDatoEmpresa();
-        CatEstatusRegistro statusVacaciones = null;
+        CatEstatusRegistro statusRegistro = null;
         
         switch(incidencia.getSolPermiso().getTipoSolicitud().getClave())
         {
             case VACACIONES:
-                statusVacaciones = EstatusRegistroBL.estatusVacaciones();
+                statusRegistro = EstatusRegistroBL.estatusVacaciones();
                 break;
             case PERMISO:
-                statusVacaciones = EstatusRegistroBL.estatusPermiso();
+                statusRegistro = EstatusRegistroBL.estatusPermiso();
                 break;
             default:
             	throw new SGPException(String.format("Status no permitido: %s", incidencia.getSolPermiso().getTipoSolicitud().getClave()));
@@ -227,28 +228,39 @@ public class RegistroBL implements Serializable
         log.trace("Lista de Fechas: {}", listaFechas);
         
         for(Date dia : listaFechas) {
+        	DetRegistro registro = null;
+        	Date diaInicio = new Date(dia.getTime());
+        	Date diaFin = new Date(dia.getTime());
         	
-            DetRegistro registro = new DetRegistro();
-            registro.setIdEmpleado(empleado);
-            registro.setStatus(statusVacaciones);
-            
-            Date registroEntrada = DateUtil.getDateTime(DateUtil.getAnio(dia), DateUtil.getMes(dia), DateUtil.getDia(dia), horaEntrada, 0, 0, 0);
-            log.trace("Dia hora entrada: {}", registroEntrada);
-            registro.setFechaEntrada(registroEntrada);
+        	DateUtil.setTime(diaInicio, 0, 0, 0);
+        	DateUtil.setTime(diaFin, 23, 59, 59);
+        	
+        	registro = registroDAO.buscarPorDia(empleado.getIdEmpleado(), diaInicio, diaFin);
+        	
+        	if(registro == null) {
+        		registro = new DetRegistro();
+                registro.setIdEmpleado(empleado);
+                Date registroEntrada = DateUtil.getDateTime(DateUtil.getAnio(dia), DateUtil.getMes(dia), DateUtil.getDia(dia), horaEntrada, 0, 0, 0);
+                log.trace("Dia hora entrada: {}", registroEntrada);
+                registro.setFechaEntrada(registroEntrada);
 
-            Date registroSalida = DateUtil.getDateTime(DateUtil.getAnio(dia), DateUtil.getMes(dia), DateUtil.getDia(dia), horaSalida, 0, 0, 0);
-            log.trace("Dia hora salida: {}", registroSalida);
-            registro.setFechaSalida(registroSalida);
+                Date registroSalida = DateUtil.getDateTime(DateUtil.getAnio(dia), DateUtil.getMes(dia), DateUtil.getDia(dia), horaSalida, 0, 0, 0);
+                log.trace("Dia hora salida: {}", registroSalida);
+                registro.setFechaSalida(registroSalida);
+        	}
+        	
+        	registro.setStatus(statusRegistro);
             
             if(SolicitudPermisoBL.TP_VACACIONES.equalsIgnoreCase(incidencia.getSolPermiso().getTipoSolicitud().getClave())) {
             	DetRegistroVacaciones registroVacaciones = new DetRegistroVacaciones();
             	registroVacaciones.setRegistro(registro);
             	registroVacaciones.setVacaciones(incidencia.getSolPermiso().getVacaciones());
+            	registro.setRegistroVacaciones(registroVacaciones);
+            	
             	RegistroVacacionesDAO registroVacacionesDAO = new RegistroVacacionesDAO();
             	registroVacacionesDAO.actualizar(registroVacaciones);
-            } else {
-            	RegistroDAO registroDAO = new RegistroDAO();
-            	registroDAO.guardar(registro);
+            } else if (SolicitudPermisoBL.TP_PERMISO.equalsIgnoreCase(incidencia.getSolPermiso().getTipoSolicitud().getClave())) {
+            	registroDAO.actualizar(registro);
             }
 
             cantidadRegistrosGuardados += 1;
@@ -301,7 +313,7 @@ public class RegistroBL implements Serializable
 			registrosIncapacidad.add(registroIncapacidad);
 			incapacidad.setRegistrosIncapacidad(registrosIncapacidad);
 //				registroDAO.guardar(registro);
-			cantidadRegistrosGuardados += 1;
+			cantidadRegistrosGuardados++;
 		}
 		
 		log.info("Num. registros de incapacidad guardados del empleado {} en asistencia: {}",
