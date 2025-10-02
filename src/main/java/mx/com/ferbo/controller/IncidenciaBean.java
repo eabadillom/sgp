@@ -322,7 +322,9 @@ public class IncidenciaBean implements Serializable {
 
         try {
             BigDecimal valor = null;
-            if (incidenciaSelected.getEmpleado().getEmpleadoConfiguracion().getGoceSueldo() == false) {
+            if(incidenciaSelected.getEmpleado().getEmpleadoConfiguracion().getGoceSueldo() == null) {
+            	valor = BigDecimal.ZERO;
+            } else if (incidenciaSelected.getEmpleado().getEmpleadoConfiguracion().getGoceSueldo() == false) {
                 valor = BigDecimal.ZERO;
             } else {
                 if (this.sGoceSueldo != null && !this.sGoceSueldo.isEmpty()) {

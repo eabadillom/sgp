@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.TemporalType;
 
 import org.apache.logging.log4j.LogManager;
@@ -204,29 +205,27 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
         return modelList;
     }
     
-    public DetRegistro buscarPorDia(Integer idEmp, Date inicioDiaActual, Date finDiaActual)
-    {
-        DetRegistro model = null;
-        EntityManager em = null;
-        
-        try
-        {
-            em = this.getEntityManager();
-            model = em.createNamedQuery("DetRegistro.findToday", DetRegistro.class)
-                .setParameter("idEmp", idEmp)
-                .setParameter("inicioDia", inicioDiaActual, TemporalType.TIMESTAMP)
-                .setParameter("finDia", finDiaActual, TemporalType.TIMESTAMP)
-                .getSingleResult();
-        }catch (Exception ex) 
-        {
-            log.error("Problema para obtener el registro...", ex);
-        } finally 
-        {
-            this.close(em);
-        }
-        
-        return model;
-    }
+	public DetRegistro buscarPorDia(Integer idEmp, Date inicioDiaActual, Date finDiaActual) {
+		DetRegistro model = null;
+		EntityManager em = null;
+
+		try {
+			em = this.getEntityManager();
+			model = em.createNamedQuery("DetRegistro.findToday", DetRegistro.class)
+					.setParameter("idEmp", idEmp)
+					.setParameter("inicioDia", inicioDiaActual, TemporalType.TIMESTAMP)
+					.setParameter("finDia", finDiaActual, TemporalType.TIMESTAMP)
+					.getSingleResult();
+		} catch(NoResultException ex) {
+			log.warn("Registro no encontrado: idEmpleado = {}, Fecha hora inicio = {}, Fecha hora fin = {}", idEmp, inicioDiaActual, finDiaActual);
+		} catch (Exception ex) {
+			log.error("Problema para obtener el registro...", ex);
+		} finally {
+			this.close(em);
+		}
+
+		return model;
+	}
     
     public List<DetRegistro> buscarPorEmpPeriodoSolicitud(Integer idEmp, String codigo, Date fechaInicial, Date fechaFin)
     {
