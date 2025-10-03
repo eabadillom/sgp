@@ -16,6 +16,14 @@
 								<p:inputText value="Semana #{nominaS.nomina.periodo}" readonly="true" style="text-align: right;"/>
 							</div>
 							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Del" />
+								<p:datePicker value="#{nominaS.nomina.periodoInicio}" readonly="true" pattern="d 'de' MMMM 'de' yyyy" locale="es_MX" timeZone="GMT-6" inputStyle="text-align: right;"/>
+							</div>
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Al" />
+								<p:datePicker value="#{nominaS.nomina.periodoFin}" readonly="true" pattern="d 'de' MMMM 'de' yyyy" locale="es_MX" timeZone="GMT-6" inputStyle="text-align: right;"/>
+							</div>
+							<div class="field col-12 md:col-3">
 								<p:outputLabel value="Dias laborados"/>
 								<p:inputNumber value="#{nominaS.nomina.diasLaborados}" symbol=" días" symbolPosition="s" inputStyle="text-align: right"/>
 							</div>
@@ -24,8 +32,18 @@
 								<p:inputNumber value="#{nominaS.nomina.diasNoLaborados}" symbol=" días" symbolPosition="s" inputStyle="text-align: right"/>
 							</div>
 							<div class="field col-12 md:col-3">
+								<p:outputLabel value="Incapacidades" />
+								<p:inputNumber value="#{nominaS.nomina.diasIncapacidad}" symbol=" días" symbolPosition="s" inputStyle="text-align: right" />
+							</div>
+							<div class="field col-12 md:col-3">
 								<p:outputLabel value="Dias pagados"/>
 								<p:inputNumber value="#{nominaS.nomina.diasPagados}" symbol=" días" symbolPosition="s" inputStyle="text-align: right"/>
+							</div>
+							
+							
+							<div class="field col-12 md:col-3">
+								<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+								<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
 							</div>
 							<div class="field col-12 md:col-3">
 								<p:outputLabel value="Subtotal"/>

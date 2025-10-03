@@ -154,6 +154,10 @@ public class DetNomina implements Serializable {
     @Basic(optional = true)
     private BigDecimal diasAsueto;
     
+    @Column(name = "nu_dias_incapacidad", precision = 6, scale = 2)
+    @Basic(optional = true)
+    private BigDecimal diasIncapacidad;
+    
     @OneToOne(mappedBy = "nomina", cascade = CascadeType.ALL, orphanRemoval = true)
     private DetNominaEmisor emisor;
     
@@ -510,5 +514,13 @@ public class DetNomina implements Serializable {
 
 	public void setNominaVacaciones(List<DetNominaVacaciones> nominaVacaciones) {
 		this.nominaVacaciones = nominaVacaciones;
+	}
+
+	public BigDecimal getDiasIncapacidad() {
+		return diasIncapacidad;
+	}
+
+	public void setDiasIncapacidad(BigDecimal diasIncapacidad) {
+		this.diasIncapacidad = diasIncapacidad;
 	}
 }
