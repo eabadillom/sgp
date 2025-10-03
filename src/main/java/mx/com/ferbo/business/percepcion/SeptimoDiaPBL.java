@@ -83,6 +83,7 @@ public class SeptimoDiaPBL extends PercepcionBL {
 		Boolean inicioEntrePeriodo = null;
 		Integer iDiasSinRelacionLaboral = 0;
 		BigDecimal diasSinRelacionLaboral = null;
+		BigDecimal diasIncapacidad = null;
 		
 		inicioEntrePeriodo     = DateUtil.isDateBetween(nomina.getReceptor().getInicioRelacionLaboral(), DateUtil.toDate(nomina.getPeriodoInicio()), DateUtil.toDate(nomina.getPeriodoFin()));
 		log.info("Inicio periodo: {}, Inicio relación laboral: {}, Fin periodo: {}", nomina.getPeriodoInicio(), nomina.getReceptor().getInicioRelacionLaboral(), nomina.getPeriodoFin());
@@ -93,6 +94,7 @@ public class SeptimoDiaPBL extends PercepcionBL {
 		}
 		
 		diasSinRelacionLaboral = new BigDecimal(iDiasSinRelacionLaboral).setScale(0, RoundingMode.HALF_UP);
+		diasIncapacidad = nomina.getDiasIncapacidad();
 		
 		log.info("El empleado tiene inicio de relación laboral dentro del periodo de nómina: Fecha Inicio relación laboral: {}", nomina.getReceptor().getInicioRelacionLaboral());
 		
@@ -102,6 +104,7 @@ public class SeptimoDiaPBL extends PercepcionBL {
 				.setScale(2, RoundingMode.HALF_UP);
 		
 		proporcionalSemanal = diasTrabajados
+				.add(diasIncapacidad)
 				.add(diasSinRelacionLaboral)
 				.add(diasVacaciones)
 				.divide(t, 4, RoundingMode.HALF_UP)

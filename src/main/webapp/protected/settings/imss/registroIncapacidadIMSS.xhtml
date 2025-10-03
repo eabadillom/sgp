@@ -8,41 +8,7 @@
     <ui:define name="title">Incapacidades</ui:define>
     <ui:define name="content">
         <h:form id="form">
-        	<script>
-                PrimeFaces.locales['es'] = 
-                {
-                    monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-                    monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-                    dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
-                    dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
-                    dayNamesMin: ['D', 'L', 'M', 'X', 'J', 'V', 'S'],
-                    weekHeader: 'Semana',
-                    firstDay: 0,
-                    isRTL: false,
-                    showMonthAfterYear: false,
-                    yearSuffix: '',
-                    timeOnlyTitle: 'Sólo hora',
-                    timeText: 'Tiempo',
-                    hourText: 'Hora',
-                    minuteText: 'Minuto',
-                    secondText: 'Segundo',
-                    millisecondText: 'Milisegundo',
-                    ampm: false,
-                    month: 'Mes',
-                    week: 'Semana',
-                    day: 'Día',
-                    allDayText: 'Todo el día',
-                    today: 'Hoy',
-                    now: 'Ahora',
-                    clear: 'Limpiar',
-                    aria: {
-                       close: 'Cerrar',
-                       previous: 'Anterior',
-                       next: 'Siguiente'
-                   }
-                };
-            </script>
-            <p:growl id="messages" showDetail="true" />
+        	<ui:include src="/protected/common/status-info.xhtml" />
             <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="30rem">
 				<p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes ui-button-primary" icon="pi pi-check"/>
 				<p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-outlined ui-button-secondary" icon="pi pi-times" />
@@ -50,29 +16,29 @@
             <div class="ui-fluid formgrid grid align-items-left">
             	<div class="field col-12 md:col-2">
             		<p:outputLabel for="@next" value="Periodo Inicio" />
-					<p:datePicker value="#{registroIncBean.periodoInicio}" showIcon="true" locale="es" timeZone="GMT-6" pattern="dd/MM/yyyy"
+					<p:datePicker value="#{registroIncBean.periodoInicio}" showIcon="true" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy"
 							styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel">
-						<p:ajax listener="#{registroIncBean.actualizarListaRegistroIncapacidades()}" update="dtRegistroIncapacidad" process="@this" />
+						<p:ajax listener="#{registroIncBean.actualizarListaRegistroIncapacidades()}" update="dtRegistroIncapacidad" process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
 					</p:datePicker>
             	</div>
             	<div class="field col-12 md:col-2">
 					<p:outputLabel for="@next" value="Periodo Fin" />
-					<p:datePicker value="#{registroIncBean.periodoFin}" showIcon="true" locale="es" timeZone="GMT-6" pattern="dd/MM/yyyy"
+					<p:datePicker value="#{registroIncBean.periodoFin}" showIcon="true" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy"
 							styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel">
-						<p:ajax listener="#{registroIncBean.actualizarListaRegistroIncapacidades()}" update="form:dtRegistroIncapacidad" process="@this" />
+						<p:ajax listener="#{registroIncBean.actualizarListaRegistroIncapacidades()}" update="form:dtRegistroIncapacidad" process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
 					</p:datePicker>
             	</div>
                 <p:divider layout="vertical"></p:divider>
             	<div class="field col-12 md:col-2">
             		<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
 					<p:selectBooleanButton id="idEstatusAprobado" value="#{registroIncBean.estatusAprobado}" onIcon="pi pi-check" onLabel="Aceptada" offIcon="pi pi-times" offLabel="Aceptada" style="width: 100%;">
-						<p:ajax event="change" update="form:dtRegistroIncapacidad" process="@this"/>
+						<p:ajax event="change" update="form:dtRegistroIncapacidad" process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
 					</p:selectBooleanButton>
             	</div>
             	<div class="field col-12 md:col-2">
             		<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
 					<p:selectBooleanButton id="idEstatusCancelado" value="#{registroIncBean.estatusCancelado}" onIcon="pi pi-check" onLabel="Cancelada" offIcon="pi pi-times" offLabel="Cancelada" style="width: 100%;">
-					    <p:ajax event="change" update="dtRegistroIncapacidad" process="@this"/>
+					    <p:ajax event="change" update="dtRegistroIncapacidad" process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
 					</p:selectBooleanButton>
             	</div>
                 <p:divider layout="vertical"></p:divider>
@@ -190,7 +156,7 @@
                         </div>
                         <div class="field col">
                             <p:outputLabel for="@next" value="Fecha Inicio" />
-                            <p:datePicker id="fechaInicio" value="#{registroIncBean.incapacidad.fechaInicio}" showIcon="true" pattern="dd/MM/yyyy" locale="es" 
+                            <p:datePicker id="fechaInicio" value="#{registroIncBean.incapacidad.fechaInicio}" showIcon="true" pattern="dd/MM/yyyy" locale="es_MX" 
                                           styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" timeZone="GMT-6" 
                                           disabled="#{registroIncBean.incapacidad.estatusSolicitud.clave eq 'C' or registroIncBean.incapacidad.controlIncapacidad.clave eq 'D'}" >
                                 <p:ajax process="@this"/>
@@ -199,7 +165,7 @@
                         <h:panelGroup id="fechaFinPanel" rendered="#{registroIncBean.incapacidad.fechaFin ne null}">
                             <div class="field col">
                                 <p:outputLabel for="@next" value="Fecha Fin" />
-                                <p:datePicker id="fechaFin" value="#{registroIncBean.incapacidad.fechaFin}" showIcon="true" pattern="dd/MM/yyyy" locale="es" 
+                                <p:datePicker id="fechaFin" value="#{registroIncBean.incapacidad.fechaFin}" showIcon="true" pattern="dd/MM/yyyy" locale="es_MX" 
                                               styleClass="ferbo-datePicker" panelStyleClass="ferbo-datePicker-panel" timeZone="GMT-6" 
                                               disabled="#{registroIncBean.incapacidad.estatusSolicitud.clave eq 'C' or registroIncBean.incapacidad.controlIncapacidad.clave eq 'D'}" >
                                     <p:ajax process="@this"/>
