@@ -132,6 +132,7 @@ public class NominaSemanalBL extends NominaBL {
 			nomina.setDiasVacaciones(diasVacaciones);
 			nomina.setDiasNoLaborados(ausencias);
 			nomina.setIncidencias(incidencias);
+			nomina.setDiasIncapacidad(incapacidades);
 			
     		/*---------------------------PERCEPCIONES------------------------------*/
     		NominaSemanalBL.calcularSueldo(nomina, this.parametros, diasLaboralesEmpleado, diasNolaboralesEmpleado, diasTrabajados, diasVacaciones);
@@ -752,7 +753,20 @@ public class NominaSemanalBL extends NominaBL {
 	 * @return
 	 */
 	private BigDecimal getIncapacidades(Map<String, DetRegistro> mapAsistencias, BigDecimal diasLaboralesPorPeriodo) {
-		return ValoresBD._CERO.get();
+		BigDecimal incapacidades = null;
+		Long iConteo = null;
+		
+		try {
+			iConteo = mapAsistencias.values().stream()
+					.filter(registro ->  EstatusRegistroBL.INCAPACIDAD.equalsIgnoreCase(registro.getStatus().getCodigo()))
+					.count()
+					;
+			incapacidades = new BigDecimal(iConteo).setScale(2, RoundingMode.HALF_UP);
+		} catch(Exception ex) {
+			incapacidades = ValoresBD._CERO.get();
+		}
+		
+		return incapacidades;
 	}
 	
 	public static synchronized void procesarISR(ParametrosNomina parametros, DetNomina nomina) {
