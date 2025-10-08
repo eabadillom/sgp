@@ -5,26 +5,33 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:jsf="http://xmlns.jcp.org/jsf">
 
-					<p:tab title="Vacaciones">
-						<p:toolbar>
-							<p:toolbarGroup>
-								<p:commandButton value="Agregar" icon="pi pi-plus" process="@this" actionListener="#{nominaS.agregaPeriodoVacacional()}">
+					<p:tab title="Prima Vacacional">
+						<div class="ui-fluid formgrid grid">
+							<div class="field col-12 md:col-3">
+								<p:commandButton value="En tiempo" icon="pi pi-plus" process="@this" actionListener="#{nominaS.agregaPeriodoVacacional('T')}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();">
 								</p:commandButton>
-							</p:toolbarGroup>
-						</p:toolbar>
-						<p:dataTable value="#{nominaS.nomina.vacaciones}" var="periodo">
+							</div>
+							<div class="field col-12 md:col-3">
+								<p:commandButton value="Reportada" icon="pi pi-plus" process="@this" actionListener="#{nominaS.agregaPeriodoVacacional('R')}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();">
+								</p:commandButton>
+							</div>
+						</div>
+						<p:dataTable value="#{nominaS.nomina.nominaVacaciones}" var="periodo">
 							<p:column headerText="Inicio periodo">
-								<p:outputLabel value="#{periodo.fechaInicio}">
+								<p:outputLabel value="#{periodo.vacaciones.fechaInicio}">
 									<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX"/>
 								</p:outputLabel>
 							</p:column>
 							<p:column headerText="Fin periodo">
-								<p:outputLabel value="#{periodo.fechaFin}">
+								<p:outputLabel value="#{periodo.vacaciones.fechaFin}">
 									<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX"/>
 								</p:outputLabel>
 							</p:column>
 							<p:column headerText="Dias">
-								<p:outputLabel value="#{periodo.diasTotales}"/>
+								<p:outputLabel value="#{periodo.vacaciones.diasTotales}"/>
+							</p:column>
+							<p:column headerText="Tipo">
+								<p:outputLabel value="#{nominaS.tipoPrimaVacacional(periodo.tipoPrima)}"/>
 							</p:column>
 						</p:dataTable>
 					</p:tab>
