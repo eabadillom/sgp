@@ -567,11 +567,19 @@ public abstract class NominaBL {
 		if(percepcion == null)
 			throw new SGPException("Debe seleccionar una percepción.");
 		
-		boolean respuesta = nomina.getPercepciones().remove(percepcion);
+		Optional<DetNominaVacaciones> periodoVacacional = null;
 		
 		if(PercepcionBL.CVE_PRIMA_VACACIONES_EN_TIEMPO.equalsIgnoreCase(percepcion.getClave())) {
-			nomina.getVacaciones().clear();
+			periodoVacacional = nomina.getNominaVacaciones().stream().filter(item -> "T".equalsIgnoreCase(item.getTipoPrima() )).findFirst();
+			nomina.getNominaVacaciones().remove(periodoVacacional.get());
+			nomina.getVacaciones().remove(periodoVacacional.get().getVacaciones());
+		} else if(PercepcionBL.CVE_PRIMA_VACACIONES_REPORTADAS.equalsIgnoreCase(percepcion.getClave())) {
+			periodoVacacional = nomina.getNominaVacaciones().stream().filter(item -> "R".equalsIgnoreCase(item.getTipoPrima() )).findFirst();
+			nomina.getNominaVacaciones().remove(periodoVacacional.get());
+			nomina.getVacaciones().remove(periodoVacacional.get().getVacaciones());
 		}
+		
+		boolean respuesta = nomina.getPercepciones().remove(percepcion);
 		
 		if(respuesta == false)
 			throw new SGPException("Ocurrió un problema para eliminar la percepción.");
