@@ -139,6 +139,7 @@ public class NominaSemanalBL extends NominaBL {
     		NominaSemanalBL.calcularBonoPuntualidad(nomina, this.parametros, this.percepcionesEmpleado, this.mapAsistencias, this.empleado.getEmpleadoConfiguracion().getRetardo(), diasLaboralesEmpleado, diasNolaboralesEmpleado, diasTrabajados);
     		NominaSemanalBL.calcularValesDespensa(nomina, this.parametros, this.percepcionesEmpleado);
 			NominaSemanalBL.calcularPrimaVacacionalEnTiempo(nomina, this.parametros);
+			NominaSemanalBL.calcularPrimaVacacionalReportada(nomina, this.parametros);
     		
     		
     		/*-------------------------DEDUCCIONES-----------------------*/
@@ -452,13 +453,23 @@ public class NominaSemanalBL extends NominaBL {
 		
 		try {
 			primaEnTiempoBO = NominaSemanalBL.getPercepcionBusinessLogic(parametros, nomina, PercepcionBL.CVE_PRIMA_VACACIONES_EN_TIEMPO);
-			
 			percepcion = primaEnTiempoBO.procesar(nomina);
-			
 			agregarPercepcion(nomina, percepcion);
-			
 		} catch (SGPException ex) {
 			log.error("[UI] Problema para obtener el cálculo de la prima vacacional en tiempo: {}", ex.getMessage());
+		}
+	}
+	
+	public static void calcularPrimaVacacionalReportada(DetNomina nomina, ParametrosNomina parametros) {
+		DetNominaPercepcion percepcion = null;
+		PercepcionBL primaReportadaBO = null;
+		
+		try {
+			primaReportadaBO = NominaSemanalBL.getPercepcionBusinessLogic(parametros, nomina, PercepcionBL.CVE_PRIMA_VACACIONES_REPORTADAS);
+			percepcion = primaReportadaBO.procesar(nomina);
+			agregarPercepcion(nomina, percepcion);
+		} catch(SGPException ex) {
+			log.error("[UI] Problema para obtener el cálculo de la prima vacacional reportada: {}", ex.getMessage());
 		}
 	}
 	
