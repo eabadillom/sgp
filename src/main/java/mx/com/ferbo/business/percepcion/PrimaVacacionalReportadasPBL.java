@@ -14,6 +14,7 @@ import mx.com.ferbo.dao.n.VacacionesDAO;
 import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.DetNomina;
 import mx.com.ferbo.model.DetNominaPercepcion;
+import mx.com.ferbo.model.DetNominaVacaciones;
 import mx.com.ferbo.model.DetVacaciones;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.SGPException;
@@ -21,6 +22,7 @@ import mx.com.ferbo.util.SGPException;
 public class PrimaVacacionalReportadasPBL extends PercepcionBL {
 	
 	private static Logger log = LogManager.getLogger(PrimaVacacionalReportadasPBL.class);
+	private DetVacaciones periodo = null;
 	
 	public PrimaVacacionalReportadasPBL(ParametrosNomina parametros, DetNomina nomina) {
 		super(parametros, nomina);
@@ -74,7 +76,7 @@ public class PrimaVacacionalReportadasPBL extends PercepcionBL {
 	}
 	
 	@Override
-	protected BigDecimal calcularCantidad(DetNomina nomina) throws SGPException {
+	public BigDecimal calcularCantidad(DetNomina nomina) throws SGPException {
 		List<DetVacaciones> periodos           = null;
 		VacacionesDAO       vacacionesDAO      = null;
 		Date                vencimientoPeriodo = null;
@@ -109,7 +111,7 @@ public class PrimaVacacionalReportadasPBL extends PercepcionBL {
 		return cantidad;
 	}
 	
-	private BigDecimal calcularTasa(DetVacaciones periodo) {
+	public BigDecimal calcularTasa(DetVacaciones periodo) {
 		BigDecimal tasa            = null;
 		BigDecimal primaVacacional = null;
 		BigDecimal diasTotales     = null;
@@ -143,6 +145,11 @@ public class PrimaVacacionalReportadasPBL extends PercepcionBL {
 		
 		periodo.setPrimaPagada(true);
 		
+		DetNominaVacaciones nominaVacaciones = new DetNominaVacaciones();
+		nominaVacaciones.setNomina(nomina);
+		nominaVacaciones.setVacaciones(periodo);
+		nominaVacaciones.setTipoPrima("R");
+		nomina.getNominaVacaciones().add(nominaVacaciones);
 	}
 
 	@Override
@@ -152,5 +159,18 @@ public class PrimaVacacionalReportadasPBL extends PercepcionBL {
 		return ValoresBD._15.get()
 				.multiply(uma)
 				.setScale(2, RoundingMode.HALF_UP);
+	}
+	
+	public void setPeriodo(DetVacaciones periodo) {
+		DetNominaVacaciones nominaVacaciones = null;
+		
+		this.periodo = periodo;
+		
+		nomina.getVacaciones().add(this.periodo);
+		nominaVacaciones = new DetNominaVacaciones();
+		nominaVacaciones.setNomina(nomina);
+		nominaVacaciones.setVacaciones(this.periodo);
+		nominaVacaciones.setTipoPrima("R");
+		nomina.getNominaVacaciones().add(nominaVacaciones);
 	}
 }

@@ -5,30 +5,31 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:jsf="http://xmlns.jcp.org/jsf">
 
-			<p:dialog widgetVar="dlgAddPeriodoVacacional" header="Periodo vacacional" modal="true">
-				<p:outputLabel id="dlg-add-periodo-vacacional">
-					<p:dataTable value="#{nominaS.periodosVacacionales}" var="periodo">
-						<p:column headerText="Inicio">
-							<p:outputLabel value="#{periodo.fechaInicio}">
-								<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX"/>
-							</p:outputLabel>
-						</p:column>
-						<p:column headerText="Fin">
-							<p:outputLabel value="#{periodo.fechaFin}">
-								<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX"/>
-							</p:outputLabel>
-						</p:column>
-						<p:column headerText="Dias">
-							<p:outputLabel value="#{periodo.diasTotales}">
-							</p:outputLabel>
-						</p:column>
-						<p:column>
-							<p:commandButton icon="pi pi-plus" process="@this" actionListener="#{nominaS.procesaPeriodoVacacional(periodo, 'T')}">
-							</p:commandButton>
-						</p:column>
-					</p:dataTable>
-				</p:outputLabel>
+			<p:dialog widgetVar="dlgAddPeriodoVacacional" header="Pago de prima vacacional" modal="true" width="30rem">
+				<p:outputPanel id="dlg-add-periodo-vacacional">
+					<p:card>
+						<p:dataTable value="#{nominaS.periodosVacacionales}" var="periodo">
+							<p:column headerText="Inicio" width="6rem">
+								<p:outputLabel value="#{periodo.fechaInicio}">
+									<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX"/>
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Fin" width="6rem">
+								<p:outputLabel value="#{periodo.fechaFin}">
+									<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX"/>
+								</p:outputLabel>
+							</p:column>
+							<p:column headerText="Dias">
+								<p:outputLabel value="#{periodo.diasTotales}">
+								</p:outputLabel>
+							</p:column>
+							<p:column width="2rem">
+								<p:commandButton icon="pi pi-plus" process="@this" actionListener="#{nominaS.procesaPeriodoVacacional(periodo)}">
+								</p:commandButton>
+							</p:column>
+						</p:dataTable>
+					</p:card>
+				</p:outputPanel>
 			</p:dialog>
-
 
 </ui:composition>

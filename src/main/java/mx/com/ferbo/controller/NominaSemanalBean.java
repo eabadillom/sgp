@@ -30,6 +30,7 @@ import mx.com.ferbo.business.nomina.NominaSemanalBL;
 import mx.com.ferbo.business.nomina.ParametrosNomina;
 import mx.com.ferbo.business.percepcion.PercepcionBL;
 import mx.com.ferbo.business.percepcion.PrimaVacacionalEnTiempoPBL;
+import mx.com.ferbo.business.percepcion.PrimaVacacionalReportadasPBL;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.EmpresaDAO;
 import mx.com.ferbo.dao.n.NominaDAO;
@@ -101,6 +102,7 @@ public class NominaSemanalBean implements Serializable {
     private List<Asistencia>    asistencias;
     private List<DetVacaciones> periodosVacacionales;
     private DetVacaciones       periodoVacacional;
+    private String              tipoPrima;
     
     private Boolean detalle = true;
     private String bitacora = null;
@@ -349,14 +351,23 @@ public class NominaSemanalBean implements Serializable {
     	}
     }
     
-    public void agregaPeriodoVacacional() {
+    public void agregaPeriodoVacacional(String tipo) {
     	FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
 		String titulo = "Periodo vacacional";
 		
 		try {
-			this.periodosVacacionales = vacacionesDAO.buscarPeriodosEnTiempoNoPagados(this.nomina.getReceptor().getRfc());
+			switch(tipo) {
+			case "T":
+				this.periodosVacacionales = vacacionesDAO.buscarPeriodosEnTiempoNoPagados(this.nomina.getReceptor().getRfc());
+				break;
+			case "R":
+				Date vencimientoPeriodo = DateUtil.addMonth(parametros.getPeriodoFin(), -6);
+				this.periodosVacacionales = vacacionesDAO.buscarReportadasPorRfcFecha(nomina.getReceptor().getRfc(), vencimientoPeriodo);
+				break;
+			}
+			this.tipoPrima = tipo;
 			
 			PrimeFaces.current().executeScript("PF('dlgAddPeriodoVacacional').show();");
 			
@@ -372,7 +383,7 @@ public class NominaSemanalBean implements Serializable {
     	}
     }
     
-    public void procesaPeriodoVacacional(DetVacaciones periodoVacacional, String tipoPrima) {
+    public void procesaPeriodoVacacional(DetVacaciones periodoVacacional) {
     	FacesMessage message = null;
 		Severity severity = null;
 		String mensaje = null;
@@ -380,6 +391,7 @@ public class NominaSemanalBean implements Serializable {
 		
 		DetNominaPercepcion primaVacacional = null;
 		PrimaVacacionalEnTiempoPBL primaEnTiempoBO = null;
+		PrimaVacacionalReportadasPBL primaReportadaBO = null;
 		
 		try {
 			
@@ -389,9 +401,15 @@ public class NominaSemanalBean implements Serializable {
 				primaVacacional = primaEnTiempoBO.procesar(nomina, primaEnTiempoBO.calcularCantidad(nomina));
 			} else if ("R".equalsIgnoreCase(tipoPrima)) {
 				log.info("Nada que realizar por el momento...");
+				primaReportadaBO = (PrimaVacacionalReportadasPBL) NominaSemanalBL.getPercepcionBusinessLogic(parametros, nomina, PercepcionBL.CVE_PRIMA_VACACIONES_REPORTADAS);
+				primaReportadaBO.setPeriodo(periodoVacacional);
+				BigDecimal cantidad = primaReportadaBO.calcularTasa(periodoVacacional);
+				primaVacacional = primaReportadaBO.procesar(nomina, cantidad);
 			} else {
 				throw new SGPException("El tipo de prima vacacional es incorrecto.");
 			}
+			
+			this.tipoPrima = null;
 			
 			NominaBL.agregarPercepcion(nomina, primaVacacional);
 			NominaBL.calcularTotales(nomina, parametros);
@@ -406,6 +424,15 @@ public class NominaSemanalBean implements Serializable {
 		} finally {
 			PrimeFaces.current().ajax().update("form:messages", "form:tv-nomina", "form:dtNomina");
 		}
+    }
+    
+    public String tipoPrimaVacacional(String clave) {
+    	if("T".equalsIgnoreCase(clave))
+    		return "En tiempo";
+    	if("R".equalsIgnoreCase(clave))
+    		return "Reportada";
+    	
+    	return "No reconocida";
     }
     
     public void actualizarPorCantidad(DetNominaPercepcion percepcion) {
@@ -1073,5 +1100,13 @@ public class NominaSemanalBean implements Serializable {
 
 	public void setPeriodoVacacional(DetVacaciones periodoVacacional) {
 		this.periodoVacacional = periodoVacacional;
+	}
+
+	public String getTipoPrima() {
+		return tipoPrima;
+	}
+
+	public void setTipoPrima(String tipoPrima) {
+		this.tipoPrima = tipoPrima;
 	}
 }
