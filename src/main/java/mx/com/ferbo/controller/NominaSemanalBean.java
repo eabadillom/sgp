@@ -517,7 +517,7 @@ public class NominaSemanalBean implements Serializable {
 		String titulo = "Percepción";
 		
 		try {
-			NominaBL.eliminarPercepcion(nomina, percepcion);
+			NominaSemanalBL.eliminarPercepcion(nomina, percepcion);
 			NominaSemanalBL.procesarISR(parametros, nomina);
 			this.actualizar();
 			
