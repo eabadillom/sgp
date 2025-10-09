@@ -568,15 +568,24 @@ public abstract class NominaBL {
 			throw new SGPException("Debe seleccionar una percepción.");
 		
 		Optional<DetNominaVacaciones> periodoVacacional = null;
+		Boolean removed = null;
 		
 		if(PercepcionBL.CVE_PRIMA_VACACIONES_EN_TIEMPO.equalsIgnoreCase(percepcion.getClave())) {
 			periodoVacacional = nomina.getNominaVacaciones().stream().filter(item -> "T".equalsIgnoreCase(item.getTipoPrima() )).findFirst();
-			nomina.getNominaVacaciones().remove(periodoVacacional.get());
-			nomina.getVacaciones().remove(periodoVacacional.get().getVacaciones());
+			log.info("Nomina vacaciones: {}", periodoVacacional.get().hashCode());
+			log.info("Vacaciones: {}", periodoVacacional.get().getVacaciones().hashCode());
+			removed = nomina.getVacaciones().remove(periodoVacacional.get().getVacaciones());
+			log.info("¿Eliminado?: {}", removed);
+			removed = nomina.getNominaVacaciones().remove(periodoVacacional.get());
+			log.info("¿Eliminado?: {}", removed);
 		} else if(PercepcionBL.CVE_PRIMA_VACACIONES_REPORTADAS.equalsIgnoreCase(percepcion.getClave())) {
 			periodoVacacional = nomina.getNominaVacaciones().stream().filter(item -> "R".equalsIgnoreCase(item.getTipoPrima() )).findFirst();
-			nomina.getNominaVacaciones().remove(periodoVacacional.get());
-			nomina.getVacaciones().remove(periodoVacacional.get().getVacaciones());
+			log.info("Nomina vacaciones: {}", periodoVacacional.get().hashCode());
+			log.info("Vacaciones: {}", periodoVacacional.get().getVacaciones().hashCode());
+			removed = nomina.getVacaciones().remove(periodoVacacional.get().getVacaciones());
+			log.info("¿Eliminado?: {}", removed);
+			removed = nomina.getNominaVacaciones().remove(periodoVacacional.get());
+			log.info("¿Eliminado?: {}", removed);
 		}
 		
 		boolean respuesta = nomina.getPercepciones().remove(percepcion);
