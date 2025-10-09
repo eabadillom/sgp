@@ -5,7 +5,12 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:jsf="http://xmlns.jcp.org/jsf">
 
-					<p:tab title="Prima Vacacional">
+					<p:tab>
+						<f:facet name="title">
+							<span>Prima Vacacional</span>
+							<p:badge severity="warning" value="#{nominaS.nomina.nominaVacaciones.size()}" visible="#{not empty nominaS.nomina.nominaVacaciones}" size="2">
+							</p:badge>
+						</f:facet>
 						<div class="ui-fluid formgrid grid">
 							<div class="field col-12 md:col-3">
 								<p:commandButton value="En tiempo" icon="pi pi-plus" process="@this" actionListener="#{nominaS.agregaPeriodoVacacional('T')}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();">

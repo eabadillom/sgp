@@ -40,7 +40,7 @@
 								</p:inputNumber>
 							</p:column>
 							<p:column width="2rem">
-								<p:commandButton icon="pi pi-times" action="#{nominaS.eliminarPercepcion(percepcion)}" styleClass="ui-button-outlined ui-button-danger">
+								<p:commandButton icon="pi pi-times" actionListener="#{nominaS.eliminarPercepcion(percepcion)}" styleClass="ui-button-outlined ui-button-danger" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();">
 									<p:confirm header="Eliminar percepción" message="¿Está seguro que desea ELIMINAR la percepción #{percepcion.tipoPercepcion.clave} - #{percepcion.nombre}?" icon="pi pi-exclamation-triangle" />
 								</p:commandButton>
 							</p:column>
