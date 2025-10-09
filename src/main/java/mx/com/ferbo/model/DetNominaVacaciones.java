@@ -57,6 +57,10 @@ public class DetNominaVacaciones implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		DetNominaVacaciones other = (DetNominaVacaciones) obj;
+		
+		if(this.id == null || other.id == null)
+			return Objects.equals(System.identityHashCode(this), System.identityHashCode(other));
+		
 		return Objects.equals(id, other.id);
 	}
 
