@@ -83,6 +83,9 @@ public class DetVacaciones implements Serializable{
             return false;
         }
         final DetVacaciones other = (DetVacaciones) obj;
+        if(this.idVacaciones == null || other.idVacaciones == null)
+			return Objects.equals(System.identityHashCode(this), System.identityHashCode(other));
+        
         return Objects.equals(this.idVacaciones, other.idVacaciones);
     }
 
