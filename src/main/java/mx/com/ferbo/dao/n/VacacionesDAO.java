@@ -213,15 +213,13 @@ public class VacacionesDAO extends BaseDAO<DetVacaciones, Integer> {
     	
     	try {
     		sql = "select\n"
-    				+ "	*\n"
+    				+ "	v.*\n"
     				+ "from det_vacaciones v\n"
-    				+ "inner join det_empleado e\n"
-    				+ "	on v.id_empleado = e.id_empleado\n"
-    				+ "inner join inf_empleado_empresa ee\n"
-    				+ "	on e.id_empleado_empresa = ee.id_empleado_empresa\n"
-    				+ "where (v.nu_dias_totales - v.nu_dias_tomados) > 0\n"
-    				+ "	and ee.nb_rfc = :rfc\n"
-    				+ "	and v.fh_fin < :fecha\n"
+    				+ "inner join det_empleado e on v.id_empleado = e.id_empleado\n"
+    				+ "inner join inf_empleado_empresa ee on e.id_empleado_empresa = ee.id_empleado_empresa\n"
+    				+ "where ee.nb_rfc = :rfc and v.fh_fin < :fecha\n"
+    				+ "	and ( (v.nu_dias_totales - v.nu_dias_tomados) > 0)\n"
+    				+ "	and (v.st_dias_pend_pagados = 0)"
     				;
     		
     		em = this.getEntityManager();
