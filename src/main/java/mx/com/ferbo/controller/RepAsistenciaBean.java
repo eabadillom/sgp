@@ -50,7 +50,7 @@ public class RepAsistenciaBean implements Serializable {
     
     private HttpServletRequest request = null;
     private FacesContext context = null;
-    private String contextPath = null;
+//    private String contextPath = null;
     private HttpSession session = null;
 
     private PlantaDAO plantaDAO;
@@ -130,14 +130,13 @@ public class RepAsistenciaBean implements Serializable {
     @PostConstruct
     public void init() {
     	DetEmpleado empleadoSesion = null;
-    	String path = null;
+//    	String path = null;
     	empleadoSesion = (DetEmpleado) session.getAttribute("empleado");
-    	contextPath = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
-    	FacesContext context = null;
+//    	contextPath = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
+//    	FacesContext context = null;
     	
     	try {
     		log.info("Ejecutando proceso init...");
-    		
     		
     		if(empleadoSesion.getDatoEmpresa().getPerfil().getIdPerfil() == 1) {
     			return;
@@ -200,6 +199,7 @@ public class RepAsistenciaBean implements Serializable {
 
     public void ajustaHoras() {
     	try {
+    		log.info("Ajustando inicio y fin del periodo...");
     		DateUtil.setTime(fechaInicio, 0, 0, 0, 0);
     		DateUtil.setTime(fechaFin, 23, 59, 59, 0);
     	} catch(Exception ex) {
@@ -323,6 +323,7 @@ public class RepAsistenciaBean implements Serializable {
 
     public void editarRegistro(DetRegistro registro) {
     	try {
+    		log.info("Cargando información de registro...");
     		this.registroSelected = registro;
     		
     		int anio = DateUtil.getAnio(registro.getFechaEntrada());
@@ -367,9 +368,10 @@ public class RepAsistenciaBean implements Serializable {
 
     public void restablecerValores() {
     	try {
+    		log.info("Reiniciando valores...");
     		this.registroSelected = null;
-    		Integer idPlanta = this.planta == null ? null : this.planta.getIdPlanta();
-    		registros = registroDAO.buscarPorPlantaPeriodo(idPlanta, this.fechaInicio, this.fechaFin);
+//    		Integer idPlanta = this.planta == null ? null : this.planta.getIdPlanta();
+//    		registros = registroDAO.buscarPorPlantaPeriodo(idPlanta, this.fechaInicio, this.fechaFin);
     	} catch(Exception ex) {
     		log.error("Problema para reestablecer los valores...", ex);
     	}
@@ -381,7 +383,7 @@ public class RepAsistenciaBean implements Serializable {
         String mensaje = null;
         String titulo = "Actualizar asistencia";
         try {
-
+        	log.info("Actualizando registro...");
             if ("F".equalsIgnoreCase(this.registroSelected.getStatus().getCodigo())) {
                 int anio = DateUtil.getAnio(this.registroSelected.getFechaEntrada());
                 int mes = DateUtil.getMes(this.registroSelected.getFechaEntrada());
@@ -392,8 +394,6 @@ public class RepAsistenciaBean implements Serializable {
             }
 
             registroDAO.actualizar(this.registroSelected);
-            Integer idPlanta = this.planta == null ? null : this.planta.getIdPlanta();
-            registros = registroDAO.buscarPorPlantaPeriodo(idPlanta, this.fechaInicio, this.fechaFin);
             mensaje = "El registro de actualizo correctamente.";
             severity = FacesMessage.SEVERITY_INFO;
         } catch (SGPException sgpEx) {
