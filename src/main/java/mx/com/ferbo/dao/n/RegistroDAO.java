@@ -131,6 +131,7 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
         List<DetRegistro> modelList = null;
         EntityManager em = null;
         try {
+        	log.info("Cargando información de registros...");
             em = this.getEntityManager();
             modelList = em.createNamedQuery("DetRegistro.findByPlantaPeriodo", DetRegistro.class)
                     .setParameter("idPlanta", idPlanta)
@@ -140,6 +141,7 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
             for (DetRegistro model : modelList) {
                 cargaInfo(model);
             }
+            log.info("Terminando carga de información de registros.");
         } catch (Exception ex) {
             log.error("Problema para obtener el listado de registros...", ex);
             modelList = new ArrayList<>();
