@@ -56,6 +56,13 @@
     </div>
     
 	<p:dialog id="dg-vacaciones" widgetVar="dgVacaciones" header="Vacaciones" showEffect="fade" responsive="true" modal="true">
+		<p:toolbar>
+			<p:toolbarGroup>
+				<p:commandButton icon="pi pi-plus" value="Periodo en curso" actionListener="#{vacacionesBean.cargarPeriodoEnCurso}" update="dt-periodos-vacacionales" >
+					<p:confirm header="Año laboral no cumplido" message="No has cumplido el año laboral, ¿estás seguro que deseas agregar el periodo vacacional?" icon="pi pi-exclamation-triangle" />
+				</p:commandButton>
+			</p:toolbarGroup>
+		</p:toolbar>
 		<p:panelGrid layout="tabular" columns="0" styleClass="ui-noborder"><!-- Sin bordes, agregar propiedad  styleClass="ui-noborder"-->
 			<p:row>
 				<p:column width="10rem" style="vertical-align: top;">
