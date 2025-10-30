@@ -47,16 +47,8 @@
 
     <ui:define name="content">
         <h:form id="formActividades">
-            <p:growl id="messages" showDetail="true" life="2500"/>
-            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="30rem">
-				<p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes ui-button-primary" icon="pi pi-check"/>
-				<p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-outlined ui-button-secondary" icon="pi pi-times" />
-			</p:confirmDialog>
-        	<p:dialog modal="true" widgetVar="statusInfoDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
-				<div align="center">
-					<i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
-				</div>
-			</p:dialog>
+        	<ui:include src="/protected/common/status-info.xhtml" />
+            <ui:include src="/protected/common/confirm.xhtml" />
             <p:tabView id="tabView" cache="false" widgetVar="tvAsistencia" dynamic="true">
             	<p:ajax event="tabChange" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
                 <p:tab title="Asistencia">

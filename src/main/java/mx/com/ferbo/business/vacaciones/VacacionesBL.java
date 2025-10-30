@@ -37,6 +37,26 @@ public class VacacionesBL {
         return periodos;
 	}
 	
+	public static List<DetVacaciones> cargarPeriodosConSaldoEnCurso(Integer idEmpleado, Date now) {
+		
+		List<DetVacaciones> periodos = new ArrayList<DetVacaciones>();
+		VacacionesDAO vacacionesDAO = new VacacionesDAO();
+        
+        log.info("Buscando periodos vacacionales del empleado...");
+        List<DetVacaciones> periodosTmp = vacacionesDAO.cargarPeriodosEnCurso(idEmpleado, now);
+        
+        for (DetVacaciones periodo : periodosTmp) {
+        	if(periodo.getDiasPendientesPagados())
+        		continue;
+        	
+        	if (periodo.getDiasTomados() < periodo.getDiasTotales() && (periodo.getDiasPagados() + periodo.getDiasTomados()) < periodo.getDiasTotales()) {
+        		periodos.add(periodo);
+        	}
+        }
+        
+        return periodos;
+	}
+	
 	public static Integer diasDisponibles(DetVacaciones periodo) {
 		Integer diasDisponibles = null;
 		CatEstatusRegistro status = EstatusRegistroBL.estatusVacaciones();
@@ -60,5 +80,4 @@ public class VacacionesBL {
 		
 		return diasDisponibles;
 	}
-
 }
