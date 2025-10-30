@@ -133,6 +133,11 @@ public class VacacionesBean implements Serializable {
 		}
 	}
 	
+	public void cargarPeriodoEnCurso() {
+		List<DetVacaciones> cargarPeriodosConSaldoEnCurso = VacacionesBL.cargarPeriodosConSaldoEnCurso(this.empleado.getIdEmpleado(), DateUtil.now());
+		this.periodosVacacionales.addAll(cargarPeriodosConSaldoEnCurso);
+	}
+	
 	public Integer diasDisponibles(DetVacaciones periodo) {
 		Integer saldo = VacacionesBL.diasDisponibles(periodo);
 		saldo = saldo - this.diasSolicitados.size();

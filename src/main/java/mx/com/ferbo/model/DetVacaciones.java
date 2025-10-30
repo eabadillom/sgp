@@ -22,7 +22,8 @@ import javax.persistence.Table;
 @NamedQuery(name = "DetVacaciones.buscarPeriodoPorEmpleadoFecha", query = "SELECT v FROM DetVacaciones v WHERE v.empleado.idEmpleado = :idEmpleado AND :fecha BETWEEN v.fechaInicio AND v.fechaFin")
 @NamedQuery(name = "DetVacaciones.buscarPeriodosNoPagados", query = "SELECT v FROM DetVacaciones v LEFT JOIN v.nominaVacaciones nv WHERE v.empleado.datoEmpresa.rfc = :rfc AND ( v.primaPagada = false or v.primaPagada IS NULL ) AND (nv IS NULL)")
 @NamedQuery(name = "DetVacaciones.buscarPeriodosDisponibles", query = "select v from DetVacaciones v where v.empleado.idEmpleado = :idEmpleado and v.fechaFin < :fecha AND (v.primaPagada = FALSE OR v.primaPagada IS NULL)")
-@NamedQuery(name = "DetVacaciones.buscarPeriodosConSaldo", query = "select v from DetVacaciones v where v.empleado.idEmpleado = :idEmpleado and v.fechaFin < :fecha ")
+@NamedQuery(name = "DetVacaciones.buscarPeriodosConSaldo", query = "select v from DetVacaciones v where v.empleado.idEmpleado = :idEmpleado and (v.fechaFin < :fecha) ")
+@NamedQuery(name = "DetVacaciones.buscarPeriodosConSaldoEnCurso", query = "SELECT v FROM DetVacaciones v WHERE v.empleado.idEmpleado = :idEmpleado AND :fecha BETWEEN v.fechaInicio AND v.fechaFin")
 public class DetVacaciones implements Serializable{
 
     private static final long serialVersionUID = -2632823297112045342L;
