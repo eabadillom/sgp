@@ -49,14 +49,13 @@ import mx.com.ferbo.util.SGPException;
 public class NominaSemanalBL extends NominaBL {
 	private static Logger log = LogManager.getLogger(NominaSemanalBL.class);
 	
+	public static final int DIAS_PERIODO = 7;
+	
 	private Date periodoInicio = null;
 	private Date periodoFin = null;
 	private Date fechaInicioAnio = null;
 	private Date fechafinAnio = null;
 	
-    private static final int SEPTIMO_DIA = 1;
-    private static final int DIAS_LABORALES_POR_PERIODO = 6;
-    
 	private Integer anio = null;
 	private PercepcionEmpleadoDAO       percepcionEmpleadoDAO = null;
 	private List<DetPercepcionEmpleado> percepcionesEmpleado = null;
@@ -97,7 +96,7 @@ public class NominaSemanalBL extends NominaBL {
 		
 		try {
 			//DIAS TOTALES DEL PERIODO = 7
-			diasPeriodo = new BigDecimal(DIAS_LABORALES_POR_PERIODO + SEPTIMO_DIA).setScale(2, RoundingMode.HALF_UP);
+			diasPeriodo = new BigDecimal(DIAS_PERIODO).setScale(2, RoundingMode.HALF_UP);
 			
 			log.info("#############################################################################");
 			log.info("Empleado: {} {} {}, Salario diario: {}", empleado.getNombre(), empleado.getPrimerAp(), empleado.getSegundoAp(), empleado.getDatoEmpresa().getSalarioDiario());
@@ -121,11 +120,11 @@ public class NominaSemanalBL extends NominaBL {
 			
 			//Para los días trabajados, se debe considerar el periodo inicio y fin de cálculo de la nómina y validar si de los 6 días que
 			//al trabajador le corresponde laborar, tuvo alguna falta.
-			incidencias    = this.getIncidencias(nomina, mapAsistencias);
-			diasTrabajados = this.getDiasTrabajados(listaDiasLaboralesEmpleado, mapAsistencias, this.parametros);
-			diasVacaciones = this.getDiasVacaciones(listaDiasLaboralesEmpleado, mapAsistencias, this.parametros);
-			ausencias      = this.getAusencias(listaDiasLaboralesEmpleado, mapAsistencias, this.parametros);
-			incapacidades = this.getIncapacidades(mapAsistencias, diasLaboralesEmpleado);
+			incidencias    = this.getIncidencias(nomina, this.mapAsistencias);
+			diasTrabajados = this.getDiasTrabajados(this.listaDiasLaboralesEmpleado, this.mapAsistencias, this.parametros);
+			diasVacaciones = this.getDiasVacaciones(this.listaDiasLaboralesEmpleado, this.mapAsistencias, this.parametros);
+			ausencias      = this.getAusencias(this.listaDiasLaboralesEmpleado, this.mapAsistencias, this.parametros);
+			incapacidades = this.getIncapacidades(this.mapAsistencias, diasLaboralesEmpleado);
 			
 			
 			nomina.setDiasLaborados(diasTrabajados);
@@ -133,6 +132,12 @@ public class NominaSemanalBL extends NominaBL {
 			nomina.setDiasNoLaborados(ausencias);
 			nomina.setIncidencias(incidencias);
 			nomina.setDiasIncapacidad(incapacidades);
+			
+			log.info("Dias del perido:   {}", diasPeriodo);
+			log.info("Dias Laborados:    {}", nomina.getDiasLaborados());
+			log.info("Dias Vacaciones:   {}", nomina.getDiasVacaciones());
+			log.info("Dias no laborados: {}", nomina.getDiasNoLaborados());
+			log.info("Dias no laborales: {}", nomina.getDiasNoLaborales());
 			
     		/*---------------------------PERCEPCIONES------------------------------*/
     		NominaSemanalBL.calcularSueldo(nomina, this.parametros, diasLaboralesEmpleado, diasNolaboralesEmpleado, diasTrabajados, diasVacaciones);
@@ -173,7 +178,8 @@ public class NominaSemanalBL extends NominaBL {
 			diasPagados = nomina.getPercepciones().stream()
 				.filter(p -> PercepcionBL.CVE_SUELDO.equalsIgnoreCase(p.getClave())
 						|| PercepcionBL.CVE_SEXTO_DIA.equalsIgnoreCase(p.getClave())
-						||  PercepcionBL.CVE_SEPTIMO_DIA.equalsIgnoreCase(p.getClave())
+						|| PercepcionBL.CVE_SEPTIMO_DIA.equalsIgnoreCase(p.getClave())
+						|| PercepcionBL.CVE_VACACIONES_EN_TIEMPO.equalsIgnoreCase(p.getClave())
 				)
 				.map(p -> p.getCantidad())
 				.reduce(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP), BigDecimal :: add)
@@ -738,7 +744,6 @@ public class NominaSemanalBL extends NominaBL {
 		
 		//Empezamos indicando los días laborales que si debe presentarse a trabajar el empleado (Lunes a Viernes: 5 días, Luens a Sábado, 6 días).
 		//A partir de este conteo, se quitarán las asistencias y los días de descanso obligatorio, para determinar si efectivamente hubo ausencias.
-//		iAusencias = listaDiasLaboralesEmpleado.size();
 		iAusencias = 0;
 		
 		for(String sDia : listaDiasLaboralesEmpleado) {

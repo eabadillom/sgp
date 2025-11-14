@@ -15,7 +15,9 @@ import mx.com.ferbo.business.deduccion.IDeducciones;
 import mx.com.ferbo.business.deduccion.subsidio.ISubsidioEmpleo;
 import mx.com.ferbo.business.deduccion.subsidio.SubsidioEmpleoExecutor;
 import mx.com.ferbo.business.nomina.NominaBL;
+import mx.com.ferbo.business.nomina.NominaSemanalBL;
 import mx.com.ferbo.business.nomina.ParametrosNomina;
+import mx.com.ferbo.business.nomina.PercepcionBL;
 import mx.com.ferbo.business.otropago.AbstractOtroPago;
 import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.CatTarifaISR;
@@ -48,33 +50,12 @@ public class ISRSemanalDBL2 extends AbstractDBL implements IDeducciones {
 	private List<DetNomina>        listaNominaMes = null;
 	private List<CatTarifaISR>     tablaISRSemanal = null;
 	private List<CatTarifaISR>     tablaISRMensual = null;
-	
-	@Deprecated
-	public ISRSemanalDBL2(Date periodoInicio, Date periodoFin, List<CatTipoDeduccion> tiposDeduccion, List<CatTipoOtroPago> tiposOtroPago, List<CatTarifaISR> tablaISR, List<DetNomina> nominaMensual)
-	throws SGPException {
-		try {
-			this.setPeriodo(periodoInicio, periodoFin);
-			this.tiposDeduccion = tiposDeduccion;
-			this.tiposOtroPago = tiposOtroPago;
-			this.tablaISR = tablaISR;
-			this.listaNominaMes = nominaMensual;
-			
-			this.tablaISRSemanal = this.tablaISR.stream()
-					.filter(t -> "s".equalsIgnoreCase(t.getTipo()))
-					.collect(Collectors.toList())
-					;
-			
-			this.tablaISRMensual = this.tablaISR.stream()
-					.filter(t -> "m".equalsIgnoreCase(t.getTipo()))
-					.collect(Collectors.toList())
-					;
-		} catch(Exception ex) {
-			throw new SGPException("Problema al iniciar el objeto de cálculo de ISR semanal...", ex);
-		}
-	}
+	private BigDecimal             ausenciasDelMes = ValoresBD._CERO.get();
+	private BigDecimal             ausenciasSemanales = ValoresBD._CERO.get();
 	
 	public ISRSemanalDBL2(ParametrosNomina parametros, List<DetNomina> nominaMensual)
 	throws SGPException {
+		BigDecimal ausencias = null;
 		try {
 			this.setPeriodo(parametros.getPeriodoInicio(), parametros.getPeriodoFin());
 			this.tiposDeduccion = parametros.getTiposDeduccion();
@@ -91,6 +72,16 @@ public class ISRSemanalDBL2 extends AbstractDBL implements IDeducciones {
 					.filter(t -> "m".equalsIgnoreCase(t.getTipo()))
 					.collect(Collectors.toList())
 					;
+			
+			ausencias = nominaMensual.stream()
+					.filter(item -> item.getDiasNoLaborados().compareTo(ValoresBD._CERO.get()) > 0)
+					.map(item -> item.getDiasNoLaborados())
+					.reduce(ValoresBD._CERO.get(), BigDecimal::add)
+					;
+			
+			this.ausenciasDelMes = this.ausenciasDelMes.add(ausencias);
+			log.info("Ausencias de los periodos anteriores: {}", this.ausenciasDelMes);
+			
 		} catch(Exception ex) {
 			throw new SGPException("Problema al iniciar el objeto de cálculo de ISR semanal...", ex);
 		}
@@ -144,10 +135,10 @@ public class ISRSemanalDBL2 extends AbstractDBL implements IDeducciones {
 		DetNominaDeduccion        dAjusteAlSubsidioCausado  = null;
 		BigDecimal                isrAjustadoPorSubsidio    = null;
 		
-//		Integer idx = null;
+		BigDecimal                ausencias = ValoresBD._CERO.get();
+		BigDecimal                asistencia = null;
 		
 		try {
-//			idx = this.nuevoIndiceDe(nomina.getDeducciones());
 			percepcionesSemanales = nomina.getPercepciones();
 			
 			deduccionesISR = new ArrayList<>();
@@ -173,16 +164,22 @@ public class ISRSemanalDBL2 extends AbstractDBL implements IDeducciones {
 				this.tarifaSubsidioBO = subsidioExecutor.loadClass("SUBEM", DateUtil.toLocalDate(periodoFin), isrAntesDeSubsidioSemanal);
 			}
 			
-			importeSubsidioSemanal = this.tarifaSubsidioBO.calcular(ISubsidioEmpleo.PERIODO_SEMANAL, dBaseISR.getImporte());
+			asistencia = nomina.getDiasLaborados()
+					.divide(nomina.getDiasNoLaborados(), RoundingMode.HALF_UP)
+					.add(nomina.getDiasLaborados())
+					;
 			
-			importeSubsidio = importeSubsidioSemanal;
+			importeSubsidioSemanal = this.tarifaSubsidioBO.calcular(ISubsidioEmpleo.PERIODO_SEMANAL, dBaseISR.getImporte());
+			importeSubsidio = importeSubsidioSemanal.multiply(asistencia).setScale(2, RoundingMode.HALF_UP);
 			
 			//ISR Semanal despues de subsidio al salario.
 			isrDespuesDeSubsidioSemanal = isrAntesDeSubsidioSemanal.subtract(importeSubsidioSemanal);
 			
-			
 			//CALCULO DE ISR MENSUAL
-			if(this.ultimaSemanaMes) {
+			this.ausenciasDelMes = this.ausenciasDelMes.add(nomina.getDiasNoLaborados());
+			log.info("[UI] Dias no laborados de todo el mes: {}", this.ausenciasDelMes);
+			
+			if(this.ausenciasDelMes.compareTo(ValoresBD._CERO.get()) <= 0 && this.ultimaSemanaMes) {
 				log.info("Percepciones: {}", percepcionesSemanales);
 				
 				baseISRMensual = this.calcularBaseISRAcumulado(baseISRSemanal, isrDespuesDeSubsidioSemanal);
@@ -218,8 +215,6 @@ public class ISRSemanalDBL2 extends AbstractDBL implements IDeducciones {
 					importeSubsidio = ValoresBD._CERO.get();
 				
 				log.info("Subsidio otorgado por ajuste mensual: {}", importeSubsidio);
-//				//TODO ¿eliminar la siguiente línea de código?
-//				isrDespuesDeSubsidioSemanal = isrAntesDeSubsidioSemanal.subtract(importeSubsidio);
 				
 				isrDespuesDeSubsidioSemanal = isrAntesDeSubsidioMensual
 						.subtract(isrAntesDeSubsidioSemanasAnteriores)
@@ -261,8 +256,11 @@ public class ISRSemanalDBL2 extends AbstractDBL implements IDeducciones {
 					.procesar(true)
 					.build();
 			
-			NominaBL.agregarDeduccion(nomina, dISRAntesSubsidio);
-			NominaBL.agregarDeduccion(nomina, dISR);
+			if(dISRAntesSubsidio.getImporte().compareTo(ValoresBD._CERO.get()) > 0)
+				NominaBL.agregarDeduccion(nomina, dISRAntesSubsidio);
+			
+			if(dISR.getImporte().compareTo(ValoresBD._CERO.get()) > 0)
+				NominaBL.agregarDeduccion(nomina, dISR);
 			
 			if(dAjusteISRMensual != null)
 				NominaBL.agregarDeduccion(nomina, dAjusteISRMensual);
@@ -272,7 +270,6 @@ public class ISRSemanalDBL2 extends AbstractDBL implements IDeducciones {
 			
 			this.procesaSubsidioAlEmpleo(nomina, importeSubsidio);
 			
-//			nomina.getDeducciones().addAll(deduccionesISR);
 		} catch(Exception ex) {
 			log.error("Problema para calcular el ISR...", ex);
 		} finally {

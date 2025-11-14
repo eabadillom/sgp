@@ -5,6 +5,7 @@ import static mx.com.ferbo.enums.ValoresBD._7;
 import static mx.com.ferbo.enums.ValoresBD._CERO;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 
 import org.apache.logging.log4j.LogManager;
@@ -60,6 +61,10 @@ public class TarifaSubsidioDBL2 implements ISubsidioEmpleo {
 			throw new SGPException("No se encontró la UMA.");
 		
 		try {
+			if(ISubsidioEmpleo.PERIODO_DIARIO.equalsIgnoreCase(periodo)) {
+				importeSubsidio = this.calcularDiario(tarifaSubsidio, uma, baseISR);
+			}
+			
 			if(ISubsidioEmpleo.PERIODO_SEMANAL.equalsIgnoreCase(periodo)) {
 				importeSubsidio = this.calcularSemanal(tarifaSubsidio, uma, baseISR);
 			}
@@ -77,6 +82,15 @@ public class TarifaSubsidioDBL2 implements ISubsidioEmpleo {
 		}
 		
 		return importeSubsidio;
+	}
+	
+	private BigDecimal calcularDiario(CatSubsidio2 tarifa, CatUMA uma, BigDecimal baseISR) {
+		BigDecimal importeDiario = tarifa.getTasa()
+				.multiply(uma.getImporteDiario())
+				.setScale(2, RoundingMode.HALF_UP)
+				;
+		
+		return importeDiario;
 	}
 	
 	private BigDecimal calcularSemanal(CatSubsidio2 tarifa, CatUMA uma, BigDecimal baseISR) {

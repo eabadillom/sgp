@@ -541,8 +541,8 @@ public abstract class NominaBL {
 		if(nomina == null)
 			throw new SGPException("El objeto nómina no está definido.");
     	
-    	if(nomina.getDeducciones() == null)
-    		throw new SGPException("La lista de deducciones no está definida.");
+		if(nomina.getDeducciones() == null)
+    		nomina.setDeducciones(new ArrayList<DetNominaDeduccion>());
 		
 		if(deduccion.getImporte() == null)
 			throw new SGPException("Debe indicar un importe.");
@@ -555,9 +555,6 @@ public abstract class NominaBL {
 		
 		if(deduccion.getNombre().trim().equalsIgnoreCase(""))
 			throw new SGPException("Debe indicar una descripción para la deducción.");
-		
-		if(nomina.getDeducciones() == null)
-			nomina.setDeducciones(new ArrayList<DetNominaDeduccion>());
 		
 		nomina.getDeducciones().add(deduccion);
 	}
