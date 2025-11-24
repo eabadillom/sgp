@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -1023,4 +1024,20 @@ public class DateUtil {
         }
 
     }
+    
+    /*
+    * Inicializa una fecha inicio una semana
+    * atras (7 dias) con una fecha final
+    */
+    public static Date moverFechaSemanaAtras(Date fechaFin) {
+        if (fechaFin == null) {
+            throw new IllegalArgumentException("La fecha fin no puede ser nula");
+        }
+
+        Instant instant = fechaFin.toInstant();
+        Instant inicioInstant = instant.minus(7, ChronoUnit.DAYS);
+
+        return Date.from(inicioInstant);
+    }
+
 }

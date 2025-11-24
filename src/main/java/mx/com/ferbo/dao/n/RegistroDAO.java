@@ -279,7 +279,7 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
         return model;
     }
     
-    public List<DetRegistro> buscarPorEmpleadoEstatus(String clave)
+    public List<DetRegistro> buscarPorEmpleadoEstatus(Date fechaInicio, Date fechaFin, String codigo)
     {
         List<DetRegistro> modelList = null;
         EntityManager em = null;
@@ -288,7 +288,9 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
         {
             em = this.getEntityManager();
             modelList = em.createNamedQuery("DetRegistro.findByEstatus", DetRegistro.class)
-                .setParameter("codigo", clave)
+                .setParameter("fechaInicio", fechaInicio)
+                .setParameter("fechaFin", fechaFin)
+                .setParameter("codigo", codigo)
                 .getResultList();
             
             for (DetRegistro r : modelList) {
