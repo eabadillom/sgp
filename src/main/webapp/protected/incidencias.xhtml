@@ -16,22 +16,42 @@
         <h:form id="formIncidencias">
             <p:growl id="messages" showDetail="true" life="2500"/>
             <p:dialog modal="true" widgetVar="statusInfoDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
-				<div align="center">
-					<i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
-				</div>
-			</p:dialog>
-            <p:tabView id="tabViewI" cache="false" widgetVar="tvIncidencias" dynamic="true">
-            	<p:ajax event="tabChange" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
-                <p:tab title="Retardos">
+                <div align="center">
+                        <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
+                </div>
+            </p:dialog>
+            <p:panel id="pnl-config-fechas" header="CONFIGURAR PERIODO" >
+                <div class="grid ui-fluid" style="gap:1rem;">
+                    <div class="p-col-6 p-md-3">
+                        <div class="field">
+                            <p:outputLabel for="@next" value="Periodo Inicio" />
+                            <p:datePicker value="#{incidenciaBean.fechaInicio}" showIcon="true" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy" style="width:100%" >
+                                <p:ajax update="tabViewI" process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" listener="#{incidenciaBean.onFechaChange}"/>
+                            </p:datePicker>
+                        </div>
+                    </div>
+                    <div class="p-col-6 p-md-3">
+                        <div class="field">
+                            <p:outputLabel for="@next" value="Periodo Fin" />
+                            <p:datePicker value="#{incidenciaBean.fechaFin}" showIcon="true" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy" style="width:100%" >
+                                <p:ajax update="tabViewI" process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" listener="#{incidenciaBean.onFechaChange}"/>
+                            </p:datePicker>
+                        </div>
+                    </div>
+                </div>
+            </p:panel>
+            <p:tabView id="tabViewI" widgetVar="tvIncidencias" dynamic="true" cache="false" activeIndex="#{ingresoBean.activeTabIndex}" >
+            	<p:ajax event="tabChange" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" listener="#{incidenciaBean.onTabChange}" update="@this" />
+                <p:tab title="Retardos" id="tabRetardos">
                     <ui:include src="/protected/seccionesIncidencias/incidenciaRegistro.xhtml" />
                 </p:tab>
-                <p:tab title="Vacaciones / permisos">
+                <p:tab title="Vacaciones / permisos" id="tabPermisos">
                     <ui:include src="/protected/seccionesIncidencias/incidencia.xhtml" />
                 </p:tab>
-                <p:tab title="Solicitudes de uniformes">
+                <p:tab title="Solicitudes de uniformes" id="tabUniformes">
                     <ui:include src="/protected/seccionesIncidencias/incidenciaPrendas.xhtml" />
                 </p:tab>
-                <p:tab title="Solicitudes de articulos">
+                <p:tab title="Solicitudes de articulos" id="tabArticulos">
                     <ui:include src="/protected/seccionesIncidencias/incidenciaArticulos.xhtml" />
                 </p:tab>
             </p:tabView>

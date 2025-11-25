@@ -5,8 +5,16 @@
                 xmlns:jsf="http://xmlns.jcp.org/jsf"
                 xmlns:h="http://xmlns.jcp.org/jsf/html">
 
-    <p:dataTable id="dtPrendasSolicitados" widgetVar="dtPrendasSolicitados" lazy="false" value="#{incidenciaBean.listaPrendas}"
+    <p:dataTable id="dtPrendasSolicitados" widgetVar="dtPrendasSolicitados" lazy="false" value="#{incidenciasPrendasBean.filtrarPrendas()}"
                  var="prendas" rowKey="#{prendas.idIncidencia}" paginator="true" rows="5" paginatorPosition="bottom" >
+        <f:facet name="header">
+            <div class="flex justify-content-start">
+                <p:inputText id="filtarNombre" value="#{incidenciasPrendasBean.filtroEmpleado}" onkeyup="PF('dtPrendasSolicitados').filter()" style="width:300px" 
+                             placeholder="Buscar empleado por nombre o apellidos">
+                    <p:ajax update="dtPrendasSolicitados" process="@this"/>
+                </p:inputText>
+            </div>
+        </f:facet>
         <p:column headerText="Nombre">
             <p:outputLabel value="#{prendas.empleado.nombre} #{prendas.empleado.primerAp} #{prendas.empleado.segundoAp}"/>
         </p:column>
@@ -28,43 +36,43 @@
             </p:outputLabel>
         </p:column>
         <p:column headerText="Estatus" width="6rem" style="text-align: center;">
-            <p:outputLabel class="customer-badge status-#{incidenciaBean.status.getStatusClass(prendas.estatusIncidencia.clave)}"
+            <p:outputLabel class="customer-badge status-#{incidenciasPrendasBean.status.getStatusClass(prendas.estatusIncidencia.clave)}"
                            value="#{prendas.estatusIncidencia.descripcion}" style="display: block; width: 7rem"/>
         </p:column>
         <p:column exportable="false" style="text-align: center" width="2rem">
             <p:commandButton icon="pi pi-bars" class="ui-button-success rounded-button m-1" styleClass="edit-button" process="@this" 
-                             action="#{incidenciaBean.visualizaDialog(prendas)}" update="formIncidencias:tabViewI:dialogPrendas"
+                             action="#{incidenciasPrendasBean.visualizaDialog(prendas)}" update="formIncidencias:tabViewI:dialogPrendas"
                              onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();">
-                <f:setPropertyActionListener value="#{prendas}" target="#{incidenciaBean.incidenciaSelected}" for="@previous"/>
+                <f:setPropertyActionListener value="#{prendas}" target="#{incidenciasPrendasBean.incidenciaSelected}" for="@previous"/>
             </p:commandButton>
         </p:column>
     </p:dataTable>
 
     <p:dialog id="dialogPrendas" widgetVar="dialogPrendas" header="Detalle solicitud uniforme" showEffect="fade" responsive="true" modal="true" 
               styleClass="ferbo-dialog-complemento-articulo" dynamic="true" cache="false" >
-        <p:outputPanel id="pnlPrendas" rendered="#{incidenciaBean.incidenciaSelected ne null}">
+        <p:outputPanel id="pnlPrendas" rendered="#{incidenciasPrendasBean.incidenciaSelected ne null}">
             <div class="formgrid grid">
                 <div class="field col">
-                    <p:outputLabel id="soPrenda" value="#{incidenciaBean.incidenciaSelected.solPrenda.prenda.descripcion}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
+                    <p:outputLabel id="soPrenda" value="#{incidenciasPrendasBean.incidenciaSelected.solPrenda.prenda.descripcion}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
                 </div>
             </div>
             <div class="formgrid grid">
                 <div class="field col">
-                    <h:graphicImage id="imgPrenda" url="/imagen/uniforme?name=#{incidenciaBean.incidenciaSelected.solPrenda.prenda.descripcion}.jpg" width="113" rendered="#{incidenciaBean.incidenciaSelected.solPrenda.prenda.descripcion ne null}" styleClass="product-image"/>
+                    <h:graphicImage id="imgPrenda" url="/imagen/uniforme?name=#{incidenciasPrendasBean.incidenciaSelected.solPrenda.prenda.descripcion}.jpg" width="113" rendered="#{incidenciasPrendasBean.incidenciaSelected.solPrenda.prenda.descripcion ne null}" styleClass="product-image"/>
                 </div>
             </div>
             <div class="formgrid grid">
                 <div class="field col">
-                    <p:outputLabel id="soCantidadTalla" value="Cantidad: #{incidenciaBean.incidenciaSelected.solPrenda.cantidad} #{incidenciaBean.incidenciaSelected.solPrenda.talla.descripcion}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
+                    <p:outputLabel id="soCantidadTalla" value="Cantidad: #{incidenciasPrendasBean.incidenciaSelected.solPrenda.cantidad} #{incidenciasPrendasBean.incidenciaSelected.solPrenda.talla.descripcion}" style="display:block ;font-size: 1.6rem;font-weight: 700;"/>
                 </div>
             </div>
         </p:outputPanel>
         <f:facet name="footer">
             <p:commandButton value="Aprobar" icon="pi pi-check" class="ui-button-success" process="pnlPrendas @this"
-                             actionListener="#{incidenciaBean.guardarEstatusPrenda(true)}"
-                             disabled="#{incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 2 or incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 3 or incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 4}"/>
+                             actionListener="#{incidenciasPrendasBean.guardarEstatusPrenda(true)}"
+                             disabled="#{incidenciasPrendasBean.incidenciaSelected.estatusIncidencia.idEstatus eq 2 or incidenciasPrendasBean.incidenciaSelected.estatusIncidencia.idEstatus eq 3 or incidenciasPrendasBean.incidenciaSelected.estatusIncidencia.idEstatus eq 4}"/>
             <p:commandButton value="Rechazar" icon="pi pi-times" class="ui-button-danger" process="pnlPrendas @this"
-                             disabled="#{incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 2 or incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 3 or incidenciaBean.incidenciaSelected.estatusIncidencia.idEstatus eq 4}"
+                             disabled="#{incidenciasPrendasBean.incidenciaSelected.estatusIncidencia.idEstatus eq 2 or incidenciasPrendasBean.incidenciaSelected.estatusIncidencia.idEstatus eq 3 or incidenciasPrendasBean.incidenciaSelected.estatusIncidencia.idEstatus eq 4}"
                              oncomplete="PF('dialogRechazarPrendas').show()"/>
         </f:facet>
     </p:dialog>
@@ -75,13 +83,13 @@
             <div class="formgrid grid">
                 <div class="field col">
                     <p:outputLabel for="txtRechazoPrendas" value="Descripción de rechazo"/>
-                    <p:inputTextarea id="txtRechazoPrendas" value="#{incidenciaBean.incidenciaSelected.solPrenda.descripcionRechazo}"/>
+                    <p:inputTextarea id="txtRechazoPrendas" value="#{incidenciasPrendasBean.incidenciaSelected.solPrenda.descripcionRechazo}"/>
                 </div>
             </div>
         </p:outputPanel>
         <f:facet name="footer">
             <p:commandButton value="Aceptar" icon="pi pi-check" class="ui-button-success" process="pnlDetalleRechazoPrendas @this"
-                             actionListener="#{incidenciaBean.guardarEstatusPrenda(false)}" oncomplete="PF('dialogRechazarPrendas').hide()" update="formIncidencias:tabViewI:dtPrendasSolicitados"/>
+                             actionListener="#{incidenciasPrendasBean.guardarEstatusPrenda(false)}" oncomplete="PF('dialogRechazarPrendas').hide()" update="formIncidencias:tabViewI:dtPrendasSolicitados"/>
             <p:commandButton value="Cancelar" icon="pi pi-times" class="ui-button-secondary" process="@this" 
                              oncomplete="PF('dialogRechazarPrendas').hide()"/>
         </f:facet>
