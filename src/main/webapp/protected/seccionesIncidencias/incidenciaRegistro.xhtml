@@ -39,25 +39,11 @@
 	       }
 	    };
 	</script>    
-    <div class="ui-fluid formgrid grid">
-        <div class="field col-12 md:col-3">
-            <p:outputLabel for="@next" value="Periodo Inicio" />
-            <p:datePicker value="#{incidenciaBean.inicio}" showIcon="true" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy">
-                <p:ajax update="dtRegistro" process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
-            </p:datePicker>
-        </div>
-        <div class="field col-12 md:col-3">
-            <p:outputLabel for="@next" value="Periodo Fin" />
-            <p:datePicker  value="#{incidenciaBean.fin}" showIcon="true" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy">
-                <p:ajax update="dtRegistro" process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
-            </p:datePicker>
-        </div>
-    </div>
-    <p:dataTable id="dtRegistro" widgetVar="dtRegistro" value="#{incidenciaBean.consultarRegistros()}" selection="#{incidenciaBean.listRegistroFiltrada}"
+    <p:dataTable id="dtRegistro" widgetVar="dtRegistro" value="#{incidenciasAusenciasBean.filtrarRegistros()}" selection="#{incidenciasAusenciasBean.listRegistroFiltrada}"
                  var="registro" rowKey="#{registro.idRegistro}" paginator="true" rows="10" paginatorPosition="bottom" reflow="true">
         <f:facet name="header">
             <div class="flex justify-content-start">
-                <p:inputText id="filtarNombre" value="#{incidenciaBean.empleadoAsistenciaTXT}" onkeyup="PF('dtRegistro').filter()" style="width:300px" 
+                <p:inputText id="filtarNombre" value="#{incidenciasAusenciasBean.empleadoAsistenciaTXT}" onkeyup="PF('dtRegistro').filter()" style="width:300px" 
                              placeholder="Buscar empleado por nombre o apellidos">
                     <p:ajax update="dtRegistro" process="@this"/>
                 </p:inputText>
@@ -72,14 +58,14 @@
             </p:outputLabel>
         </p:column>
         <p:column headerText="Estatus" width="6rem" style="text-align: center;">
-            <p:outputLabel class="customer-badge status-#{incidenciaBean.status.getEstatusRegistro(registro.status.codigo)}"
+            <p:outputLabel class="customer-badge status-#{incidenciasAusenciasBean.status.getEstatusRegistro(registro.status.codigo)}"
                            value="#{registro.status.descripcion}" style="display: block; width: 7rem"/>
         </p:column>
         <p:column width="2rem" style="text-align: center;">
             <p:commandButton icon="pi pi-bars" class="ui-button-success rounded-button m-1" styleClass="edit-button" process="@this"
-                             action="#{incidenciaBean.editarRegistro(registro)}" update="formIncidencias:tabViewI:pnlRegisto"
+                             action="#{incidenciasAusenciasBean.editarRegistro(registro)}" update="formIncidencias:tabViewI:pnlRegisto"
                              oncomplete="PF('dialogRegistro').show();">
-                <f:setPropertyActionListener value="#{registro}" target="#{incidenciaBean.registro}" for="@previous"/>
+                <f:setPropertyActionListener value="#{registro}" target="#{incidenciasAusenciasBean.registroAusencia}" for="@previous"/>
             </p:commandButton>
         </p:column>
     </p:dataTable>
@@ -89,13 +75,13 @@
             <div class="formgrid grid" >
                 <div class="field col" >
                     <p:outputLabel for="@next" value="Nombre: " style="width: 15rem" />
-                    <p:inputText value="#{incidenciaBean.registro.idEmpleado.nombre} #{incidenciaBean.registro.idEmpleado.primerAp} #{incidenciaBean.registro.idEmpleado.segundoAp}" disabled="true" />
+                    <p:inputText value="#{incidenciasAusenciasBean.registroAusencia.idEmpleado.nombre} #{incidenciasAusenciasBean.registroAusencia.idEmpleado.primerAp} #{incidenciasAusenciasBean.registroAusencia.idEmpleado.segundoAp}" disabled="true" />
                 </div>
             </div>
             <div class="formgrid grid" >
                 <div class="field col" >
                     <p:outputLabel for="@next" value="Fecha: " style="width: 4rem" />
-                    <p:inputText value="#{incidenciaBean.registro.fechaEntrada}" disabled="true" >
+                    <p:inputText value="#{incidenciasAusenciasBean.registroAusencia.fechaEntrada}" disabled="true" >
                         <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
                     </p:inputText>
                 </div>
@@ -103,8 +89,8 @@
             <div class="formgrid grid" >
                 <div class="field col" >
                     <p:outputLabel for="@next" value="Estatus: " style="width: 4rem" />
-                    <p:inputText class="customer-badge status-#{incidenciaBean.status.getEstatusRegistro(incidenciaBean.registro.status.codigo)}" 
-                                   value="#{incidenciaBean.registro.status.descripcion}" disabled="true" />
+                    <p:inputText class="customer-badge status-#{incidenciasAusenciasBean.status.getEstatusRegistro(incidenciasAusenciasBean.registroAusencia.status.codigo)}" 
+                                   value="#{incidenciasAusenciasBean.registroAusencia.status.descripcion}" disabled="true" />
                 </div>
             </div>
         </p:outputPanel>
@@ -120,7 +106,7 @@
     </p:dialog>
     <p:confirmDialog id="dlg-justificar" widgetVar="dialogoJustificar" showEffect="fade" width="300"
         message="Justificar Asistencia Empleado?" header="Confirmar" severity="warn">
-        <p:commandButton value="Si" icon="pi pi-check" actionListener="#{incidenciaBean.actualizarRegistro()}"
+        <p:commandButton value="Si" icon="pi pi-check" actionListener="#{incidenciasAusenciasBean.actualizarRegistro()}"
             process="@this" oncomplete="PF('dialogRegistro').hide()" update="formIncidencias:tabViewI:dtRegistro">
             <p:resetInput target="formIncidencias:tabViewI:pnlRegisto" />
         </p:commandButton>

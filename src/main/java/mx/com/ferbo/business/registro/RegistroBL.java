@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 import mx.com.ferbo.business.dianolaboral.DiasDeDescansoObligatorioBL;
 import mx.com.ferbo.business.empleado.EmpleadoBL;
 import mx.com.ferbo.business.incidencia.SolicitudPermisoBL;
+import mx.com.ferbo.dao.n.EstatusRegistroDAO;
 import mx.com.ferbo.dao.n.RegistroDAO;
 import mx.com.ferbo.dao.n.RegistroVacacionesDAO;
 import mx.com.ferbo.model.CatEstatusRegistro;
@@ -158,7 +160,13 @@ public class RegistroBL implements Serializable
     {
         try
         {
+            EstatusRegistroDAO estatusRegistroDAO = new EstatusRegistroDAO();
             RegistroDAO registroDAO = new RegistroDAO();
+            
+            String justificado = "J";
+            CatEstatusRegistro estatusRegJustificado = estatusRegistroDAO.buscarPorCodigo(justificado); 
+            
+            registro.setStatus(estatusRegJustificado);
             registroDAO.actualizar(registro);
         }catch(SGPException ex)
         {
@@ -266,7 +274,7 @@ public class RegistroBL implements Serializable
             cantidadRegistrosGuardados += 1;
         }
         
-        log.info("Num. registros de incapacidad guardados del empleado {} en asistencia: {}", empleado.getIdEmpleado(), cantidadRegistrosGuardados);
+        log.info("Num. registros de vacaciones guardados del empleado {} en asistencia: {}", empleado.getIdEmpleado(), cantidadRegistrosGuardados);
     }
     
 	/* Guarda los registros de incapacidad en registro de asistencia */
@@ -356,6 +364,44 @@ public class RegistroBL implements Serializable
         {
             log.info("Error: ", e);
         }
+    }
+    
+    public static void eliminarRegistro(DetRegistro registro) throws SGPException{
+        RegistroDAO registroDAO = new RegistroDAO();
+        try
+        {
+            registroDAO.eliminar(registro);
+        } catch(SGPException ex)
+        {
+            log.info("Error al eliminar el registro de vacaciones: {}", ex);
+            throw new SGPException("Error al eliminar el registro de vacaciones");
+        }
+    }
+    
+    public static List<DetRegistro> buscarPorEmpleadoAusencias(Date fechaInicio, Date fechaFin){
+        RegistroDAO registroDAO = new RegistroDAO();
+        String retardo = "R";
+        return registroDAO.buscarPorEmpleadoEstatus(fechaInicio, fechaFin, retardo);
+    }
+    
+    public static List<DetRegistro> filtrarAusencias(List<DetRegistro> registros, String numEmpleado){
+        Stream<DetRegistro> stream = registros.stream();
+
+        // --- Filtro por nombre del empleado ---
+        if (numEmpleado != null && !numEmpleado.trim().isEmpty()) {
+            String filtro = numEmpleado.trim().toUpperCase();
+
+            stream = stream.filter(obj -> {
+                String nombre = obj.getIdEmpleado().getNombre().toUpperCase();
+                String ap1    = obj.getIdEmpleado().getPrimerAp().toUpperCase();
+                String ap2    = obj.getIdEmpleado().getSegundoAp().toUpperCase();
+                return nombre.contains(filtro)
+                    || ap1.contains(filtro)
+                    || ap2.contains(filtro);
+            });
+        }
+
+        return stream.collect(Collectors.toList());
     }
     
 }

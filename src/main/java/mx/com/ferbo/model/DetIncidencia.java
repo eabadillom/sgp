@@ -29,6 +29,7 @@ import javax.validation.constraints.Null;
 @Table(name = "det_incidencia")
 @NamedQuery(name = "DetIncidencia.findAll", query = "SELECT d FROM DetIncidencia d JOIN d.empleado e JOIN d.tipoIncidencia ct JOIN d.estatusIncidencia ce LEFT JOIN d.solPermiso sp LEFT JOIN d.solArticulo sa LEFT JOIN d.solPrenda spr LEFT JOIN sp.tipoSolicitud tp LEFT JOIN sa.articulo a LEFT JOIN spr.prenda p LEFT JOIN spr.talla t ORDER BY d.fechaCap")
 @NamedQuery(name = "DetIncidencia.findByIdEmpleado", query = "SELECT d FROM DetIncidencia d JOIN d.empleado e WHERE e.idEmpleado = :idEmpleado")
+@NamedQuery(name = "DetIncidencia.findByPeriodo", query = "SELECT d FROM DetIncidencia d JOIN d.estatusIncidencia ei WHERE d.fechaCap BETWEEN :fechaInicio AND :fechaFin")
 @NamedQuery(name = "DetIncidencia.findByArticulo", query = "SELECT d FROM DetIncidencia d INNER JOIN d.empleado e INNER JOIN d.solArticulo sa WHERE e.idEmpleado = :idEmpleado AND sa.idSolicitud = :idSolicitud")
 @NamedQuery(name = "DetIncidencia.findByPermiso", query = "SELECT d FROM DetIncidencia d INNER JOIN d.empleado e INNER JOIN d.solPermiso sp WHERE e.idEmpleado = :idEmpleado AND sp.idSolicitud = :idSolicitud")
 @NamedQuery(name = "DetIncidencia.findByPrenda", query = "SELECT d FROM DetIncidencia d INNER JOIN d.empleado e INNER JOIN d.solPrenda sp WHERE e.idEmpleado = :idEmpleado AND sp.idSolicitud = :idSolicitud")
