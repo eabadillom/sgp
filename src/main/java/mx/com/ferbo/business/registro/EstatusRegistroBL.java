@@ -26,38 +26,44 @@ public class EstatusRegistroBL implements Serializable {
 	}
 
 	public static CatEstatusRegistro estatusATiempo() {
-		String aTiempo = "T";
 		EstatusRegistroDAO estatusDAO = new EstatusRegistroDAO();
-		CatEstatusRegistro estatusATiempo = estatusDAO.buscarPorCodigo(aTiempo);
+		CatEstatusRegistro estatusATiempo = estatusDAO.buscarPorCodigo(A_TIEMPO);
 		return estatusATiempo;
 	}
 
 	public static CatEstatusRegistro estatusRetardo() {
-		String retardo = "R";
 		EstatusRegistroDAO estatusDAO = new EstatusRegistroDAO();
-		CatEstatusRegistro estatusRetardo = estatusDAO.buscarPorCodigo(retardo);
+		CatEstatusRegistro estatusRetardo = estatusDAO.buscarPorCodigo(RETARDO);
 		return estatusRetardo;
 	}
 
 	public static CatEstatusRegistro estatusPermiso() {
-		String permiso = "P";
 		EstatusRegistroDAO estatusDAO = new EstatusRegistroDAO();
-		CatEstatusRegistro estatusPermiso = estatusDAO.buscarPorCodigo(permiso);
+		CatEstatusRegistro estatusPermiso = estatusDAO.buscarPorCodigo(PERMISO);
 		return estatusPermiso;
 	}
 
 	public static CatEstatusRegistro estatusVacaciones() {
-		String vacaciones = "V";
 		EstatusRegistroDAO estatusDAO = new EstatusRegistroDAO();
-		CatEstatusRegistro estatusVacaciones = estatusDAO.buscarPorCodigo(vacaciones);
+		CatEstatusRegistro estatusVacaciones = estatusDAO.buscarPorCodigo(VACACIONES);
 		return estatusVacaciones;
 	}
 
 	public static CatEstatusRegistro estatusIncapacidad() {
-		String incapacidad = "I";
 		EstatusRegistroDAO estatusDAO = new EstatusRegistroDAO();
-		CatEstatusRegistro estatusIncapacidad = estatusDAO.buscarPorCodigo(incapacidad);
+		CatEstatusRegistro estatusIncapacidad = estatusDAO.buscarPorCodigo(INCAPACIDAD);
 		return estatusIncapacidad;
 	}
-
+	
+	public static CatEstatusRegistro estatusDescanso() {
+		EstatusRegistroDAO estatusDAO = new EstatusRegistroDAO();
+		CatEstatusRegistro estatusIncapacidad = estatusDAO.buscarPorCodigo(DESCANSO);
+		return estatusIncapacidad;
+	}
+	
+	public static CatEstatusRegistro estatusAusencia() {
+		EstatusRegistroDAO estatusDAO = new EstatusRegistroDAO();
+		CatEstatusRegistro estatusIncapacidad = estatusDAO.buscarPorCodigo(AUSENCIA);
+		return estatusIncapacidad;
+	}
 }

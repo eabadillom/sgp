@@ -1,0 +1,40 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+	<p:dialog header="Dias laborales del empleado" widgetVar="dlgDiasLaborales" modal="true">
+		<p:outputPanel id="dlg-dias-laborales" styleClass="ui-fluid">
+			<p:panelGrid columns="7" layout="flex" styleClass="ui-noborder">
+					<p:selectBooleanButton value="#{nominaS.lunes}" onLabel="Lunes" offLabel="Lunes" onIcon="pi pi-check" offIcon="pi pi-times" style="width: 8rem;">
+						<p:ajax event="change" listener="#{nominaS.modificarDiasLaborales('L')}" update="form:tv-nomina"/>
+					</p:selectBooleanButton>
+					<p:selectBooleanButton value="#{nominaS.martes}" onLabel="Martes" offLabel="Martes" onIcon="pi pi-check" offIcon="pi pi-times" style="width: 8rem;">
+						<p:ajax event="change" listener="#{nominaS.modificarDiasLaborales('M')}" update="form:tv-nomina"/>
+					</p:selectBooleanButton>
+					<p:selectBooleanButton value="#{nominaS.miercoles}" onLabel="Miércoles" offLabel="Miércoles" onIcon="pi pi-check" offIcon="pi pi-times" style="width: 8rem;">
+						<p:ajax event="change" listener="#{nominaS.modificarDiasLaborales('X')}" update="form:tv-nomina"/>
+					</p:selectBooleanButton>
+					<p:selectBooleanButton value="#{nominaS.jueves}" onLabel="Jueves" offLabel="Jueves" onIcon="pi pi-check" offIcon="pi pi-times" style="width: 8rem;">
+						<p:ajax event="change" listener="#{nominaS.modificarDiasLaborales('J')}" update="form:tv-nomina"/>
+					</p:selectBooleanButton>
+					<p:selectBooleanButton value="#{nominaS.viernes}" onLabel="Viernes" offLabel="Viernes" onIcon="pi pi-check" offIcon="pi pi-times" style="width: 8rem;">
+						<p:ajax event="change" listener="#{nominaS.modificarDiasLaborales('V')}" update="form:tv-nomina"/>
+					</p:selectBooleanButton>
+					<p:selectBooleanButton value="#{nominaS.sabado}" onLabel="Sábado" offLabel="Sábado" onIcon="pi pi-check" offIcon="pi pi-times" style="width: 8rem;">
+						<p:ajax event="change" listener="#{nominaS.modificarDiasLaborales('S')}" update="form:tv-nomina"/>
+					</p:selectBooleanButton>
+					<p:selectBooleanButton value="#{nominaS.domingo}" onLabel="Domingo" offLabel="Domingo" onIcon="pi pi-check" offIcon="pi pi-times" style="width: 8rem;">
+						<p:ajax event="change" listener="#{nominaS.modificarDiasLaborales('D')}" update="form:tv-nomina"/>
+					</p:selectBooleanButton>
+			</p:panelGrid>
+		</p:outputPanel>
+		<f:facet name="footer">
+			<p:commandButton icon="pi pi-times" value="Cerrar" onclick="PF('dlgDiasLaborales').hide();" styleClass="ui-button-outlined ui-button-secondary"/>
+		</f:facet>
+	</p:dialog>
+
+
+</ui:composition>

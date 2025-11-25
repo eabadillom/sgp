@@ -79,6 +79,10 @@ public class NominaSemanalBL extends NominaBL {
 	}
 	
 	public DetNomina calcular() {
+		return this.calcular(null);
+	}
+	
+	public DetNomina calcular(DetNomina  nomina) {
 		BigDecimal diasPeriodo             = null;
 		BigDecimal diasLaboralesEmpleado   = null;
 		BigDecimal diasNolaboralesEmpleado = null;
@@ -87,45 +91,47 @@ public class NominaSemanalBL extends NominaBL {
 		BigDecimal ausencias               = null;
 		BigDecimal incapacidades           = null;
 		BigDecimal diasPagados             = null;
-		DetNomina  nomina                  = null;
 		
-		List<DetNominaPercepcion>   percepciones         = null;
-		List<DetNominaOtroPago>     otrosPagos           = null;
-		List<DetNominaDeduccion>    deducciones          = null;
 		List<DetNominaIncidencia>  incidencias          = null;
 		
 		try {
 			//DIAS TOTALES DEL PERIODO = 7
 			diasPeriodo = new BigDecimal(DIAS_PERIODO).setScale(2, RoundingMode.HALF_UP);
 			
-			log.info("#############################################################################");
-			log.info("Empleado: {} {} {}, Salario diario: {}", empleado.getNombre(), empleado.getPrimerAp(), empleado.getSegundoAp(), empleado.getDatoEmpresa().getSalarioDiario());
-			log.info("Ejecutando la nomina de la semana {} del año en curso...", this.parametros.getPeriodo());
-			nomina =  NominaSemanalBL.build(TP_NOMINA_ORDINARIA, this.parametros, this.empleado);
-			percepciones = nomina.getPercepciones();
-			otrosPagos = nomina.getOtrosPagos();
-			deducciones = nomina.getDeducciones();
+			if(nomina == null) {
+				log.info("#############################################################################");
+				log.info("Empleado: {} {} {}, Salario diario: {}", empleado.getNombre(), empleado.getPrimerAp(), empleado.getSegundoAp(), empleado.getDatoEmpresa().getSalarioDiario());
+				log.info("Ejecutando la nomina de la semana {} del año en curso...", this.parametros.getPeriodo());
+				nomina =  NominaSemanalBL.build(TP_NOMINA_ORDINARIA, this.parametros, this.empleado);
+				
+				//De la configuración del empleado, se obtienen los días de la semana que debe presentarse a laborar
+				//y los que debe descansar.
+				//Por ejemplo, una semana laboral de Lunes a Viernes, con Sábado y Domingo de descanso,
+				//o bien, una semana laboral de Lunes a Sábado, con Domingo de descanso.
+				listaDiasLaboralesEmpleado = NominaSemanalBL.getDiasLaboralesPorSemana(this.empleado);
+				listaDiasNoLaboralesEmpleado = NominaSemanalBL.getDiasNoLaboralesPorSemana(this.empleado);
+			} else {
+				listaDiasLaboralesEmpleado = nomina.getReceptor().getDiasLaborales();
+				listaDiasNoLaboralesEmpleado = nomina.getReceptor().getDiasNoLaborales();
+			}
 			
-			//De la configuración del empleado, se obtienen los días de la semana que debe presentarse a laborar
-			//y los que debe descansar.
-			//Por ejemplo, una semana laboral de Lunes a Viernes, con Sábado y Domingo de descanso,
-			//o bien, una semana laboral de Lunes a Sábado, con Domingo de descanso.
-			listaDiasLaboralesEmpleado = NominaSemanalBL.getDiasLaboralesPorSemana(this.empleado);
-			listaDiasNoLaboralesEmpleado = NominaSemanalBL.getDiasNoLaboralesPorSemana(this.empleado);
 			diasLaboralesEmpleado   = new BigDecimal(listaDiasLaboralesEmpleado.size()).setScale(2, RoundingMode.HALF_UP);
 			diasNolaboralesEmpleado = new BigDecimal(listaDiasNoLaboralesEmpleado.size()).setScale(2, RoundingMode.HALF_UP);
 			
 			nomina.setDiasLaborales(diasLaboralesEmpleado);
 			nomina.setDiasNoLaborales(diasNolaboralesEmpleado);
+			nomina.setEmpleado(this.empleado);
+			nomina.setMapAsistencias(this.mapAsistencias);
+			nomina.getReceptor().setDiasLaborales(listaDiasLaboralesEmpleado);
+			nomina.getReceptor().setDiasNoLaborales(listaDiasNoLaboralesEmpleado);
 			
 			//Para los días trabajados, se debe considerar el periodo inicio y fin de cálculo de la nómina y validar si de los 6 días que
 			//al trabajador le corresponde laborar, tuvo alguna falta.
-			incidencias    = this.getIncidencias(nomina, this.mapAsistencias);
-			diasTrabajados = this.getDiasTrabajados(this.listaDiasLaboralesEmpleado, this.mapAsistencias, this.parametros);
-			diasVacaciones = this.getDiasVacaciones(this.listaDiasLaboralesEmpleado, this.mapAsistencias, this.parametros);
-			ausencias      = this.getAusencias(this.listaDiasLaboralesEmpleado, this.mapAsistencias, this.parametros);
-			incapacidades = this.getIncapacidades(this.mapAsistencias, diasLaboralesEmpleado);
-			
+			incidencias    = this.getIncidencias(nomina, nomina.getAsistencias());
+			diasTrabajados = this.getDiasTrabajados(nomina.getReceptor().getDiasLaborales(), nomina.getAsistencias(), this.parametros);
+			diasVacaciones = this.getDiasVacaciones(nomina.getReceptor().getDiasLaborales(), nomina.getAsistencias(), this.parametros);
+			ausencias      = this.getAusencias(nomina.getReceptor().getDiasLaborales(), nomina.getAsistencias(), this.parametros);
+			incapacidades  = this.getIncapacidades(nomina.getAsistencias(), diasLaboralesEmpleado);
 			
 			nomina.setDiasLaborados(diasTrabajados);
 			nomina.setDiasVacaciones(diasVacaciones);
@@ -161,15 +167,15 @@ public class NominaSemanalBL extends NominaBL {
 			
 			
 			/*--------------------------RESUMEN--------------------------*/
-			for(DetNominaPercepcion p : percepciones) {
+			for(DetNominaPercepcion p : nomina.getPercepciones()) {
 				log.info("Percepcion: {} - {} - {}", p.getNombre(), p.getImporteExento(), p.getImporteGravado());
 			}
 			
-			for(DetNominaOtroPago o : otrosPagos) {
+			for(DetNominaOtroPago o : nomina.getOtrosPagos()) {
 				log.info("Otro pago: {} - {}", o.getNombre(), o.getImporte());
 			}
 			
-			for(DetNominaDeduccion d : deducciones) {
+			for(DetNominaDeduccion d : nomina.getDeducciones()) {
 				log.info("Deduccion: {} - {}", d.getNombre(), d.getImporte());
 			}
 			
