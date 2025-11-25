@@ -74,7 +74,7 @@ public class IncidenciasSolicitudesBean implements Serializable
     @PostConstruct
     public void init() {
         this.empleadoSesion = (DetEmpleado) getValorEnSesion("empleado");
-        log.info("El empleado {} entrando a la sección de vacaciones / permisos", this.empleadoSelected.getNombre());
+        log.info("El empleado {} entrando a la sección de vacaciones / permisos", this.empleadoSesion.getNombre());
         this.lstTipoSol = this.tipoSolicitudDAO.buscarActivos();
         this.diasDeAsueto = DiasDeDescansoObligatorioBL.diasDeAsueto();
         this.goceSueldo = "100.0";

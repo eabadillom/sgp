@@ -45,7 +45,7 @@ public class IncidenciasPrendasBean implements Serializable
     @PostConstruct
     public void init() {
         this.empleadoSesion = (DetEmpleado) getValorEnSesion("empleado");
-        log.info("El empleado {} entrando a la sección de prendas", this.empleadoSelected.getNombre());
+        log.info("El empleado {} entrando a la sección de prendas", this.empleadoSesion.getNombre());
     }
     
     public void cargar(Date inicio, Date fin) {
