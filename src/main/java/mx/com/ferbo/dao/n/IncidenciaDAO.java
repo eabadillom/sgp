@@ -60,6 +60,26 @@ public class IncidenciaDAO extends BaseDAO<DetIncidencia, Integer> {
         return modelList;
     }
     
+    public List<DetIncidencia> buscarPorPerido(Date fechaInicio, Date fechaFin) {
+        List<DetIncidencia> modelList = null;
+        EntityManager emSGP = null;
+        
+        try {
+            emSGP = getEntityManager();
+            modelList = emSGP.createNamedQuery("DetIncidencia.findByPeriodo", DetIncidencia.class)
+                    .setParameter("fechaInicio", fechaInicio)
+                    .setParameter("fechaFin", fechaFin)
+                    .getResultList()
+                    ;
+        } catch (Exception ex) {
+            log.error("Problema para obtener el listado de incidencias...", ex);
+        } finally {
+            close(emSGP);
+        }
+        
+        return modelList;
+    }
+    
     public Optional<DetIncidencia> cargar(Integer id)
     throws SGPException {
     	
@@ -232,7 +252,13 @@ public class IncidenciaDAO extends BaseDAO<DetIncidencia, Integer> {
     				.getResultList()
     				;
     		
-    		modelList.stream().forEach(item -> log.debug("Permiso: {}", item.getSolPermiso().getIdSolicitud()));
+    		modelList.stream().forEach(
+                    item -> {
+                        log.debug("Permiso: {}", item.getSolPermiso());
+                        if(item.getSolPermiso() != null)
+                            log.debug("Dias permiso: {}", item.getSolPermiso().getDiasPermiso().size());
+                    }
+                );
     		
     	} catch(Exception ex) {
     		log.error("Problema para obtener los permisos de ausencia y/o permisos de vacaciones...", ex);
