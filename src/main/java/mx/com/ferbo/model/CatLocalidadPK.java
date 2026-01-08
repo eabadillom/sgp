@@ -2,10 +2,10 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
@@ -67,11 +67,11 @@ public class CatLocalidadPK implements Serializable
     }
     
     @Override
-    public int hashCode() 
+    public int hashCode()
     {
-        int hash = 7;
-        hash = 89 * hash + this.id;
-        return hash;
+    	if(this.id == null)
+    		return System.identityHashCode(this);
+    	return Objects.hash(this.id, this.municipio);
     }
 
     @Override

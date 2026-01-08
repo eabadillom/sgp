@@ -2,10 +2,10 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
@@ -63,9 +63,9 @@ public class CatEstadoPK implements Serializable
     @Override
     public int hashCode() 
     {
-        int hash = 3;
-        hash = 23 * hash + Objects.hashCode(this.id);
-        return hash;
+    	if(this.id == null)
+    		return System.identityHashCode(this);
+    	return Objects.hash(this.id, this.pais);
     }
 
     @Override

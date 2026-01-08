@@ -22,8 +22,8 @@
 												<p:commandButton icon="pi pi-plus" value="Agregar" process="@this" update="form:panelDialogEmpleado form:dlg-salario form:dlSalariosDiarios" actionListener="#{registroEmpleadosBean.agregarSalarioDiario()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
 										</div>
 										<p:spacer height="2rem"></p:spacer>
-										<p:dataTable id="dlSalariosDiarios" value="#{registroEmpleadosBean.empleado.datoEmpresa.salariosDiarios}" var="sd" emptyMessage="No hay salario diario registrado" editable="true" editMode="cell" sortBy="#{sd.fechaRegistro}" sortOrder="ascending">
-	                               			<p:column headerText="Importe" sortable="true" sortBy="#{sd.importe}">
+										<p:dataTable id="dlSalariosDiarios" value="#{registroEmpleadosBean.empleado.datoEmpresa.salariosDiarios}" var="sd" emptyMessage="No hay salario diario registrado" editable="true" editMode="cell" sortBy="#{sd.fechaRegistro}" sortMode="single">
+	                               			<p:column headerText="Importe" sortable="true" sortBy="#{sd.importe}" sortOrder="desc">
 	                               				<p:cellEditor>
 	                               					<f:facet name="output">
 	                               						<p:outputLabel value="#{sd.importe}">
