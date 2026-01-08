@@ -7,9 +7,9 @@
 			<div class="ui-fluid formgrid grid align-items-left">
 				<div class="field col-12 md:col-2">
 					<p:outputLabel value="Emisor" />
-					<p:selectOneMenu id="soEmpresa" value="#{nominaS.empresaSelected}" autoWidth="false" converter="entityConverter">
+					<p:selectOneMenu id="soEmpresa" value="#{nominaS.empresaSelected}" autoWidth="false" converter="entityConverter" filter="true" filterMatchMode="contains">
 						<f:selectItem itemLabel="--Seleccione--"/>
-						<f:selectItems value="#{nominaS.lstEmpresas}" var="empresa" itemValue="#{empresa}" itemLabel="#{empresa.descripcion}"/>
+						<f:selectItems value="#{nominaS.lstEmpresas}" var="empresa" itemValue="#{empresa}" itemLabel="#{empresa.descripcion}" />
 						<p:ajax event="change" process="@this" listener="#{nominaS.calculaPeriodo()}" update="anio semana dp-periodo-inicio dp-periodo-fin" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
 					</p:selectOneMenu>
 				</div>

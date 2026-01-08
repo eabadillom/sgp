@@ -3,9 +3,11 @@ package mx.com.ferbo.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,7 +15,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import mx.com.ferbo.model.sat.CatBanco;
 import mx.com.ferbo.model.sat.CatEntidadFederativa;
@@ -82,8 +86,7 @@ public class InfDatoEmpresa implements Serializable {
     @Column(name = "nb_rfc")
     private String rfc;
 
-    @Basic(optional = true)
-    @Column(name = "nu_salario_diario")
+    @Transient
     private BigDecimal salarioDiario;
 
     @Basic(optional = true)
@@ -165,7 +168,10 @@ public class InfDatoEmpresa implements Serializable {
     @Basic(optional = true)
     @Column(name = "nu_dias_aguinaldo" , precision = 4, scale = 2)
     private BigDecimal diasAguinaldo;
-
+    
+    @OneToMany(mappedBy = "datoEmpresa", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private List<DetSalarioDiario> salariosDiarios;
+    
 	private InfDatoEmpresa(Builder builder) {
 		this.id = builder.id;
 		this.perfil = builder.perfil;
@@ -201,6 +207,7 @@ public class InfDatoEmpresa implements Serializable {
 		this.motivobaja = builder.motivobaja;
 		this.primaVacacional = builder.primaVacacional;
 		this.diasAguinaldo = builder.diasAguinaldo;
+		this.salariosDiarios = builder.salariosDiarios;
 	}
 
     @Override
@@ -235,51 +242,6 @@ public class InfDatoEmpresa implements Serializable {
     public InfDatoEmpresa() {
     }
     
-    public InfDatoEmpresa(Integer id, CatPerfil perfil, CatEmpresa empresa, CatPlanta planta, CatArea area,
-			CatPuesto puesto, CatTipoContrato tipoContrato, CatTipoJornada tipoJornada, CatTipoRegimen tipoRegimen,
-			Date fechaIngreso, Date fechaBaja, String nss, String rfc, BigDecimal salarioDiario, Date horaEntrada,
-			Date horasalida, Integer minutosTolerancia, CatEntidadFederativa entidadFederativa,
-			CatRiesgoPuesto riesgoPuesto, CatPeriodicidadPago periodicidadPago, CatTipoBajaEmpleado tipodebaja,
-			CatBanco banco, Boolean sindicalizado, Boolean confianza, Boolean diaLunes, Boolean diaMartes,
-			Boolean diaMiercoles, Boolean diaJueves, Boolean diaViernes, Boolean diaSabado, Boolean diaDomingo,
-			String motivobaja, BigDecimal primaVacacional, BigDecimal diasAguinaldo) {
-		super();
-		this.id = id;
-		this.perfil = perfil;
-		this.empresa = empresa;
-		this.planta = planta;
-		this.area = area;
-		this.puesto = puesto;
-		this.tipoContrato = tipoContrato;
-		this.tipoJornada = tipoJornada;
-		this.tipoRegimen = tipoRegimen;
-		this.fechaIngreso = fechaIngreso;
-		this.fechaBaja = fechaBaja;
-		this.nss = nss;
-		this.rfc = rfc;
-		this.salarioDiario = salarioDiario;
-		this.horaEntrada = horaEntrada;
-		this.horasalida = horasalida;
-		this.minutosTolerancia = minutosTolerancia;
-		this.entidadFederativa = entidadFederativa;
-		this.riesgoPuesto = riesgoPuesto;
-		this.periodicidadPago = periodicidadPago;
-		this.tipodebaja = tipodebaja;
-		this.banco = banco;
-		this.sindicalizado = sindicalizado;
-		this.confianza = confianza;
-		this.diaLunes = diaLunes;
-		this.diaMartes = diaMartes;
-		this.diaMiercoles = diaMiercoles;
-		this.diaJueves = diaJueves;
-		this.diaViernes = diaViernes;
-		this.diaSabado = diaSabado;
-		this.diaDomingo = diaDomingo;
-		this.motivobaja = motivobaja;
-		this.primaVacacional = primaVacacional;
-		this.diasAguinaldo = diasAguinaldo;
-	}
-
     public Integer getId() {
         return id;
     }
@@ -551,7 +513,15 @@ public class InfDatoEmpresa implements Serializable {
 	public void setDiasAguinaldo(BigDecimal diasAguinaldo) {
 		this.diasAguinaldo = diasAguinaldo;
 	}
+	
+	public List<DetSalarioDiario> getSalariosDiarios() {
+		return salariosDiarios;
+	}
 
+	public void setSalariosDiarios(List<DetSalarioDiario> salariosDiarios) {
+		this.salariosDiarios = salariosDiarios;
+	}
+	
 	public static final class Builder {
 		private Integer id;
 		private CatPerfil perfil;
@@ -587,6 +557,7 @@ public class InfDatoEmpresa implements Serializable {
 		private String motivobaja;
 		private BigDecimal primaVacacional;
 		private BigDecimal diasAguinaldo;
+		private List<DetSalarioDiario> salariosDiarios;
 
 		public Builder() {
 		}
@@ -758,6 +729,11 @@ public class InfDatoEmpresa implements Serializable {
 
 		public Builder diasAguinaldo(BigDecimal diasAguinaldo) {
 			this.diasAguinaldo = diasAguinaldo;
+			return this;
+		}
+		
+		public Builder salariosDiarios(List<DetSalarioDiario> salariosDiarios) {
+			this.salariosDiarios = salariosDiarios;
 			return this;
 		}
 

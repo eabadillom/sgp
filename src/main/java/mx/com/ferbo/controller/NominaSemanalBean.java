@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import mx.com.ferbo.business.nomina.ParametrosNomina;
 import mx.com.ferbo.business.percepcion.PercepcionBL;
 import mx.com.ferbo.business.percepcion.PrimaVacacionalEnTiempoPBL;
 import mx.com.ferbo.business.percepcion.PrimaVacacionalReportadasPBL;
+import mx.com.ferbo.business.registro.EstatusRegistroBL;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.EmpresaDAO;
 import mx.com.ferbo.dao.n.NominaDAO;
@@ -40,6 +42,7 @@ import mx.com.ferbo.dao.n.VacacionesDAO;
 import mx.com.ferbo.dto.ui.Asistencia;
 import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.CatEmpresa;
+import mx.com.ferbo.model.CatEstatusRegistro;
 import mx.com.ferbo.model.CatPercepcion;
 import mx.com.ferbo.model.CatPeriodicidadPago;
 import mx.com.ferbo.model.DetEmpleado;
@@ -103,6 +106,16 @@ public class NominaSemanalBean implements Serializable {
     private List<DetVacaciones> periodosVacacionales;
     private DetVacaciones       periodoVacacional;
     private String              tipoPrima;
+    private List<DetRegistro>   listaAsistencia;
+    private List<CatEstatusRegistro> statusRegistros;
+    private CatEstatusRegistro  statusRegistro;
+    private boolean lunes;
+    private boolean martes;
+    private boolean miercoles;
+    private boolean jueves;
+    private boolean viernes;
+    private boolean sabado;
+    private boolean domingo;
     
     private Boolean detalle = true;
     private String bitacora = null;
@@ -117,6 +130,8 @@ public class NominaSemanalBean implements Serializable {
 		percepcionDAO   = new PercepcionDAO();
 		vacacionesDAO   = new VacacionesDAO();
 		periodosVacacionales = new ArrayList<DetVacaciones>();
+		statusRegistros = new ArrayList<CatEstatusRegistro>();
+		
 	}
     
     @PostConstruct
@@ -147,6 +162,10 @@ public class NominaSemanalBean implements Serializable {
 				.contentLength(bytes.length)
 				.name("bitacora.txt").stream(() -> new ByteArrayInputStream(bytes))
 				.build();
+        
+        statusRegistros.add(EstatusRegistroBL.estatusJustificado());
+        statusRegistros.add(EstatusRegistroBL.estatusRetardo());
+        statusRegistros.add(EstatusRegistroBL.estatusAusencia());
     }
     
     public void calculaSemanas() {
@@ -264,6 +283,66 @@ public class NominaSemanalBean implements Serializable {
 		return nomina;
     }
     
+    public void recalcular() {
+    	NominaSemanalBL nominaSemanalBO = null;
+    	nominaSemanalBO = new NominaSemanalBL(nomina.getEmpleado(), parametros, nomina.getAsistencias());
+    	this.nomina = nominaSemanalBO.calcular(nomina);
+    }
+    
+    public void mostrarDiasLaborales() {
+    	
+    	this.lunes = this.nomina.getReceptor().getDiasLaborales().contains(DateUtil.PROP_CD_LUNES) ? true : false;
+    	this.martes = this.nomina.getReceptor().getDiasLaborales().contains(DateUtil.PROP_CD_MARTES) ? true : false;
+    	this.miercoles = this.nomina.getReceptor().getDiasLaborales().contains(DateUtil.PROP_CD_MIERCOLES) ? true : false;
+    	this.jueves = this.nomina.getReceptor().getDiasLaborales().contains(DateUtil.PROP_CD_JUEVES) ? true : false;
+    	this.viernes = this.nomina.getReceptor().getDiasLaborales().contains(DateUtil.PROP_CD_VIERNES) ? true : false;
+    	this.sabado = this.nomina.getReceptor().getDiasLaborales().contains(DateUtil.PROP_CD_SABADO) ? true : false;
+    	this.domingo = this.nomina.getReceptor().getDiasLaborales().contains(DateUtil.PROP_CD_DOMINGO) ? true : false;
+    }
+    
+    public void modificarDiasLaborales() {
+    	List<String> diasLaborales = this.nomina.getReceptor().getDiasLaborales();
+    	List<String> diasNoLaborales = this.nomina.getReceptor().getDiasNoLaborales();
+    	
+    	if(this.lunes)
+    		NominaSemanalBL.agregarDiaLaboral(DateUtil.PROP_CD_LUNES, diasLaborales, diasNoLaborales);
+    	else
+    		NominaSemanalBL.agregarDiaNoLaboral(DateUtil.PROP_CD_LUNES, diasLaborales, diasNoLaborales);
+    	
+    	if(this.martes)
+    		NominaSemanalBL.agregarDiaLaboral(DateUtil.PROP_CD_MARTES, diasLaborales, diasNoLaborales);
+    	else
+    		NominaSemanalBL.agregarDiaNoLaboral(DateUtil.PROP_CD_MARTES, diasLaborales, diasNoLaborales);
+    	
+    	if(this.miercoles)
+    		NominaSemanalBL.agregarDiaLaboral(DateUtil.PROP_CD_MIERCOLES, diasLaborales, diasNoLaborales);
+    	else
+    		NominaSemanalBL.agregarDiaNoLaboral(DateUtil.PROP_CD_MIERCOLES, diasLaborales, diasNoLaborales);
+    	
+    	if(this.jueves)
+			NominaSemanalBL.agregarDiaLaboral(DateUtil.PROP_CD_JUEVES, diasLaborales, diasNoLaborales);
+		else
+			NominaSemanalBL.agregarDiaNoLaboral(DateUtil.PROP_CD_JUEVES, diasLaborales, diasNoLaborales);
+    	
+    	if(this.viernes)
+			NominaSemanalBL.agregarDiaLaboral(DateUtil.PROP_CD_VIERNES, diasLaborales, diasNoLaborales);
+		else
+			NominaSemanalBL.agregarDiaNoLaboral(DateUtil.PROP_CD_VIERNES, diasLaborales, diasNoLaborales);
+    	
+    	if(this.sabado)
+			NominaSemanalBL.agregarDiaLaboral(DateUtil.PROP_CD_SABADO, diasLaborales, diasNoLaborales);
+		else
+			NominaSemanalBL.agregarDiaNoLaboral(DateUtil.PROP_CD_SABADO, diasLaborales, diasNoLaborales);
+    	
+    	if(this.domingo)
+			NominaSemanalBL.agregarDiaLaboral(DateUtil.PROP_CD_DOMINGO, diasLaborales, diasNoLaborales);
+		else
+			NominaSemanalBL.agregarDiaNoLaboral(DateUtil.PROP_CD_DOMINGO, diasLaborales, diasNoLaborales);
+    	
+    	log.info("Dias laborales: {}", this.nomina.getReceptor().getDiasLaborales());
+    	log.info("Dias no laborales: {}", this.nomina.getReceptor().getDiasNoLaborales());
+    }
+    
     public void cargaEmpleadoNomina(DetNomina nomina) {
     	log.info("Cargando información de nómina: {}", nomina);
     	this.nomina = nomina;
@@ -274,6 +353,15 @@ public class NominaSemanalBean implements Serializable {
     		return "";
     	
         return ManageStatus.getEstadoEmpleadoEmpresa((nomina.getId() == null ? (short) 2 : (short) 1));
+    }
+    
+    public void mostrarMapaAsistencia() {
+    	
+    	this.listaAsistencia = this.nomina.getAsistencias()
+    			.values()
+    			.stream()
+    	    	.sorted(Comparator.comparing(DetRegistro::getFechaEntrada))
+    	    	.collect(Collectors.toList());;
     }
     
     public void setPercepcionCatalogo() {
@@ -330,8 +418,17 @@ public class NominaSemanalBean implements Serializable {
 		String mensaje = null;
 		String titulo = "Percepción";
 		
+		PercepcionBL percepcionBO = null;
 		try {
 			NominaSemanalBL.agregarPercepcion(this.nomina, this.percepcion);
+	    	
+	    	percepcionBO = NominaSemanalBL.getPercepcionBusinessLogic(this.parametros, this.nomina, this.percepcion.getClave());
+	    	percepcionBO.setImporte(percepcion.getImporte());
+	    	percepcionBO.calcularExentoGravado();
+	    	
+	    	percepcion.setImporteExento(percepcionBO.getImporteExento());
+	    	percepcion.setImporteGravado(percepcionBO.getImporteGravado());
+			
 			NominaSemanalBL.procesarISR(this.parametros, this.nomina);
 			
 			this.percepcion = new DetNominaPercepcion();
@@ -1108,5 +1205,85 @@ public class NominaSemanalBean implements Serializable {
 
 	public void setTipoPrima(String tipoPrima) {
 		this.tipoPrima = tipoPrima;
+	}
+
+	public List<DetRegistro> getListaAsistencia() {
+		return listaAsistencia;
+	}
+
+	public void setListaAsistencia(List<DetRegistro> listaAsistencia) {
+		this.listaAsistencia = listaAsistencia;
+	}
+
+	public List<CatEstatusRegistro> getStatusRegistros() {
+		return statusRegistros;
+	}
+
+	public void setStatusRegistros(List<CatEstatusRegistro> statusRegistros) {
+		this.statusRegistros = statusRegistros;
+	}
+
+	public CatEstatusRegistro getStatusRegistro() {
+		return statusRegistro;
+	}
+
+	public void setStatusRegistro(CatEstatusRegistro statusRegistro) {
+		this.statusRegistro = statusRegistro;
+	}
+
+	public boolean isLunes() {
+		return lunes;
+	}
+
+	public void setLunes(boolean lunes) {
+		this.lunes = lunes;
+	}
+
+	public boolean isMartes() {
+		return martes;
+	}
+
+	public void setMartes(boolean martes) {
+		this.martes = martes;
+	}
+
+	public boolean isMiercoles() {
+		return miercoles;
+	}
+
+	public void setMiercoles(boolean miercoles) {
+		this.miercoles = miercoles;
+	}
+
+	public boolean isJueves() {
+		return jueves;
+	}
+
+	public void setJueves(boolean jueves) {
+		this.jueves = jueves;
+	}
+
+	public boolean isViernes() {
+		return viernes;
+	}
+
+	public void setViernes(boolean viernes) {
+		this.viernes = viernes;
+	}
+
+	public boolean isSabado() {
+		return sabado;
+	}
+
+	public void setSabado(boolean sabado) {
+		this.sabado = sabado;
+	}
+
+	public boolean isDomingo() {
+		return domingo;
+	}
+
+	public void setDomingo(boolean domingo) {
+		this.domingo = domingo;
 	}
 }

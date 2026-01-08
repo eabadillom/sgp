@@ -15,6 +15,7 @@ import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetEmpleadoFoto;
 import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.DetPrestamo;
+import mx.com.ferbo.model.DetSalarioDiario;
 import mx.com.ferbo.model.DetVacaciones;
 import mx.com.ferbo.util.SGPException;
 
@@ -38,6 +39,10 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
             emSGP = getEntityManager();
             model = emSGP.find(this.modelClass, id);
             if (isFullInfo) {
+            	
+            	for(DetSalarioDiario salarioDiario : model.getDatoEmpresa().getSalariosDiarios()) {
+            		log.debug("Salario diario: {}", salarioDiario);
+            	}
             	
                 log.debug("id dato empresa: {}", model.getDatoEmpresa().getId() == null ? null : model.getDatoEmpresa().getId());
                 if(model.getDatoEmpresa().getPerfil() == null)
