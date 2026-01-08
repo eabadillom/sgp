@@ -48,10 +48,8 @@
                     </p:commandButton>
                 </p:toolbarGroup>
             </p:toolbar>
-            <p:dataTable id="dtUma" widgetVar="dtUMA" var="uma" value="#{umaBean.catUMAS}" reflow="true" styleClass="products-table"
-                selection="#{umaBean.catUMASeleccionada}" rowKey="#{uma.anio}" paginator="true" rows="10" paginatorPosition="bottom"
-                lazy="true">
-                <p:column headerText="Año" style="text-align: center;" width="4rem">
+            <p:dataTable id="dtUma" widgetVar="dtUMA" var="uma" value="#{umaBean.catUMAS}" selection="#{umaBean.catUMASeleccionada}" rowKey="#{uma.anio}" paginator="true" rows="10" paginatorPosition="bottom" sortBy="#{uma.anio}" sortMode="single">
+                <p:column headerText="Año" style="text-align: center;" width="4rem" sortable="true" sortBy="#{uma.anio}" sortOrder="desc">
                     <h:outputText value="#{uma.anio}" />
                 </p:column>
                 <p:column headerText="Valor Diario" style="text-align: center;" width="4rem">

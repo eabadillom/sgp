@@ -106,8 +106,7 @@ public class DetDomicilioEmpleado implements Serializable, Cloneable {
 
 	@Override
 	public String toString() {
-		return "DetDomicilioEmpleado[" + "id=" + id + ", calle=" + calle + ", numeroExterior=" + numeroExterior
-				+ ", numeroInterior=" + numeroInterior + ']';
+		return "DetDomicilioEmpleado[" + "id=" + id + "]";
 	}
 
 	public DetDomicilioEmpleado() {

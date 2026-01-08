@@ -234,9 +234,7 @@ public class InfDatoEmpresa implements Serializable {
 
     @Override
     public String toString() {
-        return "{\"id\":\"" + id + "\", \"perfil\":\"" + perfil + "\", \"fechaIngreso\":\"" + fechaIngreso
-                + "\", \"nss\":\"" + nss + "\", \"rfc\":\"" + rfc + "\", \"salarioDiario\":\"" + salarioDiario
-                + "\", \"horaEntrada\":\"" + horaEntrada + "\", \"minutosTolerancia\":\"" + minutosTolerancia + "\"}";
+        return "{\"id\":\"" + id + "\"}";
     }
     
     public InfDatoEmpresa() {

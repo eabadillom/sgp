@@ -26,7 +26,7 @@
                             	<p:commandButton value="Reingreso..." icon="pi pi-sync" process="@this" actionListener="#{registroEmpleadosBean.reingreso}" update="form:panelDialogEmpleado form:dtEmpleados" rendered="#{registroEmpleadosBean.empleado.activo eq 0}">
                             		<p:confirm header="Reingreso" message="¿Está seguro que desea registrar el reingreso del empleado?" icon="pi pi-exclamation-triangle" />
                             	</p:commandButton>
-                            	<p:spacer width="20" />
+                            	<p:spacer width="30" />
                                 <p:commandButton value="Guardar" icon="pi pi-save" actionListener="#{registroEmpleadosBean.guardarEmpleado()}" process="panelDialogEmpleado @this" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();">
                                 	<p:confirm header="Guardar" message="¿Está seguro que desea guardar la información del empleado?" icon="pi pi-exclamation-triangle" />
                                 </p:commandButton>

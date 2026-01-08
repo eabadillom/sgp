@@ -2,15 +2,14 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.Objects;
+
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
@@ -119,22 +118,12 @@ public class CatAsentamiento implements Serializable
         this.entidadPostal = entidadPostal;
     }
     
-    /*public DetDomicilioEmpleado getDomicilioEmpleado() 
-    {
-        return domicilioEmpleado;
-    }
-
-    public void setDomicilioEmpleado(DetDomicilioEmpleado domicilioEmpleado) 
-    {
-        this.domicilioEmpleado = domicilioEmpleado;
-    }*/
-    
     @Override
     public int hashCode() 
     {
-        int hash = 3;
-        hash = 41 * hash + Objects.hashCode(this.key.getId());
-        return hash;
+    	if(this.key == null)
+    		return super.hashCode();
+        return this.key.hashCode();
     }
 
     @Override
