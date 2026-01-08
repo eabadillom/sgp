@@ -462,8 +462,11 @@ public abstract class NominaBL {
 		if(nomina.getPercepciones() == null)
 			throw new SGPException("La lista de percepciones no está definida.");
 		
-		if(percepcion.getImporteExento() == null && percepcion.getImporteGravado() == null)
-			throw new SGPException("Debe indicar un importe (exento o gravado).");
+		if(percepcion.getImporte() == null && percepcion.getImporteExento() == null && percepcion.getImporteGravado() == null)
+			throw new SGPException("Debe indicar un importe (total, exento o gravado).");
+		
+		if(percepcion.getImporte() == null)
+			percepcion.setImporte(ValoresBD._CERO.get());
 		
 		if(percepcion.getImporteExento() == null)
 			percepcion.setImporteExento(ValoresBD._CERO.get());
@@ -471,7 +474,8 @@ public abstract class NominaBL {
 		if(percepcion.getImporteGravado() == null)
 			percepcion.setImporteGravado(ValoresBD._CERO.get());
 		
-		if(percepcion.getImporteExento().compareTo(ValoresBD._CERO.get()) < 0
+		if(percepcion.getImporte().compareTo(ValoresBD._CERO.get()) < 0
+				&& percepcion.getImporteExento().compareTo(ValoresBD._CERO.get()) < 0
 				&& percepcion.getImporteGravado().compareTo(ValoresBD._CERO.get()) < 0
 				)
 			throw new SGPException("Debe indicar un importe (exento o gravado).");
@@ -504,7 +508,8 @@ public abstract class NominaBL {
 			return;
 		}
 		
-		if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(ValoresBD._CERO.get()) > 0)
+		if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(ValoresBD._CERO.get()) > 0
+				|| percepcion.getImporte().compareTo(ValoresBD._CERO.get()) > 0)
 			nomina.getPercepciones().add(percepcion);
 	}
 	
@@ -541,8 +546,8 @@ public abstract class NominaBL {
 		if(nomina == null)
 			throw new SGPException("El objeto nómina no está definido.");
     	
-    	if(nomina.getDeducciones() == null)
-    		throw new SGPException("La lista de deducciones no está definida.");
+		if(nomina.getDeducciones() == null)
+    		nomina.setDeducciones(new ArrayList<DetNominaDeduccion>());
 		
 		if(deduccion.getImporte() == null)
 			throw new SGPException("Debe indicar un importe.");
@@ -555,9 +560,6 @@ public abstract class NominaBL {
 		
 		if(deduccion.getNombre().trim().equalsIgnoreCase(""))
 			throw new SGPException("Debe indicar una descripción para la deducción.");
-		
-		if(nomina.getDeducciones() == null)
-			nomina.setDeducciones(new ArrayList<DetNominaDeduccion>());
 		
 		nomina.getDeducciones().add(deduccion);
 	}

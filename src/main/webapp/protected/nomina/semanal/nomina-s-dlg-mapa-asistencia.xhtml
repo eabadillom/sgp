@@ -1,0 +1,50 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" 
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets" 
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+					<p:dialog widgetVar="dlgMapAsistencia" header="Mapa de asistencia" modal="true">
+						<p:panel>
+							<p:outputLabel value="La modificación de estos valores sólo es para el cálculo de la nómina del periodo actual.">
+							</p:outputLabel>
+						</p:panel>
+						<p:spacer style="height: 1rem;"/>
+						<p:outputPanel id="dlg-lista-asistencia" styleClass="ui-fluid">
+							<p:dataTable value="#{nominaS.listaAsistencia}" var="registro" rowKey="#{registro.idRegistro}" editable="true" editMode="cell">
+								<p:column headerText="Dia">
+									<p:outputLabel value="#{registro.fechaEntrada}">
+										<f:convertDateTime pattern="EEEE" timeZone="GMT-6" locale="es_MX"/>
+									</p:outputLabel>
+								</p:column>
+								<p:column headerText="Fecha">
+									<p:outputLabel value="#{registro.fechaEntrada}">
+										<f:convertDateTime pattern="d 'de' MMMM 'de' yyyy" timeZone="GMT-6" locale="es_MX"/>
+									</p:outputLabel>
+								</p:column>
+								<p:column headerText="Status">
+									<p:cellEditor>
+										<f:facet name="output">
+											<p:outputLabel value="#{registro.status.descripcion}">
+											</p:outputLabel>
+										</f:facet>
+										<f:facet name="input">
+											<p:selectOneMenu value="#{registro.status}" autoWidth="false" converter="entityConverter">
+												<f:selectItem itemLabel="--STATUS--" noSelectionOption="true"/>
+												<f:selectItems value="#{nominaS.statusRegistros}" var="status" itemLabel="#{status.descripcion}" itemValue="#{status}" />
+											</p:selectOneMenu>
+										</f:facet>
+									</p:cellEditor>
+								</p:column>
+							</p:dataTable>
+						</p:outputPanel>
+						<f:facet name="footer">
+							<p:commandButton value="Recalcular" icon="pi pi-save" actionListener="#{nominaS.recalcular()}" process="form:dlg-lista-asistencia @this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" onsuccess="PF('dlgMapAsistencia').hide();" update="form:tv-nomina">
+								<p:confirm header="Modificar asistencia" message="¿Está seguro que modificar los registros de asistencia?" icon="pi pi-exclamation-triangle" />
+							</p:commandButton>
+							<p:commandButton value="Cerrar" icon="pi pi-save" onclick="PF('dlgMapAsistencia').hide();" styleClass="ui-button-outlined ui-button-secondary"/>
+						</f:facet>
+					</p:dialog>
+
+</ui:composition>

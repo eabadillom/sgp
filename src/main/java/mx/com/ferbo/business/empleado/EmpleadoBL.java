@@ -14,6 +14,7 @@ import mx.com.ferbo.business.domicilio.DomicilioBL;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.ParametroDAO;
 import mx.com.ferbo.dao.n.VacacionesDAO;
+import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.CatDiaNoLaboral;
 import mx.com.ferbo.model.CatParametro;
 import mx.com.ferbo.model.DetDomicilioEmpleado;
@@ -22,6 +23,7 @@ import mx.com.ferbo.model.DetEmpleadoConfiguracion;
 import mx.com.ferbo.model.DetEmpleadoFoto;
 import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.DetPrestamo;
+import mx.com.ferbo.model.DetSalarioDiario;
 import mx.com.ferbo.model.DetVacaciones;
 import mx.com.ferbo.model.InfDatoEmpresa;
 import mx.com.ferbo.util.DateUtil;
@@ -60,10 +62,15 @@ public class EmpleadoBL {
     public static DetEmpleado load(Integer idEmpleado) throws SGPException {
     	DetEmpleado empleado = null;
     	EmpleadoDAO empleadoDAO = null;
+    	DetSalarioDiario salarioDiario = null;
     	
     	try {
     		empleadoDAO = new EmpleadoDAO();
     		empleado = empleadoDAO.buscarPorId(idEmpleado, true);
+    		
+    		salarioDiario = salarioDiarioVigente(empleado.getDatoEmpresa().getSalariosDiarios(), new Date());
+    		empleado.getDatoEmpresa().setSalarioDiario(salarioDiario.getImporte());
+    		
     	} catch(Exception ex) {
     		log.error("Problema para obtener el empleado solicitado: id = {}", idEmpleado);
     		throw new SGPException("Ocurrió un problema al cargar la información del empleado: id = " + idEmpleado, ex);
@@ -72,6 +79,21 @@ public class EmpleadoBL {
     	loadDetail(empleado);
     	
     	return empleado;
+    }
+    
+    public static DetSalarioDiario salarioDiarioVigente(List<DetSalarioDiario> salariosDiarios, Date fecha) {
+    	DetSalarioDiario salarioDiario = null;
+    	
+    	if(salariosDiarios == null || salariosDiarios.size() == 0)
+    		return new DetSalarioDiario.Builder().build();
+    	
+    	salarioDiario = salariosDiarios.stream()
+    			.filter(sd -> sd.getFechaRegistro() != null)
+    			.filter(sd -> sd.getFechaRegistro().before(fecha))
+    			.max(Comparator.comparing(DetSalarioDiario::getFechaRegistro))
+    			.orElse(new DetSalarioDiario.Builder().importe(ValoresBD._CERO.get()).build());
+    	
+    	return salarioDiario;
     }
     
     public static DetEmpleado load(String rfc) throws SGPException {
@@ -475,4 +497,26 @@ public class EmpleadoBL {
     	
     	return false;
     }
+
+	public static void agregarSalarioDiario(DetEmpleado empleado, DetSalarioDiario salarioDiario)
+	throws SGPException {
+		DetSalarioDiario salarioDiarioVigente = null;
+		
+		if(empleado == null)
+			throw new SGPException("Debe indicar un empleado");
+		
+		if(empleado.getDatoEmpresa() == null)
+			throw new SGPException("No hay información empresarial del empleado.");
+		
+		if(empleado.getDatoEmpresa().getSalariosDiarios() == null)
+			empleado.getDatoEmpresa().setSalariosDiarios(new ArrayList<DetSalarioDiario>());
+		
+		salarioDiario.setDatoEmpresa(empleado.getDatoEmpresa());
+		
+		empleado.getDatoEmpresa().getSalariosDiarios().add(salarioDiario);
+		
+		salarioDiarioVigente = salarioDiarioVigente(empleado.getDatoEmpresa().getSalariosDiarios(), new Date());
+		
+		empleado.getDatoEmpresa().setSalarioDiario(salarioDiarioVigente.getImporte());
+	}
 }

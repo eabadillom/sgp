@@ -3,8 +3,10 @@ package mx.com.ferbo.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.persistence.Basic;
@@ -184,6 +186,12 @@ public class DetNomina implements Serializable {
     
     @Transient
     private List<DetVacaciones> vacaciones;
+    
+    @Transient
+    private DetEmpleado empleado;
+    
+    @Transient
+    private Map<String, DetRegistro> asistencias;
     
     @Override
 	public int hashCode() {
@@ -502,10 +510,10 @@ public class DetNomina implements Serializable {
 	}
 
 	public void setIncidencias(List<DetNominaIncidencia> incidencias) {
-		if(this.incidencias == null)
-			this.incidencias = incidencias;
+		if(incidencias == null)
+			this.incidencias = new ArrayList<DetNominaIncidencia>();
 		else
-			this.incidencias.addAll(incidencias);
+			this.incidencias = incidencias;
 	}
 
 	public List<DetNominaVacaciones> getNominaVacaciones() {
@@ -522,5 +530,21 @@ public class DetNomina implements Serializable {
 
 	public void setDiasIncapacidad(BigDecimal diasIncapacidad) {
 		this.diasIncapacidad = diasIncapacidad;
+	}
+
+	public DetEmpleado getEmpleado() {
+		return empleado;
+	}
+
+	public void setEmpleado(DetEmpleado empleado) {
+		this.empleado = empleado;
+	}
+
+	public Map<String, DetRegistro> getAsistencias() {
+		return asistencias;
+	}
+
+	public void setMapAsistencias(Map<String, DetRegistro> setAsistencias) {
+		this.asistencias = setAsistencias;
 	}
 }

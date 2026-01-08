@@ -6,6 +6,7 @@ import mx.com.ferbo.util.SGPException;
 
 public interface ISubsidioEmpleo {
 	
+	public static final String PERIODO_DIARIO  = "d";
 	public static final String PERIODO_SEMANAL = "s";
 	public static final String PERIODO_MENSUAL = "m";
 	

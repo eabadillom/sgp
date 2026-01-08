@@ -32,9 +32,9 @@ public class DateUtil {
 
     private static Logger log = LogManager.getLogger(DateUtil.class);
 
-    public static String PREF_FECHA = "fecha"; //Para lectura del .properties
-    public static String PREF_ASUETO = "asueto"; //Para lectura del .properties
-    public static String PREF_DIA_ESPECIAL = "especial"; //Para lectura del .properties
+    public static final String PREF_FECHA = "fecha"; //Para lectura del .properties
+    public static final String PREF_ASUETO = "asueto"; //Para lectura del .properties
+    public static final String PREF_DIA_ESPECIAL = "especial"; //Para lectura del .properties
 
     public static final String FORMATO_DD_MM_YYYY = "dd/MM/yyyy";
     public static final String FORMATO_E_DD_MM_YYYY = "E dd/MM/yyyy";
@@ -60,26 +60,26 @@ public class DateUtil {
     public static final int AM = Calendar.AM;
     public static final int PM = Calendar.PM;
 
-    public static String PROP_ENERO = "enero"; //Para lectura del .properties
-    public static String PROP_FEBRERO = "febrero"; //Para lectura del .properties
-    public static String PROP_MARZO = "marzo"; //Para lectura del .properties
-    public static String PROP_ABRIL = "abril"; //Para lectura del .properties
-    public static String PROP_MAYO = "mayo"; //Para lectura del .properties
-    public static String PROP_JUNIO = "junio"; //Para lectura del .properties
-    public static String PROP_JULIO = "julio"; //Para lectura del .properties
-    public static String PROP_AGOSTO = "agosto"; //Para lectura del .properties
-    public static String PROP_SEPTIEMBRE = "septiembre"; //Para lectura del .properties
-    public static String PROP_OCTUBRE = "octubre"; //Para lectura del .properties
-    public static String PROP_NOVIEMBRE = "noviembre"; //Para lectura del .properties
-    public static String PROP_DICIEMBRE = "diciembre"; //Para lectura del .properties
+    public static final String PROP_ENERO = "enero"; //Para lectura del .properties
+    public static final String PROP_FEBRERO = "febrero"; //Para lectura del .properties
+    public static final String PROP_MARZO = "marzo"; //Para lectura del .properties
+    public static final String PROP_ABRIL = "abril"; //Para lectura del .properties
+    public static final String PROP_MAYO = "mayo"; //Para lectura del .properties
+    public static final String PROP_JUNIO = "junio"; //Para lectura del .properties
+    public static final String PROP_JULIO = "julio"; //Para lectura del .properties
+    public static final String PROP_AGOSTO = "agosto"; //Para lectura del .properties
+    public static final String PROP_SEPTIEMBRE = "septiembre"; //Para lectura del .properties
+    public static final String PROP_OCTUBRE = "octubre"; //Para lectura del .properties
+    public static final String PROP_NOVIEMBRE = "noviembre"; //Para lectura del .properties
+    public static final String PROP_DICIEMBRE = "diciembre"; //Para lectura del .properties
 
-    public static String PROP_CD_DOMINGO = "D";
-    public static String PROP_CD_LUNES = "L";
-    public static String PROP_CD_MARTES = "M";
-    public static String PROP_CD_MIERCOLES = "X";
-    public static String PROP_CD_JUEVES = "J";
-    public static String PROP_CD_VIERNES = "V";
-    public static String PROP_CD_SABADO = "S";
+    public static final String PROP_CD_DOMINGO = "D";
+    public static final String PROP_CD_LUNES = "L";
+    public static final String PROP_CD_MARTES = "M";
+    public static final String PROP_CD_MIERCOLES = "X";
+    public static final String PROP_CD_JUEVES = "J";
+    public static final String PROP_CD_VIERNES = "V";
+    public static final String PROP_CD_SABADO = "S";
 
     public static String[] PROP_DIA_SEMANA = {PROP_CD_DOMINGO, PROP_CD_LUNES, PROP_CD_MARTES, PROP_CD_MIERCOLES, PROP_CD_JUEVES, PROP_CD_VIERNES, PROP_CD_SABADO};
 
