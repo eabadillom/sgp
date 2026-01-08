@@ -163,8 +163,7 @@ public class NominaSemanalBean implements Serializable {
 				.name("bitacora.txt").stream(() -> new ByteArrayInputStream(bytes))
 				.build();
         
-        statusRegistros.add(EstatusRegistroBL.estatusATiempo());
-        statusRegistros.add(EstatusRegistroBL.estatusPermiso());
+        statusRegistros.add(EstatusRegistroBL.estatusJustificado());
         statusRegistros.add(EstatusRegistroBL.estatusRetardo());
         statusRegistros.add(EstatusRegistroBL.estatusAusencia());
     }
@@ -301,67 +300,45 @@ public class NominaSemanalBean implements Serializable {
     	this.domingo = this.nomina.getReceptor().getDiasLaborales().contains(DateUtil.PROP_CD_DOMINGO) ? true : false;
     }
     
-    public void modificarDiasLaborales(String dia) {
+    public void modificarDiasLaborales() {
     	List<String> diasLaborales = this.nomina.getReceptor().getDiasLaborales();
     	List<String> diasNoLaborales = this.nomina.getReceptor().getDiasNoLaborales();
     	
-    	if(this.lunes) {
-    		diasLaborales.add(DateUtil.PROP_CD_LUNES);
-    		diasNoLaborales.remove(DateUtil.PROP_CD_LUNES);
-    	} else {
-    		diasLaborales.remove(DateUtil.PROP_CD_LUNES);
-    		diasNoLaborales.add(DateUtil.PROP_CD_LUNES);
-    	}
-		
-    	if(this.martes) {
-    		diasLaborales.add(DateUtil.PROP_CD_MARTES);
-    		diasNoLaborales.remove(DateUtil.PROP_CD_MARTES);
-    	} else {
-    		diasLaborales.remove(DateUtil.PROP_CD_MARTES);
-    		diasNoLaborales.add(DateUtil.PROP_CD_MARTES);
-    	}
+    	if(this.lunes)
+    		NominaSemanalBL.agregarDiaLaboral(DateUtil.PROP_CD_LUNES, diasLaborales, diasNoLaborales);
+    	else
+    		NominaSemanalBL.agregarDiaNoLaboral(DateUtil.PROP_CD_LUNES, diasLaborales, diasNoLaborales);
     	
-    	if(this.miercoles) {
-    		diasLaborales.add(DateUtil.PROP_CD_MIERCOLES);
-    		diasNoLaborales.remove(DateUtil.PROP_CD_MIERCOLES);
-    	} else {
-    		diasLaborales.remove(DateUtil.PROP_CD_MIERCOLES);
-    		diasNoLaborales.add(DateUtil.PROP_CD_MIERCOLES);
-    	}
+    	if(this.martes)
+    		NominaSemanalBL.agregarDiaLaboral(DateUtil.PROP_CD_MARTES, diasLaborales, diasNoLaborales);
+    	else
+    		NominaSemanalBL.agregarDiaNoLaboral(DateUtil.PROP_CD_MARTES, diasLaborales, diasNoLaborales);
     	
-    	if(this.jueves) {
-    		diasLaborales.add(DateUtil.PROP_CD_JUEVES);
-    		diasNoLaborales.remove(DateUtil.PROP_CD_JUEVES);
-    	} else {
-    		diasLaborales.remove(DateUtil.PROP_CD_JUEVES);
-    		diasNoLaborales.add(DateUtil.PROP_CD_JUEVES);
-    	}
+    	if(this.miercoles)
+    		NominaSemanalBL.agregarDiaLaboral(DateUtil.PROP_CD_MIERCOLES, diasLaborales, diasNoLaborales);
+    	else
+    		NominaSemanalBL.agregarDiaNoLaboral(DateUtil.PROP_CD_MIERCOLES, diasLaborales, diasNoLaborales);
     	
-    	if(this.viernes) {
-    		diasLaborales.add(DateUtil.PROP_CD_VIERNES);
-    		diasNoLaborales.remove(DateUtil.PROP_CD_VIERNES);
-    	} else {
-    		diasLaborales.remove(DateUtil.PROP_CD_VIERNES);
-    		diasNoLaborales.add(DateUtil.PROP_CD_VIERNES);
-    	}
+    	if(this.jueves)
+			NominaSemanalBL.agregarDiaLaboral(DateUtil.PROP_CD_JUEVES, diasLaborales, diasNoLaborales);
+		else
+			NominaSemanalBL.agregarDiaNoLaboral(DateUtil.PROP_CD_JUEVES, diasLaborales, diasNoLaborales);
     	
-    	if(this.sabado) {
-    		diasLaborales.add(DateUtil.PROP_CD_SABADO);
-    		diasNoLaborales.remove(DateUtil.PROP_CD_SABADO);
-    	} else {
-    		diasLaborales.remove(DateUtil.PROP_CD_SABADO);
-    		diasNoLaborales.add(DateUtil.PROP_CD_SABADO);
-    	}
+    	if(this.viernes)
+			NominaSemanalBL.agregarDiaLaboral(DateUtil.PROP_CD_VIERNES, diasLaborales, diasNoLaborales);
+		else
+			NominaSemanalBL.agregarDiaNoLaboral(DateUtil.PROP_CD_VIERNES, diasLaborales, diasNoLaborales);
     	
-    	if(this.domingo) {
-    		diasLaborales.add(DateUtil.PROP_CD_DOMINGO);
-    		diasNoLaborales.remove(DateUtil.PROP_CD_DOMINGO);
-    	} else {
-    		diasLaborales.remove(DateUtil.PROP_CD_DOMINGO);
-    		diasNoLaborales.add(DateUtil.PROP_CD_DOMINGO);
-    	}
+    	if(this.sabado)
+			NominaSemanalBL.agregarDiaLaboral(DateUtil.PROP_CD_SABADO, diasLaborales, diasNoLaborales);
+		else
+			NominaSemanalBL.agregarDiaNoLaboral(DateUtil.PROP_CD_SABADO, diasLaborales, diasNoLaborales);
     	
-    	log.info("Modificando día laboral: {}", dia);
+    	if(this.domingo)
+			NominaSemanalBL.agregarDiaLaboral(DateUtil.PROP_CD_DOMINGO, diasLaborales, diasNoLaborales);
+		else
+			NominaSemanalBL.agregarDiaNoLaboral(DateUtil.PROP_CD_DOMINGO, diasLaborales, diasNoLaborales);
+    	
     	log.info("Dias laborales: {}", this.nomina.getReceptor().getDiasLaborales());
     	log.info("Dias no laborales: {}", this.nomina.getReceptor().getDiasNoLaborales());
     }
@@ -441,8 +418,17 @@ public class NominaSemanalBean implements Serializable {
 		String mensaje = null;
 		String titulo = "Percepción";
 		
+		PercepcionBL percepcionBO = null;
 		try {
 			NominaSemanalBL.agregarPercepcion(this.nomina, this.percepcion);
+	    	
+	    	percepcionBO = NominaSemanalBL.getPercepcionBusinessLogic(this.parametros, this.nomina, this.percepcion.getClave());
+	    	percepcionBO.setImporte(percepcion.getImporte());
+	    	percepcionBO.calcularExentoGravado();
+	    	
+	    	percepcion.setImporteExento(percepcionBO.getImporteExento());
+	    	percepcion.setImporteGravado(percepcionBO.getImporteGravado());
+			
 			NominaSemanalBL.procesarISR(this.parametros, this.nomina);
 			
 			this.percepcion = new DetNominaPercepcion();

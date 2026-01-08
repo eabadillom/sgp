@@ -462,8 +462,11 @@ public abstract class NominaBL {
 		if(nomina.getPercepciones() == null)
 			throw new SGPException("La lista de percepciones no está definida.");
 		
-		if(percepcion.getImporteExento() == null && percepcion.getImporteGravado() == null)
-			throw new SGPException("Debe indicar un importe (exento o gravado).");
+		if(percepcion.getImporte() == null && percepcion.getImporteExento() == null && percepcion.getImporteGravado() == null)
+			throw new SGPException("Debe indicar un importe (total, exento o gravado).");
+		
+		if(percepcion.getImporte() == null)
+			percepcion.setImporte(ValoresBD._CERO.get());
 		
 		if(percepcion.getImporteExento() == null)
 			percepcion.setImporteExento(ValoresBD._CERO.get());
@@ -471,7 +474,8 @@ public abstract class NominaBL {
 		if(percepcion.getImporteGravado() == null)
 			percepcion.setImporteGravado(ValoresBD._CERO.get());
 		
-		if(percepcion.getImporteExento().compareTo(ValoresBD._CERO.get()) < 0
+		if(percepcion.getImporte().compareTo(ValoresBD._CERO.get()) < 0
+				&& percepcion.getImporteExento().compareTo(ValoresBD._CERO.get()) < 0
 				&& percepcion.getImporteGravado().compareTo(ValoresBD._CERO.get()) < 0
 				)
 			throw new SGPException("Debe indicar un importe (exento o gravado).");
@@ -504,7 +508,8 @@ public abstract class NominaBL {
 			return;
 		}
 		
-		if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(ValoresBD._CERO.get()) > 0)
+		if(percepcion.getImporteExento().add(percepcion.getImporteGravado()).compareTo(ValoresBD._CERO.get()) > 0
+				|| percepcion.getImporte().compareTo(ValoresBD._CERO.get()) > 0)
 			nomina.getPercepciones().add(percepcion);
 	}
 	

@@ -25,23 +25,23 @@
 							</div>
 							<div class="field col-12 md:col-3">
 								<p:outputLabel value="Dias laborados"/>
-								<p:inputNumber value="#{nominaS.nomina.diasLaborados}" symbol=" días" symbolPosition="s" inputStyle="text-align: right">
+								<p:inputNumber value="#{nominaS.nomina.diasLaborados}" symbol=" días" symbolPosition="s" inputStyle="text-align: right" readonly="true">
 									<p:ajax process="@this" update="form:tv-nomina" event="change" listener="#{nominaS.recalcular()}"/>
 								</p:inputNumber>
 							</div>
 							<div class="field col-12 md:col-3">
 								<p:outputLabel value="Ausencias"/>
-								<p:inputNumber value="#{nominaS.nomina.diasNoLaborados}" symbol=" días" symbolPosition="s" inputStyle="text-align: right">
+								<p:inputNumber value="#{nominaS.nomina.diasNoLaborados}" symbol=" días" symbolPosition="s" inputStyle="text-align: right" readonly="true">
 									<p:ajax process="@this" />
 								</p:inputNumber>
 							</div>
 							<div class="field col-12 md:col-3">
 								<p:outputLabel value="Incapacidades" />
-								<p:inputNumber value="#{nominaS.nomina.diasIncapacidad}" symbol=" días" symbolPosition="s" inputStyle="text-align: right" />
+								<p:inputNumber value="#{nominaS.nomina.diasIncapacidad}" symbol=" días" symbolPosition="s" inputStyle="text-align: right" readonly="true"/>
 							</div>
 							<div class="field col-12 md:col-3">
 								<p:outputLabel value="Dias pagados"/>
-								<p:inputNumber value="#{nominaS.nomina.diasPagados}" symbol=" días" symbolPosition="s" inputStyle="text-align: right"/>
+								<p:inputNumber value="#{nominaS.nomina.diasPagados}" symbol=" días" symbolPosition="s" inputStyle="text-align: right" readonly="true"/>
 							</div>
 							
 							

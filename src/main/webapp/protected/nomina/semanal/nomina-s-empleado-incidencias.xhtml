@@ -8,10 +8,10 @@
 					<p:tab title="Incidencias">
 						<p:toolbar>
 							<p:toolbarGroup>
-								<p:commandButton icon="pi pi-clock" actionListener="#{nominaS.mostrarMapaAsistencia()}" oncomplete="PF('dlgMapAsistencia').show();" update="form:dlg-lista-asistencia">
+								<p:commandButton icon="pi pi-calendar" actionListener="#{nominaS.mostrarDiasLaborales()}" oncomplete="PF('dlgDiasLaborales').show();" update="form:dlg-dias-laborales" title="Modificar dias laborales">
 								</p:commandButton>
 								<span style="width: 1rem;"></span>
-								<p:commandButton icon="pi pi-calendar" actionListener="#{nominaS.mostrarDiasLaborales()}" oncomplete="PF('dlgDiasLaborales').show();" update="form:dlg-dias-laborales">
+								<p:commandButton icon="pi pi-clock" actionListener="#{nominaS.mostrarMapaAsistencia()}" oncomplete="PF('dlgMapAsistencia').show();" update="form:dlg-lista-asistencia" title="Modificar asistencia">
 								</p:commandButton>
 							</p:toolbarGroup>
 						</p:toolbar>

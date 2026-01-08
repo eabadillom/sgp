@@ -113,6 +113,9 @@ public class NominaSemanalBL extends NominaBL {
 			} else {
 				listaDiasLaboralesEmpleado = nomina.getReceptor().getDiasLaborales();
 				listaDiasNoLaboralesEmpleado = nomina.getReceptor().getDiasNoLaborales();
+				nomina.getPercepciones().clear();
+				nomina.getOtrosPagos().clear();
+				nomina.getDeducciones().clear();
 			}
 			
 			diasLaboralesEmpleado   = new BigDecimal(listaDiasLaboralesEmpleado.size()).setScale(2, RoundingMode.HALF_UP);
@@ -330,6 +333,32 @@ public class NominaSemanalBL extends NominaBL {
 			throw new SGPException("No hay días de descanso asignados para el empleado.");
 		
 		return listaDiasNoLaborales;
+	}
+	
+	public static void agregarDiaLaboral(String dia, List<String> listaDiasLaborales, List<String> listaDiasNoLaborales) {
+		if(listaDiasLaborales == null)
+			listaDiasLaborales = new ArrayList<String>();
+		
+		if(listaDiasNoLaborales == null)
+			listaDiasNoLaborales = new ArrayList<String>();
+		
+		if(listaDiasLaborales.contains(dia) == false) {
+			listaDiasLaborales.add(dia);
+			listaDiasNoLaborales.remove(dia);
+		}
+	}
+	
+	public static void agregarDiaNoLaboral(String dia, List<String> listaDiasLaborales, List<String> listaDiasNoLaborales) {
+		if(listaDiasLaborales == null)
+			listaDiasLaborales = new ArrayList<String>();
+		
+		if(listaDiasNoLaborales == null)
+			listaDiasNoLaborales = new ArrayList<String>();
+		
+		if(listaDiasNoLaborales.contains(dia) == false) {
+			listaDiasLaborales.remove(dia);
+			listaDiasNoLaborales.add(dia);
+		}
 	}
 	
 	public List<DetNominaIncidencia> getIncidencias(DetNomina nomina, Map<String, DetRegistro> mapAsistencias) {

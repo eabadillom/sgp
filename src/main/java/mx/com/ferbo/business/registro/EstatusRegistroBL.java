@@ -66,4 +66,10 @@ public class EstatusRegistroBL implements Serializable {
 		CatEstatusRegistro estatusIncapacidad = estatusDAO.buscarPorCodigo(AUSENCIA);
 		return estatusIncapacidad;
 	}
+	
+	public static CatEstatusRegistro estatusJustificado() {
+		EstatusRegistroDAO estatusDAO = new EstatusRegistroDAO();
+		CatEstatusRegistro estatusIncapacidad = estatusDAO.buscarPorCodigo(JUSTIFICADO);
+		return estatusIncapacidad;
+	}
 }
