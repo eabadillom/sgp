@@ -3,12 +3,11 @@ package mx.com.ferbo.model;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
+
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -104,11 +103,11 @@ public class CatEstado implements Serializable
     }
 
     @Override
-    public int hashCode() 
+    public int hashCode()
     {
-        int hash = 7;
-        hash = 31 * hash + Objects.hashCode(this.key.getId());
-        return hash;
+    	if(this.key == null)
+    		super.hashCode();
+    	return this.key.hashCode();
     }
 
     @Override

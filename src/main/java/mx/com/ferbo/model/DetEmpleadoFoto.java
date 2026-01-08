@@ -36,7 +36,7 @@ public class DetEmpleadoFoto implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "{\"id\":\"" + id + "\", \"fotografia\":\"" + fotografia == null ? null : fotografia.length() + "\"}";
+		return "{\"id\":\"" + id + "\"}";
 	}
 
 	@Override

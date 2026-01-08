@@ -3,6 +3,7 @@ package mx.com.ferbo.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.Basic;
@@ -14,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 
 import mx.com.ferbo.model.sat.CatEntidadFederativa;
@@ -129,6 +131,12 @@ public class DetNominaReceptor implements Serializable {
 	@OneToOne
 	@JoinColumn(name = "cd_ent_fed")
 	private CatEntidadFederativa entidadFederativa;
+	
+	@Transient
+	private List<String> diasLaborales;
+	
+	@Transient
+	private List<String> diasNoLaborales;
 	
 	@Override
 	public int hashCode() {
@@ -363,5 +371,21 @@ public class DetNominaReceptor implements Serializable {
 
 	public void setPrimaVacacional(BigDecimal primaVacacional) {
 		this.primaVacacional = primaVacacional;
+	}
+
+	public List<String> getDiasLaborales() {
+		return diasLaborales;
+	}
+
+	public void setDiasLaborales(List<String> diasLaborales) {
+		this.diasLaborales = diasLaborales;
+	}
+
+	public List<String> getDiasNoLaborales() {
+		return diasNoLaborales;
+	}
+
+	public void setDiasNoLaborales(List<String> diasNoLaborales) {
+		this.diasNoLaborales = diasNoLaborales;
 	}
 }

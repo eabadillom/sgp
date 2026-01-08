@@ -36,6 +36,8 @@
                         <ui:include src="/protected/empleados/registro-detalle-prestamo.xhtml" />
 
                         <ui:include src="/protected/empleados/registro-baja.xhtml" />
+                        
+                        <ui:include src="/protected/empleados/registro-salario-diario.xhtml" />
 
                         <p:confirmDialog widgetVar="dlgEliminarPrestamo" showEffect="fade" width="30rem" message="¿Está seguro que desea eliminar el préstamo seleccionado?" header="Confirmar" severity="warn">
                             <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{registroEmpleadosBean.eliminarPrestamo(prestamo)}" process="@this" oncomplete="PF('dlgEliminarPrestamo').hide();"/>

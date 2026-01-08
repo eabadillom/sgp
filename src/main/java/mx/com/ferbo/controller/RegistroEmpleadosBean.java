@@ -71,6 +71,7 @@ import mx.com.ferbo.model.DetNominaPeriodo;
 import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.DetPrestamo;
 import mx.com.ferbo.model.DetRegistroVacaciones;
+import mx.com.ferbo.model.DetSalarioDiario;
 import mx.com.ferbo.model.DetVacaciones;
 import mx.com.ferbo.model.InfDatoEmpresa;
 import mx.com.ferbo.model.sat.CatBanco;
@@ -121,6 +122,7 @@ public class RegistroEmpleadosBean implements Serializable {
     private PercepcionDAO         percepcionDAO;
     private TipoBajaEmpleadoDAO   tipoBajaEmpleadoDAO;
     private InfDatoEmpresa        datoEmpresa;
+    private DetSalarioDiario      salarioDiario;
     
     private List<CatPercepcion>   percepciones;
     private List<DetPercepcionEmpleado> percepcionesEmpleado;
@@ -276,7 +278,7 @@ public class RegistroEmpleadosBean implements Serializable {
         this.empleado.setEmpleadoFoto(this.empleadoFoto);
         this.detBiometrico = new DetBiometrico();
         this.detBiometrico.setEmpleado(this.empleado);
-        
+        this.salarioDiario = new DetSalarioDiario.Builder().build();
         this.activeTabIndex = 0;
     }
     
@@ -296,13 +298,26 @@ public class RegistroEmpleadosBean implements Serializable {
 	        
 	        this.nuevaPercepcionEmpleado();
 	        this.prestamo = new DetPrestamo();
-	        
 	        this.percepcion = new CatPercepcion();
+	        this.salarioDiario = new DetSalarioDiario.Builder().build();
 	        
 		} catch (SGPException ex) {
 			log.error("Problema para cargar el detalle del empleado...", ex);
 		} finally {
 			PrimeFaces.current().ajax().update("form:messages", "form:dlg-empleado", "form:panelDialogFoto", ":form:panelDialogEmpleado");
+		}
+    }
+    
+    public void nuevoSalarioDiario() {
+    	this.salarioDiario = new DetSalarioDiario.Builder().build();
+    }
+    
+    public void agregarSalarioDiario() {
+    	try {
+			EmpleadoBL.agregarSalarioDiario(this.empleado, this.salarioDiario);
+			this.salarioDiario = new DetSalarioDiario.Builder().build();
+		} catch (SGPException ex) {
+			log.error("Hubo un problema para agregar el salario diario...", ex);
 		}
     }
     
@@ -1346,5 +1361,13 @@ public class RegistroEmpleadosBean implements Serializable {
 
 	public void setEmpleados(List<DetEmpleado> empleados) {
 		this.empleados = empleados;
+	}
+
+	public DetSalarioDiario getSalarioDiario() {
+		return salarioDiario;
+	}
+
+	public void setSalarioDiario(DetSalarioDiario salarioDiario) {
+		this.salarioDiario = salarioDiario;
 	}
 }
