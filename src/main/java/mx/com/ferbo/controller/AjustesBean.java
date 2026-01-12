@@ -272,7 +272,7 @@ public class AjustesBean implements Serializable {
     public void subsidio() {
         String path = null;
         try {
-            path = contextPath + "/protected/settings/sat/subsidio.xhtml";
+            path = contextPath + "/protected/settings/sat/subsidio2.xhtml";
             FacesContext.getCurrentInstance().getExternalContext().redirect(path);
         } catch (Exception e) {
             e.getMessage();

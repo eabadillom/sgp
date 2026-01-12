@@ -10,15 +10,13 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "cat_subsidio_2")
-@NamedQueries({
-	@NamedQuery(name = "Subsidio2.buscarVigente", query = "SELECT s FROM CatSubsidio2 s WHERE (:fecha BETWEEN s.vigenciaInicio AND s.vigenciaFin) OR (s.vigenciaInicio <= :fecha AND s.vigenciaFin IS NULL) ")
-})
+@NamedQuery(name = "Subsidio2.buscarVigente", query = "SELECT s FROM CatSubsidio2 s WHERE (:fecha BETWEEN s.vigenciaInicio AND s.vigenciaFin) OR (s.vigenciaInicio <= :fecha AND s.vigenciaFin IS NULL) ")
+@NamedQuery(name = "Subsidio2.buscarTodos", query = "SELECT s FROM CatSubsidio2 s ORDER BY s.vigenciaInicio")
 public class CatSubsidio2 {
 	
 	@Id
