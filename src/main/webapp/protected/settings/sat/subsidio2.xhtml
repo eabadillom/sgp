@@ -1,0 +1,79 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/plantillas/template.xhtml">
+	<ui:define name="title">Subsidio</ui:define>
+	<ui:define name="content">
+		<h:form id="form">
+			<ui:include src="/protected/common/status-info.xhtml"></ui:include>
+			<ui:include src="/protected/common/locale-es_MX.xhtml"></ui:include>
+			<p:toolbar>
+				<p:toolbarGroup>
+					<p:commandButton icon="pi pi-plus" value="Agregar" process="@this" actionListener="#{subsidio2Bean.nuevo()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dgSubsidio').show()"></p:commandButton>
+				</p:toolbarGroup>
+			</p:toolbar>
+			<p:spacer height="2rem"></p:spacer>
+			<p:dataTable id="dt-subsidios" value="#{subsidio2Bean.subsidios}" var="subsidio" sortBy="#{subsidio.vigenciaInicio}" sortMode="single">
+				<p:column headerText="Inicio vigencia" style="text-align: center;" sortable="true" sortBy="#{subsidio.vigenciaInicio}" sortOrder="descending">
+					<p:outputLabel value="#{subsidio.vigenciaInicio}">
+					</p:outputLabel>
+				</p:column>
+				<p:column headerText="Fin vigencia" style="text-align: center;" sortable="true" sortBy="#{subsidio.vigenciaInicio}" sortOrder="descending">
+					<p:outputLabel value="#{subsidio.vigenciaFin}">
+					</p:outputLabel>
+				</p:column>
+				<p:column headerText="Tasa" style="text-align: right;">
+					<p:outputLabel value="#{subsidio.tasa}" converter="percentConverter">
+						<f:convertNumber type="percent" maxFractionDigits="2"></f:convertNumber>
+					</p:outputLabel>
+				</p:column>
+				<p:column headerText="Límite subsidio" style="text-align: right;">
+					<p:outputLabel value="#{subsidio.importeMaximo}">
+						<f:convertNumber locale="es_MX" type="currency" />
+					</p:outputLabel>
+				</p:column>
+				<p:column width="2rem">
+					<p:commandButton icon="pi pi-bars" process="@this" oncomplete="PF('dgSubsidio').show();" update="form:dg-subsidio">
+						<f:setPropertyActionListener value="#{subsidio}" target="#{subsidio2Bean.subsidio}"></f:setPropertyActionListener>
+					</p:commandButton>
+				</p:column>
+			</p:dataTable>
+			<p:dialog id="dg-subsidio" widgetVar="dgSubsidio" header="Subsidio">
+				<p:outputLabel styleClass="ui-fluid">
+					<div style="field">
+						<p:outputLabel for="@next" value="Tasa:"></p:outputLabel>
+						<p:inputNumber value="#{subsidio2Bean.subsidio.tasa}" converter="percentConverter" symbol=" %" symbolPosition="s" inputStyle="text-align: right">
+						</p:inputNumber>
+					</div>
+					<p:spacer height="1rem;"></p:spacer>
+					<div style="field">
+						<p:outputLabel for="@next" value="Importe máximo:"></p:outputLabel>
+						<p:inputNumber value="#{subsidio2Bean.subsidio.importeMaximo}" emptyValue="null" decimalPlaces="2" symbol="$ " symbolPosition="p" inputStyle="text-align: right">
+						</p:inputNumber>
+					</div>
+					<p:spacer height="1rem;"></p:spacer>
+					<div style="field">
+						<p:outputLabel for="@next" value="Del:"></p:outputLabel>
+						<p:datePicker value="#{subsidio2Bean.subsidio.vigenciaInicio}" locale="es_MX" showIcon="true">
+						</p:datePicker>
+					</div>
+					<p:spacer height="1rem;"></p:spacer>
+					<div style="field">
+						<p:outputLabel for="@next" value="al:"></p:outputLabel>
+						<p:datePicker value="#{subsidio2Bean.subsidio.vigenciaFin}" locale="es_MX" showIcon="true">
+						</p:datePicker>
+					</div>
+				</p:outputLabel>
+				<f:facet name="footer">
+					<p:commandButton icon="pi pi-check" value="Guardar" process="form:dg-subsidio" actionListener="#{subsidio2Bean.guardar()}" update="form:dt-subsidios" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();">
+					</p:commandButton>
+					<p:commandButton icon="pi pi-times" value="Cerrar" onclick="PF('dgSubsidio').hide();" styleClass="ui-button-outlined ui-button-secondary">
+					</p:commandButton>
+				</f:facet>
+			</p:dialog>
+		</h:form>
+	</ui:define>
+</ui:composition>

@@ -1,6 +1,7 @@
 package mx.com.ferbo.dao.n;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 
@@ -39,5 +40,21 @@ public class Subsidio2DAO extends BaseDAO<CatSubsidio2, Integer> {
 		}
 		
 		return model;
+	}
+	
+	public List<CatSubsidio2> buscarTodos() {
+		List<CatSubsidio2> modelList = null;
+		EntityManager em = null;
+		
+		try {
+			em = this.getEntityManager();
+			modelList = em.createNamedQuery("Subsidio2.buscarTodos", modelClass).getResultList();
+		} catch(Exception ex) {
+			log.error("Problema para consultar la lista de Subsidios");
+		} finally {
+			close(em);
+		}
+		
+		return modelList;
 	}
 }
