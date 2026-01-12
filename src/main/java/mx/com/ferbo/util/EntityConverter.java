@@ -14,7 +14,7 @@ import javax.faces.convert.FacesConverter;
  */
 
 @FacesConverter(value = "entityConverter")
-public class EntityConverter implements Converter {
+public class EntityConverter implements Converter<Object> {
     private static Map<Object, String> entities = new WeakHashMap<Object, String>();
     
     @Override
