@@ -40,6 +40,7 @@ public class EmpleadoBL {
     	empleado = new DetEmpleado();
     	empleado.setActivo((short) 1);
     	empleado.setDatoEmpresa(new InfDatoEmpresa());
+    	empleado.getDatoEmpresa().setSalariosDiarios(new ArrayList<DetSalarioDiario>());
     	
     	domicilio = DomicilioBL.build(empleado);
     	empleado.setDomicilio(domicilio);
@@ -84,14 +85,14 @@ public class EmpleadoBL {
     public static DetSalarioDiario salarioDiarioVigente(List<DetSalarioDiario> salariosDiarios, Date fecha) {
     	DetSalarioDiario salarioDiario = null;
     	
-    	if(salariosDiarios == null || salariosDiarios.size() == 0)
-    		return new DetSalarioDiario.Builder().build();
-    	
-    	salarioDiario = salariosDiarios.stream()
-    			.filter(sd -> sd.getFechaRegistro() != null)
-    			.filter(sd -> sd.getFechaRegistro().before(fecha))
-    			.max(Comparator.comparing(DetSalarioDiario::getFechaRegistro))
-    			.orElse(new DetSalarioDiario.Builder().importe(ValoresBD._CERO.get()).build());
+		if(salariosDiarios == null || salariosDiarios.size() == 0)
+			return new DetSalarioDiario.Builder().importe(ValoresBD._CERO.get()).build();
+		
+		salarioDiario = salariosDiarios.stream()
+				.filter(sd -> sd.getFechaRegistro() != null)
+				.filter(sd -> sd.getFechaRegistro().compareTo(fecha) <= 0)
+				.max(Comparator.comparing(DetSalarioDiario::getFechaRegistro))
+				.orElse(new DetSalarioDiario.Builder().importe(ValoresBD._CERO.get()).build());
     	
     	return salarioDiario;
     }
@@ -466,8 +467,11 @@ public class EmpleadoBL {
     		
 			nuevoEmpleado.setDomicilio(e.getDomicilio().clone());
 		} catch (CloneNotSupportedException e1) {
-			nuevoEmpleado.setDomicilio(new DetDomicilioEmpleado());
+			if(nuevoEmpleado == null)
+				nuevoEmpleado = new DetEmpleado.Builder().domicilio(new DetDomicilioEmpleado()) .build();
 		} finally {
+			if(nuevoEmpleado == null)
+				nuevoEmpleado = new DetEmpleado.Builder().build();
 			nuevoEmpleado.getDomicilio().setEmpleado(nuevoEmpleado);
 		}
     	

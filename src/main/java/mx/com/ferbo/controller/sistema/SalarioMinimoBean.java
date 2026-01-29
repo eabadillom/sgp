@@ -3,7 +3,6 @@ package mx.com.ferbo.controller.sistema;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -11,17 +10,18 @@ import javax.faces.application.FacesMessage.Severity;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import mx.com.ferbo.business.empleado.EmpleadoBL;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.SalarioMinimoDAO;
+import mx.com.ferbo.business.empleado.EmpleadoBL;
+import mx.com.ferbo.business.empleado.SalarioMinimoBL;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
-import mx.com.ferbo.dto.SalarioMinimoDTO;
+import mx.com.ferbo.dao.n.SalarioMinimoDAO;
+import mx.com.ferbo.model.CatSalarioMinimo;
 import mx.com.ferbo.model.DetEmpleado;
-import mx.com.ferbo.util.DateUtil;
+import mx.com.ferbo.model.DetSalarioDiario;
 import mx.com.ferbo.util.SGPException;
 
 @Named(value = "salarioMinBean")
@@ -30,22 +30,24 @@ public class SalarioMinimoBean implements Serializable {
 
     private static final long serialVersionUID = -4884705779733680337L;
     private static Logger log = LogManager.getLogger(SalarioMinimoBean.class);
-    private String contextPath = null;
 
-    private List<SalarioMinimoDTO> salarios;
-    private SalarioMinimoDTO salario;
+    private List<CatSalarioMinimo> salarios;
+    private CatSalarioMinimo salario;
     private SalarioMinimoDAO salarioDAO;
-    private List<DetEmpleado> lstEmpleadosPorActualizar;
+    private List<DetEmpleado> empleados;
 
     private Boolean salarioGeneral;
     private Boolean salarioFrontera;
     private EmpleadoDAO empleadoDAO;
     private BigDecimal salarioSugerido;
+    private DetEmpleado empleado;
+    private DetSalarioDiario salarioDiario;
+    
 
     public SalarioMinimoBean() {
         salarioDAO = new SalarioMinimoDAO();
         empleadoDAO = new EmpleadoDAO();
-        salario = new SalarioMinimoDTO();
+        salario = new CatSalarioMinimo();
     }
 
     @PostConstruct
@@ -53,11 +55,12 @@ public class SalarioMinimoBean implements Serializable {
         salarios = salarioDAO.buscarTodos();
         this.salarioGeneral = false;
         this.salarioFrontera = false;
-        this.salarioSugerido = new BigDecimal("0.000");
+        this.salarioSugerido = new BigDecimal("0.00");
+        this.empleado = EmpleadoBL.build();
     }
 
     public void nuevo() {
-        this.salario = new SalarioMinimoDTO();
+        this.salario = new CatSalarioMinimo();
         log.info("Nuevo salario minimo: {}", this.salario);
     }
 
@@ -105,6 +108,8 @@ public class SalarioMinimoBean implements Serializable {
             }
 
             this.salarios = salarioDAO.buscarTodos();
+            
+            this.porDebajoMinimo();
 
             mensaje = "El salario minimo se guardó correctamente";
             severity = FacesMessage.SEVERITY_INFO;
@@ -153,29 +158,104 @@ public class SalarioMinimoBean implements Serializable {
         log.info("Eliminar salario minimo: {}", this.salario);
 
     }
+    
+    public String tituloDialogDebajoMinimo() {
+    	if(this.salario == null)
+    		return "";
+    	return String.format("Empleados con salario inferior a $ %s (ZG), $ %s (ZLFN)", this.salario.getZonaG(), this.salario.getZonaLFN());
+    }
+    
+    public void porDebajoMinimo() {
 
-    public List<SalarioMinimoDTO> getSalarios() {
+        try {
+        	this.empleados = SalarioMinimoBL.validarSalariosMinimos(this.salario.getVigencia());
+
+            this.salarioSugerido = new BigDecimal("0.00");
+
+        } catch (SGPException sgpEx) {
+            log.error("No se puedo obtener a los empleados con salario por debajo del minimo. " + sgpEx.getMessage());
+        } catch (Exception ex) {
+            log.error("Error desconocido...", ex);
+        } finally {
+        	PrimeFaces.current().ajax().update("form:dtEmpleadoPorDebajo");
+        }
+    }
+    
+    public void nuevoSalarioDiario(DetEmpleado empleado) {
+    	this.salarioDiario = new DetSalarioDiario.Builder().build();
+    }
+    
+    public void agregarSalarioDiario() {
+    	try {
+			EmpleadoBL.agregarSalarioDiario(this.empleado, this.salarioDiario);
+			this.salarioDiario = new DetSalarioDiario.Builder().build();
+		} catch (SGPException ex) {
+			log.error("Hubo un problema para agregar el salario diario...", ex);
+		}
+    }
+
+    public void actualizarSalarios() {
+
+        if (this.empleados.isEmpty()) {
+            return;
+        }
+
+        FacesMessage message = null;
+        Severity severity = null;
+        String mensaje = null;
+        String titulo = "Actualizar salario empleado";
+
+        for (DetEmpleado empleado : this.empleados) {
+            try {
+
+                empleadoDAO.actualizar(empleado);
+                mensaje = "El salario minimo de " + empleado.getNombre() + " " + empleado.getPrimerAp() + " " + empleado.getSegundoAp() + " se actualizo correctamente";
+                severity = FacesMessage.SEVERITY_INFO;
+
+            } catch (SGPException sgpEx) {
+
+                mensaje = "El salario minimo de " + empleado.getNombre() + " " + empleado.getPrimerAp() + " " + empleado.getSegundoAp() + " no se actualizo correctamente";
+                severity = FacesMessage.SEVERITY_ERROR;
+
+                log.error("No se pudo actualizar el salario. " + sgpEx.getMessage());
+            } finally {
+                message = new FacesMessage(severity, titulo, mensaje);
+                FacesContext.getCurrentInstance().addMessage(null, message);
+                PrimeFaces.current().ajax().update("form:messages");
+            }
+        }  
+        porDebajoMinimo();
+    }
+
+    public void limpiarVariables() {
+        this.empleados = null;
+        this.salarioSugerido = new BigDecimal("0.00");
+        this.salarioGeneral = false;
+        this.salarioFrontera = false;
+    }
+
+    public List<CatSalarioMinimo> getSalarios() {
         return salarios;
     }
 
-    public void setSalarios(List<SalarioMinimoDTO> salarios) {
+    public void setSalarios(List<CatSalarioMinimo> salarios) {
         this.salarios = salarios;
     }
 
-    public SalarioMinimoDTO getSalario() {
+    public CatSalarioMinimo getSalario() {
         return salario;
     }
 
-    public void setSalario(SalarioMinimoDTO salario) {
+    public void setSalario(CatSalarioMinimo salario) {
         this.salario = salario;
     }
 
-    public List<DetEmpleado> getLstEmpleadosPorActualizar() {
-        return lstEmpleadosPorActualizar;
+    public List<DetEmpleado> getEmpleados() {
+        return empleados;
     }
 
-    public void setLstEmpleadosPorActualizar(List<DetEmpleado> lstEmpleadosPorActualizar) {
-        this.lstEmpleadosPorActualizar = lstEmpleadosPorActualizar;
+    public void setEmpleados(List<DetEmpleado> empleados) {
+        this.empleados = empleados;
     }
 
     public Boolean getSalarioGeneral() {
@@ -202,72 +282,19 @@ public class SalarioMinimoBean implements Serializable {
         this.salarioSugerido = salarioSugerido;
     }
 
-    public void porDebajoMinimo() {
+	public DetEmpleado getEmpleado() {
+		return empleado;
+	}
 
-        try {
+	public void setEmpleado(DetEmpleado empleado) {
+		this.empleado = empleado;
+	}
 
-            this.lstEmpleadosPorActualizar = null;
-            this.salarioSugerido = new BigDecimal("0.000");
+	public DetSalarioDiario getSalarioDiario() {
+		return salarioDiario;
+	}
 
-            if (this.salarioGeneral == true && this.salarioFrontera == true) {
-                this.lstEmpleadosPorActualizar = null;
-                this.salarioSugerido = new BigDecimal("0.000");
-            }
-
-            if (this.salarioGeneral == true && this.salarioFrontera == false) {
-                this.lstEmpleadosPorActualizar = empleadoDAO.empleadosSalarioMinimoGeneral(this.salario.getZonaG(), DateUtil.now());
-                this.salarioSugerido = this.salario.getZonaG();
-            }
-
-            if (this.salarioFrontera == true && this.salarioGeneral == false) {
-                this.lstEmpleadosPorActualizar = empleadoDAO.empleadosSalarioMinimoFrontera(this.salario.getZonaLFN(), DateUtil.now());
-                this.salarioSugerido = this.salario.getZonaLFN();
-            }
-
-        } catch (SGPException sgpEx) {
-            log.error("No se puedo obtener a los empleados con salario por debajo del minimo. " + sgpEx.getMessage());
-        } catch (Exception ex) {
-            log.error("Error desconocido. " + ex.getMessage());
-        }
-    }
-
-    public void actualizarSalarios() {
-
-        if (this.lstEmpleadosPorActualizar.isEmpty()) {
-            return;
-        }
-
-        FacesMessage message = null;
-        Severity severity = null;
-        String mensaje = null;
-        String titulo = "Actualizar salario empleado";
-
-        for (DetEmpleado empleado : this.lstEmpleadosPorActualizar) {
-            try {
-
-                empleadoDAO.actualizar(empleado);
-                mensaje = "El salario minimo de " + empleado.getNombre() + " " + empleado.getPrimerAp() + " " + empleado.getSegundoAp() + " se actualizo correctamente";
-                severity = FacesMessage.SEVERITY_INFO;
-
-            } catch (SGPException sgpEx) {
-
-                mensaje = "El salario minimo de " + empleado.getNombre() + " " + empleado.getPrimerAp() + " " + empleado.getSegundoAp() + " no se actualizo correctamente";
-                severity = FacesMessage.SEVERITY_ERROR;
-
-                log.error("No se pudo actualizar el salario. " + sgpEx.getMessage());
-            } finally {
-                message = new FacesMessage(severity, titulo, mensaje);
-                FacesContext.getCurrentInstance().addMessage(null, message);
-                PrimeFaces.current().ajax().update("form:messages", "form:dg-menorAlMinimo");
-            }
-        }  
-        porDebajoMinimo();
-    }
-
-    public void limpiarVariables() {
-        this.lstEmpleadosPorActualizar = null;
-        this.salarioSugerido = new BigDecimal("0.000");
-        this.salarioGeneral = false;
-        this.salarioFrontera = false;
-    }
+	public void setSalarioDiario(DetSalarioDiario salarioDiario) {
+		this.salarioDiario = salarioDiario;
+	}
 }
