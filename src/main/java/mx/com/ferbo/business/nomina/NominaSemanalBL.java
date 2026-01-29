@@ -100,9 +100,9 @@ public class NominaSemanalBL extends NominaBL {
 			
 			if(nomina == null) {
 				log.info("#############################################################################");
+				nomina =  NominaSemanalBL.build(TP_NOMINA_ORDINARIA, this.parametros, this.empleado);
 				log.info("Empleado: {} {} {}, Salario diario: {}", empleado.getNombre(), empleado.getPrimerAp(), empleado.getSegundoAp(), empleado.getDatoEmpresa().getSalarioDiario());
 				log.info("Ejecutando la nomina de la semana {} del año en curso...", this.parametros.getPeriodo());
-				nomina =  NominaSemanalBL.build(TP_NOMINA_ORDINARIA, this.parametros, this.empleado);
 				
 				//De la configuración del empleado, se obtienen los días de la semana que debe presentarse a laborar
 				//y los que debe descansar.
