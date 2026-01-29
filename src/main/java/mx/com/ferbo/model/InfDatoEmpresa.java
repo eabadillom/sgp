@@ -16,6 +16,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -85,6 +86,11 @@ public class InfDatoEmpresa implements Serializable {
     @Basic(optional = true)
     @Column(name = "nb_rfc")
     private String rfc;
+    
+    @Basic(optional = true)
+    @OneToOne
+    @JoinColumn(name = "cd_zona", referencedColumnName = "cd_zona")
+    private CatZonaSalario zona;
 
     @Transient
     private BigDecimal salarioDiario;
@@ -738,5 +744,13 @@ public class InfDatoEmpresa implements Serializable {
 		public InfDatoEmpresa build() {
 			return new InfDatoEmpresa(this);
 		}
+	}
+
+	public CatZonaSalario getZona() {
+		return zona;
+	}
+
+	public void setZona(CatZonaSalario zona) {
+		this.zona = zona;
 	}
 }

@@ -7,41 +7,23 @@
     template="/WEB-INF/plantillas/template.xhtml">
     <ui:define name="title">Salario mínimo</ui:define>
     <ui:define name="content">
-	<script>
-            PrimeFaces.locales['es'] = {
-                monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-                monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-                dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
-                dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
-                dayNamesMin: ['D', 'L', 'M', 'X', 'J', 'V', 'S'],
-                weekHeader: 'Semana',
-                firstDay: 1,
-                isRTL: false,
-                showMonthAfterYear: false,
-                yearSuffix: '',
-                timeOnlyTitle: 'Sólo hora',
-                timeText: 'Tiempo',
-                hourText: 'Hora',
-                minuteText: 'Minuto',
-                secondText: 'Segundo',
-                millisecondText: 'Milisegundo',
-                ampm: false,
-                month: 'Mes',
-                week: 'Semana',
-                day: 'Día',
-                allDayText: 'Todo el día',
-                today: 'Hoy',
-                now: 'Ahora',
-                clear: 'Limpiar',
-                aria: {
-                   close: 'Cerrar',
-                   previous: 'Anterior',
-                   next: 'Siguiente',
-                }
-            };
-        </script>
+	<ui:include src="/protected/common/locale-es_MX.xhtml"></ui:include>
+		<h:outputStylesheet>
+			/* Contenedor principal dentro del dialog */
+			.dialog-body-full {
+			    display: flex;
+			    flex-direction: column;
+			    height: calc(100vh - 11rem); /* resta header + bordes del dialog */
+			}
+			
+			/* DataList ocupando todo el espacio restante */
+			.datalist-full {
+			    flex: 1;
+			    overflow-y: auto;
+			}
+		</h:outputStylesheet>
         <h:form id="form">
-            <p:growl id="messages" showDetail="true" life="4000"/>
+            <p:growl id="messages" showDetail="true" life="3000"/>
             <p:dialog modal="true" widgetVar="statusDialog" header="Cargando información..." draggable="false" closable="false" resizable="false">
                 <div align="center">
                     <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
@@ -54,25 +36,27 @@
             </p:toolbar>
             <div style="padding-top: 1rem">
                 <p:dataTable id="dt-salario" widgetVar="dtSalario" value="#{salarioMinBean.salarios}" var="salario" allowUnsorting="true" sortMode="single">
-                    <p:column headerText="Vigencia" style="text-align: center;">
+                    <p:column headerText="Vigencia" style="text-align: center;" sortable="true" sortBy="#{salario.vigencia}" sortOrder="desc">
                         <p:outputLabel value="#{salario.vigencia}">
-                            <f:convertDateTime pattern="dd/MMM/yyyy" locale="es" timeZone="GMT-6:00"/>
+                            <f:convertDateTime pattern="dd/MMM/yyyy" locale="es_MX" timeZone="GMT-6"/>
                         </p:outputLabel>
                     </p:column>
                     <p:column headerText="Zona General" style="text-align: center;">
                         <p:outputLabel value="#{salario.zonaG}">
-                            <f:convertNumber pattern="$#,##0.00" />
+                        	<f:convertNumber type="currency"></f:convertNumber>
                         </p:outputLabel>
                     </p:column>
                     <p:column headerText="Zona Libre Frontera Norte" style="text-align: center;">
                         <p:outputLabel value="#{salario.zonaLFN}">
-                            <f:convertNumber pattern="$#,##0.00" />
+                            <f:convertNumber type="currency"></f:convertNumber>
                         </p:outputLabel>
                     </p:column>
-                    <p:column style="text-align: center;">
+                    <p:column width="2rem" style="text-align: center;">
                         <p:commandButton icon="pi pi-bars" onclick="PF('statusDialog').show();" oncomplete="PF('statusDialog').hide();PF('dgSalario').show();" actionListener="#{salarioMinBean.editar}" process="@this dt-salario" update="form:dg-salario">
                             <f:setPropertyActionListener value="#{salario}" target="#{salarioMinBean.salario}" />
                         </p:commandButton>
+                    </p:column>
+                    <p:column width="2rem" style="text-align: center;">
                         <p:commandButton icon="pi pi-times" styleClass="ui-button-danger" process="@this dt-salario" action="#{salarioMinBean.eliminar}">
                             <p:confirm header="Confirmación" message="¿Deseas eliminar este registro?" icon="pi pi-info-circle"/>
                             <f:setPropertyActionListener value="#{salario}" target="#{salarioMinBean.salario}" />
@@ -80,9 +64,11 @@
                     </p:column>
                 </p:dataTable>
             </div>
+            
+            <!-- Dialogo para agregar / actualizar el salario minimo. -->
             <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
-                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-flat"/>
                 <p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-outlined"/>
             </p:confirmDialog>
             <p:dialog id="dg-salario" widgetVar="dgSalario" header="Salario mínimo" showEffect="hide" modal="true">
                 <p:outputPanel class="ui-fluid">
@@ -101,52 +87,107 @@
                     </div>
                 </p:outputPanel>
                 <f:facet name="footer">
-                    <p:commandButton value="Guardar" actionListener="#{salarioMinBean.guardar}" process="dg-salario @this" update="dt-salario" oncomplete="PF('dgSalario').hide(); PF('dg-menorAlMinimo').show()">
+                    <p:commandButton value="Guardar" actionListener="#{salarioMinBean.guardar}" process="dg-salario @this" update="dt-salario form:dtEmpleadoPorDebajo" oncomplete="PF('dgSalario').hide(); PF('dg-menorAlMinimo').show()">
                     </p:commandButton>
                 </f:facet>
             </p:dialog>
-            <p:dialog id="dg-menorAlMinimo" widgetVar="dg-menorAlMinimo" header="Empleados por debajo del salario minimo" showEffect="hide" modal="true">
-
-                <p:toolbar styleClass="mb-2">
-                    <p:toolbarGroup>
-                        <p:outputLabel id="toggleGeneral" value="Salario en zona general"/>
-                        <p:toggleSwitch value="#{salarioMinBean.salarioGeneral}" >
-                            <p:ajax event="change" listener="#{salarioMinBean.porDebajoMinimo()}" update="dg-menorAlMinimo" process="@this" oncomplete="PF('dg-menorAlMinimo').hide(); PF('dg-menorAlMinimo').show();"/>
-                        </p:toggleSwitch>
-                    </p:toolbarGroup>
-                    <p:toolbarGroup>
-                        <p:outputLabel id="toggleFrontera" value="Salario en zona de la Frontera"/>
-                        <p:toggleSwitch value="#{salarioMinBean.salarioFrontera}" >
-                            <p:ajax event="change" listener="#{salarioMinBean.porDebajoMinimo()}" update="dg-menorAlMinimo" process="@this" oncomplete="PF('dg-menorAlMinimo').hide(); PF('dg-menorAlMinimo').show();"/>
-                        </p:toggleSwitch>
-                    </p:toolbarGroup>
-                </p:toolbar>
-
-                <p:toolbar styleClass="mb-1">
-                    <p:toolbarGroup>
-                        <p:outputLabel value="Salario minimo: #{salarioMinBean.salarioSugerido}"/>
-                    </p:toolbarGroup>
-                </p:toolbar>
-
-                <p:dataTable id="dtEmpleadoPorDebajo" value="#{salarioMinBean.lstEmpleadosPorActualizar}" var="empleado" paginator="true" rows="5">
-                    <p:column headerText="Nombre(s)" sortBy="#{empleado.nombre}" filterable="false">
-                        <h:outputText style="vertical-alin: middle; margin-left: .5rem" value="#{empleado.nombre}" />
-                    </p:column>
-                    <p:column headerText="Primer Apellido" sortBy="#{empleado.primerAp}" filterable="false">
-                        <h:outputText style="vertical-alin: middle; margin-left: .5rem" value="#{empleado.primerAp}" />
-                    </p:column>
-                    <p:column headerText="Segundo Apellido" sortBy="#{empleado.segundoAp}" filterable="false">
-                        <h:outputText style="vertical-alin: middle; margin-left: .5rem" value="#{empleado.segundoAp}" />
-                    </p:column>
-                    <p:column headerText="Salario Actual" sortBy="#{empleado.datoEmpresa.salarioDiario}" filterable="false">
-                        <h:inputText style="vertical-alin: middle; margin-left: .5rem" value="#{empleado.datoEmpresa.salarioDiario}" />
-                    </p:column>
-                </p:dataTable>
+            
+            <!-- Dialogo para presentar la lista de empleados con salario diario inferior al mínimo -->
+            <p:dialog id="dg-menorAlMinimo" widgetVar="dg-menorAlMinimo" header="#{salarioMinBean.tituloDialogDebajoMinimo()}" showEffect="hide" modal="true" width="100%" resizable="false" style="height:100vh;" closable="true">
+            	<div class="dialog-body-full">
+	            	<p:dataList id="dtEmpleadoPorDebajo" value="#{salarioMinBean.empleados}" var="empleado" paginator="true" rows="10" type="definition" paginatorPosition="bottom">
+	            		<f:facet name="header">
+	            			<p:outputLabel value="Empleados" />
+	            		</f:facet>
+	            		<div class="ui-fluid formgrid grid">
+	            			<div class="col-12 md:col-6">
+	            				<div style="padding: 0.5rem;">
+		            				<p:outputLabel value="#{empleado.nombre} #{empleado.primerAp} #{empleado.segundoAp}" />
+	            				</div>
+	            			</div>
+	            			<div class="col-6 md:col-3">
+	            				<div style="padding: 0.5rem;">
+		            				<p:outputLabel style="vertical-alin: middle" value="#{empleado.datoEmpresa.zona.nombre}" />
+	            				</div>
+	            			</div>
+	            			<div class="col-3 md:col-2">
+	            				<div style="padding: 0.5rem;" align="right">
+			            			<p:outputLabel value="#{empleado.datoEmpresa.salarioDiario}">
+			                    		<f:convertNumber type="currency" />
+			                    	</p:outputLabel>
+	            				</div>
+	            			</div>
+	            			<div class="col-3 md:col-1">
+	            				<div align="right">
+			            			<p:commandButton icon="pi pi-pencil" process="@this" update="form:dlg-salario" actionListener="#{salarioMinBean.nuevoSalarioDiario(empleado)}" oncomplete="PF('dlgSalario').show();">
+			                    		<f:setPropertyActionListener value="#{empleado}" target="#{salarioMinBean.empleado}"></f:setPropertyActionListener>
+			                    	</p:commandButton>
+	            				</div>
+	            			</div>
+	            		</div>
+	            		
+	            		<p:separator style="margin: 0.5rem!important;" />
+	            		
+	            	</p:dataList>
+            	</div>
+                
                 <f:facet name="footer">
-                    <p:commandButton value="Actualizar empleado(s)" icon="pi pi-check" styleClass="" actionListener="#{salarioMinBean.actualizarSalarios()}"  process="dg-menorAlMinimo @this" update="dg-menorAlMinimo" oncomplete="PF('dg-menorAlMinimo').hide(); PF('dg-menorAlMinimo').show();"/>
-                    <p:commandButton value="Cerrar Dialogo" icon="pi pi-times" styleClass="ui-button-danger" actionListener="#{salarioMinBean.limpiarVariables()}" oncomplete="PF('dg-menorAlMinimo').hide();" update="dg-menorAlMinimo"/>
+                    <p:commandButton value="Actualizar empleado(s)" icon="pi pi-check" actionListener="#{salarioMinBean.actualizarSalarios()}"  process="@this" update="form:dtEmpleadoPorDebajo" oncomplete="PF('dg-menorAlMinimo').hide(); PF('dg-menorAlMinimo').show();"/>
+                    <p:commandButton value="Cerrar" icon="pi pi-times" styleClass="ui-button-secondary" actionListener="#{salarioMinBean.limpiarVariables()}" oncomplete="PF('dg-menorAlMinimo').hide();" update="dg-menorAlMinimo"/>
                 </f:facet>
             </p:dialog>
+            
+            <!-- Dialogo para actualizar el salario diario del empleado -->
+            <p:dialog widgetVar="dlgSalario" header="Salario diario" modal="true" position="center top" width="30rem" showEffect="fade" hideEffect="fade">
+				<p:outputPanel id="dlg-salario" styleClass="ui-fluid">
+					<p:panel header="#{salarioMinBean.empleado.nombre} #{salarioMinBean.empleado.primerAp} #{salarioMinBean.empleado.segundoAp}">
+						<span>
+							<p:inputNumber value="#{salarioMinBean.salarioDiario.importe}" symbol="$ " symbolPosition="p" inputStyle="text-align: right" placeholder="Importe: $">
+								<p:ajax process="@this" />
+							</p:inputNumber>
+						</span>
+						<span>
+							<p:datePicker value="#{salarioMinBean.salarioDiario.fechaRegistro}" pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX" placeholder="Vigente desde: dd / mm / yyyy">
+								<p:ajax process="@this" />
+							</p:datePicker>
+						</span>
+						<div>
+							<p:commandButton icon="pi pi-plus" value="Agregar" process="@this" update="form:dlSalariosDiarios form:dtEmpleadoPorDebajo" actionListener="#{salarioMinBean.agregarSalarioDiario()}" />
+						</div>
+					</p:panel>
+					<p:spacer height="2rem"></p:spacer>
+					<p:dataTable id="dlSalariosDiarios" value="#{salarioMinBean.empleado.datoEmpresa.salariosDiarios}" var="sd" emptyMessage="No hay salario diario registrado" editable="true" editMode="cell" sortBy="#{sd.fechaRegistro}" sortMode="single" rows="5" paginator="true" paginatorPosition="bottom">
+						<p:column headerText="Importe" sortable="true" sortBy="#{sd.importe}" sortOrder="desc">
+							<p:cellEditor>
+								<f:facet name="output">
+									<p:outputLabel value="#{sd.importe}">
+										<f:convertNumber currencySymbol="$ " maxFractionDigits="2" type="currency" locale="es_MX" currencyCode="MXN"></f:convertNumber>
+									</p:outputLabel>
+								</f:facet>
+								<f:facet name="input">
+									<p:inputNumber value="#{sd.importe}"></p:inputNumber>
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+                   		<p:column headerText="Fecha" sortable="true" sortBy="#{sd.fechaRegistro}">
+							<p:cellEditor>
+								<f:facet name="output">
+									<p:outputLabel value="#{sd.fechaRegistro}">
+										<f:convertDateTime locale="es_MX" pattern="dd / MMM / yyyy" timeZone="GMT-6" />
+									</p:outputLabel>
+								</f:facet>
+								<f:facet name="input">
+									<p:datePicker value="#{sd.fechaRegistro}" showIcon="true">
+									</p:datePicker>
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+					</p:dataTable>
+				</p:outputPanel>
+               	<f:facet name="footer">
+               		<p:commandButton icon="pi pi-times" value="Cerrar" onclick="PF('dlgSalario').hide();" class="ui-button-secondary"></p:commandButton>
+               	</f:facet>
+              </p:dialog>
         </h:form>
     </ui:define>
 </ui:composition>

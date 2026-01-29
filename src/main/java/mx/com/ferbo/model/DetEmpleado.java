@@ -32,7 +32,7 @@ import javax.validation.constraints.Size;
 @NamedQuery(name = "DetEmpleado.findByActiveEmpresaIngreso", query = "SELECT e FROM DetEmpleado e WHERE e.empleadoConfiguracion.procesarNomina = true AND e.datoEmpresa.empresa.idEmpresa = :idEmpresa AND ( (e.datoEmpresa.fechaIngreso <= :periodoPagoInicio AND e.datoEmpresa.fechaBaja IS NULL) OR (e.datoEmpresa.fechaIngreso <= :periodoPagoInicio AND e.datoEmpresa.fechaBaja >= :periodoPagoFin)) ORDER BY e.nombre, e.primerAp, e.segundoAp")
 @NamedQuery(name = "DetEmpleado.findByRFC", query = "SELECT e FROM DetEmpleado e WHERE e.datoEmpresa.rfc = :rfc")
 @NamedQuery(name = "DetEmpleado.findByCURP", query = "SELECT e FROM DetEmpleado e WHERE e.curp = :curp")
-@NamedQuery(name = "DetEmpleado.findByActiveEmpresaPlanta", query = "SELECT e FROM DetEmpleado e WHERE (:idEmpresa is null or e.datoEmpresa.empresa.idEmpresa = :idEmpresa) AND (:idPlanta is null or e.datoEmpresa.planta.idPlanta = :idPlanta) and ( (e.datoEmpresa.fechaIngreso <= :fecha) and ( e.datoEmpresa.fechaBaja is null or :fecha <= e.datoEmpresa.fechaBaja ) ) ")
+@NamedQuery(name = "DetEmpleado.findByActiveEmpresaPlanta", query = "SELECT e FROM DetEmpleado e WHERE (:idEmpresa is null or e.datoEmpresa.empresa.idEmpresa = :idEmpresa) AND (:idPlanta is null or e.datoEmpresa.planta.idPlanta = :idPlanta) and ( (e.datoEmpresa.fechaIngreso <= :fecha) and ( e.datoEmpresa.fechaBaja is null or :fecha <= e.datoEmpresa.fechaBaja ) ) ORDER BY e.nombre, e.primerAp, e.segundoAp ")
 public class DetEmpleado implements Serializable, Cloneable {
 
     private static final long serialVersionUID = 1L;

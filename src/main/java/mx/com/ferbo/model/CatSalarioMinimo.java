@@ -76,6 +76,8 @@ public class CatSalarioMinimo implements Serializable {
 
 	@Override
 	public int hashCode() {
+		if(this.id == null)
+			return System.identityHashCode(this);
 		return Objects.hash(id);
 	}
 

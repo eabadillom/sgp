@@ -49,6 +49,7 @@ import mx.com.ferbo.dao.n.TipoJornadaDAO;
 import mx.com.ferbo.dao.n.TipoPercepcionDAO;
 import mx.com.ferbo.dao.n.TipoPrestamoDAO;
 import mx.com.ferbo.dao.n.TipoRegimenDAO;
+import mx.com.ferbo.dao.n.ZonaSalarioDAO;
 import mx.com.ferbo.dao.n.sat.BancoDAO;
 import mx.com.ferbo.model.CatArea;
 import mx.com.ferbo.model.CatAsentamiento;
@@ -61,6 +62,7 @@ import mx.com.ferbo.model.CatPlanta;
 import mx.com.ferbo.model.CatPuesto;
 import mx.com.ferbo.model.CatTipoBajaEmpleado;
 import mx.com.ferbo.model.CatTipoPrestamo;
+import mx.com.ferbo.model.CatZonaSalario;
 import mx.com.ferbo.model.DetBiometrico;
 import mx.com.ferbo.model.DetDomicilioEmpleado;
 import mx.com.ferbo.model.DetEmpleado;
@@ -123,6 +125,8 @@ public class RegistroEmpleadosBean implements Serializable {
     private TipoBajaEmpleadoDAO   tipoBajaEmpleadoDAO;
     private InfDatoEmpresa        datoEmpresa;
     private DetSalarioDiario      salarioDiario;
+    private ZonaSalarioDAO        zonaSalarioDAO;
+    private List<CatZonaSalario>  zonasSalario;
     
     private List<CatPercepcion>   percepciones;
     private List<DetPercepcionEmpleado> percepcionesEmpleado;
@@ -195,8 +199,9 @@ public class RegistroEmpleadosBean implements Serializable {
     		tipoBajaEmpleadoDAO = new TipoBajaEmpleadoDAO();
     		bancoDAO = new BancoDAO();
     		percepcionDAO = new PercepcionDAO();
+    		zonaSalarioDAO = new ZonaSalarioDAO();
     		
-    		empleado = new DetEmpleado();
+    		empleado = EmpleadoBL.build();
     		lstEmpleados = new ArrayList<>();
     		
     		lstCatEmpresa = empresaDAO.buscarActivo();
@@ -217,6 +222,7 @@ public class RegistroEmpleadosBean implements Serializable {
             percepciones = percepcionDAO.buscarTodos();
             prestamo = new DetPrestamo();
             this.activo = Boolean.TRUE;
+            zonasSalario = zonaSalarioDAO.buscarTodos();
             
             consultaEmpleados();
     	} catch(Exception ex) {
@@ -1369,5 +1375,13 @@ public class RegistroEmpleadosBean implements Serializable {
 
 	public void setSalarioDiario(DetSalarioDiario salarioDiario) {
 		this.salarioDiario = salarioDiario;
+	}
+
+	public List<CatZonaSalario> getZonasSalario() {
+		return zonasSalario;
+	}
+
+	public void setZonasSalario(List<CatZonaSalario> zonasSalario) {
+		this.zonasSalario = zonasSalario;
 	}
 }
