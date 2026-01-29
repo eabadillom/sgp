@@ -13,7 +13,7 @@
 												</p:inputNumber>
 											</span>
 											<span>
-												<p:datePicker value="#{registroEmpleadosBean.salarioDiario.fechaRegistro}" pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX" placeholder="Fecha: dd / mm / yyyy">
+												<p:datePicker value="#{registroEmpleadosBean.salarioDiario.fechaRegistro}" pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX" placeholder="Vigente desde: dd / mm / yyyy">
 													<p:ajax process="@this" />
 												</p:datePicker>
 											</span>
@@ -22,7 +22,7 @@
 												<p:commandButton icon="pi pi-plus" value="Agregar" process="@this" update="form:panelDialogEmpleado form:dlg-salario form:dlSalariosDiarios" actionListener="#{registroEmpleadosBean.agregarSalarioDiario()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
 										</div>
 										<p:spacer height="2rem"></p:spacer>
-										<p:dataTable id="dlSalariosDiarios" value="#{registroEmpleadosBean.empleado.datoEmpresa.salariosDiarios}" var="sd" emptyMessage="No hay salario diario registrado" editable="true" editMode="cell" sortBy="#{sd.fechaRegistro}" sortMode="single">
+										<p:dataTable id="dlSalariosDiarios" value="#{registroEmpleadosBean.empleado.datoEmpresa.salariosDiarios}" var="sd" emptyMessage="No hay salario diario registrado" editable="true" editMode="cell" sortBy="#{sd.fechaRegistro}" sortMode="single" rows="5" paginator="true" paginatorPosition="bottom">
 	                               			<p:column headerText="Importe" sortable="true" sortBy="#{sd.importe}" sortOrder="desc">
 	                               				<p:cellEditor>
 	                               					<f:facet name="output">
