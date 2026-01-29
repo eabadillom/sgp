@@ -25,10 +25,12 @@
                             </p:column>
                             <p:column field="nombre" headerText="Nombre" filterMatchMode="contains">
                             </p:column>
-                            <p:column width="6rem">
-                                <p:commandButton styleClass="edit-button m-1" actionListener="#{registroEmpleadosBean.editar(empleado)}" process="@this" update="form:dlg-empleado form:panelDialogEmpleado form:panelDialogEmpleado:previewFingerprint1" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dialogEmpleado').show();" icon="pi pi-pencil">
+                            <p:column width="2rem">
+                                <p:commandButton icon="pi pi-bars" styleClass="edit-button" actionListener="#{registroEmpleadosBean.editar(empleado)}" process="@this" update="form:dlg-empleado form:panelDialogEmpleado form:panelDialogEmpleado:previewFingerprint1" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dialogEmpleado').show();">
                                 </p:commandButton>
-                                <p:commandButton class="ui-button-danger m-1" icon="pi pi-times" process="@this" actionListener="#{registroEmpleadosBean.validarEmpleado(empleado)}" oncomplete="PF('dg-eliminarEmpleado').show()" update=":form:dg-eliminarEmpleado" >
+                            </p:column>
+                            <p:column width="2rem">
+                                <p:commandButton icon="pi pi-times" styleClass="ui-button-danger" process="@this" actionListener="#{registroEmpleadosBean.validarEmpleado(empleado)}" oncomplete="PF('dg-eliminarEmpleado').show()" update=":form:dg-eliminarEmpleado" >
                                     <f:setPropertyActionListener value="#{empleado}" target="#{registroEmpleadosBean.empleado}" />
                                 </p:commandButton>
                             </p:column>
