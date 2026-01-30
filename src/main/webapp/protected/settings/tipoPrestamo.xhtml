@@ -22,7 +22,7 @@
 			<div style="padding-top: 1rem">
 				<p:dataTable id="dt-tipoPrestamo" widgetVar="dtTipoPrestamo" value="#{tipoPrestamoBean.tiposPrestamo}" var="tp" allowUnsorting="true" sortMode="single">
 					<p:column headerText="Clave" width="5rem">
-						<p:outputLabel value="#{tp.clave}" />
+						<p:outputLabel value="#{tp.tipoPrestamo}" />
 					</p:column>
 					<p:column headerText="Descripción">
 						<p:outputLabel value="#{tp.descripcion}" />
@@ -38,7 +38,7 @@
 				<p:outputPanel class="ui-fluid">
 					<div class="p-field">
 						<p:outputLabel value="Clave"/>
-						<p:inputText value="#{tipoPrestamoBean.tipoPrestamo.clave}" readonly="#{not tipoPrestamoBean.crear}" />
+						<p:inputText value="#{tipoPrestamoBean.tipoPrestamo.tipoPrestamo}" readonly="#{not tipoPrestamoBean.crear}" />
 					</div>
 					<div class="p-field">
 						<p:outputLabel value="Descripcion" for="@next"/>
