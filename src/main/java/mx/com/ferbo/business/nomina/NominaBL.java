@@ -17,6 +17,7 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.deduccion.AbstractDBL;
 import mx.com.ferbo.business.deduccion.AjusteAlNetoDBL;
+import mx.com.ferbo.business.empleado.EmpleadoBL;
 import mx.com.ferbo.business.otropago.AbstractOtroPago;
 import mx.com.ferbo.business.otropago.AjusteAlNetoOtroPago;
 import mx.com.ferbo.business.percepcion.PercepcionBL;
@@ -95,6 +96,7 @@ public abstract class NominaBL {
 				receptor = new DetNominaReceptor();
 				emisor   = new DetNominaEmisor();
 			} else {
+				empleado = EmpleadoBL.load(empleado.getIdEmpleado());
 				receptor = getReceptor(nomina, parametros, empleado);
 				emisor   = getEmisor(nomina, empleado.getDatoEmpresa().getEmpresa());
 			}
@@ -375,6 +377,8 @@ public abstract class NominaBL {
 			if(empleado.getDatoEmpresa().getPeriodicidadPago() == null)
 				throw new SGPException("La periodicidad de pago del empleado no está definida.");
 			receptor.setPeriodicidadPago(empleado.getDatoEmpresa().getPeriodicidadPago());
+			
+			empleado.getDatoEmpresa().setSalarioDiario(EmpleadoBL.salarioDiarioVigente(empleado.getDatoEmpresa().getSalariosDiarios(), parametros.getPeriodoFin()).getImporte());
 			
 			if(empleado.getDatoEmpresa().getSalarioDiario() == null)
 				throw new SGPException("El salario diario del empleado no está definido.");
