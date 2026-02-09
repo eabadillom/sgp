@@ -71,6 +71,9 @@ public class ISRSemanalDBL2 extends AbstractDBL implements IDeducciones {
 					.collect(Collectors.toList())
 					;
 			
+			if(nominaMensual == null)
+				return;
+			
 			ausencias = nominaMensual.stream()
 					.filter(item -> item.getDiasNoLaborados().compareTo(ValoresBD._CERO.get()) > 0)
 					.map(item -> item.getDiasNoLaborados())

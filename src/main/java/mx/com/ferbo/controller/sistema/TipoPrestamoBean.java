@@ -14,10 +14,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.dao.TipoPrestamoDAO;
-import mx.com.ferbo.dao.sat.TipoDeduccionDAO;
-import mx.com.ferbo.dto.TipoPrestamoDTO;
-import mx.com.ferbo.dto.sat.TipoDeduccionDTO;
+import mx.com.ferbo.dao.n.TipoPrestamoDAO;
+import mx.com.ferbo.dao.n.sat.TipoDeduccionDAO;
+import mx.com.ferbo.model.CatTipoPrestamo;
+import mx.com.ferbo.model.sat.CatTipoDeduccion;
 import mx.com.ferbo.util.SGPException;
 
 @Named(value = "tipoPrestamoBean")
@@ -28,11 +28,11 @@ public class TipoPrestamoBean implements Serializable {
 	private static Logger log = LogManager.getLogger(TipoPrestamoBean.class);
 	
 	private TipoPrestamoDAO tipoPrestamoDAO;
-	private List<TipoPrestamoDTO> tiposPrestamo = null;
-	private TipoPrestamoDTO tipoPrestamo = null;
+	private List<CatTipoPrestamo> tiposPrestamo = null;
+	private CatTipoPrestamo tipoPrestamo = null;
 	
 	private TipoDeduccionDAO tipoDeduccionDAO = null;
-	private List<TipoDeduccionDTO> tiposDeduccion = null;
+	private List<CatTipoDeduccion> tiposDeduccion = null;
 	
 	private boolean crear = false;
 	
@@ -67,7 +67,7 @@ public class TipoPrestamoBean implements Serializable {
         	if(this.tipoPrestamo == null)
         		throw new SGPException("No hay un tipo de préstamo seleccionado.");
         	
-        	if(this.tipoPrestamo.getClave() == null || this.tipoPrestamo.getClave().equalsIgnoreCase(""))
+        	if(this.tipoPrestamo.getTipoPrestamo() == null || this.tipoPrestamo.getTipoPrestamo().equalsIgnoreCase(""))
         		throw new SGPException("Debe indicar la clave del tipo de préstamo");
         	
         	if(this.tipoPrestamo.getDescripcion() == null || this.tipoPrestamo.getDescripcion().equalsIgnoreCase(""))
@@ -99,27 +99,27 @@ public class TipoPrestamoBean implements Serializable {
         }
 	}
 
-	public List<TipoPrestamoDTO> getTiposPrestamo() {
+	public List<CatTipoPrestamo> getTiposPrestamo() {
 		return tiposPrestamo;
 	}
 
-	public void setTiposPrestamo(List<TipoPrestamoDTO> tiposPrestamo) {
+	public void setTiposPrestamo(List<CatTipoPrestamo> tiposPrestamo) {
 		this.tiposPrestamo = tiposPrestamo;
 	}
 
-	public TipoPrestamoDTO getTipoPrestamo() {
+	public CatTipoPrestamo getTipoPrestamo() {
 		return tipoPrestamo;
 	}
 
-	public void setTipoPrestamo(TipoPrestamoDTO tipoPrestamo) {
+	public void setTipoPrestamo(CatTipoPrestamo tipoPrestamo) {
 		this.tipoPrestamo = tipoPrestamo;
 	}
 
-	public List<TipoDeduccionDTO> getTiposDeduccion() {
+	public List<CatTipoDeduccion> getTiposDeduccion() {
 		return tiposDeduccion;
 	}
 
-	public void setTiposDeduccion(List<TipoDeduccionDTO> tiposDeduccion) {
+	public void setTiposDeduccion(List<CatTipoDeduccion> tiposDeduccion) {
 		this.tiposDeduccion = tiposDeduccion;
 	}
 
