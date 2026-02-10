@@ -243,7 +243,7 @@ public class RegistroBL implements Serializable
         	DateUtil.setTime(diaInicio, 0, 0, 0);
         	DateUtil.setTime(diaFin, 23, 59, 59);
         	
-        	registro = registroDAO.buscarPorDia(empleado.getIdEmpleado(), diaInicio, diaFin);
+        	registro = registroDAO.buscarPorDia(incidencia.getEmpleado().getIdEmpleado(), diaInicio, diaFin);
         	
         	if(registro == null) {
         		registro = new DetRegistro();
