@@ -215,8 +215,8 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
 			em = this.getEntityManager();
 			model = em.createNamedQuery("DetRegistro.findToday", DetRegistro.class)
 					.setParameter("idEmp", idEmp)
-					.setParameter("inicioDia", inicioDiaActual, TemporalType.TIMESTAMP)
-					.setParameter("finDia", finDiaActual, TemporalType.TIMESTAMP)
+					.setParameter("inicioDia", inicioDiaActual)
+					.setParameter("finDia", finDiaActual)
 					.getSingleResult();
 		} catch(NoResultException ex) {
 			log.warn("Registro no encontrado: idEmpleado = {}, Fecha hora inicio = {}, Fecha hora fin = {}", idEmp, inicioDiaActual, finDiaActual);
