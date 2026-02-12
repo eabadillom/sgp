@@ -616,7 +616,7 @@ public class RegistroEmpleadosBean implements Serializable {
     }
 
     public synchronized void guardarEmpleado() {
-        FacesMessage message = null;
+    	FacesMessage message = null;
         Severity severity = null;
         String mensaje = null;
         String titulo = "Guardar empleado";
@@ -956,10 +956,25 @@ public class RegistroEmpleadosBean implements Serializable {
     }
 
     public void validarEmpleado(DetEmpleado empleado) {
-        EmpleadoBL.validarDatosEmpleado(empleado);
-        this.tipofinrelacion = null;
-        this.motivofinrelaicion = null;
-        this.fechafinrelacion = null;
+    	FacesMessage message = null;
+        Severity severity = null;
+        String mensaje = null;
+        String titulo = "Baja del empleado";
+    	
+    	try {
+    		this.empleado = EmpleadoBL.load(empleado.getIdEmpleado());
+    		this.datoEmpresa = this.empleado.getDatoEmpresa();
+    		this.tipofinrelacion = null;
+    		this.motivofinrelaicion = null;
+    		this.fechafinrelacion = null;
+    		
+    	} catch(Exception ex) {
+    		mensaje = ex.getMessage();
+    		severity = FacesMessage.SEVERITY_WARN;
+    		message = new FacesMessage(severity, titulo, mensaje);
+            FacesContext.getCurrentInstance().addMessage(null, message);
+            PrimeFaces.current().ajax().update("form:messages");
+    	}
     }
 
     public void recalcularVacaciones() {
