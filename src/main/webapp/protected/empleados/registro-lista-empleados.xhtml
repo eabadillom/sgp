@@ -30,7 +30,7 @@
                                 </p:commandButton>
                             </p:column>
                             <p:column width="2rem">
-                                <p:commandButton icon="pi pi-times" styleClass="ui-button-danger" process="@this" actionListener="#{registroEmpleadosBean.validarEmpleado(empleado)}" oncomplete="PF('dg-eliminarEmpleado').show()" update=":form:dg-eliminarEmpleado" >
+                                <p:commandButton icon="pi pi-times" styleClass="ui-button-danger" process="@this" actionListener="#{registroEmpleadosBean.validarEmpleado(empleado)}" oncomplete="PF('dg-eliminarEmpleado').show()" update="form:dg-eliminarEmpleado" disabled="#{empleado.activo ne 1 and not empty empleado.datoEmpresa.fechaBaja}" >
                                     <f:setPropertyActionListener value="#{empleado}" target="#{registroEmpleadosBean.empleado}" />
                                 </p:commandButton>
                             </p:column>
