@@ -27,10 +27,10 @@
                             		<p:confirm header="Reingreso" message="¿Está seguro que desea registrar el reingreso del empleado?" icon="pi pi-exclamation-triangle" />
                             	</p:commandButton>
                             	<p:spacer width="30" />
-                                <p:commandButton value="Guardar" icon="pi pi-save" actionListener="#{registroEmpleadosBean.guardarEmpleado()}" process="panelDialogEmpleado @this" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();">
+                                <p:commandButton value="Guardar" icon="pi pi-save" actionListener="#{registroEmpleadosBean.guardarEmpleado()}" process="panelDialogEmpleado @this" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" disabled="#{registroEmpleadosBean.empleado.activo eq 0 and registroEmpleadosBean.empleado.datoEmpresa.fechaBaja eq null}">
                                 	<p:confirm header="Guardar" message="¿Está seguro que desea guardar la información del empleado?" icon="pi pi-exclamation-triangle" />
                                 </p:commandButton>
-                                <p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dialogEmpleado').hide()" class="ui-button-secondary" resetValues="true"/>
+                                <p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dialogEmpleado').hide();" class="ui-button-secondary"/>
                             </f:facet>
                         </p:dialog> 
 

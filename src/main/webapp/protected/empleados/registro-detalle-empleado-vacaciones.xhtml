@@ -12,7 +12,7 @@
                                     </p:toolbar>
                                     <p:dataTable id="dtVacaciones" widgetVar="dtVacaciones" var="vacacion" value="#{registroEmpleadosBean.empleado.vacaciones}" reflow="true" styleClass="products-table"
                                                  rowKey="#{vacacion.idVacaciones}" paginator="true" rows="6" rowSelectMode="add" 
-                                                 paginatorPosition="bottom" lazy="true">
+                                                 paginatorPosition="bottom" lazy="true" size="small">
                                         <p:column headerText="Fecha de inicio" style="text-align: center;">
                                             <p:outputLabel value="#{vacacion.fechaInicio}">
                                                 <f:convertDateTime type="date" pattern="dd/MM/yyyy" />

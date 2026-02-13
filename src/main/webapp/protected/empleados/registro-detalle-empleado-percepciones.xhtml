@@ -39,7 +39,7 @@
                                             </p:commandButton>
                                         </div>
                                     </div>
-                                    <p:dataTable id="dt-percepcion-empleado" value="#{registroEmpleadosBean.empleado.percepcionesEmpleado}" var="percepcion" paginator="true" rows="5" paginatorPosition="bottom">
+                                    <p:dataTable id="dt-percepcion-empleado" value="#{registroEmpleadosBean.empleado.percepcionesEmpleado}" var="percepcion" paginator="true" rows="5" paginatorPosition="bottom" size="small">
                                         <p:column headerText="SAT" width="2rem" style="text-align: center;">
                                             <p:outputLabel value="#{percepcion.percepcion.tipoPercepcion.clave}" title="#{percepcion.percepcion.tipoPercepcion.descripcion}" />
                                         </p:column>
