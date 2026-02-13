@@ -10,43 +10,11 @@
     <ui:define name="head">
         <h:outputScript library="recursos" name="js/primefaces_locale.js" />
         <h:outputStylesheet name="css/estilos.css" library="recursos"/>
-        <script>
-			PrimeFaces.locales['es_MX'] = {
-				monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-				monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-				dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
-				dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
-				dayNamesMin: ['D', 'L', 'M', 'X', 'J', 'V', 'S'],
-				weekHeader: 'Semana',
-				firstDay: 1,
-				isRTL: false,
-				showMonthAfterYear: false,
-				yearSuffix: '',
-				timeOnlyTitle: 'Sólo hora',
-				timeText: 'Tiempo',
-				hourText: 'Hora',
-				minuteText: 'Minuto',
-				secondText: 'Segundo',
-				millisecondText: 'Milisegundo',
-				ampm: false,
-				month: 'Mes',
-				week: 'Semana',
-				day: 'Día',
-				allDayText: 'Todo el día',
-				today: 'Hoy',
-				now: 'Ahora',
-				clear: 'Limpiar',
-				aria: {
-				   close: 'Cerrar',
-				   previous: 'Anterior',
-				   next: 'Siguiente',
-				}
-			};
-		</script>
     </ui:define>
 
     <ui:define name="content">
         <h:form id="formActividades">
+        	<ui:include src="/protected/common/locale-es_MX.xhtml"/>
         	<ui:include src="/protected/common/status-info.xhtml" />
             <ui:include src="/protected/common/confirm.xhtml" />
             <p:tabView id="tabView" cache="false" widgetVar="tvAsistencia" dynamic="true">

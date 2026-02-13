@@ -10,7 +10,7 @@
                                             <p:commandButton value="Agregar" icon="pi pi-plus" oncomplete="PF('dgPrestamo').show();"></p:commandButton>
                                         </p:toolbarGroup>
                                     </p:toolbar>
-                                    <p:dataTable id="dt-prestamos" widgetVar="dtPrestamos" value="#{registroEmpleadosBean.empleado.prestamos}" var="prestamo" allowUnsorting="true" sortMode="single" reflow="true" lazy="true">
+                                    <p:dataTable id="dt-prestamos" widgetVar="dtPrestamos" value="#{registroEmpleadosBean.empleado.prestamos}" var="prestamo" allowUnsorting="true" sortMode="single" reflow="true" lazy="true" size="small">
                                         <p:column headerText="Fecha inicio" sortBy="#{prestamo.fechaInicio}">
                                             <p:datePicker value="#{prestamo.fechaInicio}" monthNavigator="true" yearNavigator="true" showIcon="true" pattern="dd/MM/yyyy" locale="es" timeZone="GMT-6">
                                                 <p:ajax process="@this"></p:ajax>

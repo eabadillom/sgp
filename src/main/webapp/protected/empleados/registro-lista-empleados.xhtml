@@ -9,7 +9,8 @@
                         			value="#{registroEmpleadosBean.empleados}"
                         			paginator="true" rows="10"
                         			emptyMessage="No hay empleados con los criterios de búsqueda" 
-                        			paginatorPosition="bottom" >
+                        			paginatorPosition="bottom"
+                        			size="small" >
 
                             <f:facet name="header">
                                 <p:inputText id="globalFilter" onkeyup="PF('dtEmpleados').filter();" style="width:300px" placeholder="Buscar empleado por nombre o apellidos">
