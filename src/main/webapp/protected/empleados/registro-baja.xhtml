@@ -4,7 +4,7 @@
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 
-						<p:dialog widgetVar="dg-eliminarEmpleado" header="Estatus del empleado en la empresa" showEffect="fade" modal="true" responsive="true" 
+						<p:dialog widgetVar="dg-eliminarEmpleado" header="Baja de empleado" showEffect="fade" modal="true" responsive="true" 
                                   draggable="true" resizable="false" dynamic="true"  width="500">
                             <p:outputPanel id="dg-eliminarEmpleado">
 	                            <div class="p-field">
@@ -21,29 +21,22 @@
 	                                    <p:ajax process="@this"/>
 	                                </p:inputTextarea>
 	                            </div>
-	
+								
 	                            <h:panelGroup rendered="#{registroEmpleadosBean.statusfechabaja}">
 	                                <div class="p-field">
 	                                    <p:outputLabel for="fechadebaja" value="Fecha de ultimo dia laboral"/><br/>
-	                                    <p:datePicker id="fechadebaja" 
-	                                                  value="#{registroEmpleadosBean.fechafinrelacion}" 
-	                                                  showIcon="true" 
-	                                                  yearNavigator="true" 
-	                                                  monthNavigator="true" 
-	                                                  weekCalculator="true" 
-	                                                  pattern="dd/MM/yyyy" 
-	                                                  timeZone="GMT-6" 
-	                                                  locale="es_MX">
+	                                    <p:datePicker id="fechadebaja" value="#{registroEmpleadosBean.fechafinrelacion}" showIcon="true" yearNavigator="true" 
+	                                                  monthNavigator="true"  weekCalculator="true" pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX">
 	                                        <p:ajax process="@this"/>
 	                                    </p:datePicker>
 	                                </div>
 	                            </h:panelGroup>
                             </p:outputPanel>
                             <f:facet name="footer">
-	                            <p:commandButton value="Eliminar" icon="pi pi-check" process="@this" actionListener="#{registroEmpleadosBean.eliminaEmpleado()}" oncomplete="PF('dg-eliminarEmpleado').hide();" style="margin: 0.3rem" styleClass="ui-button-danger">
-	                            	<p:confirm header="Modificar empleado" message="¿Está seguro que desea modificar al empleado?" icon="pi pi-exclamation-triangle" />
+	                            <p:commandButton value="Confirmar" icon="pi pi-trash" process="@this" actionListener="#{registroEmpleadosBean.eliminaEmpleado()}" oncomplete="PF('dg-eliminarEmpleado').hide();" style="margin: 0.3rem" styleClass="ui-button-outlined ui-button-danger">
+	                            	<p:confirm header="Confirmar" message="Esta acción no se puede deshacer. ¿Está seguro que desea dar de baja al empleado?" icon="pi pi-exclamation-triangle" />
 	                            </p:commandButton>
-	                            <p:commandButton value="Cancelar" icon="pi pi-times" style="margin: 0.3rem" onclick="PF('dg-eliminarEmpleado').hide();" />
+	                            <p:commandButton value="Cancelar" icon="pi pi-times" style="margin: 0.3rem" onclick="PF('dg-eliminarEmpleado').hide();" styleClass="ui-button-outlined ui-button-secondary"/>
                             </f:facet>
                         </p:dialog>
 

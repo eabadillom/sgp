@@ -15,7 +15,7 @@ PrimeFaces.locales ['es_MX'] = {
     dayNamesMin: ['D', 'L', 'M', 'M', 'J', 'V', 'S'],
     weekHeader: 'Semana',
     weekNumberTitle: 'S',
-    firstDay: 0,
+    firstDay: 1,//día lunes como primer día de la semana.
     isRTL: false,
     showMonthAfterYear: false,
     yearSuffix:'',
