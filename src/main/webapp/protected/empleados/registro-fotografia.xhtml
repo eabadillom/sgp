@@ -16,7 +16,7 @@
                             </p:outputPanel>
                             <f:facet name="footer">
                                 <p:commandButton  value="Capture" icon="pi pi-camera" onclick="PF('pc').capture()" process="@this" 
-                                                  update="form:photo form:btnAceptarFoto"/>
+                                                  update="form:photo form:btnAceptarFoto form:panelDialogEmpleado"/>
                                 <p:commandButton id="btnAceptarFoto" value="Aceptar" disabled="#{registroEmpleadosBean.empleadoFoto.fotografia eq null}" update="form:panelDialogEmpleado"
                                                  oncomplete="PF('pc').detach();" class="ui-button-success" icon="pi pi-check" onclick="PF('dialogFotografia').hide()" process="@this"/>
                                 <p:commandButton value="Cancelar" icon="pi pi-times" onclick="PF('dialogFotografia').hide(); PF('pc').detach();" class="ui-button-secondary" />

@@ -15,47 +15,42 @@
         <h:form id="form">
             <ui:include src="/protected/common/status-info.xhtml" />
             <ui:include src="/protected/common/confirm.xhtml" />
-            <div class="grid table-demo">
-                <div class="col-12">
-                    <div class="card p-4">
-                        <p:blockUI block="form:dialogBiometrico" widgetVar="bui"/>
-                        <p:remoteCommand name="verificaEstado" onstart="PF('bui').hide();" actionListener="#{registroEmpleadosBean.validaHuella()}"/>
-                        
-                        <ui:include src="/protected/empleados/registro-filtros-busqueda.xhtml" />
+            <ui:include src="/protected/common/locale-es_MX.xhtml"/>
+            <p:blockUI block="form:dialogBiometrico" widgetVar="bui"/>
+            <p:remoteCommand name="verificaEstado" onstart="PF('bui').hide();" actionListener="#{registroEmpleadosBean.validaHuella()}"/>
+            
+            <ui:include src="/protected/empleados/registro-filtros-busqueda.xhtml" />
 
-                        <ui:include src="/protected/empleados/registro-lista-empleados.xhtml" />
-                        
-                        <ui:include src="/protected/empleados/registro-detalle-empleado.xhtml" />
-                        
-                        <ui:include src="/protected/empleados/registro-precalculo.xhtml" />
-						
-                        <ui:include src="/protected/empleados/registro-fotografia.xhtml" /> 
+            <ui:include src="/protected/empleados/registro-lista-empleados.xhtml" />
+            
+            <ui:include src="/protected/empleados/registro-detalle-empleado.xhtml" />
+            
+            <ui:include src="/protected/empleados/registro-precalculo.xhtml" />
 
-                        <ui:include src="/protected/empleados/registro-biometrico.xhtml" />
-                        
-                        <ui:include src="/protected/empleados/registro-detalle-prestamo.xhtml" />
+            <ui:include src="/protected/empleados/registro-fotografia.xhtml" /> 
 
-                        <ui:include src="/protected/empleados/registro-baja.xhtml" />
-                        
-                        <ui:include src="/protected/empleados/registro-salario-diario.xhtml" />
+            <ui:include src="/protected/empleados/registro-biometrico.xhtml" />
+            
+            <ui:include src="/protected/empleados/registro-detalle-prestamo.xhtml" />
 
-                        <p:confirmDialog widgetVar="dlgEliminarPrestamo" showEffect="fade" width="30rem" message="¿Está seguro que desea eliminar el préstamo seleccionado?" header="Confirmar" severity="warn">
-                            <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{registroEmpleadosBean.eliminarPrestamo(prestamo)}" process="@this" oncomplete="PF('dlgEliminarPrestamo').hide();"/>
-                            <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('dlgEliminarPrestamo').hide()" />
-                        </p:confirmDialog>
+            <ui:include src="/protected/empleados/registro-baja.xhtml" />
+            
+            <ui:include src="/protected/empleados/registro-salario-diario.xhtml" />
 
-                        <p:confirmDialog widgetVar="dlgEliminarPercepcionEmpleado" showEffect="fade" width="30rem" message="¿Está seguro que desea eliminar la percepción seleccionada?" header="Confirmar" severity="warn">
-                            <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{registroEmpleadosBean.eliminarPercepcionEmpleado()}" process="@this" oncomplete="PF('dlgEliminarPercepcionEmpleado').hide();"/>
-                            <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('dlgEliminarPercepcionEmpleado').hide()" />
-                        </p:confirmDialog>
+            <p:confirmDialog widgetVar="dlgEliminarPrestamo" showEffect="fade" width="30rem" message="¿Está seguro que desea eliminar el préstamo seleccionado?" header="Confirmar" severity="warn">
+                <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{registroEmpleadosBean.eliminarPrestamo(prestamo)}" process="@this" oncomplete="PF('dlgEliminarPrestamo').hide();"/>
+                <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('dlgEliminarPrestamo').hide()" />
+            </p:confirmDialog>
 
-                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="300">
-                            <p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
-                            <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary" icon="pi pi-times" />
-                        </p:confirmDialog>
-                    </div>
-                </div>
-            </div>
+            <p:confirmDialog widgetVar="dlgEliminarPercepcionEmpleado" showEffect="fade" width="30rem" message="¿Está seguro que desea eliminar la percepción seleccionada?" header="Confirmar" severity="warn">
+                <p:commandButton value="Sí" icon="pi pi-check" actionListener="#{registroEmpleadosBean.eliminarPercepcionEmpleado()}" process="@this" oncomplete="PF('dlgEliminarPercepcionEmpleado').hide();"/>
+                <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times" onclick="PF('dlgEliminarPercepcionEmpleado').hide()" />
+            </p:confirmDialog>
+
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="300">
+                <p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary" icon="pi pi-times" />
+            </p:confirmDialog>
             <script>
                 $('.respresultado').hide();
                 $(".clean").click(function () {
