@@ -1,5 +1,7 @@
 package mx.com.ferbo.dao.n;
 
+import java.util.Optional;
+
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 
@@ -17,30 +19,12 @@ public class EmpleadoFotoDAO extends BaseDAO<DetEmpleadoFoto, Integer> {
 		super(modelClass);
 	}
 	
-	@Deprecated
-	public DetEmpleadoFoto buscar(String numeroEmpleado) {
-		DetEmpleadoFoto model = null;
-		EntityManager em = null;
-		
-		try {
-			em = this.getEntityManager();
-			model = em.createNamedQuery("DetEmpleadoFoto.findByNumeroEmpleado", modelClass)
-					.setParameter("numeroEmpleado", numeroEmpleado)
-					.getSingleResult()
-					;
-			
-		} catch(NoResultException ex) {
-			log.warn("No hay registro de foto para el empleado {}", numeroEmpleado);
-		} catch(Exception ex) {
-			log.error("Problema para obtener la foto del empleado " + numeroEmpleado, ex);
-		} finally {
-			this.close(em);
-		}
-		
-		return model;
+	public EmpleadoFotoDAO() {
+		super(DetEmpleadoFoto.class);
 	}
 	
-	public DetEmpleadoFoto buscar(Integer idEmpleado) {
+	public Optional<DetEmpleadoFoto> buscar(Integer idEmpleado) {
+		Optional<DetEmpleadoFoto> optional = null;
 		DetEmpleadoFoto model = null;
 		EntityManager em = null;
 		
@@ -50,15 +34,18 @@ public class EmpleadoFotoDAO extends BaseDAO<DetEmpleadoFoto, Integer> {
 					.setParameter("idEmpleado", idEmpleado)
 					.getSingleResult()
 					;
+			optional = Optional.of(model);
 		} catch(NoResultException ex) {
 			log.warn("Problema para obtener la fotografía del empleado con id {}", idEmpleado);
+			optional = Optional.empty();
 		} catch(Exception ex) {
 			log.error("Problema para obtener la foto del empleado con id {}...\n{}", idEmpleado, ex);
+			optional = Optional.empty();
 		} finally {
 			this.close(em);
 		}
 		
-		return model;
+		return optional;
 	}
 
 }

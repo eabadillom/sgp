@@ -2,16 +2,11 @@
 <%@ page import="mx.com.ferbo.model.DetEmpleado" %>
 <%@ page import="org.apache.logging.log4j.LogManager" %>
 <%@ page import="org.apache.logging.log4j.Logger" %>
-<%DetEmpleado empleado = (DetEmpleado) session.getAttribute("empleado"); %>
 <%
     String path = request.getContextPath();
     String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + path;
     String imagesPath = basePath + "/resources/recursos/images/dialog";
 
-    if (empleado != null) {
-        request.getSession().invalidate();
-    }
-    
     String numEmpleado = "";
     Integer tamanioPermitido = 4;
 %>

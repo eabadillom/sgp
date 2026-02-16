@@ -44,13 +44,13 @@ import mx.com.ferbo.dao.n.PlantaDAO;
 import mx.com.ferbo.dao.n.PuestoDAO;
 import mx.com.ferbo.dao.n.RiesgoPuestoDAO;
 import mx.com.ferbo.dao.n.TipoBajaEmpleadoDAO;
-import mx.com.ferbo.dao.n.TipoContratoDAO;
-import mx.com.ferbo.dao.n.TipoJornadaDAO;
-import mx.com.ferbo.dao.n.TipoPercepcionDAO;
 import mx.com.ferbo.dao.n.TipoPrestamoDAO;
-import mx.com.ferbo.dao.n.TipoRegimenDAO;
 import mx.com.ferbo.dao.n.ZonaSalarioDAO;
 import mx.com.ferbo.dao.n.sat.BancoDAO;
+import mx.com.ferbo.dao.n.sat.TipoContratoDAO;
+import mx.com.ferbo.dao.n.sat.TipoJornadaDAO;
+import mx.com.ferbo.dao.n.sat.TipoPercepcionDAO;
+import mx.com.ferbo.dao.n.sat.TipoRegimenDAO;
 import mx.com.ferbo.model.CatArea;
 import mx.com.ferbo.model.CatAsentamiento;
 import mx.com.ferbo.model.CatEmpresa;
@@ -294,7 +294,9 @@ public class RegistroEmpleadosBean implements Serializable {
 			this.empleado = EmpleadoBL.load(empleado.getIdEmpleado());
 			this.datoEmpresa = this.empleado.getDatoEmpresa();
 			this.percepcionesEmpleado = this.empleado.getPercepcionesEmpleado();
-			this.empleadoFoto = empleadoFotoDAO.buscar(this.empleado.getIdEmpleado());
+			this.empleadoFoto = empleadoFotoDAO
+					.buscar(this.empleado.getIdEmpleado())
+					.orElse(new DetEmpleadoFoto.Builder().empleado(empleado).build());
 	        if (this.empleadoFoto != null) {
 	            log.debug("Foto: {}", this.empleadoFoto.getFotografia());
 	        }

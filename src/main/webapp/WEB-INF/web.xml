@@ -34,7 +34,7 @@
         <filter-class>mx.com.ferbo.filter.SessionFilter</filter-class>
         <init-param>
             <param-name>exception-pages</param-name>
-            <param-value>/registry /imagen/articulo /imagen/uniforme /login.jsp /login.jsp .png.xhtml .png .css.xhtml .css .js.xhtml .js .gif.xhtml .gif .jpg.xhtml .jpg .bmp.xhtml .bmp .svg.xhtml .svg .jpeg.xhtml .jpeg .ico.xhtml .ico .xml.xhtml .xml .htm .html .tif.xhtml .tif .txt.xhtml .txt .woff.xhtml .woff</param-value>
+            <param-value>/registry /imagen/articulo /imagen/uniforme /login.jsp .png.xhtml .png .css.xhtml .css .js.xhtml .js .gif.xhtml .gif .jpg.xhtml .jpg .bmp.xhtml .bmp .svg.xhtml .svg .jpeg.xhtml .jpeg .ico.xhtml .ico .xml.xhtml .xml .htm .html .tif.xhtml .tif .txt.xhtml .txt .woff.xhtml .woff</param-value>
         </init-param>
         <init-param>
             <param-name>enabled</param-name>
@@ -62,6 +62,10 @@
         <servlet-class>mx.com.ferbo.servlet.RegistryServlet</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>Logout Servlet</servlet-name>
+        <servlet-class>mx.com.ferbo.servlet.LogoutServlet</servlet-class>
+    </servlet>
+    <servlet>
     	<servlet-name>Imagen Articulo Servlet</servlet-name>
     	<servlet-class>mx.com.ferbo.servlet.ImagenArticuloServlet</servlet-class>
     </servlet>
@@ -80,6 +84,10 @@
     <servlet-mapping>
         <servlet-name>Registry Servlet</servlet-name>
         <url-pattern>/registry</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Logout Servlet</servlet-name>
+        <url-pattern>/logout</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
     	<servlet-name>Imagen Articulo Servlet</servlet-name>

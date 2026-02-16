@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import javax.annotation.PostConstruct;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
@@ -110,6 +111,26 @@ public class SideBarBean implements Serializable {
 		FacesContext.getCurrentInstance().getExternalContext().redirect(context);
 
 		log.info("Finalizando sesion..........");
+	}
+	
+	public void cerrarSesion() throws IOException {
+		try {
+			log.info("Entrada al killSesion");
+			FacesContext facesContext = FacesContext.getCurrentInstance();
+			ExternalContext ec = facesContext.getExternalContext();
+
+		    ec.invalidateSession();
+			
+			String context = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
+			FacesContext.getCurrentInstance().getExternalContext().redirect(context);
+			
+			log.info("Finalizando sesion..........");
+			
+			facesContext.responseComplete();
+			
+		} catch(Exception ex) {
+			log.error("ERROR AL CERAR LA SESIÓN...", ex);
+		}
 	}
 
 	public DetEmpleado getEmpleadoSelected() {
