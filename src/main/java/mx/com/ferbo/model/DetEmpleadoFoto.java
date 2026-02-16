@@ -34,6 +34,15 @@ public class DetEmpleadoFoto implements Serializable {
 	@OneToOne(mappedBy = "empleadoFoto")
 	private DetEmpleado empleado;
 	
+	public DetEmpleadoFoto() {
+	}
+
+	private DetEmpleadoFoto(Builder builder) {
+		this.id = builder.id;
+		this.fotografia = builder.fotografia;
+		this.empleado = builder.empleado;
+	}
+	
 	@Override
 	public String toString() {
 		return "{\"id\":\"" + id + "\"}";
@@ -80,5 +89,30 @@ public class DetEmpleadoFoto implements Serializable {
 
 	public void setEmpleado(DetEmpleado empleado) {
 		this.empleado = empleado;
+	}
+
+	public static final class Builder {
+		private Integer id;
+		private String fotografia;
+		private DetEmpleado empleado;
+
+		public DetEmpleadoFoto build() {
+			return new DetEmpleadoFoto(this);
+		}
+
+		public Builder id(Integer id) {
+			this.id = id;
+			return this;
+		}
+
+		public Builder fotografia(String fotografia) {
+			this.fotografia = fotografia;
+			return this;
+		}
+
+		public Builder empleado(DetEmpleado empleado) {
+			this.empleado = empleado;
+			return this;
+		}
 	}
 }
