@@ -28,7 +28,7 @@
 						</p:submenu>
 						<p:menuitem id="reportes" value="Reportes" icon="pi pi-chart-bar" outcome="/protected/reportes" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1 }"/>
 						<p:menuitem id="ajustes" value="Ajustes" icon="pi pi-cog" outcome="/protected/settings/ajustes" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1}"></p:menuitem> 
-						<p:menuitem value="Salir" icon="pi pi-fw pi-sign-out" action="#{SideBarBean.killSesion()}"  process="@this" url="/sgp/login.jsp"/>
+						<p:menuitem value="Salir" icon="pi pi-fw pi-sign-out" url="#{request.contextPath}/logout" ajax="false"/>
 	                </po:menu>
 	            </div>
 	        </div>

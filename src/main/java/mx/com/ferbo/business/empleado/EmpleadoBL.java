@@ -11,12 +11,15 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.business.dianolaboral.DiasDeDescansoObligatorioBL;
 import mx.com.ferbo.business.domicilio.DomicilioBL;
+import mx.com.ferbo.dao.n.BiometricoDAO;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
+import mx.com.ferbo.dao.n.EmpleadoFotoDAO;
 import mx.com.ferbo.dao.n.ParametroDAO;
 import mx.com.ferbo.dao.n.VacacionesDAO;
 import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.CatDiaNoLaboral;
 import mx.com.ferbo.model.CatParametro;
+import mx.com.ferbo.model.DetBiometrico;
 import mx.com.ferbo.model.DetDomicilioEmpleado;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetEmpleadoConfiguracion;
@@ -404,8 +407,13 @@ public class EmpleadoBL {
     	DetEmpleado nuevoEmpleado = null;
     	InfDatoEmpresa datoEmpresa = null;
     	DetEmpleadoConfiguracion configuracion = null;
+    	DetEmpleadoFoto foto = null;
+    	DetBiometrico biometrico = null;
     	Date fechaIngreso = new Date();
 		DateUtil.setTime(fechaIngreso, 0, 0, 0);
+		EmpleadoFotoDAO fotoDAO = null;
+		BiometricoDAO biometricoDAO = null;
+		
     	
     	try {
     		datoEmpresa = new InfDatoEmpresa.Builder()
@@ -442,6 +450,12 @@ public class EmpleadoBL {
     		
     		configuracion = new DetEmpleadoConfiguracion.Builder()
     				.build();
+    		
+    		fotoDAO = new EmpleadoFotoDAO();
+    		
+    		foto = fotoDAO.buscar(e.getIdEmpleado()).orElse(new DetEmpleadoFoto.Builder()
+    						.empleado(nuevoEmpleado)
+    						.fotografia(null).build());
     		
     		nuevoEmpleado = new DetEmpleado.Builder()
     				.numEmpleado(e.getNumEmpleado())
