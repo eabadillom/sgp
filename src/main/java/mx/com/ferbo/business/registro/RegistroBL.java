@@ -42,6 +42,54 @@ public class RegistroBL implements Serializable
     private static final String VACACIONES = "V";
     private static final String PERMISO = "P";
     
+    public static synchronized Optional<DetRegistro> buscar(Integer idEmpleado, Date fecha) {
+    	Optional<DetRegistro> optional = null;
+    	DetRegistro registro = null;
+    	RegistroDAO registroDAO = null;
+    	
+    	Date inicio = null;
+        Date fin = null;
+    	
+    	try {
+    		inicio = new Date(fecha.getTime());
+        	fin = new Date(fecha.getTime());
+        	
+        	DateUtil.setTime(inicio, 0, 0, 0, 0);
+        	DateUtil.setTime(fin, 23, 59, 59, 999);
+    		
+    		registroDAO = new RegistroDAO();
+    		registro = registroDAO.buscarPorEmpleadoFechaEntrada(idEmpleado, inicio, fin);
+    		
+    		optional = Optional.of(registro);
+    	} catch(Exception ex) {
+    		optional = Optional.empty();
+    	}
+    	
+    	return optional;
+    }
+    
+    public void guardar(DetRegistro registro)
+    throws SGPException {
+    	DetRegistro existe = null;
+    	RegistroDAO registroDAO = new RegistroDAO();
+    	
+    	Date fechaInicio = new Date(registro.getFecha().getTime());
+    	Date fechaFin    = new Date(registro.getFecha().getTime());
+    	
+    	DateUtil.setTime(fechaInicio, 0, 0, 0, 0);
+    	DateUtil.setTime(fechaFin, 23, 59, 59, 999);
+    	
+    	
+    	existe = registroDAO.buscarPorEmpleadoFechaEntrada(registro.getEmpleado().getIdEmpleado(), fechaInicio, fechaFin);
+    	
+    	if(existe == null) {
+    		registroDAO.guardar(registro);
+    		return;
+    	}
+    	
+		throw new SGPException("El registro ya existe. No es posible agregar uno nuevo.");
+    }
+    
 	/**
 	 * Valida las fechas de solicitud permiso en registro de asistencia de un empleado
 	 */
@@ -185,7 +233,7 @@ public class RegistroBL implements Serializable
 
         registro.setFechaEntrada(fechaActual);
         registro.setFechaSalida(null);
-        registro.setIdEmpleado(empleado);
+        registro.setEmpleado(empleado);
         log.info("Hora actual del sistema: {}", horaSistema);
         if (empleadoConf == null || empleadoConf.getRetardo() == null) {
             log.info("Registro sin la configuracion de retardo");
@@ -247,7 +295,7 @@ public class RegistroBL implements Serializable
         	
         	if(registro == null) {
         		registro = new DetRegistro();
-                registro.setIdEmpleado(empleado);
+                registro.setEmpleado(empleado);
                 Date registroEntrada = DateUtil.getDateTime(DateUtil.getAnio(dia), DateUtil.getMes(dia), DateUtil.getDia(dia), horaEntrada, 0, 0, 0);
                 log.trace("Dia hora entrada: {}", registroEntrada);
                 registro.setFechaEntrada(registroEntrada);
@@ -301,7 +349,7 @@ public class RegistroBL implements Serializable
 		
 		for (Date dia : listaFechas) {
 			DetRegistro registro = new DetRegistro();
-			registro.setIdEmpleado(empleado);
+			registro.setEmpleado(empleado);
 			registro.setStatus(EstatusRegistroBL.estatusIncapacidad());
 			
 			Date registroEntrada = DateUtil.getDateTime(DateUtil.getAnio(dia), DateUtil.getMes(dia),
@@ -343,7 +391,7 @@ public class RegistroBL implements Serializable
             for(Date dia : listaFechas)
             {
                 DetRegistro registro = new DetRegistro();
-                registro.setIdEmpleado(empleadoInc);
+                registro.setEmpleado(empleadoInc);
                 registro.setStatus(EstatusRegistroBL.estatusIncapacidad());
 
                 Date registroEntrada = DateUtil.getDateTime(DateUtil.getAnio(dia), DateUtil.getMes(dia), DateUtil.getDia(dia), horaEntrada, 0, 0, 0);
@@ -392,9 +440,9 @@ public class RegistroBL implements Serializable
             String filtro = numEmpleado.trim().toUpperCase();
 
             stream = stream.filter(obj -> {
-                String nombre = obj.getIdEmpleado().getNombre().toUpperCase();
-                String ap1    = obj.getIdEmpleado().getPrimerAp().toUpperCase();
-                String ap2    = obj.getIdEmpleado().getSegundoAp().toUpperCase();
+                String nombre = obj.getEmpleado().getNombre().toUpperCase();
+                String ap1    = obj.getEmpleado().getPrimerAp().toUpperCase();
+                String ap2    = obj.getEmpleado().getSegundoAp().toUpperCase();
                 return nombre.contains(filtro)
                     || ap1.contains(filtro)
                     || ap2.contains(filtro);
