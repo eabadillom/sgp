@@ -19,6 +19,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 /**
  *
@@ -28,19 +29,19 @@ import javax.persistence.TemporalType;
 @Table(name = "det_registro")
 @NamedQueries({
     @NamedQuery(name = "DetRegistro.findAll", query = "SELECT d FROM DetRegistro d"),
-    @NamedQuery(name = "DetRegistro.findByIdEmpDesc", query = "SELECT d FROM DetRegistro d INNER JOIN d.idEmpleado de INNER JOIN d.status cer WHERE de.idEmpleado = :idEmp"),
-    @NamedQuery(name = "DetRegistro.findByIdEmp", query = "SELECT d FROM DetRegistro d INNER JOIN d.idEmpleado e INNER JOIN d.status ce WHERE e.idEmpleado = :idEmp"),
-    @NamedQuery(name = "DetRegistro.findByYear", query = "SELECT d FROM DetRegistro d INNER JOIN d.idEmpleado e INNER JOIN d.status ce WHERE d.fechaEntrada LIKE :fechaEntrada"),
-    @NamedQuery(name = "DetRegistro.findByNomina", query = "SELECT d FROM DetRegistro d INNER JOIN d.idEmpleado e INNER JOIN d.status ce WHERE d.fechaEntrada BETWEEN :fechaEntrada AND :fechaSalida"),
-    @NamedQuery(name = "DetRegistro.findByIdEmpleadoPeriodo", query = "SELECT d FROM DetRegistro d INNER JOIN d.idEmpleado e INNER JOIN d.status ce WHERE d.idEmpleado.idEmpleado = :idEmpleado AND d.fechaEntrada BETWEEN :fechaEntrada AND :fechaSalida"),
-    @NamedQuery(name = "DetRegistro.findByEmpleadoPeriodo", query = "SELECT d FROM DetRegistro d WHERE d.idEmpleado.idEmpleado = :idEmpleado AND d.fechaEntrada BETWEEN :fechaEntrada AND :fechaSalida ORDER BY d.fechaEntrada"),
-    @NamedQuery(name = "DetRegistro.findByIdEmplActivo", query = "SELECT d FROM DetRegistro d INNER JOIN d.idEmpleado e INNER JOIN d.status ce WHERE e.idEmpleado = :idEmp AND e.activo = 1 AND d.fechaEntrada LIKE :fechaEntrada"),
-    @NamedQuery(name = "DetRegistro.findByIdEmpleadoAndFecha", query = "SELECT r FROM DetRegistro r WHERE r.idEmpleado.idEmpleado = :idEmpleado AND (r.fechaEntrada BETWEEN :fechaEntradaInicio AND :fechaEntradaFin)"),
-    @NamedQuery(name = "DetRegistro.findToday", query = "SELECT d FROM DetRegistro d INNER JOIN d.idEmpleado e INNER JOIN d.status ce WHERE e.idEmpleado = :idEmp AND e.activo = 1 AND (d.fechaEntrada BETWEEN :inicioDia and :finDia) ORDER BY d.fechaEntrada"),
-    @NamedQuery(name = "DetRegistro.findByPlantaPeriodo", query = "SELECT r FROM DetRegistro r WHERE (r.idEmpleado.datoEmpresa.planta.idPlanta = :idPlanta OR :idPlanta IS NULL) AND r.fechaEntrada BETWEEN :fechaInicio AND :fechaFin ORDER BY r.idEmpleado.nombre, r.idEmpleado.primerAp, r.idEmpleado.segundoAp, r.fechaEntrada"),
-    @NamedQuery(name = "DetRegistro.findByPeriodoSolicitud", query = "SELECT dr FROM DetRegistro dr INNER JOIN dr.idEmpleado de INNER JOIN dr.status cer WHERE de.idEmpleado = :idEmp AND cer.codigo = :codigo AND ((dr.fechaEntrada BETWEEN :fechaInicial AND :fechaFinal) OR (dr.fechaEntrada = :fechaInicial) OR (dr.fechaEntrada = :fechaFinal))"),
-    @NamedQuery(name = "DetRegistro.findByFechaEstatus", query = "SELECT dr FROM DetRegistro dr INNER JOIN dr.status cer INNER JOIN dr.idEmpleado de WHERE de.idEmpleado = :idEmp AND (:fecha BETWEEN dr.fechaEntrada AND dr.fechaSalida) AND cer.codigo = :codigo"),
-    @NamedQuery(name = "DetRegistro.findByEstatus", query = "SELECT dr FROM DetRegistro dr INNER JOIN dr.status cer INNER JOIN dr.idEmpleado de WHERE cer.codigo = :codigo AND (dr.fechaEntrada BETWEEN :fechaInicio AND :fechaFin )")
+    @NamedQuery(name = "DetRegistro.findByIdEmpDesc", query = "SELECT d FROM DetRegistro d INNER JOIN d.empleado de INNER JOIN d.status cer WHERE de.idEmpleado = :idEmp"),
+    @NamedQuery(name = "DetRegistro.findByIdEmp", query = "SELECT d FROM DetRegistro d INNER JOIN d.empleado e INNER JOIN d.status ce WHERE e.idEmpleado = :idEmp"),
+    @NamedQuery(name = "DetRegistro.findByYear", query = "SELECT d FROM DetRegistro d INNER JOIN d.empleado e INNER JOIN d.status ce WHERE d.fechaEntrada LIKE :fechaEntrada"),
+    @NamedQuery(name = "DetRegistro.findByNomina", query = "SELECT d FROM DetRegistro d INNER JOIN d.empleado e INNER JOIN d.status ce WHERE d.fechaEntrada BETWEEN :fechaEntrada AND :fechaSalida"),
+    @NamedQuery(name = "DetRegistro.findByIdEmpleadoPeriodo", query = "SELECT d FROM DetRegistro d INNER JOIN d.empleado e INNER JOIN d.status ce WHERE d.empleado.idEmpleado = :idEmpleado AND d.fechaEntrada BETWEEN :fechaEntrada AND :fechaSalida"),
+    @NamedQuery(name = "DetRegistro.findByEmpleadoPeriodo", query = "SELECT d FROM DetRegistro d WHERE d.empleado.idEmpleado = :idEmpleado AND d.fechaEntrada BETWEEN :fechaEntrada AND :fechaSalida ORDER BY d.fechaEntrada"),
+    @NamedQuery(name = "DetRegistro.findByIdEmplActivo", query = "SELECT d FROM DetRegistro d INNER JOIN d.empleado e INNER JOIN d.status ce WHERE e.idEmpleado = :idEmp AND e.activo = 1 AND d.fechaEntrada LIKE :fechaEntrada"),
+    @NamedQuery(name = "DetRegistro.findByIdEmpleadoAndFecha", query = "SELECT r FROM DetRegistro r WHERE r.empleado.idEmpleado = :idEmpleado AND (r.fechaEntrada BETWEEN :fechaEntradaInicio AND :fechaEntradaFin)"),
+    @NamedQuery(name = "DetRegistro.findToday", query = "SELECT d FROM DetRegistro d INNER JOIN d.empleado e INNER JOIN d.status ce WHERE e.idEmpleado = :idEmp AND e.activo = 1 AND (d.fechaEntrada BETWEEN :inicioDia and :finDia) ORDER BY d.fechaEntrada"),
+    @NamedQuery(name = "DetRegistro.findByPlantaPeriodo", query = "SELECT r FROM DetRegistro r WHERE (r.empleado.datoEmpresa.planta.idPlanta = :idPlanta OR :idPlanta IS NULL) AND r.fechaEntrada BETWEEN :fechaInicio AND :fechaFin ORDER BY r.empleado.nombre, r.empleado.primerAp, r.empleado.segundoAp, r.fechaEntrada"),
+    @NamedQuery(name = "DetRegistro.findByPeriodoSolicitud", query = "SELECT dr FROM DetRegistro dr INNER JOIN dr.empleado de INNER JOIN dr.status cer WHERE de.idEmpleado = :idEmp AND cer.codigo = :codigo AND ((dr.fechaEntrada BETWEEN :fechaInicial AND :fechaFinal) OR (dr.fechaEntrada = :fechaInicial) OR (dr.fechaEntrada = :fechaFinal))"),
+    @NamedQuery(name = "DetRegistro.findByFechaEstatus", query = "SELECT dr FROM DetRegistro dr INNER JOIN dr.status cer INNER JOIN dr.empleado de WHERE de.idEmpleado = :idEmp AND (:fecha BETWEEN dr.fechaEntrada AND dr.fechaSalida) AND cer.codigo = :codigo"),
+    @NamedQuery(name = "DetRegistro.findByEstatus", query = "SELECT dr FROM DetRegistro dr INNER JOIN dr.status cer INNER JOIN dr.empleado de WHERE cer.codigo = :codigo AND (dr.fechaEntrada BETWEEN :fechaInicio AND :fechaFin )")
 })
 public class DetRegistro implements Serializable {
 
@@ -50,6 +51,9 @@ public class DetRegistro implements Serializable {
     @Basic(optional = false)
     @Column(name = "id_registro")
     private Integer idRegistro;
+    
+    @Transient
+    private Date fecha;
 
     @Column(name = "fecha_entrada")
     @Temporal(TemporalType.TIMESTAMP)
@@ -65,7 +69,7 @@ public class DetRegistro implements Serializable {
 
     @JoinColumn(name = "id_empleado", referencedColumnName = "id_empleado")
     @ManyToOne(optional = false)
-    private DetEmpleado idEmpleado;
+    private DetEmpleado empleado;
     
     @OneToOne(mappedBy = "registro", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private DetRegistroVacaciones registroVacaciones;
@@ -125,6 +129,14 @@ public class DetRegistro implements Serializable {
         this.idRegistro = idRegistro;
     }
     
+    public Date getFecha() {
+		return fecha;
+	}
+
+	public void setFecha(Date fecha) {
+		this.fecha = fecha;
+	}
+    
     public Date getFechaEntrada() {
         return fechaEntrada;
     }
@@ -149,12 +161,12 @@ public class DetRegistro implements Serializable {
         this.status = estatus;
     }
     
-    public DetEmpleado getIdEmpleado() {
-        return idEmpleado;
+    public DetEmpleado getEmpleado() {
+        return empleado;
     }
     
-    public void setIdEmpleado(DetEmpleado idEmpleado) {
-        this.idEmpleado = idEmpleado;
+    public void setEmpleado(DetEmpleado empleado) {
+        this.empleado = empleado;
     }
 
     public DetRegistroVacaciones getRegistroVacaciones() {

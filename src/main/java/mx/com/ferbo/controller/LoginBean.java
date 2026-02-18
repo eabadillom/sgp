@@ -142,7 +142,7 @@ public class LoginBean implements Serializable {
 
                 switch (registro) {
                     case "Entrada":
-                        registroEmpleado.setIdEmpleado(empleadoSelected);
+                        registroEmpleado.setEmpleado(empleadoSelected);
                         registroEmpleado.setFechaEntrada(new Date());
                         registroEmpleado.setFechaSalida(null);
                         if (result > 0) {
@@ -170,7 +170,7 @@ public class LoginBean implements Serializable {
                     case "Salida":
                         try {
                         registroEmpleado = lstregistroEmpleados.get(lstregistroEmpleados.size() - 1);
-                        registroEmpleado.setIdEmpleado(lstregistroEmpleados.get(lstregistroEmpleados.size() - 1).getIdEmpleado());
+                        registroEmpleado.setEmpleado(lstregistroEmpleados.get(lstregistroEmpleados.size() - 1).getEmpleado());
                         lstregistroEmpleados.get(lstregistroEmpleados.size() - 1);
                         registroEmpleado.setFechaSalida(new Date());
                         registroDAO.actualizar(registroEmpleado);

@@ -80,7 +80,7 @@ public class IncidenciasAusenciasBean implements Serializable
             RegistroBL.actualizarRegistroAsistencia(this.registroAusencia);
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Registro", "Se actualizo el registro de asistencia");
         } catch (SGPException ex) {
-            log.warn("Error al guardar el registro de asistencia del empleado: {}", this.registroAusencia.getIdEmpleado() != null ? this.registroAusencia.getIdEmpleado().getNumEmpleado() : null);
+            log.warn("Error al guardar el registro de asistencia del empleado: {}", this.registroAusencia.getEmpleado() != null ? this.registroAusencia.getEmpleado().getNumEmpleado() : null);
             log.warn("EX-0030: ", ex);
             FacesUtils.addMessage(FacesMessage.SEVERITY_ERROR, "Registro", "Error al actualizar el registro, contacte al administrador de sistemas");
         } finally {

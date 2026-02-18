@@ -1,0 +1,96 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    template="/WEB-INF/plantillas/template.xhtml">
+    <ui:define name="head">
+       	<ui:include src="/protected/common/locale-es_MX.xhtml" />
+    </ui:define>
+    <ui:define name="title">Asistencia</ui:define>
+    <ui:define name="content">
+        <h:form id="form" enctype="multipart/form-data">
+        	<ui:include src="/protected/common/status-info.xhtml" />
+        	<p:outputPanel id="pnl-buscar">
+	            <div class="ui-fluid formgrid grid">
+	            	<div class="field col-6 md:col-2">
+	                    <p:selectOneMenu id="sel-planta" value="#{repAsistenciaBean.planta}" converter="entityConverter" autoWidth="false">
+	                        <f:selectItem itemLabel="Todas las plantas"></f:selectItem>
+	                        <f:selectItems value="#{repAsistenciaBean.plantas}" var="planta" itemLabel="#{planta.descripcion}" itemValue="#{planta}"></f:selectItems>
+	                    </p:selectOneMenu>
+	            	</div>
+	            	<div class="field col-6 md:col-2">
+	                    <p:datePicker id="fechaInicio" showIcon="true" placeholder="Del: dd/mm/aaaa" value="#{repAsistenciaBean.fechaInicio}" locale="es_MX" pattern="dd/MM/yyyy" timeZone="GMT-6" readonly="false" maxdate="#{repAsistenciaBean.fechaFin}">
+	                        <p:ajax event="dateSelect" listener="#{repAsistenciaBean.ajustaHoras}" process="@this" update="fechaFin"></p:ajax>
+	                    </p:datePicker>
+	            	</div>
+	            	<div class="field col-6 md:col-2">
+	                    <p:datePicker id="fechaFin" showIcon="true" placeholder="Del: dd/mm/aaaa" value="#{repAsistenciaBean.fechaFin}" locale="es_MX" pattern="dd/MM/yyyy" timeZone="GMT-6" readonly="false" mindate="#{repAsistenciaBean.fechaInicio}">
+	                        <p:ajax event="dateSelect" listener="#{repAsistenciaBean.ajustaHoras}" process="@this" update="fechaInicio"></p:ajax>
+	                    </p:datePicker>
+	            	</div>
+	            	<div class="field col-6 md:col-2">
+	                    <p:commandButton value="Buscar" icon="pi pi-search" process="pnl-buscar @this" update="dt-registros :form:cmd-exportar-pdf" actionListener="#{repAsistenciaBean.cargaInfo}" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
+	            	</div>
+	            	<div class="field col-6 md:col-2">
+	            		<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+	            	</div>
+	                <div class="field col-6 md:col-2">
+	                	<p:commandButton value="Agregar" icon="pi pi-stopwatch" process="@this" update="form:pnl-registro" actionListener="#{repAsistenciaBean.nuevoRegistro}" oncomplete="PF('dgEditarRegistro').show();" styleClass="ui-button-outlined"/>
+	                </div>
+	            </div>
+        	</p:outputPanel>
+            <p:dataTable id="dt-registros" widgetVar="dtRegistros" value="#{repAsistenciaBean.registros}" var="registro" rows="10" paginator="true" paginatorPosition="bottom" size="small">
+            
+            	<f:facet name="header">
+            		<p:inputText id="globalFilter" onkeyup="PF('dtRegistros').filter();" style="width: 100%;" placeholder="Buscar por nombre o apellidos" />
+            	</f:facet>
+            	
+                <p:column field="empleado.nombre" headerText="Nombre">
+                </p:column>
+                <p:column field="empleado.primerAp" headerText="1er Apellido">
+                </p:column>
+                <p:column field="empleado.segundoAp" headerText="2o Apellido">
+                </p:column>
+                <p:column headerText="Fecha" style="width: 6rem; text-align: center;">
+                    <p:outputLabel value="#{registro.fechaEntrada}">
+                        <f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX"/>
+                    </p:outputLabel>
+                </p:column>
+                <p:column headerText="Entrada" style="width: 6rem; text-align: center;" >
+                    <p:outputLabel value="#{registro.fechaEntrada}">
+                        <f:convertDateTime pattern="HH:mm:ss" timeZone="GMT-6" locale="es_MX"/>
+                    </p:outputLabel>
+                </p:column>
+                <p:column headerText="Salida" style="width: 6rem; text-align: center;" >
+                    <p:outputLabel value="#{registro.fechaSalida}">
+                        <f:convertDateTime pattern="HH:mm:ss" timeZone="GMT-6" locale="es_MX"/>
+                    </p:outputLabel>
+                </p:column>
+                <p:column headerText="Status" style="width: 6rem;">
+                    <p:badge value="#{repAsistenciaBean.obtenerEstatusAsistencia(registro)}" severity="#{repAsistenciaBean.badgeColor}"></p:badge>
+                </p:column>
+                <p:column style="width: 2rem;">
+                    <p:commandButton icon="pi pi-bars" actionListener="#{repAsistenciaBean.editarRegistro(registro)}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dgEditarRegistro').show();" update="form:pnl-registro" process="@this"/>
+                </p:column>
+            </p:dataTable>
+            <p:spacer style="height: 1rem;"/>
+            <p:panel id="cmd-exportar-pdf">
+                <div style="padding-left: 1rem; padding-right: 1rem; display: inline-block;">
+                    <p:commandButton value="Exportar a PDF" icon="pi pi-file-pdf" ajax="false" rendered="#{not empty repAsistenciaBean.registros}" actionListener="#{repAsistenciaBean.exportarPDF}">
+                        <p:fileDownload value="#{repAsistenciaBean.pdfFile}"/>
+                    </p:commandButton>
+                </div>
+                <div style="padding-left: 1rem; padding-right: 1rem; display: inline-block;">
+                    <p:commandButton value="Exportar a Excel" icon="pi pi-file-excel" ajax="false" rendered="#{not empty repAsistenciaBean.registros}" actionListener="#{repAsistenciaBean.exportarXLS}">
+                        <p:fileDownload value="#{repAsistenciaBean.xlsFile}"/>
+                    </p:commandButton>
+                </div>
+            </p:panel>
+            
+            <ui:include src="/protected/reportes/asistencia/asistencia-dlg-registro.xhtml" />
+            
+        </h:form>
+    </ui:define>
+</ui:composition>
