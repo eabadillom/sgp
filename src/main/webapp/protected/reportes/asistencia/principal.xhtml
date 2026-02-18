@@ -55,15 +55,20 @@
                 </p:column>
                 <p:column headerText="Fecha" style="width: 6rem; text-align: center;">
                     <p:outputLabel value="#{registro.fechaEntrada}">
+                        <f:convertDateTime pattern="EEEE" timeZone="GMT-6" locale="es_MX"/>
+                    </p:outputLabel>
+                </p:column>
+                <p:column headerText="Fecha" style="width: 6rem; text-align: center;">
+                    <p:outputLabel value="#{registro.fechaEntrada}">
                         <f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX"/>
                     </p:outputLabel>
                 </p:column>
-                <p:column headerText="Entrada" style="width: 6rem; text-align: center;" >
+                <p:column headerText="Entrada" style="width: 5rem; text-align: center;" >
                     <p:outputLabel value="#{registro.fechaEntrada}">
                         <f:convertDateTime pattern="HH:mm:ss" timeZone="GMT-6" locale="es_MX"/>
                     </p:outputLabel>
                 </p:column>
-                <p:column headerText="Salida" style="width: 6rem; text-align: center;" >
+                <p:column headerText="Salida" style="width: 5rem; text-align: center;" >
                     <p:outputLabel value="#{registro.fechaSalida}">
                         <f:convertDateTime pattern="HH:mm:ss" timeZone="GMT-6" locale="es_MX"/>
                     </p:outputLabel>
