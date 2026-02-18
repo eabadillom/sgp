@@ -554,4 +554,25 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
     	
     	return registrosEmpleado;
     }
+    
+    public List<DetEmpleado> buscarPorNombrePrimerSegundoApellido(String query) {
+    	List<DetEmpleado> modelList = null;
+    	EntityManager em = null;
+    	
+    	try {
+    		em = this.getEntityManager();
+    		modelList = em.createNamedQuery("DetEmpleado.fullNameContains", modelClass)
+    				.setParameter("query", String.format("%%%s%%", query))
+    				.getResultList();
+    		
+    		modelList.stream().forEach(item -> log.debug("Id dato empresa: {}", item.getDatoEmpresa().getId()));
+    		log.info("Longitud de la lista de empleados: {}", modelList.size());
+    	} catch(Exception ex) {
+    		log.error("Problema para obtener la lista de empleados con la palabra {}, \n{}", query, ex);
+    	} finally {
+    		this.close(em);
+    	}
+    	
+    	return modelList;
+    }
 }

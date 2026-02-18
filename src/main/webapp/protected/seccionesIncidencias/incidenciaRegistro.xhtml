@@ -50,7 +50,7 @@
             </div>
         </f:facet>
         <p:column headerText="Nombre">
-            <p:outputLabel value="#{registro.idEmpleado.nombre} #{registro.idEmpleado.primerAp} #{registro.idEmpleado.segundoAp}"/>
+            <p:outputLabel value="#{registro.empleado.nombre} #{registro.empleado.primerAp} #{registro.empleado.segundoAp}"/>
         </p:column>
         <p:column headerText="Fecha" width="10rem" style="text-align: center;">
             <p:outputLabel value="#{registro.fechaEntrada}">
@@ -75,7 +75,7 @@
             <div class="formgrid grid" >
                 <div class="field col" >
                     <p:outputLabel for="@next" value="Nombre: " style="width: 15rem" />
-                    <p:inputText value="#{incidenciasAusenciasBean.registroAusencia.idEmpleado.nombre} #{incidenciasAusenciasBean.registroAusencia.idEmpleado.primerAp} #{incidenciasAusenciasBean.registroAusencia.idEmpleado.segundoAp}" disabled="true" />
+                    <p:inputText value="#{incidenciasAusenciasBean.registroAusencia.empleado.nombre} #{incidenciasAusenciasBean.registroAusencia.empleado.primerAp} #{incidenciasAusenciasBean.registroAusencia.empleado.segundoAp}" disabled="true" />
                 </div>
             </div>
             <div class="formgrid grid" >

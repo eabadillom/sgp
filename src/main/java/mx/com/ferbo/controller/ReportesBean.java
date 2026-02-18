@@ -44,7 +44,7 @@ public class ReportesBean implements Serializable{
 		String path = null;
 		try {
 			log.info("Redirigiendo a reporte asistencia...");
-			path = this.contextPath + "/protected/reportes/asistencia.xhtml";
+			path = this.contextPath + "/protected/reportes/asistencia/principal.xhtml";
 			FacesContext.getCurrentInstance().getExternalContext().redirect(path);
 		} catch (IOException ex) {
 			log.error("Problema para redirigir al registro de préstamos...", ex);

@@ -60,7 +60,7 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
                     .setParameter("fechaEntradaInicio", fechaEntradaInicio)
                     .setParameter("fechaEntradaFin", fechaEntradaFin)
                     .getSingleResult();
-            log.debug("IdEmpleado: {}", model.getIdEmpleado().getIdEmpleado());
+            log.debug("IdEmpleado: {}", model.getEmpleado().getIdEmpleado());
             log.debug("Estatus: {}", model.getStatus().getIdEstatus());
         } catch (Exception ex) {
             model = null;
@@ -114,7 +114,7 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
                     .getResultList();
 
             for (DetRegistro r : modelList) {
-                log.trace("Registro - idEmpleado: {}", r.getIdEmpleado().getIdEmpleado());
+                log.trace("Registro - idEmpleado: {}", r.getEmpleado().getIdEmpleado());
                 log.trace("Status registro: {}", r.getStatus().getIdEstatus());
             }
 
@@ -153,8 +153,8 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
     
     private void cargaInfo(DetRegistro model) {
     	try {
-    		log.trace("IdEmpleado: {}", model.getIdEmpleado().getIdEmpleado());
-    		log.trace("Id Planta: {}", model.getIdEmpleado().getDatoEmpresa().getPlanta().getIdPlanta());
+    		log.trace("IdEmpleado: {}", model.getEmpleado().getIdEmpleado());
+    		log.trace("Id Planta: {}", model.getEmpleado().getDatoEmpresa().getPlanta().getIdPlanta());
     	} catch(Exception ex) {
     		log.warn("Problema para cargar el detalle del empleado...", ex);
     	}
@@ -294,7 +294,7 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
                 .getResultList();
             
             for (DetRegistro r : modelList) {
-                log.debug("Registro - idEmpleado: {}", r.getIdEmpleado().getIdEmpleado());
+                log.debug("Registro - idEmpleado: {}", r.getEmpleado().getIdEmpleado());
                 log.debug("Status registro: {}", r.getStatus().getIdEstatus());
             }
         }catch (Exception ex) 

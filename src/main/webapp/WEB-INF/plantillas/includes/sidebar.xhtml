@@ -14,7 +14,7 @@
 	                <h:graphicImage value="#{SideBarBean.empleadoFoto.fotografia}" style="border-radius: 30%;width: auto; height: 7rem;"/>
 	            </div>
 	            <div class="menu">
-	                <po:menu widgetVar="OmegaMenuWidget">
+	                <po:menu id="menu" widgetVar="OmegaMenuWidget">
 						<p:menuitem id="registroEmp" value="Registro de Empleados" icon="fas fa-solid fa-user-plus" outcome="/protected/empleados/registro" rendered="#{SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 1 or SideBarBean.empleadoSelected.datoEmpresa.perfil.idPerfil eq 2}"/>
 						<p:menuitem id="asistencia" value="Mi asistencia" icon="fas fa-solid fa-calendar-check" outcome="/protected/asistencia"/>
 						<p:menuitem id="uniformes" value="Solicitar uniforme" icon="fas fa-solid fa-tshirt" outcome="/protected/uniformes" rendered="#{SideBarBean.showUniformes}"/>

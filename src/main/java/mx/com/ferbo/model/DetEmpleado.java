@@ -33,9 +33,11 @@ import javax.validation.constraints.Size;
 @NamedQuery(name = "DetEmpleado.findByRFC", query = "SELECT e FROM DetEmpleado e WHERE e.datoEmpresa.rfc = :rfc")
 @NamedQuery(name = "DetEmpleado.findByCURP", query = "SELECT e FROM DetEmpleado e WHERE e.curp = :curp")
 @NamedQuery(name = "DetEmpleado.findByActiveEmpresaPlanta", query = "SELECT e FROM DetEmpleado e WHERE (:idEmpresa is null or e.datoEmpresa.empresa.idEmpresa = :idEmpresa) AND (:idPlanta is null or e.datoEmpresa.planta.idPlanta = :idPlanta) and ( (e.datoEmpresa.fechaIngreso <= :fecha) and ( e.datoEmpresa.fechaBaja is null or :fecha <= e.datoEmpresa.fechaBaja ) ) ORDER BY e.nombre, e.primerAp, e.segundoAp ")
+@NamedQuery(name = "DetEmpleado.fullNameContains", query = "SELECT e FROM DetEmpleado e WHERE (e.nombre like :query) OR (e.primerAp like :query) OR (e.segundoAp like :query)")
 public class DetEmpleado implements Serializable, Cloneable {
-
+	
     private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
@@ -118,9 +120,13 @@ public class DetEmpleado implements Serializable, Cloneable {
     
     @Override
     public int hashCode() {
-    	if(this.idEmpleado == null)
-    		return System.identityHashCode(this);
-        return Objects.hashCode(this.idEmpleado);
+    	Integer hash;
+    	if(this.idEmpleado == null) {
+    		hash = System.identityHashCode(this);
+    		return hash;
+    	}
+    	hash = Objects.hashCode(this.idEmpleado);
+        return hash;
     }
 
     @Override
@@ -128,12 +134,15 @@ public class DetEmpleado implements Serializable, Cloneable {
         if (this == obj) {
             return true;
         }
+        
         if (obj == null) {
             return false;
         }
+        
         if (getClass() != obj.getClass()) {
             return false;
         }
+        
         final DetEmpleado other = (DetEmpleado) obj;
         return Objects.equals(this.idEmpleado, other.idEmpleado);
     }
