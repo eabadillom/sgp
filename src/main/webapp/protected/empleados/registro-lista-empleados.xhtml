@@ -5,8 +5,7 @@
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 
 						<p:dataTable id="dtEmpleados" widgetVar="dtEmpleados" var="empleado"
-                        			reflow="true" styleClass="products-table"
-                        			value="#{registroEmpleadosBean.empleados}"
+                        			reflow="true" value="#{registroEmpleadosBean.empleados}"
                         			paginator="true" rows="10"
                         			emptyMessage="No hay empleados con los criterios de búsqueda" 
                         			paginatorPosition="bottom"
@@ -20,11 +19,11 @@
                             <p:column headerText="Número" width="4rem">
                                 <h:outputText value="#{empleado.numEmpleado}" styleClass="customer-badge status-#{registroEmpleadosBean.obtenerStatusEmpleadoEmpresa(empleado)}"/>
                             </p:column>
-                            <p:column field="primerAp" headerText="Primer Apellido" filterMatchMode="contains" >
+                            <p:column field="primerAp" headerText="Primer Apellido">
                             </p:column>
-                            <p:column field="segundoAp" headerText="Segundo Apellido" filterMatchMode="contains">
+                            <p:column field="segundoAp" headerText="Segundo Apellido">
                             </p:column>
-                            <p:column field="nombre" headerText="Nombre" filterMatchMode="contains">
+                            <p:column field="nombre" headerText="Nombre">
                             </p:column>
                             <p:column width="2rem">
                                 <p:commandButton icon="pi pi-bars" styleClass="edit-button" actionListener="#{registroEmpleadosBean.editar(empleado)}" process="@this" update="form:dlg-empleado form:panelDialogEmpleado form:panelDialogEmpleado:previewFingerprint1" onclick="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dialogEmpleado').show();">

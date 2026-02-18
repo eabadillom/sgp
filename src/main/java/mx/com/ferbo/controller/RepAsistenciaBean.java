@@ -1,17 +1,10 @@
 package mx.com.ferbo.controller;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.Serializable;
-import java.net.URL;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TimeZone;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -28,6 +21,9 @@ import org.primefaces.PrimeFaces;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 
+import mx.com.ferbo.business.registro.EstatusRegistroBL;
+import mx.com.ferbo.business.registro.RegistroBL;
+import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.EstatusRegistroDAO;
 import mx.com.ferbo.dao.n.PlantaDAO;
 import mx.com.ferbo.dao.n.RegistroDAO;
@@ -35,9 +31,9 @@ import mx.com.ferbo.model.CatEstatusRegistro;
 import mx.com.ferbo.model.CatPlanta;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetRegistro;
+import mx.com.ferbo.reports.AsistenciaRBL;
 import mx.com.ferbo.util.DateUtil;
-import mx.com.ferbo.util.EntityManagerUtil;
-import mx.com.ferbo.util.JasperReportUtil;
+import mx.com.ferbo.util.FacesUtils;
 import mx.com.ferbo.util.SGPException;
 import mx.com.ferbo.util.SGPSecurityException;
 
@@ -56,7 +52,8 @@ public class RepAsistenciaBean implements Serializable {
     private PlantaDAO plantaDAO;
     private RegistroDAO registroDAO;
     private EstatusRegistroDAO statusRegistroDAO;
-
+    private EmpleadoDAO empleadoDAO;
+    private DetEmpleado empleado;
     private List<CatPlanta> plantas;
     private List<DetRegistro> registros;
 
@@ -89,9 +86,10 @@ public class RepAsistenciaBean implements Serializable {
     			throw new SGPSecurityException("No tiene acceso a este recurso.");
     		
     		
-    		plantaDAO = new PlantaDAO(CatPlanta.class);
-    		registroDAO = new RegistroDAO(DetRegistro.class);
-    		statusRegistroDAO = new EstatusRegistroDAO(CatEstatusRegistro.class);
+    		plantaDAO = new PlantaDAO();
+    		registroDAO = new RegistroDAO();
+    		statusRegistroDAO = new EstatusRegistroDAO();
+    		empleadoDAO = new EmpleadoDAO();
     		
     		plantas = plantaDAO.buscarTodos();
     		lstEstatus = new ArrayList<CatEstatusRegistro>();
@@ -130,10 +128,7 @@ public class RepAsistenciaBean implements Serializable {
     @PostConstruct
     public void init() {
     	DetEmpleado empleadoSesion = null;
-//    	String path = null;
     	empleadoSesion = (DetEmpleado) session.getAttribute("empleado");
-//    	contextPath = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
-//    	FacesContext context = null;
     	
     	try {
     		log.info("Ejecutando proceso init...");
@@ -142,16 +137,6 @@ public class RepAsistenciaBean implements Serializable {
     			return;
     		}
     		
-//	    	path = this.contextPath + "/unauthorized.xhtml?faces-redirect=true";
-//	    	log.info("Redirigiendo a {}", path);
-//	    	context = FacesContext.getCurrentInstance();
-//	    	FacesContext.getCurrentInstance()
-//	    		.getApplication()
-//	    		.getNavigationHandler()
-//	    		.handleNavigation(context, null, path);
-//    		
-//    		
-//    		log.info("Proceso init terminado.");
     	} catch(Exception ex) {
     		log.error("Problema para entrar al reporte de inventario...", ex);
     	}
@@ -181,6 +166,8 @@ public class RepAsistenciaBean implements Serializable {
             registros = registroDAO.buscarPorPlantaPeriodo(idPlanta, this.fechaInicio, this.fechaFin);
 
             log.info("{}  registro(s) encontrado(s)", registros.size());
+            
+            this.nuevoRegistro();
 
         } catch (SGPException ex) {
             mensaje = ex.getMessage();
@@ -196,7 +183,7 @@ public class RepAsistenciaBean implements Serializable {
             }
         }
     }
-
+    
     public void ajustaHoras() {
     	try {
     		log.info("Ajustando inicio y fin del periodo...");
@@ -206,119 +193,78 @@ public class RepAsistenciaBean implements Serializable {
     		log.error("Problema para establecer la hora inicio y fin del periodo...", ex);
     	}
     }
-
-    public void exportarPDF() {
-        String jasperPath = null;
-        String filename = null;
-        String images = null;
-        String message = null;
-        Severity severity = null;
-        File reportFile = null;
-        File imgFile = null;
-        JasperReportUtil jasperReportUtil = null;
-        Map<String, Object> parameters = null;
-        Connection conn = null;
-
-        Date fechaFinT = null;
-        try {
-            jasperPath = "/jasper/ReporteAsistencia.jrxml";
-            filename = String.format("ReporteAsistencia_%s_%s.pdf", DateUtil.getString(this.fechaInicio, DateUtil.FORMATO_YYYY_MM_DD), DateUtil.getString(this.fechaFin, DateUtil.FORMATO_YYYY_MM_DD));
-            images = "/images/logo.png";
-            reportFile = new File(jasperPath);
-            jasperReportUtil = new JasperReportUtil();
-            parameters = new HashMap<String, Object>();
-
-            URL resource = getClass().getResource(jasperPath);//verifica si el recurso esta disponible 
-            URL resourceimg = getClass().getResource(images);
-            String file = resource.getFile();//retorna la ubicacion del archivo
-            String img = resourceimg.getFile();
-            reportFile = new File(file);//crea un archivo
-            imgFile = new File(img);
-            conn = EntityManagerUtil.getConnection();
-            log.info("Conexion: {}", conn);
-            DateUtil.setTime(fechaInicio, 0, 0, 0, 0);
-            DateUtil.setTime(fechaFin, 23, 59, 59, 0);
-            log.info("Inicio del periodo de búsqueda: {}", this.fechaInicio);
-            log.info("Fin del periodo de búsqueda: {}", this.fechaFin);
-
-            fechaFinT = new Date(this.fechaFin.getTime());
-            fechaFinT = DateUtil.addDay(fechaFinT, 1);
-
-            parameters.put("REPORT_CONNECTION", conn);
-            parameters.put("idPlanta", this.planta == null ? null : this.planta.getIdPlanta());
-            parameters.put("REPORT_TIME_ZONE", TimeZone.getTimeZone("GMT-06:00"));
-            parameters.put("REPORT_LOCALE", new Locale("es", "MX"));
-            parameters.put("fechaInicio", this.fechaInicio);
-            parameters.put("fechaFin", fechaFinT);
-            parameters.put("imagen", imgFile.getPath());
-            pdfFile = jasperReportUtil.getPdf(filename, parameters, reportFile.getPath());
-            log.info("Exportación completa.");
-        } catch (Exception e) {
-            log.error("Ocurrió un problema al imprimir el reporte de asistencia...", e);
-            message = String.format("No es posible exportar el reporte.");
-            severity = FacesMessage.SEVERITY_INFO;
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
-            PrimeFaces.current().ajax().update("form:messages");
-        } finally {
-            EntityManagerUtil.close(conn);
-        }
+    
+    public void nuevoRegistro() {
+    	this.registroSelected = new DetRegistro();
+    	this.registroSelected.setStatus(EstatusRegistroBL.estatusJustificado());
+    	this.empleado = null;
+    	if(this.registroSelected.getEmpleado() != null)
+    		log.info("nuevo registro -- EmpleadoSelected: {}", this.registroSelected.getEmpleado());
     }
-
-    public void exportarXLS() {
-        String jasperPath = null;
-        String filename = null;
-        String images = null;
-        String message = null;
-        Severity severity = null;
-        File reportFile = null;
-        File imgFile = null;
-        JasperReportUtil jasperReportUtil = null;
-        Map<String, Object> parameters = null;
-        Connection conn = null;
-
-        Date fechaFinT = null;
+    
+    public List<DetEmpleado> buscarEmpleado(String query) {
+    	List<DetEmpleado> empleados = null;
+    	
+    	try {
+    		if(query == null)
+    			return new ArrayList<DetEmpleado>();
+    		
+    		if(query.trim().equals(""))
+    			return new ArrayList<DetEmpleado>();
+    		
+    		log.info("Buscando empleados por: {}", query);
+    		empleados = empleadoDAO.buscarPorNombrePrimerSegundoApellido(query);
+    	} catch(Exception ex) {
+    		empleados = new ArrayList<DetEmpleado>();
+    	}
+    	return empleados;
+    }
+    
+    public void asignarEmpleado() {
         try {
-            jasperPath = "/jasper/ReporteAsistencia.jrxml";
-            filename = String.format("ReporteAsistencia_%s_%s.xlsx", DateUtil.getString(this.fechaInicio, DateUtil.FORMATO_YYYY_MM_DD), DateUtil.getString(this.fechaFin, DateUtil.FORMATO_YYYY_MM_DD));
-            images = "/images/logo.png";
-            reportFile = new File(jasperPath);
-            jasperReportUtil = new JasperReportUtil();
-            parameters = new HashMap<String, Object>();
-
-            URL resource = getClass().getResource(jasperPath);//verifica si el recurso esta disponible 
-            URL resourceimg = getClass().getResource(images);
-            String file = resource.getFile();//retorna la ubicacion del archivo
-            String img = resourceimg.getFile();
-            reportFile = new File(file);//crea un archivo
-            imgFile = new File(img);
-            conn = EntityManagerUtil.getConnection();
-            log.info("Conexion: {}", conn);
-            DateUtil.setTime(fechaInicio, 0, 0, 0, 0);
-            DateUtil.setTime(fechaFin, 23, 59, 59, 0);
-            log.info("Inicio del periodo de búsqueda: {}", this.fechaInicio);
-            log.info("Fin del periodo de búsqueda: {}", this.fechaFin);
-
-            fechaFinT = new Date(this.fechaFin.getTime());
-            fechaFinT = DateUtil.addDay(fechaFinT, 1);
-
-            parameters.put("REPORT_CONNECTION", conn);
-            parameters.put("idPlanta", this.planta == null ? null : this.planta.getIdPlanta());
-            parameters.put("REPORT_TIME_ZONE", TimeZone.getTimeZone("GMT-06:00"));
-            parameters.put("REPORT_LOCALE", new Locale("es", "MX"));
-            parameters.put("fechaInicio", this.fechaInicio);
-            parameters.put("fechaFin", fechaFinT);
-            parameters.put("imagen", imgFile.getPath());
-            xlsFile = jasperReportUtil.getXls(filename, parameters, reportFile.getPath());
-            log.info("Exportación completa.");
-        } catch (Exception e) {
-            log.error("Ocurrió un problema al imprimir el reporte de asistencia...", e);
-            message = String.format("No es posible exportar el reporte.");
-            severity = FacesMessage.SEVERITY_INFO;
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
-            PrimeFaces.current().ajax().update("form:messages");
+        	this.registroSelected.setEmpleado(this.empleado);
+        } catch(Exception ex) {
+        	log.warn("Problema para asignar al empleado: {}", ex.getMessage());
         } finally {
-            EntityManagerUtil.close(conn);
+        	PrimeFaces.current().ajax().update("form:messages");
         }
+        
+    }
+    
+    public void asignarHoraAsistencia() {
+    	FacesMessage message = null;
+        Severity severity = null;
+        String titulo = "Problema con el registro";
+        String mensaje = null;
+    	
+    	try {
+    		log.info("Asignando hora de entrada / salida para el día {}...", this.registroSelected.getFecha());
+    		
+    		if(this.empleado == null)
+    			throw new SGPException("Debe indicar un empleado");
+    		
+    		if(RegistroBL.buscar(this.empleado.getIdEmpleado(), this.registroSelected.getFecha()).isPresent())
+    			throw new SGPException("El empleado ya cuenta con un registro de asistencia en la fecha indicada.");
+    		
+        	this.registroSelected.setFechaEntrada(this.empleado.getDatoEmpresa().getHoraEntrada());
+        	this.registroSelected.setFechaSalida(this.empleado.getDatoEmpresa().getHorasalida());
+        	
+        	log.info("Asistencia: {}, {}", this.registroSelected.getFechaEntrada(), this.registroSelected.getFechaSalida());
+    	} catch(SGPException ex) {
+    		log.warn("Problema para asignar el horario de entrada / salida del empleado: {}", ex.getMessage());
+    		severity = FacesMessage.SEVERITY_WARN;
+    		mensaje = ex.getMessage();
+    		message = new FacesMessage(severity, titulo, mensaje);
+            FacesContext.getCurrentInstance().addMessage(null, message);
+    	} catch(Exception ex) {
+    		log.error("Problema para asignar el horario de entrada / salida del empleado: {}", ex);
+    		severity = FacesMessage.SEVERITY_ERROR;
+    		mensaje = "Ocurrió un problema con la asignación de horarios de entrada y salida.";
+    		message = new FacesMessage(severity, titulo, mensaje);
+            FacesContext.getCurrentInstance().addMessage(null, message);
+    	} finally {
+    		PrimeFaces.current().ajax().update(":form:messages");
+    	}
     }
 
     public void editarRegistro(DetRegistro registro) {
@@ -329,6 +275,11 @@ public class RepAsistenciaBean implements Serializable {
     		int anio = DateUtil.getAnio(registro.getFechaEntrada());
     		int mes = DateUtil.getMes(registro.getFechaEntrada());
     		int dia = DateUtil.getDia(registro.getFechaEntrada());
+    		
+    		this.registroSelected.setFecha(new Date(this.registroSelected.getFechaEntrada().getTime()));
+    		
+    		DateUtil.setTime(this.registroSelected.getFecha(), 0, 0, 0, 0);
+    		
     		
     		Date diaPermitido = DateUtil.getDateTime(anio, mes, dia, 0, 0, 0, 0);
     		
@@ -357,7 +308,7 @@ public class RepAsistenciaBean implements Serializable {
     		}
     		
     		if (registro.getStatus().getDescripcion().equals("Falta")) {
-    			int horaSalida = DateUtil.getHora(registro.getIdEmpleado().getDatoEmpresa().getHorasalida());
+    			int horaSalida = DateUtil.getHora(registro.getEmpleado().getDatoEmpresa().getHorasalida());
     			Date diaSalida = DateUtil.getDateTime(anio, mes, dia, horaSalida, 0, 0, 0);
     			registro.setFechaSalida(diaSalida);
     		}
@@ -365,30 +316,47 @@ public class RepAsistenciaBean implements Serializable {
     		log.error("Problema para editar el registro de asistencia...", ex);
     	}
     }
-
-    public void restablecerValores() {
-    	try {
-    		log.info("Reiniciando valores...");
-    		this.registroSelected = null;
-//    		Integer idPlanta = this.planta == null ? null : this.planta.getIdPlanta();
-//    		registros = registroDAO.buscarPorPlantaPeriodo(idPlanta, this.fechaInicio, this.fechaFin);
-    	} catch(Exception ex) {
-    		log.error("Problema para reestablecer los valores...", ex);
-    	}
+    
+    public void guardar() {
+    	if(this.registroSelected.getIdRegistro() == null)
+    		this.guardarRegistro();
+    	else
+    		this.actualizarRegistro();
     }
 
     public void actualizarRegistro() {
         FacesMessage message = null;
         FacesMessage.Severity severity = null;
         String mensaje = null;
-        String titulo = "Actualizar asistencia";
+        String titulo = "Actualizar registro";
+        
+        Date entrada = null;
+        Date salida = null;
+        
         try {
         	log.info("Actualizando registro...");
+        	entrada = new Date(this.registroSelected.getFecha().getTime());
+        	DateUtil.setTime(entrada,
+        			DateUtil.getHora(this.registroSelected.getFechaEntrada()),
+        			DateUtil.getMinuto(this.registroSelected.getFechaEntrada()),
+        			DateUtil.getSegundo(this.registroSelected.getFechaEntrada()),
+        			0);
+        	
+        	salida = new Date(this.registroSelected.getFecha().getTime());
+        	DateUtil.setTime(salida,
+        			DateUtil.getHora(this.registroSelected.getFechaSalida()),
+        			DateUtil.getMinuto(this.registroSelected.getFechaSalida()),
+        			DateUtil.getSegundo(this.registroSelected.getFechaSalida()),
+        			0);
+        	
+        	this.registroSelected.setFechaEntrada(entrada);
+        	this.registroSelected.setFechaSalida(salida);
+        	
             if ("F".equalsIgnoreCase(this.registroSelected.getStatus().getCodigo())) {
                 int anio = DateUtil.getAnio(this.registroSelected.getFechaEntrada());
                 int mes = DateUtil.getMes(this.registroSelected.getFechaEntrada());
                 int dia = DateUtil.getDia(this.registroSelected.getFechaEntrada());
-                Date entrada = DateUtil.getDateTime(anio, mes, dia, 0, 0, 0, 0);
+                entrada = DateUtil.getDateTime(anio, mes, dia, 0, 0, 0, 0);
                 this.registroSelected.setFechaEntrada(entrada);
                 this.registroSelected.setFechaSalida(entrada);
             }
@@ -396,6 +364,7 @@ public class RepAsistenciaBean implements Serializable {
             registroDAO.actualizar(this.registroSelected);
             mensaje = "El registro de actualizo correctamente.";
             severity = FacesMessage.SEVERITY_INFO;
+            PrimeFaces.current().executeScript("PF('dgEditarRegistro').hide();");
         } catch (SGPException sgpEx) {
             log.error("Ocurrió un problema al actualizar el registro de asistencia...", sgpEx);
             mensaje = "No se actualizo el registro.";
@@ -411,7 +380,56 @@ public class RepAsistenciaBean implements Serializable {
             PrimeFaces.current().ajax().update("form:messages");
         }
     }
-
+    
+    public void guardarRegistro() {
+    	FacesMessage message = null;
+        FacesMessage.Severity severity = null;
+        String mensaje = null;
+        String titulo = "Guardar registro";
+        Date entrada = null;
+        Date salida = null;
+        
+        try {
+        	entrada = new Date(this.registroSelected.getFecha().getTime());
+        	salida = new Date(this.registroSelected.getFecha().getTime());
+        	
+        	DateUtil.setTime(entrada,
+        			DateUtil.getHora(this.registroSelected.getFechaEntrada()),
+        			DateUtil.getMinuto(this.registroSelected.getFechaEntrada()),
+        			DateUtil.getSegundo(this.registroSelected.getFechaEntrada()),
+        			0);
+        	
+        	DateUtil.setTime(salida,
+        			DateUtil.getHora(this.registroSelected.getFechaSalida()),
+        			DateUtil.getMinuto(this.registroSelected.getFechaSalida()),
+        			DateUtil.getSegundo(this.registroSelected.getFechaSalida()),
+        			0);
+        	
+        	this.registroSelected.setFechaEntrada(entrada);
+        	this.registroSelected.setFechaSalida(salida);
+        	
+        	new RegistroBL().guardar(this.registroSelected);
+        	this.registros.add(registroSelected);
+        	
+        	mensaje = "La información se guardó correctamente.";
+            severity = FacesMessage.SEVERITY_INFO;
+            PrimeFaces.current().executeScript("PF('dgEditarRegistro').hide();");
+        } catch(SGPException ex) {
+        	log.warn("Problema al guardar la información del registro: {}", ex.getMessage());
+        	mensaje = ex.getMessage();
+        	severity = FacesMessage.SEVERITY_WARN;
+        } catch(Exception ex) {
+        	mensaje = "No es posible guardar el registro de asistencia.";
+            severity = FacesMessage.SEVERITY_ERROR;
+        } finally {
+            message = new FacesMessage(severity, titulo, mensaje);
+            FacesContext.getCurrentInstance().addMessage(null, message);
+            PrimeFaces.current().ajax().update("form:messages", "form:dt-registros");
+        }
+        
+        
+    }
+    
     public String obtenerEstatusAsistencia(DetRegistro registro) {
     	try {
     		switch (registro.getStatus().getCodigo()) {
@@ -443,7 +461,75 @@ public class RepAsistenciaBean implements Serializable {
 
         return registro.getStatus().getDescripcion();
     }
+    
+    public void exportarPDF() {
+        String message = null;
+        Severity severity = null;
+        
+        Date fechaFinT = null;
+        String fileName = null;
+        Integer idPlanta = null;
+        
+        try {
+            DateUtil.setTime(fechaInicio, 0, 0, 0, 0);
+            DateUtil.setTime(fechaFin, 23, 59, 59, 0);
+            log.info("Inicio del periodo de búsqueda: {}", this.fechaInicio);
+            log.info("Fin del periodo de búsqueda: {}", this.fechaFin);
 
+            fechaFinT = new Date(this.fechaFin.getTime());
+            fechaFinT = DateUtil.addDay(fechaFinT, 1);
+            idPlanta = this.planta == null ? null : this.planta.getIdPlanta();
+            
+            fileName = String.format("ReporteAsistencia_%s_al_%s.pdf",
+            		DateUtil.getString(fechaInicio, DateUtil.FORMATO_YYYY_MM_DD),
+            		DateUtil.getString(fechaFinT, DateUtil.FORMATO_YYYY_MM_DD));
+            
+            pdfFile = FacesUtils.getPDF(fileName, new AsistenciaRBL().getPDF(idPlanta, this.fechaInicio, fechaFinT));
+            
+            log.info("Exportación completa.");
+        } catch (Exception e) {
+            log.error("Ocurrió un problema al imprimir el reporte de asistencia...", e);
+            message = String.format("No es posible exportar el reporte.");
+            severity = FacesMessage.SEVERITY_INFO;
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
+            PrimeFaces.current().ajax().update("form:messages");
+        }
+    }
+
+    public void exportarXLS() {
+    	String message = null;
+        Severity severity = null;
+        
+        Date fechaFinT = null;
+        String fileName = null;
+        Integer idPlanta = null;
+        
+        try {
+            DateUtil.setTime(fechaInicio, 0, 0, 0, 0);
+            DateUtil.setTime(fechaFin, 23, 59, 59, 0);
+            log.info("Inicio del periodo de búsqueda: {}", this.fechaInicio);
+            log.info("Fin del periodo de búsqueda: {}", this.fechaFin);
+
+            fechaFinT = new Date(this.fechaFin.getTime());
+            fechaFinT = DateUtil.addDay(fechaFinT, 1);
+            idPlanta = this.planta == null ? null : this.planta.getIdPlanta();
+            
+            fileName = String.format("ReporteAsistencia_%s_al_%s.xlsx",
+            		DateUtil.getString(fechaInicio, DateUtil.FORMATO_YYYY_MM_DD),
+            		DateUtil.getString(fechaFinT, DateUtil.FORMATO_YYYY_MM_DD));
+            
+            xlsFile = FacesUtils.getXLSX(fileName, new AsistenciaRBL().getXLSX(idPlanta, this.fechaInicio, fechaFinT));
+            
+            log.info("Exportación completa.");
+        } catch (Exception e) {
+            log.error("Ocurrió un problema al imprimir el reporte de asistencia...", e);
+            message = String.format("No es posible exportar el reporte.");
+            severity = FacesMessage.SEVERITY_INFO;
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, "Error en impresion", message));
+            PrimeFaces.current().ajax().update("form:messages");
+        }
+    }
+    
     public List<CatPlanta> getPlantas() {
         return plantas;
     }
@@ -539,5 +625,13 @@ public class RepAsistenciaBean implements Serializable {
     public void setDiasDesabilitados(List<Date> diasDesabilitados) {
         this.diasDesabilitados = diasDesabilitados;
     }
+
+	public DetEmpleado getEmpleado() {
+		return empleado;
+	}
+
+	public void setEmpleado(DetEmpleado empleado) {
+		this.empleado = empleado;
+	}
 
 }

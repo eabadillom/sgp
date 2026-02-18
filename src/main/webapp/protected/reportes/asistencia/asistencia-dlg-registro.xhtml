@@ -1,0 +1,76 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+			<p:dialog header="Registro de asistencia" widgetVar="dgEditarRegistro" showEffect="fade" modal="true" responsive="true" draggable="true" resizable="false" dynamic="true">
+                <p:outputPanel id="pnl-registro" rendered="#{repAsistenciaBean.registroSelected ne null}">
+                	<div class="ui-fluid formgrid grid">
+                		<div class="field col-4 md:col-1">
+	                		<p:outputLabel value="Buscar" rendered="#{repAsistenciaBean.registroSelected.idRegistro eq null}"/>
+	                		<p:autoComplete value="#{repAsistenciaBean.empleado}" var="e"
+	                						rendered="#{repAsistenciaBean.registroSelected.idRegistro eq null}"
+	                						itemLabel="#{e.numEmpleado}"
+	                						itemValue="#{e}" converter="entityConverter"
+	                						completeMethod="#{repAsistenciaBean.buscarEmpleado}"
+	                		                readonly="#{repAsistenciaBean.registroSelected.idRegistro ne null}"
+	                		                minQueryLength="4" forceSelection="true" scrollHeight="250">
+	                		    <p:ajax process="@this" event="valueChange" listener="#{repAsistenciaBean.asignarEmpleado}" update="form:txtEmpleado" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
+								<p:column>
+									<p:outputLabel value="#{e.nombre} #{e.primerAp} #{e.segundoAp}"/>
+								</p:column>
+	                		</p:autoComplete>
+                		</div>
+                		<div class="field col-8 md:col-5">
+                			<p:outputLabel value="Empleado"></p:outputLabel>
+                			<p:inputText id="txtEmpleado" value="#{repAsistenciaBean.registroSelected.empleado.nombre} #{repAsistenciaBean.registroSelected.empleado.primerAp} #{repAsistenciaBean.registroSelected.empleado.segundoAp}" readonly="true" />
+                		</div>
+                		<div class="field col-6 md:col-3">
+                			<p:outputLabel value="Fecha" />
+                			<p:datePicker value="#{repAsistenciaBean.registroSelected.fecha}" pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX" showIcon="true" readonly="#{repAsistenciaBean.registroSelected.idRegistro ne null}" mindate="#{repAsistenciaBean.fechaInicio}" maxdate="#{repAsistenciaBean.fechaFin}">
+                				<p:ajax process="@this" listener="#{repAsistenciaBean.asignarHoraAsistencia}" event="dateSelect" update="form:pnl-registro" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
+                			</p:datePicker>
+                		</div>
+                		<div class="field col-6 md:col-3">
+                			<p:outputLabel for="@next" value="Estatus del registro"/>
+                			<p:selectOneMenu id="EstatusRegistro" value="#{repAsistenciaBean.registroSelected.status}" converter="entityConverter" autoWidth="false">
+	                            <f:selectItems value="#{repAsistenciaBean.lstEstatus}" var="estatusregistro" itemLabel="#{estatusregistro.descripcion}" itemValue="#{estatusregistro}"/>
+	                            <p:ajax process="@this"/>
+	                        </p:selectOneMenu>
+                		</div>
+                		<div class="field col-12 md:col-3">
+                			<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+                		</div>
+                		<div class="field col-6 md:col-3">
+	                		<p:outputLabel for="@next" value="Entrada"/>
+	                		 <p:datePicker id="fechaEntrada" value="#{repAsistenciaBean.registroSelected.fechaEntrada}"
+	                        			pattern="dd/MM/yyyy HH:mm:ss" locale="es_MX" timeZone="GMT-6"
+										timeOnly="true" readonlyInput="false"
+										inline="true" timeInput="true" disabledDates="#{repAsistenciaBean.diasDesabilitados}">
+							</p:datePicker>
+                		</div>
+                		<div class="field col-6 md:col-3">
+                			<p:outputLabel for="@next" value="Salida"/>
+                			<p:datePicker id="fechaSalida" value="#{repAsistenciaBean.registroSelected.fechaSalida}"
+	                        			pattern="dd/MM/yyyy HH:mm:ss" locale="es_MX" timeZone="GMT-6"
+										timeOnly="true" readonlyInput="false"
+										inline="true" timeInput="true" disabledDates="#{repAsistenciaBean.diasDesabilitados}">
+							</p:datePicker>
+                		</div>
+                	</div>
+                </p:outputPanel>
+                <f:facet name="footer">
+                    <p:commandButton value="Guardar" icon="pi pi-check" actionListener="#{repAsistenciaBean.guardar()}" update="form:dt-registros" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();">
+                    </p:commandButton>
+                    <p:commandButton value="Cancelar" icon="pi pi-times" styleClass="ui-button-outlined ui-button-secondary" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dgEditarRegistro').hide();" ajax="true" process="@this">
+                    </p:commandButton>
+                </f:facet>
+            </p:dialog>
+            <style>
+		        .ferbo-datePicker .ui-datepicker-calendar td a.ui-state-active{
+		            background: #77ff00 !important;
+		        }
+		    </style>
+
+</ui:composition>
