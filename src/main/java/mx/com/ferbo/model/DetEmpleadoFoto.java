@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -31,7 +32,8 @@ public class DetEmpleadoFoto implements Serializable {
 	@Basic(optional = true)
 	private String fotografia;
 	
-	@OneToOne(mappedBy = "empleadoFoto")
+	@OneToOne(optional = false)
+	@JoinColumn(name = "id_empleado")
 	private DetEmpleado empleado;
 	
 	public DetEmpleadoFoto() {
