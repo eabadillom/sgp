@@ -37,7 +37,7 @@ public class SessionFilter implements Filter {
     private static final String INIT_PARAM_EXCEPTION_PAGES = "exception-pages";
     private static final String INIT_PARAM_ENABLED = "enabled";
     private static final String DEFAULT_LOGIN_PAGE = "/login.jsp";
-    private static final String NO_SESSION_PAGE = "/login.jsp";
+    private static final String NO_SESSION_PAGE = "";// /login.jsp;
     private static final String UNAUTHORIZED = "/unauthorized.xhtml";
     
     private static final Map<String, List<Integer>> permisos = new HashMap<String, List<Integer>>();
