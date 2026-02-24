@@ -319,6 +319,7 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
         return model;
     }
 
+    @Deprecated
     public DetEmpleado buscarPorNumeroEmpleadoFoto(String numeroEmpleado, boolean isFullInfo) {
         DetEmpleado model = null;
         EntityManager emSGP = null;
@@ -330,7 +331,6 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
             if (isFullInfo) {
                 log.info("Dato empresa: {}", model.getDatoEmpresa().getId());
                 log.info("Perfil: {}", model.getDatoEmpresa().getPerfil().getIdPerfil());
-                log.info("Foto id: {}", model.getEmpleadoFoto().getId());
             }
         } catch (Exception ex) {
             log.error("Problema para obtener el número de empleado " + numeroEmpleado, ex);

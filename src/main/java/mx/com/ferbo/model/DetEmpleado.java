@@ -9,7 +9,6 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -99,10 +98,6 @@ public class DetEmpleado implements Serializable, Cloneable {
     @JoinColumn(name = "id_empleado_empresa")
     private InfDatoEmpresa datoEmpresa;
 
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_empleado_foto")
-    private DetEmpleadoFoto empleadoFoto;
-    
     @OneToMany(mappedBy = "empleado", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<DetPercepcionEmpleado> percepcionesEmpleado;
     
@@ -165,7 +160,6 @@ public class DetEmpleado implements Serializable, Cloneable {
     	private String correo;
     	private short activo;
     	private InfDatoEmpresa datoEmpresa;
-    	private DetEmpleadoFoto empleadoFoto;
     	private List<DetPercepcionEmpleado> percepcionesEmpleado;
     	private List<DetPrestamo> prestamos;
     	private List<DetVacaciones> vacaciones;
@@ -232,11 +226,6 @@ public class DetEmpleado implements Serializable, Cloneable {
     		return this;
     	}
     	
-    	public DetEmpleado.Builder empleadoFoto(DetEmpleadoFoto empleadoFoto) {
-    		this.empleadoFoto = empleadoFoto;
-    		return this;
-    	}
-    	
     	public DetEmpleado.Builder percepcionesEmpleado(List<DetPercepcionEmpleado> percepcionesEmpleado) {
     		this.percepcionesEmpleado = percepcionesEmpleado;
     		return this;
@@ -283,7 +272,6 @@ public class DetEmpleado implements Serializable, Cloneable {
     	this.correo = builder.correo;
     	this.activo = builder.activo;
     	this.datoEmpresa = builder.datoEmpresa;
-    	this.empleadoFoto = builder.empleadoFoto;
     	this.percepcionesEmpleado = builder.percepcionesEmpleado;
     	this.prestamos = builder.prestamos;
     	this.vacaciones = builder.vacaciones;
@@ -399,14 +387,6 @@ public class DetEmpleado implements Serializable, Cloneable {
 
     public void setDatoEmpresa(InfDatoEmpresa datoEmpresa) {
         this.datoEmpresa = datoEmpresa;
-    }
-
-    public DetEmpleadoFoto getEmpleadoFoto() {
-        return empleadoFoto;
-    }
-
-    public void setEmpleadoFoto(DetEmpleadoFoto empleadoFoto) {
-        this.empleadoFoto = empleadoFoto;
     }
 
 	public List<DetPercepcionEmpleado> getPercepcionesEmpleado() {
