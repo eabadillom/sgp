@@ -281,7 +281,6 @@ public class RegistroEmpleadosBean implements Serializable {
     	this.datoEmpresa = this.empleado.getDatoEmpresa();
         this.empleadoFoto = new DetEmpleadoFoto();
         this.empleadoFoto.setEmpleado(empleado);
-        this.empleado.setEmpleadoFoto(this.empleadoFoto);
         this.detBiometrico = new DetBiometrico();
         this.detBiometrico.setEmpleado(this.empleado);
         this.salarioDiario = new DetSalarioDiario.Builder().build();
@@ -297,9 +296,6 @@ public class RegistroEmpleadosBean implements Serializable {
 			this.empleadoFoto = empleadoFotoDAO
 					.buscar(this.empleado.getIdEmpleado())
 					.orElse(new DetEmpleadoFoto.Builder().empleado(empleado).build());
-	        if (this.empleadoFoto != null) {
-	            log.debug("Foto: {}", this.empleadoFoto.getFotografia());
-	        }
 	        
 	        this.detBiometrico = biometricoDAO.consultaBiometricoByIdEmpleado(this.empleado.getIdEmpleado());
 	        log.info("Biometrico: {}", this.detBiometrico);
@@ -754,7 +750,6 @@ public class RegistroEmpleadosBean implements Serializable {
     public void oncapture(CaptureEvent captureEvent) {
         if (this.empleadoFoto == null) {
             this.empleadoFoto = new DetEmpleadoFoto();
-            this.empleado.setEmpleadoFoto(empleadoFoto);
         }
 
         this.empleadoFoto.setFotografia("data:image/jpeg;base64," + Base64.getEncoder().encodeToString(captureEvent.getData()));

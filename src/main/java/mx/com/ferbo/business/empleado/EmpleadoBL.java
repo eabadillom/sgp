@@ -210,11 +210,6 @@ public class EmpleadoBL {
             empleadoporvalidar.setEmpleadoConfiguracion(new DetEmpleadoConfiguracion());
         }
 
-        if (empleadoporvalidar.getEmpleadoFoto() == null) {
-            log.info("La foto del empleado es nula, se le asigna memoria");
-            empleadoporvalidar.setEmpleadoFoto(new DetEmpleadoFoto());
-        }
-
         if (empleadoporvalidar.getDatoEmpresa() == null) {
             log.info("El dato empresarial del empleado es nulo, se le asigna memoria");
             empleadoporvalidar.setDatoEmpresa(new InfDatoEmpresa());
