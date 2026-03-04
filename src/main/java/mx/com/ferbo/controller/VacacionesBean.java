@@ -65,6 +65,8 @@ public class VacacionesBean implements Serializable {
 	private List<Integer> invalidDays;
 	private List<Date> diasDeAsueto;
 	private Boolean mostrarCanceladas;
+	private Boolean desbloquearDiasNoLaborales;
+	private Boolean desbloquearDiasDeDescanso;
 	
 	private ManageStatus status;
 	
@@ -184,6 +186,9 @@ public class VacacionesBean implements Serializable {
 				.map(DetDiaPermiso::getFecha)
 				.collect(Collectors.toList())
 				;
+			
+			this.desbloquearDiasDeDescanso = new Boolean(false);
+			this.desbloquearDiasNoLaborales = new Boolean(false);
 		} catch(SGPException ex) {
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
@@ -215,6 +220,22 @@ public class VacacionesBean implements Serializable {
 			log.info("Dias solicitados: {}", this.diasSolicitados.size());
 		} catch(Exception ex) {
 			log.error("Problema para obtener los días solicitados...", ex);
+		}
+	}
+	
+	public void mostrarDiasLaborales() {
+		if(this.desbloquearDiasNoLaborales.booleanValue()) {
+			this.diasDeAsueto = new ArrayList<Date>();
+		} else {
+			this.diasDeAsueto = DiasDeDescansoObligatorioBL.diasDeAsueto();
+		}
+	}
+	
+	public void mostrarDiasDeDescanso() {
+		if(this.desbloquearDiasDeDescanso.booleanValue()) {
+			this.invalidDays = new ArrayList<Integer>();
+		} else {
+			this.invalidDays = SolicitudPermisoBL.obtenerDiasSeleccionados(empleado.getDatoEmpresa());
 		}
 	}
 	
@@ -478,6 +499,22 @@ public class VacacionesBean implements Serializable {
 
 	public void setMostrarCanceladas(Boolean mostrarCanceladas) {
 		this.mostrarCanceladas = mostrarCanceladas;
+	}
+
+	public Boolean getDesbloquearDiasNoLaborales() {
+		return desbloquearDiasNoLaborales;
+	}
+
+	public void setDesbloquearDiasNoLaborales(Boolean desbloquearDiasNoLaborales) {
+		this.desbloquearDiasNoLaborales = desbloquearDiasNoLaborales;
+	}
+
+	public Boolean getDesbloquearDiasDeDescanso() {
+		return desbloquearDiasDeDescanso;
+	}
+
+	public void setDesbloquearDiasDeDescanso(Boolean desbloquearDiasDeDescanso) {
+		this.desbloquearDiasDeDescanso = desbloquearDiasDeDescanso;
 	}
 
 }
