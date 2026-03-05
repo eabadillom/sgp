@@ -250,15 +250,15 @@ public class RegistroBL implements Serializable
     }
     
     /*Guarda los registros del tipo solicitud permiso en registro asistencia*/
-    public static void guardarRegistroVacaciones(DetEmpleado empleado, DetIncidencia incidencia, List<Date> diasAsueto) throws SGPException 
+    public static void guardarRegistroVacaciones(DetIncidencia incidencia, List<Date> diasAsueto) throws SGPException 
     {
     	RegistroDAO registroDAO = new RegistroDAO();
-        EmpleadoBL.empleadoTieneDiasLaborales(empleado);
+        EmpleadoBL.empleadoTieneDiasLaborales(incidencia.getEmpleado());
         List<Date> listaFechas = null;
         
         int cantidadRegistrosGuardados = 0;
         
-        InfDatoEmpresa empleadoEmpresa = empleado.getDatoEmpresa();
+        InfDatoEmpresa empleadoEmpresa = incidencia.getEmpleado().getDatoEmpresa();
         CatEstatusRegistro statusRegistro = null;
         
         switch(incidencia.getSolPermiso().getTipoSolicitud().getClave())
@@ -295,7 +295,7 @@ public class RegistroBL implements Serializable
         	
         	if(registro == null) {
         		registro = new DetRegistro();
-                registro.setEmpleado(empleado);
+                registro.setEmpleado(incidencia.getEmpleado());
                 Date registroEntrada = DateUtil.getDateTime(DateUtil.getAnio(dia), DateUtil.getMes(dia), DateUtil.getDia(dia), horaEntrada, 0, 0, 0);
                 log.trace("Dia hora entrada: {}", registroEntrada);
                 registro.setFechaEntrada(registroEntrada);
@@ -322,7 +322,7 @@ public class RegistroBL implements Serializable
             cantidadRegistrosGuardados += 1;
         }
         
-        log.info("Num. registros de vacaciones guardados del empleado {} en asistencia: {}", empleado.getIdEmpleado(), cantidadRegistrosGuardados);
+        log.info("Num. registros de vacaciones guardados del empleado {} en asistencia: {}", incidencia.getEmpleado().getIdEmpleado(), cantidadRegistrosGuardados);
     }
     
 	/* Guarda los registros de incapacidad en registro de asistencia */

@@ -40,7 +40,7 @@ public class IncidenciasSolicitudesBean implements Serializable
     private final IncidenciaDAO incidenciaDAO = new IncidenciaDAO();
     private final TipoSolicitudDAO tipoSolicitudDAO = new TipoSolicitudDAO();
     
-    private DetEmpleado empleadoSesion;
+    private DetEmpleado autorizador;
     private DetEmpleado empleadoSelected;
     private DetIncidencia incidenciaSelected;
     private List<DetIncidencia> listaPermisos;
@@ -73,10 +73,9 @@ public class IncidenciasSolicitudesBean implements Serializable
     
     @PostConstruct
     public void init() {
-        this.empleadoSesion = (DetEmpleado) getValorEnSesion("empleado");
-        log.info("El empleado {} entrando a la sección de vacaciones / permisos", this.empleadoSesion.getNombre());
+        this.autorizador = (DetEmpleado) getValorEnSesion("empleado");
+        log.info("El empleado {} entrando a la sección de vacaciones / permisos", this.autorizador.getNombre());
         this.lstTipoSol = this.tipoSolicitudDAO.buscarActivos();
-//        this.diasDeAsueto = DiasDeDescansoObligatorioBL.diasDeAsueto();
         this.goceSueldo = "100.0";
     }
     
@@ -135,9 +134,6 @@ public class IncidenciasSolicitudesBean implements Serializable
                     this.incidenciaSelected = incidenciaDAO.cargar(solicitudIncidencia.getIdIncidencia())
                             .orElseThrow(() -> new SGPException("No se encontró la incidencia solicitada."));
 
-//                    EmpleadoBL.empleadoTieneDiasLaborales(incidenciaSelected.getEmpleado());
-//                    this.invalidDays = IncidenciaBL.obtenerDiasSeleccionados(empleadoSelected.getDatoEmpresa());
-
                     fechas = this.incidenciaSelected.getSolPermiso().getDiasPermiso().stream()
                             .map(DetDiaPermiso::getFecha)
                             .collect(Collectors.toList())
@@ -167,7 +163,7 @@ public class IncidenciasSolicitudesBean implements Serializable
 
     public void aprobarIncidencia() {
         try {
-            IncidenciaBL.aprobarIncidencia(this.incidenciaSelected, this.empleadoSesion, this.goceSueldo);
+            IncidenciaBL.aprobarIncidencia(this.autorizador, this.incidenciaSelected, this.goceSueldo);
             log.info("Dias solicitados del empleado {} son: {}", this.empleadoSelected.getIdEmpleado(), this.diasVacacionesSolicitados);
             
             this.consultarPermisos();
@@ -184,7 +180,7 @@ public class IncidenciasSolicitudesBean implements Serializable
 
     public void rechazarIncidencia() {
         try {
-            IncidenciaBL.rechazarIncidencia(this.incidenciaSelected, this.empleadoSesion, this.descripcionRechazo);
+            IncidenciaBL.rechazarIncidencia(this.incidenciaSelected, this.autorizador, this.descripcionRechazo);
             
             this.consultarPermisos();
             FacesUtils.addMessage(FacesMessage.SEVERITY_INFO, "Incidencia", "Incidencia rechazada");
@@ -203,11 +199,11 @@ public class IncidenciasSolicitudesBean implements Serializable
             
             switch(tipoIncidencia){
                 case VACACIONES:
-                    IncidenciaBL.cancelarIncidencia(this.incidenciaSelected, this.empleadoSesion);
+                    IncidenciaBL.cancelarIncidencia(this.incidenciaSelected, this.autorizador);
                     IncidenciaBL.cancelarVacaciones(this.incidenciaSelected);
                     break;
                 case PERMISO:
-                    IncidenciaBL.cancelarIncidencia(this.incidenciaSelected, this.empleadoSesion);
+                    IncidenciaBL.cancelarIncidencia(this.incidenciaSelected, this.autorizador);
                     break;
                 default:
                     throw new SGPException("No hay solicitudes de vacaciones y/o permiso, contacte a su administrador de sistemas");
