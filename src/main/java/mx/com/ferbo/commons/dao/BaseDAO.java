@@ -52,15 +52,15 @@ public abstract class BaseDAO<MODEL, PK> {
 	public synchronized void guardar(MODEL model) throws SGPException {
 		EntityManager em = null;
 		try {
-			log.info("Guardando objeto: {}", model);
+			log.info("Guardando objeto {}: {}", this.modelClass, model);
 			em = getEntityManager();
 			em.getTransaction().begin();
 			em.persist(model);
 			em.getTransaction().commit();
-			log.info("Objeto guardado correctamente: {}", model);
+			log.info("Objeto {} guardado correctamente: {}", this.modelClass, model);
 		} catch(Exception ex) {
 			rollback(em);
-			log.error("Problema para guardar el objeto: " + model, ex);
+			log.error("Problema para guardar el objeto {}: {}\n{}", this.modelClass, model, ex);
 			throw new SGPException("Error al guardar en la base de datos.");
 		} finally {
 			close(em);
@@ -70,15 +70,15 @@ public abstract class BaseDAO<MODEL, PK> {
 	public synchronized void actualizar(MODEL model)throws SGPException {
 		EntityManager em = null;
 		try {
-			log.info("Actualizando objeto: {}", model);
+			log.info("Actualizando objeto {}: {}", this.modelClass, model);
 			em = getEntityManager();
 			em.getTransaction().begin();
 			model = em.merge(model);
 			em.getTransaction().commit();
-			log.info("Objeto actualizado correctamente: {}", model);
+			log.info("Objeto {} actualizado correctamente: {}", this.modelClass, model);
 		} catch(Exception ex) {
 			rollback(em);
-			log.error("Problema para actualizar el objeto: " + model, ex);
+			log.error("Problema para actualizar el objeto {}: {}\n{}", this.modelClass, model, ex);
 			throw new SGPException("Error al actualizar en la base de datos.");
 		} finally {
 			close(em);

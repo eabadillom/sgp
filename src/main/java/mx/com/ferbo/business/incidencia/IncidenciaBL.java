@@ -307,7 +307,7 @@ public class IncidenciaBL implements Serializable
         return resultado.collect(Collectors.toList());
     }
     
-    public static void aprobarIncidencia(DetIncidencia incidencia, DetEmpleado empleadoRev, String goceSueldo) throws SGPException
+    public static void aprobarIncidencia(DetEmpleado autorizador, DetIncidencia incidencia, String goceSueldo) throws SGPException
     {
         IncidenciaDAO incidenciaDAO = new IncidenciaDAO();
         
@@ -322,13 +322,13 @@ public class IncidenciaBL implements Serializable
         incidencia.setEstatusIncidencia(EstatusIncidenciaBL.estatusAprobado());
         incidencia.getSolPermiso().setEstatus(EstatusSolicitudBL.estatusAprobado());
         incidencia.getSolPermiso().setGoceSueldo(valor);
-        incidencia.setEmpleadoRev(empleadoRev);
+        incidencia.setEmpleadoRev(autorizador);
         incidencia.setFechaMod(new Date());
-        incidencia.getSolPermiso().setFechaMod(new Date());
-        incidencia.getSolPermiso().setEmpleadoRev(empleadoRev);
+        incidencia.getSolPermiso().setFechaMod(incidencia.getFechaMod());
+        incidencia.getSolPermiso().setEmpleadoRev(autorizador);
 
         if (incidencia.getEstatusIncidencia().getClave().trim().matches(ST_APROBADA)) {
-            RegistroBL.guardarRegistroVacaciones(empleadoRev, incidencia, DiasDeDescansoObligatorioBL.diasDeAsueto());
+            RegistroBL.guardarRegistroVacaciones(incidencia, DiasDeDescansoObligatorioBL.diasDeAsueto());
         }
 
         incidenciaDAO.actualizar(incidencia);
