@@ -214,7 +214,7 @@ public class RepAsistenciaBean implements Serializable {
     			return new ArrayList<DetEmpleado>();
     		
     		log.info("Buscando empleados por: {}", query);
-    		empleados = empleadoDAO.buscarPorNombrePrimerSegundoApellido(query);
+    		empleados = empleadoDAO.buscarPorNombrePrimerSegundoApellido(query, this.fechaFin);
     	} catch(Exception ex) {
     		empleados = new ArrayList<DetEmpleado>();
     	}
