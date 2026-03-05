@@ -76,7 +76,7 @@ public class IncidenciasSolicitudesBean implements Serializable
         this.empleadoSesion = (DetEmpleado) getValorEnSesion("empleado");
         log.info("El empleado {} entrando a la sección de vacaciones / permisos", this.empleadoSesion.getNombre());
         this.lstTipoSol = this.tipoSolicitudDAO.buscarActivos();
-        this.diasDeAsueto = DiasDeDescansoObligatorioBL.diasDeAsueto();
+//        this.diasDeAsueto = DiasDeDescansoObligatorioBL.diasDeAsueto();
         this.goceSueldo = "100.0";
     }
     
@@ -135,8 +135,8 @@ public class IncidenciasSolicitudesBean implements Serializable
                     this.incidenciaSelected = incidenciaDAO.cargar(solicitudIncidencia.getIdIncidencia())
                             .orElseThrow(() -> new SGPException("No se encontró la incidencia solicitada."));
 
-                    EmpleadoBL.empleadoTieneDiasLaborales(incidenciaSelected.getEmpleado());
-                    this.invalidDays = IncidenciaBL.obtenerDiasSeleccionados(empleadoSelected.getDatoEmpresa());
+//                    EmpleadoBL.empleadoTieneDiasLaborales(incidenciaSelected.getEmpleado());
+//                    this.invalidDays = IncidenciaBL.obtenerDiasSeleccionados(empleadoSelected.getDatoEmpresa());
 
                     fechas = this.incidenciaSelected.getSolPermiso().getDiasPermiso().stream()
                             .map(DetDiaPermiso::getFecha)

@@ -28,27 +28,27 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
         super(DetRegistro.class);
     }
     
-    public List<DetRegistro> buscarTodos()
-    {
-        List<DetRegistro> modelList = null;
-        EntityManager em = null;
-        
-        try
-        {
-            em = this.getEntityManager();
-            modelList = em.createNamedQuery("DetRegistro.findAll", DetRegistro.class)
-                .getResultList();
-        }catch (Exception ex) 
-        {
-            log.error("Problema para obtener el listado de registros...", ex);
-            modelList = new ArrayList<>();
-        } finally 
-        {
-            this.close(em);
-        }
-        
-        return modelList;
-    }
+//    public List<DetRegistro> buscarTodos()
+//    {
+//        List<DetRegistro> modelList = null;
+//        EntityManager em = null;
+//        
+//        try
+//        {
+//            em = this.getEntityManager();
+//            modelList = em.createNamedQuery("DetRegistro.findAll", DetRegistro.class)
+//                .getResultList();
+//        }catch (Exception ex) 
+//        {
+//            log.error("Problema para obtener el listado de registros...", ex);
+//            modelList = new ArrayList<>();
+//        } finally 
+//        {
+//            this.close(em);
+//        }
+//        
+//        return modelList;
+//    }
 
     public DetRegistro buscarPorEmpleadoFechaEntrada(Integer idEmpleado, Date fechaEntradaInicio, Date fechaEntradaFin) {
         DetRegistro model = null;
@@ -306,6 +306,28 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
         }
         
         return modelList;
+    }
+    
+    public List<DetRegistro> buscarPorEmpleadoPeriodo(Integer idEmpleado, Date periodoInicio, Date periodoFin) {
+    	List<DetRegistro> modelList = null;
+    	EntityManager em = null;
+    	
+    	try {
+    		em = this.getEntityManager();
+    		modelList = em.createNamedQuery("DetRegistro.findByIdEmpleadoPeriodo", modelClass)
+    				.setParameter("idEmpleado", idEmpleado)
+    				.setParameter("periodoInicio", periodoInicio)
+    				.setParameter("periodoFin", periodoFin)
+    				.getResultList();
+    		
+    	} catch(Exception ex) {
+    		if(modelList == null)
+    			modelList = new ArrayList<DetRegistro>();
+    	} finally {
+    		this.close(em);
+    	}
+    	
+    	return modelList;
     }
     
 }
