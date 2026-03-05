@@ -56,6 +56,7 @@ public class RepAsistenciaBean implements Serializable {
     private DetEmpleado empleado;
     private List<CatPlanta> plantas;
     private List<DetRegistro> registros;
+    private List<Date> registrosEmpleado;
 
     private CatPlanta planta = null;
     private Date fechaInicio;
@@ -221,14 +222,19 @@ public class RepAsistenciaBean implements Serializable {
     }
     
     public void asignarEmpleado() {
+    	List<DetRegistro> registrosEmp = null;
         try {
         	this.registroSelected.setEmpleado(this.empleado);
+        	
+        	registrosEmp = RegistroBL.buscarPorEmpleadoPeriodo(this.empleado.getIdEmpleado(), this.fechaInicio, this.fechaFin);
+        	this.registrosEmpleado = RegistroBL.toDateList(registrosEmp);
+        	
         } catch(Exception ex) {
         	log.warn("Problema para asignar al empleado: {}", ex.getMessage());
+        	this.registrosEmpleado = new ArrayList<Date>();
         } finally {
         	PrimeFaces.current().ajax().update("form:messages");
         }
-        
     }
     
     public void asignarHoraAsistencia() {
@@ -632,6 +638,14 @@ public class RepAsistenciaBean implements Serializable {
 
 	public void setEmpleado(DetEmpleado empleado) {
 		this.empleado = empleado;
+	}
+
+	public List<Date> getRegistrosEmpleado() {
+		return registrosEmpleado;
+	}
+
+	public void setRegistrosEmpleado(List<Date> registrosEmpleado) {
+		this.registrosEmpleado = registrosEmpleado;
 	}
 
 }
