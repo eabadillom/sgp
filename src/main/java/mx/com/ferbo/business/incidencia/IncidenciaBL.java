@@ -311,10 +311,10 @@ public class IncidenciaBL implements Serializable
     {
         IncidenciaDAO incidenciaDAO = new IncidenciaDAO();
         
-        Boolean gs = incidencia.getEmpleado().getEmpleadoConfiguracion().getGoceSueldo();
+        Boolean isGoceSueldo = incidencia.getEmpleado().getEmpleadoConfiguracion().getGoceSueldo();
         
         BigDecimal valor = Optional.ofNullable(goceSueldo)
-            .filter(s -> Boolean.TRUE.equals(gs))
+            .filter(s -> Boolean.TRUE.equals(isGoceSueldo))
             .filter(s -> !s.trim().isEmpty())
             .map(BigDecimal::new)
             .orElse(BigDecimal.ZERO);

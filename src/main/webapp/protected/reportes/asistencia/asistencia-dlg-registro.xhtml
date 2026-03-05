@@ -16,7 +16,7 @@
 	                						completeMethod="#{repAsistenciaBean.buscarEmpleado}"
 	                		                readonly="#{repAsistenciaBean.registroSelected.idRegistro ne null}"
 	                		                minQueryLength="4" forceSelection="true" scrollHeight="250">
-	                		    <p:ajax process="@this" event="valueChange" listener="#{repAsistenciaBean.asignarEmpleado}" update="form:txtEmpleado" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
+	                		    <p:ajax process="@this" event="valueChange" listener="#{repAsistenciaBean.asignarEmpleado}" update="form:txtEmpleado form:fechaRegistro" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
 								<p:column>
 									<p:outputLabel value="#{e.nombre} #{e.primerAp} #{e.segundoAp}"/>
 								</p:column>
@@ -28,7 +28,7 @@
                 		</div>
                 		<div class="field col-6 md:col-3">
                 			<p:outputLabel value="Fecha" />
-                			<p:datePicker value="#{repAsistenciaBean.registroSelected.fecha}" pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX" showIcon="true" readonly="#{repAsistenciaBean.registroSelected.idRegistro ne null}" mindate="#{repAsistenciaBean.fechaInicio}" maxdate="#{repAsistenciaBean.fechaFin}">
+                			<p:datePicker id="fechaRegistro" value="#{repAsistenciaBean.registroSelected.fecha}" pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX" showIcon="true" readonly="#{repAsistenciaBean.registroSelected.idRegistro ne null}" mindate="#{repAsistenciaBean.fechaInicio}" maxdate="#{repAsistenciaBean.fechaFin}" disabledDates="#{repAsistenciaBean.registrosEmpleado}">
                 				<p:ajax process="@this" listener="#{repAsistenciaBean.asignarHoraAsistencia}" event="dateSelect" update="form:pnl-registro" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
                 			</p:datePicker>
                 		</div>
