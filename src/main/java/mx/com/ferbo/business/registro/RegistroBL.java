@@ -451,5 +451,42 @@ public class RegistroBL implements Serializable
 
         return stream.collect(Collectors.toList());
     }
-    
+
+	public static List<DetRegistro> buscarPorEmpleadoPeriodo(Integer idEmpleado, Date fechaInicio, Date fechaFin) {
+		List<DetRegistro> registros = null;
+		RegistroDAO registroDAO = null;
+		Date periodoInicio = null;
+		Date periodoFin = null;
+		
+		try {
+			periodoInicio = new Date(fechaInicio.getTime());
+			periodoFin = new Date(fechaFin.getTime());
+			
+			DateUtil.setTime(periodoInicio, 0, 0, 0, 0);
+			DateUtil.setTime(periodoFin, 23, 59, 59, 999);
+			
+			registroDAO = new RegistroDAO();
+			registros = registroDAO.buscarPorEmpleadoPeriodo(idEmpleado, periodoInicio, periodoFin);
+			
+		} catch(Exception ex) {
+			log.error("Problema para obtener los registros de asistencia...", ex);
+			registros = new ArrayList<DetRegistro>();
+		}
+		
+		return registros;
+	}
+	
+	public static List<Date> toDateList(List<DetRegistro> registros) {
+		List<Date> dateList = null;
+		
+		try {
+			dateList = registros.stream()
+					.map(item -> item.getFechaEntrada())
+					.collect(Collectors.toList());
+		} catch(Exception ex) {
+			dateList = new ArrayList<Date>();
+		}
+		
+		return dateList;
+	}
 }

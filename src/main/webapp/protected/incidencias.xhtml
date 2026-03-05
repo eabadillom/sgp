@@ -20,11 +20,11 @@
                         <i class="pi pi-spinner pi-spin" style="font-size:3rem;"></i>
                 </div>
             </p:dialog>
-            <p:panel id="pnl-config-fechas" header="CONFIGURAR PERIODO" >
+            <p:panel id="pnl-config-fechas" header="PERIODO" >
                 <div class="grid ui-fluid" style="gap:1rem;">
                     <div class="p-col-6 p-md-3">
                         <div class="field">
-                            <p:outputLabel for="@next" value="Periodo Inicio" />
+                            <p:outputLabel for="@next" value="Inicio" />
                             <p:datePicker value="#{incidenciaBean.fechaInicio}" showIcon="true" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy" style="width:100%" >
                                 <p:ajax update="tabViewI" process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" listener="#{incidenciaBean.onFechaChange}"/>
                             </p:datePicker>
@@ -32,7 +32,7 @@
                     </div>
                     <div class="p-col-6 p-md-3">
                         <div class="field">
-                            <p:outputLabel for="@next" value="Periodo Fin" />
+                            <p:outputLabel for="@next" value="Fin" />
                             <p:datePicker value="#{incidenciaBean.fechaFin}" showIcon="true" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy" style="width:100%" >
                                 <p:ajax update="tabViewI" process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" listener="#{incidenciaBean.onFechaChange}"/>
                             </p:datePicker>

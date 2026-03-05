@@ -33,7 +33,7 @@ import javax.persistence.Transient;
     @NamedQuery(name = "DetRegistro.findByIdEmp", query = "SELECT d FROM DetRegistro d INNER JOIN d.empleado e INNER JOIN d.status ce WHERE e.idEmpleado = :idEmp"),
     @NamedQuery(name = "DetRegistro.findByYear", query = "SELECT d FROM DetRegistro d INNER JOIN d.empleado e INNER JOIN d.status ce WHERE d.fechaEntrada LIKE :fechaEntrada"),
     @NamedQuery(name = "DetRegistro.findByNomina", query = "SELECT d FROM DetRegistro d INNER JOIN d.empleado e INNER JOIN d.status ce WHERE d.fechaEntrada BETWEEN :fechaEntrada AND :fechaSalida"),
-    @NamedQuery(name = "DetRegistro.findByIdEmpleadoPeriodo", query = "SELECT d FROM DetRegistro d INNER JOIN d.empleado e INNER JOIN d.status ce WHERE d.empleado.idEmpleado = :idEmpleado AND d.fechaEntrada BETWEEN :fechaEntrada AND :fechaSalida"),
+    @NamedQuery(name = "DetRegistro.findByIdEmpleadoPeriodo", query = "SELECT d FROM DetRegistro d INNER JOIN d.empleado e INNER JOIN d.status ce WHERE d.empleado.idEmpleado = :idEmpleado AND d.fechaEntrada BETWEEN :periodoInicio AND :periodoFin"),
     @NamedQuery(name = "DetRegistro.findByEmpleadoPeriodo", query = "SELECT d FROM DetRegistro d WHERE d.empleado.idEmpleado = :idEmpleado AND d.fechaEntrada BETWEEN :fechaEntrada AND :fechaSalida ORDER BY d.fechaEntrada"),
     @NamedQuery(name = "DetRegistro.findByIdEmplActivo", query = "SELECT d FROM DetRegistro d INNER JOIN d.empleado e INNER JOIN d.status ce WHERE e.idEmpleado = :idEmp AND e.activo = 1 AND d.fechaEntrada LIKE :fechaEntrada"),
     @NamedQuery(name = "DetRegistro.findByIdEmpleadoAndFecha", query = "SELECT r FROM DetRegistro r WHERE r.empleado.idEmpleado = :idEmpleado AND (r.fechaEntrada BETWEEN :fechaEntradaInicio AND :fechaEntradaFin)"),

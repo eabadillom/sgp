@@ -64,7 +64,7 @@
                            value="#{incidencia.estatusIncidencia.descripcion}"/>
         </p:column>
         <p:column style="text-align: center" width="2rem">
-            <p:commandButton icon="pi pi-bars" class="ui-button-success rounded-button m-1"  process="@this" styleClass="edit-button"
+            <p:commandButton icon="pi pi-bars" process="@this" styleClass="edit-button"
                              action="#{incidenciasSolicitudesBean.visualizaDialog(incidencia)}" update="formIncidencias:tabViewI:dialogPermisos"
                              onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();">
                 <!-- <f:setPropertyActionListener value="#{incidencia}" target="#{incidenciasSolicitudesBean.incidenciaSelected}" for="@previous" /> -->
