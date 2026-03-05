@@ -32,7 +32,7 @@ import javax.validation.constraints.Size;
 @NamedQuery(name = "DetEmpleado.findByRFC", query = "SELECT e FROM DetEmpleado e WHERE e.datoEmpresa.rfc = :rfc")
 @NamedQuery(name = "DetEmpleado.findByCURP", query = "SELECT e FROM DetEmpleado e WHERE e.curp = :curp")
 @NamedQuery(name = "DetEmpleado.findByActiveEmpresaPlanta", query = "SELECT e FROM DetEmpleado e WHERE (:idEmpresa is null or e.datoEmpresa.empresa.idEmpresa = :idEmpresa) AND (:idPlanta is null or e.datoEmpresa.planta.idPlanta = :idPlanta) and ( (e.datoEmpresa.fechaIngreso <= :fecha) and ( e.datoEmpresa.fechaBaja is null or :fecha <= e.datoEmpresa.fechaBaja ) ) ORDER BY e.nombre, e.primerAp, e.segundoAp ")
-@NamedQuery(name = "DetEmpleado.fullNameContains", query = "SELECT e FROM DetEmpleado e WHERE (e.nombre like :query) OR (e.primerAp like :query) OR (e.segundoAp like :query)")
+@NamedQuery(name = "DetEmpleado.fullNameContains", query = "SELECT e FROM DetEmpleado e INNER JOIN FETCH e.datoEmpresa de INNER JOIN FETCH e.domicilio d WHERE ( (e.datoEmpresa.fechaIngreso <= :fecha and e.datoEmpresa.fechaBaja IS NULL) OR ( e.datoEmpresa.fechaIngreso <= :fecha AND e.datoEmpresa.fechaBaja >= :fecha) ) AND ((e.nombre like :query) OR (e.primerAp like :query) OR (e.segundoAp like :query))")
 public class DetEmpleado implements Serializable, Cloneable {
 	
     private static final long serialVersionUID = 1L;

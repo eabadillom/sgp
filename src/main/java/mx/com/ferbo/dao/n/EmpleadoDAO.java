@@ -555,7 +555,7 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
     	return registrosEmpleado;
     }
     
-    public List<DetEmpleado> buscarPorNombrePrimerSegundoApellido(String query) {
+    public List<DetEmpleado> buscarPorNombrePrimerSegundoApellido(String query, Date fecha) {
     	List<DetEmpleado> modelList = null;
     	EntityManager em = null;
     	
@@ -563,6 +563,7 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
     		em = this.getEntityManager();
     		modelList = em.createNamedQuery("DetEmpleado.fullNameContains", modelClass)
     				.setParameter("query", String.format("%%%s%%", query))
+    				.setParameter("fecha", fecha)
     				.getResultList();
     		
     		modelList.stream().forEach(item -> log.debug("Id dato empresa: {}", item.getDatoEmpresa().getId()));
