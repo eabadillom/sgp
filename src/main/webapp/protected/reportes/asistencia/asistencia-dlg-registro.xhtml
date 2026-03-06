@@ -7,7 +7,11 @@
 			<p:dialog header="Registro de asistencia" widgetVar="dgEditarRegistro" showEffect="fade" modal="true" responsive="true" draggable="true" resizable="false" dynamic="true">
                 <p:outputPanel id="pnl-registro" rendered="#{repAsistenciaBean.registroSelected ne null}">
                 	<div class="ui-fluid formgrid grid">
-                		<div class="field col-4 md:col-1">
+                		
+                		<div class="field col-12 md:col-3">
+                			<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+                		</div>
+                		<div class="field col-4 md:col-2">
 	                		<p:outputLabel value="Buscar" rendered="#{repAsistenciaBean.registroSelected.idRegistro eq null}"/>
 	                		<p:autoComplete value="#{repAsistenciaBean.empleado}" var="e"
 	                						rendered="#{repAsistenciaBean.registroSelected.idRegistro eq null}"
@@ -22,13 +26,43 @@
 								</p:column>
 	                		</p:autoComplete>
                 		</div>
-                		<div class="field col-8 md:col-5">
+                		<div class="field col-8 md:col-4">
                 			<p:outputLabel value="Empleado"></p:outputLabel>
                 			<p:inputText id="txtEmpleado" value="#{repAsistenciaBean.registroSelected.empleado.nombre} #{repAsistenciaBean.registroSelected.empleado.primerAp} #{repAsistenciaBean.registroSelected.empleado.segundoAp}" readonly="true" />
                 		</div>
+                		<div class="field col-12 md:col-3">
+                			<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+                		</div>
+                		
+                		<div class="field col-12 md:col-3">
+                			<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+                		</div>
+                		<div class="field col-6 md:col-3">
+                			<p:selectBooleanButton value="#{repAsistenciaBean.desbloquearDiasDeDescanso}" onIcon="pi pi-lock-open" offIcon="pi pi-lock" onLabel="Días de descanso" offLabel="Días de descanso">
+                				<p:ajax process="@this" event="valueChange" listener="#{repAsistenciaBean.mostrarDiasDeDescanso}"/>
+                			</p:selectBooleanButton>
+                		</div>
+                		<div class="field col-6 md:col-3">
+                			<p:selectBooleanButton value="#{repAsistenciaBean.desbloquearDiasNoLaborales}" onIcon="pi pi-lock-open" offIcon="pi pi-lock" onLabel="Días no laborales" offLabel="Días no laborales">
+                			
+                			</p:selectBooleanButton>
+                		</div>
+                		<div class="field col-12 md:col-3">
+                			<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+                		</div>
+                		
+                		
+                		<div class="field col-12 md:col-3">
+                			<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+                		</div>
                 		<div class="field col-6 md:col-3">
                 			<p:outputLabel value="Fecha" />
-                			<p:datePicker id="fechaRegistro" value="#{repAsistenciaBean.registroSelected.fecha}" pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX" showIcon="true" readonly="#{repAsistenciaBean.registroSelected.idRegistro ne null}" mindate="#{repAsistenciaBean.fechaInicio}" maxdate="#{repAsistenciaBean.fechaFin}" disabledDates="#{repAsistenciaBean.registrosEmpleado}">
+                			<p:datePicker id="fechaRegistro" value="#{repAsistenciaBean.registroSelected.fecha}" pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX"
+                					showIcon="true" readonly="#{repAsistenciaBean.registroSelected.idRegistro ne null}"
+                					mindate="#{repAsistenciaBean.fechaInicio}"
+                					maxdate="#{repAsistenciaBean.fechaFin}"
+                					disabledDates="#{repAsistenciaBean.diasDeshabilitados}"
+                					disabledDays="#{repAsistenciaBean.invalidDays}" >
                 				<p:ajax process="@this" listener="#{repAsistenciaBean.asignarHoraAsistencia}" event="dateSelect" update="form:pnl-registro" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
                 			</p:datePicker>
                 		</div>
@@ -42,12 +76,15 @@
                 		<div class="field col-12 md:col-3">
                 			<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
                 		</div>
+                		<div class="field col-12 md:col-3">
+                			<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+                		</div>
                 		<div class="field col-6 md:col-3">
 	                		<p:outputLabel for="@next" value="Entrada"/>
 	                		 <p:datePicker id="fechaEntrada" value="#{repAsistenciaBean.registroSelected.fechaEntrada}"
 	                        			pattern="dd/MM/yyyy HH:mm:ss" locale="es_MX" timeZone="GMT-6"
 										timeOnly="true" readonlyInput="false"
-										inline="true" timeInput="true" disabledDates="#{repAsistenciaBean.diasDesabilitados}">
+										inline="true" timeInput="true">
 							</p:datePicker>
                 		</div>
                 		<div class="field col-6 md:col-3">
@@ -55,7 +92,7 @@
                 			<p:datePicker id="fechaSalida" value="#{repAsistenciaBean.registroSelected.fechaSalida}"
 	                        			pattern="dd/MM/yyyy HH:mm:ss" locale="es_MX" timeZone="GMT-6"
 										timeOnly="true" readonlyInput="false"
-										inline="true" timeInput="true" disabledDates="#{repAsistenciaBean.diasDesabilitados}">
+										inline="true" timeInput="true">
 							</p:datePicker>
                 		</div>
                 	</div>

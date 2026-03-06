@@ -24,7 +24,7 @@ import org.primefaces.model.DefaultScheduleModel;
 import org.primefaces.model.ScheduleEvent;
 import org.primefaces.model.ScheduleModel;
 
-import mx.com.ferbo.business.dianolaboral.DiasDeDescansoObligatorioBL;
+import mx.com.ferbo.business.dianolaboral.DiasNoLaboralesBL;
 import mx.com.ferbo.business.empleado.EmpleadoBL;
 import mx.com.ferbo.business.empleado.RegistroAsistenciaBL;
 import mx.com.ferbo.business.incidencia.CalendarioBL;
@@ -97,7 +97,7 @@ public class AsistenciaBean implements Serializable {
     private Date periodoSolicitudFin;
     
     public AsistenciaBean() {
-        this.diasDeAsueto = DiasDeDescansoObligatorioBL.diasDeAsueto();
+        this.diasDeAsueto = DiasNoLaboralesBL.diasDeAsueto();
         calendario = new DefaultScheduleModel();
         solicitudPermisoDAO = new SolicitudPermisoDAO();
         tipoSolicitudDAO = new TipoSolicitudDAO();
@@ -286,7 +286,7 @@ public class AsistenciaBean implements Serializable {
 
         try {
             
-            DiasDeDescansoObligatorioBL.diasDescansoEstanActualizados();
+            DiasNoLaboralesBL.diasDescansoEstanActualizados();
             EmpleadoBL.empleadoTieneDiasLaborales(empleadoSelected);
             
             this.inicializaSolicitud();

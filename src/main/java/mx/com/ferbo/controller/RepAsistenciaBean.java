@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -21,6 +22,8 @@ import org.primefaces.PrimeFaces;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 
+import mx.com.ferbo.business.dianolaboral.DiasNoLaboralesBL;
+import mx.com.ferbo.business.incidencia.SolicitudPermisoBL;
 import mx.com.ferbo.business.registro.EstatusRegistroBL;
 import mx.com.ferbo.business.registro.RegistroBL;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
@@ -68,7 +71,12 @@ public class RepAsistenciaBean implements Serializable {
     private String badgeColor;
     private DetRegistro registroSelected;
     private List<CatEstatusRegistro> lstEstatus;
-    private List<Date> diasDesabilitados;
+    private List<Date> diasDeshabilitados;
+    
+    private Boolean desbloquearDiasDeDescanso;
+    private Boolean desbloquearDiasNoLaborales;
+    private List<Date> diasNoLaborales;
+    private List<Integer> invalidDays;
 
     public RepAsistenciaBean() throws SGPSecurityException {
     	DetEmpleado empleadoSesion = null;
@@ -199,8 +207,6 @@ public class RepAsistenciaBean implements Serializable {
     	this.registroSelected = new DetRegistro();
     	this.registroSelected.setStatus(EstatusRegistroBL.estatusJustificado());
     	this.empleado = null;
-    	if(this.registroSelected.getEmpleado() != null)
-    		log.info("nuevo registro -- EmpleadoSelected: {}", this.registroSelected.getEmpleado());
     }
     
     public List<DetEmpleado> buscarEmpleado(String query) {
@@ -236,6 +242,22 @@ public class RepAsistenciaBean implements Serializable {
         	PrimeFaces.current().ajax().update("form:messages");
         }
     }
+    
+    public void mostrarDiasDeDescanso() {
+		if(this.desbloquearDiasDeDescanso.booleanValue()) {
+			this.invalidDays = new ArrayList<Integer>();
+		} else {
+			this.invalidDays = SolicitudPermisoBL.obtenerDiasSeleccionados(this.empleado.getDatoEmpresa());
+		}
+	}
+    
+    public void mostrarDiasLaborales() {
+		if(this.desbloquearDiasNoLaborales.booleanValue()) {
+			this.diasNoLaborales = new ArrayList<Date>();
+		} else {
+			this.diasNoLaborales = DiasNoLaboralesBL.buscarPorPeriodo(new Date(fechaInicio.getTime()), new Date(fechaFin.getTime()));
+		}
+	}
     
     public void asignarHoraAsistencia() {
     	FacesMessage message = null;
@@ -274,50 +296,46 @@ public class RepAsistenciaBean implements Serializable {
     }
 
     public void editarRegistro(DetRegistro registro) {
+    	List<DetRegistro> registrosEmp = null;
+    	final Date diaPermitido;
+    	
     	try {
     		log.info("Cargando información de registro...");
     		this.registroSelected = registro;
+    		this.empleado = this.registroSelected.getEmpleado();
+    		
+    		this.desbloquearDiasDeDescanso = new Boolean(false);
+			this.desbloquearDiasNoLaborales = new Boolean(false);
+			
+			this.mostrarDiasDeDescanso();
+			this.mostrarDiasLaborales();
     		
     		int anio = DateUtil.getAnio(registro.getFechaEntrada());
     		int mes = DateUtil.getMes(registro.getFechaEntrada());
     		int dia = DateUtil.getDia(registro.getFechaEntrada());
-    		
-    		this.registroSelected.setFecha(new Date(this.registroSelected.getFechaEntrada().getTime()));
+    		Date fecha = new Date(this.registroSelected.getFechaEntrada().getTime());
+    		DateUtil.setTime(fecha, 0, 0, 0, 0);
+    		this.registroSelected.setFecha(fecha);
     		
     		DateUtil.setTime(this.registroSelected.getFecha(), 0, 0, 0, 0);
     		
+    		diaPermitido = this.registroSelected.getFecha();
+    		this.diasDeshabilitados = new ArrayList<Date>();
     		
-    		Date diaPermitido = DateUtil.getDateTime(anio, mes, dia, 0, 0, 0, 0);
+    		registrosEmp = RegistroBL.buscarPorEmpleadoPeriodo(this.registroSelected.getEmpleado().getIdEmpleado(), this.fechaInicio, this.fechaFin);
+        	this.registrosEmpleado = RegistroBL.toDateList(registrosEmp);
+        	this.registrosEmpleado.forEach(t -> DateUtil.setTime(t, 0, 0, 0, 0));
     		
-    		this.diasDesabilitados = new ArrayList<Date>();
-    		
-    		int maximoDia = 30;
-    		
-    		if (mes == 1) {
-    			maximoDia = 28;
-    			if (DateUtil.esBisiesto(diaPermitido)) {
-    				maximoDia = 29;
-    			}
-    		}
-    		
-    		if (mes == 0 || mes == 2 || mes == 4 || mes == 6 || mes == 7 || mes == 9 || mes == 11) {
-    			maximoDia = 31;
-    		}
-    		
-    		maximoDia++;
-    		
-    		for (int i = 1; i < maximoDia; i++) {
-    			Date diaNoPermitido = DateUtil.getDateTime(anio, mes, i, 0, 0, 0, 0);
-    			if (diaNoPermitido.compareTo(diaPermitido) != 0) {
-    				this.diasDesabilitados.add(diaNoPermitido);
-    			}
-    		}
+    		this.registrosEmpleado.remove(diaPermitido);
+    		this.diasDeshabilitados.addAll(this.registrosEmpleado);
+    		this.diasDeshabilitados.addAll(this.diasNoLaborales);
     		
     		if (registro.getStatus().getDescripcion().equals("Falta")) {
     			int horaSalida = DateUtil.getHora(registro.getEmpleado().getDatoEmpresa().getHorasalida());
     			Date diaSalida = DateUtil.getDateTime(anio, mes, dia, horaSalida, 0, 0, 0);
     			registro.setFechaSalida(diaSalida);
     		}
+    		log.info("Terminando de cargar la información del registro.");
     	} catch(Exception ex) {
     		log.error("Problema para editar el registro de asistencia...", ex);
     	}
@@ -624,12 +642,12 @@ public class RepAsistenciaBean implements Serializable {
         this.lstEstatus = lstEstatus;
     }
 
-    public List<Date> getDiasDesabilitados() {
-        return diasDesabilitados;
+    public List<Date> getDiasDeshabilitados() {
+        return diasDeshabilitados;
     }
 
-    public void setDiasDesabilitados(List<Date> diasDesabilitados) {
-        this.diasDesabilitados = diasDesabilitados;
+    public void setDiasDeshabilitados(List<Date> diasDeshabilitados) {
+        this.diasDeshabilitados = diasDeshabilitados;
     }
 
 	public DetEmpleado getEmpleado() {
@@ -646,6 +664,38 @@ public class RepAsistenciaBean implements Serializable {
 
 	public void setRegistrosEmpleado(List<Date> registrosEmpleado) {
 		this.registrosEmpleado = registrosEmpleado;
+	}
+
+	public Boolean getDesbloquearDiasDeDescanso() {
+		return desbloquearDiasDeDescanso;
+	}
+
+	public void setDesbloquearDiasDeDescanso(Boolean desbloquearDiasDeDescanso) {
+		this.desbloquearDiasDeDescanso = desbloquearDiasDeDescanso;
+	}
+
+	public Boolean getDesbloquearDiasNoLaborales() {
+		return desbloquearDiasNoLaborales;
+	}
+
+	public void setDesbloquearDiasNoLaborales(Boolean desbloquearDiasNoLaborales) {
+		this.desbloquearDiasNoLaborales = desbloquearDiasNoLaborales;
+	}
+
+	public List<Integer> getInvalidDays() {
+		return invalidDays;
+	}
+
+	public void setInvalidDays(List<Integer> invalidDays) {
+		this.invalidDays = invalidDays;
+	}
+
+	public List<Date> getDiasNoLaborales() {
+		return diasNoLaborales;
+	}
+
+	public void setDiasNoLaborales(List<Date> diasNoLaborales) {
+		this.diasNoLaborales = diasNoLaborales;
 	}
 
 }

@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import mx.com.ferbo.dao.n.DiaNoLaboralDAO;
 import mx.com.ferbo.model.CatDiaNoLaboral;
 import mx.com.ferbo.util.DateUtil;
@@ -15,10 +17,10 @@ import org.apache.logging.log4j.Logger;
  *
  * @author alberto
  */
-public class DiasDeDescansoObligatorioBL implements Serializable {
+public class DiasNoLaboralesBL implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private static Logger log = LogManager.getLogger(DiasDeDescansoObligatorioBL.class);
+    private static Logger log = LogManager.getLogger(DiasNoLaboralesBL.class);
     
     public static List<Date> diasDeAsueto() 
     {
@@ -35,6 +37,27 @@ public class DiasDeDescansoObligatorioBL implements Serializable {
         }
 
         return diasDeAsueto;
+    }
+    
+    public static List<Date> buscarPorPeriodo(Date inicio, Date fin) {
+    	List<Date> diasNoLaborales;
+    	DiaNoLaboralDAO diaNoLaboralDAO = null;
+    	
+    	try {
+    		DateUtil.setTime(inicio, 0, 0, 0, 0);
+    		DateUtil.setTime(fin, 0, 0, 0, 0);
+    		
+    		diaNoLaboralDAO = new DiaNoLaboralDAO();
+    		diasNoLaborales = diaNoLaboralDAO.buscarPorPeriodo("MX", inicio, fin)
+    				.stream()
+    				.map(item -> item.getFecha())
+    				.collect(Collectors.toList());
+    	} catch(Exception ex) {
+    		diasNoLaborales = new ArrayList<Date>();
+    	}
+    	
+    	
+    	return diasNoLaborales;
     }
     
     public static List<CatDiaNoLaboral> diasDescansoAnual() 

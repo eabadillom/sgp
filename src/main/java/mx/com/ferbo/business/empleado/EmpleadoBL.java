@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.business.dianolaboral.DiasDeDescansoObligatorioBL;
+import mx.com.ferbo.business.dianolaboral.DiasNoLaboralesBL;
 import mx.com.ferbo.business.domicilio.DomicilioBL;
 import mx.com.ferbo.dao.n.BiometricoDAO;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
@@ -377,7 +377,7 @@ public class EmpleadoBL {
 
     public static boolean empleadoAsisteEnDiaDescanso(DetEmpleado empleado) {
         
-        List<CatDiaNoLaboral> diasDescanso = DiasDeDescansoObligatorioBL.diasDescansoAnual();
+        List<CatDiaNoLaboral> diasDescanso = DiasNoLaboralesBL.diasDescansoAnual();
         List<String> diasLaboralesEmpleado = new ArrayList<String>();
         String diaLaborando = DateUtil.getDiaSemana(DateUtil.now());
         Date hoy = DateUtil.now();

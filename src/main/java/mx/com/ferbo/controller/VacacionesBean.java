@@ -19,7 +19,7 @@ import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.SelectEvent;
 
-import mx.com.ferbo.business.dianolaboral.DiasDeDescansoObligatorioBL;
+import mx.com.ferbo.business.dianolaboral.DiasNoLaboralesBL;
 import mx.com.ferbo.business.empleado.EmpleadoBL;
 import mx.com.ferbo.business.incidencia.IncidenciaBL;
 import mx.com.ferbo.business.incidencia.SolicitudPermisoBL;
@@ -75,7 +75,7 @@ public class VacacionesBean implements Serializable {
 		this.empleadoDAO = new EmpleadoDAO();
 		this.empleado = (DetEmpleado) request.getSession(false).getAttribute("empleado");
 		this.empleado = this.empleadoDAO.buscarPorId(this.empleado.getIdEmpleado());
-		this.diasDeAsueto = DiasDeDescansoObligatorioBL.diasDeAsueto();
+		this.diasDeAsueto = DiasNoLaboralesBL.diasDeAsueto();
 		this.invalidDays = SolicitudPermisoBL.obtenerDiasSeleccionados(empleado.getDatoEmpresa());
 		this.periodoInicio = DateUtil.addMonth(new Date(), -1);
 		this.periodoFin    = DateUtil.addMonth(new Date(),  1);
@@ -118,7 +118,7 @@ public class VacacionesBean implements Serializable {
         
 		try {
 			this.permiso = IncidenciaBL.create(IncidenciaBL.TP_VACACIONES, this.empleado);
-			DiasDeDescansoObligatorioBL.diasDescansoEstanActualizados();
+			DiasNoLaboralesBL.diasDescansoEstanActualizados();
             EmpleadoBL.empleadoTieneDiasLaborales(this.empleado);
             this.periodosVacacionales = VacacionesBL.cargarPeriodosConSaldo(this.empleado.getIdEmpleado(), DateUtil.now());
             this.periodoVacacional = null;
@@ -227,7 +227,7 @@ public class VacacionesBean implements Serializable {
 		if(this.desbloquearDiasNoLaborales.booleanValue()) {
 			this.diasDeAsueto = new ArrayList<Date>();
 		} else {
-			this.diasDeAsueto = DiasDeDescansoObligatorioBL.diasDeAsueto();
+			this.diasDeAsueto = DiasNoLaboralesBL.diasDeAsueto();
 		}
 	}
 	
