@@ -17,7 +17,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
-import mx.com.ferbo.business.dianolaboral.DiasDeDescansoObligatorioBL;
+import mx.com.ferbo.business.dianolaboral.DiasNoLaboralesBL;
 import mx.com.ferbo.business.incapacidad.IncapacidadBL;
 import mx.com.ferbo.business.incidencia.SolicitudPermisoBL;
 import mx.com.ferbo.business.registro.RegistroBL;
@@ -343,7 +343,7 @@ public class IncapacidadIMSSBean implements Serializable
             
             if(riesgoTrabajoDefuncion == false)
                 //Guarda el registro de incapacidad en asistencia
-                RegistroBL.guardarRegistroIncapacidad(this.incapacidad, this.incapacidad.getFechaInicio(), this.incapacidad.getFechaFin(), DiasDeDescansoObligatorioBL.diasDeAsueto());
+                RegistroBL.guardarRegistroIncapacidad(this.incapacidad, this.incapacidad.getFechaInicio(), this.incapacidad.getFechaFin(), DiasNoLaboralesBL.diasDeAsueto());
             
             this.registroIncapacidadDAO.guardar(this.incapacidad);
             
@@ -651,7 +651,7 @@ public class IncapacidadIMSSBean implements Serializable
         {
             Date auxFecha = DateUtil.moverFechaUnDiaAdelante(auxiliarFecha);
             log.info("Fecha inicial: {} y Fecha final: {}", auxFecha, fechaFin);
-            RegistroBL.guardarRegistroIncapacidad(null, auxFecha, fechaFin, DiasDeDescansoObligatorioBL.diasDeAsueto());
+            RegistroBL.guardarRegistroIncapacidad(null, auxFecha, fechaFin, DiasNoLaboralesBL.diasDeAsueto());
         }
         
         if(incapacidad.getDiasAutorizados() < primerosDiasIncapacidad)
