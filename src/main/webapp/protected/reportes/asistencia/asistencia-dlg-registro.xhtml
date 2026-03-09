@@ -12,9 +12,8 @@
                 			<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
                 		</div>
                 		<div class="field col-4 md:col-2">
-	                		<p:outputLabel value="Buscar" rendered="#{repAsistenciaBean.registroSelected.idRegistro eq null}"/>
+	                		<p:outputLabel value="#{repAsistenciaBean.registroSelected.idRegistro eq null ? 'Buscar' : 'Número'}" />
 	                		<p:autoComplete value="#{repAsistenciaBean.empleado}" var="e"
-	                						rendered="#{repAsistenciaBean.registroSelected.idRegistro eq null}"
 	                						itemLabel="#{e.numEmpleado}"
 	                						itemValue="#{e}" converter="entityConverter"
 	                						completeMethod="#{repAsistenciaBean.buscarEmpleado}"
