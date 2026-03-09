@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import mx.com.ferbo.business.dianolaboral.DiasDeDescansoObligatorioBL;
+import mx.com.ferbo.business.dianolaboral.DiasNoLaboralesBL;
 import mx.com.ferbo.business.empleado.EmpleadoBL;
 import mx.com.ferbo.business.incidencia.SolicitudPermisoBL;
 import mx.com.ferbo.dao.n.EstatusRegistroDAO;
@@ -126,7 +126,7 @@ public class RegistroBL implements Serializable
 		DateUtil.setTime(fechaFin, horaSalida, 0, 0, 0);
 
 		List<Date> listaFechasAsistencia = DateUtil.generarArreglosFechas(fechaInicio, fechaFin);
-		listaFechasAsistencia = DateUtil.diasVacacionesSolicitados(listaFechasAsistencia, DiasDeDescansoObligatorioBL.diasDeAsueto(), empleado.getDatoEmpresa());
+		listaFechasAsistencia = DateUtil.diasVacacionesSolicitados(listaFechasAsistencia, DiasNoLaboralesBL.diasDeAsueto(), empleado.getDatoEmpresa());
 		int totalFechasIncapacidades = listaFechasAsistencia.size();
 
 		List<DetRegistro> listaRegistroAsistencia = registroDAO.buscarPorEmpPeriodoSolicitud(empleado.getIdEmpleado(), clave, fechaInicio, fechaFin);
