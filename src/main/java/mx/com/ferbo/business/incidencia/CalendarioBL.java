@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 
-import mx.com.ferbo.business.dianolaboral.DiasDeDescansoObligatorioBL;
+import mx.com.ferbo.business.dianolaboral.DiasNoLaboralesBL;
 import mx.com.ferbo.dao.n.RegistroDAO;
 import mx.com.ferbo.model.CatDiaNoLaboral;
 import mx.com.ferbo.model.CatEstatusRegistro;
@@ -62,7 +62,7 @@ public class CalendarioBL implements Serializable
         
         ScheduleModel calendario = new DefaultScheduleModel();
         
-        for(DefaultScheduleEvent auxEventDiasDescansoObligatorio : generaEventosDiasDescansoObligatorio(DiasDeDescansoObligatorioBL.diasDescansoAnual()))
+        for(DefaultScheduleEvent auxEventDiasDescansoObligatorio : generaEventosDiasDescansoObligatorio(DiasNoLaboralesBL.diasDescansoAnual()))
         {
             calendario.addEvent(auxEventDiasDescansoObligatorio);
         }

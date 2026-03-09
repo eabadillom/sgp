@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import mx.com.ferbo.business.dianolaboral.DiasDeDescansoObligatorioBL;
+import mx.com.ferbo.business.dianolaboral.DiasNoLaboralesBL;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -328,7 +328,7 @@ public class IncidenciaBL implements Serializable
         incidencia.getSolPermiso().setEmpleadoRev(autorizador);
 
         if (incidencia.getEstatusIncidencia().getClave().trim().matches(ST_APROBADA)) {
-            RegistroBL.guardarRegistroVacaciones(incidencia, DiasDeDescansoObligatorioBL.diasDeAsueto());
+            RegistroBL.guardarRegistroVacaciones(incidencia, DiasNoLaboralesBL.diasDeAsueto());
         }
 
         incidenciaDAO.actualizar(incidencia);

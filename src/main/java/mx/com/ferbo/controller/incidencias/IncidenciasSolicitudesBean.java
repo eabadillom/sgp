@@ -9,7 +9,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
-import mx.com.ferbo.business.dianolaboral.DiasDeDescansoObligatorioBL;
+import mx.com.ferbo.business.dianolaboral.DiasNoLaboralesBL;
 import mx.com.ferbo.business.empleado.EmpleadoBL;
 import mx.com.ferbo.business.incidencia.IncidenciaBL;
 import mx.com.ferbo.dao.n.IncidenciaDAO;
@@ -123,7 +123,7 @@ public class IncidenciasSolicitudesBean implements Serializable
                     }
                     this.invalidDays = IncidenciaBL.obtenerDiasSeleccionados(empleadoSelected.getDatoEmpresa());
                     fechas = IncidenciaBL.fechasSolicitudPermiso(incidenciaSelected.getSolPermiso());
-                    this.diasDeVacaciones = DateUtil.diasVacacionesSolicitados(fechas, DiasDeDescansoObligatorioBL.diasDeAsueto(), empleadoSelected.getDatoEmpresa());
+                    this.diasDeVacaciones = DateUtil.diasVacacionesSolicitados(fechas, DiasNoLaboralesBL.diasDeAsueto(), empleadoSelected.getDatoEmpresa());
                     log.info("Dias Solicitados: {}", this.diasDeVacaciones.toString());
                     this.diasVacacionesSolicitados = this.diasDeVacaciones.size();
                     log.info("Total Dias de Vacaciones Solicitados: {}", this.diasVacacionesSolicitados);
