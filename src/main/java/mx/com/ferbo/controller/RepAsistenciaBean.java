@@ -275,8 +275,12 @@ public class RepAsistenciaBean implements Serializable {
     		this.diasDeshabilitados = new ArrayList<Date>();
     	
     	this.diasDeshabilitados.clear();
-    	this.diasDeshabilitados.addAll(this.diasNoLaborales);
-    	this.diasDeshabilitados.addAll(this.registrosEmpleado);
+    	
+    	if(this.diasNoLaborales != null)
+    		this.diasDeshabilitados.addAll(this.diasNoLaborales);
+    	
+    	if(this.registrosEmpleado != null)
+    		this.diasDeshabilitados.addAll(this.registrosEmpleado);
     }
     
     public void asignarHoraAsistencia() {
