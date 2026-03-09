@@ -249,10 +249,10 @@ public class RepAsistenciaBean implements Serializable {
     
     public void mostrarDiasDeDescanso() {
 		if(this.desbloquearDiasDeDescanso.booleanValue()) {
-			log.info("Ocultar días de descanso...");
+			log.debug("Ocultar días de descanso...");
 			this.invalidDays = new ArrayList<Integer>();
 		} else {
-			log.info("Mostrar días de descanso...");
+			log.debug("Mostrar días de descanso...");
 			this.invalidDays = SolicitudPermisoBL.obtenerDiasSeleccionados(this.empleado.getDatoEmpresa());
 			log.info("Días de descanso: {}", this.invalidDays);
 		}
@@ -260,10 +260,10 @@ public class RepAsistenciaBean implements Serializable {
     
     public void mostrarDiasLaborales() {
 		if(this.desbloquearDiasNoLaborales.booleanValue()) {
-			log.info("Ocultar días dias no laborales...");
+			log.debug("Ocultar días dias no laborales...");
 			this.diasNoLaborales = new ArrayList<Date>();
 		} else {
-			log.info("Mostrar días no laborales...");
+			log.debug("Mostrar días no laborales...");
 			this.diasNoLaborales = DiasNoLaboralesBL.buscarPorPeriodo(new Date(fechaInicio.getTime()), new Date(fechaFin.getTime()));
 			log.info("Días no laborales: {}", this.diasNoLaborales);
 		}
