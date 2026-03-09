@@ -5,7 +5,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -207,6 +206,8 @@ public class RepAsistenciaBean implements Serializable {
     	this.registroSelected = new DetRegistro();
     	this.registroSelected.setStatus(EstatusRegistroBL.estatusJustificado());
     	this.empleado = null;
+    	this.desbloquearDiasDeDescanso = Boolean.FALSE;
+    	this.desbloquearDiasNoLaborales = Boolean.FALSE;
     }
     
     public List<DetEmpleado> buscarEmpleado(String query) {
@@ -235,6 +236,9 @@ public class RepAsistenciaBean implements Serializable {
         	registrosEmp = RegistroBL.buscarPorEmpleadoPeriodo(this.empleado.getIdEmpleado(), this.fechaInicio, this.fechaFin);
         	this.registrosEmpleado = RegistroBL.toDateList(registrosEmp);
         	
+        	this.mostrarDiasLaborales();
+        	this.mostrarDiasDeDescanso();
+        	
         } catch(Exception ex) {
         	log.warn("Problema para asignar al empleado: {}", ex.getMessage());
         	this.registrosEmpleado = new ArrayList<Date>();
@@ -245,19 +249,35 @@ public class RepAsistenciaBean implements Serializable {
     
     public void mostrarDiasDeDescanso() {
 		if(this.desbloquearDiasDeDescanso.booleanValue()) {
+			log.info("Ocultar días de descanso...");
 			this.invalidDays = new ArrayList<Integer>();
 		} else {
+			log.info("Mostrar días de descanso...");
 			this.invalidDays = SolicitudPermisoBL.obtenerDiasSeleccionados(this.empleado.getDatoEmpresa());
+			log.info("Días de descanso: {}", this.invalidDays);
 		}
 	}
     
     public void mostrarDiasLaborales() {
 		if(this.desbloquearDiasNoLaborales.booleanValue()) {
+			log.info("Ocultar días dias no laborales...");
 			this.diasNoLaborales = new ArrayList<Date>();
 		} else {
+			log.info("Mostrar días no laborales...");
 			this.diasNoLaborales = DiasNoLaboralesBL.buscarPorPeriodo(new Date(fechaInicio.getTime()), new Date(fechaFin.getTime()));
+			log.info("Días no laborales: {}", this.diasNoLaborales);
 		}
+		this.actualizarPeriodo();
 	}
+    
+    public void actualizarPeriodo() {
+    	if(this.diasDeshabilitados == null)
+    		this.diasDeshabilitados = new ArrayList<Date>();
+    	
+    	this.diasDeshabilitados.clear();
+    	this.diasDeshabilitados.addAll(this.diasNoLaborales);
+    	this.diasDeshabilitados.addAll(this.registrosEmpleado);
+    }
     
     public void asignarHoraAsistencia() {
     	FacesMessage message = null;
