@@ -13,6 +13,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.bouncycastle.util.Objects;
+
 /**
  *
  * @author Gabo
@@ -46,6 +48,30 @@ public class CatEstatusIncidencia implements Serializable {
     
     @OneToMany(mappedBy = "estatusIncidencia")
     private List<DetIncidencia> detIncidenciaList;
+    
+    @Override
+    public int hashCode() {
+    	if(this.idEstatus == null)
+    		return System.identityHashCode(this);
+    	return Objects.hashCode(this.idEstatus);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof CatEstatusIncidencia))
+            return false;
+        
+        CatEstatusIncidencia other = (CatEstatusIncidencia) object;
+        if ((this.idEstatus == null && other.idEstatus != null) || (this.idEstatus != null && !this.idEstatus.equals(other.idEstatus)))
+            return false;
+        
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "CatEstatusIncidencia[" + "idEstatus=" + idEstatus + ", descripcion=" + descripcion + ", clave=" + clave + ']';
+    }
 
     public CatEstatusIncidencia() {
     }
@@ -99,30 +125,4 @@ public class CatEstatusIncidencia implements Serializable {
     public void setDetIncidenciaList(List<DetIncidencia> detIncidenciaList) {
         this.detIncidenciaList = detIncidenciaList;
     }
-
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (idEstatus != null ? idEstatus.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof CatEstatusIncidencia)) {
-            return false;
-        }
-        CatEstatusIncidencia other = (CatEstatusIncidencia) object;
-        if ((this.idEstatus == null && other.idEstatus != null) || (this.idEstatus != null && !this.idEstatus.equals(other.idEstatus))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "CatEstatusIncidencia[" + "idEstatus=" + idEstatus + ", descripcion=" + descripcion + ", clave=" + clave + ']';
-    }
-    
 }

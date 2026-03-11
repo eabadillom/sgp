@@ -18,7 +18,7 @@ import org.primefaces.PrimeFaces;
 
 import mx.com.ferbo.business.incidencia.IncidenciaBL;
 import mx.com.ferbo.business.incidencia.SolicitudPermisoBL;
-import mx.com.ferbo.dao.n.IncidenciaDAO;
+import mx.com.ferbo.dao.n.IncidenciaPermisoDAO;
 import mx.com.ferbo.dao.n.TipoSolicitudDAO;
 import mx.com.ferbo.model.CatTipoSolicitud;
 import mx.com.ferbo.model.DetEmpleado;
@@ -42,7 +42,7 @@ public class PermisosBean implements Serializable {
 	private Date minDate;
 	private List<DetIncidencia> permisos;
 	private DetIncidencia permiso;
-	private IncidenciaDAO incidenciaDAO;
+	private IncidenciaPermisoDAO incidenciaDAO;
 	private CatTipoSolicitud tipoSolicitud;
 	private TipoSolicitudDAO tipoSolicitudDAO;
 	private Boolean mostrarCanceladas;
@@ -54,7 +54,7 @@ public class PermisosBean implements Serializable {
 		this.empleado = (DetEmpleado) this.request.getSession(false).getAttribute("empleado");
 		this.periodoInicio = DateUtil.addMonth(new Date(), -1);
 		this.periodoFin    = DateUtil.addMonth(new Date(),  1);
-		this.incidenciaDAO = new IncidenciaDAO();
+		this.incidenciaDAO = new IncidenciaPermisoDAO();
 		this.tipoSolicitudDAO = new TipoSolicitudDAO();
 		this.tipoSolicitud = this.tipoSolicitudDAO.buscarPorClave(SolicitudPermisoBL.TP_PERMISO)
 				.orElseThrow(() -> new SGPException("Tipo de solicitud no encontrada"));
