@@ -2,6 +2,8 @@ package mx.com.ferbo.model;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -40,6 +42,38 @@ public class CatTipoIncidencia implements Serializable {
     
     @OneToMany(mappedBy = "tipoIncidencia")
     private List<DetIncidencia> detIncidenciaList;
+    
+    @Override
+    public int hashCode() {
+    	if(this.idTipo == null)
+    		return System.identityHashCode(this);
+    	return Objects.hashCode(this.idTipo);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+    	if(object == null)
+    		return false;
+    	
+        if ((object instanceof CatTipoIncidencia) == false)
+            return false;
+        
+        CatTipoIncidencia other = (CatTipoIncidencia) object;
+        
+        if ((this.idTipo == null && other.idTipo != null) || (this.idTipo != null && !this.idTipo.equals(other.idTipo))) {
+            return false;
+        }
+        
+        if(this.hashCode() != other.hashCode())
+    		return false;
+        
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "CatTipoIncidencia[" + "idTipo=" + idTipo + ", descripcion=" + descripcion + ", clave=" + clave + ']';
+    }
 
     public CatTipoIncidencia() {
     }
@@ -79,30 +113,4 @@ public class CatTipoIncidencia implements Serializable {
     public void setDetIncidenciaList(List<DetIncidencia> detIncidenciaList) {
         this.detIncidenciaList = detIncidenciaList;
     }
-
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (idTipo != null ? idTipo.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof CatTipoIncidencia)) {
-            return false;
-        }
-        CatTipoIncidencia other = (CatTipoIncidencia) object;
-        if ((this.idTipo == null && other.idTipo != null) || (this.idTipo != null && !this.idTipo.equals(other.idTipo))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "CatTipoIncidencia[" + "idTipo=" + idTipo + ", descripcion=" + descripcion + ", clave=" + clave + ']';
-    }
-    
 }

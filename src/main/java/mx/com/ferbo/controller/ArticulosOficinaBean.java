@@ -137,7 +137,7 @@ public class ArticulosOficinaBean implements Serializable {
 
                 incidencia.setTipoIncidencia(catTipoIncidencia);
                 incidencia.setEmpleado(empleadoSelected);
-                incidencia.setEstatusIncidencia(EstatusIncidenciaBL.estatusEnviado());
+                incidencia.setEstatusIncidencia(EstatusIncidenciaBL.enviado());
                 incidencia.setVisible((short) 1);
                 incidencia.setSolArticulo(solicitudArticulo);
                 incidencia.setFechaCap(new Date());
@@ -195,7 +195,7 @@ public class ArticulosOficinaBean implements Serializable {
             }
             
             solicitud.setEstatus(EstatusSolicitudBL.estatusCancelado());
-            incidencia.setEstatusIncidencia(EstatusIncidenciaBL.estatusCancelado());
+            incidencia.setEstatusIncidencia(EstatusIncidenciaBL.cancelado());
             incidencia.setSolArticulo(solicitud);
             incidenciaDAO.actualizar(incidencia);                    
             

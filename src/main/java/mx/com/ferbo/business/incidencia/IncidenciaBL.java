@@ -18,6 +18,7 @@ import mx.com.ferbo.business.incapacidad.IncapacidadBL;
 import mx.com.ferbo.business.notifmovil.NotifMovilBL;
 import mx.com.ferbo.business.registro.RegistroBL;
 import mx.com.ferbo.business.sgpapiclient.SGPApiClientBL;
+import mx.com.ferbo.dao.n.EstatusIncidenciaDAO;
 import mx.com.ferbo.dao.n.IncidenciaDAO;
 import mx.com.ferbo.dao.n.RegistroVacacionesDAO;
 import mx.com.ferbo.dao.n.TipoIncidenciaDAO;
@@ -46,16 +47,17 @@ public class IncidenciaBL implements Serializable
     private static final long serialVersionUID = 1L;
     private static final Logger log = LogManager.getLogger(IncidenciaBL.class);
     
-    public static final String TP_PERMISO = "PE";
-    public static final String TP_VACACIONES = "V";
-    public static final String TP_PRENDA = "PR";
-    public static final String TP_ARTICULO = "A";
+    public static final String TP_PERMISO    = TipoIncidenciaBL.TP_PERMISO;
+    public static final String TP_VACACIONES = TipoIncidenciaBL.TP_VACACIONES;
+    public static final String TP_PRENDA     = TipoIncidenciaBL.TP_PRENDA;
+    public static final String TP_ARTICULO   = TipoIncidenciaBL.TP_ARTICULO;
     
-    public static final String ST_ENVIADA = "E";
-    public static final String ST_APROBADA = "A";
-    public static final String ST_RECHAZADA = "R";
-    public static final String ST_CANCELADA = "C";
+    public static final String ST_ENVIADA    = EstatusIncidenciaBL.ST_ENVIADA;
+    public static final String ST_APROBADA   = EstatusIncidenciaBL.ST_APROBADA;
+    public static final String ST_RECHAZADA  = EstatusIncidenciaBL.ST_RECHAZADA;
+    public static final String ST_CANCELADA  = EstatusIncidenciaBL.ST_CANCELADA;
     
+    @Deprecated
     public static List<Date> fechasSolicitudPermiso(DetSolicitudPermiso auxSolicitudPermiso)
     {
         Date fechaInicio = auxSolicitudPermiso.getFechaInicio();
@@ -106,7 +108,7 @@ public class IncidenciaBL implements Serializable
     			.orElseThrow(() -> new SGPException("Tipo de incidencia no encontrada."));
     	incidencia.setTipoIncidencia(tipoIncidencia);
     	incidencia.setEmpleado(empleado);
-    	incidencia.setEstatusIncidencia(EstatusIncidenciaBL.estatusEnviado());
+    	incidencia.setEstatusIncidencia(EstatusIncidenciaBL.enviado());
     	incidencia.setVisible((short) 1);
     	incidencia.setFechaCap(new Date());
     	
@@ -319,7 +321,7 @@ public class IncidenciaBL implements Serializable
             .map(BigDecimal::new)
             .orElse(BigDecimal.ZERO);
 
-        incidencia.setEstatusIncidencia(EstatusIncidenciaBL.estatusAprobado());
+        incidencia.setEstatusIncidencia(EstatusIncidenciaBL.aprobado());
         incidencia.getSolPermiso().setEstatus(EstatusSolicitudBL.estatusAprobado());
         incidencia.getSolPermiso().setGoceSueldo(valor);
         incidencia.setEmpleadoRev(autorizador);
@@ -338,7 +340,7 @@ public class IncidenciaBL implements Serializable
     {
         IncidenciaDAO incidenciaDAO = new IncidenciaDAO();
         
-        incidencia.setEstatusIncidencia(EstatusIncidenciaBL.estatusRechazado());
+        incidencia.setEstatusIncidencia(EstatusIncidenciaBL.rechazado());
         incidencia.setEmpleadoRev(empleadoRev);
         incidencia.setFechaMod(new Date());
         incidencia.getSolPermiso().setFechaMod(new Date());
@@ -354,7 +356,7 @@ public class IncidenciaBL implements Serializable
         IncidenciaDAO incidenciaDAO = new IncidenciaDAO();
         
         incidencia.setEmpleadoRev(new DetEmpleado(empleadoRev.getIdEmpleado()));
-        incidencia.setEstatusIncidencia(EstatusIncidenciaBL.estatusCancelado());
+        incidencia.setEstatusIncidencia(EstatusIncidenciaBL.cancelado());
         incidencia.setFechaMod(new Date());
         incidencia.getSolPermiso().setEstatus(EstatusSolicitudBL.estatusCancelado());
         incidencia.getSolPermiso().setFechaMod(new Date());
@@ -405,7 +407,7 @@ public class IncidenciaBL implements Serializable
         FacesUtils.requireNonNull(incidencia, "Error al actualizar la incidencia");
         FacesUtils.requireNonNull(empleado, "Error al actualizar la incidencia");
         
-        CatEstatusIncidencia estatusInc = aprobado ? EstatusIncidenciaBL.estatusAprobado() : EstatusIncidenciaBL.estatusRechazado();
+        CatEstatusIncidencia estatusInc = aprobado ? EstatusIncidenciaBL.aprobado() : EstatusIncidenciaBL.rechazado();
         
         incidencia.setEstatusIncidencia(estatusInc);
         incidencia.setFechaMod(new Date());
@@ -437,5 +439,4 @@ public class IncidenciaBL implements Serializable
         solicitud.setFechaMod(new Date());
         solicitud.setEmpleadoRev(emp);
     }
-    
 }
