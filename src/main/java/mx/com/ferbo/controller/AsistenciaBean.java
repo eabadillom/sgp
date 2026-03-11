@@ -250,7 +250,7 @@ public class AsistenciaBean implements Serializable {
             
             solicitudSelected.setEstatus(EstatusSolicitudBL.estatusCancelado());
             incidencia = this.incidenciaDAO.buscarPorPermiso(empleadoSelected.getIdEmpleado(), solicitudSelected.getIdSolicitud());
-            incidencia.setEstatusIncidencia(EstatusIncidenciaBL.estatusCancelado());
+            incidencia.setEstatusIncidencia(EstatusIncidenciaBL.cancelado());
             incidencia.setSolPermiso(solicitudSelected);
             incidenciaDAO.actualizar(incidencia);
             

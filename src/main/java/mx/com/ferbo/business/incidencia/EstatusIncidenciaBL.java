@@ -6,17 +6,18 @@ import java.util.List;
 import mx.com.ferbo.dao.n.EstatusIncidenciaDAO;
 import mx.com.ferbo.model.CatEstatusIncidencia;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 /**
  *
  * @author alberto
  */
 public class EstatusIncidenciaBL implements Serializable
 {
-    private static final Logger log = LogManager.getLogger(EstatusIncidenciaBL.class);
     private static final long serialVersionUID = 1L;
+    
+    public static final String ST_ENVIADA    = "E";
+    public static final String ST_APROBADA   = "A";
+    public static final String ST_RECHAZADA  = "R";
+    public static final String ST_CANCELADA  = "C";
     
     public static List<CatEstatusIncidencia> buscarTodos()
     {
@@ -25,33 +26,33 @@ public class EstatusIncidenciaBL implements Serializable
         return listEstatusIncidencia;
     }
     
-    public static CatEstatusIncidencia estatusEnviado()
+    public static CatEstatusIncidencia enviado()
     {
-        String enviado = "E";
+        String enviado = ST_ENVIADA;
         EstatusIncidenciaDAO estatusIncidenciaDAO = new EstatusIncidenciaDAO();
         CatEstatusIncidencia estatusEnviado = estatusIncidenciaDAO.buscarPorClave(enviado);
         return estatusEnviado;
     }
     
-    public static CatEstatusIncidencia estatusAprobado()
+    public static CatEstatusIncidencia aprobado()
     {
-        String aprobado = "A";
+        String aprobado = ST_APROBADA;
         EstatusIncidenciaDAO estatusIncidenciaDAO = new EstatusIncidenciaDAO();
         CatEstatusIncidencia estatusAprobado = estatusIncidenciaDAO.buscarPorClave(aprobado);
         return estatusAprobado;
     }
     
-    public static CatEstatusIncidencia estatusRechazado()
+    public static CatEstatusIncidencia rechazado()
     {
-        String rechazado = "R";
+        String rechazado = ST_RECHAZADA;
         EstatusIncidenciaDAO estatusIncidenciaDAO = new EstatusIncidenciaDAO();
         CatEstatusIncidencia estatusRechazado = estatusIncidenciaDAO.buscarPorClave(rechazado);
         return estatusRechazado;
     }
     
-    public static CatEstatusIncidencia estatusCancelado()
+    public static CatEstatusIncidencia cancelado()
     {
-        String cancelado = "C";
+        String cancelado = ST_CANCELADA;
         EstatusIncidenciaDAO estatusIncidenciaDAO = new EstatusIncidenciaDAO();
         CatEstatusIncidencia estatusCancelado = estatusIncidenciaDAO.buscarPorClave(cancelado);
         return estatusCancelado;
