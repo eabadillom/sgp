@@ -179,7 +179,7 @@ public class UniformesBean implements Serializable {
                 
                 incidencia.setTipoIncidencia(catTipoIncidencia);
                 incidencia.setEmpleado(empleadoSelected);
-                incidencia.setEstatusIncidencia(EstatusIncidenciaBL.estatusEnviado());
+                incidencia.setEstatusIncidencia(EstatusIncidenciaBL.enviado());
                 incidencia.setVisible((short) 1);
                 incidencia.setSolPrenda(detSolicitudPrenda);
                 incidencia.setFechaCap(new Date());
@@ -237,7 +237,7 @@ public class UniformesBean implements Serializable {
             
             solicitud.setEstatus(EstatusSolicitudBL.estatusCancelado());
             incidencia.setSolPrenda(solicitud);
-            incidencia.setEstatusIncidencia(EstatusIncidenciaBL.estatusCancelado());
+            incidencia.setEstatusIncidencia(EstatusIncidenciaBL.cancelado());
             incidenciaDAO.actualizar(incidencia);
             actualizarListas();
             mensaje = "Se actualizo la solicitud correctamente";

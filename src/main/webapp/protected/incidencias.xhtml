@@ -24,7 +24,7 @@
                 <div class="grid ui-fluid" style="gap:1rem;">
                     <div class="p-col-6 p-md-3">
                         <div class="field">
-                            <p:outputLabel for="@next" value="Inicio" />
+                            <p:outputLabel for="@next" value="Del" />
                             <p:datePicker value="#{incidenciaBean.fechaInicio}" showIcon="true" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy" style="width:100%" >
                                 <p:ajax update="tabViewI" process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" listener="#{incidenciaBean.onFechaChange}"/>
                             </p:datePicker>
@@ -32,7 +32,7 @@
                     </div>
                     <div class="p-col-6 p-md-3">
                         <div class="field">
-                            <p:outputLabel for="@next" value="Fin" />
+                            <p:outputLabel for="@next" value="al" />
                             <p:datePicker value="#{incidenciaBean.fechaFin}" showIcon="true" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy" style="width:100%" >
                                 <p:ajax update="tabViewI" process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" listener="#{incidenciaBean.onFechaChange}"/>
                             </p:datePicker>
@@ -40,13 +40,16 @@
                     </div>
                 </div>
             </p:panel>
+            
+            <p:spacer style="height: 1rem;"/>
+            
             <p:tabView id="tabViewI" widgetVar="tvIncidencias" dynamic="true" cache="false" activeIndex="#{ingresoBean.activeTabIndex}" >
             	<p:ajax event="tabChange" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" listener="#{incidenciaBean.onTabChange}" update="@this" />
                 <p:tab title="Retardos" id="tabRetardos">
                     <ui:include src="/protected/seccionesIncidencias/incidenciaRegistro.xhtml" />
                 </p:tab>
                 <p:tab title="Vacaciones / permisos" id="tabPermisos">
-                    <ui:include src="/protected/seccionesIncidencias/incidencia.xhtml" />
+                    <ui:include src="/protected/seccionesIncidencias/incidenciaPermisos.xhtml" />
                 </p:tab>
                 <p:tab title="Solicitudes de uniformes" id="tabUniformes">
                     <ui:include src="/protected/seccionesIncidencias/incidenciaPrendas.xhtml" />

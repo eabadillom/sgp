@@ -22,12 +22,12 @@ import org.primefaces.event.SelectEvent;
 import mx.com.ferbo.business.dianolaboral.DiasNoLaboralesBL;
 import mx.com.ferbo.business.empleado.EmpleadoBL;
 import mx.com.ferbo.business.incidencia.IncidenciaBL;
+import mx.com.ferbo.business.incidencia.IncidenciaVacacionesBL;
 import mx.com.ferbo.business.incidencia.SolicitudPermisoBL;
 import mx.com.ferbo.business.vacaciones.VacacionesBL;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
-import mx.com.ferbo.dao.n.IncidenciaDAO;
+import mx.com.ferbo.dao.n.IncidenciaPermisoDAO;
 import mx.com.ferbo.dao.n.TipoSolicitudDAO;
-import mx.com.ferbo.dao.n.VacacionesDAO;
 import mx.com.ferbo.model.CatTipoSolicitud;
 import mx.com.ferbo.model.DetDiaPermiso;
 import mx.com.ferbo.model.DetEmpleado;
@@ -53,13 +53,12 @@ public class VacacionesBean implements Serializable {
 	private Date minDate;
 	private List<DetIncidencia> permisos;
 	private DetIncidencia permiso;
-	private IncidenciaDAO incidenciaDAO;
+	private IncidenciaPermisoDAO incidenciaDAO;
 	private CatTipoSolicitud tipoSolicitud;
 	private TipoSolicitudDAO tipoSolicitudDAO;
 	private List<DetVacaciones> periodosVacacionales;
 	private DetVacaciones periodoVacacional;
 	private Integer diasTotalesPermitidos = 0;
-	private VacacionesDAO vacacionesDAO = null;
 	private List<Date> diasSolicitados;
 	
 	private List<Integer> invalidDays;
@@ -79,13 +78,12 @@ public class VacacionesBean implements Serializable {
 		this.invalidDays = SolicitudPermisoBL.obtenerDiasSeleccionados(empleado.getDatoEmpresa());
 		this.periodoInicio = DateUtil.addMonth(new Date(), -1);
 		this.periodoFin    = DateUtil.addMonth(new Date(),  1);
-		this.incidenciaDAO = new IncidenciaDAO();
+		this.incidenciaDAO = new IncidenciaPermisoDAO();
 		this.tipoSolicitudDAO = new TipoSolicitudDAO();
 		this.tipoSolicitud = this.tipoSolicitudDAO.buscarPorClave(SolicitudPermisoBL.TP_PERMISO)
 				.orElseThrow(() -> new SGPException("Tipo de solicitud no encontrada"));
 		this.minDate = DateUtil.addDay(DateUtil.now(), -7);
 		this.status = new ManageStatus();
-		this.vacacionesDAO = new VacacionesDAO();
 		this.mostrarCanceladas = Boolean.FALSE;
 	}
 	
@@ -96,16 +94,18 @@ public class VacacionesBean implements Serializable {
 	
 	public void cargarPermisos() {
 		log.info("Cargando lista de permisos del empleado...");
-		this.permisos = this.incidenciaDAO.buscarPermisos(this.empleado.getIdEmpleado(), this.periodoInicio, this.periodoFin)
-				.stream()
-				.filter(item -> SolicitudPermisoBL.TP_VACACIONES
-						.equalsIgnoreCase(item.getSolPermiso().getTipoSolicitud().getClave()))
-				.collect(Collectors.toList())
-				;
+		if(this.permisos == null)
+			this.permisos = new ArrayList<DetIncidencia>();
+		
+		this.permisos.clear();
+		this.permisos.addAll(IncidenciaVacacionesBL.buscarPendientes(this.empleado));
+		this.permisos.addAll(IncidenciaVacacionesBL.buscarAprobadas(empleado, periodoInicio, periodoFin));
+		this.permisos.addAll(IncidenciaVacacionesBL.buscarRechazadas(empleado, periodoInicio, periodoFin));
+		this.permisos.addAll(IncidenciaVacacionesBL.buscarCanceladas(empleado, periodoInicio, periodoFin));
 		
 		if(this.mostrarCanceladas == false)
 			permisos = permisos.stream()
-			.filter(item -> !"C".equalsIgnoreCase(item.getSolPermiso().getEstatus().getClave()) )
+			.filter(item -> !IncidenciaBL.ST_CANCELADA.equalsIgnoreCase(item.getSolPermiso().getEstatus().getClave()) )
 			.collect(Collectors.toList())
 			;
 	}

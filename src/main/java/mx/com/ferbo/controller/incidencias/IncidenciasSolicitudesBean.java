@@ -4,15 +4,22 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.primefaces.PrimeFaces;
+
 import mx.com.ferbo.business.dianolaboral.DiasNoLaboralesBL;
 import mx.com.ferbo.business.empleado.EmpleadoBL;
 import mx.com.ferbo.business.incidencia.IncidenciaBL;
-import mx.com.ferbo.dao.n.IncidenciaDAO;
+import mx.com.ferbo.business.incidencia.IncidenciaVacacionesBL;
+import mx.com.ferbo.dao.n.IncidenciaPermisoDAO;
 import mx.com.ferbo.dao.n.TipoSolicitudDAO;
 import mx.com.ferbo.model.CatTipoSolicitud;
 import mx.com.ferbo.model.DetDiaPermiso;
@@ -22,9 +29,6 @@ import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.FacesUtils;
 import mx.com.ferbo.util.ManageStatus;
 import mx.com.ferbo.util.SGPException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.primefaces.PrimeFaces;
 
 /**
  *
@@ -37,7 +41,7 @@ public class IncidenciasSolicitudesBean implements Serializable
     private static final long serialVersionUID = 1L;
     private static Logger log = LogManager.getLogger(IncidenciasSolicitudesBean.class);
     
-    private final IncidenciaDAO incidenciaDAO = new IncidenciaDAO();
+    private final IncidenciaPermisoDAO incidenciaDAO = new IncidenciaPermisoDAO();
     private final TipoSolicitudDAO tipoSolicitudDAO = new TipoSolicitudDAO();
     
     private DetEmpleado autorizador;
@@ -52,12 +56,12 @@ public class IncidenciasSolicitudesBean implements Serializable
     private List<Date> diasDeVacaciones;
     private ManageStatus status = new ManageStatus();
     
-    private boolean incidenciaVacaciones = false;
+    private boolean incidenciaVacaciones = true;
     private boolean incidenciaPermiso = false;
     private boolean estatusAceptado = false;
     private boolean estatusRechazado = false;
     private boolean estatusCancelado = false;
-    private boolean estatusEnviado = false;
+    private boolean estatusEnviado = true;
     
     private Date fechaInicio;
     private Date fechaFin;
@@ -74,9 +78,11 @@ public class IncidenciasSolicitudesBean implements Serializable
     @PostConstruct
     public void init() {
         this.autorizador = (DetEmpleado) getValorEnSesion("empleado");
-        log.info("El empleado {} entrando a la sección de vacaciones / permisos", this.autorizador.getNombre());
+        log.info("El empleado {} entra a la sección de vacaciones / permisos", this.autorizador.getNombre());
         this.lstTipoSol = this.tipoSolicitudDAO.buscarActivos();
         this.goceSueldo = "100.0";
+        
+        this.listaPermisos = IncidenciaVacacionesBL.buscarPendientes();
     }
     
     public void cargar(Date inicio, Date fin) {
@@ -96,7 +102,10 @@ public class IncidenciasSolicitudesBean implements Serializable
     public void consultarPermisos(){
         DateUtil.setTime(this.fechaInicio, 0, 0, 0);
         DateUtil.setTime(this.fechaFin, 11, 59, 59);
-        this.listaPermisos = this.incidenciaDAO.buscarPermisos(this.fechaInicio, this.fechaFin);
+        
+        this.listaPermisos.clear();
+        this.listaPermisos = IncidenciaVacacionesBL.buscarPendientes();
+        this.listaPermisos.addAll(this.incidenciaDAO.buscarPermisos(this.fechaInicio, this.fechaFin)) ;
     }
     
     public List<DetIncidencia> consultarTipoPermisos() {
