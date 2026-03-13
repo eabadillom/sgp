@@ -9,16 +9,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import mx.com.ferbo.business.dianolaboral.DiasNoLaboralesBL;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import mx.com.ferbo.business.dianolaboral.DiasNoLaboralesBL;
 import mx.com.ferbo.business.incapacidad.IncapacidadBL;
 import mx.com.ferbo.business.notifmovil.NotifMovilBL;
 import mx.com.ferbo.business.registro.RegistroBL;
 import mx.com.ferbo.business.sgpapiclient.SGPApiClientBL;
-import mx.com.ferbo.dao.n.EstatusIncidenciaDAO;
 import mx.com.ferbo.dao.n.IncidenciaDAO;
 import mx.com.ferbo.dao.n.RegistroVacacionesDAO;
 import mx.com.ferbo.dao.n.TipoIncidenciaDAO;
@@ -169,13 +168,11 @@ public class IncidenciaBL implements Serializable
     	
     	SolicitudPermisoBL.validarSolicitudPermiso(incidencia.getSolPermiso());
     	
-    IncapacidadBL.validarRegistrosIncapacidades(
+    	IncapacidadBL.validarRegistrosIncapacidades(
     			incidencia.getEmpleado(),
     			incidencia.getSolPermiso().getFechaInicio(),
     			incidencia.getSolPermiso().getFechaFin())
-    	;
-    	
-    	
+    			;
     }
     
     public static void guardar(DetIncidencia incidencia)
@@ -185,8 +182,7 @@ public class IncidenciaBL implements Serializable
     	IncapacidadBL.validarRegistrosIncapacidades(
     			incidencia.getEmpleado(),
     			incidencia.getSolPermiso().getFechaInicio(),
-    			incidencia.getSolPermiso().getFechaFin())
-    	;
+    			incidencia.getSolPermiso().getFechaFin());
     	
     	IncidenciaDAO incidenciaDAO = new IncidenciaDAO();
     	
@@ -238,7 +234,6 @@ public class IncidenciaBL implements Serializable
         }
         
         msjNotificacion = NotifMovilBL.obtenerMensaje(mensaje, incidencia.getEmpleado());
-        
         sgpApiClient.enviarNotificacion(msjNotificacion);
     }
     

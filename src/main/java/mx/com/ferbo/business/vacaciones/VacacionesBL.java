@@ -29,6 +29,8 @@ public class VacacionesBL {
         	if(periodo.getDiasPendientesPagados())
         		continue;
         	
+        	periodo.setDiasDisponibles(diasDisponibles(periodo));
+        	
         	if (periodo.getDiasTomados() < periodo.getDiasTotales() && (periodo.getDiasPagados() + periodo.getDiasTomados()) < periodo.getDiasTotales()) {
         		periodos.add(periodo);
         	}

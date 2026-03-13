@@ -2,7 +2,6 @@ package mx.com.ferbo.controller;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +23,7 @@ import mx.com.ferbo.business.empleado.EmpleadoBL;
 import mx.com.ferbo.business.incidencia.IncidenciaBL;
 import mx.com.ferbo.business.incidencia.IncidenciaVacacionesBL;
 import mx.com.ferbo.business.incidencia.SolicitudPermisoBL;
+import mx.com.ferbo.business.incidencia.SolicitudVacacionesBL;
 import mx.com.ferbo.business.vacaciones.VacacionesBL;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.IncidenciaPermisoDAO;
@@ -57,7 +57,6 @@ public class VacacionesBean implements Serializable {
 	private CatTipoSolicitud tipoSolicitud;
 	private TipoSolicitudDAO tipoSolicitudDAO;
 	private List<DetVacaciones> periodosVacacionales;
-	private DetVacaciones periodoVacacional;
 	private Integer diasTotalesPermitidos = 0;
 	private List<Date> diasSolicitados;
 	
@@ -67,23 +66,25 @@ public class VacacionesBean implements Serializable {
 	private Boolean desbloquearDiasNoLaborales;
 	private Boolean desbloquearDiasDeDescanso;
 	
+	private String mensajeConfirmacion;
+	
 	private ManageStatus status;
 	
 	public VacacionesBean() throws SGPException {
-		this.request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-		this.empleadoDAO = new EmpleadoDAO();
-		this.empleado = (DetEmpleado) request.getSession(false).getAttribute("empleado");
-		this.empleado = this.empleadoDAO.buscarPorId(this.empleado.getIdEmpleado());
-		this.diasDeAsueto = DiasNoLaboralesBL.diasDeAsueto();
-		this.invalidDays = SolicitudPermisoBL.obtenerDiasSeleccionados(empleado.getDatoEmpresa());
-		this.periodoInicio = DateUtil.addMonth(new Date(), -1);
-		this.periodoFin    = DateUtil.addMonth(new Date(),  1);
-		this.incidenciaDAO = new IncidenciaPermisoDAO();
-		this.tipoSolicitudDAO = new TipoSolicitudDAO();
-		this.tipoSolicitud = this.tipoSolicitudDAO.buscarPorClave(SolicitudPermisoBL.TP_PERMISO)
+		this.request           = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+		this.empleadoDAO       = new EmpleadoDAO();
+		this.empleado          = (DetEmpleado) request.getSession(false).getAttribute("empleado");
+		this.empleado          = this.empleadoDAO.buscarPorId(this.empleado.getIdEmpleado());
+		this.diasDeAsueto      = DiasNoLaboralesBL.diasDeAsueto();
+		this.invalidDays       = SolicitudPermisoBL.obtenerDiasSeleccionados(empleado.getDatoEmpresa());
+		this.periodoInicio     = DateUtil.addMonth(new Date(), -1);
+		this.periodoFin        = DateUtil.addMonth(new Date(),  1);
+		this.incidenciaDAO     = new IncidenciaPermisoDAO();
+		this.tipoSolicitudDAO  = new TipoSolicitudDAO();
+		this.tipoSolicitud     = this.tipoSolicitudDAO.buscarPorClave(SolicitudPermisoBL.TP_PERMISO)
 				.orElseThrow(() -> new SGPException("Tipo de solicitud no encontrada"));
-		this.minDate = DateUtil.addDay(DateUtil.now(), -7);
-		this.status = new ManageStatus();
+		this.minDate           = DateUtil.addDay(DateUtil.now(), -7);
+		this.status            = new ManageStatus();
 		this.mostrarCanceladas = Boolean.FALSE;
 	}
 	
@@ -121,7 +122,6 @@ public class VacacionesBean implements Serializable {
 			DiasNoLaboralesBL.diasDescansoEstanActualizados();
             EmpleadoBL.empleadoTieneDiasLaborales(this.empleado);
             this.periodosVacacionales = VacacionesBL.cargarPeriodosConSaldo(this.empleado.getIdEmpleado(), DateUtil.now());
-            this.periodoVacacional = null;
             this.diasSolicitados = new ArrayList<Date>();
 			
             PrimeFaces.current().executeScript("PF('dialogVacaciones').show()");
@@ -135,32 +135,6 @@ public class VacacionesBean implements Serializable {
 		}
 	}
 	
-	public void cargarPeriodoEnCurso() {
-		List<DetVacaciones> cargarPeriodosConSaldoEnCurso = VacacionesBL.cargarPeriodosConSaldoEnCurso(this.empleado.getIdEmpleado(), DateUtil.now());
-		this.periodosVacacionales.addAll(cargarPeriodosConSaldoEnCurso);
-	}
-	
-	public Integer diasDisponibles(DetVacaciones periodo) {
-		Integer saldo = VacacionesBL.diasDisponibles(periodo);
-		saldo = saldo - this.diasSolicitados.size();
-    	return saldo;
-	}
-	
-	public void onPeriodoSelect(SelectEvent<DetVacaciones> event) {
-    	log.debug("Seleccionando periodo vacacional: {}", event.getObject().getIdVacaciones());
-    	DetVacaciones periodo = (DetVacaciones)event.getObject();
-    	String mensaje = String.format("Puede seleccionar %d días", (periodo.getDiasTotales() - periodo.getDiasTomados()));
-    	FacesMessage msg = new FacesMessage("Seleccione sus días",  mensaje);
-        FacesContext.getCurrentInstance().addMessage(null, msg);
-        PrimeFaces.current().ajax().update("formActividades:messages", "formActividades:tabView:dpView");
-    }
-    
-    public void onPeriodoUnselect(SelectEvent<DetVacaciones> event) {
-    	log.debug("Seleccionando periodo vacacional: {}", event.getObject().getIdVacaciones());
-    	FacesMessage msg = new FacesMessage("Product Unselected", String.valueOf(event.getObject().getIdVacaciones()));
-        FacesContext.getCurrentInstance().addMessage(null, msg);
-    }
-	
 	public void cargarPermiso(DetIncidencia permiso) {
 		FacesMessage message = null;
 		FacesMessage.Severity severity = null;
@@ -172,11 +146,9 @@ public class VacacionesBean implements Serializable {
 			this.permiso = incidenciaDAO.cargar(permiso.getIdIncidencia())
 					.orElseThrow(() -> new SGPException("Incidencia no encontrada."));
 			
-			this.periodoVacacional = this.permiso.getSolPermiso().getVacaciones();
-			
 			this.periodosVacacionales = VacacionesBL.cargarPeriodosConSaldo(this.empleado.getIdEmpleado(), DateUtil.now());
-			if(this.periodosVacacionales.contains(this.periodoVacacional) == false)
-				this.periodosVacacionales.add(periodoVacacional);
+			if(this.periodosVacacionales.contains(this.permiso.getSolPermiso().getVacaciones()) == false)
+				this.periodosVacacionales.add(this.permiso.getSolPermiso().getVacaciones());
 			
 			if(this.permiso.getSolPermiso().getDiasPermiso() == null
 					|| this.permiso.getSolPermiso().getDiasPermiso().size() == 0)
@@ -204,24 +176,32 @@ public class VacacionesBean implements Serializable {
 		}
 	}
 	
-	public void seleccionarFecha() {
-		Date fechaInicio = null;
-		Date fechaFin = null;
-		try {
-			log.info("Fecha seleccionada: {}", this.permiso.getSolPermiso().getFechaInicio());
-			this.diasSolicitados.stream().forEach(dia -> log.info("Dia solicitado: {}", dia ));
-			
-			fechaInicio = this.diasSolicitados.stream().min(Comparator.naturalOrder()).orElseThrow(() -> new SGPException("No hay fecha seleccionada."));
-			fechaFin = this.diasSolicitados.stream().max(Comparator.naturalOrder()).orElseThrow(() -> new SGPException("No hay fecha seleccionada"));
-			
-			this.permiso.getSolPermiso().setFechaInicio(fechaInicio);
-			this.permiso.getSolPermiso().setFechaFin(fechaFin);
-			
-			log.info("Dias solicitados: {}", this.diasSolicitados.size());
-		} catch(Exception ex) {
-			log.error("Problema para obtener los días solicitados...", ex);
-		}
+	public void cargarPeriodoEnCurso() {
+		List<DetVacaciones> cargarPeriodosConSaldoEnCurso = VacacionesBL.cargarPeriodosConSaldoEnCurso(this.empleado.getIdEmpleado(), DateUtil.now());
+		this.periodosVacacionales.addAll(cargarPeriodosConSaldoEnCurso);
 	}
+	
+	public void onPeriodoSelect(SelectEvent<DetVacaciones> event) {
+    	log.debug("Seleccionando periodo vacacional: {}", event.getObject().getIdVacaciones());
+    	
+    	DetVacaciones periodo = (DetVacaciones) event.getObject();
+    	
+    	if(this.diasSolicitados == null)
+    		this.diasSolicitados = new ArrayList<Date>();
+    	
+    	this.diasSolicitados.clear();
+    	
+    	String mensaje = String.format("Puede seleccionar %d días", periodo.getDiasDisponibles());
+    	FacesMessage msg = new FacesMessage(mensaje);
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+        PrimeFaces.current().ajax().update("formActividades:messages", "formActividades:tabView:dpView");
+    }
+    
+    public void onPeriodoUnselect(SelectEvent<DetVacaciones> event) {
+    	log.debug("Seleccionando periodo vacacional: {}", event.getObject().getIdVacaciones());
+    	FacesMessage msg = new FacesMessage("Product Unselected", String.valueOf(event.getObject().getIdVacaciones()));
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+    }
 	
 	public void mostrarDiasLaborales() {
 		if(this.desbloquearDiasNoLaborales.booleanValue()) {
@@ -243,54 +223,39 @@ public class VacacionesBean implements Serializable {
 		FacesMessage message = null;
 		FacesMessage.Severity severity = null;
 		String mensaje = null;
-		String titulo = "Solicitud";
-		
-		Date fechaInicio = null;
-		Date fechaFin = null;
+		String titulo = null;
 		
 		try {
-			
-			
 			log.info("Guardando solicitud de permiso...");
 			
-			this.permiso.getSolPermiso().setFechaFin(this.permiso.getSolPermiso().getFechaInicio());
-			this.permiso.getSolPermiso().setVacaciones(periodoVacacional);
+			this.permiso.getSolPermiso()
+				.setDiasPermiso(SolicitudVacacionesBL.toDiaPermisoList(this.permiso.getSolPermiso(), this.diasSolicitados));
 			
-			fechaInicio = this.diasSolicitados.stream().min(Comparator.naturalOrder()).orElseThrow(() -> new SGPException("No hay fecha seleccionada."));
-			fechaFin = this.diasSolicitados.stream().max(Comparator.naturalOrder()).orElseThrow(() -> new SGPException("No hay fecha seleccionada"));
-			
-			this.permiso.getSolPermiso().setFechaInicio(fechaInicio);
-			this.permiso.getSolPermiso().setFechaFin(fechaFin);
-			
-			this.diasSolicitados.stream().forEach(dia -> {
-				DetDiaPermiso diaPermiso = new DetDiaPermiso();
-				diaPermiso.setSolicitudPermiso(this.permiso.getSolPermiso());
-				diaPermiso.setFecha(dia);
-				this.permiso.getSolPermiso().getDiasPermiso().add(diaPermiso);
-			});
-			
-			log.info("Tipo de incidencia: {}", this.permiso.getTipoIncidencia().getClave());
-			
-			log.info("Tipo de solicitud: {}", this.permiso.getSolPermiso().getTipoSolicitud().getClave());
-			
+			SolicitudVacacionesBL.validator()
+				.incidencia(this.permiso)
+				.validate();
 			
 			IncidenciaBL.guardar(this.permiso);
-                        IncidenciaBL.enviarNotificacion(this.permiso);
-			this.cargarPermisos();
-			
+			IncidenciaBL.enviarNotificacion(this.permiso);
 			PrimeFaces.current().executeScript("PF('dgVacaciones').hide();");
+			
+			this.cargarPermisos();
+			titulo = "Solicitud correcta";
 			mensaje = "La solicitud se guardó correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
 		} catch(SGPException ex){
+			titulo = "Verifique su solicitud";
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
 		} catch(Exception ex) {
+			titulo = "Error del sistema";
 			mensaje = "Ocurrió un problema al guardar la solicitud del permiso.";
 			severity = FacesMessage.SEVERITY_ERROR;
 		} finally {
+			this.mensajeConfirmacion = mensaje;
 			message = new FacesMessage(severity, titulo, mensaje);
             FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update("formActividades:messages", "formActividades:tabView:dtVacaciones");
+			PrimeFaces.current().ajax().update("formActividades:messages", "formActividades:tabView:resumen");
 		}
 	}
 	
@@ -457,14 +422,6 @@ public class VacacionesBean implements Serializable {
 		this.periodosVacacionales = periodosVacacionales;
 	}
 
-	public DetVacaciones getPeriodoVacacional() {
-		return periodoVacacional;
-	}
-
-	public void setPeriodoVacacional(DetVacaciones periodoVacacional) {
-		this.periodoVacacional = periodoVacacional;
-	}
-
 	public Integer getDiasTotalesPermitidos() {
 		return diasTotalesPermitidos;
 	}
@@ -515,6 +472,14 @@ public class VacacionesBean implements Serializable {
 
 	public void setDesbloquearDiasDeDescanso(Boolean desbloquearDiasDeDescanso) {
 		this.desbloquearDiasDeDescanso = desbloquearDiasDeDescanso;
+	}
+
+	public String getMensajeConfirmacion() {
+		return mensajeConfirmacion;
+	}
+
+	public void setMensajeConfirmacion(String mensajeConfirmacion) {
+		this.mensajeConfirmacion = mensajeConfirmacion;
 	}
 
 }
