@@ -46,9 +46,9 @@ public class IncidenciaPermisoDAO extends BaseDAO<DetIncidencia, Integer> {
     		model = em.find(this.modelClass, id);
     		
     		model.getSolPermiso().getDiasPermiso().stream()
-    		.forEach(item -> log.info("dia solicitado: {}", item.getId()));
+    		.forEach(item -> log.debug("dia solicitado: {}", item.getId()));
     		
-    		log.info("Id vacaciones: {}", model.getSolPermiso().getVacaciones().getIdVacaciones());
+    		log.debug("Id vacaciones: {}", model.getSolPermiso().getVacaciones().getIdVacaciones());
     		
     		optional = Optional.of(model);
     	} catch(Exception ex) {

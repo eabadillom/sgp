@@ -1,6 +1,7 @@
 package mx.com.ferbo.controller.incidencias;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -81,8 +82,7 @@ public class IncidenciasSolicitudesBean implements Serializable
         log.info("El empleado {} entra a la sección de vacaciones / permisos", this.autorizador.getNombre());
         this.lstTipoSol = this.tipoSolicitudDAO.buscarActivos();
         this.goceSueldo = "100.0";
-        
-        this.listaPermisos = IncidenciaVacacionesBL.buscarPendientes();
+        this.listaPermisos = new ArrayList<DetIncidencia>();
     }
     
     public void cargar(Date inicio, Date fin) {
@@ -102,10 +102,15 @@ public class IncidenciasSolicitudesBean implements Serializable
     public void consultarPermisos(){
         DateUtil.setTime(this.fechaInicio, 0, 0, 0);
         DateUtil.setTime(this.fechaFin, 11, 59, 59);
+        List<DetIncidencia> otrosPermisos = this.incidenciaDAO.buscarPermisos(this.fechaInicio, this.fechaFin);
         
         this.listaPermisos.clear();
-        this.listaPermisos = IncidenciaVacacionesBL.buscarPendientes();
-        this.listaPermisos.addAll(this.incidenciaDAO.buscarPermisos(this.fechaInicio, this.fechaFin)) ;
+        this.listaPermisos.addAll(IncidenciaVacacionesBL.buscarPendientes());
+        this.listaPermisos.addAll(
+        		otrosPermisos.stream()
+            	.filter(p -> !p.getEstatusIncidencia().getClave().equalsIgnoreCase(IncidenciaBL.ST_ENVIADA))
+            	.collect(Collectors.toList())
+        		) ;
     }
     
     public List<DetIncidencia> consultarTipoPermisos() {

@@ -61,6 +61,7 @@ public class PermisosBean implements Serializable {
 		this.minDate = DateUtil.addDay(DateUtil.now(), -7);
 		this.status = new ManageStatus();
 		this.mostrarCanceladas = Boolean.FALSE;
+		this.permiso = IncidenciaBL.create(IncidenciaBL.TP_PERMISO, this.empleado);
 	}
 	
 	@PostConstruct
