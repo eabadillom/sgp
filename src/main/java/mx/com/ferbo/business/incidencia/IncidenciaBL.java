@@ -217,24 +217,26 @@ public class IncidenciaBL implements Serializable
     
     }
     
-    public static void enviarNotificacion(DetIncidencia incidencia)
-    {
-        SGPApiClientBL sgpApiClient = new SGPApiClientBL();
-        
-        NotificacionMovilDTO msjNotificacion = null;
-        String mensaje = "";
-        switch(incidencia.getTipoIncidencia().getClave())
-        {
-            case TP_VACACIONES: 
-                mensaje = "vacaciones";
-                break;
-            case TP_PERMISO:
-                mensaje = "permiso";
-                break;
-        }
-        
-        msjNotificacion = NotifMovilBL.obtenerMensaje(mensaje, incidencia.getEmpleado());
-        sgpApiClient.enviarNotificacion(msjNotificacion);
+    public static void enviarNotificacion(DetIncidencia incidencia) {
+    	SGPApiClientBL sgpApiClient = null;
+    	NotificacionMovilDTO msjNotificacion = null;
+    	String mensaje = "";
+    	try {
+    		sgpApiClient = new SGPApiClientBL();
+    		switch(incidencia.getTipoIncidencia().getClave())
+    		{
+    		case TP_VACACIONES: 
+    			mensaje = "vacaciones";
+    			break;
+    		case TP_PERMISO:
+    			mensaje = "permiso";
+    			break;
+    		}
+    		msjNotificacion = NotifMovilBL.obtenerMensaje(mensaje, incidencia.getEmpleado());
+    		sgpApiClient.enviarNotificacion(msjNotificacion);
+    	} catch(Exception ex) {
+    		log.error("Problema para enviar la notificacion al SGP-Movil...", ex);
+    	}
     }
     
     public static List<DetIncidencia> consultarIncidencias(Date fechaInicio, Date fechaFin, String clave)

@@ -16,39 +16,163 @@
 	   		<ui:include src="/protected/common/confirm.xhtml"></ui:include>
 	   		<p:panel id="pnl-info" header="Registrar periodo vacacional">
 	   			<div class="ui-fluid formgrid grid">
-			    	<div class="field col-12 md:col-3">
+			    	<div class="col-12 md:col-2">
 			    		<p:outputLabel value="Buscar"/>
 			    		<p:autoComplete value="#{regVacacionesBean.empleado}" var="e"
 			    			itemLabel="#{e.numEmpleado}"
 			    			itemValue="#{e}" converter="entityConverter"
 			    			completeMethod="#{regVacacionesBean.buscarEmpleado}"
 			    			minQueryLength="4" forceSelection="true" scrollHeight="250" autocomplete="off">
-			    			<p:ajax process="@this" event="valueChange" listener="#{regVacacionesBean.asignarEmpleado}" update="pnl-info dt-periodos" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
+			    			<p:ajax process="@this" event="valueChange" listener="#{regVacacionesBean.asignarEmpleado}" update="form:pnl-info form:dt-vacaciones" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
 			    			<p:column>
 			    				<p:outputLabel value="#{e.nombre} #{e.primerAp} #{e.segundoAp}" />
 			    			</p:column>
 			    		</p:autoComplete>
 					</div>
-					<div class="field col-12 md:col-6">
+					<div class="col-12 md:col-5">
 						<p:outputLabel value="Empleado" />
 						<p:inputText value="#{regVacacionesBean.empleado.nombre} #{regVacacionesBean.empleado.primerAp} #{regVacacionesBean.empleado.segundoAp}" readonly="true" />
 					</div>
+					<div class="col-12 md:col-2">
+	   					<p:outputLabel value="Inicio"></p:outputLabel>
+	   					<p:datePicker value="#{regVacacionesBean.periodoInicio}" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy" showIcon="true">
+			    			<p:ajax process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();" />
+			    		</p:datePicker>
+	   				</div>
+	   				<div class="col-12 md:col-2">
+	   					<p:outputLabel value="Fin"></p:outputLabel>
+	   					<p:datePicker value="#{regVacacionesBean.periodoFin}" locale="es_MX" timeZone="GMT-6" pattern="dd/MM/yyyy" showIcon="true">
+			    			<p:ajax process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
+			    		</p:datePicker>
+	   				</div>
+	   				<div class="col-12 md:col-1">
+	   					<div>
+		   					<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
+	   					</div>
+	   					<p:commandButton icon="pi pi-plus" process="@this" actionListener="#{regVacacionesBean.nuevoPermiso()}" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dgVacaciones').show();" update="form:dg-vacaciones">
+	   					</p:commandButton>
+	   				</div>
 				</div>
 	   		</p:panel>
-	   		<p:dataTable id="dt-periodos" value="#{regVacacionesBean.empleado.vacaciones}" var="periodo">
-	   			<p:column>
-	   				<p:outputLabel value="#{periodo.fechaInicio}" />
-	   			</p:column>
-	   			<p:column>
-	   				<p:outputLabel value="#{periodo.fechaFin}" />
-	   			</p:column>
-	   			<p:column>
-	   				<p:outputLabel value="#{periodo.diasTotales}" />
-	   			</p:column>
-	   			<p:column>
-	   				<p:outputLabel value="#{periodo.diasDisponibles}" />
-	   			</p:column>
-			</p:dataTable>
+	   		<p:spacer height="1rem">
+	   		</p:spacer>
+			<p:dataTable id="dt-vacaciones" widgetVar="dtVacaciones" var="permiso" value="#{regVacacionesBean.permisos}" paginator="true" rows="5" paginatorPosition="bottom">
+				<f:facet name="header">
+					<p:outputLabel value="Permisos vacacionales solicitados"></p:outputLabel>
+				</f:facet>
+				<p:column headerText="Del" sortBy="#{permiso.solPermiso.fechaInicio}">
+					<p:outputLabel value="#{permiso.solPermiso.fechaInicio}">
+						<f:convertDateTime type="date" pattern="dd / MMM / yyyy" timeZone="GMT-6"/>
+					</p:outputLabel>
+				</p:column>
+				<p:column headerText="Al" sortBy="#{permiso.solPermiso.fechaFin}">
+					<p:outputLabel value="#{permiso.solPermiso.fechaFin}">
+						<f:convertDateTime type="date" pattern="dd / MMM / yyyy" timeZone="GMT-6"/>
+					</p:outputLabel>
+				</p:column>
+				<p:column headerText="Status" sortBy="#{permiso.solPermiso.estatus.descripcion}">
+					<span class="customer-badge status-#{regVacacionesBean.status.getStatusClass(permiso.solPermiso.estatus.clave)}" style="display: block; width: 7rem">
+						#{regVacacionesBean.status.getStatusText( permiso.solPermiso.estatus.clave)}
+					</span>
+				</p:column>
+				<p:column style="width: 2rem">
+					<p:commandButton class="ui-button-success rounded-button m-1" icon="pi pi-bars" process="@this" styleClass="edit-button"
+						action="#{regVacacionesBean.cargarPermiso(permiso)}" update="form:dg-vacaciones" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();PF('dgVacaciones').show();">
+					</p:commandButton>
+				</p:column>
+	   		</p:dataTable>
+	   		
+	   		<p:dialog id="dg-vacaciones" widgetVar="dgVacaciones" header="Vacaciones" showEffect="fade" responsive="true" modal="true">
+	   			<p:toolbar>
+					<p:toolbarGroup align="left">
+						<p:commandButton icon="pi pi-plus" value="Periodo en curso" actionListener="#{regVacacionesBean.cargarPeriodoEnCurso}" update="dt-periodos-vacacionales" >
+							<p:confirm header="Año laboral no cumplido" message="No has cumplido el año laboral, ¿estás seguro que deseas agregar el periodo vacacional?" icon="pi pi-exclamation-triangle" />
+						</p:commandButton>
+					</p:toolbarGroup>
+					<p:toolbarGroup align="right">
+						<p:selectBooleanButton value="#{regVacacionesBean.desbloquearDiasDeDescanso}" onIcon="pi pi-lock-open" offIcon="pi pi-lock" onLabel="Días de descanso" offLabel="Días de descanso">
+							<p:ajax process="@this" event="valueChange" listener="#{regVacacionesBean.mostrarDiasDeDescanso}" update="form:dpView"/>
+						</p:selectBooleanButton>
+						<p:selectBooleanButton value="#{regVacacionesBean.desbloquearDiasNoLaborales}" onIcon="pi pi-lock-open" offIcon="pi pi-lock" onLabel="Días no laborales" offLabel="Días no laborales">
+							<p:ajax process="@this" event="valueChange" listener="#{regVacacionesBean.mostrarDiasLaborales}" update="form:dpView" />
+						</p:selectBooleanButton>
+					</p:toolbarGroup>
+				</p:toolbar>
+				
+				<p:panelGrid layout="tabular" columns="0" styleClass="ui-noborder"><!-- Sin bordes, agregar propiedad  styleClass="ui-noborder"-->
+					<p:row>
+						<p:column width="10rem" style="vertical-align: top;">
+							<p:card>
+								<p:dataTable id="dt-periodos-vacacionales" widgetVar="dtPeriodosVacaciones" var="periodo" value="#{regVacacionesBean.periodosVacacionales}"
+					                         paginator="true" rows="4" paginatorPosition="bottom" selectionMode="single"
+					                         selection="#{regVacacionesBean.permiso.solPermiso.vacaciones}" rowKey="#{periodo.idVacaciones}" disabledSelection="#{regVacacionesBean.permiso.idIncidencia ne null}" >
+					                <p:ajax event="rowSelect" listener="#{regVacacionesBean.onPeriodoSelect}" update="form:dpView"/>
+					                <p:column headerText="Periodo inicio" style="text-align: center;">
+					                    <p:outputLabel value="#{periodo.fechaInicio}">
+					                    	<f:convertDateTime pattern="dd 'de' MMM 'de' yyyy" locale="es_MX" timeZone="GMT-6" />
+					                    </p:outputLabel>
+					                </p:column>
+					                <p:column headerText="Periodo fin" style="text-align: center;">
+					                    <p:outputLabel value="#{periodo.fechaFin}">
+					                    	<f:convertDateTime pattern="dd 'de' MMM 'de' yyyy" locale="es_MX" timeZone="GMT-6" />
+					                    </p:outputLabel>
+					                </p:column>
+					                <p:column headerText="Total" width="4rem" style="text-align: center;">
+					                    <p:outputLabel value="#{periodo.diasTotales} día(s)"/>
+					                </p:column>
+					                <p:column headerText="Disponibles" width="6rem" style="text-align: center;">
+					                    <p:outputLabel value="#{periodo.diasDisponibles} día(s)"/>
+					                </p:column>
+					            </p:dataTable>
+							</p:card>
+						</p:column>
+						<p:column rowspan="2">
+							<p:card>
+								<p:datePicker id="dpView" styleClass="ferbo-datePicker"  disabled="#{regVacacionesBean.permiso.solPermiso.vacaciones eq null}" readonlyInput="true"
+				                          inline="true" pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX" value="#{regVacacionesBean.diasSolicitados}"
+				                          mindate="#{regVacacionesBean.permiso.solPermiso.fechaInicio}" maxdate="#{regVacacionesBean.permiso.solPermiso.fechaFin}"
+				                          selectionMode="multiple" disabledDays="#{regVacacionesBean.invalidDays}"
+				                          disabledDates="#{regVacacionesBean.diasDeAsueto}">
+					            </p:datePicker>
+							</p:card>
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column style="vertical-align: bottom;">
+							<p:card id="resumen">
+								<div align="center">
+									<p:outputLabel value="#{regVacacionesBean.mensajeConfirmacion}" />
+								</div>
+								<div align="center">
+									<p:outputLabel value="#{regVacacionesBean.permiso.solPermiso.estatus.descripcion}" rendered="#{regVacacionesBean.permiso.idIncidencia ne null}" styleClass="customer-badge status-#{regVacacionesBean.status.getStatusClass(permiso.solPermiso.estatus.clave)}"/>
+								</div>
+								<div align="center">
+									<div>
+										<p:outputLabel value="Motivo de rechazo:" rendered="#{regVacacionesBean.permiso.solPermiso.estatus.clave eq 'R'}" styleClass="customer-badge status-#{regVacacionesBean.status.getStatusClass(permiso.solPermiso.estatus.clave)}"/>
+									</div>
+									<div>
+										<p:inputText id="txtMotivo" value="#{regVacacionesBean.permiso.solPermiso.descripcionRechazo}" disabled="true" rendered="#{regVacacionesBean.permiso.solPermiso.estatus.clave eq 'R'}"/>
+									</div>
+								</div>
+							</p:card>
+						</p:column>
+					</p:row>
+				</p:panelGrid>
+				<f:facet name="footer">
+					<p:commandButton value="Cancelar" icon="pi pi-check" actionListener="#{regVacacionesBean.cancelar()}" process="@this" update="form:dt-vacaciones" rendered="#{regVacacionesBean.permiteCancelar()}" styleClass="ui-button-raised ui-button-danger">
+						<p:confirm header="Cancelar permiso" message="¿Está seguro que desea cancelar este permiso?" icon="pi pi-exclamation-triangle" />
+					</p:commandButton>
+					<ui:remove>
+					<p:commandButton value="Actualizar" icon="pi pi-check" actionListener="#{regVacacionesBean.actualizar()}" process="@this" update="dt-vacaciones" rendered="#{regVacacionesBean.permiteActualizar()}">
+						<p:confirm header="Actualizar permiso" message="¿Está seguro que desea actualizar este periodo?" icon="pi pi-exclamation-triangle" />
+					</p:commandButton>
+					</ui:remove>
+					<p:commandButton id="cmdSolicitar" value="Solicitar" icon="pi pi-check" process="@this dpView" actionListener="#{regVacacionesBean.guardar()}" update="dt-vacaciones" rendered="#{vacacionesBean.permiso.idIncidencia eq null}">
+						<p:confirm header="Solicitar permiso" message="¿Está seguro que desea registrar este periodo?" icon="pi pi-exclamation-triangle" />
+					</p:commandButton>
+					<p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dgVacaciones').hide()" class="ui-button-secondary"/>
+		        </f:facet>
+	   		</p:dialog>
    		</h:form>
 	</ui:define>
 </ui:composition>
