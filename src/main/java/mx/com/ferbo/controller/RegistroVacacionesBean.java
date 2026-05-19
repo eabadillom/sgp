@@ -10,6 +10,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,7 +43,9 @@ public class RegistroVacacionesBean implements Serializable {
 	private static final long serialVersionUID = -1867635090603750012L;
 	private static final Logger log = LogManager.getLogger(RegistroVacacionesBean.class);
 	
+	private HttpServletRequest request;
 	private DetEmpleado empleado = null;
+	private DetEmpleado autorizador = null;
 	private List<DetEmpleado> empleados;
 	private EmpleadoDAO empleadoDAO;
 	private Date periodoInicio;
@@ -68,18 +71,20 @@ public class RegistroVacacionesBean implements Serializable {
 	
 	public RegistroVacacionesBean() throws SGPException {
 		log.info("Entrando al registro de vacaciones de los empleados...");
-		this.empleadoDAO = new EmpleadoDAO();
+		this.request           = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+		this.autorizador       = (DetEmpleado) request.getSession(false).getAttribute("empleado");
+		this.empleadoDAO       = new EmpleadoDAO();
 		this.periodoVacacional = new DetVacaciones();
-		this.desbloquearDiasDeDescanso = Boolean.FALSE;
-		this.desbloquearDiasNoLaborales = Boolean.FALSE;
-		this.periodoInicio = DateUtil.now();
-		this.periodoFin = DateUtil.now();
+		this.periodoInicio     = DateUtil.now();
+		this.periodoFin        = DateUtil.now();
 		this.incidenciaDAO     = new IncidenciaPermisoDAO();
 		this.status            = new ManageStatus();
 		this.tipoSolicitudDAO  = new TipoSolicitudDAO();
 		this.tipoSolicitud     = this.tipoSolicitudDAO.buscarPorClave(SolicitudPermisoBL.TP_PERMISO)
 				.orElseThrow(() -> new SGPException("Tipo de solicitud no encontrada"));
 		this.mostrarCanceladas = Boolean.FALSE;
+		this.desbloquearDiasDeDescanso = Boolean.FALSE;
+		this.desbloquearDiasNoLaborales = Boolean.FALSE;
 		log.info("Termina el constructor.");
 	}
 	
@@ -142,13 +147,15 @@ public class RegistroVacacionesBean implements Serializable {
         String titulo = "Cargar informacion";
         
 		try {
+			if(this.empleado == null)
+				throw new SGPException("Debe seleccionar un empleado.");
+			
 			this.permiso = IncidenciaBL.create(IncidenciaBL.TP_VACACIONES, this.empleado);
 			DiasNoLaboralesBL.diasDescansoEstanActualizados();
             EmpleadoBL.empleadoTieneDiasLaborales(this.empleado);
             this.periodosVacacionales = VacacionesBL.cargarPeriodosConSaldo(this.empleado.getIdEmpleado(), DateUtil.now());
             this.diasSolicitados = new ArrayList<Date>();
-			
-            PrimeFaces.current().executeScript("PF('dialogVacaciones').show()");
+            PrimeFaces.current().executeScript("PF('dgVacaciones').show()");
 		} catch(Exception ex) {
 			log.error("Problema para crear una solicitud de vacaciones...", ex);
 			mensaje = "Problema para generar la solicitud de vacaciones.";
