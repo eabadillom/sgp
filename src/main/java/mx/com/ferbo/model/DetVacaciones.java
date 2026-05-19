@@ -16,6 +16,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "det_vacaciones")
@@ -44,6 +45,9 @@ public class DetVacaciones implements Serializable{
     
     @Column(name = "nu_dias_tomados")
     private Integer diasTomados;
+    
+    @Transient
+    private Integer diasDisponibles;
     
     @Column(name = "st_prima_pagada")
     private Boolean primaPagada;
@@ -198,5 +202,13 @@ public class DetVacaciones implements Serializable{
 	
 	public void setRegistroVacaciones(List<DetRegistroVacaciones> registroVacaciones) {
 		this.registroVacaciones = registroVacaciones;
+	}
+
+	public Integer getDiasDisponibles() {
+		return diasDisponibles;
+	}
+
+	public void setDiasDisponibles(Integer diasDisponibles) {
+		this.diasDisponibles = diasDisponibles;
 	}
 }
