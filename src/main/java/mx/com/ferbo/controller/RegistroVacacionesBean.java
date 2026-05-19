@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
@@ -37,61 +36,91 @@ import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.ManageStatus;
 import mx.com.ferbo.util.SGPException;
 
-@Named(value = "vacacionesBean")
+@Named(value = "regVacacionesBean")
 @ViewScoped
-public class VacacionesBean implements Serializable {
+public class RegistroVacacionesBean implements Serializable {
 
-	private static final long serialVersionUID = -1098787464152570894L;
-	private static Logger log = LogManager.getLogger(VacacionesBean.class);
+	private static final long serialVersionUID = -1867635090603750012L;
+	private static final Logger log = LogManager.getLogger(RegistroVacacionesBean.class);
 	
 	private HttpServletRequest request;
-	
-	private DetEmpleado empleado;
+	private DetEmpleado empleado = null;
+	private DetEmpleado autorizador = null;
+	private List<DetEmpleado> empleados;
 	private EmpleadoDAO empleadoDAO;
 	private Date periodoInicio;
 	private Date periodoFin;
-	private Date minDate;
-	private List<DetIncidencia> permisos;
-	private DetIncidencia permiso;
+	private DetVacaciones periodoVacacional;
 	private IncidenciaPermisoDAO incidenciaDAO;
 	private CatTipoSolicitud tipoSolicitud;
 	private TipoSolicitudDAO tipoSolicitudDAO;
-	private List<DetVacaciones> periodosVacacionales;
-	private Integer diasTotalesPermitidos = 0;
-	private List<Date> diasSolicitados;
-	
-	private List<Integer> invalidDays;
-	private List<Date> diasDeAsueto;
+	private List<Date> diasDeshabilitados;
 	private Boolean mostrarCanceladas;
-	private Boolean desbloquearDiasNoLaborales;
 	private Boolean desbloquearDiasDeDescanso;
+    private Boolean desbloquearDiasNoLaborales;
+    private List<Date> diasNoLaborales;
+    private List<Integer> invalidDays;
+    private List<Date> diasDeAsueto;
+    private List<DetIncidencia> permisos;
+    private DetIncidencia permiso;
+    private List<DetVacaciones> periodosVacacionales;
+    private List<Date> diasSolicitados;
+    
+    private String mensajeConfirmacion;
+    private ManageStatus status;
 	
-	private String mensajeConfirmacion;
-	
-	private ManageStatus status;
-	
-	public VacacionesBean() throws SGPException {
+	public RegistroVacacionesBean() throws SGPException {
+		log.info("Entrando al registro de vacaciones de los empleados...");
 		this.request           = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+		this.autorizador       = (DetEmpleado) request.getSession(false).getAttribute("empleado");
 		this.empleadoDAO       = new EmpleadoDAO();
-		this.empleado          = (DetEmpleado) request.getSession(false).getAttribute("empleado");
-		this.empleado          = this.empleadoDAO.buscarPorId(this.empleado.getIdEmpleado());
-		this.diasDeAsueto      = DiasNoLaboralesBL.diasDeAsueto();
-		this.invalidDays       = SolicitudPermisoBL.obtenerDiasSeleccionados(empleado.getDatoEmpresa());
-		this.periodoInicio     = DateUtil.addMonth(new Date(), -1);
-		this.periodoFin        = DateUtil.addMonth(new Date(),  1);
+		this.periodoVacacional = new DetVacaciones();
+		this.periodoInicio     = DateUtil.now();
+		this.periodoFin        = DateUtil.now();
 		this.incidenciaDAO     = new IncidenciaPermisoDAO();
+		this.status            = new ManageStatus();
 		this.tipoSolicitudDAO  = new TipoSolicitudDAO();
 		this.tipoSolicitud     = this.tipoSolicitudDAO.buscarPorClave(SolicitudPermisoBL.TP_PERMISO)
 				.orElseThrow(() -> new SGPException("Tipo de solicitud no encontrada"));
-		this.minDate           = DateUtil.addDay(DateUtil.now(), -7);
-		this.status            = new ManageStatus();
 		this.mostrarCanceladas = Boolean.FALSE;
+		this.desbloquearDiasDeDescanso = Boolean.FALSE;
+		this.desbloquearDiasNoLaborales = Boolean.FALSE;
+		log.info("Termina el constructor.");
 	}
 	
-	@PostConstruct
-	public void init() {
-		this.cargarPermisos();
-	}
+	public List<DetEmpleado> buscarEmpleado(String query) {
+    	List<DetEmpleado> empleados = null;
+    	
+    	try {
+    		if(query == null)
+    			return new ArrayList<DetEmpleado>();
+    		
+    		if(query.trim().equals(""))
+    			return new ArrayList<DetEmpleado>();
+    		
+    		log.info("Buscando empleados por: {}", query);
+    		empleados = empleadoDAO.buscarPorNombrePrimerSegundoApellido(query, DateUtil.now());
+    		
+    	} catch(Exception ex) {
+    		empleados = new ArrayList<DetEmpleado>();
+    	}
+    	return empleados;
+    }
+	
+	public void asignarEmpleado() {
+    	
+        try {
+        	log.info("Empleado: {}", this.empleado);
+        	this.cargarPermisos();
+        	this.mostrarDiasLaborales();
+        	this.mostrarDiasDeDescanso();
+        	
+        } catch(Exception ex) {
+        	log.warn("Problema para asignar al empleado: {}", ex.getMessage());
+        } finally {
+        	PrimeFaces.current().ajax().update("form:messages");
+        }
+    }
 	
 	public void cargarPermisos() {
 		log.info("Cargando lista de permisos del empleado...");
@@ -118,24 +147,63 @@ public class VacacionesBean implements Serializable {
         String titulo = "Cargar informacion";
         
 		try {
+			if(this.empleado == null)
+				throw new SGPException("Debe seleccionar un empleado.");
+			
 			this.permiso = IncidenciaBL.create(IncidenciaBL.TP_VACACIONES, this.empleado);
 			DiasNoLaboralesBL.diasDescansoEstanActualizados();
             EmpleadoBL.empleadoTieneDiasLaborales(this.empleado);
             this.periodosVacacionales = VacacionesBL.cargarPeriodosConSaldo(this.empleado.getIdEmpleado(), DateUtil.now());
             this.diasSolicitados = new ArrayList<Date>();
-			
-            PrimeFaces.current().executeScript("PF('dialogVacaciones').show()");
+            PrimeFaces.current().executeScript("PF('dgVacaciones').show()");
 		} catch(Exception ex) {
 			log.error("Problema para crear una solicitud de vacaciones...", ex);
 			mensaje = "Problema para generar la solicitud de vacaciones.";
             severity = FacesMessage.SEVERITY_ERROR;
             message = new FacesMessage(severity, titulo, mensaje);
             FacesContext.getCurrentInstance().addMessage(null, message);
-            PrimeFaces.current().ajax().update(":formActividades:messages");
+            PrimeFaces.current().ajax().update("form:messages");
 		}
 	}
 	
-	public void cargarPermiso(DetIncidencia permiso) {
+	public void mostrarDiasDeDescanso() {
+		if(this.desbloquearDiasDeDescanso.booleanValue()) {
+			this.invalidDays = new ArrayList<Integer>();
+		} else {
+			this.invalidDays = SolicitudPermisoBL.obtenerDiasSeleccionados(this.empleado.getDatoEmpresa());
+			log.info("Días de descanso: {}", this.invalidDays);
+		}
+	}
+    
+    public void mostrarDiasLaborales() {
+    	Date fechaInicio = DateUtil.now();
+    	Date fechaFin = DateUtil.now();
+    	
+    	fechaInicio = DateUtil.addMonth(fechaInicio, -6);
+    	fechaFin = DateUtil.addMonth(fechaFin, 1);
+    	
+		if(this.desbloquearDiasNoLaborales.booleanValue()) {
+			log.debug("Ocultar días dias no laborales...");
+			this.diasNoLaborales = new ArrayList<Date>();
+		} else {
+			log.debug("Mostrar días no laborales...");
+			this.diasNoLaborales = DiasNoLaboralesBL.buscarPorPeriodo(new Date(fechaInicio.getTime()), new Date(fechaFin.getTime()));
+			log.info("Días no laborales: {}", this.diasNoLaborales);
+		}
+		this.actualizarPeriodo();
+	}
+    
+    public void actualizarPeriodo() {
+    	if(this.diasDeshabilitados == null)
+    		this.diasDeshabilitados = new ArrayList<Date>();
+    	
+    	this.diasDeshabilitados.clear();
+    	
+    	if(this.diasNoLaborales != null)
+    		this.diasDeshabilitados.addAll(this.diasNoLaborales);
+    }
+    
+    public void cargarPermiso(DetIncidencia permiso) {
 		FacesMessage message = null;
 		FacesMessage.Severity severity = null;
 		String mensaje = null;
@@ -166,22 +234,23 @@ public class VacacionesBean implements Serializable {
 			severity = FacesMessage.SEVERITY_WARN;
 			message = new FacesMessage(severity, titulo, mensaje);
             FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update("formActividades:messages", "formActividades:tabView:dg-vacaciones");
 		} catch(Exception ex) {
 			mensaje = "Ocurrió un problema al cargar la solicitud.";
 			severity = FacesMessage.SEVERITY_WARN;
 			message = new FacesMessage(severity, titulo, mensaje);
             FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update("formActividades:messages", "formActividades:tabView:dg-vacaciones");
+		} finally {
+			PrimeFaces.current().ajax().update("form:messages", "form:dg-vacaciones", "form:cmdSolicitar");
 		}
 	}
-	
-	public void cargarPeriodoEnCurso() {
+    
+    public void cargarPeriodoEnCurso() {
 		List<DetVacaciones> cargarPeriodosConSaldoEnCurso = VacacionesBL.cargarPeriodosConSaldoEnCurso(this.empleado.getIdEmpleado(), DateUtil.now());
 		this.periodosVacacionales.addAll(cargarPeriodosConSaldoEnCurso);
 	}
-	
-	public void onPeriodoSelect(SelectEvent<DetVacaciones> event) {
+    
+    public void onPeriodoSelect(SelectEvent<DetVacaciones> event) {
+    	FacesMessage.Severity severity = null;
     	log.debug("Seleccionando periodo vacacional: {}", event.getObject().getIdVacaciones());
     	
     	DetVacaciones periodo = (DetVacaciones) event.getObject();
@@ -190,36 +259,14 @@ public class VacacionesBean implements Serializable {
     		this.diasSolicitados = new ArrayList<Date>();
     	
     	this.diasSolicitados.clear();
-    	
+    	severity = FacesMessage.SEVERITY_INFO;
     	String mensaje = String.format("Puede seleccionar %d días", periodo.getDiasDisponibles());
-    	FacesMessage msg = new FacesMessage(mensaje);
+    	FacesMessage msg = new FacesMessage(severity, mensaje, null);
         FacesContext.getCurrentInstance().addMessage(null, msg);
-        PrimeFaces.current().ajax().update("formActividades:messages", "formActividades:tabView:dpView");
+        PrimeFaces.current().ajax().update("form:messages");
     }
     
-    public void onPeriodoUnselect(SelectEvent<DetVacaciones> event) {
-    	log.debug("Seleccionando periodo vacacional: {}", event.getObject().getIdVacaciones());
-    	FacesMessage msg = new FacesMessage("Product Unselected", String.valueOf(event.getObject().getIdVacaciones()));
-        FacesContext.getCurrentInstance().addMessage(null, msg);
-    }
-	
-	public void mostrarDiasLaborales() {
-		if(this.desbloquearDiasNoLaborales.booleanValue()) {
-			this.diasDeAsueto = new ArrayList<Date>();
-		} else {
-			this.diasDeAsueto = DiasNoLaboralesBL.diasDeAsueto();
-		}
-	}
-	
-	public void mostrarDiasDeDescanso() {
-		if(this.desbloquearDiasDeDescanso.booleanValue()) {
-			this.invalidDays = new ArrayList<Integer>();
-		} else {
-			this.invalidDays = SolicitudPermisoBL.obtenerDiasSeleccionados(empleado.getDatoEmpresa());
-		}
-	}
-	
-	public void guardar() {
+    public void guardar() {
 		FacesMessage message = null;
 		FacesMessage.Severity severity = null;
 		String mensaje = null;
@@ -227,6 +274,8 @@ public class VacacionesBean implements Serializable {
 		
 		try {
 			log.info("Guardando solicitud de permiso...");
+			if(this.permiso.getIdIncidencia() != null)
+				throw new SGPException("El periodo solicitado ya se encuentra registrado.");
 			
 			this.permiso.getSolPermiso()
 				.setDiasPermiso(SolicitudVacacionesBL.toDiaPermisoList(this.permiso.getSolPermiso(), this.diasSolicitados));
@@ -244,10 +293,12 @@ public class VacacionesBean implements Serializable {
 			mensaje = "La solicitud se guardó correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
 		} catch(SGPException ex){
+			log.warn(ex.getMessage());
 			titulo = "Verifique su solicitud";
 			mensaje = ex.getMessage();
 			severity = FacesMessage.SEVERITY_WARN;
 		} catch(Exception ex) {
+			log.error("Problema para guardar la solicitud...", ex);
 			titulo = "Error del sistema";
 			mensaje = "Ocurrió un problema al guardar la solicitud del permiso.";
 			severity = FacesMessage.SEVERITY_ERROR;
@@ -255,11 +306,11 @@ public class VacacionesBean implements Serializable {
 			this.mensajeConfirmacion = mensaje;
 			message = new FacesMessage(severity, titulo, mensaje);
             FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update("formActividades:messages", "formActividades:tabView:resumen");
+			PrimeFaces.current().ajax().update("form:messages", "form:resumen");
 		}
 	}
-	
-	public void actualizar() {
+    
+    public void actualizar() {
 		FacesMessage message = null;
 		FacesMessage.Severity severity = null;
 		String mensaje = null;
@@ -286,11 +337,11 @@ public class VacacionesBean implements Serializable {
 		} finally {
 			message = new FacesMessage(severity, titulo, mensaje);
             FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update("formActividades:messages", "formActividades:tabView:dt-permisos");
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-permisos");
 		}
 	}
-	
-	public void cancelar() {
+    
+    public void cancelar() {
 		FacesMessage message = null;
 		FacesMessage.Severity severity = null;
 		String mensaje = null;
@@ -300,7 +351,6 @@ public class VacacionesBean implements Serializable {
 			log.info("Cancelando solicitud de vacaciones...");
 			IncidenciaBL.cancelar(this.permiso);
 			this.cargarPermisos();
-			
 			PrimeFaces.current().executeScript("PF('dgVacaciones').hide();");
 			mensaje = "La solicitud se guardó correctamente.";
 			severity = FacesMessage.SEVERITY_INFO;
@@ -313,13 +363,13 @@ public class VacacionesBean implements Serializable {
 		} finally {
 			message = new FacesMessage(severity, titulo, mensaje);
             FacesContext.getCurrentInstance().addMessage(null, message);
-			PrimeFaces.current().ajax().update("formActividades:messages", "formActividades:tabView:dt-vacaciones");
+			PrimeFaces.current().ajax().update("form:messages", "form:dt-vacaciones");
 		}
 		
 		
 	}
-	
-	public boolean permiteActualizar() {
+    
+    public boolean permiteActualizar() {
 		boolean respuesta = false;
 		
 		if(permiso == null)
@@ -365,7 +415,81 @@ public class VacacionesBean implements Serializable {
 		return respuesta;
 	}
 	
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	
+	public List<DetEmpleado> getEmpleados() {
+		return empleados;
+	}
+
+	public void setEmpleados(List<DetEmpleado> empleados) {
+		this.empleados = empleados;
+	}
+
+	public DetEmpleado getEmpleado() {
+		return empleado;
+	}
+
+	public void setEmpleado(DetEmpleado empleado) {
+		this.empleado = empleado;
+	}
+
+	public DetVacaciones getPeriodoVacacional() {
+		return periodoVacacional;
+	}
+
+	public void setPeriodoVacacional(DetVacaciones periodoVacacional) {
+		this.periodoVacacional = periodoVacacional;
+	}
+
+	public List<Date> getDiasDeshabilitados() {
+		return diasDeshabilitados;
+	}
+
+	public void setDiasDeshabilitados(List<Date> diasDeshabilitados) {
+		this.diasDeshabilitados = diasDeshabilitados;
+	}
+
+	public Boolean getDesbloquearDiasDeDescanso() {
+		return desbloquearDiasDeDescanso;
+	}
+
+	public void setDesbloquearDiasDeDescanso(Boolean desbloquearDiasDeDescanso) {
+		this.desbloquearDiasDeDescanso = desbloquearDiasDeDescanso;
+	}
+
+	public Boolean getDesbloquearDiasNoLaborales() {
+		return desbloquearDiasNoLaborales;
+	}
+
+	public void setDesbloquearDiasNoLaborales(Boolean desbloquearDiasNoLaborales) {
+		this.desbloquearDiasNoLaborales = desbloquearDiasNoLaborales;
+	}
+
+	public List<Date> getDiasNoLaborales() {
+		return diasNoLaborales;
+	}
+
+	public void setDiasNoLaborales(List<Date> diasNoLaborales) {
+		this.diasNoLaborales = diasNoLaborales;
+	}
+
+	public List<Integer> getInvalidDays() {
+		return invalidDays;
+	}
+
+	public void setInvalidDays(List<Integer> invalidDays) {
+		this.invalidDays = invalidDays;
+	}
+
+	public List<DetVacaciones> getPeriodosVacacionales() {
+		return periodosVacacionales;
+	}
+
+	public void setPeriodosVacacionales(List<DetVacaciones> periodosVacacionales) {
+		this.periodosVacacionales = periodosVacacionales;
+	}
+
 	public Date getPeriodoInicio() {
 		return periodoInicio;
 	}
@@ -382,12 +506,12 @@ public class VacacionesBean implements Serializable {
 		this.periodoFin = periodoFin;
 	}
 
-	public Date getMinDate() {
-		return minDate;
+	public ManageStatus getStatus() {
+		return status;
 	}
 
-	public void setMinDate(Date minDate) {
-		this.minDate = minDate;
+	public void setStatus(ManageStatus status) {
+		this.status = status;
 	}
 
 	public List<DetIncidencia> getPermisos() {
@@ -406,72 +530,12 @@ public class VacacionesBean implements Serializable {
 		this.permiso = permiso;
 	}
 
-	public ManageStatus getStatus() {
-		return status;
-	}
-
-	public void setStatus(ManageStatus status) {
-		this.status = status;
-	}
-
-	public List<DetVacaciones> getPeriodosVacacionales() {
-		return periodosVacacionales;
-	}
-
-	public void setPeriodosVacacionales(List<DetVacaciones> periodosVacacionales) {
-		this.periodosVacacionales = periodosVacacionales;
-	}
-
-	public Integer getDiasTotalesPermitidos() {
-		return diasTotalesPermitidos;
-	}
-
-	public void setDiasTotalesPermitidos(Integer diasTotalesPermitidos) {
-		this.diasTotalesPermitidos = diasTotalesPermitidos;
-	}
-
 	public List<Date> getDiasSolicitados() {
 		return diasSolicitados;
 	}
 
 	public void setDiasSolicitados(List<Date> diasSolicitados) {
 		this.diasSolicitados = diasSolicitados;
-	}
-
-	public List<Integer> getInvalidDays() {
-		return invalidDays;
-	}
-
-	public void setInvalidDays(List<Integer> invalidDays) {
-		this.invalidDays = invalidDays;
-	}
-
-	public List<Date> getDiasDeAsueto() {
-		return diasDeAsueto;
-	}
-
-	public Boolean getMostrarCanceladas() {
-		return mostrarCanceladas;
-	}
-
-	public void setMostrarCanceladas(Boolean mostrarCanceladas) {
-		this.mostrarCanceladas = mostrarCanceladas;
-	}
-
-	public Boolean getDesbloquearDiasNoLaborales() {
-		return desbloquearDiasNoLaborales;
-	}
-
-	public void setDesbloquearDiasNoLaborales(Boolean desbloquearDiasNoLaborales) {
-		this.desbloquearDiasNoLaborales = desbloquearDiasNoLaborales;
-	}
-
-	public Boolean getDesbloquearDiasDeDescanso() {
-		return desbloquearDiasDeDescanso;
-	}
-
-	public void setDesbloquearDiasDeDescanso(Boolean desbloquearDiasDeDescanso) {
-		this.desbloquearDiasDeDescanso = desbloquearDiasDeDescanso;
 	}
 
 	public String getMensajeConfirmacion() {
@@ -481,5 +545,14 @@ public class VacacionesBean implements Serializable {
 	public void setMensajeConfirmacion(String mensajeConfirmacion) {
 		this.mensajeConfirmacion = mensajeConfirmacion;
 	}
+
+	public List<Date> getDiasDeAsueto() {
+		return diasDeAsueto;
+	}
+
+	public void setDiasDeAsueto(List<Date> diasDeAsueto) {
+		this.diasDeAsueto = diasDeAsueto;
+	}
+	
 
 }
