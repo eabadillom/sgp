@@ -44,7 +44,8 @@
 		        </p:column>
 		        <p:column headerText="Status" sortBy="#{permiso.solPermiso.estatus.descripcion}">
 		            <span class="customer-badge status-#{vacacionesBean.status.getStatusClass(permiso.solPermiso.estatus.clave)}" style="display: block; width: 7rem">
-		                #{vacacionesBean.status.getStatusText( permiso.solPermiso.estatus.clave)}</span>
+		                #{vacacionesBean.status.getStatusText( permiso.solPermiso.estatus.clave)}
+	                </span>
 		        </p:column>
 		        <p:column style="width: 2rem">
 		            <p:commandButton class="ui-button-success rounded-button m-1" icon="pi pi-bars" process="@this" styleClass="edit-button"
@@ -77,11 +78,9 @@
 				<p:column width="10rem" style="vertical-align: top;">
 					<p:card>
 						<p:dataTable id="dt-periodos-vacacionales" widgetVar="dtPeriodosVacaciones" var="periodo" value="#{vacacionesBean.periodosVacacionales}"
-			                         paginator="true" rows="4" paginatorPosition="bottom"
-			                         selection="#{vacacionesBean.periodoVacacional}" rowKey="#{periodo.idVacaciones}">
-			                <p:ajax event="rowSelectRadio" listener="#{vacacionesBean.onPeriodoSelect}" update="formActividades:tabView:dpView"/>
-			                <p:column selectionMode="single"  width="2rem" style="text-align:center">
-			                </p:column>
+			                         paginator="true" rows="4" paginatorPosition="bottom" selectionMode="single"
+			                         selection="#{vacacionesBean.permiso.solPermiso.vacaciones}" rowKey="#{periodo.idVacaciones}" >
+			                <p:ajax event="rowSelect" listener="#{vacacionesBean.onPeriodoSelect}" update="formActividades:tabView:dpView"/>
 			                <p:column headerText="Periodo inicio" style="text-align: center;">
 			                    <p:outputLabel value="#{periodo.fechaInicio}">
 			                    	<f:convertDateTime pattern="dd 'de' MMM 'de' yyyy" locale="es_MX" timeZone="GMT-6" />
@@ -95,20 +94,19 @@
 			                <p:column headerText="Total" width="4rem" style="text-align: center;">
 			                    <p:outputLabel value="#{periodo.diasTotales} día(s)"/>
 			                </p:column>
-			                <p:column headerText="Disponibles" width="5rem" style="text-align: center;">
-			                    <p:outputLabel value="#{vacacionesBean.diasDisponibles(periodo)} día(s)"/>
+			                <p:column headerText="Disponibles" width="6rem" style="text-align: center;">
+			                    <p:outputLabel value="#{periodo.diasDisponibles} día(s)"/>
 			                </p:column>
 			            </p:dataTable>
 					</p:card>
 				</p:column>
 				<p:column rowspan="2">
 					<p:card>
-						<p:datePicker id="dpView" styleClass="ferbo-datePicker"  disabled="#{vacacionesBean.periodoVacacional eq null}" readonlyInput="true" 
-		                          timeZone="GMT-6" locale="es_MX" value="#{vacacionesBean.diasSolicitados}"
+						<p:datePicker id="dpView" styleClass="ferbo-datePicker"  disabled="#{vacacionesBean.permiso.solPermiso.vacaciones eq null}" readonlyInput="true"
+		                          inline="true" pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX" value="#{vacacionesBean.diasSolicitados}"
 		                          mindate="#{vacacionesBean.permiso.solPermiso.fechaInicio}" maxdate="#{vacacionesBean.permiso.solPermiso.fechaFin}"
-		                          inline="true" selectionMode="multiple" disabledDays="#{vacacionesBean.invalidDays}" 
+		                          selectionMode="multiple" disabledDays="#{vacacionesBean.invalidDays}"
 		                          disabledDates="#{vacacionesBean.diasDeAsueto}">
-							<p:ajax event="dateSelect" process="@this" listener="#{vacacionesBean.seleccionarFecha()}" update="txtFechaInicio txtFechaFin dt-periodos-vacacionales" />
 			            </p:datePicker>
 					</p:card>
 				</p:column>
@@ -116,14 +114,9 @@
 			
 			<p:row>
 				<p:column style="vertical-align: bottom;">
-					<p:card>
+					<p:card id="resumen">
 						<div align="center">
-							<p:inputText id="txtFechaInicio" value="#{vacacionesBean.permiso.solPermiso.fechaInicio}" disabled="true" >
-				                <f:convertDateTime type="date" pattern="'del' dd 'de' MMMM 'de' yyyy" locale="es" timeZone="GMT-6"/>
-				            </p:inputText>
-				            <p:inputText id="txtFechaFin" value="#{vacacionesBean.permiso.solPermiso.fechaFin}" disabled="true">
-				                <f:convertDateTime type="date" pattern="'al' dd 'de' MMMM 'de' yyyy" locale="es" timeZone="GMT-6"/>
-				            </p:inputText>
+							<p:outputLabel value="#{vacacionesBean.mensajeConfirmacion}" />
 						</div>
 						<div align="center">
 							<p:outputLabel value="#{vacacionesBean.permiso.solPermiso.estatus.descripcion}" rendered="#{vacacionesBean.permiso.idIncidencia ne null}" styleClass="customer-badge status-#{vacacionesBean.status.getStatusClass(permiso.solPermiso.estatus.clave)}"/>
@@ -147,10 +140,10 @@
             	<p:confirm header="Cancelar permiso" message="¿Está seguro que desea cancelar este permiso?" icon="pi pi-exclamation-triangle" />
             </p:commandButton>
             <p:commandButton value="Actualizar" icon="pi pi-check" actionListener="#{vacacionesBean.actualizar()}" process="@this" update="dtVacaciones" rendered="#{vacacionesBean.permiteActualizar()}">
-            	<p:confirm header="Actualizar permiso" message="¿Está seguro que desea actualizar permiso de vacaciones?" icon="pi pi-exclamation-triangle" />
+            	<p:confirm header="Actualizar permiso" message="¿Está seguro que desea actualizar este periodo?" icon="pi pi-exclamation-triangle" />
             </p:commandButton>
-            <p:commandButton value="Solicitar" icon="pi pi-check" process="@this" actionListener="#{vacacionesBean.guardar()}" rendered="#{vacacionesBean.permiso.idIncidencia eq null}">
-				<p:confirm header="Solicitar permiso" message="¿Está seguro que desea solicitar permiso para este día?" icon="pi pi-exclamation-triangle" />
+            <p:commandButton id="cmdSolicitar" value="Solicitar" icon="pi pi-check" process="@this dpView" actionListener="#{vacacionesBean.guardar()}" rendered="#{vacacionesBean.permiso.idIncidencia eq null}">
+				<p:confirm header="Solicitar permiso" message="¿Está seguro que desea registrar este periodo?" icon="pi pi-exclamation-triangle" />
 			</p:commandButton>
             <p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dgVacaciones').hide()" class="ui-button-secondary"/>
         </f:facet>

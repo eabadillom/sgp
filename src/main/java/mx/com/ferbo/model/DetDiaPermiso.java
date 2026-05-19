@@ -31,9 +31,18 @@ public class DetDiaPermiso implements Serializable{
 	private Date fecha;
 	
 	@ManyToOne
-	@JoinColumn(name = "id_solicitud")
+	@JoinColumn(name = "id_solicitud", referencedColumnName = "id_solicitud")
 	@Basic(optional = false)
 	private DetSolicitudPermiso solicitudPermiso;
+	
+	public DetDiaPermiso() {
+	}
+
+	private DetDiaPermiso(Builder builder) {
+		this.id = builder.id;
+		this.fecha = builder.fecha;
+		this.solicitudPermiso = builder.solicitudPermiso;
+	}
 
 	@Override
 	public int hashCode() {
@@ -81,5 +90,37 @@ public class DetDiaPermiso implements Serializable{
 
 	public void setSolicitudPermiso(DetSolicitudPermiso solicitudPermiso) {
 		this.solicitudPermiso = solicitudPermiso;
+	}
+	
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	public static final class Builder {
+		private Integer id;
+		private Date fecha;
+		private DetSolicitudPermiso solicitudPermiso;
+
+		public Builder() {
+		}
+
+		public Builder id(Integer id) {
+			this.id = id;
+			return this;
+		}
+
+		public Builder fecha(Date fecha) {
+			this.fecha = fecha;
+			return this;
+		}
+
+		public Builder solicitudPermiso(DetSolicitudPermiso solicitudPermiso) {
+			this.solicitudPermiso = solicitudPermiso;
+			return this;
+		}
+
+		public DetDiaPermiso build() {
+			return new DetDiaPermiso(this);
+		}
 	}
 }
