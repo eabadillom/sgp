@@ -66,10 +66,10 @@
 			</p:outputLabel>
 		</div>
 		<f:facet name="footer">
-			<p:commandButton value="Cancelar" icon="pi pi-times" actionListener="#{permisosBean.cancelar()}" rendered="#{permisosBean.permiteCancelar()}" styleClass="ui-button-danger">
+			<p:commandButton value="Cancelar" icon="pi pi-times" actionListener="#{permisosBean.cancelar()}" rendered="#{permisosBean.permiteCancelar()}" styleClass="ui-button-outlined ui-button-danger">
 				<p:confirm header="Cancelar permiso" message="¿Está seguro que desea cancelar este permiso?" icon="pi pi-exclamation-triangle" />
 			</p:commandButton>
-			<p:commandButton value="Actualizar" icon="pi pi-check" process="@this" actionListener="#{permisosBean.actualizar()}" rendered="#{permisosBean.permiteActualizar()}">
+			<p:commandButton value="Actualizar" icon="pi pi-save" process="@this" actionListener="#{permisosBean.actualizar()}" rendered="#{permisosBean.permiteActualizar()}" styleClass="ui-button-outlined">
 				<p:confirm header="Actualizar permiso" message="¿Está seguro que desea actualizar permiso para este día?" icon="pi pi-exclamation-triangle" />
 			</p:commandButton>
 			<p:commandButton value="Solicitar" icon="pi pi-check" process="@this" actionListener="#{permisosBean.guardar()}" rendered="#{permisosBean.permiso.idIncidencia eq null}">
