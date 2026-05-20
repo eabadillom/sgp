@@ -144,13 +144,13 @@
 
         </p:outputPanel>
         <f:facet name="footer">
-            <p:commandButton value="Aprobar" icon="pi pi-check" class="ui-button-success" process="pnlDetalleSolicitudPermiso @this"
+            <p:commandButton value="Aprobar" icon="pi pi-check" process="pnlDetalleSolicitudPermiso @this"
                              actionListener="#{incidenciasSolicitudesBean.aprobarIncidencia()}"
                              rendered="#{incidenciasSolicitudesBean.permiteAprobar()}"/>
-            <p:commandButton value="Rechazar" icon="pi pi-times" class="ui-button-warning" process="pnlDetalleSolicitudPermiso @this"
+            <p:commandButton value="Rechazar" icon="pi pi-times" class="ui-button-outlined ui-button-danger" process="pnlDetalleSolicitudPermiso @this"
                              rendered="#{incidenciasSolicitudesBean.permiteRechazar()}"
                              oncomplete="PF('dialogPermisos').hide(); PF('dialogRechazar').show()"/>
-            <p:commandButton value="Cancelar" icon="pi pi-trash" class="ui-button-danger" process="pnlDetalleSolicitudPermiso @this" 
+            <p:commandButton value="Cancelar" icon="pi pi-trash" class="ui-button-outlined ui-button-danger" process="pnlDetalleSolicitudPermiso @this" 
                              rendered="#{incidenciasSolicitudesBean.permiteCancelar()}"
                              oncomplete="PF('dialogPermisos').hide(); PF('dialogoCancelar').show()"/>
             <p:commandButton value="Cerrar" icon="pi pi-times" class="ui-button-secondary" onclick="PF('').hide();">
