@@ -136,13 +136,13 @@
 		</p:panelGrid>
 
         <f:facet name="footer">
-            <p:commandButton value="Cancelar" icon="pi pi-times" actionListener="#{vacacionesBean.cancelar()}" process="@this" update="dtVacaciones" rendered="#{vacacionesBean.permiteCancelar()}" styleClass="ui-button-outlined ui-button-danger">
+            <p:commandButton value="Cancelar" icon="pi pi-times" actionListener="#{vacacionesBean.cancelar()}" process="@this" update="formActividades:tabView:dtVacaciones" rendered="#{vacacionesBean.permiteCancelar()}" styleClass="ui-button-outlined ui-button-danger" onstart="PF('statusInfoDialog').show();"  oncomplete="PF('statusInfoDialog').hide();">
             	<p:confirm header="Cancelar permiso" message="¿Está seguro que desea cancelar este permiso?" icon="pi pi-exclamation-triangle" />
             </p:commandButton>
-            <p:commandButton value="Actualizar" icon="pi pi-save" actionListener="#{vacacionesBean.actualizar()}" process="@this" update="dtVacaciones" rendered="#{vacacionesBean.permiteActualizar()}" styleClass="ui-button-outlined">
+            <p:commandButton value="Actualizar" icon="pi pi-save" actionListener="#{vacacionesBean.actualizar()}" process="@this" update="formActividades:tabView:dtVacaciones" rendered="#{vacacionesBean.permiteActualizar()}" styleClass="ui-button-outlined" onstart="PF('statusInfoDialog').show();"  oncomplete="PF('statusInfoDialog').hide();">
             	<p:confirm header="Actualizar permiso" message="¿Está seguro que desea actualizar este periodo?" icon="pi pi-exclamation-triangle" />
             </p:commandButton>
-            <p:commandButton id="cmdSolicitar" value="Solicitar" icon="pi pi-check" process="@this dpView" actionListener="#{vacacionesBean.guardar()}" rendered="#{vacacionesBean.permiso.idIncidencia eq null}">
+            <p:commandButton id="cmdSolicitar" value="Solicitar" icon="pi pi-check" process="@this dpView" actionListener="#{vacacionesBean.guardar()}" rendered="#{vacacionesBean.permiso.idIncidencia eq null}" update="formActividades:tabView:dtVacaciones" onstart="PF('statusInfoDialog').show();"  oncomplete="PF('statusInfoDialog').hide();">
 				<p:confirm header="Solicitar permiso" message="¿Está seguro que desea registrar este periodo?" icon="pi pi-exclamation-triangle" />
 			</p:commandButton>
             <p:commandButton value="Cerrar" icon="pi pi-times" onclick="PF('dgVacaciones').hide()" class="ui-button-secondary"/>
