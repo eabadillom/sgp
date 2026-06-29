@@ -40,6 +40,7 @@ public class VacacionesBL {
 	}
 	
 	public static List<DetVacaciones> cargarPeriodosConSaldoEnCurso(Integer idEmpleado, Date now) {
+		Integer diasDisponibles = null;
 		
 		List<DetVacaciones> periodos = new ArrayList<DetVacaciones>();
 		VacacionesDAO vacacionesDAO = new VacacionesDAO();
@@ -52,6 +53,8 @@ public class VacacionesBL {
         		continue;
         	
         	if (periodo.getDiasTomados() < periodo.getDiasTotales() && (periodo.getDiasPagados() + periodo.getDiasTomados()) < periodo.getDiasTotales()) {
+        		diasDisponibles = diasDisponibles(periodo);
+        		periodo.setDiasDisponibles(diasDisponibles);
         		periodos.add(periodo);
         	}
         }
