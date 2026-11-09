@@ -296,7 +296,7 @@ public class RegistroAsistenciaBL {
                 break;
 
             default:
-                throw new SGPException("El día de la semana, no concuerda los regiestrados en el sistema, favor de verificar.");
+                throw new SGPException("El día de la semana no coincide con los registrados en el sistema. Por favor, verifica la información.");
         }
 
         return esDiaLaboral;
