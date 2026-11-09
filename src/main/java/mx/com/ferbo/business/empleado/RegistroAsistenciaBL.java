@@ -244,7 +244,7 @@ public class RegistroAsistenciaBL {
 
         registro.setFechaEntrada(horaRegistro);
 
-        log.info("La Hora de registro de entrada del empleado {} {} {} por ahora se establece a nulo", registro.getEmpleado().getNombre(), registro.getEmpleado().getPrimerAp(), registro.getEmpleado().getSegundoAp());
+        log.info("La hora de registro de salida del empleado {} {} {} por ahora se establece a nulo", registro.getEmpleado().getNombre(), registro.getEmpleado().getPrimerAp(), registro.getEmpleado().getSegundoAp());
         registro.setFechaSalida(null);
 
         registro.setStatus(estatusRegistro);
