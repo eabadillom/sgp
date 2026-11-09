@@ -1,6 +1,8 @@
 package mx.com.ferbo.business.dianolaboral;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -80,6 +82,37 @@ public class DiasNoLaboralesBL implements Serializable {
         if (diasNoLaborables.isEmpty() || diasNoLaborables.size() < 2) {
             throw new SGPException("Error: Dias de asueto no actualizados. Por favor contactar a RH");
         }
+    }
+
+     public static CatDiaNoLaboral BuscarYobtenerDiaFestivo(Date dia) throws SGPException {
+
+        if (dia == null) {
+            throw new SGPException("El día recibido no puede ser vacío");
+        }
+
+        List<CatDiaNoLaboral> diasFestivos = diasDescansoAnual();
+
+        if (diasFestivos == null || diasFestivos.size() == 0) {
+            throw new SGPException("Es necesario registrar los días de asueto. Favor de verificar y actualizar la información en el catálogo.");
+        }
+
+        log.info("El día de hoy es: {}", dia);
+
+        CatDiaNoLaboral resultado = null;
+
+        for (CatDiaNoLaboral diaFestivo : diasFestivos) {
+            Date fechaDiaFestivo = diaFestivo.getFecha();
+            log.info("Fecha del día destivo: {}", fechaDiaFestivo);
+            log.info("¿{} es igual a {}?", fechaDiaFestivo, dia);
+            LocalDate fecha1 = fechaDiaFestivo.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate fecha2 = dia.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+            if (fecha1.isEqual(fecha2)) {
+                resultado = diaFestivo;
+            }
+        }
+
+        return resultado;
     }
 
 }
