@@ -19,6 +19,7 @@ import org.primefaces.PrimeFaces;
 import mx.com.ferbo.business.dianolaboral.DiasNoLaboralesBL;
 import mx.com.ferbo.business.empleado.EmpleadoBL;
 import mx.com.ferbo.business.incidencia.IncidenciaBL;
+import mx.com.ferbo.business.incidencia.IncidenciaPermisosBL;
 import mx.com.ferbo.business.incidencia.IncidenciaVacacionesBL;
 import mx.com.ferbo.dao.n.IncidenciaPermisoDAO;
 import mx.com.ferbo.dao.n.TipoSolicitudDAO;
@@ -106,11 +107,45 @@ public class IncidenciasSolicitudesBean implements Serializable
         
         this.listaPermisos.clear();
         this.listaPermisos.addAll(IncidenciaVacacionesBL.buscarPendientes());
-        this.listaPermisos.addAll(
-        		otrosPermisos.stream()
-            	.filter(p -> !p.getEstatusIncidencia().getClave().equalsIgnoreCase(IncidenciaBL.ST_ENVIADA))
-            	.collect(Collectors.toList())
-        		) ;
+        this.listaPermisos.addAll(IncidenciaPermisosBL.buscarPendientes());
+        
+        //Busca solicitudes (incidencias) de tipo "Vacaciones"
+        if(this.incidenciaVacaciones) {
+        	if(this.estatusEnviado)
+        		this.listaPermisos.addAll(
+        				otrosPermisos.stream()
+        				.filter(p -> IncidenciaBL.TP_VACACIONES.equalsIgnoreCase(p.getTipoIncidencia().getClave()))
+        				.filter(p -> !IncidenciaBL.ST_ENVIADA.equalsIgnoreCase(p.getEstatusIncidencia().getClave()))
+        				.collect(Collectors.toList())
+        				) ;
+        	
+        	if(this.estatusAceptado)
+        		this.listaPermisos.addAll(
+        				otrosPermisos.stream()
+        				.filter(p -> IncidenciaBL.TP_VACACIONES.equalsIgnoreCase(p.getTipoIncidencia().getClave()))
+        				.filter(p -> !IncidenciaBL.ST_APROBADA.equalsIgnoreCase(p.getEstatusIncidencia().getClave()))
+        				.collect(Collectors.toList())
+        				);
+        }
+        
+        //Busca solicitudes (incidencias) de tipo "Permiso"
+        if(this.incidenciaPermiso) {
+        	if(this.estatusEnviado)
+        		this.listaPermisos.addAll(
+        				otrosPermisos.stream()
+        				.filter(p -> IncidenciaBL.TP_PERMISO.equalsIgnoreCase(p.getTipoIncidencia().getClave()))
+        				.filter(p -> !IncidenciaBL.ST_ENVIADA.equalsIgnoreCase(p.getEstatusIncidencia().getClave()))
+        				.collect(Collectors.toList())
+        				) ;
+        	
+        	if(this.estatusAceptado)
+        		this.listaPermisos.addAll(
+        				otrosPermisos.stream()
+        				.filter(p -> IncidenciaBL.TP_PERMISO.equalsIgnoreCase(p.getTipoIncidencia().getClave()))
+        				.filter(p -> !IncidenciaBL.ST_APROBADA.equalsIgnoreCase(p.getEstatusIncidencia().getClave()))
+        				.collect(Collectors.toList())
+        				);
+        }
     }
     
     public List<DetIncidencia> consultarTipoPermisos() {

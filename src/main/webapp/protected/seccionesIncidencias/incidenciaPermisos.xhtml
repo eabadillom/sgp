@@ -22,13 +22,13 @@
         <div class="field col-12 md:col-2">
         	<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
             <p:selectBooleanButton id="idEstatusAceptado" value="#{incidenciasSolicitudesBean.estatusAceptado}" onIcon="pi pi-check" onLabel="Aprobadas" offIcon="pi pi-times" offLabel="Aprobadas" >
-                <p:ajax event="change" update="dtIncidencias" process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
+                <p:ajax event="change" update="dtIncidencias" listener="#{incidenciasSolicitudesBean.consultarPermisos()}" process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
             </p:selectBooleanButton>
         </div>
         <div class="field col-12 md:col-2" >
         	<p:outputLabel value="." style="color: rgba(255, 255, 255, 0);" />
             <p:selectBooleanButton id="idEstatusEnviado" value="#{incidenciasSolicitudesBean.estatusEnviado}" onIcon="pi pi-check" onLabel="Pendientes" offIcon="pi pi-times" offLabel="Pendientes" >
-                <p:ajax event="change" update="dtIncidencias" process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
+                <p:ajax event="change" update="dtIncidencias" listener="#{incidenciasSolicitudesBean.consultarPermisos()}" process="@this" onstart="PF('statusInfoDialog').show();" oncomplete="PF('statusInfoDialog').hide();"/>
             </p:selectBooleanButton>
         </div>
     </div>
