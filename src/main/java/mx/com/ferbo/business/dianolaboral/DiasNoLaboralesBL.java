@@ -84,7 +84,7 @@ public class DiasNoLaboralesBL implements Serializable {
         }
     }
 
-     public static CatDiaNoLaboral BuscarYobtenerDiaFestivo(Date dia) throws SGPException {
+     public static CatDiaNoLaboral BuscarYobtenerDiaNoLaboral(Date dia) throws SGPException {
 
         if (dia == null) {
             throw new SGPException("El día recibido no puede ser vacío");

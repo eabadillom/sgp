@@ -217,23 +217,28 @@ public class RegistroAsistenciaBL {
 
         DateUtil.resetTime(hoy);
 
-        CatDiaNoLaboral diaNoLaboral = DiasNoLaboralesBL.BuscarYobtenerDiaFestivo(hoy);
+        CatDiaNoLaboral diaNoLaboral = DiasNoLaboralesBL.BuscarYobtenerDiaNoLaboral(hoy);
         
         if (diaNoLaboral == null) {
             diaNoLaboral = new CatDiaNoLaboral();
             diaNoLaboral.setOficial(false);
         }
             
-        
+        // Se pregunta si el día de mañana es un día no raboral oficial
         boolean respuesta = diaNoLaboral.getOficial();
 
+        // Sí el día de mañana es un día no laboral oficial, se registra como una asistencia en día no laboral
         if (respuesta) {
             estatusRegistro = estatusRegistroDAO.buscarPorCodigo(ASISTENCIA_DIA_NO_LABORAL);
         } else {
+            // Cómo no fue un día no laboral oficial, se tiene que preguntar si el día de mñana es un día de descanso por contrato
             boolean esDiaDeDescanso = esDiaDescansoDelEmpleado(empleado, hoy);
+
+            // Cómo no es un día no laboral y ofical y tampoco es un día de descanso por contrato, la asistencia se toma como una simple asistencia.
             if (esDiaDeDescanso) {
                 estatusRegistro = estatusRegistroDAO.buscarPorCodigo(A_TIEMPO);
             } else {
+                // Cómo es un día de descanso por contrato del empleado, se debe tomar como una asistencia en día no laboral.
                 estatusRegistro = estatusRegistroDAO.buscarPorCodigo(ASISTENCIA_DIA_NO_LABORAL);
             }
         }
