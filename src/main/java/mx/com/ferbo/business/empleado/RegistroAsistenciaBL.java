@@ -234,7 +234,7 @@ public class RegistroAsistenciaBL {
             // Cómo no fue un día no laboral oficial, se tiene que preguntar si el día de mñana es un día de descanso por contrato
             boolean esDiaDeDescanso = esDiaDescansoDelEmpleado(empleado, hoy);
 
-            // Cómo no es un día no laboral y ofical y tampoco es un día de descanso por contrato, la asistencia se toma como una simple asistencia.
+            // Cómo no es un día no laboral ofical y tampoco es un día de descanso por contrato, la asistencia se toma como una simple asistencia.
             if (esDiaDeDescanso) {
                 estatusRegistro = estatusRegistroDAO.buscarPorCodigo(A_TIEMPO);
             } else {
