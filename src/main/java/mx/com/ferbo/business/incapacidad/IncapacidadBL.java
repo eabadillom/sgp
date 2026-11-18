@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.dao.n.imss.IncapacidadIMSSDAO;
 import mx.com.ferbo.model.DetEmpleado;
+import mx.com.ferbo.model.DetIncidencia;
 import mx.com.ferbo.model.DetRegistroIncapacidad;
 import mx.com.ferbo.model.imss.DetIncapacidad;
 import mx.com.ferbo.util.SGPException;
@@ -22,6 +23,8 @@ public class IncapacidadBL implements Serializable
 {
     private static final Logger log = LogManager.getLogger(IncapacidadBL.class);
     private static final long serialVersionUID = 1L;
+
+    private static final String APROBADA = "A";
     
     public static void validarRegistrosIncapacidades(DetEmpleado empleado, Date fechaInicio, Date fechaFinal) throws SGPException
     {
@@ -31,7 +34,12 @@ public class IncapacidadBL implements Serializable
         if(!listIncapacidades.isEmpty())
         {
             log.warn("El empleado {} tiene las siguientes incapacidades: {}", empleado.getIdEmpleado(), listIncapacidades.toString());
-            throw new SGPException("Ya existe un registro de incapacidad");
+            //throw new SGPException("Ya existe un registro de incapacidad");
+            for (DetIncapacidad incapacidad : listIncapacidades) {
+                if (APROBADA.equalsIgnoreCase(incapacidad.getEstatusSolicitud().getClave())){
+                    throw new SGPException("La incapacidad del día " + incapacidad.getFechaInicio() + " aún se encuentra APROBADA.");
+                }
+            }
         }
     }
     
