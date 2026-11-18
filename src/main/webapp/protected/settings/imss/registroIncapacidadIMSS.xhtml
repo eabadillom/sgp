@@ -124,19 +124,19 @@
                             </p:selectOneMenu>
                         </div>
                         <div class="field col">
-                            <p:outputLabel for="@next" value="Riesgo Trabajo"/>
-                            <p:selectOneMenu id="riesgoTrabajo" autoWidth="false" converter="entityConverter" value="#{registroIncBean.riesgoTrabajo}" 
+                            <p:outputLabel for="@next" value="Secuela del Riesgo Trabajo"/>
+                            <p:selectOneMenu id="riesgoTrabajo" autoWidth="false" converter="entityConverter" value="#{registroIncBean.incapacidad.secuelaRiesgoTrabajo}" 
                                              disabled="#{registroIncBean.incapacidad.tipoIncapacidad.incapacidadSAT.clave ne '01' 
                                             or registroIncBean.incapacidad.estatusSolicitud.clave eq 'C' 
                                             or registroIncBean.controlIncapacidad.clave eq 'D'}" >
                                 <f:selectItem itemLabel="--Seleccione--" itemValue="#{null}" />
                                 <f:selectItems value="#{registroIncBean.listaRiesgoTrabajo}" var="tipoV" itemLabel="#{tipoV.descripcion}" itemValue="#{tipoV}"/>
-                                <p:ajax event="change" update="pnlRegistoIncapacidad" process="@this" resetValues="true"/>
+                                <p:ajax process="@this" update="pnlRegistoIncapacidad" resetValues="true"/>
                             </p:selectOneMenu>
                         </div>
                         <div class="field col">
                             <p:outputLabel for="@next" value="Tipo de Riesgo de Trabajo"/>
-                            <p:selectOneMenu id="tipoRiesgoTrabajo" autoWidth="false" converter="entityConverter" value="#{registroIncBean.tipoRiesgo}" 
+                            <p:selectOneMenu id="tipoRiesgoTrabajo" autoWidth="false" converter="entityConverter" value="#{registroIncBean.incapacidad.tipoRiesgo}" 
                                              disabled="#{registroIncBean.incapacidad.tipoIncapacidad.incapacidadSAT.clave ne '01' 
                                             or registroIncBean.incapacidad.estatusSolicitud.clave eq 'C' 
                                             or registroIncBean.controlIncapacidad.clave eq 'D'}" >
