@@ -34,7 +34,6 @@ public class IncapacidadBL implements Serializable
         if(!listIncapacidades.isEmpty())
         {
             log.warn("El empleado {} tiene las siguientes incapacidades: {}", empleado.getIdEmpleado(), listIncapacidades.toString());
-            //throw new SGPException("Ya existe un registro de incapacidad");
             for (DetIncapacidad incapacidad : listIncapacidades) {
                 if (APROBADA.equalsIgnoreCase(incapacidad.getEstatusSolicitud().getClave())){
                     throw new SGPException("La incapacidad del día " + incapacidad.getFechaInicio() + " aún se encuentra APROBADA.");
