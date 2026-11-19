@@ -86,6 +86,8 @@ public class DiasNoLaboralesBL implements Serializable {
 
      public static CatDiaNoLaboral BuscarYobtenerDiaNoLaboral(Date dia) throws SGPException {
 
+        String zonaGMT6 = "-06:00";
+
         if (dia == null) {
             throw new SGPException("El día recibido no puede ser vacío");
         }
@@ -104,8 +106,8 @@ public class DiasNoLaboralesBL implements Serializable {
             Date fechaDiaFestivo = diaFestivo.getFecha();
             log.info("Fecha del día destivo: {}", fechaDiaFestivo);
             log.info("¿{} es igual a {}?", fechaDiaFestivo, dia);
-            LocalDate fecha1 = fechaDiaFestivo.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            LocalDate fecha2 = dia.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate fecha1 = fechaDiaFestivo.toInstant().atZone(ZoneId.of(zonaGMT6)).toLocalDate();
+            LocalDate fecha2 = dia.toInstant().atZone(ZoneId.of(zonaGMT6)).toLocalDate();
 
             if (fecha1.isEqual(fecha2)) {
                 resultado = diaFestivo;
