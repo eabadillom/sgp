@@ -16,7 +16,7 @@ public class AsistenciaRBL extends ReportBL {
 	private static final String LOGO_PATH  = "/images/logo.png";
 	private static final String JRXML_PATH = "/jasper/ReporteAsistencia.jrxml";
 	
-	public synchronized byte[] getPDF(Integer idPlanta, Date fechaInicio, Date fechaFin) {
+	public synchronized byte[] getPDF(Integer idPlanta, Integer idEmpresa, Date fechaInicio, Date fechaFin) {
 		byte[] bytes = null;
 		
 		Map<String, Object> parameters = null;
@@ -32,6 +32,7 @@ public class AsistenciaRBL extends ReportBL {
 			
 			parameters = getParameters();
 			parameters.put("idPlanta", idPlanta);
+			parameters.put("idEmpresa", idEmpresa);
 			parameters.put("fechaInicio", fechaInicio);
 			parameters.put("fechaFin", fechaFin);
 			parameters.put("imagen", logoPath);
@@ -47,7 +48,7 @@ public class AsistenciaRBL extends ReportBL {
 		return bytes;
 	}
 	
-	public synchronized byte[] getXLSX(Integer idPlanta, Date fechaInicio, Date fechaFin) {
+	public synchronized byte[] getXLSX(Integer idPlanta, Integer idEmpresa, Date fechaInicio, Date fechaFin) {
 		byte[] bytes = null;
 		
 		Map<String, Object> parameters = null;
@@ -63,6 +64,7 @@ public class AsistenciaRBL extends ReportBL {
 			
 			parameters = getParameters();
 			parameters.put("idPlanta", idPlanta);
+			parameters.put("idEmpresa", idEmpresa);
 			parameters.put("fechaInicio", fechaInicio);
 			parameters.put("fechaFin", fechaFin);
 			parameters.put("imagen", logoPath);
