@@ -11,6 +11,7 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -82,6 +83,8 @@ public class DateUtil {
     public static final String PROP_CD_SABADO = "S";
 
     public static String[] PROP_DIA_SEMANA = {PROP_CD_DOMINGO, PROP_CD_LUNES, PROP_CD_MARTES, PROP_CD_MIERCOLES, PROP_CD_JUEVES, PROP_CD_VIERNES, PROP_CD_SABADO};
+
+    private  static final List<String> diasSemana = Arrays.asList(PROP_DIA_SEMANA);
 
     public static final String KEY_SEPARADOR_DIA = " ";//Para lectura del .properties
 
@@ -1038,6 +1041,10 @@ public class DateUtil {
         Instant inicioInstant = instant.minus(7, ChronoUnit.DAYS);
 
         return Date.from(inicioInstant);
+    }
+
+    public static List<String> getDiasSemana() {
+        return diasSemana;
     }
 
 }
