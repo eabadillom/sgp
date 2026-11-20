@@ -1,25 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
+<!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 6.19.0  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteAsistencia" pageWidth="612" pageHeight="792" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="b2dbfb33-a851-457d-b39e-16777d1ed655">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="361"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="626"/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="SGP_Azure.jrdax"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
 	<parameter name="idPlanta" class="java.lang.Integer"/>
 	<parameter name="fechaInicio" class="java.util.Date"/>
 	<parameter name="fechaFin" class="java.util.Date"/>
 	<parameter name="imagen" class="java.lang.String">
 		<defaultValueExpression><![CDATA["./logo.png"]]></defaultValueExpression>
 	</parameter>
+	<parameter name="idEmpresa" class="java.lang.String"/>
 	<queryString language="SQL">
 		<![CDATA[SELECT
 	e.nombre, e.primer_ap, e.segundo_ap, r.fecha_entrada, r.fecha_salida, er.descripcion
 FROM det_registro r 
 INNER JOIN det_empleado e ON r.id_empleado = e.id_empleado
 INNER JOIN inf_empleado_empresa iee on e.id_empleado_empresa = iee.id_empleado_empresa
+INNER JOIN cat_empresa em ON iee.id_empresa = em.id_empresa
 INNER JOIN cat_planta p ON iee.id_planta = p.id_planta
 INNER JOIN cat_estatus_registro er ON er.id_estatus = r.id_estatus 
-WHERE (p.id_planta = $P{idPlanta} OR $P{idPlanta} IS NULL) AND (r.fecha_entrada >= $P{fechaInicio} AND r.fecha_entrada <= $P{fechaFin}) 
+WHERE (p.id_planta = $P{idPlanta} OR $P{idPlanta} IS NULL) AND (em.id_empresa = $P{idEmpresa} OR $P{idEmpresa} IS NULL) AND (r.fecha_entrada >= $P{fechaInicio} AND r.fecha_entrada <= $P{fechaFin}) 
 ORDER BY
 e.nombre, e.primer_ap, e.segundo_ap, r.fecha_entrada]]>
 	</queryString>
