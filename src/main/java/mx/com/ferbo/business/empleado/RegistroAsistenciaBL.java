@@ -9,7 +9,7 @@ import mx.com.ferbo.dao.n.EstatusRegistroDAO;
 import mx.com.ferbo.dao.n.RegistroDAO;
 import mx.com.ferbo.dao.n.TokenDAO;
 import mx.com.ferbo.dto.NotificacionMovilDTO;
-
+import mx.com.ferbo.model.CatDiaNoLaboral;
 import mx.com.ferbo.model.CatEstatusRegistro;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetEmpleadoConfiguracion;
@@ -23,6 +23,8 @@ import mx.com.ferbo.util.SGPException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import mx.com.ferbo.business.dianolaboral.DiasNoLaboralesBL;
 import mx.com.ferbo.business.notifmovil.NotifMovilBL;
 
 /**
@@ -40,6 +42,7 @@ public class RegistroAsistenciaBL {
     private static final String VACACIONES = "V";
     private static final String ASISTENCIA_DIA_NO_LABORAL = "X";
     private static final String A_TIEMPO = "T";
+    private static final String DESCANSO = "D";
 
     public RegistroAsistenciaBL() {
         this.registroDAO = new RegistroDAO(DetRegistro.class);
@@ -149,6 +152,11 @@ public class RegistroAsistenciaBL {
                     registro.setFechaEntrada(fechaActual);
                     registro.setFechaSalida(null);
                     break;
+
+                case DESCANSO:
+                        registroDiaNoLaboralODescanso(empleado, registro); 
+                    break;
+
                 default:
                     registro.setFechaSalida(fechaActual);   
             }
@@ -189,6 +197,115 @@ public class RegistroAsistenciaBL {
             sgpApiClient.enviarNotificacion(msjNotificacion);
             log.info("Notificacion enviada de retardo del empleado: {}", empleado.getIdEmpleado());
         }
+    }
+
+    private static void registroDiaNoLaboralODescanso(DetEmpleado empleado, DetRegistro registro) throws SGPException {
+
+        if (registro == null) {
+            throw new SGPException("El registro de asistencia no pueder ser vacío");
+        }
+
+        if (!DESCANSO.equalsIgnoreCase(registro.getStatus().getCodigo())) {
+            throw new SGPException("El registro de asistencia actual no corresponde a un día de descanso ni a un día no laborable.");
+        }
+
+        EstatusRegistroDAO estatusRegistroDAO = new EstatusRegistroDAO();
+
+        CatEstatusRegistro estatusRegistro;
+
+        Date hoy = DateUtil.now();
+
+        DateUtil.resetTime(hoy);
+
+        CatDiaNoLaboral diaNoLaboral = DiasNoLaboralesBL.BuscarYobtenerDiaNoLaboral(hoy);
+        
+        if (diaNoLaboral == null) {
+            diaNoLaboral = new CatDiaNoLaboral();
+            diaNoLaboral.setOficial(false);
+        }
+            
+        // Se pregunta si el día de mañana es un día no raboral oficial
+        boolean respuesta = diaNoLaboral.getOficial();
+
+        // Sí el día de mañana es un día no laboral oficial, se registra como una asistencia en día no laboral
+        if (respuesta) {
+            estatusRegistro = estatusRegistroDAO.buscarPorCodigo(ASISTENCIA_DIA_NO_LABORAL);
+        } else {
+            // Cómo no fue un día no laboral oficial, se tiene que preguntar si el día de mñana es un día de descanso por contrato
+            boolean esDiaDeDescanso = esDiaDescansoDelEmpleado(empleado, hoy);
+
+            // Cómo no es un día no laboral ofical y tampoco es un día de descanso por contrato, la asistencia se toma como una simple asistencia.
+            if (esDiaDeDescanso) {
+                estatusRegistro = estatusRegistroDAO.buscarPorCodigo(A_TIEMPO);
+            } else {
+                // Cómo es un día de descanso por contrato del empleado, se debe tomar como una asistencia en día no laboral.
+                estatusRegistro = estatusRegistroDAO.buscarPorCodigo(ASISTENCIA_DIA_NO_LABORAL);
+            }
+        }
+
+        Date horaRegistro = DateUtil.now();
+
+        log.info("Hora de registro de entrada del empleado {} {} {} es: {}", registro.getEmpleado().getNombre(), registro.getEmpleado().getPrimerAp(), registro.getEmpleado().getSegundoAp(), horaRegistro);
+
+        registro.setFechaEntrada(horaRegistro);
+
+        log.info("La hora de registro de salida del empleado {} {} {} por ahora se establece a nulo", registro.getEmpleado().getNombre(), registro.getEmpleado().getPrimerAp(), registro.getEmpleado().getSegundoAp());
+        registro.setFechaSalida(null);
+
+        registro.setStatus(estatusRegistro);
+
+    }
+
+    private static boolean esDiaDescansoDelEmpleado(DetEmpleado empleado, Date hoy) throws SGPException {
+
+        if (empleado == null) {
+            throw new SGPException("El empleado no puede ser vacío");
+        }
+
+        if (hoy == null) {
+            throw new SGPException("La fecha del día de hoy no puedse ser vacía");
+        }
+
+        boolean esDiaLaboral = false;
+
+        String nombreDia = DateUtil.getDiaSemana(hoy);
+
+        switch (nombreDia) {
+        
+            case "L":
+                esDiaLaboral = empleado.getDatoEmpresa().getDiaLunes();
+                break;
+
+            case "M":
+                esDiaLaboral = empleado.getDatoEmpresa().getDiaMartes();
+                break;
+
+            case "X":
+                esDiaLaboral = empleado.getDatoEmpresa().getDiaMiercoles();
+                break;
+
+            case "J":
+                esDiaLaboral = empleado.getDatoEmpresa().getDiaJueves();
+                break;
+
+            case "V":
+                esDiaLaboral = empleado.getDatoEmpresa().getDiaViernes();
+                break;
+
+            case "S":
+                esDiaLaboral = empleado.getDatoEmpresa().getDiaSabado();
+                break;
+
+            case "D":
+                esDiaLaboral = empleado.getDatoEmpresa().getDiaDomingo();
+                break;
+
+            default:
+                throw new SGPException("El día de la semana no coincide con los registrados en el sistema. Por favor, verifica la información.");
+        }
+
+        return esDiaLaboral;
+
     }
     
 }
