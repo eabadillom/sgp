@@ -12,6 +12,12 @@
 	                        <f:selectItems value="#{repAsistenciaBean.plantas}" var="planta" itemLabel="#{planta.descripcion}" itemValue="#{planta}"></f:selectItems>
 	                    </p:selectOneMenu>
 	            	</div>
+                    <div class="field col-6 md:col-2">
+	                    <p:selectOneMenu id="sel-empresa" value="#{repAsistenciaBean.empresa}" converter="entityConverter" autoWidth="false">
+	                        <f:selectItem itemLabel="Todas las razones sociales"></f:selectItem>
+	                        <f:selectItems value="#{repAsistenciaBean.empresas}" var="empresa" itemLabel="#{empresa.descripcion}" itemValue="#{empresa}"></f:selectItems>
+	                    </p:selectOneMenu>
+	            	</div>
 	            	<div class="field col-6 md:col-2">
 	                    <p:datePicker id="fechaInicio" showIcon="true" placeholder="Del: dd/mm/aaaa" value="#{repAsistenciaBean.fechaInicio}" locale="es_MX" pattern="dd/MM/yyyy" timeZone="GMT-6" readonly="false" maxdate="#{repAsistenciaBean.fechaFin}">
 	                        <p:ajax event="dateSelect" listener="#{repAsistenciaBean.ajustaHoras}" process="@this" update="fechaFin"></p:ajax>

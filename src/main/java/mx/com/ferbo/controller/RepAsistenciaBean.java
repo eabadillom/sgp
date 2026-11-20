@@ -3,6 +3,7 @@ package mx.com.ferbo.controller;
 import java.io.ByteArrayInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -26,9 +27,11 @@ import mx.com.ferbo.business.incidencia.SolicitudPermisoBL;
 import mx.com.ferbo.business.registro.EstatusRegistroBL;
 import mx.com.ferbo.business.registro.RegistroBL;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
+import mx.com.ferbo.dao.n.EmpresaDAO;
 import mx.com.ferbo.dao.n.EstatusRegistroDAO;
 import mx.com.ferbo.dao.n.PlantaDAO;
 import mx.com.ferbo.dao.n.RegistroDAO;
+import mx.com.ferbo.model.CatEmpresa;
 import mx.com.ferbo.model.CatEstatusRegistro;
 import mx.com.ferbo.model.CatPlanta;
 import mx.com.ferbo.model.DetEmpleado;
@@ -52,15 +55,18 @@ public class RepAsistenciaBean implements Serializable {
     private HttpSession session = null;
 
     private PlantaDAO plantaDAO;
+	private EmpresaDAO empresaDAO;
     private RegistroDAO registroDAO;
     private EstatusRegistroDAO statusRegistroDAO;
     private EmpleadoDAO empleadoDAO;
     private DetEmpleado empleado;
     private List<CatPlanta> plantas;
+	private List<CatEmpresa> empresas;
     private List<DetRegistro> registros;
     private List<Date> registrosEmpleado;
 
     private CatPlanta planta = null;
+	private CatEmpresa empresa = null;
     private Date fechaInicio;
     private Date fechaFin;
 
@@ -95,11 +101,13 @@ public class RepAsistenciaBean implements Serializable {
     		
     		
     		plantaDAO = new PlantaDAO();
+			empresaDAO = new EmpresaDAO();
     		registroDAO = new RegistroDAO();
     		statusRegistroDAO = new EstatusRegistroDAO();
     		empleadoDAO = new EmpleadoDAO();
     		
     		plantas = plantaDAO.buscarTodos();
+			empresas = empresaDAO.buscarActivo();
     		lstEstatus = new ArrayList<CatEstatusRegistro>();
     		status = statusRegistroDAO.buscarPorCodigo("T");
     		lstEstatus.add(status);
@@ -133,10 +141,44 @@ public class RepAsistenciaBean implements Serializable {
     	}
     }
 
+	public void calculaSemana() {
+		Date hoy = DateUtil.now();
+		DateUtil.resetTime(hoy);
+
+		String inicialHoy = DateUtil.getDiaSemana(hoy);
+
+		this.fechaInicio = new Date(hoy.getTime());
+		this.fechaFin = new Date(hoy.getTime());
+
+		if ("J".equalsIgnoreCase(inicialHoy.toString())) {
+			fechaInicio = DateUtil.addDay(hoy, -6);
+			return;
+		}
+
+		if ("V".equalsIgnoreCase(inicialHoy.toString())) {
+			fechaFin = DateUtil.addDay(hoy, 6);
+			return ;
+		}
+
+		ArrayList<String> diasSemana = new ArrayList<>(DateUtil.getDiasSemana());
+
+		int indiceViernes = diasSemana.indexOf("V");
+
+		if (indiceViernes != -1) {
+			Collections.rotate(diasSemana, -(indiceViernes));
+		}
+
+		int indiceHoy = diasSemana.indexOf(inicialHoy);
+
+		fechaInicio = DateUtil.addDay(this.fechaInicio, -(indiceHoy));
+		fechaFin = DateUtil.addDay(this.fechaFin, (6-(indiceHoy)));
+	}
+
     @PostConstruct
     public void init() {
     	DetEmpleado empleadoSesion = null;
     	empleadoSesion = (DetEmpleado) session.getAttribute("empleado");
+		calculaSemana();
     	
     	try {
     		log.info("Ejecutando proceso init...");
@@ -157,6 +199,7 @@ public class RepAsistenciaBean implements Serializable {
         String mensaje = null;
 
         Integer idPlanta = null;
+		Integer idEmpresa = null;
 
         try {
             DateUtil.setTime(fechaInicio, 0, 0, 0, 0);
@@ -170,8 +213,9 @@ public class RepAsistenciaBean implements Serializable {
             }
 
             idPlanta = this.planta == null ? null : this.planta.getIdPlanta();
+			idEmpresa = this.empresa == null ? null : this.empresa.getIdEmpresa();
 
-            registros = registroDAO.buscarPorPlantaPeriodo(idPlanta, this.fechaInicio, this.fechaFin);
+			registros = registroDAO.buscarConFiltros(fechaInicio, fechaFin, idPlanta, idEmpresa);
 
             log.info("{}  registro(s) encontrado(s)", registros.size());
             
@@ -517,6 +561,7 @@ public class RepAsistenciaBean implements Serializable {
         Date fechaFinT = null;
         String fileName = null;
         Integer idPlanta = null;
+		Integer idEmpresa = null;
         
         try {
             DateUtil.setTime(fechaInicio, 0, 0, 0, 0);
@@ -527,12 +572,13 @@ public class RepAsistenciaBean implements Serializable {
             fechaFinT = new Date(this.fechaFin.getTime());
             fechaFinT = DateUtil.addDay(fechaFinT, 1);
             idPlanta = this.planta == null ? null : this.planta.getIdPlanta();
+			idEmpresa = this.empresa == null ? null : this.empresa.getIdEmpresa();
             
             fileName = String.format("ReporteAsistencia_%s_al_%s.pdf",
             		DateUtil.getString(fechaInicio, DateUtil.FORMATO_YYYY_MM_DD),
             		DateUtil.getString(fechaFinT, DateUtil.FORMATO_YYYY_MM_DD));
             
-            pdfFile = FacesUtils.getPDF(fileName, new AsistenciaRBL().getPDF(idPlanta, this.fechaInicio, fechaFinT));
+            pdfFile = FacesUtils.getPDF(fileName, new AsistenciaRBL().getPDF(idPlanta, idEmpresa, this.fechaInicio, fechaFinT));
             
             log.info("Exportación completa.");
         } catch (Exception e) {
@@ -551,6 +597,7 @@ public class RepAsistenciaBean implements Serializable {
         Date fechaFinT = null;
         String fileName = null;
         Integer idPlanta = null;
+		Integer idEmpresa = null;
         
         try {
             DateUtil.setTime(fechaInicio, 0, 0, 0, 0);
@@ -561,12 +608,13 @@ public class RepAsistenciaBean implements Serializable {
             fechaFinT = new Date(this.fechaFin.getTime());
             fechaFinT = DateUtil.addDay(fechaFinT, 1);
             idPlanta = this.planta == null ? null : this.planta.getIdPlanta();
+			idEmpresa = this.empresa == null ? null : this.empresa.getIdEmpresa();
             
             fileName = String.format("ReporteAsistencia_%s_al_%s.xlsx",
             		DateUtil.getString(fechaInicio, DateUtil.FORMATO_YYYY_MM_DD),
             		DateUtil.getString(fechaFinT, DateUtil.FORMATO_YYYY_MM_DD));
             
-            xlsFile = FacesUtils.getXLSX(fileName, new AsistenciaRBL().getXLSX(idPlanta, this.fechaInicio, fechaFinT));
+            xlsFile = FacesUtils.getXLSX(fileName, new AsistenciaRBL().getXLSX(idPlanta, idEmpresa,this.fechaInicio, fechaFinT));
             
             log.info("Exportación completa.");
         } catch (Exception e) {
@@ -722,4 +770,16 @@ public class RepAsistenciaBean implements Serializable {
 		this.diasNoLaborales = diasNoLaborales;
 	}
 
+	public List<CatEmpresa> getEmpresas() {
+		return empresas;
+	}
+
+	public CatEmpresa getEmpresa() {
+		return empresa;
+	}
+
+	public void setEmpresa(CatEmpresa empresa) {
+		this.empresa = empresa;
+	}
+	
 }
