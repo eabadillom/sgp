@@ -354,7 +354,7 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
             return  query.getResultList();
        } catch (Exception ex) {
             log.error("Error al momento de buscar los registros de asistencia: {}", ex.getMessage(), ex);
-            throw new SGPException("Error al momento de buscar los registos de asistencia con los filtros seleccionados");
+            throw new SGPException("Error al momento de buscar los registros de asistencia con los filtros seleccionados");
        } finally {
             close(em);
        }
