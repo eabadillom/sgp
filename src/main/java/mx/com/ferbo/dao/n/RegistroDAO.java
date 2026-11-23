@@ -21,12 +21,12 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
 	
 	private static Logger log = LogManager.getLogger(RegistroDAO.class);
 
-    private static final String queryRegistros = "SELECT dr " +  
+    private static final String REPORTE_ASISTENCIA = "SELECT dr " +  
         "FROM DetRegistro dr " +
         "WHERE (:periodoInicio IS NULL OR dr.fechaEntrada >= :periodoInicio) AND (:periodoFin IS NULL OR dr.fechaEntrada <= :periodoFin) " +
         "AND (:idPlanta IS NULL OR dr.empleado.datoEmpresa.planta.idPlanta = :idPlanta) " +
         "AND (:idEmpresa IS NULL OR dr.empleado.datoEmpresa.empresa.idEmpresa = :idEmpresa) " +
-        "ORDER BY dr.empleado.nombre, dr.empleado.primerAp , dr.empleado.segundoAp";
+        "ORDER BY dr.empleado.nombre ASC, dr.empleado.primerAp ASC, dr.empleado.segundoAp ASC, dr.fechaEntrada ASC";
 
   public RegistroDAO(Class<DetRegistro> modelClass) {
         super(modelClass);
@@ -37,28 +37,6 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
         super(DetRegistro.class);
     }
     
-//    public List<DetRegistro> buscarTodos()
-//    {
-//        List<DetRegistro> modelList = null;
-//        EntityManager em = null;
-//        
-//        try
-//        {
-//            em = this.getEntityManager();
-//            modelList = em.createNamedQuery("DetRegistro.findAll", DetRegistro.class)
-//                .getResultList();
-//        }catch (Exception ex) 
-//        {
-//            log.error("Problema para obtener el listado de registros...", ex);
-//            modelList = new ArrayList<>();
-//        } finally 
-//        {
-//            this.close(em);
-//        }
-//        
-//        return modelList;
-//    }
-
     public DetRegistro buscarPorEmpleadoFechaEntrada(Integer idEmpleado, Date fechaEntradaInicio, Date fechaEntradaFin) {
         DetRegistro model = null;
         EntityManager emSGP = null;
@@ -345,7 +323,7 @@ public class RegistroDAO extends BaseDAO<DetRegistro, Integer> {
 
        try {
             em = getEntityManager();
-            query = em.createQuery(queryRegistros, DetRegistro.class);
+            query = em.createQuery(REPORTE_ASISTENCIA, DetRegistro.class);
             query.setParameter("periodoInicio", periodoInicio);
             query.setParameter("periodoFin", periodoFin);
             query.setParameter("idPlanta", idPlanta);
