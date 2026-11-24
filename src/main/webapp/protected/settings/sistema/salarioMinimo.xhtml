@@ -138,9 +138,9 @@
             </p:dialog>
             
             <!-- Dialogo para actualizar el salario diario del empleado -->
-            <p:dialog widgetVar="dlgSalario" header="Salario diario" modal="true" position="center top" width="30rem" showEffect="fade" hideEffect="fade">
+            <p:dialog id="dlgSalario" widgetVar="dlgSalario" header="Salario diario" modal="true" position="center top" width="30rem" showEffect="fade" hideEffect="fade">
 				<p:outputPanel id="dlg-salario" styleClass="ui-fluid">
-					<p:panel header="#{salarioMinBean.empleado.nombre} #{salarioMinBean.empleado.primerAp} #{salarioMinBean.empleado.segundoAp}">
+					<p:panel id="pnlSalario" header="#{salarioMinBean.empleado.nombre} #{salarioMinBean.empleado.primerAp} #{salarioMinBean.empleado.segundoAp}">
 						<span>
 							<p:inputNumber value="#{salarioMinBean.salarioDiario.importe}" symbol="$ " symbolPosition="p" inputStyle="text-align: right" placeholder="Importe: $">
 								<p:ajax process="@this" />
@@ -150,6 +150,13 @@
 							<p:datePicker value="#{salarioMinBean.salarioDiario.fechaRegistro}" pattern="dd/MM/yyyy" timeZone="GMT-6" locale="es_MX" placeholder="Vigente desde: dd / mm / yyyy">
 								<p:ajax process="@this" />
 							</p:datePicker>
+						</span>
+						<span>
+                            <p:selectOneMenu value="#{salarioMinBean.empleado.datoEmpresa.zona}" converter="entityConverter" autoWidth="false">
+                                <f:selectItem itemLabel="--Seleccione una zona geográfica--" itemValue="#{null}"/>
+                                <f:selectItems value="#{salarioMinBean.zonasSalario}" var="zona" itemLabel="#{zona.nombre}" itemValue="#{zona}"/>
+                                <p:ajax process="@this"/>
+                            </p:selectOneMenu>
 						</span>
 						<div>
 							<p:commandButton icon="pi pi-plus" value="Agregar" process="@this" update="form:dlSalariosDiarios form:dtEmpleadoPorDebajo" actionListener="#{salarioMinBean.agregarSalarioDiario()}" />
@@ -191,3 +198,4 @@
         </h:form>
     </ui:define>
 </ui:composition>
+

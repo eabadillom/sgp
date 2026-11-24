@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 
 import mx.com.ferbo.commons.dao.BaseDAO;
 import mx.com.ferbo.model.CatSalarioMinimo;
+import mx.com.ferbo.util.SGPException;
 
 public class SalarioMinimoDAO extends BaseDAO<CatSalarioMinimo, Integer> {
 	

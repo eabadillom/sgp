@@ -436,21 +436,25 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
     }
     
     public List<DetEmpleado> buscarActivosConSalarioDiario(Integer idEmpresa, Integer idPlanta, Date fecha) {
-    	List<DetEmpleado> modelList = null;
+    	List<DetEmpleado> empleados = null;
     	EntityManager em = null;
     	
     	try {
     		em = this.getEntityManager();
-    		modelList = em.createNamedQuery("DetEmpleado.findByActiveEmpresaPlanta", this.modelClass)
+    		empleados = em.createNamedQuery("DetEmpleado.findByActiveEmpresaPlanta", this.modelClass)
     				.setParameter("idEmpresa", idEmpresa)
     				.setParameter("idPlanta", idPlanta)
     				.setParameter("fecha", fecha)
     				.getResultList()
     				;
     		
-    		for(DetEmpleado model : modelList) {
-    			model.getDatoEmpresa().getSalariosDiarios().stream().forEach(sd -> log.debug("Salario diario: {}", sd.getId()));
-    			log.debug("Zona: {}", model.getDatoEmpresa().getZona().getClave());
+    		for(DetEmpleado empleado : empleados) {
+                //model.getDatoEmpresa().getSalariosDiarios().stream().forEach(sd -> log.debug("Salario diario: {}", sd.getId()));
+                List<DetSalarioDiario> salarios = empleado.getDatoEmpresa().getSalariosDiarios();
+                for (DetSalarioDiario salario : salarios) {
+                    log.debug("Id de salario: {}", salario.getId());
+                    log.debug("Zona: {}", empleado.getDatoEmpresa().getZona().getClave());
+                }
     		}
     	} catch(Exception ex) {
     		log.error("Problema para obtener la lista de empleados...", ex);
@@ -458,7 +462,7 @@ public class EmpleadoDAO extends BaseDAO<DetEmpleado, Integer> {
     		this.close(em);
     	}
     	
-    	return modelList;
+    	return empleados;
     }
 
     public DetEmpleadoFoto buscarFoto(String numeroEmpleado) {

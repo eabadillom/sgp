@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.SalarioMinimoDAO;
 import mx.com.ferbo.model.CatSalarioMinimo;
+import mx.com.ferbo.model.CatZonaSalario;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetSalarioDiario;
 import mx.com.ferbo.util.SGPException;
@@ -57,10 +58,35 @@ public class SalarioMinimoBL {
 		log.info("Salario minimo: {}", salarioMinimo);
 		for(DetEmpleado empleado : empleados) {
 			log.debug("Empleado: {}", empleado);
+
+			String nombreEmpleado = empleado.getNombre() + " " + empleado.getPrimerAp() + " " + empleado.getSegundoAp();
+
+			List<DetSalarioDiario> salariosDarios = empleado.getDatoEmpresa().getSalariosDiarios();
+
+			if (salariosDarios.size() == 0) {
+				log.warn("El empleado " + nombreEmpleado + " no tiene ningun salario registrado. Se le debe registrar uno");
+			}
 			
-			salarioDiario = EmpleadoBL.salarioDiarioVigente(empleado.getDatoEmpresa().getSalariosDiarios() , fecha)
+			salarioDiario = EmpleadoBL.salarioDiarioVigente( salariosDarios, fecha)
 					.getImporte();
-			importeSalarioMinimo = "G".equalsIgnoreCase(empleado.getDatoEmpresa().getZona().getClave()) ?
+
+			if (empleado.getDatoEmpresa() == null) {
+				log.warn("El empleado " + nombreEmpleado + "  no tiene información relacionada con la empresa. Se ñe debe registrar");
+			}
+
+			CatZonaSalario zona = empleado.getDatoEmpresa().getZona();
+			String claveZona = "";
+
+			if (zona == null) {
+				log.warn("El empleado " + nombreEmpleado + " no tiene asignada una zona geográfica de trabajo. Se le debe registrar una.");
+			} else {
+				claveZona = empleado.getDatoEmpresa().getZona().getClave();
+				if (claveZona == null || "".equalsIgnoreCase(claveZona)) {
+					log.warn("El empleado " + nombreEmpleado + " no tiene asignada una zona geográfica de trabajo. Se le debe registrar una.");
+				} 
+			}
+			
+			importeSalarioMinimo = "G".equalsIgnoreCase(claveZona) ?
 					salarioMinimo.getZonaG() : salarioMinimo.getZonaLFN();
 			
 			log.debug("Salario diario del empleado: {}", salarioDiario);

@@ -19,7 +19,9 @@ import mx.com.ferbo.business.empleado.EmpleadoBL;
 import mx.com.ferbo.business.empleado.SalarioMinimoBL;
 import mx.com.ferbo.dao.n.EmpleadoDAO;
 import mx.com.ferbo.dao.n.SalarioMinimoDAO;
+import mx.com.ferbo.dao.n.ZonaSalarioDAO;
 import mx.com.ferbo.model.CatSalarioMinimo;
+import mx.com.ferbo.model.CatZonaSalario;
 import mx.com.ferbo.model.DetEmpleado;
 import mx.com.ferbo.model.DetSalarioDiario;
 import mx.com.ferbo.util.SGPException;
@@ -42,12 +44,16 @@ public class SalarioMinimoBean implements Serializable {
     private BigDecimal salarioSugerido;
     private DetEmpleado empleado;
     private DetSalarioDiario salarioDiario;
+
+    private List<CatZonaSalario> zonasSalario;
+    private ZonaSalarioDAO zonaSalarioDAO;
     
 
     public SalarioMinimoBean() {
         salarioDAO = new SalarioMinimoDAO();
         empleadoDAO = new EmpleadoDAO();
         salario = new CatSalarioMinimo();
+        zonaSalarioDAO = new ZonaSalarioDAO();
     }
 
     @PostConstruct
@@ -57,6 +63,7 @@ public class SalarioMinimoBean implements Serializable {
         this.salarioFrontera = false;
         this.salarioSugerido = new BigDecimal("0.00");
         this.empleado = EmpleadoBL.build();
+        zonasSalario = zonaSalarioDAO.buscarTodos();
     }
 
     public void nuevo() {
@@ -125,7 +132,7 @@ public class SalarioMinimoBean implements Serializable {
         } finally {
             message = new FacesMessage(severity, titulo, mensaje);
             FacesContext.getCurrentInstance().addMessage(null, message);
-            PrimeFaces.current().ajax().update("form:messages", "form:dt-salario");
+            PrimeFaces.current().ajax().update("form:messages", "form:dt-salario", "form:dg-menorAlMinimo");
         }
     }
 
@@ -162,7 +169,9 @@ public class SalarioMinimoBean implements Serializable {
     public String tituloDialogDebajoMinimo() {
     	if(this.salario == null)
     		return "";
-    	return String.format("Empleados con salario inferior a $ %s (ZG), $ %s (ZLFN)", this.salario.getZonaG(), this.salario.getZonaLFN());
+        BigDecimal importeZonaG = (this.salario.getZonaG() != null) ? this.salario.getZonaG() : BigDecimal.valueOf(0.00);
+        BigDecimal importeZonaF = (this.salario.getZonaLFN() != null) ? this.salario.getZonaLFN() :  BigDecimal.valueOf(0.00);
+    	return String.format("Empleados con salario inferior a $ %s (ZG), $ %s (ZLFN)", importeZonaG, importeZonaF);
     }
     
     public void porDebajoMinimo() {
@@ -182,7 +191,7 @@ public class SalarioMinimoBean implements Serializable {
     }
     
     public void nuevoSalarioDiario(DetEmpleado empleado) {
-    	this.salarioDiario = new DetSalarioDiario.Builder().build();
+        this.salarioDiario = new DetSalarioDiario();
     }
     
     public void agregarSalarioDiario() {
@@ -297,4 +306,14 @@ public class SalarioMinimoBean implements Serializable {
 	public void setSalarioDiario(DetSalarioDiario salarioDiario) {
 		this.salarioDiario = salarioDiario;
 	}
+
+    public List<CatZonaSalario> getZonasSalario() {
+        return zonasSalario;
+    }
+
+    public void setZonasSalario(List<CatZonaSalario> zonasSalario) {
+        this.zonasSalario = zonasSalario;
+    }
+
+    
 }
