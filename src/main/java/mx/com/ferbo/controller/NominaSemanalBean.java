@@ -290,14 +290,13 @@ public class NominaSemanalBean implements Serializable {
     }
     
     public void mostrarDiasLaborales() {
-    	
-    	this.lunes = this.nomina.getReceptor().getDiasLaborales().contains(DateUtil.PROP_CD_LUNES) ? true : false;
-    	this.martes = this.nomina.getReceptor().getDiasLaborales().contains(DateUtil.PROP_CD_MARTES) ? true : false;
+    	this.lunes     = this.nomina.getReceptor().getDiasLaborales().contains(DateUtil.PROP_CD_LUNES)     ? true : false;
+    	this.martes    = this.nomina.getReceptor().getDiasLaborales().contains(DateUtil.PROP_CD_MARTES)    ? true : false;
     	this.miercoles = this.nomina.getReceptor().getDiasLaborales().contains(DateUtil.PROP_CD_MIERCOLES) ? true : false;
-    	this.jueves = this.nomina.getReceptor().getDiasLaborales().contains(DateUtil.PROP_CD_JUEVES) ? true : false;
-    	this.viernes = this.nomina.getReceptor().getDiasLaborales().contains(DateUtil.PROP_CD_VIERNES) ? true : false;
-    	this.sabado = this.nomina.getReceptor().getDiasLaborales().contains(DateUtil.PROP_CD_SABADO) ? true : false;
-    	this.domingo = this.nomina.getReceptor().getDiasLaborales().contains(DateUtil.PROP_CD_DOMINGO) ? true : false;
+    	this.jueves    = this.nomina.getReceptor().getDiasLaborales().contains(DateUtil.PROP_CD_JUEVES)    ? true : false;
+    	this.viernes   = this.nomina.getReceptor().getDiasLaborales().contains(DateUtil.PROP_CD_VIERNES)   ? true : false;
+    	this.sabado    = this.nomina.getReceptor().getDiasLaborales().contains(DateUtil.PROP_CD_SABADO)    ? true : false;
+    	this.domingo   = this.nomina.getReceptor().getDiasLaborales().contains(DateUtil.PROP_CD_DOMINGO)   ? true : false;
     }
     
     public void modificarDiasLaborales() {

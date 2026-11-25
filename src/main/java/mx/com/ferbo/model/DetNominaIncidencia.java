@@ -1,6 +1,7 @@
 package mx.com.ferbo.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Objects;
 
@@ -13,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -44,6 +46,9 @@ public class DetNominaIncidencia implements Serializable {
 	@Size(min = 1, max = 45)
 	@Column(name = "nb_incidencia")
 	private String descripcion;
+	
+	@Transient
+	private BigDecimal salario;
 
 	@Override
 	public int hashCode() {
@@ -119,5 +124,13 @@ public class DetNominaIncidencia implements Serializable {
 
 	public void setDescripcion(String descripcion) {
 		this.descripcion = descripcion;
+	}
+	
+	public BigDecimal getSalario() {
+		return salario;
+	}
+
+	public void setSalario(BigDecimal salario) {
+		this.salario = salario;
 	}
 }

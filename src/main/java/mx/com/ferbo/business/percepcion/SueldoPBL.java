@@ -3,6 +3,10 @@ package mx.com.ferbo.business.percepcion;
 import static mx.com.ferbo.enums.ValoresBD._CERO;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -10,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 import mx.com.ferbo.business.nomina.ParametrosNomina;
 import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.DetNomina;
+import mx.com.ferbo.model.DetNominaIncidencia;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.util.SGPException;
 
@@ -54,8 +59,20 @@ public class SueldoPBL extends PercepcionBL {
 			if(cantidad == null)
 				throw new SGPException("No se indicó el valor (cantidad).");
 			
-			this.cantidad = cantidad;
-			this.importe = this.calcularImporte(this.cantidad, baseCalculo);
+			List<BigDecimal> salarios = nomina.getIncidencias().stream()
+				.map(DetNominaIncidencia::getSalario)
+				.filter(Objects::nonNull)
+				.distinct()
+				.collect(Collectors.toList())
+				;
+			
+			if(salarios.size() > 1) {
+				this.importe = this.calcularSalario(nomina.getIncidencias());
+			} else {
+				this.cantidad = cantidad;
+				this.importe = this.calcularImporte(this.cantidad, baseCalculo);
+			}
+			
 			this.calcularExentoGravado();
 		} catch(SGPException ex) {
 			log.warn("[UI] {}", ex.getMessage());
@@ -81,8 +98,30 @@ public class SueldoPBL extends PercepcionBL {
 	protected BigDecimal calcularCantidad(DetNomina nomina) throws SGPException {
 		BigDecimal cantidad = null;
 		cantidad = nomina.getDiasLaborados();
-//		cantidad = this.diasTrabajados.setScale(2, RoundingMode.HALF_UP);
 		log.info("[UI] dias trabajados = {}", this.diasTrabajados);
 		return cantidad;
+	}
+	
+	private BigDecimal calcularSalario(List<DetNominaIncidencia> incidencias) {
+		BigDecimal salario = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+		
+		for(DetNominaIncidencia incidencia : incidencias) {
+			
+			switch (incidencia.getClave()) {
+			case "T":
+			case "R":
+			case "J":
+			case "V":
+			case "O":
+			case "N":
+				log.info("Agregando salario por {}: {}", incidencia.getDescripcion(), incidencia.getSalario());
+				salario = salario.add(incidencia.getSalario());
+				break;
+			default:
+				break;
+			}
+		}
+		
+		return salario;
 	}
 }

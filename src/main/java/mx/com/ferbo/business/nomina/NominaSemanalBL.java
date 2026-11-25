@@ -32,6 +32,7 @@ import mx.com.ferbo.business.registro.EstatusRegistroBL;
 import mx.com.ferbo.dao.n.NominaDAO;
 import mx.com.ferbo.dao.n.PercepcionEmpleadoDAO;
 import mx.com.ferbo.dao.n.RegistroDAO;
+import mx.com.ferbo.dto.ui.RegistroAsistenciaDTO;
 import mx.com.ferbo.enums.ValoresBD;
 import mx.com.ferbo.model.CatDiaNoLaboral;
 import mx.com.ferbo.model.CatEstatusRegistro;
@@ -43,6 +44,7 @@ import mx.com.ferbo.model.DetNominaOtroPago;
 import mx.com.ferbo.model.DetNominaPercepcion;
 import mx.com.ferbo.model.DetPercepcionEmpleado;
 import mx.com.ferbo.model.DetRegistro;
+import mx.com.ferbo.model.DetSalarioDiario;
 import mx.com.ferbo.util.DateUtil;
 import mx.com.ferbo.util.SGPException;
 
@@ -118,7 +120,10 @@ public class NominaSemanalBL extends NominaBL {
 				nomina.getDeducciones().clear();
 			}
 			
+			/*Los días de la semana que el empleado debe presentarse a trabajar.*/
 			diasLaboralesEmpleado   = new BigDecimal(listaDiasLaboralesEmpleado.size()).setScale(2, RoundingMode.HALF_UP);
+			
+			/*Los días de la semana que el empleado tiene derecho a descansar.*/
 			diasNolaboralesEmpleado = new BigDecimal(listaDiasNoLaboralesEmpleado.size()).setScale(2, RoundingMode.HALF_UP);
 			
 			nomina.setDiasLaborales(diasLaboralesEmpleado);
@@ -136,10 +141,10 @@ public class NominaSemanalBL extends NominaBL {
 			ausencias      = this.getAusencias(nomina.getReceptor().getDiasLaborales(), nomina.getAsistencias(), this.parametros);
 			incapacidades  = this.getIncapacidades(nomina.getAsistencias(), diasLaboralesEmpleado);
 			
+			nomina.setIncidencias(incidencias);
 			nomina.setDiasLaborados(diasTrabajados);
 			nomina.setDiasVacaciones(diasVacaciones);
 			nomina.setDiasNoLaborados(ausencias);
-			nomina.setIncidencias(incidencias);
 			nomina.setDiasIncapacidad(incapacidades);
 			
 			log.info("Dias del perido:   {}", diasPeriodo);
@@ -365,12 +370,20 @@ public class NominaSemanalBL extends NominaBL {
 		List<DetNominaIncidencia> incidencias = new ArrayList<DetNominaIncidencia>();
 		
 		mapAsistencias.forEach((key, registro) -> {
+			RegistroAsistenciaDTO regAsistencia = null;
+			
 			DetNominaIncidencia incidencia = new DetNominaIncidencia();
 			incidencia.setNomina(nomina);
 			incidencia.setFechaHoraEntrada(registro.getFechaEntrada());
 			incidencia.setFechaHoraSalida(registro.getFechaSalida());
 			incidencia.setClave(registro.getStatus().getCodigo());
 			incidencia.setDescripcion(registro.getStatus().getDescripcion());
+			
+			if(registro instanceof RegistroAsistenciaDTO) {
+				regAsistencia = (RegistroAsistenciaDTO) registro;
+				incidencia.setSalario(regAsistencia.getSalario().getImporte());
+			}
+			
 			incidencias.add(incidencia);
 		});
 		
@@ -692,7 +705,27 @@ public class NominaSemanalBL extends NominaBL {
 			diaSemana = DateUtil.getDiaSemana(registro.getFechaEntrada());
 			if(mapAsistencias.containsKey(diaSemana))
 				continue;
-			mapAsistencias.put(diaSemana, registro);
+			
+			Date fecha = new Date(registro.getFechaEntrada().getTime());
+			DateUtil.resetTime(fecha);
+			
+			DetSalarioDiario salarioDiarioVigente = null;
+			salarioDiarioVigente = SalarioDiarioBL.salarioDiarioVigente(empleado, fecha);
+			
+			DetRegistro regAsistencia = new RegistroAsistenciaDTO.Builder()
+			.idRegistro(registro.getIdRegistro())
+			.fecha(fecha)
+			.fechaEntrada(registro.getFechaEntrada())
+			.fechaSalida(registro.getFechaSalida())
+			.status(registro.getStatus())
+			.empleado(registro.getEmpleado())
+			.registroVacaciones(registro.getRegistroVacaciones())
+			.salario(salarioDiarioVigente)
+			.build()
+			;
+			
+			
+			mapAsistencias.put(diaSemana, regAsistencia);
 		}
 		
 		
@@ -708,7 +741,21 @@ public class NominaSemanalBL extends NominaBL {
 			diaNLEntrada = new Date(dia.getFecha().getTime());
 			diaNLSalida = new Date(dia.getFecha().getTime());
 			
-			mapAsistencias.put(diaSemana, new DetRegistro(null, diaNLEntrada, diaNLSalida, statusDescanso));
+			Date fecha = new Date(diaNLEntrada.getTime());
+			DateUtil.resetTime(fecha);
+			
+			DetRegistro regAsistencia = new RegistroAsistenciaDTO.Builder()
+					.fecha(fecha)
+					.fechaEntrada(diaNLEntrada)
+					.fechaSalida(diaNLSalida)
+					.status(statusDescanso)
+					.empleado(empleado)
+					.registroVacaciones(null)
+					.salario(SalarioDiarioBL.salarioDiarioVigente(empleado, fecha))
+					.build()
+					;
+			
+			mapAsistencias.put(diaSemana, regAsistencia);
 		}
 		
 		log.info("Mapa de asistencias: {}", mapAsistencias);

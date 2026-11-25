@@ -39,6 +39,11 @@
 							<p:column headerText="Status">
 								<p:outputLabel value="#{incidencia.descripcion}" />
 							</p:column>
+							<p:column headerText="S.D.">
+								<p:outputLabel value="#{incidencia.salario}">
+									<f:convertNumber currencySymbol="$" locale="es_MX" maxFractionDigits="2" type="currency"/>
+								</p:outputLabel>
+							</p:column>
 						</p:dataTable>
 					</p:tab>
 </ui:composition>

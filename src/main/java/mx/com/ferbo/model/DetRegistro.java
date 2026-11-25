@@ -50,29 +50,29 @@ public class DetRegistro implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id_registro")
-    private Integer idRegistro;
+    protected Integer idRegistro;
     
     @Transient
-    private Date fecha;
+    protected Date fecha;
 
     @Column(name = "fecha_entrada")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date fechaEntrada;
+    protected Date fechaEntrada;
 
     @Column(name = "fecha_salida")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date fechaSalida;
+    protected Date fechaSalida;
 
     @JoinColumn(name = "id_estatus", referencedColumnName = "id_estatus")
     @ManyToOne
-    private CatEstatusRegistro status;
+    protected CatEstatusRegistro status;
 
     @JoinColumn(name = "id_empleado", referencedColumnName = "id_empleado")
     @ManyToOne(optional = false)
-    private DetEmpleado empleado;
+    protected DetEmpleado empleado;
     
     @OneToOne(mappedBy = "registro", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private DetRegistroVacaciones registroVacaciones;
+    protected DetRegistroVacaciones registroVacaciones;
     
     @Override
 	public int hashCode() {
